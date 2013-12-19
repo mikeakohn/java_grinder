@@ -34,7 +34,7 @@ int l;
   fseek(in, marker, SEEK_SET);
 
 #ifdef BIG_INDIAN
-  fread(java_class->attributes_heap, 1, len, in);
+  (void)fread(java_class->attributes_heap, 1, len, in);
 #else
   struct attributes_t *attribute;
   for (count = 0; count < java_class->attributes_count; count++)
@@ -42,7 +42,7 @@ int l;
     attribute = (struct attributes_t *)(java_class->attributes_heap + java_class->attributes[count]);
     attribute->attribute_name_index = read_int16(in);
     attribute->attribute_length = read_int32(in);
-    fread(attribute->info, 1, attribute->attribute_length, in);
+    if (fread(attribute->info, 1, attribute->attribute_length, in));
   }
 #endif
 }
@@ -74,7 +74,7 @@ int n,l,r;
   fseek(in, marker, SEEK_SET);
 
 #ifdef BIG_INDIAN
-  fread(java_class->fields_heap, 1, len, in);
+  if (fread(java_class->fields_heap, 1, len, in));
 #else
   struct attributes_t *attribute;
   struct fields_t *field;
@@ -91,7 +91,7 @@ int n,l,r;
       attribute = (struct attributes_t *)(java_class->fields_heap+java_class->fields[count]+n);
       attribute->attribute_name_index = read_int16(in);
       attribute->attribute_length = read_int32(in);
-      fread(attribute->info, 1, attribute->attribute_length, in);
+      if (fread(attribute->info, 1, attribute->attribute_length, in));
       n = n + 6 + attribute->attribute_length;
     }
   }
@@ -124,7 +124,7 @@ int n,l,r;
   java_class->methods_heap = (unsigned char *)malloc(len);
   fseek(in, marker, SEEK_SET);
 #ifdef BIG_INDIAN
-  fread(java_class->methods_heap, 1, len, in);
+  if (fread(java_class->methods_heap, 1, len, in));
 #else
   struct attributes_t *attribute;
   struct methods_t *method;
@@ -141,7 +141,7 @@ int n,l,r;
       attribute = (struct attributes_t *)(java_class->methods_heap + java_class->methods[count] + n);
       attribute->attribute_name_index = read_int16(in);
       attribute->attribute_length = read_int32(in);
-      fread(attribute->info, 1, attribute->attribute_length, in);
+      if (fread(attribute->info, 1, attribute->attribute_length, in));
       n = n + 6 + attribute->attribute_length;
     }
   }
@@ -261,7 +261,7 @@ int ch;
         utf8 = (struct constant_utf8_t *)constant_pool;
         utf8->tag = ch;
         utf8->length = read_int16(in);
-        fread(utf8->bytes, 1, utf8->length, in);
+        if (fread(utf8->bytes, 1, utf8->length, in));
         break;
 
       default:
@@ -276,7 +276,7 @@ int ch;
  * can see dead people.  That's what you get for reading my source
  * code!  :)  */
 
-struct java_class_t *read_class(FILE *in)
+struct java_class_t *java_class_read(FILE *in)
 {
 struct java_class_t *java_class;
 int t;
@@ -367,7 +367,7 @@ static void print_access(int a)
   if (a & ACC_ABSTRACT) printf(" abstract");
 }
 
-void print_class(struct java_class_t *java_class)
+void java_class_print(struct java_class_t *java_class)
 {
 int r;
 

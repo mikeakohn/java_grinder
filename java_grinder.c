@@ -26,9 +26,9 @@ struct java_class_t *java_class;
     exit(1);
   }
 
-  java_class = read_class(in);
+  java_class = java_class_read(in);
 #ifdef DEBUG
-  print_class(java_class);
+  java_class_print(java_class);
 #endif
 
   java_init_stack(&java_thread, STACK_LEN);
