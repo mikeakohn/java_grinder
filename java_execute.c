@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "java_thread.h"
+#include "java_stack.h"
 #include "java_class.h"
 
 // Size the stack/local_vars should be before malloc'ing a heap
@@ -96,7 +96,7 @@ int n;
 }
 #endif
 
-int java_execute_method(struct java_class_t *java_class, int method_index, struct java_thread_t *java_thread, int stack_start_ptr)
+int java_execute_method(struct java_class_t *java_class, int method_index, struct java_stack_t *java_stack, int stack_start_ptr)
 {
 struct methods_t *method = ((void *)java_class->methods_heap) + java_class->methods[method_index];
 unsigned char *bytes = method->attributes[0].info;
@@ -157,9 +157,9 @@ printf("code_len=%d\n", code_len);
     stack_types = stack_types;
   }
 #else
-  stack_values_start = java_thread->stack_values + (stack_start_ptr*sizeof(int));
+  stack_values_start = java_stack->values + (stack_start_ptr*sizeof(int));
   stack_values = stack_values_start;
-  stack_types = java_thread->stack_types + (stack_start_ptr);
+  stack_types = java_stack->types + (stack_start_ptr);
 #endif
 
   if (max_locals > LOCAL_SIZE)
@@ -1140,32 +1140,32 @@ printf("code_len=%d\n", code_len);
 
       case 172: // ireturn (0xac)
         value1 = POP_INTEGER()
-        stack_values = java_thread->stack_values;
-        stack_types = java_thread->stack_types;
+        stack_values = java_stack->values;
+        stack_types = java_stack->types;
         PUSH_INTEGER(value1);
         goto leave;
         break;
 
       case 173: // lreturn (0xad)
         lvalue1 = POP_LONG()
-        stack_values = java_thread->stack_values;
-        stack_types = java_thread->stack_types;
+        stack_values = java_stack->values;
+        stack_types = java_stack->types;
         PUSH_LONG(lvalue1);
         goto leave;
         break;
 
       case 174: // freturn (0xae)
         value1 = POP_INTEGER()
-        stack_values = java_thread->stack_values;
-        stack_types = java_thread->stack_types;
+        stack_values = java_stack->values;
+        stack_types = java_stack->types;
         PUSH_INTEGER(value1);
         goto leave;
         break;
 
       case 175: // dreturn (0xaf)
         dvalue1 = POP_DOUBLE()
-        stack_values = java_thread->stack_values;
-        stack_types = java_thread->stack_types;
+        stack_values = java_stack->values;
+        stack_types = java_stack->types;
         PUSH_LONG(dvalue1);
         goto leave;
         break;

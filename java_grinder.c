@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "java_thread.h"
+#include "java_stack.h"
 #include "java_class.h"
 #include "java_execute.h"
 
@@ -10,7 +10,7 @@
 int main(int argc, char *argv[])
 {
 FILE *in;
-struct java_thread_t java_thread;
+struct java_stack_t java_stack;
 struct java_class_t *java_class;
 
   if (argc != 2)
@@ -31,9 +31,9 @@ struct java_class_t *java_class;
   java_class_print(java_class);
 #endif
 
-  java_init_stack(&java_thread, STACK_LEN);
-  java_execute_method(java_class, 1, &java_thread, 0);
-  java_free_stack(&java_thread);
+  java_stack_init(&java_stack, STACK_LEN);
+  java_execute_method(java_class, 1, &java_stack, 0);
+  java_stack_free(&java_stack);
 
   fclose(in);
 

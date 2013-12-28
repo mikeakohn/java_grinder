@@ -5,7 +5,7 @@ DEBUG=-DDEBUG -g
 CFLAGS=-Wall -O3 $(DEBUG) $(OPTIMIZATIONS)
 LDFLAGS=
 
-OBJS=fileio.o java_class.o java_execute.o java_thread.o
+OBJS=fileio.o java_class.o java_execute.o java_stack.o
 #JOBJS=$(shell ls *.java | sed 's/\.java/\.class/')
 
 default: $(OBJS)
