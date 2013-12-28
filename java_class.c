@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <inttypes.h>
 #include <string.h>
 
 #include "fileio.h"
@@ -490,7 +492,7 @@ int i;
 
       case CONSTANT_LONG:
         constant_long = heap;
-        printf("Long: %ld\n",constant_long->value);
+        printf("Long: %"PRId64"\n",constant_long->value);
         break;
 
       case CONSTANT_DOUBLE:
