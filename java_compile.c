@@ -96,7 +96,7 @@ int n;
 }
 #endif
 
-int java_execute_method(struct java_class_t *java_class, int method_index, struct java_stack_t *java_stack, int stack_start_ptr)
+int java_compile_method(struct java_class_t *java_class, int method_index, struct java_stack_t *java_stack, int stack_start_ptr)
 {
 struct methods_t *method = ((void *)java_class->methods_heap) + java_class->methods[method_index];
 unsigned char *bytes = method->attributes[0].info;

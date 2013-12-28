@@ -3,7 +3,7 @@
 
 #include "java_stack.h"
 #include "java_class.h"
-#include "java_execute.h"
+#include "java_compile.h"
 
 #define STACK_LEN 65536
 
@@ -32,7 +32,7 @@ struct java_class_t *java_class;
 #endif
 
   java_stack_init(&java_stack, STACK_LEN);
-  java_execute_method(java_class, 1, &java_stack, 0);
+  java_compile_method(java_class, 1, &java_stack, 0);
   java_stack_free(&java_stack);
 
   fclose(in);
