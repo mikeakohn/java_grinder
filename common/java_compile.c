@@ -139,6 +139,8 @@ int stack_ptr=0;
 uint32_t ref;
 struct generic_32bit_t *gen32;
 struct constant_float_t *constant_float;
+FILE *out = generator->out;
+int ret = 0;
 
   // bytes points to the method attributes info for the method.
   max_stack = ((int)bytes[0]<<8) | ((int)bytes[1]);
@@ -196,72 +198,71 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 2: // iconst_m1 (0x02)
-        PUSH_INTEGER(-1);
+        ret = generator->push_integer(generator->context, out, -1);
         pc++;
         break;
 
       case 3: // iconst_0 (0x03)
-        PUSH_INTEGER(0);
+        ret = generator->push_integer(generator->context, out, 0);
         pc++;
         break;
 
       case 4: // iconst_1 (0x04)
-        PUSH_INTEGER(1);
+        ret = generator->push_integer(generator->context, out, 1);
         pc++;
         break;
 
       case 5: // iconst_2 (0x05)
-        PUSH_INTEGER(2);
+        ret = generator->push_integer(generator->context, out, 2);
         pc++;
         break;
 
       case 6: // iconst_3 (0x06)
-        PUSH_INTEGER(3);
+        ret = generator->push_integer(generator->context, out, 3);
         pc++;
         break;
 
       case 7: // iconst_4 (0x07)
-        PUSH_INTEGER(4);
+        ret = generator->push_integer(generator->context, out, 4);
         pc++;
         break;
 
       case 8: // iconst_5 (0x08)
-        PUSH_INTEGER(5);
+        ret = generator->push_integer(generator->context, out, 5);
         pc++;
         break;
 
       case 9: // lconst_0 (0x09)
-        PUSH_LONG(0);
+        ret = generator->push_long(generator->context, out, 0);
         pc++;
         break;
 
       case 10: // lconst_1 (0x0a)
-        PUSH_LONG(1);
+        ret = generator->push_long(generator->context, out, 1);
         pc++;
         break;
 
       case 11: // fconst_0 (0x0b)
-        PUSH_FLOAT(fzero);
+        ret = generator->push_float(generator->context, out, fzero);
         pc++;
         break;
 
       case 12: // fconst_1 (0x0c)
-        // PUSH_INTEGER(*((unsigned int *)((void *)&fone)));
-        PUSH_FLOAT(fone);
+        ret = generator->push_float(generator->context, out, fone);
         pc++;
         break;
 
       case 13: // fconst_2 (0x0d)
-        PUSH_FLOAT(ftwo);
+        ret = generator->push_float(generator->context, out, ftwo);
         pc++;
         break;
 
       case 14: // dconst_0 (0x0e)
-        printf("Opcode (0x0e) dconst_0 unimplemented\n");
+        ret = generator->push_double(generator->context, out, fzero);
         break;
 
       case 15: // dconst_1 (0x0f)
-        printf("Opcode (0x0f) dconst_1 unimplemented\n");
+        ret = generator->push_double(generator->context, out, fone);
         break;
 
       case 16: // bipush (0x10)
@@ -1437,6 +1438,8 @@ printf("code_len=%d\n", code_len);
         printf("Opcode (0xff) impdep2 unimplemented\n");
         break;
     }
+
+    if (ret != 0) { break; }
 
 #ifdef DEBUG
     stack_dump(stack_values_start,stack_types,stack_ptr);

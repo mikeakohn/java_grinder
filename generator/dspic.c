@@ -32,10 +32,30 @@ void dspic_serial_init(void *context, FILE *out)
 {
 }
 
-void dspic_main(void *context, FILE *out)
+void dspic_method(void *context, FILE *out, char *name)
 {
   // main() function goes here
-  fprintf(out, "main:\n\n");
+  fprintf(out, "%s:\n\n", name);
+}
+
+int dspic_push_integer(void *context, FILE *out, int32_t n)
+{
+  return 0;
+}
+
+int dspic_push_long(void *context, FILE *out, int64_t n)
+{
+  return 0;
+}
+
+int dspic_push_float(void *context, FILE *out, float f)
+{
+  return 0;
+}
+
+int dspic_push_double(void *context, FILE *out, double f)
+{
+  return 0;
 }
 
 void dspic_close(void *context, FILE *out)

@@ -15,18 +15,26 @@
 struct generator_t;
 
 typedef int (*init_t)(void **, FILE *);
-typedef void (*close_t)(void *, FILE *);
 typedef void (*serial_init_t)(void *, FILE *);
-typedef void (*main_t)(void *, FILE *);
+typedef void (*method_t)(void *, FILE *, char *);
+typedef int (*push_integer_t)(void *, FILE *, int32_t);
+typedef int (*push_long_t)(void *, FILE *, int64_t);
+typedef int (*push_float_t)(void *, FILE *, float);
+typedef int (*push_double_t)(void *, FILE *, double);
+typedef void (*close_t)(void *, FILE *);
 
 struct generator_t
 {
   FILE *out;
   void *context;
   init_t init;
-  close_t close;
   serial_init_t serial_init;
-  main_t main;
+  method_t method;
+  push_integer_t push_integer;
+  push_long_t push_long;
+  push_float_t push_float;
+  push_double_t push_double;
+  close_t close;
 };
 
 enum

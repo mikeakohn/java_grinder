@@ -19,7 +19,11 @@ struct msp430_t
 
 int msp430_init(void **context, FILE *out);
 void msp430_serial_init(void *context, FILE *out);
-void msp430_main(void *context, FILE *out);
+void msp430_method(void *context, FILE *out, char *name);
+int msp430_push_integer(void *context, FILE *out, int32_t n);
+int msp430_push_long(void *context, FILE *out, int64_t n);
+int msp430_push_float(void *context, FILE *out, float f);
+int msp430_push_double(void *context, FILE *out, double f);
 void msp430_close(void *context, FILE *out);
 
 #endif
