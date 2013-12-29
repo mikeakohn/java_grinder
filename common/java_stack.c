@@ -21,6 +21,9 @@ int java_stack_init(struct java_stack_t *java_stack, int len)
   java_stack->types = malloc(len);
   java_stack->len = len;
 
+  memset(java_stack->values, 0, len * sizeof(int));
+  memset(java_stack->types, 0, len);
+
   return 0;
 }
 

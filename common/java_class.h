@@ -188,7 +188,7 @@ struct java_class_t
   unsigned char *attributes_heap;
 };
 
-struct java_class_t *java_class_read(FILE *in);
+int java_class_read(struct java_class_t *java_class, FILE *in);
 void java_class_print(struct java_class_t *java_class);
 void java_class_free(struct java_class_t *java_class);
 

@@ -289,12 +289,10 @@ int ch;
  * can see dead people.  That's what you get for reading my source
  * code!  :)  */
 
-struct java_class_t *java_class_read(FILE *in)
+int java_class_read(struct java_class_t *java_class, FILE *in)
 {
-struct java_class_t *java_class;
 int t;
 
-  java_class = (struct java_class_t *)malloc(sizeof(struct java_class_t));
   memset(java_class, 0, sizeof(struct java_class_t));
 
   java_class->magic = read_int32(in);
@@ -347,7 +345,7 @@ int t;
     read_attributes(in, java_class);
   }
 
-  return java_class;
+  return 0;
 }
 
 void free_class(struct java_class_t *java_class)
@@ -362,7 +360,6 @@ void free_class(struct java_class_t *java_class)
   if (java_class->fields_heap != 0) free(java_class->fields_heap);
   if (java_class->methods_heap != 0) free(java_class->methods_heap);
   if (java_class->attributes_heap != 0) free(java_class->attributes_heap);
-  free(java_class);
 }
 
 #ifdef DEBUG

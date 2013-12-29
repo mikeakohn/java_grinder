@@ -12,9 +12,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "java_stack.h"
 #include "java_class.h"
+#include "java_compile.h"
 
 // Size the stack/local_vars should be before malloc'ing a heap
 #ifdef FRAME_STACK
@@ -107,7 +109,7 @@ int n;
 }
 #endif
 
-int java_compile_method(struct java_class_t *java_class, int method_index, struct java_stack_t *java_stack, int stack_start_ptr)
+int java_compile_method(struct java_class_t *java_class, int method_index, struct generator_t *generator, struct java_stack_t *java_stack, int stack_start_ptr)
 {
 struct methods_t *method = ((void *)java_class->methods_heap) + java_class->methods[method_index];
 unsigned char *bytes = method->attributes[0].info;
@@ -127,14 +129,14 @@ int max_stack;
 int max_locals;
 int code_len;
 #ifdef FRAME_STACK
-unsigned int stack_stack[STACK_SIZE];
-unsigned char stack_types_stack[STACK_SIZE];
+uint32_t stack_stack[STACK_SIZE];
+uint8_t stack_types_stack[STACK_SIZE];
 #endif
-unsigned int *stack_values=0;
-unsigned int *stack_values_start=0;
-unsigned char *stack_types=0;
+uint32_t *stack_values=0;
+uint32_t *stack_values_start=0;
+uint8_t *stack_types=0;
 int stack_ptr=0;
-unsigned int ref;
+uint32_t ref;
 struct generic_32bit_t *gen32;
 struct constant_float_t *constant_float;
 

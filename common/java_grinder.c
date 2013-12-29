@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 FILE *in;
 struct java_stack_t java_stack;
 struct generator_t generator;
-struct java_class_t *java_class;
+struct java_class_t java_class;
 int cpu_type = CPU_INVALID;
 
   if (argc != 4)
@@ -55,17 +55,17 @@ int cpu_type = CPU_INVALID;
     exit(1);
   }
 
-  java_class = java_class_read(in);
+  java_class_read(&java_class, in);
 #ifdef DEBUG
-  java_class_print(java_class);
+  java_class_print(&java_class);
 #endif
 
   java_stack_init(&java_stack, STACK_LEN);
-  java_compile_method(java_class, 1, &java_stack, 0);
+  java_compile_method(&java_class, 1, &generator, &java_stack, 0);
   java_stack_free(&java_stack);
+  generator_close(&generator);
 
   fclose(in);
-  generator_close(&generator);
 
   return 0;
 }
