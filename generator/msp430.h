@@ -18,6 +18,8 @@ struct msp430_t
 };
 
 int msp430_init(void **context, FILE *out);
+void msp430_serial_init(void *context, FILE *out);
+void msp430_main(void *context, FILE *out);
 void msp430_close(void *context, FILE *out);
 
 #endif

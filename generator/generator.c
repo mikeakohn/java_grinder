@@ -32,10 +32,14 @@ int generator_init(struct generator_t *generator, char *filename, int cpu_type)
     case CPU_MSP430:
       generator->init = msp430_init;
       generator->close = msp430_close;
+      generator->serial_init = msp430_serial_init;
+      generator->main = msp430_main;
       break;
     case CPU_DSPIC:
       generator->init = dspic_init;
       generator->close = dspic_close;
+      generator->serial_init = dspic_serial_init;
+      generator->main = dspic_main;
       break;
     default:
       printf("WTF: error\n");

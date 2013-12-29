@@ -16,6 +16,8 @@ struct generator_t;
 
 typedef int (*init_t)(void **, FILE *);
 typedef void (*close_t)(void *, FILE *);
+typedef void (*serial_init_t)(void *, FILE *);
+typedef void (*main_t)(void *, FILE *);
 
 struct generator_t
 {
@@ -23,6 +25,8 @@ struct generator_t
   void *context;
   init_t init;
   close_t close;
+  serial_init_t serial_init;
+  main_t main;
 };
 
 enum

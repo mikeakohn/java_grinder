@@ -18,6 +18,8 @@ struct dspic_t
 };
 
 int dspic_init(void **context, FILE *out);
+void dspic_serial_init(void *context, FILE *out);
+void dspic_main(void *context, FILE *out);
 void dspic_close(void *context, FILE *out);
 
 #endif

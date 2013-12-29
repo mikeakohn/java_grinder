@@ -17,15 +17,24 @@
 
 int dspic_init(void **context, FILE *out)
 {
-  fprintf(out, ".dspic\n\n");
+  // For now we only support a specific chip
+  fprintf(out, ".dspic\n");
+  fprintf(out, ".include \"p30f3012.inc\"\n\n");
 
-  // Add any set up items here
+  // Add any set up items (stack, registers, etc)
   fprintf(out, "start:\n\n");
 
+  return 0;
+}
+
+void dspic_serial_init(void *context, FILE *out)
+{
+}
+
+void dspic_main(void *context, FILE *out)
+{
   // main() function goes here
   fprintf(out, "main:\n\n");
-
-  return 0;
 }
 
 void dspic_close(void *context, FILE *out)
