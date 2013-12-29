@@ -9,10 +9,16 @@
  *
  */
 
-#ifndef _JAVA_COMPILE_H
-#define _JAVA_COMPILE_H
+#ifndef _MSP430_H
+#define _MSP430_H
 
-int java_compile_method(struct java_class_t *java_class, int method_index, struct java_stack_t *java_stack, int stack_start_ptr);
+struct msp430_t
+{
+  FILE *out;
+};
+
+int msp430_init(struct msp430_t *msp430);
+void msp430_close(struct msp430_t *msp430);
 
 #endif
 

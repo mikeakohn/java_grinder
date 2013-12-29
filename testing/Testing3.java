@@ -7,19 +7,19 @@ public class Testing3
   double d;
   float f;
 
-    c=100;
+    c = 100;
 
-    for (k=0; k<10; k++)
+    for (k = 0; k < 10; k++)
     {
-      c=c-5;
+      c = c - 5;
     }
 
     System.out.println(c);
-    f=(float)c*(float)k;
+    f = (float)c * (float)k;
     System.out.println(f);
-    d=f;
-    d=d*1.34;
-    f=(float)d;
+    d = f;
+    d = d * 1.34;
+    f = (float)d;
     System.out.println(f);
   }
 }

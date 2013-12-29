@@ -9,12 +9,18 @@
  *
  */
 
-#ifndef _FILEIO_H
-#define _FILEIO_H
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
 
-int16_t read_int16(FILE *in);
-int32_t read_int32(FILE *in);
-int64_t read_int64(FILE *in);
+#include "dspic.h"
 
-#endif
+int dspic_init(struct dspic_t *dspic)
+{
+}
+
+void dspic_close(struct dspic_t *dspic)
+{
+}
+
 

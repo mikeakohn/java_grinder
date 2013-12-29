@@ -9,10 +9,16 @@
  *
  */
 
-#ifndef _JAVA_COMPILE_H
-#define _JAVA_COMPILE_H
+#ifndef _DSPIC_H
+#define _DSPIC_H
 
-int java_compile_method(struct java_class_t *java_class, int method_index, struct java_stack_t *java_stack, int stack_start_ptr);
+struct dspic_t
+{
+  FILE *out;
+};
+
+int dspic_init(struct dspic_t *dspic);
+void dspic_close(struct dspic_t *dspic);
 
 #endif
 

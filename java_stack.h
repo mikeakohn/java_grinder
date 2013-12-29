@@ -1,3 +1,14 @@
+/**
+ *  Java Grinder
+ *  Author: Michael Kohn
+ *   Email: mike@mikekohn.net
+ *     Web: http://www.mikekohn.net/
+ * License: GPL
+ *
+ * Copyright 2013 by Michael Kohn
+ *
+ */
+
 #ifndef _JAVA_STACK_H
 #define _JAVA_STACK_H
 

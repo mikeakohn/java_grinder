@@ -6,11 +6,11 @@ public class Testing2
   int c;
   float k;
 
-    k=100.0f;
+    k = 100.0f;
 
-    for (c=0; c<1000000000; c++)
+    for (c = 0; c < 1000000000; c++)
     {
-      k=k+c;
+      k = k + c;
     }
 
     System.out.println(k);
