@@ -1,11 +1,11 @@
 /**
  *  Java Grinder
- *  Author: Michael Kohn
- *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *  Author: Joe Davisson
+ *   Email:
+ *     Web:
  * License: GPL
  *
- * Copyright 2013 by Michael Kohn
+ * Copyright 2013 by Joe Davisson
  *
  */
 
@@ -14,11 +14,11 @@
 
 struct msp430_t
 {
-  FILE *out;
+  int place_holder;
 };
 
-int msp430_init(struct msp430_t *msp430);
-void msp430_close(struct msp430_t *msp430);
+int msp430_init(void **context);
+void msp430_close(void *context);
 
 #endif
 

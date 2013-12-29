@@ -15,11 +15,12 @@
 
 #include "dspic.h"
 
-int dspic_init(struct dspic_t *dspic)
+int dspic_init(void **context)
 {
+  return 0;
 }
 
-void dspic_close(struct dspic_t *dspic)
+void dspic_close(void *context)
 {
 }
 

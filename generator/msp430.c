@@ -1,11 +1,11 @@
 /**
  *  Java Grinder
- *  Author: Michael Kohn
- *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *  Author: Joe Davisson
+ *   Email:
+ *     Web:
  * License: GPL
  *
- * Copyright 2013 by Michael Kohn
+ * Copyright 2013 by Joe Davisson
  *
  */
 
@@ -13,13 +13,14 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "dspic.h"
+#include "msp430.h"
 
-int dspic_init(struct dspic_t *dspic)
+int msp430_init(void **context)
 {
+  return 0;
 }
 
-void dspic_close(struct dspic_t *dspic)
+void msp430_close(void *context)
 {
 }
 
