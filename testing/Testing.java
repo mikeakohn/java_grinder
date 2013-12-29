@@ -15,7 +15,7 @@ public class Testing
       System.out.println(c);
     } 
 
-    while(1);
+    while(true);
   }
 }
 

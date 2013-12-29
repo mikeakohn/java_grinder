@@ -17,8 +17,8 @@ struct dspic_t
   int place_holder;
 };
 
-int dspic_init(void **context);
-void dspic_close(void *context);
+int dspic_init(void **context, FILE *out);
+void dspic_close(void *context, FILE *out);
 
 #endif
 

@@ -10,7 +10,7 @@ test: $(JOBJS)
 	javac $*.java
 
 clean:
-	@rm -f *.o java_grinder *.class build/*.o
+	@rm -f *.o java_grinder testing/*.class *.class build/*.o *.asm
 	@echo "Clean!"
 
 

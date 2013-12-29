@@ -15,12 +15,12 @@
 
 #include "msp430.h"
 
-int msp430_init(void **context)
+int msp430_init(void **context, FILE *out)
 {
   return 0;
 }
 
-void msp430_close(void *context)
+void msp430_close(void *context, FILE *out)
 {
 }
 

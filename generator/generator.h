@@ -14,8 +14,8 @@
 
 struct generator_t;
 
-typedef int (*init_t)(void **);
-typedef void (*close_t)(void *);
+typedef int (*init_t)(void **, FILE *);
+typedef void (*close_t)(void *, FILE *);
 
 struct generator_t
 {

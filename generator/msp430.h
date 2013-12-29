@@ -17,8 +17,8 @@ struct msp430_t
   int place_holder;
 };
 
-int msp430_init(void **context);
-void msp430_close(void *context);
+int msp430_init(void **context, FILE *out);
+void msp430_close(void *context, FILE *out);
 
 #endif
 

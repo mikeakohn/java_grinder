@@ -42,12 +42,12 @@ int generator_init(struct generator_t *generator, char *filename, int cpu_type)
       return -1;
   }
 
-  return generator->init(&generator->context);
+  return generator->init(&generator->context, generator->out);
 }
 
 void generator_close(struct generator_t *generator)
 {
-  generator->close(generator->context);
+  generator->close(generator->context, generator->out);
   fclose(generator->out);
 }
 
