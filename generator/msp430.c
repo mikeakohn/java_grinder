@@ -1,11 +1,11 @@
 /**
  *  Java Grinder
- *  Author: Joe Davisson
- *   Email:
- *     Web:
+ *  Author: The Naken Crew
+ *   Email: mike@mikekohn.net
+ *     Web: http://www.naken.cc/
  * License: GPL
  *
- * Copyright 2013 by Joe Davisson
+ * Copyright 2013 by The Naken Crew
  *
  */
 

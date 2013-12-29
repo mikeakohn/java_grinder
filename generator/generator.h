@@ -1,11 +1,11 @@
 /**
  *  Java Grinder
- *  Author: Michael Kohn
+ *  Author: The Naken Crew
  *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *     Web: http://www.naken.cc/
  * License: GPL
  *
- * Copyright 2013 by Michael Kohn
+ * Copyright 2013 by The Naken Crew
  *
  */
 

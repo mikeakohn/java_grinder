@@ -1,53 +1,52 @@
 /**
  *  Java Grinder
- *  Author: Michael Kohn
+ *  Author: The Naken Crew
  *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *     Web: http://www.naken.cc/
  * License: GPL
  *
- * Copyright 2013 by Michael Kohn
+ * Copyright 2013 by The Naken Crew
  *
  */
 
 #include <stdio.h>
 #include <stdlib.h>
-
-typedef long long imeantitlonglong;
+#include <stdint.h>
 
 int16_t read_int16(FILE *in)
 {
-unsigned int i;
+uint32_t i;
 
-  i=(unsigned int)getc(in)<<8;
-  i|=getc(in);
+  i = (uint32_t)getc(in) << 8;
+  i |= getc(in);
 
   return (int16_t)i;
 }
 
 int32_t read_int32(FILE *in)
 {
-unsigned int i;
+uint32_t i;
 
-  i=(unsigned int)getc(in)<<24;
-  i|=(unsigned int)getc(in)<<16;
-  i|=(unsigned int)getc(in)<<8;
-  i|=(unsigned int)getc(in);
+  i = (uint32_t)getc(in) << 24;
+  i |= (uint32_t)getc(in) << 16;
+  i |= (uint32_t)getc(in) << 8;
+  i |= (uint32_t)getc(in);
 
   return (int32_t)i;
 }
 
 int64_t read_int64(FILE *in)
 {
-unsigned long long i;
+uint64_t i;
 
-  i=((imeantitlonglong)getc(in))<<56;
-  i|=((imeantitlonglong)getc(in))<<48;
-  i|=((imeantitlonglong)getc(in))<<40;
-  i|=((imeantitlonglong)getc(in))<<32;
-  i|=((imeantitlonglong)getc(in))<<24;
-  i|=((imeantitlonglong)getc(in))<<16;
-  i|=((imeantitlonglong)getc(in))<<8;
-  i|=getc(in);
+  i = ((uint64_t)getc(in)) << 56;
+  i |= ((uint64_t)getc(in)) << 48;
+  i |= ((uint64_t)getc(in)) << 40;
+  i |= ((uint64_t)getc(in)) << 32;
+  i |= ((uint64_t)getc(in)) << 24;
+  i |= ((uint64_t)getc(in)) << 16;
+  i |= ((uint64_t)getc(in)) << 8;
+  i |= getc(in);
 
   return (int64_t)i;
 }

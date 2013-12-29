@@ -11,9 +11,9 @@
 
 package cc.naken.java_grinder;
 
-public class UART
+public class SPI
 {
-  public UART(int port, int baud_rate)
+  public SPI(int clock_divisor, int clock_phase, int clock_polarity)
   {
   }
 
