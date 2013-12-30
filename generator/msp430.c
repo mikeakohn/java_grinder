@@ -24,7 +24,11 @@ void msp430_serial_init(void *context, FILE *out)
 {
 }
 
-void msp430_method(void *context, FILE *out, char *name)
+void msp430_method_start(void *context, FILE *out, int local_count, char *name)
+{
+}
+
+void msp430_method_end(void *context, FILE *out, int local_count)
 {
 }
 
@@ -44,6 +48,11 @@ int msp430_push_float(void *context, FILE *out, float f)
 }
 
 int msp430_push_double(void *context, FILE *out, double f)
+{
+  return 0;
+}
+
+int msp430_push_byte(void *context, FILE *out, char b)
 {
   return 0;
 }

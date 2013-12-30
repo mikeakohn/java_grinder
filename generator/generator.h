@@ -16,11 +16,13 @@ struct generator_t;
 
 typedef int (*init_t)(void **, FILE *);
 typedef void (*serial_init_t)(void *, FILE *);
-typedef void (*method_t)(void *, FILE *, char *);
+typedef void (*method_start_t)(void *, FILE *, int, char *);
+typedef void (*method_end_t)(void *, FILE *, int);
 typedef int (*push_integer_t)(void *, FILE *, int32_t);
 typedef int (*push_long_t)(void *, FILE *, int64_t);
 typedef int (*push_float_t)(void *, FILE *, float);
 typedef int (*push_double_t)(void *, FILE *, double);
+typedef int (*push_byte_t)(void *, FILE *, char);
 typedef void (*close_t)(void *, FILE *);
 
 struct generator_t
@@ -29,11 +31,13 @@ struct generator_t
   void *context;
   init_t init;
   serial_init_t serial_init;
-  method_t method;
+  method_start_t method_start;
+  method_end_t method_end;
   push_integer_t push_integer;
   push_long_t push_long;
   push_float_t push_float;
   push_double_t push_double;
+  push_byte_t push_byte;
   close_t close;
 };
 

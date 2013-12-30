@@ -36,14 +36,21 @@ void dspic_serial_init(void *context, FILE *out)
 {
 }
 
-void dspic_method(void *context, FILE *out, char *name)
+void dspic_method_start(void *context, FILE *out, int local_count, char *name)
 {
   struct dspic_t *dspic = (struct dspic_t *)context;
   dspic->reg = 0;
   dspic->stack_count = 0;
 
   // main() function goes here
-  fprintf(out, "%s:\n\n", name);
+  fprintf(out, "%s:\n", name);
+  fprintf(out, "  sub #0x%x, sp\n", local_count * 2);
+}
+
+void dspic_method_end(void *context, FILE *out, int local_count)
+{
+  fprintf(out, "  add #0x%x, sp\n", local_count * 2);
+  fprintf(out, "  ret\n\n");
 }
 
 int dspic_push_integer(void *context, FILE *out, int32_t n)
@@ -107,6 +114,25 @@ int dspic_push_double(void *context, FILE *out, double f)
 {
   printf("Error: double is not currently supported.\n");
   return -1;
+}
+
+int dspic_push_byte(void *context, FILE *out, char b)
+{
+  struct dspic_t *dspic = (struct dspic_t *)context;
+
+  uint16_t value = ((int32_t)b)&0xffff;
+
+  if (dspic->reg < 8)
+  {
+    fprintf(out, "  mov #0x%02x, w%d\n", value, (dspic->reg + 1));
+    dspic->reg++;
+  }
+    else
+  {
+    fprintf(out, "  mov #0x%02x, w0\n", value);
+    fprintf(out, "  push w0\n");
+  }
+  return 0;
 }
 
 void dspic_close(void *context, FILE *out)

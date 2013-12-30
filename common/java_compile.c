@@ -44,13 +44,6 @@
 #define PUSH_BYTE PUSH_INTEGER
 #define POP_BYTE POP_INTEGER
 
-/*
-#define PUSH_LONG(a) stack_types[stack_ptr]=JAVA_TYPE_LONG; stack_values[stack_ptr++]=a;
-#define POP_LONG() stack_values[--stack_ptr]; \
-              if (stack_types[stack_ptr]!=JAVA_TYPE_LONG) \
-              { printf("Exception: Expected Long\n"); goto leave; }
-*/
-
 #define PUSH_LONG(gen_value) ((int16_t *)(void *)&stack_types)[stack_ptr]=(JAVA_TYPE_LONG<<8)|JAVA_TYPE_LONG; *(long long *)stack_values=gen_value; stack_values+=2;
 #define POP_LONG() *(long long *)(stack_values-2); stack_values-=2; \
               stack_ptr-=2; \
@@ -152,6 +145,8 @@ int ret = 0;
   pc_start = (((int)bytes[code_len+8]<<8) |
              ((int)bytes[code_len+9])) + 8;
   pc = pc_start;
+
+  generator->method_start(generator->context, out, max_locals, "temp");
 
 #ifdef DEBUG
 printf("pc=%d\n", pc);
@@ -267,6 +262,7 @@ printf("code_len=%d\n", code_len);
 
       case 16: // bipush (0x10)
         PUSH_BYTE((char)bytes[pc+1])
+        ret = generator->push_byte(generator->context, out, (char)bytes[pc+1]);
         pc+=2;
         break;
 
@@ -317,6 +313,7 @@ printf("code_len=%d\n", code_len);
           else
         {
           PUSH_INTEGER(local_vars[bytes[pc+1]]);
+          //ret = generator->push_integer(generator->context, out, 2);
           pc += 2;
         }
         break;
@@ -1450,6 +1447,8 @@ printf("code_len=%d\n", code_len);
     else if (pc < 8) { pc = pc + code_len; }
   }
 leave:
+
+  generator->method_end(generator->context, out, max_locals);
 
   if (local_vars != local_vars_stack) { free(local_vars); }
 #ifdef FRAME_STACK
