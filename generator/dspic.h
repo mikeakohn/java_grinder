@@ -14,7 +14,9 @@
 
 struct dspic_t
 {
-  int place_holder;
+  int reg;            // count number of registers are are using as stack
+  int stack_count;    // count how many things we put on the stack
+  //uint8_t register_stack[8];
 };
 
 int dspic_init(void **context, FILE *out);
