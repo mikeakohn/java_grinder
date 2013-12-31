@@ -371,22 +371,26 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 26: // iload_0 (0x1a)
-        PUSH_INTEGER(local_vars[0]);
+        //PUSH_INTEGER(local_vars[0]);
+        ret = generator->push_integer_local(generator->context, out, 0);
         pc++;
         break;
 
       case 27: // iload_1 (0x1b)
-        PUSH_INTEGER(local_vars[1]);
+        //PUSH_INTEGER(local_vars[1]);
+        ret = generator->push_integer_local(generator->context, out, 1);
         pc++;
         break;
 
       case 28: // iload_2 (0x1c)
-        PUSH_INTEGER(local_vars[2]);
+        //PUSH_INTEGER(local_vars[2]);
+        ret = generator->push_integer_local(generator->context, out, 2);
         pc++;
         break;
 
       case 29: // iload_3 (0x1d)
-        PUSH_INTEGER(local_vars[3]);
+        //PUSH_INTEGER(local_vars[3]);
+        ret = generator->push_integer_local(generator->context, out, 3);
         pc++;
         break;
 
