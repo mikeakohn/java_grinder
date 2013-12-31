@@ -22,10 +22,12 @@ void msp430_serial_init(void *context, FILE *out);
 void msp430_method_start(void *context, FILE *out, int local_count, char *name);
 void msp430_method_end(void *context, FILE *out, int local_count);
 int msp430_push_integer(void *context, FILE *out, int32_t n);
+int msp430_push_integer_local(void *context, FILE *out, int index);
 int msp430_push_long(void *context, FILE *out, int64_t n);
 int msp430_push_float(void *context, FILE *out, float f);
 int msp430_push_double(void *context, FILE *out, double f);
 int msp430_push_byte(void *context, FILE *out, char b);
+int msp430_push_short(void *context, FILE *out, int16_t s);
 void msp430_close(void *context, FILE *out);
 
 #endif

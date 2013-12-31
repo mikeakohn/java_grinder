@@ -13,26 +13,30 @@ package cc.naken.java_grinder;
 
 public class SPI
 {
-  public SPI(int clock_divisor, int clock_phase, int clock_polarity)
+  private SPI()
   {
   }
 
-  public void send(byte c)
+  public static void init(int clock_divisor, int clock_phase, int clock_polarity)
+  {
+  }
+
+  public static void send(byte c)
   {
      System.out.println("Sent char " + c);
   }
 
-  public byte read(byte c)
+  public static byte read(byte c)
   {
     return 0;
   }
 
-  public boolean isDataAvailable()
+  public static boolean isDataAvailable()
   {
     return false;
   }
 
-  public boolean isSendReady()
+  public static boolean isSendReady()
   {
     return false;
   }

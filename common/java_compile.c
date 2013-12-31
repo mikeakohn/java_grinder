@@ -261,24 +261,29 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 16: // bipush (0x10)
-        PUSH_BYTE((char)bytes[pc+1])
+        //PUSH_BYTE((char)bytes[pc+1])
         ret = generator->push_byte(generator->context, out, (char)bytes[pc+1]);
         pc+=2;
         break;
 
       case 17: // sipush (0x11)
-        printf("Opcode (0x11) sipush unimplemented\n");
+        ret = generator->push_short(generator->context, out, (bytes[pc+1]<<8)|(bytes[pc+2]));
+        pc+=3;
         break;
 
       case 18: // ldc (0x12)
         gen32 = ((void *)java_class->constants_heap) + java_class->constant_pool[bytes[pc+1]];
         if (gen32->tag == CONSTANT_INTEGER)
-        { PUSH_INTEGER(gen32->value); }
+        {
+          //PUSH_INTEGER(gen32->value);
+          ret = generator->push_integer(generator->context, out, gen32->value);
+        }
           else
         if (gen32->tag == CONSTANT_FLOAT)
         {
           constant_float = (void *)gen32;
-          PUSH_FLOAT(constant_float->value);
+          //PUSH_FLOAT(constant_float->value);
+          ret = generator->push_float(generator->context, out, constant_float->value);
         }
           else
         if (gen32->tag == CONSTANT_STRING)
@@ -307,13 +312,14 @@ printf("code_len=%d\n", code_len);
         if (wide == 1)
         {
           wide = 0;
-          PUSH_INTEGER(local_vars[GET_PC_UINT16(1)]);
+          //PUSH_INTEGER(local_vars[GET_PC_UINT16(1)]);
+          ret = generator->push_integer_local(generator->context, out, GET_PC_UINT16(1));
           pc += 3;
         }
           else
         {
-          PUSH_INTEGER(local_vars[bytes[pc+1]]);
-          //ret = generator->push_integer(generator->context, out, 2);
+          //PUSH_INTEGER(local_vars[bytes[pc+1]]);
+          ret = generator->push_integer_local(generator->context, out, bytes[pc+1]);
           pc += 2;
         }
         break;

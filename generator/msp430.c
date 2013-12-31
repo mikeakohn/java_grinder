@@ -37,6 +37,11 @@ int msp430_push_integer(void *context, FILE *out, int32_t n)
   return 0;
 }
 
+int msp430_push_integer_local(void *context, FILE *out, int index)
+{
+  return 0;
+}
+
 int msp430_push_long(void *context, FILE *out, int64_t n)
 {
   return 0;
@@ -53,6 +58,11 @@ int msp430_push_double(void *context, FILE *out, double f)
 }
 
 int msp430_push_byte(void *context, FILE *out, char b)
+{
+  return 0;
+}
+
+int msp430_push_short(void *context, FILE *out, int16_t s)
 {
   return 0;
 }

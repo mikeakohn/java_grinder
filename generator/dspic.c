@@ -79,6 +79,25 @@ int dspic_push_integer(void *context, FILE *out, int32_t n)
   return 0;
 }
 
+int dspic_push_integer_local(void *context, FILE *out, int index)
+{
+  struct dspic_t *dspic = (struct dspic_t *)context;
+
+  fprintf(out, "  mov [sp+%d], w0\n", (index + 1) * 2);
+
+  if (dspic->reg < 8)
+  {
+    fprintf(out, "  mov w0, w%d\n", (dspic->reg + 1));
+    dspic->reg++;
+  }
+    else
+  {
+    fprintf(out, "  push w0\n");
+  }
+
+  return 0;
+}
+
 int dspic_push_long(void *context, FILE *out, int64_t n)
 {
   struct dspic_t *dspic = (struct dspic_t *)context;
@@ -121,6 +140,25 @@ int dspic_push_byte(void *context, FILE *out, char b)
   struct dspic_t *dspic = (struct dspic_t *)context;
 
   uint16_t value = ((int32_t)b)&0xffff;
+
+  if (dspic->reg < 8)
+  {
+    fprintf(out, "  mov #0x%02x, w%d\n", value, (dspic->reg + 1));
+    dspic->reg++;
+  }
+    else
+  {
+    fprintf(out, "  mov #0x%02x, w0\n", value);
+    fprintf(out, "  push w0\n");
+  }
+  return 0;
+}
+
+int dspic_push_short(void *context, FILE *out, int16_t s)
+{
+  struct dspic_t *dspic = (struct dspic_t *)context;
+
+  uint16_t value = s;
 
   if (dspic->reg < 8)
   {

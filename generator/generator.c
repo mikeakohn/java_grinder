@@ -36,10 +36,12 @@ int generator_init(struct generator_t *generator, char *filename, int cpu_type)
       generator->method_start = msp430_method_start;
       generator->method_end = msp430_method_end;
       generator->push_integer = msp430_push_integer;
+      generator->push_integer_local = msp430_push_integer_local;
       generator->push_long = msp430_push_long;
       generator->push_float = msp430_push_float;
       generator->push_double = msp430_push_double;
       generator->push_byte = msp430_push_byte;
+      generator->push_short = msp430_push_short;
       generator->close = msp430_close;
       break;
     case CPU_DSPIC:
@@ -49,10 +51,12 @@ int generator_init(struct generator_t *generator, char *filename, int cpu_type)
       generator->method_start = dspic_method_start;
       generator->method_end = dspic_method_end;
       generator->push_integer = dspic_push_integer;
+      generator->push_integer_local = dspic_push_integer_local;
       generator->push_long = dspic_push_long;
       generator->push_float = dspic_push_float;
       generator->push_double = dspic_push_double;
       generator->push_byte = dspic_push_byte;
+      generator->push_short = dspic_push_short;
       generator->close = dspic_close;
       break;
     default:
