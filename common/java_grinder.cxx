@@ -13,19 +13,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "java_stack.h"
-#include "java_class.h"
+#include "JavaStack.h"
+#include "JavaClass.h"
 #include "java_compile.h"
-#include "generator.h"
+#include "Generator.h"
 
 #define STACK_LEN 65536
 
 int main(int argc, char *argv[])
 {
 FILE *in;
-struct java_stack_t java_stack;
-struct generator_t generator;
-struct java_class_t java_class;
+JavaStack *java_stack;
+Generator *generator;
+JavaClass *java_class;
 int cpu_type = CPU_INVALID;
 
   if (argc != 4)

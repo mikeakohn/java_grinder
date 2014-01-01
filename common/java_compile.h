@@ -12,11 +12,11 @@
 #ifndef _JAVA_COMPILE_H
 #define _JAVA_COMPILE_H
 
-#include "generator.h"
-#include "java_class.h"
-#include "java_stack.h"
+#include "Generator.h"
+#include "JavaClass.h"
+#include "JavaStack.h"
 
-int java_compile_method(struct java_class_t *java_class, int method_index, struct generator_t *generator, struct java_stack_t *java_stack, int stack_start_ptr);
+int java_compile_method(JavaClass *class, int method_index, struct generator_t *generator, JavaStack *stack, int stack_start_ptr);
 
 #endif
 

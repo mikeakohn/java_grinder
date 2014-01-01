@@ -15,12 +15,11 @@
 #include <stdint.h>
 #include <inttypes.h>
 
-#include "dspic.h"
+#include "DSPIC.h"
 
-int dspic_init(void **context, FILE *out)
+int dspic::open()
 {
-  struct dspic_t *dspic = (struct dspic_t *)malloc(sizeof(struct dspic_t));
-  *context = dspic;
+  if (generator::open() != 0) { return -1; }
 
   // For now we only support a specific chip
   fprintf(out, ".dspic\n");
@@ -32,13 +31,12 @@ int dspic_init(void **context, FILE *out)
   return 0;
 }
 
-void dspic_serial_init(void *context, FILE *out)
+void dspic::serial_init()
 {
 }
 
-void dspic_method_start(void *context, FILE *out, int local_count, char *name)
+void dspic::method_start(int local_count, char *name)
 {
-  struct dspic_t *dspic = (struct dspic_t *)context;
   dspic->reg = 0;
   dspic->stack_count = 0;
 
@@ -47,16 +45,14 @@ void dspic_method_start(void *context, FILE *out, int local_count, char *name)
   fprintf(out, "  sub #0x%x, sp\n", local_count * 2);
 }
 
-void dspic_method_end(void *context, FILE *out, int local_count)
+void dspic::method_end(int local_count)
 {
   fprintf(out, "  add #0x%x, sp\n", local_count * 2);
   fprintf(out, "  ret\n\n");
 }
 
-int dspic_push_integer(void *context, FILE *out, int32_t n)
+int dspic::push_integer(int32_t n)
 {
-  struct dspic_t *dspic = (struct dspic_t *)context;
-
   if (n > 65535 || n < -32768)
   {
     printf("Error: literal value %d bigger than 16 bit.\n", n);
@@ -79,10 +75,8 @@ int dspic_push_integer(void *context, FILE *out, int32_t n)
   return 0;
 }
 
-int dspic_push_integer_local(void *context, FILE *out, int index)
+int dspic::push_integer_local(int index)
 {
-  struct dspic_t *dspic = (struct dspic_t *)context;
-
   fprintf(out, "  mov [sp+%d], w0\n", (index + 1) * 2);
 
   if (dspic->reg < 8)
@@ -98,10 +92,8 @@ int dspic_push_integer_local(void *context, FILE *out, int index)
   return 0;
 }
 
-int dspic_push_long(void *context, FILE *out, int64_t n)
+int dspic::push_long(int64_t n)
 {
-  struct dspic_t *dspic = (struct dspic_t *)context;
-
   if (n > 65535 || n < -32768)
   {
     printf("Error: literal value %"PRId64" bigger than 16 bit.\n", n);
@@ -123,22 +115,20 @@ int dspic_push_long(void *context, FILE *out, int64_t n)
   return 0;
 }
 
-int dspic_push_float(void *context, FILE *out, float f)
+int dspic::push_float(float f)
 {
   printf("Error: float is not currently supported.\n");
   return -1;
 }
 
-int dspic_push_double(void *context, FILE *out, double f)
+int dspic::push_double(double f)
 {
   printf("Error: double is not currently supported.\n");
   return -1;
 }
 
-int dspic_push_byte(void *context, FILE *out, char b)
+int dspic::push_byte(char b)
 {
-  struct dspic_t *dspic = (struct dspic_t *)context;
-
   uint16_t value = ((int32_t)b)&0xffff;
 
   if (dspic->reg < 8)
@@ -154,10 +144,8 @@ int dspic_push_byte(void *context, FILE *out, char b)
   return 0;
 }
 
-int dspic_push_short(void *context, FILE *out, int16_t s)
+int dspic::push_short(int16_t s)
 {
-  struct dspic_t *dspic = (struct dspic_t *)context;
-
   uint16_t value = s;
 
   if (dspic->reg < 8)
@@ -173,9 +161,8 @@ int dspic_push_short(void *context, FILE *out, int16_t s)
   return 0;
 }
 
-void dspic_close(void *context, FILE *out)
+void dspic::close()
 {
-  free(context);
 }
 
 

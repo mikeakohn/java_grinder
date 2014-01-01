@@ -14,8 +14,8 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "java_stack.h"
-#include "java_class.h"
+#include "JavaStack.h"
+#include "JavaClass.h"
 #include "java_compile.h"
 
 // http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html
@@ -106,7 +106,7 @@ int n;
 }
 #endif
 
-int java_compile_method(struct java_class_t *java_class, int method_index, struct generator_t *generator, struct java_stack_t *java_stack, int stack_start_ptr)
+int java_compile_method(JavaClass *java_class, int method_index, struct generator_t *generator, JavaStack *java_stack, int stack_start_ptr)
 {
 struct methods_t *method = ((void *)java_class->methods_heap) + java_class->methods[method_index];
 unsigned char *bytes = method->attributes[0].info;

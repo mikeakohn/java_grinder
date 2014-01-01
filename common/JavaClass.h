@@ -161,8 +161,12 @@ struct methods_t
   struct attributes_t attributes[];
 };
 
-struct java_class_t
+class JavaClass
 {
+public:
+  JavaClass(FILE *in);
+  ~JavaClass();
+
   int32_t magic;
   int16_t minor_version;
   int16_t major_version;
@@ -182,15 +186,25 @@ struct java_class_t
 
   // Extra Crap (these should be voids *'s really.. it was easier to make
   //             them unsigned char * at first)
-  unsigned char *constants_heap;
-  unsigned char *fields_heap;
-  unsigned char *methods_heap;
-  unsigned char *attributes_heap;
-};
+  uint8_t *constants_heap;
+  uint8_t *fields_heap;
+  uint8_t *methods_heap;
+  uint8_t *attributes_heap;
 
-int java_class_read(struct java_class_t *java_class, FILE *in);
-void java_class_print(struct java_class_t *java_class);
-void java_class_free(struct java_class_t *java_class);
+private:
+  void read_attributes(FILE *in);
+  void read_fields(FILE *in);
+  void read_methods(FILE *in);
+  void read_constant_pool(FILE *in);
+#ifdef DEBUG
+  void print_access(int a);
+  void print();
+  void print_constant_pool();
+  void print_attributes();
+  void print_fields();
+  void print_methods();
+#endif
+};
 
 #endif
 
