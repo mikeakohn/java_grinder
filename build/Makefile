@@ -11,7 +11,7 @@ CPUS=DSPIC.o MSP430.o
 OBJS=fileio.o Generator.o JavaClass.o java_compile.o JavaStack.o table_java_instr.o $(CPUS)
 
 default: $(OBJS)
-	gcc -o ../java_grinder ../common/java_grinder.c \
+	$(CXX) -o ../java_grinder ../common/java_grinder.cxx \
 	    $(OBJS) \
 	    $(CFLAGS) $(LDFLAGS)
 

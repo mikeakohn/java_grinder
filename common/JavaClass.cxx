@@ -9,6 +9,8 @@
  *
  */
 
+#define __STDC_FORMAT_MACROS
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -492,8 +494,8 @@ int i;
 
       case CONSTANT_LONG:
         constant_long = (constant_long_t *)heap;
-        //printf("Long: %"PRId64"\n",constant_long->value);
-        printf("Long: %lld\n",constant_long->value);
+        printf("Long: %" PRId64 "\n",constant_long->value);
+        //printf("Long: %lld\n",constant_long->value);
         break;
 
       case CONSTANT_DOUBLE:

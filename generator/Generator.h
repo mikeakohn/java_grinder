@@ -20,7 +20,7 @@ public:
   Generator();
   virtual ~Generator();
 
-  int open(char *filename);
+  virtual int open(char *filename);
   void label(char *name);
 
   virtual int init() = 0;
@@ -61,7 +61,7 @@ public:
   virtual int brk() = 0;
   virtual void close() = 0;
 
-private:
+protected:
   FILE *out;
 };
 

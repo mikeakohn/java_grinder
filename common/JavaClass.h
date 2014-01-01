@@ -12,6 +12,8 @@
 #ifndef _JAVA_CLASS_H
 #define _JAVA_CLASS_H
 
+#include <stdint.h>
+
 // http://java.sun.com/docs/books/jvms/second_edition/html/ClassFile.doc.html
 // http://www.brics.dk/~mis/dOvs/jvmspec/ref-Java.html
 // http://java.sun.com/docs/books/jvms/second_edition/html/Mnemonics.doc.html
@@ -166,6 +168,7 @@ class JavaClass
 public:
   JavaClass(FILE *in);
   ~JavaClass();
+  void print();
 
   int32_t magic;
   int16_t minor_version;
@@ -198,7 +201,6 @@ private:
   void read_constant_pool(FILE *in);
 #ifdef DEBUG
   void print_access(int a);
-  void print();
   void print_constant_pool();
   void print_attributes();
   void print_fields();
