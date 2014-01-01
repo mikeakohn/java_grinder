@@ -163,6 +163,131 @@ int DSPIC::push_short(int16_t s)
   return 0;
 }
 
+int DSPIC::pop_integer_local(int index)
+{
+  return 0;
+}
+
+int DSPIC::pop()
+{
+  return 0;
+}
+
+int DSPIC::dup()
+{
+  return 0;
+}
+
+int DSPIC::dup2()
+{
+  return 0;
+}
+
+int DSPIC::swap()
+{
+  return 0;
+}
+
+int DSPIC::add_integers()
+{
+  return 0;
+}
+
+int DSPIC::sub_integers()
+{
+  return 0;
+}
+
+int DSPIC::mul_integers()
+{
+  return 0;
+}
+
+int DSPIC::div_integers()
+{
+  return 0;
+}
+
+int DSPIC::neg_integer()
+{
+  return 0;
+}
+
+int DSPIC::shift_left_integer()
+{
+  return 0;
+}
+
+int DSPIC::shift_right_integer()
+{
+  return 0;
+}
+
+int DSPIC::shift_right_uinteger()
+{
+  return 0;
+}
+
+int DSPIC::and_integer()
+{
+  return 0;
+}
+
+int DSPIC::or_integer()
+{
+  return 0;
+}
+
+int DSPIC::xor_integer()
+{
+  return 0;
+}
+
+int DSPIC::inc_integer(int index, int num)
+{
+  return 0;
+}
+
+int DSPIC::jump_cond(int cond)
+{
+  return 0;
+}
+
+int DSPIC::jump_cond_integer(int cond)
+{
+  return 0;
+}
+
+int DSPIC::ret_local(int index)
+{
+  return 0;
+}
+
+int DSPIC::ret_integer()
+{
+  return 0;
+}
+
+int DSPIC::ret()
+{
+  return 0;
+}
+
+int DSPIC::jump(const char *name)
+{
+  return 0;
+}
+
+int DSPIC::call(const char *name)
+{
+  return 0;
+}
+
+int DSPIC::brk()
+{
+  return 0;
+}
+
 void DSPIC::close()
 {
 }

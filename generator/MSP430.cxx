@@ -67,6 +67,131 @@ int MSP430::push_short(int16_t s)
   return 0;
 }
 
+int MSP430::pop_integer_local(int index)
+{
+  return 0;
+}
+
+int MSP430::pop()
+{
+  return 0;
+}
+
+int MSP430::dup()
+{
+  return 0;
+}
+
+int MSP430::dup2()
+{
+  return 0;
+}
+
+int MSP430::swap()
+{
+  return 0;
+}
+
+int MSP430::add_integers()
+{
+  return 0;
+}
+
+int MSP430::sub_integers()
+{
+  return 0;
+}
+
+int MSP430::mul_integers()
+{
+  return 0;
+}
+
+int MSP430::div_integers()
+{
+  return 0;
+}
+
+int MSP430::neg_integer()
+{
+  return 0;
+}
+
+int MSP430::shift_left_integer()
+{
+  return 0;
+}
+
+int MSP430::shift_right_integer()
+{
+  return 0;
+}
+
+int MSP430::shift_right_uinteger()
+{
+  return 0;
+}
+
+int MSP430::and_integer()
+{
+  return 0;
+}
+
+int MSP430::or_integer()
+{
+  return 0;
+}
+
+int MSP430::xor_integer()
+{
+  return 0;
+}
+
+int MSP430::inc_integer(int index, int num)
+{
+  return 0;
+}
+
+int MSP430::jump_cond(int cond)
+{
+  return 0;
+}
+
+int MSP430::jump_cond_integer(int cond)
+{
+  return 0;
+}
+
+int MSP430::ret_local(int index)
+{
+  return 0;
+}
+
+int MSP430::ret_integer()
+{
+  return 0;
+}
+
+int MSP430::ret()
+{
+  return 0;
+}
+
+int MSP430::jump(const char *name)
+{
+  return 0;
+}
+
+int MSP430::call(const char *name)
+{
+  return 0;
+}
+
+int MSP430::brk()
+{
+  return 0;
+}
+
 void MSP430::close()
 {
 }

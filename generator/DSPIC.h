@@ -19,7 +19,6 @@ class DSPIC : public Generator
 public:
   virtual int open(char *filename);
 
-  virtual int init();
   virtual void serial_init();
   virtual void method_start(int local_count, const char *name);
   virtual void method_end(int local_count);
