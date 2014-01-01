@@ -7,7 +7,7 @@ LDFLAGS=
 VPATH=../generator:../common
 
 CPUS=dspic.o msp430.o
-OBJS=fileio.o generator.o java_class.o java_compile.o java_stack.o $(CPUS)
+OBJS=fileio.o generator.o java_class.o java_compile.o java_stack.o table_java_instr.o $(CPUS)
 #JOBJS=$(shell ls *.java | sed 's/\.java/\.class/')
 
 default: $(OBJS)
