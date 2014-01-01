@@ -16,7 +16,7 @@
 #include "JavaClass.h"
 #include "JavaStack.h"
 
-int java_compile_method(JavaClass *class, int method_index, struct generator_t *generator, JavaStack *stack, int stack_start_ptr);
+int java_compile_method(JavaClass *java_class, int method_index, Generator *generator, JavaStack *stack, int stack_start_ptr);
 
 #endif
 

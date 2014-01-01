@@ -17,6 +17,7 @@
 #include "JavaStack.h"
 #include "JavaClass.h"
 #include "java_compile.h"
+#include "table_java_instr.h"
 
 // http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html
 
@@ -106,9 +107,9 @@ int n;
 }
 #endif
 
-int java_compile_method(JavaClass *java_class, int method_index, struct generator_t *generator, JavaStack *java_stack, int stack_start_ptr)
+int java_compile_method(JavaClass *java_class, int method_index, Generator *generator, JavaStack *java_stack, int stack_start_ptr)
 {
-struct methods_t *method = ((void *)java_class->methods_heap) + java_class->methods[method_index];
+struct methods_t *method = (struct methods_t *)(java_class->methods_heap + java_class->methods[method_index]);
 unsigned char *bytes = method->attributes[0].info;
 int pc;
 const float fzero = 0.0;
@@ -117,10 +118,11 @@ const float ftwo = 2.0;
 int wide = 0;
 int local_vars_stack[LOCAL_SIZE];
 int *local_vars;
-float fvalue1,fvalue2;
-int value1,value2;
-long long lvalue1,lvalue2;
-double dvalue1,dvalue2;
+//float fvalue1,fvalue2;
+//int value1,value2;
+//long long lvalue1,lvalue2;
+//double dvalue1,dvalue2;
+int value1;
 int pc_start;
 int max_stack;
 int max_locals;
@@ -129,14 +131,13 @@ int code_len;
 uint32_t stack_stack[STACK_SIZE];
 uint8_t stack_types_stack[STACK_SIZE];
 #endif
-uint32_t *stack_values=0;
-uint32_t *stack_values_start=0;
-uint8_t *stack_types=0;
-int stack_ptr=0;
+uint32_t *stack_values = NULL;
+uint32_t *stack_values_start = NULL;
+uint8_t *stack_types = NULL;
+int stack_ptr = 0;
 uint32_t ref;
 struct generic_32bit_t *gen32;
 struct constant_float_t *constant_float;
-FILE *out = generator->out;
 int ret = 0;
 
   // bytes points to the method attributes info for the method.
@@ -150,7 +151,7 @@ int ret = 0;
              ((int)bytes[code_len+9])) + 8;
   pc = pc_start;
 
-  generator->method_start(generator->context, out, max_locals, "temp");
+  generator->method_start(max_locals, "temp");
 
 #ifdef DEBUG
 printf("pc=%d\n", pc);
@@ -171,13 +172,13 @@ printf("code_len=%d\n", code_len);
     stack_types = stack_types;
   }
 #else
-  stack_values_start = java_stack->values + (stack_start_ptr*sizeof(int));
+  stack_values_start = (uint32_t *)((uint8_t *)java_stack->values + (stack_start_ptr * sizeof(int)));
   stack_values = stack_values_start;
-  stack_types = java_stack->types + (stack_start_ptr);
+  stack_types = ((uint8_t *)java_stack->types) + stack_start_ptr;
 #endif
 
   if (max_locals > LOCAL_SIZE)
-  { local_vars = malloc(max_locals * (sizeof(int))); }
+  { local_vars = (int *)malloc(max_locals * (sizeof(int))); }
     else
   { local_vars = local_vars_stack; }
 
@@ -198,99 +199,99 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 2: // iconst_m1 (0x02)
-        ret = generator->push_integer(generator->context, out, -1);
+        ret = generator->push_integer(-1);
         pc++;
         break;
 
       case 3: // iconst_0 (0x03)
-        ret = generator->push_integer(generator->context, out, 0);
+        ret = generator->push_integer(0);
         pc++;
         break;
 
       case 4: // iconst_1 (0x04)
-        ret = generator->push_integer(generator->context, out, 1);
+        ret = generator->push_integer(1);
         pc++;
         break;
 
       case 5: // iconst_2 (0x05)
-        ret = generator->push_integer(generator->context, out, 2);
+        ret = generator->push_integer(2);
         pc++;
         break;
 
       case 6: // iconst_3 (0x06)
-        ret = generator->push_integer(generator->context, out, 3);
+        ret = generator->push_integer(3);
         pc++;
         break;
 
       case 7: // iconst_4 (0x07)
-        ret = generator->push_integer(generator->context, out, 4);
+        ret = generator->push_integer(4);
         pc++;
         break;
 
       case 8: // iconst_5 (0x08)
-        ret = generator->push_integer(generator->context, out, 5);
+        ret = generator->push_integer(5);
         pc++;
         break;
 
       case 9: // lconst_0 (0x09)
-        ret = generator->push_long(generator->context, out, 0);
+        ret = generator->push_long(0);
         pc++;
         break;
 
       case 10: // lconst_1 (0x0a)
-        ret = generator->push_long(generator->context, out, 1);
+        ret = generator->push_long(1);
         pc++;
         break;
 
       case 11: // fconst_0 (0x0b)
-        ret = generator->push_float(generator->context, out, fzero);
+        ret = generator->push_float(fzero);
         pc++;
         break;
 
       case 12: // fconst_1 (0x0c)
-        ret = generator->push_float(generator->context, out, fone);
+        ret = generator->push_float(fone);
         pc++;
         break;
 
       case 13: // fconst_2 (0x0d)
-        ret = generator->push_float(generator->context, out, ftwo);
+        ret = generator->push_float(ftwo);
         pc++;
         break;
 
       case 14: // dconst_0 (0x0e)
-        ret = generator->push_double(generator->context, out, fzero);
+        ret = generator->push_double(fzero);
         pc++;
         break;
 
       case 15: // dconst_1 (0x0f)
-        ret = generator->push_double(generator->context, out, fone);
+        ret = generator->push_double(fone);
         pc++;
         break;
 
       case 16: // bipush (0x10)
         //PUSH_BYTE((char)bytes[pc+1])
-        ret = generator->push_byte(generator->context, out, (char)bytes[pc+1]);
+        ret = generator->push_byte((char)bytes[pc+1]);
         pc+=2;
         break;
 
       case 17: // sipush (0x11)
-        ret = generator->push_short(generator->context, out, (bytes[pc+1]<<8)|(bytes[pc+2]));
+        ret = generator->push_short((bytes[pc+1]<<8)|(bytes[pc+2]));
         pc+=3;
         break;
 
       case 18: // ldc (0x12)
-        gen32 = ((void *)java_class->constants_heap) + java_class->constant_pool[bytes[pc+1]];
+        gen32 = ((generic_32bit_t *)java_class->constants_heap) + java_class->constant_pool[bytes[pc+1]];
         if (gen32->tag == CONSTANT_INTEGER)
         {
           //PUSH_INTEGER(gen32->value);
-          ret = generator->push_integer(generator->context, out, gen32->value);
+          ret = generator->push_integer(gen32->value);
         }
           else
         if (gen32->tag == CONSTANT_FLOAT)
         {
-          constant_float = (void *)gen32;
+          constant_float = (constant_float_t *)gen32;
           //PUSH_FLOAT(constant_float->value);
-          ret = generator->push_float(generator->context, out, constant_float->value);
+          ret = generator->push_float(constant_float->value);
         }
           else
         if (gen32->tag == CONSTANT_STRING)
@@ -308,12 +309,12 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 19: // ldc_w (0x13)
-        printf("Opcode (0x13) ldc_w unimplemented\n");
+        UNIMPL()
         pc += 3;
         break;
 
       case 20: // ldc2_w (0x14)
-        printf("Opcode (0x14) ldc2_w unimplemented\n");
+        UNIMPL()
         pc += 3;
         break;
 
@@ -322,13 +323,13 @@ printf("code_len=%d\n", code_len);
         {
           wide = 0;
           //PUSH_INTEGER(local_vars[GET_PC_UINT16(1)]);
-          ret = generator->push_integer_local(generator->context, out, GET_PC_UINT16(1));
+          ret = generator->push_integer_local(GET_PC_UINT16(1));
           pc += 3;
         }
           else
         {
           //PUSH_INTEGER(local_vars[bytes[pc+1]]);
-          ret = generator->push_integer_local(generator->context, out, bytes[pc+1]);
+          ret = generator->push_integer_local(bytes[pc+1]);
           pc += 2;
         }
         break;
@@ -376,7 +377,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 25: // aload (0x19)
-        printf("Opcode (0x19) aload unimplemented\n");
+        UNIMPL()
         if (wide == 1)
         {
           pc += 3;
@@ -389,156 +390,156 @@ printf("code_len=%d\n", code_len);
 
       case 26: // iload_0 (0x1a)
         //PUSH_INTEGER(local_vars[0]);
-        ret = generator->push_integer_local(generator->context, out, 0);
+        ret = generator->push_integer_local(0);
         pc++;
         break;
 
       case 27: // iload_1 (0x1b)
         //PUSH_INTEGER(local_vars[1]);
-        ret = generator->push_integer_local(generator->context, out, 1);
+        ret = generator->push_integer_local(1);
         pc++;
         break;
 
       case 28: // iload_2 (0x1c)
         //PUSH_INTEGER(local_vars[2]);
-        ret = generator->push_integer_local(generator->context, out, 2);
+        ret = generator->push_integer_local(2);
         pc++;
         break;
 
       case 29: // iload_3 (0x1d)
         //PUSH_INTEGER(local_vars[3]);
-        ret = generator->push_integer_local(generator->context, out, 3);
+        ret = generator->push_integer_local(3);
         pc++;
         break;
 
       case 30: // lload_0 (0x1e)
-        printf("Opcode (0x1e) lload_0 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 31: // lload_1 (0x1f)
-        printf("Opcode (0x1f) lload_1 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 32: // lload_2 (0x20)
-        printf("Opcode (0x20) lload_2 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 33: // lload_3 (0x21)
-        printf("Opcode (0x21) lload_3 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 34: // fload_0 (0x22)
-        printf("Opcode (0x22) fload_0 unimplemented\n");
+        UNIMPL()
         //PUSH_FLOAT_I(local_vars[0]);
         pc++;
         break;
 
       case 35: // fload_1 (0x23)
-        printf("Opcode (0x23) fload_1 unimplemented\n");
+        UNIMPL()
         //PUSH_FLOAT_I(local_vars[1]);
         pc++;
         break;
 
       case 36: // fload_2 (0x24)
-        printf("Opcode (0x24) fload_2 unimplemented\n");
+        UNIMPL()
         //PUSH_FLOAT_I(local_vars[2]);
         pc++;
         break;
 
       case 37: // fload_3 (0x25)
-        printf("Opcode (0x25) fload_3 unimplemented\n");
+        UNIMPL()
         //PUSH_FLOAT_I(local_vars[3]);
         pc++;
         break;
 
       case 38: // dload_0 (0x26)
-        printf("Opcode (0x26) dload_0 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 39: // dload_1 (0x27)
-        printf("Opcode (0x27) dload_1 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 40: // dload_2 (0x28)
-        printf("Opcode (0x28) dload_2 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 41: // dload_3 (0x29)
-        printf("Opcode (0x29) dload_3 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 42: // aload_0 (0x2a)
-        printf("Opcode (0x2a) aload_0 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 43: // aload_1 (0x2b)
-        printf("Opcode (0x2b) aload_1 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 44: // aload_2 (0x2c)
-        printf("Opcode (0x2c) aload_2 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 45: // aload_3 (0x2d)
-        printf("Opcode (0x2d) aload_3 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 46: // iaload (0x2e)
-        printf("Opcode (0x2e) iaload unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 47: // laload (0x2f)
-        printf("Opcode (0x2f) laload unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 48: // faload (0x30)
-        printf("Opcode (0x30) faload unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 49: // daload (0x31)
-        printf("Opcode (0x31) daload unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 50: // aaload (0x32)
-        printf("Opcode (0x32) aaload unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 51: // baload (0x33)
-        printf("Opcode (0x33) baload unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 52: // caload (0x34)
-        printf("Opcode (0x34) caload unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 53: // saload (0x35)
-        printf("Opcode (0x35) saload unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 54: // istore (0x36)
         if (wide == 1)
         {
-          ret = generator->pop_integer_local(generator->context, out, GET_PC_UINT16(1));
+          ret = generator->pop_integer_local(GET_PC_UINT16(1));
           //local_vars[GET_PC_UINT16(1)]=POP_INTEGER();
           pc += 3;
           wide = 0;
@@ -546,13 +547,13 @@ printf("code_len=%d\n", code_len);
           else
         {
           //local_vars[bytes[pc+1]]=POP_INTEGER();
-          ret = generator->pop_integer_local(generator->context, out, bytes[pc+1]);
+          ret = generator->pop_integer_local(bytes[pc+1]);
           pc += 2;
         }
         break;
 
       case 55: // lstore (0x37)
-        printf("Opcode (0x37) lstore unimplemented\n");
+        UNIMPL()
         if (wide == 1)
         {
           pc += 3;
@@ -564,7 +565,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 56: // fstore (0x38)
-        printf("Opcode (0x38) fstore unimplemented\n");
+        UNIMPL()
         if (wide == 1)
         {
           pc += 3;
@@ -576,7 +577,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 57: // dstore (0x39)
-        printf("Opcode (0x39) dstore unimplemented\n");
+        UNIMPL()
         if (wide == 1)
         {
           pc += 3;
@@ -588,7 +589,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 58: // astore (0x3a)
-        printf("Opcode (0x3a) astore unimplemented\n");
+        UNIMPL()
         if (wide == 1)
         {
           pc += 3;
@@ -601,154 +602,154 @@ printf("code_len=%d\n", code_len);
 
       case 59: // istore_0 (0x3b)
         //local_vars[0] = POP_INTEGER();
-        ret = generator->pop_integer_local(generator->context, out, 0);
+        ret = generator->pop_integer_local(0);
         pc++;
         break;
 
       case 60: // istore_1 (0x3c)
         //local_vars[1] = POP_INTEGER();
-        ret = generator->pop_integer_local(generator->context, out, 1);
+        ret = generator->pop_integer_local(1);
         pc++;
         break;
 
       case 61: // istore_2 (0x3d)
         //local_vars[2] = POP_INTEGER();
-        ret = generator->pop_integer_local(generator->context, out, 2);
+        ret = generator->pop_integer_local(2);
         pc++;
         break;
 
       case 62: // istore_3 (0x3e)
         //local_vars[3] = POP_INTEGER();
-        ret = generator->pop_integer_local(generator->context, out, 3);
+        ret = generator->pop_integer_local(3);
         pc++;
         break;
 
       case 63: // lstore_0 (0x3f)
-        printf("Opcode (0x3f) lstore_0 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 64: // lstore_1 (0x40)
-        printf("Opcode (0x40) lstore_1 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 65: // lstore_2 (0x41)
-        printf("Opcode (0x41) lstore_2 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 66: // lstore_3 (0x42)
-        printf("Opcode (0x42) lstore_3 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 67: // fstore_0 (0x43)
-        printf("Opcode (0x43) fstore_0 unimplemented\n");
+        UNIMPL()
         //local_vars[0] = POP_FLOAT_I()
         pc++;
         break;
 
       case 68: // fstore_1 (0x44)
-        printf("Opcode (0x44) fstore_1 unimplemented\n");
+        UNIMPL()
         //local_vars[1] = POP_FLOAT_I()
         pc++;
         break;
 
       case 69: // fstore_2 (0x45)
-        printf("Opcode (0x45) fstore_2 unimplemented\n");
+        UNIMPL()
         //local_vars[2] = POP_FLOAT_I()
         pc++;
         break;
 
       case 70: // fstore_3 (0x46)
-        printf("Opcode (0x46) fstore_3 unimplemented\n");
+        UNIMPL()
         //local_vars[3] = POP_FLOAT_I()
         pc++;
         break;
 
       case 71: // dstore_0 (0x47)
-        printf("Opcode (0x47) dstore_0 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 72: // dstore_1 (0x48)
-        printf("Opcode (0x48) dstore_1 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 73: // dstore_2 (0x49)
-        printf("Opcode (0x49) dstore_2 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 74: // dstore_3 (0x4a)
-        printf("Opcode (0x4a) dstore_3 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 75: // astore_0 (0x4b)
-        printf("Opcode (0x4b) astore_0 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 76: // astore_1 (0x4c)
-        printf("Opcode (0x4c) astore_1 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 77: // astore_2 (0x4d)
-        printf("Opcode (0x4d) astore_2 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 78: // astore_3 (0x4e)
-        printf("Opcode (0x4e) astore_3 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 79: // iastore (0x4f)
-        printf("Opcode (0x4f) iastore unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 80: // lastore (0x50)
-        printf("Opcode (0x50) lastore unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 81: // fastore (0x51)
-        printf("Opcode (0x51) fastore unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 82: // dastore (0x52)
-        printf("Opcode (0x52) dastore unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 83: // aastore (0x53)
-        printf("Opcode (0x53) aastore unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 84: // bastore (0x54)
-        printf("Opcode (0x54) bastore unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 85: // castore (0x55)
-        printf("Opcode (0x55) castore unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 86: // sastore (0x56)
-        printf("Opcode (0x56) sastore unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 87: // pop (0x57)
-        ret = generator->pop(generator->context, out);
+        ret = generator->pop();
         //POP_NULL();
         pc++;
         break;
@@ -756,8 +757,8 @@ printf("code_len=%d\n", code_len);
       case 88: // pop2 (0x58)
         //POP_NULL();
         //POP_NULL();
-        ret = generator->pop(generator->context, out);
-        ret = generator->pop(generator->context, out);
+        ret = generator->pop();
+        ret = generator->pop();
         pc++;
         break;
 
@@ -765,17 +766,17 @@ printf("code_len=%d\n", code_len);
         //value1 = POP_INTEGER();
         //PUSH_INTEGER(value1);
         //PUSH_INTEGER(value1);
-        ret = generator->dup(generator->context, out);
+        ret = generator->dup();
         pc++;
         break;
 
       case 90: // dup_x1 (0x5a)
-        printf("Opcode (0x5a) dup_x1 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 91: // dup_x2 (0x5b)
-        printf("Opcode (0x5b) dup_x2 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
@@ -786,17 +787,17 @@ printf("code_len=%d\n", code_len);
         //PUSH_INTEGER(value2);
         //PUSH_INTEGER(value1);
         //PUSH_INTEGER(value2);
-        ret = generator->dup2(generator->context, out);
+        ret = generator->dup2();
         pc++;
         break;
 
       case 93: // dup2_x1 (0x5d)
-        printf("Opcode (0x5d) dup2_x1 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 94: // dup2_x2 (0x5e)
-        printf("Opcode (0x5e) dup2_x2 unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
@@ -805,7 +806,7 @@ printf("code_len=%d\n", code_len);
         //value1 = POP_INTEGER();
         //PUSH_INTEGER(value2);
         //PUSH_INTEGER(value1);
-        ret = generator->swap(generator->context, out);
+        ret = generator->swap();
         pc++;
         break;
 
@@ -814,34 +815,37 @@ printf("code_len=%d\n", code_len);
         //value2 = POP_INTEGER();
         //value1 = value1+value2;
         //PUSH_INTEGER(value1);
-        ret = generator->add_integers(generator->context, out);
+        ret = generator->add_integers();
         pc++;
         break;
 
       case 97: // ladd (0x61)
+        UNIMPL()
         //lvalue1 = POP_LONG();
         //lvalue2 = POP_LONG();
         //lvalue1 = lvalue1+lvalue2;
         //PUSH_LONG(lvalue1);
-        ret = generator->add_longs(generator->context, out);
+        //ret = generator->add_longs();
         pc++;
         break;
 
       case 98: // fadd (0x62)
+        UNIMPL()
         //fvalue1 = POP_FLOAT();
         //fvalue2 = POP_FLOAT();
         //fvalue1 = fvalue1+fvalue2;
         //PUSH_FLOAT(fvalue1);
-        ret = generator->add_floats(generator->context, out);
+        //ret = generator->add_floats();
         pc++;
         break;
 
       case 99: // dadd (0x63)
+        UNIMPL()
         //dvalue1 = POP_DOUBLE();
         //dvalue2 = POP_DOUBLE();
         //dvalue1 = dvalue1+dvalue2;
         //PUSH_DOUBLE(dvalue1);
-        ret = generator->add_doubles(generator->context, out);
+        //ret = generator->add_doubles();
         pc++;
         break;
 
@@ -850,34 +854,37 @@ printf("code_len=%d\n", code_len);
         //value2 = POP_INTEGER();
         //value1 = value2-value1;
         //PUSH_INTEGER(value1);
-        ret = generator->sub_integers(generator->context, out);
+        ret = generator->sub_integers();
         pc++;
         break;
 
       case 101: // lsub (0x65)
+        UNIMPL()
         //lvalue1 = POP_LONG();
         //lvalue2 = POP_LONG();
         //lvalue1 = lvalue2-lvalue1;
         //PUSH_LONG(lvalue1);
-        ret = generator->sub_longs(generator->context, out);
+        //ret = generator->sub_longs();
         pc++;
         break;
 
       case 102: // fsub (0x66)
+        UNIMPL()
         //fvalue1 = POP_FLOAT();
         //fvalue2 = POP_FLOAT();
         //fvalue1 = fvalue2-fvalue1;
         //PUSH_FLOAT(fvalue1);
-        ret = generator->sub_floats(generator->context, out);
+        //ret = generator->sub_floats();
         pc++;
         break;
 
       case 103: // dsub (0x67)
+        UNIMPL()
         //dvalue1 = POP_DOUBLE();
         //dvalue2 = POP_DOUBLE();
         //dvalue1 = dvalue2-dvalue1;
         //PUSH_DOUBLE(dvalue1);
-        ret = generator->sub_doubles(generator->context, out);
+        //ret = generator->sub_doubles();
         pc++;
         break;
 
@@ -886,55 +893,57 @@ printf("code_len=%d\n", code_len);
         //value2 = POP_INTEGER();
         //value1 = value2*value1;
         //PUSH_INTEGER(value1);
-        ret = generator->mul_integers(generator->context, out);
+        ret = generator->mul_integers();
         pc++;
         break;
 
       case 105: // lmul (0x69)
+        UNIMPL()
         //lvalue1 = POP_LONG();
         //lvalue2 = POP_LONG();
         //lvalue1 = lvalue2*lvalue1;
         //PUSH_LONG(lvalue1);
-        ret = generator->mul_longs(generator->context, out);
+        //ret = generator->mul_longs();
         pc++;
         break;
 
       case 106: // fmul (0x6a)
+        UNIMPL()
         //fvalue1 = POP_FLOAT();
         //fvalue2 = POP_FLOAT();
         //fvalue1 = fvalue2*fvalue1;
         //PUSH_FLOAT(fvalue1);
-        ret = generator->mul_floats(generator->context, out);
+        //ret = generator->mul_floats();
         pc++;
         break;
 
       case 107: // dmul (0x6b)
+        UNIMPL()
         //dvalue1 = POP_DOUBLE();
         //dvalue2 = POP_DOUBLE();
         //dvalue1 = dvalue2*dvalue1;
         //PUSH_DOUBLE(dvalue1);
-        ret = generator->mul_doubles(generator->context, out);
+        //ret = generator->mul_doubles();
         pc++;
         break;
 
       case 108: // idiv (0x6c)
-        //printf("Opcode (0x6c) idiv unimplemented\n");
-        ret = generator->div_integers(generator->context, out);
+        ret = generator->div_integers();
         pc++;
         break;
 
       case 109: // ldiv (0x6d)
-        printf("Opcode (0x6d) ldiv unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 110: // fdiv (0x6e)
-        printf("Opcode (0x6e) fdiv unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
       case 111: // ddiv (0x6f)
-        printf("Opcode (0x6f) ddiv unimplemented\n");
+        UNIMPL()
         pc++;
         break;
 
@@ -959,8 +968,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 116: // ineg (0x74)
-        //printf("Opcode (0x74) ineg unimplemented\n");
-        ret = generator->neg_integers(generator->context, out);
+        ret = generator->neg_integer();
         pc++;
         break;
 
@@ -980,7 +988,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 120: // ishl (0x78)
-        ret = generator->shift_left_integer(generator->context, out);
+        ret = generator->shift_left_integer();
         pc++;
         break;
 
@@ -990,7 +998,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 122: // ishr (0x7a)
-        ret = generator->shift_right_integer(generator->context, out);
+        ret = generator->shift_right_integer();
         pc++;
         break;
 
@@ -1000,7 +1008,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 124: // iushr (0x7c)
-        ret = generator->shift_right_uinteger(generator->context, out);
+        ret = generator->shift_right_uinteger();
         pc++;
         break;
 
@@ -1013,7 +1021,7 @@ printf("code_len=%d\n", code_len);
         //value1 = POP_INTEGER();
         //value2 = POP_INTEGER();
         //PUSH_INTEGER(value1&value2);
-        ret = generator->and_integer(generator->context, out);
+        ret = generator->and_integer();
         pc++;
         break;
 
@@ -1023,7 +1031,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 128: // ior (0x80)
-        ret = generator->or_integer(generator->context, out);
+        ret = generator->or_integer();
         pc++;
         break;
 
@@ -1033,7 +1041,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 130: // ixor (0x82)
-        ret = generator->xor_integer(generator->context, out);
+        ret = generator->xor_integer();
         pc++;
         break;
 
@@ -1046,14 +1054,14 @@ printf("code_len=%d\n", code_len);
         if (wide == 1)
         {
           //local_vars[GET_PC_UINT16(1)] += GET_PC_INT16(3);
-          ret = generator->inc_integer(generator->context, out, GET_PC_UINT16(1), GET_PC_INT16(3));
+          ret = generator->inc_integer(GET_PC_UINT16(1), GET_PC_INT16(3));
           pc += 5;
           wide = 0;
         }
           else
         {
           //local_vars[bytes[pc+1]] += ((char)bytes[pc+2]);
-          ret = generator->inc_integer(generator->context, out, bytes[pc+1], bytes[pc+2]);
+          ret = generator->inc_integer(bytes[pc+1], bytes[pc+2]);
           pc += 3;
         }
         break;
@@ -1195,7 +1203,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 153: // ifeq (0x99)
-        ret = generator->jump_cond(generator->context, out, COND_ZERO);
+        ret = generator->jump_cond(COND_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
         //if (value1 == 0)
@@ -1205,7 +1213,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 154: // ifne (0x9a)
-        ret = generator->jump_cond(generator->context, out, COND_NOT_ZERO);
+        ret = generator->jump_cond(COND_NOT_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
         //if (value1 != 0)
@@ -1215,7 +1223,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 155: // iflt (0x9b)
-        ret = generator->jump_cond(generator->context, out, COND_LESS);
+        ret = generator->jump_cond(COND_LESS);
         pc += 3;
         //value1 = POP_INTEGER();
         //if (value1 < 0)
@@ -1225,7 +1233,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 156: // ifge (0x9c)
-        ret = generator->jump_cond(generator->context, out, COND_GREATER_EQUAL);
+        ret = generator->jump_cond(COND_GREATER_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
         //if (value1 >= 0)
@@ -1235,7 +1243,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 157: // ifgt (0x9d)
-        ret = generator->jump_cond(generator->context, out, COND_GREATER);
+        ret = generator->jump_cond(COND_GREATER);
         pc += 3;
         //value1 = POP_INTEGER();
         //if (value1 > 0)
@@ -1245,7 +1253,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 158: // ifle (0x9e)
-        ret = generator->jump_cond(generator->context, out, COND_LESS_EQUAL);
+        ret = generator->jump_cond(COND_LESS_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
         //if (value1 <= 0)
@@ -1255,7 +1263,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 159: // if_icmpeq (0x9f)
-        ret = generator->jump_integer_cond(generator->context, out, COND_EQUAL);
+        ret = generator->jump_cond_integer(COND_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
         //value2 = POP_INTEGER();
@@ -1266,7 +1274,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 160: // if_icmpne (0xa0)
-        ret = generator->jump_integer_cond(generator->context, out, COND_NOT_EQUAL);
+        ret = generator->jump_cond_integer(COND_NOT_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
         //value2 = POP_INTEGER();
@@ -1277,7 +1285,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 161: // if_icmplt (0xa1)
-        ret = generator->jump_integer_cond(generator->context, out, COND_LESS);
+        ret = generator->jump_cond_integer(COND_LESS);
         pc += 3;
         //value1 = POP_INTEGER();
         //value2 = POP_INTEGER();
@@ -1288,7 +1296,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 162: // if_icmpge (0xa2)
-        ret = generator->jump_integer_cond(generator->context, out, COND_GREATER_EQUAL);
+        ret = generator->jump_cond_integer(COND_GREATER_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
         //value2 = POP_INTEGER();
@@ -1299,7 +1307,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 163: // if_icmpgt (0xa3)
-        ret = generator->jump_integer_cond(generator->context, out, COND_GREATER);
+        ret = generator->jump_cond_integer(COND_GREATER);
         pc += 3;
         //value1 = POP_INTEGER();
         //value2 = POP_INTEGER();
@@ -1310,7 +1318,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 164: // if_icmple (0xa4)
-        ret = generator->jump_integer_cond(generator->context, out, COND_LESS_EQUAL);
+        ret = generator->jump_cond_integer(COND_LESS_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
         //value2 = POP_INTEGER();
@@ -1329,13 +1337,13 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 167: // goto (0xa7)
-        ret = generator->jump(generator->context, out, "label");
+        ret = generator->jump("label");
         pc += 3;
         //pc += GET_PC_INT16(1);
         break;
 
       case 168: // jsr (0xa8)
-        ret = generator->call(generator->context, out, "label");
+        ret = generator->call("label");
         pc += 3;
         //PUSH_INTEGER(pc+3);
         //pc += GET_PC_INT16(1);
@@ -1345,17 +1353,16 @@ printf("code_len=%d\n", code_len);
         if (wide == 1)
         {
           //pc = local_vars[GET_PC_UINT16(1)];
-          ret = generator->ret_value(generator->context, out, GET_PC_UINT16(1));
+          ret = generator->ret_local(GET_PC_UINT16(1));
           pc += 3;
           wide = 0;
         }
           else
         {
           //pc = local_vars[bytes[pc+1]];
-          ret = generator->ret_local(generator->context, out, bytes[pc+1]);
+          ret = generator->ret_local(bytes[pc+1]);
           pc += 2;
         }
-#endif
         break;
 
       case 170: // tableswitch (0xaa)
@@ -1373,7 +1380,7 @@ printf("code_len=%d\n", code_len);
         //stack_values = java_stack->values;
         //stack_types = java_stack->types;
         //PUSH_INTEGER(value1);
-        ret = generator->ret_integer(generator->context, out);
+        ret = generator->ret_integer();
         pc++;
         //goto leave;
         break;
@@ -1414,14 +1421,13 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 177: // return (0xb1)
-        ret = generator->ret(generator->context, out);
+        ret = generator->ret();
         pc++;
         break;
 
       case 178: // getstatic (0xb2)
         UNIMPL()
         pc+=3;
-        // printf("Opcode (0xb2) getstatic unimplemented\n");
         // FIXME - need to test for private/protected and that it's a field
         // printf("getstatic %d\n",GET_PC_UINT16(1));
         //PUSH_REF(GET_PC_UINT16(1));
@@ -1454,16 +1460,16 @@ printf("code_len=%d\n", code_len);
 #ifdef DEBUG
           int n;
 #endif
-          constant_method = ((void*)java_class->constants_heap) + java_class->constant_pool[ref];
+          constant_method = ((constant_methodref_t *)java_class->constants_heap) + java_class->constant_pool[ref];
           if (constant_method->tag != CONSTANT_METHODREF)
           {
             printf("Exception: reference is not a method\n");
             goto leave;
           }
 
-          constant_class = ((void*)java_class->constants_heap) + java_class->constant_pool[constant_method->class_index];
-          constant_utf8 = ((void*)java_class->constants_heap) + java_class->constant_pool[constant_class->name_index];
-          constant_nameandtype = ((void*)java_class->constants_heap) + java_class->constant_pool[constant_method->name_and_type_index];
+          constant_class = ((constant_class_t *)java_class->constants_heap) + java_class->constant_pool[constant_method->class_index];
+          constant_utf8 = ((constant_utf8_t *)java_class->constants_heap) + java_class->constant_pool[constant_class->name_index];
+          constant_nameandtype = ((constant_nameandtype_t *)java_class->constants_heap) + java_class->constant_pool[constant_method->name_and_type_index];
 #ifdef DEBUG
           printf("Call to class: ");
           for (n = 0; n < constant_utf8->length; n++)
@@ -1472,7 +1478,7 @@ printf("code_len=%d\n", code_len);
           }
           printf("\n");
 #endif
-          constant_utf8 = ((void*)java_class->constants_heap) + java_class->constant_pool[constant_nameandtype->name_index];
+          constant_utf8 = ((constant_utf8_t *)java_class->constants_heap) + java_class->constant_pool[constant_nameandtype->name_index];
 #ifdef DEBUG
           printf("Call to method: ");
           for (n = 0; n < constant_utf8->length; n++)
@@ -1486,7 +1492,7 @@ printf("code_len=%d\n", code_len);
             printf("We only support println right now (and not even very well :)\n");
             goto leave;
           }
-          constant_utf8 = ((void*)java_class->constants_heap) + java_class->constant_pool[constant_nameandtype->descriptor_index];
+          constant_utf8 = ((constant_utf8_t *)java_class->constants_heap) + java_class->constant_pool[constant_nameandtype->descriptor_index];
 
 #ifdef DEBUG
           printf("Call to signature: ");
@@ -1595,19 +1601,19 @@ printf("code_len=%d\n", code_len);
         //              (((unsigned int)bytes[pc+2])<<16) |
         //              (((unsigned int)bytes[pc+3])<<8) |
         //              bytes[pc+4]);
-        ret = generator->jump(generator->context, out, "label");
+        ret = generator->jump("label");
         pc += 5;
         break;
 
       case 201: // jsr_w (0xc9)
         //PUSH_INTEGER(pc+5);
         //pc += GET_PC_INT32(1);
-        ret = generator->call(generator->context, out, "label");
+        ret = generator->call("label");
         pc += 5;
         break;
 
       case 202: // breakpoint (0xca)
-        ret = generator->break(generator->context, out);
+        ret = generator->brk();
         pc++;
         break;
 
@@ -1685,7 +1691,7 @@ printf("code_len=%d\n", code_len);
   }
 leave:
 
-  generator->method_end(generator->context, out, max_locals);
+  generator->method_end(max_locals);
 
   if (local_vars != local_vars_stack) { free(local_vars); }
 #ifdef FRAME_STACK

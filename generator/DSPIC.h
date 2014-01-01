@@ -14,7 +14,7 @@
 
 #include "Generator.h"
 
-class dspic : public generator
+class DSPIC : public Generator
 {
   int reg;            // count number of registers are are using as stack
   int stack_count;    // count how many things we put on the stack

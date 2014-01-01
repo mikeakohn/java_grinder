@@ -17,15 +17,15 @@
 #include "MSP430.h"
 #include "Generator.h"
 
-generator::generator()
+Generator::Generator()
 {
 }
 
-generator::~generator()
+Generator::~Generator()
 {
 }
 
-int generator::open(char *filename)
+int Generator::open(char *filename)
 {
   out = fopen(filename, "wb");
 
@@ -38,12 +38,12 @@ int generator::open(char *filename)
   return 0;
 }
 
-void generator::close()
+void Generator::close()
 {
   fclose(out);
 }
 
-void generator::label(char *name)
+void Generator::label(char *name)
 {
   fprintf(out, "%s:", name);
 }

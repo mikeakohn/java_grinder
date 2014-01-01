@@ -15,7 +15,7 @@
 
 #include "JavaStack.h"
 
-int JavaStack::JavaStack(int len)
+JavaStack::JavaStack(int len)
 {
   values = malloc(len * sizeof(int));
   types = malloc(len);
@@ -23,11 +23,9 @@ int JavaStack::JavaStack(int len)
 
   memset(values, 0, len * sizeof(int));
   memset(types, 0, len);
-
-  return 0;
 }
 
-void ~JavaStack::JavaStack()
+JavaStack::~JavaStack()
 {
   free(values);
   free(types);

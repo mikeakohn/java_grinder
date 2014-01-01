@@ -12,30 +12,67 @@
 #ifndef _GENERATOR_H
 #define _GENERATOR_H
 
-class generator
+#include <stdio.h>
+
+class Generator
 {
 public:
-  generator();
-  virtual ~generator();
+  Generator();
+  virtual ~Generator();
 
   int open(char *filename);
   void label(char *name);
 
-  virtual int init();
-  virtual void serial_init();
-  virtual void method_start(int local_count, char *name);
-  virtual void method_end(int local_count);
-  virtual int push_integer(int32_t n);
-  virtual int push_integer_local(int index);
-  virtual int push_long(int64_t n);
-  virtual int push_float(float f);
-  virtual int push_double(double f);
-  virtual int push_byte(char b);
-  virtual int push_short(int16_t s);
-  virtual void close();
+  virtual int init() = 0;
+  virtual void serial_init() = 0;
+  virtual void method_start(int local_count, const char *name) = 0;
+  virtual void method_end(int local_count) = 0;
+  virtual int push_integer(int32_t n) = 0;
+  virtual int push_integer_local(int index) = 0;
+  virtual int push_long(int64_t n) = 0;
+  virtual int push_float(float f) = 0;
+  virtual int push_double(double f) = 0;
+  virtual int push_byte(char b) = 0;
+  virtual int push_short(int16_t s) = 0;
+  virtual int pop_integer_local(int index) = 0;
+  virtual int pop() = 0;
+  virtual int dup() = 0;
+  virtual int dup2() = 0;
+  virtual int swap() = 0;
+  virtual int add_integers() = 0;
+  virtual int sub_integers() = 0;
+  virtual int mul_integers() = 0;
+  virtual int div_integers() = 0;
+  virtual int neg_integer() = 0;
+  virtual int shift_left_integer() = 0;
+  virtual int shift_right_integer() = 0;
+  virtual int shift_right_uinteger() = 0;
+  virtual int and_integer() = 0;
+  virtual int or_integer() = 0;
+  virtual int xor_integer() = 0;
+  virtual int inc_integer(int index, int num) = 0;
+  virtual int jump_cond(int cond) = 0;
+  virtual int jump_cond_integer(int cond) = 0;
+  virtual int ret_local(int index) = 0;
+  virtual int ret_integer() = 0;
+  virtual int ret() = 0;
+  virtual int jump(const char *name) = 0;
+  virtual int call(const char *name) = 0;
+  virtual int brk() = 0;
+  virtual void close() = 0;
 
 private:
   FILE *out;
+};
+
+enum
+{
+  COND_EQUAL,
+  COND_NOT_EQUAL,
+  COND_LESS,
+  COND_LESS_EQUAL,
+  COND_GREATER,
+  COND_GREATER_EQUAL,
 };
 
 enum

@@ -14,7 +14,7 @@
 
 #include "Generator.h"
 
-class msp430 : public generator
+class MSP430 : public Generator
 {
 };
 
