@@ -18,10 +18,14 @@
 #include "java_class.h"
 #include "java_compile.h"
 
+// http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html
+
 // Size the stack/local_vars should be before malloc'ing a heap
 #ifdef FRAME_STACK
 #define STACK_SIZE 256
 #endif
+
+#define UNIMPL() printf("Opcode (%d) '%s' unimplemented\n", bytes[pc], table_java_instr[(int)bytes[pc]].name); ret = -1;
 
 #define LOCAL_SIZE 32
 
@@ -189,7 +193,8 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 1: // aconst_null (0x01)
-        printf("Opcode (0x01) aconst_null unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 2: // iconst_m1 (0x02)
@@ -254,10 +259,12 @@ printf("code_len=%d\n", code_len);
 
       case 14: // dconst_0 (0x0e)
         ret = generator->push_double(generator->context, out, fzero);
+        pc++;
         break;
 
       case 15: // dconst_1 (0x0f)
         ret = generator->push_double(generator->context, out, fone);
+        pc++;
         break;
 
       case 16: // bipush (0x10)
@@ -302,10 +309,12 @@ printf("code_len=%d\n", code_len);
 
       case 19: // ldc_w (0x13)
         printf("Opcode (0x13) ldc_w unimplemented\n");
+        pc += 3;
         break;
 
       case 20: // ldc2_w (0x14)
         printf("Opcode (0x14) ldc2_w unimplemented\n");
+        pc += 3;
         break;
 
       case 21: // iload (0x15)
@@ -368,6 +377,14 @@ printf("code_len=%d\n", code_len);
 
       case 25: // aload (0x19)
         printf("Opcode (0x19) aload unimplemented\n");
+        if (wide == 1)
+        {
+          pc += 3;
+        }
+          else
+        {
+          pc += 2;
+        }
         break;
 
       case 26: // iload_0 (0x1a)
@@ -396,827 +413,1033 @@ printf("code_len=%d\n", code_len);
 
       case 30: // lload_0 (0x1e)
         printf("Opcode (0x1e) lload_0 unimplemented\n");
+        pc++;
         break;
 
       case 31: // lload_1 (0x1f)
         printf("Opcode (0x1f) lload_1 unimplemented\n");
+        pc++;
         break;
 
       case 32: // lload_2 (0x20)
         printf("Opcode (0x20) lload_2 unimplemented\n");
+        pc++;
         break;
 
       case 33: // lload_3 (0x21)
         printf("Opcode (0x21) lload_3 unimplemented\n");
+        pc++;
         break;
 
       case 34: // fload_0 (0x22)
-        PUSH_FLOAT_I(local_vars[0]);
+        printf("Opcode (0x22) fload_0 unimplemented\n");
+        //PUSH_FLOAT_I(local_vars[0]);
         pc++;
         break;
 
       case 35: // fload_1 (0x23)
-        PUSH_FLOAT_I(local_vars[1]);
+        printf("Opcode (0x23) fload_1 unimplemented\n");
+        //PUSH_FLOAT_I(local_vars[1]);
         pc++;
         break;
 
       case 36: // fload_2 (0x24)
-        PUSH_FLOAT_I(local_vars[2]);
+        printf("Opcode (0x24) fload_2 unimplemented\n");
+        //PUSH_FLOAT_I(local_vars[2]);
         pc++;
         break;
 
       case 37: // fload_3 (0x25)
-        PUSH_FLOAT_I(local_vars[3]);
+        printf("Opcode (0x25) fload_3 unimplemented\n");
+        //PUSH_FLOAT_I(local_vars[3]);
         pc++;
         break;
 
       case 38: // dload_0 (0x26)
         printf("Opcode (0x26) dload_0 unimplemented\n");
+        pc++;
         break;
 
       case 39: // dload_1 (0x27)
         printf("Opcode (0x27) dload_1 unimplemented\n");
+        pc++;
         break;
 
       case 40: // dload_2 (0x28)
         printf("Opcode (0x28) dload_2 unimplemented\n");
+        pc++;
         break;
 
       case 41: // dload_3 (0x29)
         printf("Opcode (0x29) dload_3 unimplemented\n");
+        pc++;
         break;
 
       case 42: // aload_0 (0x2a)
         printf("Opcode (0x2a) aload_0 unimplemented\n");
+        pc++;
         break;
 
       case 43: // aload_1 (0x2b)
         printf("Opcode (0x2b) aload_1 unimplemented\n");
+        pc++;
         break;
 
       case 44: // aload_2 (0x2c)
         printf("Opcode (0x2c) aload_2 unimplemented\n");
+        pc++;
         break;
 
       case 45: // aload_3 (0x2d)
         printf("Opcode (0x2d) aload_3 unimplemented\n");
+        pc++;
         break;
 
       case 46: // iaload (0x2e)
         printf("Opcode (0x2e) iaload unimplemented\n");
+        pc++;
         break;
 
       case 47: // laload (0x2f)
         printf("Opcode (0x2f) laload unimplemented\n");
+        pc++;
         break;
 
       case 48: // faload (0x30)
         printf("Opcode (0x30) faload unimplemented\n");
+        pc++;
         break;
 
       case 49: // daload (0x31)
         printf("Opcode (0x31) daload unimplemented\n");
+        pc++;
         break;
 
       case 50: // aaload (0x32)
         printf("Opcode (0x32) aaload unimplemented\n");
+        pc++;
         break;
 
       case 51: // baload (0x33)
         printf("Opcode (0x33) baload unimplemented\n");
+        pc++;
         break;
 
       case 52: // caload (0x34)
         printf("Opcode (0x34) caload unimplemented\n");
+        pc++;
         break;
 
       case 53: // saload (0x35)
         printf("Opcode (0x35) saload unimplemented\n");
+        pc++;
         break;
 
       case 54: // istore (0x36)
         if (wide == 1)
         {
-          local_vars[GET_PC_UINT16(1)]=POP_INTEGER();
+          ret = generator->pop_integer_local(generator->context, out, GET_PC_UINT16(1));
+          //local_vars[GET_PC_UINT16(1)]=POP_INTEGER();
           pc += 3;
           wide = 0;
         }
           else
         {
-          local_vars[bytes[pc+1]]=POP_INTEGER();
+          //local_vars[bytes[pc+1]]=POP_INTEGER();
+          ret = generator->pop_integer_local(generator->context, out, bytes[pc+1]);
           pc += 2;
         }
         break;
 
       case 55: // lstore (0x37)
         printf("Opcode (0x37) lstore unimplemented\n");
+        if (wide == 1)
+        {
+          pc += 3;
+        }
+          else
+        {
+          pc += 2;
+        }
         break;
 
       case 56: // fstore (0x38)
         printf("Opcode (0x38) fstore unimplemented\n");
+        if (wide == 1)
+        {
+          pc += 3;
+        }
+          else
+        {
+          pc += 2;
+        }
         break;
 
       case 57: // dstore (0x39)
         printf("Opcode (0x39) dstore unimplemented\n");
+        if (wide == 1)
+        {
+          pc += 3;
+        }
+          else
+        {
+          pc += 2;
+        }
         break;
 
       case 58: // astore (0x3a)
         printf("Opcode (0x3a) astore unimplemented\n");
+        if (wide == 1)
+        {
+          pc += 3;
+        }
+          else
+        {
+          pc += 2;
+        }
         break;
 
       case 59: // istore_0 (0x3b)
-        local_vars[0] = POP_INTEGER();
+        //local_vars[0] = POP_INTEGER();
+        ret = generator->pop_integer_local(generator->context, out, 0);
         pc++;
         break;
 
       case 60: // istore_1 (0x3c)
-        local_vars[1] = POP_INTEGER();
+        //local_vars[1] = POP_INTEGER();
+        ret = generator->pop_integer_local(generator->context, out, 1);
         pc++;
         break;
 
       case 61: // istore_2 (0x3d)
-        local_vars[2] = POP_INTEGER();
+        //local_vars[2] = POP_INTEGER();
+        ret = generator->pop_integer_local(generator->context, out, 2);
         pc++;
         break;
 
       case 62: // istore_3 (0x3e)
-        local_vars[3] = POP_INTEGER();
+        //local_vars[3] = POP_INTEGER();
+        ret = generator->pop_integer_local(generator->context, out, 3);
         pc++;
         break;
 
       case 63: // lstore_0 (0x3f)
         printf("Opcode (0x3f) lstore_0 unimplemented\n");
+        pc++;
         break;
 
       case 64: // lstore_1 (0x40)
         printf("Opcode (0x40) lstore_1 unimplemented\n");
+        pc++;
         break;
 
       case 65: // lstore_2 (0x41)
         printf("Opcode (0x41) lstore_2 unimplemented\n");
+        pc++;
         break;
 
       case 66: // lstore_3 (0x42)
         printf("Opcode (0x42) lstore_3 unimplemented\n");
+        pc++;
         break;
 
       case 67: // fstore_0 (0x43)
-        local_vars[0] = POP_FLOAT_I()
+        printf("Opcode (0x43) fstore_0 unimplemented\n");
+        //local_vars[0] = POP_FLOAT_I()
         pc++;
         break;
 
       case 68: // fstore_1 (0x44)
-        local_vars[1] = POP_FLOAT_I()
+        printf("Opcode (0x44) fstore_1 unimplemented\n");
+        //local_vars[1] = POP_FLOAT_I()
         pc++;
         break;
 
       case 69: // fstore_2 (0x45)
-        local_vars[2] = POP_FLOAT_I()
+        printf("Opcode (0x45) fstore_2 unimplemented\n");
+        //local_vars[2] = POP_FLOAT_I()
         pc++;
         break;
 
       case 70: // fstore_3 (0x46)
-        local_vars[3] = POP_FLOAT_I()
+        printf("Opcode (0x46) fstore_3 unimplemented\n");
+        //local_vars[3] = POP_FLOAT_I()
         pc++;
         break;
 
       case 71: // dstore_0 (0x47)
         printf("Opcode (0x47) dstore_0 unimplemented\n");
+        pc++;
         break;
 
       case 72: // dstore_1 (0x48)
         printf("Opcode (0x48) dstore_1 unimplemented\n");
+        pc++;
         break;
 
       case 73: // dstore_2 (0x49)
         printf("Opcode (0x49) dstore_2 unimplemented\n");
+        pc++;
         break;
 
       case 74: // dstore_3 (0x4a)
         printf("Opcode (0x4a) dstore_3 unimplemented\n");
+        pc++;
         break;
 
       case 75: // astore_0 (0x4b)
         printf("Opcode (0x4b) astore_0 unimplemented\n");
+        pc++;
         break;
 
       case 76: // astore_1 (0x4c)
         printf("Opcode (0x4c) astore_1 unimplemented\n");
+        pc++;
         break;
 
       case 77: // astore_2 (0x4d)
         printf("Opcode (0x4d) astore_2 unimplemented\n");
+        pc++;
         break;
 
       case 78: // astore_3 (0x4e)
         printf("Opcode (0x4e) astore_3 unimplemented\n");
+        pc++;
         break;
 
       case 79: // iastore (0x4f)
         printf("Opcode (0x4f) iastore unimplemented\n");
+        pc++;
         break;
 
       case 80: // lastore (0x50)
         printf("Opcode (0x50) lastore unimplemented\n");
+        pc++;
         break;
 
       case 81: // fastore (0x51)
         printf("Opcode (0x51) fastore unimplemented\n");
+        pc++;
         break;
 
       case 82: // dastore (0x52)
         printf("Opcode (0x52) dastore unimplemented\n");
+        pc++;
         break;
 
       case 83: // aastore (0x53)
         printf("Opcode (0x53) aastore unimplemented\n");
+        pc++;
         break;
 
       case 84: // bastore (0x54)
         printf("Opcode (0x54) bastore unimplemented\n");
+        pc++;
         break;
 
       case 85: // castore (0x55)
         printf("Opcode (0x55) castore unimplemented\n");
+        pc++;
         break;
 
       case 86: // sastore (0x56)
         printf("Opcode (0x56) sastore unimplemented\n");
+        pc++;
         break;
 
       case 87: // pop (0x57)
-        POP_NULL();
+        ret = generator->pop(generator->context, out);
+        //POP_NULL();
         pc++;
         break;
 
       case 88: // pop2 (0x58)
-        POP_NULL();
-        POP_NULL();
+        //POP_NULL();
+        //POP_NULL();
+        ret = generator->pop(generator->context, out);
+        ret = generator->pop(generator->context, out);
         pc++;
         break;
 
       case 89: // dup (0x59)
-        value1 = POP_INTEGER();
-        PUSH_INTEGER(value1);
-        PUSH_INTEGER(value1);
+        //value1 = POP_INTEGER();
+        //PUSH_INTEGER(value1);
+        //PUSH_INTEGER(value1);
+        ret = generator->dup(generator->context, out);
         pc++;
         break;
 
       case 90: // dup_x1 (0x5a)
         printf("Opcode (0x5a) dup_x1 unimplemented\n");
+        pc++;
         break;
 
       case 91: // dup_x2 (0x5b)
         printf("Opcode (0x5b) dup_x2 unimplemented\n");
+        pc++;
         break;
 
       case 92: // dup2 (0x5c)
-        value2 = POP_INTEGER();
-        value1 = POP_INTEGER();
-        PUSH_INTEGER(value1);
-        PUSH_INTEGER(value2);
-        PUSH_INTEGER(value1);
-        PUSH_INTEGER(value2);
+        //value2 = POP_INTEGER();
+        //value1 = POP_INTEGER();
+        //PUSH_INTEGER(value1);
+        //PUSH_INTEGER(value2);
+        //PUSH_INTEGER(value1);
+        //PUSH_INTEGER(value2);
+        ret = generator->dup2(generator->context, out);
         pc++;
         break;
 
       case 93: // dup2_x1 (0x5d)
         printf("Opcode (0x5d) dup2_x1 unimplemented\n");
+        pc++;
         break;
 
       case 94: // dup2_x2 (0x5e)
         printf("Opcode (0x5e) dup2_x2 unimplemented\n");
+        pc++;
         break;
 
       case 95: // swap (0x5f)
-        value2 = POP_INTEGER();
-        value1 = POP_INTEGER();
-        PUSH_INTEGER(value2);
-        PUSH_INTEGER(value1);
+        //value2 = POP_INTEGER();
+        //value1 = POP_INTEGER();
+        //PUSH_INTEGER(value2);
+        //PUSH_INTEGER(value1);
+        ret = generator->swap(generator->context, out);
         pc++;
         break;
 
       case 96: // iadd (0x60)
-        value1 = POP_INTEGER();
-        value2 = POP_INTEGER();
-        value1 = value1+value2;
-        PUSH_INTEGER(value1);
+        //value1 = POP_INTEGER();
+        //value2 = POP_INTEGER();
+        //value1 = value1+value2;
+        //PUSH_INTEGER(value1);
+        ret = generator->add_integers(generator->context, out);
         pc++;
         break;
 
       case 97: // ladd (0x61)
-        lvalue1 = POP_LONG();
-        lvalue2 = POP_LONG();
-        lvalue1 = lvalue1+lvalue2;
-        PUSH_LONG(lvalue1);
+        //lvalue1 = POP_LONG();
+        //lvalue2 = POP_LONG();
+        //lvalue1 = lvalue1+lvalue2;
+        //PUSH_LONG(lvalue1);
+        ret = generator->add_longs(generator->context, out);
         pc++;
         break;
 
       case 98: // fadd (0x62)
-        fvalue1 = POP_FLOAT();
-        fvalue2 = POP_FLOAT();
-        fvalue1 = fvalue1+fvalue2;
-        PUSH_FLOAT(fvalue1);
+        //fvalue1 = POP_FLOAT();
+        //fvalue2 = POP_FLOAT();
+        //fvalue1 = fvalue1+fvalue2;
+        //PUSH_FLOAT(fvalue1);
+        ret = generator->add_floats(generator->context, out);
         pc++;
         break;
 
       case 99: // dadd (0x63)
-        dvalue1 = POP_DOUBLE();
-        dvalue2 = POP_DOUBLE();
-        dvalue1 = dvalue1+dvalue2;
-        PUSH_DOUBLE(dvalue1);
+        //dvalue1 = POP_DOUBLE();
+        //dvalue2 = POP_DOUBLE();
+        //dvalue1 = dvalue1+dvalue2;
+        //PUSH_DOUBLE(dvalue1);
+        ret = generator->add_doubles(generator->context, out);
         pc++;
         break;
 
       case 100: // isub (0x64)
-        value1 = POP_INTEGER();
-        value2 = POP_INTEGER();
-        value1 = value2-value1;
-        PUSH_INTEGER(value1);
+        //value1 = POP_INTEGER();
+        //value2 = POP_INTEGER();
+        //value1 = value2-value1;
+        //PUSH_INTEGER(value1);
+        ret = generator->sub_integers(generator->context, out);
         pc++;
         break;
 
       case 101: // lsub (0x65)
-        lvalue1 = POP_LONG();
-        lvalue2 = POP_LONG();
-        lvalue1 = lvalue2-lvalue1;
-        PUSH_LONG(lvalue1);
+        //lvalue1 = POP_LONG();
+        //lvalue2 = POP_LONG();
+        //lvalue1 = lvalue2-lvalue1;
+        //PUSH_LONG(lvalue1);
+        ret = generator->sub_longs(generator->context, out);
         pc++;
         break;
 
       case 102: // fsub (0x66)
-        fvalue1 = POP_FLOAT();
-        fvalue2 = POP_FLOAT();
-        fvalue1 = fvalue2-fvalue1;
-        PUSH_FLOAT(fvalue1);
+        //fvalue1 = POP_FLOAT();
+        //fvalue2 = POP_FLOAT();
+        //fvalue1 = fvalue2-fvalue1;
+        //PUSH_FLOAT(fvalue1);
+        ret = generator->sub_floats(generator->context, out);
         pc++;
         break;
 
       case 103: // dsub (0x67)
-        dvalue1 = POP_DOUBLE();
-        dvalue2 = POP_DOUBLE();
-        dvalue1 = dvalue2-dvalue1;
-        PUSH_DOUBLE(dvalue1);
+        //dvalue1 = POP_DOUBLE();
+        //dvalue2 = POP_DOUBLE();
+        //dvalue1 = dvalue2-dvalue1;
+        //PUSH_DOUBLE(dvalue1);
+        ret = generator->sub_doubles(generator->context, out);
         pc++;
         break;
 
       case 104: // imul (0x68)
-        value1 = POP_INTEGER();
-        value2 = POP_INTEGER();
-        value1 = value2*value1;
-        PUSH_INTEGER(value1);
+        //value1 = POP_INTEGER();
+        //value2 = POP_INTEGER();
+        //value1 = value2*value1;
+        //PUSH_INTEGER(value1);
+        ret = generator->mul_integers(generator->context, out);
         pc++;
         break;
 
       case 105: // lmul (0x69)
-        lvalue1 = POP_LONG();
-        lvalue2 = POP_LONG();
-        lvalue1 = lvalue2*lvalue1;
-        PUSH_LONG(lvalue1);
+        //lvalue1 = POP_LONG();
+        //lvalue2 = POP_LONG();
+        //lvalue1 = lvalue2*lvalue1;
+        //PUSH_LONG(lvalue1);
+        ret = generator->mul_longs(generator->context, out);
         pc++;
         break;
 
       case 106: // fmul (0x6a)
-        fvalue1 = POP_FLOAT();
-        fvalue2 = POP_FLOAT();
-        fvalue1 = fvalue2*fvalue1;
-        PUSH_FLOAT(fvalue1);
+        //fvalue1 = POP_FLOAT();
+        //fvalue2 = POP_FLOAT();
+        //fvalue1 = fvalue2*fvalue1;
+        //PUSH_FLOAT(fvalue1);
+        ret = generator->mul_floats(generator->context, out);
         pc++;
         break;
 
       case 107: // dmul (0x6b)
-        dvalue1 = POP_DOUBLE();
-        dvalue2 = POP_DOUBLE();
-        dvalue1 = dvalue2*dvalue1;
-        PUSH_DOUBLE(dvalue1);
+        //dvalue1 = POP_DOUBLE();
+        //dvalue2 = POP_DOUBLE();
+        //dvalue1 = dvalue2*dvalue1;
+        //PUSH_DOUBLE(dvalue1);
+        ret = generator->mul_doubles(generator->context, out);
         pc++;
         break;
 
       case 108: // idiv (0x6c)
-        printf("Opcode (0x6c) idiv unimplemented\n");
+        //printf("Opcode (0x6c) idiv unimplemented\n");
+        ret = generator->div_integers(generator->context, out);
+        pc++;
         break;
 
       case 109: // ldiv (0x6d)
         printf("Opcode (0x6d) ldiv unimplemented\n");
+        pc++;
         break;
 
       case 110: // fdiv (0x6e)
         printf("Opcode (0x6e) fdiv unimplemented\n");
+        pc++;
         break;
 
       case 111: // ddiv (0x6f)
         printf("Opcode (0x6f) ddiv unimplemented\n");
+        pc++;
         break;
 
       case 112: // irem (0x70)
-        printf("Opcode (0x70) irem unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 113: // lrem (0x71)
-        printf("Opcode (0x71) lrem unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 114: // frem (0x72)
-        printf("Opcode (0x72) frem unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 115: // drem (0x73)
-        printf("Opcode (0x73) drem unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 116: // ineg (0x74)
-        printf("Opcode (0x74) ineg unimplemented\n");
+        //printf("Opcode (0x74) ineg unimplemented\n");
+        ret = generator->neg_integers(generator->context, out);
+        pc++;
         break;
 
       case 117: // lneg (0x75)
-        printf("Opcode (0x75) lneg unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 118: // fneg (0x76)
-        printf("Opcode (0x76) fneg unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 119: // dneg (0x77)
-        printf("Opcode (0x77) dneg unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 120: // ishl (0x78)
-        printf("Opcode (0x78) ishl unimplemented\n");
+        ret = generator->shift_left_integer(generator->context, out);
+        pc++;
         break;
 
       case 121: // lshl (0x79)
-        printf("Opcode (0x79) lshl unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 122: // ishr (0x7a)
-        printf("Opcode (0x7a) ishr unimplemented\n");
+        ret = generator->shift_right_integer(generator->context, out);
+        pc++;
         break;
 
       case 123: // lshr (0x7b)
-        printf("Opcode (0x7b) lshr unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 124: // iushr (0x7c)
-        printf("Opcode (0x7c) iushr unimplemented\n");
+        ret = generator->shift_right_uinteger(generator->context, out);
+        pc++;
         break;
 
       case 125: // lushr (0x7d)
-        printf("Opcode (0x7d) lushr unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 126: // iand (0x7e)
-        value1 = POP_INTEGER();
-        value2 = POP_INTEGER();
-        PUSH_INTEGER(value1&value2);
+        //value1 = POP_INTEGER();
+        //value2 = POP_INTEGER();
+        //PUSH_INTEGER(value1&value2);
+        ret = generator->and_integer(generator->context, out);
+        pc++;
         break;
 
       case 127: // land (0x7f)
-        printf("Opcode (0x7f) land unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 128: // ior (0x80)
-        printf("Opcode (0x80) ior unimplemented\n");
+        ret = generator->or_integer(generator->context, out);
+        pc++;
         break;
 
       case 129: // lor (0x81)
-        printf("Opcode (0x81) lor unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 130: // ixor (0x82)
-        printf("Opcode (0x82) ixor unimplemented\n");
+        ret = generator->xor_integer(generator->context, out);
+        pc++;
         break;
 
       case 131: // lxor (0x83)
-        printf("Opcode (0x83) lxor unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 132: // iinc (0x84)
         if (wide == 1)
         {
-          local_vars[GET_PC_UINT16(1)] += GET_PC_INT16(3);
+          //local_vars[GET_PC_UINT16(1)] += GET_PC_INT16(3);
+          ret = generator->inc_integer(generator->context, out, GET_PC_UINT16(1), GET_PC_INT16(3));
           pc += 5;
           wide = 0;
         }
           else
         {
-          local_vars[bytes[pc+1]] += ((char)bytes[pc+2]);
+          //local_vars[bytes[pc+1]] += ((char)bytes[pc+2]);
+          ret = generator->inc_integer(generator->context, out, bytes[pc+1], bytes[pc+2]);
           pc += 3;
         }
         break;
 
       case 133: // i2l (0x85)
-        value1 = POP_INTEGER();
-        lvalue1 = value1;
-        PUSH_LONG(lvalue1);
+        UNIMPL()
+        //value1 = POP_INTEGER();
+        //lvalue1 = value1;
+        //PUSH_LONG(lvalue1);
         pc++;
         break;
 
       case 134: // i2f (0x86)
-        value1 = POP_INTEGER();
-        fvalue1 = value1;
-        PUSH_FLOAT(fvalue1);
+        UNIMPL()
+        //value1 = POP_INTEGER();
+        //fvalue1 = value1;
+        //PUSH_FLOAT(fvalue1);
         pc++;
         break;
 
       case 135: // i2d (0x87)
-        value1 = POP_INTEGER();
-        dvalue1 = value1;
-        PUSH_DOUBLE(dvalue1);
+        UNIMPL()
+        //value1 = POP_INTEGER();
+        //dvalue1 = value1;
+        //PUSH_DOUBLE(dvalue1);
         pc++;
         break;
 
       case 136: // l2i (0x88)
-        lvalue1 = POP_LONG();
-        value1 = (int)lvalue1;
-        PUSH_INTEGER(value1);
+        UNIMPL()
+        //lvalue1 = POP_LONG();
+        //value1 = (int)lvalue1;
+        //PUSH_INTEGER(value1);
         pc++;
         break;
 
       case 137: // l2f (0x89)
-        lvalue1 = POP_LONG();
-        fvalue1 = lvalue1;
-        PUSH_FLOAT(fvalue1);
+        UNIMPL()
+        //lvalue1 = POP_LONG();
+        //fvalue1 = lvalue1;
+        //PUSH_FLOAT(fvalue1);
         pc++;
         break;
 
       case 138: // l2d (0x8a)
-        lvalue1 = POP_LONG();
-        dvalue1 = lvalue1;
-        PUSH_DOUBLE(dvalue1);
+        UNIMPL()
+        //lvalue1 = POP_LONG();
+        //dvalue1 = lvalue1;
+        //PUSH_DOUBLE(dvalue1);
         pc++;
         break;
 
       case 139: // f2i (0x8b)
-        fvalue1 = POP_FLOAT();
-        value1 = fvalue1;
-        PUSH_INTEGER(value1);
+        UNIMPL()
+        //fvalue1 = POP_FLOAT();
+        //value1 = fvalue1;
+        //PUSH_INTEGER(value1);
         pc++;
         break;
 
       case 140: // f2l (0x8c)
-        fvalue1 = POP_FLOAT();
-        lvalue1 = fvalue1;
-        PUSH_LONG(lvalue1);
+        UNIMPL()
+        //fvalue1 = POP_FLOAT();
+        //lvalue1 = fvalue1;
+        //PUSH_LONG(lvalue1);
         pc++;
         break;
 
       case 141: // f2d (0x8d)
-        fvalue1 = POP_FLOAT();
-        dvalue1 = fvalue1;
-        PUSH_INTEGER(dvalue1);
+        UNIMPL()
+        //fvalue1 = POP_FLOAT();
+        //dvalue1 = fvalue1;
+        //PUSH_INTEGER(dvalue1);
         pc++;
         break;
 
       case 142: // d2i (0x8e)
-        dvalue1 = POP_DOUBLE();
-        value1 = dvalue1;
-        PUSH_INTEGER(value1);
+        UNIMPL()
+        //dvalue1 = POP_DOUBLE();
+        //value1 = dvalue1;
+        //PUSH_INTEGER(value1);
         pc++;
         break;
 
       case 143: // d2l (0x8f)
-        dvalue1 = POP_DOUBLE();
-        lvalue1 = dvalue1;
-        PUSH_LONG(lvalue1);
+        UNIMPL()
+        //dvalue1 = POP_DOUBLE();
+        //lvalue1 = dvalue1;
+        //PUSH_LONG(lvalue1);
         pc++;
         break;
 
       case 144: // d2f (0x90)
-        dvalue1 = POP_DOUBLE();
-        fvalue1 = dvalue1;
-        PUSH_FLOAT(fvalue1);
+        UNIMPL()
+        //dvalue1 = POP_DOUBLE();
+        //fvalue1 = dvalue1;
+        //PUSH_FLOAT(fvalue1);
         pc++;
         break;
 
       case 145: // i2b (0x91)
-        printf("Opcode (0x91) i2b unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 146: // i2c (0x92)
-        printf("Opcode (0x92) i2c unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 147: // i2s (0x93)
-        printf("Opcode (0x93) i2s unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 148: // lcmp (0x94)
-        printf("Opcode (0x94) lcmp unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 149: // fcmpl (0x95)
-        printf("Opcode (0x95) fcmpl unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 150: // fcmpg (0x96)
-        printf("Opcode (0x96) fcmpg unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 151: // dcmpl (0x97)
-        printf("Opcode (0x97) dcmpl unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 152: // dcmpg (0x98)
-        printf("Opcode (0x98) dcmpg unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 153: // ifeq (0x99)
-        value1 = POP_INTEGER();
-        if (value1 == 0)
-        { pc += GET_PC_INT16(1); }
-          else
-        { pc += 3; }
+        ret = generator->jump_cond(generator->context, out, COND_ZERO);
+        pc += 3;
+        //value1 = POP_INTEGER();
+        //if (value1 == 0)
+        //{ pc += GET_PC_INT16(1); }
+        //  else
+        //{ pc += 3; }
         break;
 
       case 154: // ifne (0x9a)
-        value1 = POP_INTEGER();
-        if (value1 != 0)
-        { pc += GET_PC_INT16(1); }
-          else
-        { pc += 3; }
+        ret = generator->jump_cond(generator->context, out, COND_NOT_ZERO);
+        pc += 3;
+        //value1 = POP_INTEGER();
+        //if (value1 != 0)
+        //{ pc += GET_PC_INT16(1); }
+        //  else
+        //{ pc += 3; }
         break;
 
       case 155: // iflt (0x9b)
-        value1 = POP_INTEGER();
-        if (value1 < 0)
-        { pc += GET_PC_INT16(1); }
-          else
-        { pc += 3; }
+        ret = generator->jump_cond(generator->context, out, COND_LESS);
+        pc += 3;
+        //value1 = POP_INTEGER();
+        //if (value1 < 0)
+        //{ pc += GET_PC_INT16(1); }
+        //  else
+        //{ pc += 3; }
         break;
 
       case 156: // ifge (0x9c)
-        value1 = POP_INTEGER();
-        if (value1 >= 0)
-        { pc += GET_PC_INT16(1); }
-          else
-        { pc += 3; }
+        ret = generator->jump_cond(generator->context, out, COND_GREATER_EQUAL);
+        pc += 3;
+        //value1 = POP_INTEGER();
+        //if (value1 >= 0)
+        //{ pc += GET_PC_INT16(1); }
+        //  else
+        //{ pc += 3; }
         break;
 
       case 157: // ifgt (0x9d)
-        value1 = POP_INTEGER();
-        if (value1 > 0)
-        { pc += GET_PC_INT16(1); }
-          else
-        { pc += 3; }
+        ret = generator->jump_cond(generator->context, out, COND_GREATER);
+        pc += 3;
+        //value1 = POP_INTEGER();
+        //if (value1 > 0)
+        //{ pc += GET_PC_INT16(1); }
+        //  else
+        //{ pc += 3; }
         break;
 
       case 158: // ifle (0x9e)
-        value1 = POP_INTEGER();
-        if (value1 <= 0)
-        { pc += GET_PC_INT16(1); }
-          else
-        { pc += 3; }
+        ret = generator->jump_cond(generator->context, out, COND_LESS_EQUAL);
+        pc += 3;
+        //value1 = POP_INTEGER();
+        //if (value1 <= 0)
+        //{ pc += GET_PC_INT16(1); }
+        //  else
+        //{ pc += 3; }
         break;
 
       case 159: // if_icmpeq (0x9f)
-        value1 = POP_INTEGER();
-        value2 = POP_INTEGER();
-        if (value2 == value1)
-        { pc += GET_PC_INT16(1); }
-          else
-        { pc += 3; }
+        ret = generator->jump_integer_cond(generator->context, out, COND_EQUAL);
+        pc += 3;
+        //value1 = POP_INTEGER();
+        //value2 = POP_INTEGER();
+        //if (value2 == value1)
+        //{ pc += GET_PC_INT16(1); }
+        //  else
+        //{ pc += 3; }
         break;
 
       case 160: // if_icmpne (0xa0)
-        value1 = POP_INTEGER();
-        value2 = POP_INTEGER();
-        if (value2 != value1)
-        { pc += GET_PC_INT16(1); }
-          else
-        { pc += 3; }
+        ret = generator->jump_integer_cond(generator->context, out, COND_NOT_EQUAL);
+        pc += 3;
+        //value1 = POP_INTEGER();
+        //value2 = POP_INTEGER();
+        //if (value2 != value1)
+        //{ pc += GET_PC_INT16(1); }
+        //  else
+        //{ pc += 3; }
         break;
 
       case 161: // if_icmplt (0xa1)
-        value1 = POP_INTEGER();
-        value2 = POP_INTEGER();
-        if (value2 < value1)
-        { pc += GET_PC_INT16(1); }
-          else
-        { pc += 3; }
+        ret = generator->jump_integer_cond(generator->context, out, COND_LESS);
+        pc += 3;
+        //value1 = POP_INTEGER();
+        //value2 = POP_INTEGER();
+        //if (value2 < value1)
+        //{ pc += GET_PC_INT16(1); }
+        //  else
+        //{ pc += 3; }
         break;
 
       case 162: // if_icmpge (0xa2)
-        value1 = POP_INTEGER();
-        value2 = POP_INTEGER();
-        if (value2 >= value1)
-        { pc += GET_PC_INT16(1); }
-          else
-        { pc += 3; }
+        ret = generator->jump_integer_cond(generator->context, out, COND_GREATER_EQUAL);
+        pc += 3;
+        //value1 = POP_INTEGER();
+        //value2 = POP_INTEGER();
+        //if (value2 >= value1)
+        //{ pc += GET_PC_INT16(1); }
+        //  else
+        //{ pc += 3; }
         break;
 
       case 163: // if_icmpgt (0xa3)
-        value1 = POP_INTEGER();
-        value2 = POP_INTEGER();
-        if (value2 > value1)
-        { pc += GET_PC_INT16(1); }
-          else
-        { pc += 3; }
+        ret = generator->jump_integer_cond(generator->context, out, COND_GREATER);
+        pc += 3;
+        //value1 = POP_INTEGER();
+        //value2 = POP_INTEGER();
+        //if (value2 > value1)
+        //{ pc += GET_PC_INT16(1); }
+        //  else
+        //{ pc += 3; }
         break;
 
       case 164: // if_icmple (0xa4)
-        value1 = POP_INTEGER();
-        value2 = POP_INTEGER();
-        if (value2 <= value1)
-        { pc += GET_PC_INT16(1); }
-          else
-        { pc += 3; }
+        ret = generator->jump_integer_cond(generator->context, out, COND_LESS_EQUAL);
+        pc += 3;
+        //value1 = POP_INTEGER();
+        //value2 = POP_INTEGER();
+        //if (value2 <= value1)
+        //{ pc += GET_PC_INT16(1); }
+        //  else
+        //{ pc += 3; }
         break;
 
       case 165: // if_acmpeq (0xa5)
-        printf("Opcode (0xa5) if_acmpeq unimplemented\n");
+        UNIMPL()
         break;
 
       case 166: // if_acmpne (0xa6)
-        printf("Opcode (0xaa) if_acmpne unimplemented\n");
+        UNIMPL()
         break;
 
       case 167: // goto (0xa7)
-        pc += GET_PC_INT16(1);
+        ret = generator->jump(generator->context, out, "label");
+        pc += 3;
+        //pc += GET_PC_INT16(1);
         break;
 
       case 168: // jsr (0xa8)
-        PUSH_INTEGER(pc+3);
-        pc += GET_PC_INT16(1);
+        ret = generator->call(generator->context, out, "label");
+        pc += 3;
+        //PUSH_INTEGER(pc+3);
+        //pc += GET_PC_INT16(1);
         break;
 
       case 169: // ret (0xa9)
         if (wide == 1)
         {
-          pc = local_vars[GET_PC_UINT16(1)];
+          //pc = local_vars[GET_PC_UINT16(1)];
+          ret = generator->ret_value(generator->context, out, GET_PC_UINT16(1));
+          pc += 3;
           wide = 0;
         }
           else
         {
-          pc = local_vars[GET_PC_UINT32(1)];
+          //pc = local_vars[bytes[pc+1]];
+          ret = generator->ret_local(generator->context, out, bytes[pc+1]);
+          pc += 2;
         }
+#endif
         break;
 
       case 170: // tableswitch (0xaa)
-        printf("Opcode (0xaa) tableswitch unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 171: // lookupswitch (0xab)
-        printf("Opcode (0xab) lookupswitch unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 172: // ireturn (0xac)
-        value1 = POP_INTEGER()
-        stack_values = java_stack->values;
-        stack_types = java_stack->types;
-        PUSH_INTEGER(value1);
-        goto leave;
+        //value1 = POP_INTEGER()
+        //stack_values = java_stack->values;
+        //stack_types = java_stack->types;
+        //PUSH_INTEGER(value1);
+        ret = generator->ret_integer(generator->context, out);
+        pc++;
+        //goto leave;
         break;
 
       case 173: // lreturn (0xad)
-        lvalue1 = POP_LONG()
-        stack_values = java_stack->values;
-        stack_types = java_stack->types;
-        PUSH_LONG(lvalue1);
-        goto leave;
+        UNIMPL()
+        pc++;
+        //lvalue1 = POP_LONG()
+        //stack_values = java_stack->values;
+        //stack_types = java_stack->types;
+        //PUSH_LONG(lvalue1);
+        //goto leave;
         break;
 
       case 174: // freturn (0xae)
-        value1 = POP_INTEGER()
-        stack_values = java_stack->values;
-        stack_types = java_stack->types;
-        PUSH_INTEGER(value1);
-        goto leave;
+        UNIMPL()
+        pc++;
+        //value1 = POP_INTEGER()
+        //stack_values = java_stack->values;
+        //stack_types = java_stack->types;
+        //PUSH_INTEGER(value1);
+        //goto leave;
         break;
 
       case 175: // dreturn (0xaf)
-        dvalue1 = POP_DOUBLE()
-        stack_values = java_stack->values;
-        stack_types = java_stack->types;
-        PUSH_LONG(dvalue1);
-        goto leave;
+        UNIMPL()
+        pc++;
+        //dvalue1 = POP_DOUBLE()
+        //stack_values = java_stack->values;
+        //stack_types = java_stack->types;
+        //PUSH_LONG(dvalue1);
+        //goto leave;
         break;
 
       case 176: // areturn (0xb0)
-        printf("Opcode (0xb0) areturn unimplemented\n");
+        UNIMPL()
+        pc++;
         break;
 
       case 177: // return (0xb1)
-        goto leave;
+        ret = generator->ret(generator->context, out);
+        pc++;
         break;
 
       case 178: // getstatic (0xb2)
+        UNIMPL()
+        pc+=3;
         // printf("Opcode (0xb2) getstatic unimplemented\n");
         // FIXME - need to test for private/protected and that it's a field
         // printf("getstatic %d\n",GET_PC_UINT16(1));
-        PUSH_REF(GET_PC_UINT16(1));
-        pc+=3;
+        //PUSH_REF(GET_PC_UINT16(1));
         break;
 
       case 179: // putstatic (0xb3)
-        printf("Opcode (0xb3) putstatic unimplemented\n");
+        UNIMPL()
+        pc+=3;
         break;
 
       case 180: // getfield (0xb4)
-        printf("Opcode (0xb4) getfield unimplemented\n");
+        UNIMPL()
+        pc+=3;
         break;
 
       case 181: // putfield (0xb5)
-        printf("Opcode (0xb5) putfield unimplemented\n");
+        UNIMPL()
+        pc+=3;
         break;
 
       case 182: // invokevirtual (0xb6)
@@ -1299,55 +1522,55 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 183: // invokespecial (0xb7)
-        printf("Opcode (0xb7) invokespecial unimplemented\n");
+        UNIMPL()
         break;
 
       case 184: // invokestatic (0xb8)
-        printf("Opcode (0xb8) invokestatic unimplemented\n");
+        UNIMPL()
         break;
 
       case 185: // invokeinterface (0xb9)
-        printf("Opcode (0xb9) invokeinterface unimplemented\n");
+        UNIMPL()
         break;
 
       case 186: // xxxunusedxxx1 (0xba)
-        printf("Opcode (0xba) xxxunusedxxx1 unimplemented\n");
+        UNIMPL()
         break;
 
       case 187: // new (0xbb)
-        printf("Opcode (0xbb) new unimplemented\n");
+        UNIMPL()
         break;
 
       case 188: // newarray (0xbc)
-        printf("Opcode (0xbc) newarray unimplemented\n");
+        UNIMPL()
         break;
 
       case 189: // anewarray (0xbd)
-        printf("Opcode (0xbd) anewarray unimplemented\n");
+        UNIMPL()
         break;
 
       case 190: // arraylength (0xbe)
-        printf("Opcode (0xbe) arraylength unimplemented\n");
+        UNIMPL()
         break;
 
       case 191: // athrow (0xbf)
-        printf("Opcode (0xbf) athrow unimplemented\n");
+        UNIMPL()
         break;
 
       case 192: // checkcast (0xc0)
-        printf("Opcode (0xc0) checkcast unimplemented\n");
+        UNIMPL()
         break;
 
       case 193: // instanceof (0xc1)
-        printf("Opcode (0xc1) instanceof unimplemented\n");
+        UNIMPL()
         break;
 
       case 194: // monitorenter (0xc2)
-        printf("Opcode (0xc2) monitorenter unimplemented\n");
+        UNIMPL()
         break;
 
       case 195: // monitorexit (0xc3)
-        printf("Opcode (0xc3) monitorexit unimplemented\n");
+        UNIMPL()
         break;
 
       case 196: // wide (0xc4)
@@ -1356,32 +1579,36 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 197: // multianewarray (0xc5)
-        printf("Opcode (0xc5) multianewarray unimplemented\n");
+        UNIMPL()
         break;
 
       case 198: // ifnull (0xc6)
-        printf("Opcode (0xc6) ifnull unimplemented\n");
+        UNIMPL()
         break;
 
       case 199: // ifnonnull (0xc7)
-        printf("Opcode (0xc7) ifnonnull unimplemented\n");
+        UNIMPL()
         break;
 
       case 200: // goto_w (0xc8)
-        pc += (short)((((unsigned int)bytes[pc+1])<<24) |
-                      (((unsigned int)bytes[pc+2])<<16) |
-                      (((unsigned int)bytes[pc+3])<<8) |
-                      bytes[pc+4]);
+        //pc += (short)((((unsigned int)bytes[pc+1])<<24) |
+        //              (((unsigned int)bytes[pc+2])<<16) |
+        //              (((unsigned int)bytes[pc+3])<<8) |
+        //              bytes[pc+4]);
+        ret = generator->jump(generator->context, out, "label");
+        pc += 5;
         break;
 
       case 201: // jsr_w (0xc9)
-        PUSH_INTEGER(pc+5);
-        pc += GET_PC_INT32(1);
+        //PUSH_INTEGER(pc+5);
+        //pc += GET_PC_INT32(1);
+        ret = generator->call(generator->context, out, "label");
+        pc += 5;
         break;
 
       case 202: // breakpoint (0xca)
-        printf("Breakpoint reached!  pc=%d\n",pc);
-        goto leave;
+        ret = generator->break(generator->context, out);
+        pc++;
         break;
 
       case 203: // not_valid (0xfe)
@@ -1438,11 +1665,11 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 254: // impdep1 (0xfe)
-        printf("Opcode (0xfe) impdep1 unimplemented\n");
+        UNIMPL()
         break;
 
       case 255: // impdep2 (0xff)
-        printf("Opcode (0xff) impdep2 unimplemented\n");
+        UNIMPL()
         break;
     }
 
