@@ -25,5 +25,7 @@ struct table_java_instr_t
   uint8_t wide;        // width of instruction when wide=1
 };
 
+extern table_java_instr_t table_java_instr[];
+
 #endif
 
