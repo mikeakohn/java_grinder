@@ -209,7 +209,7 @@ int DSPIC::add_integers()
 {
   if (reg < 7)
   {
-    fprintf(out, "  add w%d, w%d\n", reg, reg - 1);
+    fprintf(out, "  add w%d, w%d, w%d\n", reg, reg - 1, reg - 1);
     reg--;
   }
     else

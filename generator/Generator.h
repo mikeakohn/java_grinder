@@ -63,6 +63,7 @@ public:
 
 protected:
   FILE *out;
+  int label_count;
 };
 
 enum

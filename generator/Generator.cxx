@@ -17,7 +17,7 @@
 #include "MSP430.h"
 #include "Generator.h"
 
-Generator::Generator()
+Generator::Generator() : label_count(0)
 {
 }
 

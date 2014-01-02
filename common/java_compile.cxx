@@ -30,24 +30,7 @@
 
 #define LOCAL_SIZE 32
 
-#define PUSH_GENERIC(gen_value, gen_type) stack_types[stack_ptr++]=gen_type; *stack_values=gen_value; stack_values++;
-#define POP_GENERIC(gen_type) *(--stack_values); \
-              if (stack_types[--stack_ptr]!=gen_type) \
-              { printf("Exception: Expected Integer\n"); goto leave; }
-
-#define POP_INTEGER() POP_GENERIC(JAVA_TYPE_INTEGER);
-
-#define PUSH_FLOAT_I(value) PUSH_GENERIC(value, JAVA_TYPE_FLOAT);
-#define POP_FLOAT_I() POP_GENERIC(JAVA_TYPE_FLOAT);
-
-#define PUSH_REF(value) PUSH_GENERIC(value, JAVA_TYPE_REF);
-#define POP_REF() POP_GENERIC(JAVA_TYPE_REF);
-
-#define PUSH_LONG(gen_value) ((int16_t *)(void *)&stack_types)[stack_ptr]=(JAVA_TYPE_LONG<<8)|JAVA_TYPE_LONG; *(long long *)stack_values=gen_value; stack_values+=2;
-
-#define POP_FLOAT() *(float*)(--stack_values); \
-              if (stack_types[--stack_ptr]!=JAVA_TYPE_FLOAT) \
-              { printf("Exception: Expected Float\n"); goto leave; }
+//#define PUSH_LONG(gen_value) ((int16_t *)(void *)&stack_types)[stack_ptr]=(JAVA_TYPE_LONG<<8)|JAVA_TYPE_LONG; *(long long *)stack_values=gen_value; stack_values+=2;
 
 #define GET_PC_INT16(a) ((short int)(((unsigned short int)bytes[pc+a+0])<<8|bytes[pc+a+1]))
 #define GET_PC_UINT16(a) (((unsigned short int)bytes[pc+a+0])<<8|bytes[pc+a+1])
@@ -62,6 +45,7 @@
 
 
 #ifdef DEBUG
+#if 0
 static void stack_dump(unsigned int *stack, unsigned char *stack_types, int stack_ptr)
 {
 int n;
@@ -89,6 +73,7 @@ int n;
   }
 }
 #endif
+#endif
 
 int java_compile_method(JavaClass *java_class, int method_index, Generator *generator, JavaStack *java_stack, int stack_start_ptr)
 {
@@ -111,13 +96,13 @@ int max_stack;
 int max_locals;
 int code_len;
 #ifdef FRAME_STACK
-uint32_t stack_stack[STACK_SIZE];
-uint8_t stack_types_stack[STACK_SIZE];
+//uint32_t stack_stack[STACK_SIZE];
+//uint8_t stack_types_stack[STACK_SIZE];
 #endif
-uint32_t *stack_values = NULL;
-uint32_t *stack_values_start = NULL;
-uint8_t *stack_types = NULL;
-int stack_ptr = 0;
+//uint32_t *stack_values = NULL;
+//uint32_t *stack_values_start = NULL;
+//uint8_t *stack_types = NULL;
+//int stack_ptr = 0;
 uint32_t ref;
 struct generic_32bit_t *gen32;
 struct constant_float_t *constant_float;
@@ -146,18 +131,18 @@ printf("code_len=%d\n", code_len);
 #ifdef FRAME_STACK
   if (max_stack > STACK_SIZE)
   {
-    stack = malloc(max_stack*(sizeof(int)));
-    stack_types = malloc(max_stack);
+    //stack = malloc(max_stack*(sizeof(int)));
+    //stack_types = malloc(max_stack);
   }
     else
   {
-    stack_values = stack_stack;
-    stack_types = stack_types;
+    //stack_values = stack_stack;
+    //stack_types = stack_types;
   }
 #else
-  stack_values_start = (uint32_t *)((uint8_t *)java_stack->values + (stack_start_ptr * sizeof(int)));
-  stack_values = stack_values_start;
-  stack_types = ((uint8_t *)java_stack->types) + stack_start_ptr;
+  //stack_values_start = (uint32_t *)((uint8_t *)java_stack->values + (stack_start_ptr * sizeof(int)));
+  //stack_values = stack_values_start;
+  //stack_types = ((uint8_t *)java_stack->types) + stack_start_ptr;
 #endif
 
   if (max_locals > LOCAL_SIZE)
@@ -318,43 +303,46 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 22: // lload (0x16)
+        UNIMPL()
         if (wide == 1)
         {
           wide = 0;
-          PUSH_LONG(*((long long *)(local_vars+GET_PC_UINT16(1))));
+          //PUSH_LONG(*((long long *)(local_vars+GET_PC_UINT16(1))));
           pc += 3;
         }
           else
         {
-          PUSH_LONG(*((long long *)(local_vars+bytes[pc+1])));
+          //PUSH_LONG(*((long long *)(local_vars+bytes[pc+1])));
           pc += 2;
         }
         break;
 
       case 23: // fload (0x17)
+        UNIMPL()
         if (wide == 1)
         {
           wide = 0;
-          PUSH_FLOAT_I(local_vars[GET_PC_UINT16(1)]);
+          //PUSH_FLOAT_I(local_vars[GET_PC_UINT16(1)]);
           pc += 3;
         }
           else
         {
-          PUSH_FLOAT_I(local_vars[bytes[pc+1]]);
+          //PUSH_FLOAT_I(local_vars[bytes[pc+1]]);
           pc += 2;
         }
         break;
 
       case 24: // dload (0x18)
+        UNIMPL()
         if (wide == 1)
         {
           wide = 0;
-          PUSH_LONG(*((long long *)(local_vars+GET_PC_UINT16(1))));
+          //PUSH_LONG(*((long long *)(local_vars+GET_PC_UINT16(1))));
           pc += 3;
         }
           else
         {
-          PUSH_LONG(*((long long *)(local_vars+bytes[pc+1])));
+          //PUSH_LONG(*((long long *)(local_vars+bytes[pc+1])));
           pc += 2;
         }
         break;
@@ -1488,14 +1476,16 @@ printf("code_len=%d\n", code_len);
 
           if (constant_utf8->bytes[1] == 'I')
           {
-            value1 = POP_INTEGER(); // FIXME.. wrong
+            //value1 = POP_INTEGER(); // FIXME.. wrong
+            value1 = 0;
             printf("%d\n",value1);
           }
             else
           if (constant_utf8->bytes[1] == 'F')
           {
             float f1;
-            f1 = POP_FLOAT(); // FIXME.. wrong
+            //f1 = POP_FLOAT(); // FIXME.. wrong
+            f1 = 0;
             printf("%f\n", f1);
           }
             else
@@ -1504,8 +1494,9 @@ printf("code_len=%d\n", code_len);
             goto leave;
           }
         }
-        ref = POP_REF(); // FIXME.. wrong
+        //ref = POP_REF(); // FIXME.. wrong
         // printf("invokevirtual %d\n",GET_PC_UINT16(1));
+        ref = 0;  // FIXME.. wrong
 
         pc += 3;
         break;
@@ -1667,7 +1658,7 @@ printf("code_len=%d\n", code_len);
     if (ret != 0) { break; }
 
 #ifdef DEBUG
-    stack_dump(stack_values_start,stack_types,stack_ptr);
+    //stack_dump(stack_values_start, stack_types, stack_ptr);
 #endif
 
     // Is this even needed?
@@ -1683,7 +1674,7 @@ leave:
 
   if (local_vars != local_vars_stack) { free(local_vars); }
 #ifdef FRAME_STACK
-  if (stack_values != stack_stack) { free(stack_value); }
+  //if (stack_values != stack_stack) { free(stack_value); }
   if (stack_types != stack_types_stack) { free(stack_types); }
 #endif
 
