@@ -152,12 +152,12 @@ int MSP430::inc_integer(int index, int num)
   return 0;
 }
 
-int MSP430::jump_cond(int cond)
+int MSP430::jump_cond(const char *label, int cond)
 {
   return 0;
 }
 
-int MSP430::jump_cond_integer(int cond)
+int MSP430::jump_cond_integer(const char *label, int cond)
 {
   return 0;
 }

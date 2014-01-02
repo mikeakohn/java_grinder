@@ -34,6 +34,8 @@
 // w9 top of stack 
 // w10 pointer to locals
 
+const char *cond_str[] = { "z", "nz", "lt", "le", "gt", "ge" };
+
 int DSPIC::open(char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
@@ -280,13 +282,38 @@ int DSPIC::inc_integer(int index, int num)
   return 0;
 }
 
-int DSPIC::jump_cond(int cond)
+int DSPIC::jump_cond(const char *label, int cond)
 {
+  if (reg < 8)
+  {
+    fprintf(out, "  cmp #0, w%d\n", reg);
+  }
+    else
+  {
+    //fprintf(out, "  cmp #0, [sp+%d]\n", reg);
+  }
+
+  fprintf(out, "  bra %s, %s\n", cond_str[cond], label);
   return 0;
 }
 
-int DSPIC::jump_cond_integer(int cond)
+int DSPIC::jump_cond_integer(const char *label, int cond)
 {
+  if (reg < 7)
+  {
+    fprintf(out, "  cmp w%d, w%d, w%d\n", reg, reg - 1, reg - 1);
+  }
+    else
+  if (reg == 7)
+  {
+
+  }
+    else
+  {
+  }
+
+  fprintf(out, "  bra %s, %s\n", cond_str[cond], label);
+
   return 0;
 }
 
@@ -328,11 +355,13 @@ int DSPIC::return_void(int local_count)
 
 int DSPIC::jump(const char *name)
 {
+  fprintf(out, "  bra %s\n", name);
   return 0;
 }
 
 int DSPIC::call(const char *name)
 {
+  fprintf(out, "  call %s\n", name);
   return 0;
 }
 

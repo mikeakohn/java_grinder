@@ -3,7 +3,13 @@ public class Testing
 {
   static public int add_nums(int a, int b)
   {
-    return a + b;
+    int n;
+    for (n = 0; n < 10; n++)
+    {
+      a = a + b;
+    }
+
+    return a;
   }
 
   static public void main(String args[])

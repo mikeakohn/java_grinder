@@ -45,7 +45,7 @@ void Generator::close()
 
 void Generator::label(char *name)
 {
-  fprintf(out, "%s:", name);
+  fprintf(out, "%s:\n", name);
 }
 
 

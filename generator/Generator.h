@@ -51,8 +51,8 @@ public:
   virtual int or_integer() = 0;
   virtual int xor_integer() = 0;
   virtual int inc_integer(int index, int num) = 0;
-  virtual int jump_cond(int cond) = 0;
-  virtual int jump_cond_integer(int cond) = 0;
+  virtual int jump_cond(const char *label, int cond) = 0;
+  virtual int jump_cond_integer(const char *label, int cond) = 0;
   virtual int return_local(int index, int local_count) = 0;
   virtual int return_integer(int local_count) = 0;
   virtual int return_void(int local_count) = 0;
@@ -68,7 +68,7 @@ protected:
 
 enum
 {
-  COND_EQUAL,
+  COND_EQUAL = 0,
   COND_NOT_EQUAL,
   COND_LESS,
   COND_LESS_EQUAL,
@@ -76,12 +76,14 @@ enum
   COND_GREATER_EQUAL,
 };
 
+#if 0
 enum
 {
   CPU_INVALID,
   CPU_MSP430,
   CPU_DSPIC,
 };
+#endif
 
 #endif
 

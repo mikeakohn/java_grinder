@@ -75,6 +75,72 @@ int n;
 #endif
 #endif
 
+static void fill_label_map(uint8_t *label_map, int label_map_len, uint8_t *bytes, int code_len, int pc_start)
+{
+int pc = pc_start;
+int wide = 0;
+int address;
+
+  memset(label_map, 0, label_map_len);
+
+  while(pc - pc_start < code_len)
+  {
+    int opcode = bytes[pc];
+
+    if (opcode == 0xc4) { wide = 1; pc++; continue; }
+
+    switch(opcode)
+    {
+        case 0x99:  // ifeq
+        case 0x9a:  // ifne
+        case 0x9b:  // iflt
+        case 0x9c:  // ifge
+        case 0x9d:  // ifgt
+        case 0x9e:  // ifle
+        case 0x9f:  // if_icmpeq
+        case 0xa0:  // if_icmpne
+        case 0xa1:  // if_icmplt
+        case 0xa2:  // if_icmpge
+        case 0xa3:  // if_icmpgt
+        case 0xa4:  // if_icmple
+        case 0xa5:  // if_acmpeq
+        case 0xa6:  // if_acmpne
+        case 0xa7:  // goto
+        case 0xa8:  // jsr
+        case 0xc6:  // ifnull
+        case 0xc7:  // ifnonnull
+        {
+          int16_t offset = GET_PC_INT16(1);
+          address = (pc + offset) - pc_start;
+          if (address < 0) { printf("Internal error: %s:%d\n", __FILE__, __LINE__); return; }
+          label_map[address / 8] = 1 << (address % 8);
+          break;
+        }
+        case 0xc8:  // goto_w
+        case 0xc9:  // jsr_w
+        {
+          int32_t offset = GET_PC_INT32(1);
+          address = (pc + offset) - pc_start;
+          if (address < 0) { printf("Internal error: %s:%d\n", __FILE__, __LINE__); return; }
+          label_map[address / 8] = 1 << (address % 8);
+          break;
+        }
+      default:
+        break;
+    }
+
+    if (wide == 1)
+    {
+      pc += table_java_instr[opcode].wide;
+      wide = 0;
+    }
+      else
+    {
+      pc += table_java_instr[opcode].normal;
+    }
+  }
+}
+
 int java_compile_method(JavaClass *java_class, int method_index, Generator *generator, JavaStack *java_stack, int stack_start_ptr)
 {
 struct methods_t *method = (struct methods_t *)(java_class->methods_heap + java_class->methods[method_index]);
@@ -84,8 +150,8 @@ const float fzero = 0.0;
 const float fone = 1.0;
 const float ftwo = 2.0;
 int wide = 0;
-int local_vars_stack[LOCAL_SIZE];
-int *local_vars;
+//int local_vars_stack[LOCAL_SIZE];
+//int *local_vars;
 //float fvalue1,fvalue2;
 //int value1,value2;
 //long long lvalue1,lvalue2;
@@ -106,7 +172,9 @@ int code_len;
 uint32_t ref;
 struct generic_32bit_t *gen32;
 struct constant_float_t *constant_float;
+uint8_t *label_map;
 int ret = 0;
+char label[16];
 
   // bytes points to the method attributes info for the method.
   max_stack = ((int)bytes[0]<<8) | ((int)bytes[1]);
@@ -121,6 +189,10 @@ int ret = 0;
 
   generator->method_start(max_locals, "temp");
 
+  int label_map_len = (code_len / 8) + 1;
+  label_map = (uint8_t *)alloca(label_map_len);
+  fill_label_map(label_map, label_map_len, bytes, code_len, pc_start);
+
 #ifdef DEBUG
 printf("pc=%d\n", pc);
 printf("max_stack=%d\n", max_stack);
@@ -128,6 +200,7 @@ printf("max_locals=%d\n", max_locals);
 printf("code_len=%d\n", code_len);
 #endif
 
+#if 0
 #ifdef FRAME_STACK
   if (max_stack > STACK_SIZE)
   {
@@ -149,12 +222,20 @@ printf("code_len=%d\n", code_len);
   { local_vars = (int *)malloc(max_locals * (sizeof(int))); }
     else
   { local_vars = local_vars_stack; }
+#endif
 
   while(1)
   {
+    int address = pc - pc_start;
 #ifdef DEBUG
-    printf("pc=%d opcode=%d (0x%02x)\n", pc - pc_start, bytes[pc], bytes[pc]);
+    printf("pc=%d opcode=%d (0x%02x)\n", address, bytes[pc], bytes[pc]);
 #endif
+    if ((label_map[address / 8] & (1 << (address % 8))) != 0)
+    {
+      sprintf(label, "temp_%d", address);
+      generator->label(label);
+    }
+
     switch(bytes[pc])
     {
       case 0: // nop (0x00)
@@ -1174,7 +1255,8 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 153: // ifeq (0x99)
-        ret = generator->jump_cond(COND_EQUAL);
+        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        ret = generator->jump_cond(label, COND_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
         //if (value1 == 0)
@@ -1184,7 +1266,8 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 154: // ifne (0x9a)
-        ret = generator->jump_cond(COND_NOT_EQUAL);
+        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        ret = generator->jump_cond(label, COND_NOT_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
         //if (value1 != 0)
@@ -1194,7 +1277,8 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 155: // iflt (0x9b)
-        ret = generator->jump_cond(COND_LESS);
+        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        ret = generator->jump_cond(label, COND_LESS);
         pc += 3;
         //value1 = POP_INTEGER();
         //if (value1 < 0)
@@ -1204,7 +1288,8 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 156: // ifge (0x9c)
-        ret = generator->jump_cond(COND_GREATER_EQUAL);
+        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        ret = generator->jump_cond(label, COND_GREATER_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
         //if (value1 >= 0)
@@ -1214,7 +1299,8 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 157: // ifgt (0x9d)
-        ret = generator->jump_cond(COND_GREATER);
+        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        ret = generator->jump_cond(label, COND_GREATER);
         pc += 3;
         //value1 = POP_INTEGER();
         //if (value1 > 0)
@@ -1224,7 +1310,8 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 158: // ifle (0x9e)
-        ret = generator->jump_cond(COND_LESS_EQUAL);
+        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        ret = generator->jump_cond(label, COND_LESS_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
         //if (value1 <= 0)
@@ -1234,7 +1321,8 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 159: // if_icmpeq (0x9f)
-        ret = generator->jump_cond_integer(COND_EQUAL);
+        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        ret = generator->jump_cond_integer(label, COND_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
         //value2 = POP_INTEGER();
@@ -1245,7 +1333,8 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 160: // if_icmpne (0xa0)
-        ret = generator->jump_cond_integer(COND_NOT_EQUAL);
+        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        ret = generator->jump_cond_integer(label, COND_NOT_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
         //value2 = POP_INTEGER();
@@ -1256,7 +1345,8 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 161: // if_icmplt (0xa1)
-        ret = generator->jump_cond_integer(COND_LESS);
+        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        ret = generator->jump_cond_integer(label, COND_LESS);
         pc += 3;
         //value1 = POP_INTEGER();
         //value2 = POP_INTEGER();
@@ -1267,7 +1357,8 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 162: // if_icmpge (0xa2)
-        ret = generator->jump_cond_integer(COND_GREATER_EQUAL);
+        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        ret = generator->jump_cond_integer(label, COND_GREATER_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
         //value2 = POP_INTEGER();
@@ -1278,7 +1369,8 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 163: // if_icmpgt (0xa3)
-        ret = generator->jump_cond_integer(COND_GREATER);
+        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        ret = generator->jump_cond_integer(label, COND_GREATER);
         pc += 3;
         //value1 = POP_INTEGER();
         //value2 = POP_INTEGER();
@@ -1289,7 +1381,8 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 164: // if_icmple (0xa4)
-        ret = generator->jump_cond_integer(COND_LESS_EQUAL);
+        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        ret = generator->jump_cond_integer(label, COND_LESS_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
         //value2 = POP_INTEGER();
@@ -1308,13 +1401,15 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 167: // goto (0xa7)
-        ret = generator->jump("label");
+        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        ret = generator->jump(label);
         pc += 3;
         //pc += GET_PC_INT16(1);
         break;
 
       case 168: // jsr (0xa8)
-        ret = generator->call("label");
+        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        ret = generator->call(label);
         pc += 3;
         //PUSH_INTEGER(pc+3);
         //pc += GET_PC_INT16(1);
@@ -1575,14 +1670,16 @@ printf("code_len=%d\n", code_len);
         //              (((unsigned int)bytes[pc+2])<<16) |
         //              (((unsigned int)bytes[pc+3])<<8) |
         //              bytes[pc+4]);
-        ret = generator->jump("label");
+        sprintf(label, "temp_%d", address + GET_PC_INT32(1));
+        ret = generator->jump(label);
         pc += 5;
         break;
 
       case 201: // jsr_w (0xc9)
         //PUSH_INTEGER(pc+5);
         //pc += GET_PC_INT32(1);
-        ret = generator->call("label");
+        sprintf(label, "temp_%d", address + GET_PC_INT32(1));
+        ret = generator->call(label);
         pc += 5;
         break;
 
@@ -1672,10 +1769,12 @@ leave:
 
   //generator->method_end(max_locals);
 
+#if 0
   if (local_vars != local_vars_stack) { free(local_vars); }
 #ifdef FRAME_STACK
   //if (stack_values != stack_stack) { free(stack_value); }
   if (stack_types != stack_types_stack) { free(stack_types); }
+#endif
 #endif
 
   return 0;
