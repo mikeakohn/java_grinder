@@ -19,6 +19,21 @@
 
 #include "DSPIC.h"
 
+#define LOCAL_VAR(i) (i * 2)
+
+// ABI is:
+// w0 temp
+// w1 bottom of stack
+// w2 ..
+// w3 ..
+// w4 ..
+// w5 ..
+// w6 ..
+// w7 ..
+// w8 ..
+// w9 top of stack 
+// w10 pointer to locals
+
 int DSPIC::open(char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
@@ -44,13 +59,15 @@ void DSPIC::method_start(int local_count, const char *name)
 
   // main() function goes here
   fprintf(out, "%s:\n", name);
+  fprintf(out, "  mov sp, w10\n");
   fprintf(out, "  sub #0x%x, sp\n", local_count * 2);
 }
 
 void DSPIC::method_end(int local_count)
 {
-  fprintf(out, "  add #0x%x, sp\n", local_count * 2);
-  fprintf(out, "  ret\n\n");
+  //fprintf(out, "  add #0x%x, sp\n", local_count * 2);
+  //fprintf(out, "  ret\n\n");
+  fprintf(out, "  ret\n");
 }
 
 int DSPIC::push_integer(int32_t n)
@@ -79,7 +96,7 @@ int DSPIC::push_integer(int32_t n)
 
 int DSPIC::push_integer_local(int index)
 {
-  fprintf(out, "  mov [sp+%d], w0\n", (index + 1) * 2);
+  fprintf(out, "  mov [w10-#%d], w0\n", LOCAL_VAR(index));
 
   if (reg < 8)
   {
@@ -190,6 +207,21 @@ int DSPIC::swap()
 
 int DSPIC::add_integers()
 {
+  if (reg < 7)
+  {
+    fprintf(out, "  add w%d, w%d\n", reg, reg - 1);
+    reg--;
+  }
+    else
+  if (reg == 7)
+  {
+
+  }
+    else
+  {
+  }
+
+
   return 0;
 }
 
@@ -258,18 +290,39 @@ int DSPIC::jump_cond_integer(int cond)
   return 0;
 }
 
-int DSPIC::ret_local(int index)
+int DSPIC::return_local(int index, int local_count)
 {
+  fprintf(out, "  mov [w10-#%d], w0\n", LOCAL_VAR(index));
+  //fprintf(out, "  add #0x%x, sp\n", local_count * 2);
+  fprintf(out, "  mov w10, sp\n");
+  fprintf(out, "  ret\n");
+
   return 0;
 }
 
-int DSPIC::ret_integer()
+int DSPIC::return_integer(int local_count)
 {
+  if (reg < 8)
+  {
+    fprintf(out, "  mov w%d, w0\n", reg - 1 + 1);
+  }
+    else
+  {
+    fprintf(out, "  mov [sp+2], w0\n");
+  }
+
+  //fprintf(out, "  add #0x%x, sp\n", local_count * 2);
+  fprintf(out, "  mov w10, sp\n");
+  fprintf(out, "  ret\n");
   return 0;
 }
 
-int DSPIC::ret()
+int DSPIC::return_void(int local_count)
 {
+  //fprintf(out, "  add #0x%x, sp\n", local_count * 2);
+  fprintf(out, "  mov w10, sp\n");
+  fprintf(out, "  ret\n");
+
   return 0;
 }
 

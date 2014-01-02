@@ -47,9 +47,9 @@ class MSP430 : public Generator
   virtual int inc_integer(int index, int num);
   virtual int jump_cond(int cond);
   virtual int jump_cond_integer(int cond);
-  virtual int ret_local(int index);
-  virtual int ret_integer();
-  virtual int ret();
+  virtual int return_local(int index, int local_count);
+  virtual int return_integer(int local_count);
+  virtual int return_void(int local_count);
   virtual int jump(const char *name);
   virtual int call(const char *name);
   virtual int brk();

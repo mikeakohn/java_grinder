@@ -53,9 +53,9 @@ public:
   virtual int inc_integer(int index, int num) = 0;
   virtual int jump_cond(int cond) = 0;
   virtual int jump_cond_integer(int cond) = 0;
-  virtual int ret_local(int index) = 0;
-  virtual int ret_integer() = 0;
-  virtual int ret() = 0;
+  virtual int return_local(int index, int local_count) = 0;
+  virtual int return_integer(int local_count) = 0;
+  virtual int return_void(int local_count) = 0;
   virtual int jump(const char *name) = 0;
   virtual int call(const char *name) = 0;
   virtual int brk() = 0;

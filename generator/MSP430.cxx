@@ -162,17 +162,17 @@ int MSP430::jump_cond_integer(int cond)
   return 0;
 }
 
-int MSP430::ret_local(int index)
+int MSP430::return_local(int index, int local_count)
 {
   return 0;
 }
 
-int MSP430::ret_integer()
+int MSP430::return_integer(int local_count)
 {
   return 0;
 }
 
-int MSP430::ret()
+int MSP430::return_void(int local_count)
 {
   return 0;
 }

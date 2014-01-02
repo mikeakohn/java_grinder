@@ -30,14 +30,11 @@
 
 #define LOCAL_SIZE 32
 
-#define POP_NULL() stack_values--; stack_ptr--;
-
 #define PUSH_GENERIC(gen_value, gen_type) stack_types[stack_ptr++]=gen_type; *stack_values=gen_value; stack_values++;
 #define POP_GENERIC(gen_type) *(--stack_values); \
               if (stack_types[--stack_ptr]!=gen_type) \
               { printf("Exception: Expected Integer\n"); goto leave; }
 
-#define PUSH_INTEGER(value) PUSH_GENERIC(value, JAVA_TYPE_INTEGER);
 #define POP_INTEGER() POP_GENERIC(JAVA_TYPE_INTEGER);
 
 #define PUSH_FLOAT_I(value) PUSH_GENERIC(value, JAVA_TYPE_FLOAT);
@@ -46,22 +43,8 @@
 #define PUSH_REF(value) PUSH_GENERIC(value, JAVA_TYPE_REF);
 #define POP_REF() POP_GENERIC(JAVA_TYPE_REF);
 
-#define PUSH_BYTE PUSH_INTEGER
-#define POP_BYTE POP_INTEGER
-
 #define PUSH_LONG(gen_value) ((int16_t *)(void *)&stack_types)[stack_ptr]=(JAVA_TYPE_LONG<<8)|JAVA_TYPE_LONG; *(long long *)stack_values=gen_value; stack_values+=2;
-#define POP_LONG() *(long long *)(stack_values-2); stack_values-=2; \
-              stack_ptr-=2; \
-              if (stack_types[stack_ptr]!=JAVA_TYPE_LONG) \
-              { printf("Exception: Expected Long\n"); goto leave; }
 
-#define PUSH_DOUBLE(gen_value) ((int16_t *)(void *)&stack_types)[stack_ptr]=(JAVA_TYPE_DOUBLE<<8)|JAVA_TYPE_DOUBLE; *(double *)stack_values=gen_value; stack_values+=2;
-#define POP_DOUBLE() *((double *)(stack_values-2)); stack_values-=2; \
-              stack_ptr-=2; \
-              if (stack_types[stack_ptr]!=JAVA_TYPE_DOUBLE) \
-              { printf("Exception: Expected Double\n"); goto leave; }
-
-#define PUSH_FLOAT(gen_value) stack_types[stack_ptr++]=JAVA_TYPE_FLOAT; *(float *)stack_values=gen_value; stack_values++;
 #define POP_FLOAT() *(float*)(--stack_values); \
               if (stack_types[--stack_ptr]!=JAVA_TYPE_FLOAT) \
               { printf("Exception: Expected Float\n"); goto leave; }
@@ -297,12 +280,12 @@ printf("code_len=%d\n", code_len);
         if (gen32->tag == CONSTANT_STRING)
         {
           printf("Can't do a string yet.. :(\n");
-          goto leave;
+          ret = -1;
         }
           else
         {
           printf("Cannot ldc this type\n");
-          goto leave;
+          ret = -1;
         }
 
         pc += 2;
@@ -1353,14 +1336,14 @@ printf("code_len=%d\n", code_len);
         if (wide == 1)
         {
           //pc = local_vars[GET_PC_UINT16(1)];
-          ret = generator->ret_local(GET_PC_UINT16(1));
+          ret = generator->return_local(GET_PC_UINT16(1), max_locals);
           pc += 3;
           wide = 0;
         }
           else
         {
           //pc = local_vars[bytes[pc+1]];
-          ret = generator->ret_local(bytes[pc+1]);
+          ret = generator->return_local(bytes[pc+1], max_locals);
           pc += 2;
         }
         break;
@@ -1380,7 +1363,7 @@ printf("code_len=%d\n", code_len);
         //stack_values = java_stack->values;
         //stack_types = java_stack->types;
         //PUSH_INTEGER(value1);
-        ret = generator->ret_integer();
+        ret = generator->return_integer(max_locals);
         pc++;
         //goto leave;
         break;
@@ -1421,7 +1404,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 177: // return (0xb1)
-        ret = generator->ret();
+        ret = generator->return_void(max_locals);
         pc++;
         break;
 
@@ -1668,6 +1651,8 @@ printf("code_len=%d\n", code_len);
       case 251: // not_valid (0xfe)
       case 252: // not_valid (0xfe)
       case 253: // not_valid (0xfe)
+        UNIMPL()
+        pc++;
         break;
 
       case 254: // impdep1 (0xfe)
@@ -1686,12 +1671,15 @@ printf("code_len=%d\n", code_len);
 #endif
 
     // Is this even needed?
-    if (pc >= code_len + 8) { pc = pc - code_len; }
-    else if (pc < 8) { pc = pc + code_len; }
+    //if (pc >= code_len + 8) { pc = pc - code_len; }
+    //else if (pc < 8) { pc = pc + code_len; }
+
+    //printf("pc=%d opcode=%d (0x%02x)\n", pc - pc_start, bytes[pc], bytes[pc]);
+    if (pc - pc_start >= code_len) { break; }
   }
 leave:
 
-  generator->method_end(max_locals);
+  //generator->method_end(max_locals);
 
   if (local_vars != local_vars_stack) { free(local_vars); }
 #ifdef FRAME_STACK
