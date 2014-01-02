@@ -28,6 +28,7 @@ FILE *in;
 JavaStack *java_stack;
 Generator *generator;
 JavaClass *java_class;
+int index;
 
   if (argc != 4)
   {
@@ -62,13 +63,17 @@ JavaClass *java_class;
     exit(1);
   }
 
+  java_stack = new JavaStack(STACK_LEN);
   java_class = new JavaClass(in);
 #ifdef DEBUG
   java_class->print();
 #endif
 
-  java_stack = new JavaStack(STACK_LEN);
-  java_compile_method(java_class, 1, generator, java_stack, 0);
+  for (index = 0; index < java_class->methods_count; index++)
+  {
+    java_compile_method(java_class, index, generator, java_stack, 0);
+  }
+
   delete java_stack;
   delete generator;
 

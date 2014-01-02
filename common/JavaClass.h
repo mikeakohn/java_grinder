@@ -169,6 +169,8 @@ public:
   JavaClass(FILE *in);
   ~JavaClass();
   void print();
+  int get_constant(char *name, int len, int index);
+  int get_method_name(char *name, int len, int index);
 
   int32_t magic;
   int16_t minor_version;

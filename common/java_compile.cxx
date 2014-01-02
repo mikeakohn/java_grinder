@@ -175,6 +175,18 @@ struct constant_float_t *constant_float;
 uint8_t *label_map;
 int ret = 0;
 char label[16];
+char method_name[64];
+
+  if (java_class->get_method_name(method_name, sizeof(method_name), method_index) != 0)
+  {
+    strcpy(method_name, "error");
+  }
+
+  if (strcmp(method_name, "<init>") == 0)
+  {
+    printf("Skipping constructor\n");
+    return 0;
+  }
 
   // bytes points to the method attributes info for the method.
   max_stack = ((int)bytes[0]<<8) | ((int)bytes[1]);
@@ -187,7 +199,7 @@ char label[16];
              ((int)bytes[code_len+9])) + 8;
   pc = pc_start;
 
-  generator->method_start(max_locals, "temp");
+  generator->method_start(max_locals, method_name);
 
   int label_map_len = (code_len / 8) + 1;
   label_map = (uint8_t *)alloca(label_map_len);
@@ -232,7 +244,7 @@ printf("code_len=%d\n", code_len);
 #endif
     if ((label_map[address / 8] & (1 << (address % 8))) != 0)
     {
-      sprintf(label, "temp_%d", address);
+      sprintf(label, "%s_%d", method_name, address);
       generator->label(label);
     }
 
@@ -1255,7 +1267,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 153: // ifeq (0x99)
-        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
         ret = generator->jump_cond(label, COND_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
@@ -1266,7 +1278,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 154: // ifne (0x9a)
-        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
         ret = generator->jump_cond(label, COND_NOT_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
@@ -1277,7 +1289,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 155: // iflt (0x9b)
-        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
         ret = generator->jump_cond(label, COND_LESS);
         pc += 3;
         //value1 = POP_INTEGER();
@@ -1288,7 +1300,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 156: // ifge (0x9c)
-        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
         ret = generator->jump_cond(label, COND_GREATER_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
@@ -1299,7 +1311,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 157: // ifgt (0x9d)
-        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
         ret = generator->jump_cond(label, COND_GREATER);
         pc += 3;
         //value1 = POP_INTEGER();
@@ -1310,7 +1322,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 158: // ifle (0x9e)
-        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
         ret = generator->jump_cond(label, COND_LESS_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
@@ -1321,7 +1333,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 159: // if_icmpeq (0x9f)
-        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
         ret = generator->jump_cond_integer(label, COND_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
@@ -1333,7 +1345,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 160: // if_icmpne (0xa0)
-        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
         ret = generator->jump_cond_integer(label, COND_NOT_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
@@ -1345,7 +1357,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 161: // if_icmplt (0xa1)
-        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
         ret = generator->jump_cond_integer(label, COND_LESS);
         pc += 3;
         //value1 = POP_INTEGER();
@@ -1357,7 +1369,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 162: // if_icmpge (0xa2)
-        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
         ret = generator->jump_cond_integer(label, COND_GREATER_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
@@ -1369,7 +1381,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 163: // if_icmpgt (0xa3)
-        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
         ret = generator->jump_cond_integer(label, COND_GREATER);
         pc += 3;
         //value1 = POP_INTEGER();
@@ -1381,7 +1393,7 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 164: // if_icmple (0xa4)
-        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
         ret = generator->jump_cond_integer(label, COND_LESS_EQUAL);
         pc += 3;
         //value1 = POP_INTEGER();
@@ -1401,14 +1413,14 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 167: // goto (0xa7)
-        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
         ret = generator->jump(label);
         pc += 3;
         //pc += GET_PC_INT16(1);
         break;
 
       case 168: // jsr (0xa8)
-        sprintf(label, "temp_%d", address + GET_PC_INT16(1));
+        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
         ret = generator->call(label);
         pc += 3;
         //PUSH_INTEGER(pc+3);
@@ -1670,7 +1682,7 @@ printf("code_len=%d\n", code_len);
         //              (((unsigned int)bytes[pc+2])<<16) |
         //              (((unsigned int)bytes[pc+3])<<8) |
         //              bytes[pc+4]);
-        sprintf(label, "temp_%d", address + GET_PC_INT32(1));
+        sprintf(label, "%s_%d", method_name, address + GET_PC_INT32(1));
         ret = generator->jump(label);
         pc += 5;
         break;
@@ -1678,7 +1690,7 @@ printf("code_len=%d\n", code_len);
       case 201: // jsr_w (0xc9)
         //PUSH_INTEGER(pc+5);
         //pc += GET_PC_INT32(1);
-        sprintf(label, "temp_%d", address + GET_PC_INT32(1));
+        sprintf(label, "%s_%d", method_name, address + GET_PC_INT32(1));
         ret = generator->call(label);
         pc += 5;
         break;
@@ -1767,7 +1779,7 @@ printf("code_len=%d\n", code_len);
   }
 leave:
 
-  //generator->method_end(max_locals);
+  generator->method_end(max_locals);
 
 #if 0
   if (local_vars != local_vars_stack) { free(local_vars); }

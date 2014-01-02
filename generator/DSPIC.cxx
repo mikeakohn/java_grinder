@@ -69,7 +69,7 @@ void DSPIC::method_end(int local_count)
 {
   //fprintf(out, "  add #0x%x, sp\n", local_count * 2);
   //fprintf(out, "  ret\n\n");
-  fprintf(out, "  ret\n");
+  fprintf(out, "\n");
 }
 
 int DSPIC::push_integer(int32_t n)
