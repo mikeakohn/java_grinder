@@ -60,6 +60,7 @@ public:
   virtual void close();
 
 private:
+  int stack_alu(const char *instr);
   int reg;
   int stack;
   int label_count;

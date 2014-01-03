@@ -34,7 +34,7 @@
 // w9 top of stack 
 // w10 pointer to locals
 
-const char *cond_str[] = { "z", "nz", "lt", "le", "gt", "ge" };
+static const char *cond_str[] = { "z", "nz", "lt", "le", "gt", "ge" };
 
 DSPIC::DSPIC() : reg(0), stack(0)
 {

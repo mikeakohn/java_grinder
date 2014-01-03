@@ -30,6 +30,9 @@
 #define REG_STACK(a) (a + 4)
 #define LOCALS(a) ((a * 2) + 2)
 
+// FIXME - This isn't quite right
+static const char *cond_str[] = { "jz", "jnz", "jl", "jle", "jg", "jge" };
+
 MSP430::MSP430() : reg(0), stack(0), label_count(0)
 {
 
@@ -259,48 +262,12 @@ int MSP430::swap()
 
 int MSP430::add_integers()
 {
-  if (stack == 0)
-  {
-    fprintf(out, "  add.w r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
-    reg--;
-  }
-    else
-  if (stack == 1)
-  {
-    fprintf(out, "  pop r15\n");
-    fprintf(out, "  mov.w 15, r%d\n", REG_STACK(reg-1));
-    stack--;
-  }
-    else
-  {
-    fprintf(out, "  pop r15\n");
-    fprintf(out, "  add.w r15, @sp\n");
-  }
-
-  return 0;
+  return stack_alu("add");
 }
 
 int MSP430::sub_integers()
 {
-  if (stack == 0)
-  {
-    fprintf(out, "  sub.w r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
-    reg--;
-  }
-    else
-  if (stack == 1)
-  {
-    fprintf(out, "  pop r15\n");
-    fprintf(out, "  sub.w r15, r%d\n", REG_STACK(reg-1));
-    stack--;
-  }
-    else
-  {
-    fprintf(out, "  pop r15\n");
-    fprintf(out, "  sub.w r15, @sp\n");
-  }
-
-  return 0;
+  return stack_alu("sub");
 }
 
 int MSP430::mul_integers()
@@ -343,85 +310,232 @@ int MSP430::shift_left_integer()
     else
   if (reg > 0)
   {
-    fprintf(out, "  mov.w r%d, r15\n", REG_STACK(reg));
+    fprintf(out, "  mov.w r%d, r15\n", REG_STACK(reg-1));
     reg--;
   }
+
+  fprintf(out, "label_%d:\n", label_count);
+
+  if (stack > 0)
+  {
+    fprintf(out, "  rla.w @sp\n");
+  }
+    else
+  {
+    fprintf(out, "  rla.w r%d\n", REG_STACK(reg-1));
+  }
+
+  fprintf(out, "  dec.w r15\n");
+  fprintf(out, "  jnz label_%d\n", label_count);
+
+  label_count++;
 
   return 0;
 }
 
 int MSP430::shift_right_integer()
 {
+  // FIXME - for MSP430x, this can be sped up
+  if (stack > 0)
+  {
+    fprintf(out, "  pop r15\n");
+    stack--;
+  }
+    else
+  if (reg > 0)
+  {
+    fprintf(out, "  mov.w r%d, r15\n", REG_STACK(reg-1));
+    reg--;
+  }
+
+  fprintf(out, "label_%d:\n", label_count);
+
+  if (stack > 0)
+  {
+    fprintf(out, "  rra.w @sp\n");
+  }
+    else
+  {
+    fprintf(out, "  rra.w r%d\n", REG_STACK(reg-1));
+  }
+
+  fprintf(out, "  dec.w r15\n");
+  fprintf(out, "  jnz label_%d\n", label_count);
+
+  label_count++;
+
   return 0;
 }
 
 int MSP430::shift_right_uinteger()
 {
+  // FIXME - for MSP430x, this can be sped up
+  if (stack > 0)
+  {
+    fprintf(out, "  pop r15\n");
+    stack--;
+  }
+    else
+  if (reg > 0)
+  {
+    fprintf(out, "  mov.w r%d, r15\n", REG_STACK(reg-1));
+    reg--;
+  }
+
+  fprintf(out, "label_%d:\n", label_count);
+
+  if (stack > 0)
+  {
+    fprintf(out, "  rra.w @sp\n");
+  }
+    else
+  {
+    fprintf(out, "  rra.w r%d\n", REG_STACK(reg-1));
+  }
+
+  fprintf(out, "  dec.w r15\n");
+  fprintf(out, "  jnz label_%d\n", label_count);
+
+  label_count++;
+
   return 0;
 }
 
 int MSP430::and_integer()
 {
-  return 0;
+  return stack_alu("and");
 }
 
 int MSP430::or_integer()
 {
-  return 0;
+  return stack_alu("or");
 }
 
 int MSP430::xor_integer()
 {
-  return 0;
+  return stack_alu("xor");
 }
 
 int MSP430::inc_integer(int index, int num)
 {
+  fprintf(out, "  add.w #%d, -%d(r12)\n", num, LOCALS(index));
   return 0;
 }
 
 int MSP430::jump_cond(const char *label, int cond)
 {
+  if (stack > 0)
+  {
+    fprintf(out, "  cmp.w #0, 0(sp)\n");
+  }
+    else
+  {
+    fprintf(out, "  cmp.w #0, r%d\n", REG_STACK(reg-1));
+  }
+
+  fprintf(out, "  %s %s", cond_str[cond], label);
+
   return 0;
 }
 
 int MSP430::jump_cond_integer(const char *label, int cond)
 {
+  if (stack > 1)
+  {
+    fprintf(out, "  cmp.w 2(sp), 4(sp)\n");
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  cmp.w 2(sp), r%d\n", REG_STACK(reg-1));
+  }
+    else
+  {
+    fprintf(out, "  cmp.w r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+  }
+
+  fprintf(out, "  %s %s", cond_str[cond], label);
+
   return 0;
 }
 
 int MSP430::return_local(int index, int local_count)
 {
+  fprintf(out, "  mov.w -%d(w12), r15\n", LOCALS(index));
+
+  fprintf(out, "  mov.w r12, sp\n");
+  fprintf(out, "  ret\n");
+
   return 0;
 }
 
 int MSP430::return_integer(int local_count)
 {
+  if (stack > 0)
+  {
+    fprintf(out, "  mov.w @sp, r15\n");
+  }
+    else
+  {
+    fprintf(out, "  mov.w r%d, r15\n", REG_STACK(reg - 1));
+  }
+
+  fprintf(out, "  mov.w r12, sp\n");
+  fprintf(out, "  ret\n");
+
   return 0;
 }
 
 int MSP430::return_void(int local_count)
 {
+  fprintf(out, "  mov r12, sp\n");
+  fprintf(out, "  ret\n");
+
   return 0;
 }
 
 int MSP430::jump(const char *name)
 {
+  fprintf(out, "  jmp %s\n", name);
   return 0;
 }
 
 int MSP430::call(const char *name)
 {
+  fprintf(out, "  call #%s\n", name);
   return 0;
 }
 
 int MSP430::brk()
 {
-  return 0;
+  printf("brk unimplemented\n");
+  return -1;
 }
 
 void MSP430::close()
 {
 }
 
+int MSP430::stack_alu(const char *instr)
+{
+  if (stack == 0)
+  {
+    fprintf(out, "  %s.w r%d, r%d\n", instr, REG_STACK(reg-1), REG_STACK(reg-2));
+    reg--;
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  pop r15\n");
+    fprintf(out, "  %s.w 15, r%d\n", instr, REG_STACK(reg-1));
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  pop r15\n");
+    fprintf(out, "  %s.w r15, @sp\n", instr);
+  }
+
+  return 0;
+}
 
