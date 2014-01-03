@@ -433,7 +433,7 @@ int MSP430::jump_cond(const char *label, int cond)
     fprintf(out, "  cmp.w #0, r%d\n", REG_STACK(reg-1));
   }
 
-  fprintf(out, "  %s %s", cond_str[cond], label);
+  fprintf(out, "  %s %s\n", cond_str[cond], label);
 
   return 0;
 }
@@ -454,7 +454,7 @@ int MSP430::jump_cond_integer(const char *label, int cond)
     fprintf(out, "  cmp.w r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
   }
 
-  fprintf(out, "  %s %s", cond_str[cond], label);
+  fprintf(out, "  %s %s\n", cond_str[cond], label);
 
   return 0;
 }
