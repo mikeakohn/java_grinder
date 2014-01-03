@@ -32,7 +32,7 @@ public:
   virtual int push_long(int64_t n) = 0;
   virtual int push_float(float f) = 0;
   virtual int push_double(double f) = 0;
-  virtual int push_byte(char b) = 0;
+  virtual int push_byte(int8_t b) = 0;
   virtual int push_short(int16_t s) = 0;
   virtual int pop_integer_local(int index) = 0;
   virtual int pop() = 0;

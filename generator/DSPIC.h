@@ -17,6 +17,9 @@
 class DSPIC : public Generator
 {
 public:
+  DSPIC();
+  virtual ~DSPIC();
+
   virtual int open(char *filename);
 
   virtual void serial_init();
@@ -27,7 +30,7 @@ public:
   virtual int push_long(int64_t n);
   virtual int push_float(float f);
   virtual int push_double(double f);
-  virtual int push_byte(char b);
+  virtual int push_byte(int8_t b);
   virtual int push_short(int16_t s);
   virtual int pop_integer_local(int index);
   virtual int pop();
@@ -58,7 +61,7 @@ public:
 
 private:
   int reg;            // count number of registers are are using as stack
-  int stack_count;    // count how many things we put on the stack
+  int stack;          // count how many things we put on the stack
 };
 
 #endif

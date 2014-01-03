@@ -16,6 +16,10 @@
 
 class MSP430 : public Generator
 {
+public:
+  MSP430();
+  virtual ~MSP430();
+
   virtual int open(char *filename);
 
   virtual void serial_init();
@@ -26,7 +30,7 @@ class MSP430 : public Generator
   virtual int push_long(int64_t n);
   virtual int push_float(float f);
   virtual int push_double(double f);
-  virtual int push_byte(char b);
+  virtual int push_byte(int8_t b);
   virtual int push_short(int16_t s);
   virtual int pop_integer_local(int index);
   virtual int pop();
@@ -54,6 +58,11 @@ class MSP430 : public Generator
   virtual int call(const char *name);
   virtual int brk();
   virtual void close();
+
+private:
+  int reg;
+  int stack;
+  int label_count;
 };
 
 #endif

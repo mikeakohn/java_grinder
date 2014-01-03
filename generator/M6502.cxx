@@ -20,6 +20,16 @@
 // X
 // Y
 
+M6502::M6502()
+{
+
+}
+
+M6502::~M6502()
+{
+
+}
+
 int M6502::open(char *filename)
 {
   return 0;
@@ -62,7 +72,7 @@ int M6502::push_double(double f)
   return 0;
 }
 
-int M6502::push_byte(char b)
+int M6502::push_byte(int8_t b)
 {
   return 0;
 }

@@ -24,10 +24,33 @@
 // r9
 // r10
 // r11 top of stack
+// r12 points to locals
+// r15 is temp
 
+#define REG_STACK(a) (a + 4)
+#define LOCALS(a) ((a * 2) + 2)
+
+MSP430::MSP430() : reg(0), stack(0), label_count(0)
+{
+
+}
+
+MSP430::~MSP430()
+{
+
+}
 
 int MSP430::open(char *filename)
 {
+  if (Generator::open(filename) != 0) { return -1; }
+
+  // For now we only support a specific chip
+  fprintf(out, ".msp430\n");
+  fprintf(out, ".include \"msp430x2xx.inc\"\n\n");
+
+  // Add any set up items (stack, registers, etc)
+  fprintf(out, "start:\n\n");
+
   return 0;
 }
 
@@ -37,99 +60,293 @@ void MSP430::serial_init()
 
 void MSP430::method_start(int local_count, const char *name)
 {
+  reg = 0;
+  stack = 0;
+
+  // main() function goes here
+  fprintf(out, "%s:\n", name);
+  fprintf(out, "  mov sp, r12\n");
+  fprintf(out, "  sub #0x%x, sp\n", local_count * 2);
 }
 
 void MSP430::method_end(int local_count)
 {
+  fprintf(out, "\n");
 }
 
 int MSP430::push_integer(int32_t n)
 {
+  if (n > 65535 || n < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", n);
+    return -1;
+  }
+
+  uint16_t value = (n & 0xffff);
+
+  if (reg < 8)
+  {
+    fprintf(out, "  mov.w #0x%02x, r%d\n", value, REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  push #0x%02x\n", value);
+    stack++;
+  }
+
   return 0;
 }
 
 int MSP430::push_integer_local(int index)
 {
+  fprintf(out, "  mov.w r12, r15\n");
+  fprintf(out, "  sub #0x%02x, r15\n", LOCALS(index));
+
+  if (reg < 8)
+  {
+    fprintf(out, "  mov.w @r15, r%d\n", REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  push @r15\n");
+    stack++;
+  }
+
   return 0;
 }
 
 int MSP430::push_long(int64_t n)
 {
-  return 0;
+  printf("long is not supported right now\n");
+  return -1;
 }
 
 int MSP430::push_float(float f)
 {
-  return 0;
+  printf("float is not supported right now\n");
+  return -1;
 }
 
 int MSP430::push_double(double f)
 {
-  return 0;
+  printf("double is not supported right now\n");
+  return -1;
 }
 
-int MSP430::push_byte(char b)
+int MSP430::push_byte(int8_t b)
 {
+  int16_t n = b;
+  uint16_t value = (n & 0xffff);
+
+  if (reg < 8)
+  {
+    fprintf(out, "  mov #0x%02x, r%d\n", value, REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  push #0x%02x\n", value);
+    stack++;
+  }
+
   return 0;
 }
 
 int MSP430::push_short(int16_t s)
 {
+  uint16_t value = (s & 0xffff);
+
+  if (reg < 8)
+  {
+    fprintf(out, "  mov #0x%02x, r%d\n", value, REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  push #0x%02x\n", value);
+    stack++;
+  }
+
   return 0;
 }
 
 int MSP430::pop_integer_local(int index)
 {
+  if (stack > 0)
+  {
+    fprintf(out, "  pop -%d(r12)\n", index);
+    stack--;
+  }
+    else
+  if (reg > 0)
+  {
+    fprintf(out, "  mov.w r%d, -%d(r12)\n", REG_STACK(reg), index);
+    reg--;
+  }
+
   return 0;
 }
 
 int MSP430::pop()
 {
+  if (stack > 0)
+  {
+    fprintf(out, "  pop cg\n");
+    stack--;
+  }
+    else
+  if (reg > 0)
+  {
+    reg--;
+  }
+
   return 0;
 }
 
 int MSP430::dup()
 {
+  if (stack > 0)
+  {
+    fprintf(out, "  push @sp\n");
+    stack++;
+  }
+    else
+  if (reg == 8)
+  {
+    fprintf(out, "  push r%d\n", REG_STACK(7));
+    stack++;
+  }
+    else
+  {
+    fprintf(out, "  mov.w r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg));
+    reg++;
+  }
   return 0;
 }
 
 int MSP430::dup2()
 {
-  return 0;
+  printf("Need to implement dup2()\n");
+  return -1;
 }
 
 int MSP430::swap()
 {
+  if (stack == 0)
+  {
+    fprintf(out, "  mov.w r%d, r15\n", REG_STACK(reg-1));
+    fprintf(out, "  mov.w r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+    fprintf(out, "  mov.w r15, r%d\n", REG_STACK(reg-2));
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  mov.w r%d, r15\n", REG_STACK(reg-1));
+    fprintf(out, "  mov.w @sp, r%d\n", REG_STACK(reg-1));
+    fprintf(out, "  mov.w r15, 0(sp)\n");
+  }
+    else
+  {
+    fprintf(out, "  mov.w (2)sp, r15\n");
+    fprintf(out, "  mov.w @sp, 2(sp)\n");
+    fprintf(out, "  mov.w r15, 0(sp)\n");
+  }
+
   return 0;
 }
 
 int MSP430::add_integers()
 {
+  if (stack == 0)
+  {
+    fprintf(out, "  add.w r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+    reg--;
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  pop r15\n");
+    fprintf(out, "  mov.w 15, r%d\n", REG_STACK(reg-1));
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  pop r15\n");
+    fprintf(out, "  add.w r15, @sp\n");
+  }
+
   return 0;
 }
 
 int MSP430::sub_integers()
 {
+  if (stack == 0)
+  {
+    fprintf(out, "  sub.w r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+    reg--;
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  pop r15\n");
+    fprintf(out, "  sub.w r15, r%d\n", REG_STACK(reg-1));
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  pop r15\n");
+    fprintf(out, "  sub.w r15, @sp\n");
+  }
+
   return 0;
 }
 
 int MSP430::mul_integers()
 {
-  return 0;
+  printf("mul not supported yet\n");
+
+  return -1;
 }
 
 int MSP430::div_integers()
 {
-  return 0;
+  printf("div not supported yet\n");
+
+  return -1;
 }
 
 int MSP430::neg_integer()
 {
+  if (stack >= 1)
+  {
+    fprintf(out, "  neg.w @sp\n");
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  neg.w r%d\n", REG_STACK(reg-1));
+  }
+
   return 0;
 }
 
 int MSP430::shift_left_integer()
 {
+  // FIXME - for MSP430x, this can be sped up
+  if (stack > 0)
+  {
+    fprintf(out, "  pop r15\n");
+    stack--;
+  }
+    else
+  if (reg > 0)
+  {
+    fprintf(out, "  mov.w r%d, r15\n", REG_STACK(reg));
+    reg--;
+  }
+
   return 0;
 }
 

@@ -16,6 +16,10 @@
 
 class ARM : public Generator
 {
+public:
+  ARM();
+  virtual ~ARM();
+
   virtual int open(char *filename);
 
   virtual void serial_init();
@@ -26,7 +30,7 @@ class ARM : public Generator
   virtual int push_long(int64_t n);
   virtual int push_float(float f);
   virtual int push_double(double f);
-  virtual int push_byte(char b);
+  virtual int push_byte(int8_t b);
   virtual int push_short(int16_t s);
   virtual int pop_integer_local(int index);
   virtual int pop();

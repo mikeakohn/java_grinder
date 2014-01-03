@@ -36,6 +36,16 @@
 
 const char *cond_str[] = { "z", "nz", "lt", "le", "gt", "ge" };
 
+DSPIC::DSPIC() : reg(0), stack(0)
+{
+
+}
+
+DSPIC::~DSPIC()
+{
+
+}
+
 int DSPIC::open(char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
@@ -57,7 +67,7 @@ void DSPIC::serial_init()
 void DSPIC::method_start(int local_count, const char *name)
 {
   reg = 0;
-  stack_count = 0;
+  stack = 0;
 
   // main() function goes here
   fprintf(out, "%s:\n", name);
@@ -91,6 +101,7 @@ int DSPIC::push_integer(int32_t n)
   {
     fprintf(out, "  mov #0x%02x, w0\n", value);
     fprintf(out, "  push w0\n");
+    stack++;
   }
 
   return 0;
@@ -108,6 +119,7 @@ int DSPIC::push_integer_local(int index)
     else
   {
     fprintf(out, "  push w0\n");
+    stack++;
   }
 
   return 0;
@@ -132,6 +144,7 @@ int DSPIC::push_long(int64_t n)
   {
     fprintf(out, "  mov #0x%02x, w0\n", value);
     fprintf(out, "  push w0\n");
+    stack++;
   }
   return 0;
 }
@@ -148,7 +161,7 @@ int DSPIC::push_double(double f)
   return -1;
 }
 
-int DSPIC::push_byte(char b)
+int DSPIC::push_byte(int8_t b)
 {
   uint16_t value = ((int32_t)b)&0xffff;
 
@@ -161,6 +174,7 @@ int DSPIC::push_byte(char b)
   {
     fprintf(out, "  mov #0x%02x, w0\n", value);
     fprintf(out, "  push w0\n");
+    stack++;
   }
   return 0;
 }
@@ -178,6 +192,7 @@ int DSPIC::push_short(int16_t s)
   {
     fprintf(out, "  mov #0x%02x, w0\n", value);
     fprintf(out, "  push w0\n");
+    stack++;
   }
   return 0;
 }

@@ -25,6 +25,15 @@
 // r10
 // r11
 
+ARM::ARM()
+{
+
+}
+
+ARM::~ARM()
+{
+
+}
 
 int ARM::open(char *filename)
 {
@@ -68,7 +77,7 @@ int ARM::push_double(double f)
   return 0;
 }
 
-int ARM::push_byte(char b)
+int ARM::push_byte(int8_t b)
 {
   return 0;
 }
