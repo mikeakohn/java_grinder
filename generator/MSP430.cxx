@@ -15,6 +15,17 @@
 
 #include "MSP430.h"
 
+// ABI is:
+// r4 top of stack
+// r5
+// r6
+// r7
+// r8
+// r9
+// r10
+// r11 top of stack
+
+
 int MSP430::open(char *filename)
 {
   return 0;

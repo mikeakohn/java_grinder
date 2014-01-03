@@ -1,0 +1,210 @@
+/**
+ *  Java Grinder
+ *  Author: The Naken Crew
+ *   Email: mike@mikekohn.net
+ *     Web: http://www.naken.cc/
+ * License: GPL
+ *
+ * Copyright 2013 by The Naken Crew
+ *
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+
+#include "ARM.h"
+
+// ABI is:
+// r4
+// r5
+// r6
+// r7
+// r8
+// r9
+// r10
+// r11
+
+
+int ARM::open(char *filename)
+{
+  return 0;
+}
+
+void ARM::serial_init()
+{
+}
+
+void ARM::method_start(int local_count, const char *name)
+{
+}
+
+void ARM::method_end(int local_count)
+{
+}
+
+int ARM::push_integer(int32_t n)
+{
+  return 0;
+}
+
+int ARM::push_integer_local(int index)
+{
+  return 0;
+}
+
+int ARM::push_long(int64_t n)
+{
+  return 0;
+}
+
+int ARM::push_float(float f)
+{
+  return 0;
+}
+
+int ARM::push_double(double f)
+{
+  return 0;
+}
+
+int ARM::push_byte(char b)
+{
+  return 0;
+}
+
+int ARM::push_short(int16_t s)
+{
+  return 0;
+}
+
+int ARM::pop_integer_local(int index)
+{
+  return 0;
+}
+
+int ARM::pop()
+{
+  return 0;
+}
+
+int ARM::dup()
+{
+  return 0;
+}
+
+int ARM::dup2()
+{
+  return 0;
+}
+
+int ARM::swap()
+{
+  return 0;
+}
+
+int ARM::add_integers()
+{
+  return 0;
+}
+
+int ARM::sub_integers()
+{
+  return 0;
+}
+
+int ARM::mul_integers()
+{
+  return 0;
+}
+
+int ARM::div_integers()
+{
+  return 0;
+}
+
+int ARM::neg_integer()
+{
+  return 0;
+}
+
+int ARM::shift_left_integer()
+{
+  return 0;
+}
+
+int ARM::shift_right_integer()
+{
+  return 0;
+}
+
+int ARM::shift_right_uinteger()
+{
+  return 0;
+}
+
+int ARM::and_integer()
+{
+  return 0;
+}
+
+int ARM::or_integer()
+{
+  return 0;
+}
+
+int ARM::xor_integer()
+{
+  return 0;
+}
+
+int ARM::inc_integer(int index, int num)
+{
+  return 0;
+}
+
+int ARM::jump_cond(const char *label, int cond)
+{
+  return 0;
+}
+
+int ARM::jump_cond_integer(const char *label, int cond)
+{
+  return 0;
+}
+
+int ARM::return_local(int index, int local_count)
+{
+  return 0;
+}
+
+int ARM::return_integer(int local_count)
+{
+  return 0;
+}
+
+int ARM::return_void(int local_count)
+{
+  return 0;
+}
+
+int ARM::jump(const char *name)
+{
+  return 0;
+}
+
+int ARM::call(const char *name)
+{
+  return 0;
+}
+
+int ARM::brk()
+{
+  return 0;
+}
+
+void ARM::close()
+{
+}
+
+

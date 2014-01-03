@@ -7,7 +7,7 @@ CFLAGS=-Wall -O3 $(DEBUG) $(INCLUDES) $(OPTIMIZATIONS)
 LDFLAGS=
 VPATH=../generator:../common
 
-CPUS=DSPIC.o MSP430.o
+CPUS=DSPIC.o MSP430.o ARM.o M6502.o
 OBJS=fileio.o Generator.o JavaClass.o java_compile.o JavaStack.o table_java_instr.o $(CPUS)
 
 default: $(OBJS)
