@@ -342,7 +342,7 @@ int t;
   }
 }
 
-int JavaClass::get_constant(char *name, int len, int index)
+int JavaClass::get_name_constant(char *name, int len, int index)
 {
 struct constant_utf8_t *constant_utf8;
 int tag,offset;
@@ -373,7 +373,7 @@ struct methods_t *method;
   if (index >= methods_count) { return -1; }
 
   method = (struct methods_t *)(methods_heap + methods[index]);
-  get_constant(name, sizeof(name), method->name_index);
+  get_name_constant(name, sizeof(name), method->name_index);
 
   return 0;
 }
@@ -382,15 +382,105 @@ int JavaClass::get_field_name(char *name, int len, int index)
 {
 struct fields_t *field;
 
-printf("ref=%d fields_count=%d\n", index, fields_count);
   name[0] = 0;
   if (index >= fields_count) { return -1; }
 
   field = (struct fields_t *)(fields_heap + fields[index]);
-printf("field->name_index=%d\n\n", field->name_index);
-  get_constant(name, sizeof(name), field->name_index);
+  get_name_constant(name, sizeof(name), field->name_index);
 
   return 0;
+}
+
+int JavaClass::get_ref_name_type(char *name, char *type, int len, int index)
+{
+struct constant_fieldref_t *constant_fieldref;
+struct constant_methodref_t *constant_methodref;
+struct constant_nameandtype_t *constant_nameandtype;
+int tag,offset;
+void *heap;
+
+  name[0] = 0;
+  type[0] = 0;
+
+  while(1)
+  {
+    if (index > constant_pool_count) { return -1; }
+ 
+    offset = constant_pool[index];
+    heap = (void *)(((uint8_t *)constants_heap) + offset);
+    tag = constants_heap[offset];
+
+    if (tag == CONSTANT_FIELDREF)
+    {
+      constant_fieldref = (constant_fieldref_t *)heap;
+      index = constant_fieldref->name_and_type_index;
+    }
+      else
+    if (tag == CONSTANT_METHODREF)
+    {
+      constant_methodref = (constant_methodref_t *)heap;
+      index = constant_methodref->name_and_type_index;
+    }
+      else
+    if (tag == CONSTANT_NAMEANDTYPE)
+    {
+      constant_nameandtype = (constant_nameandtype_t *)heap;
+      get_name_constant(name, len, constant_nameandtype->name_index);
+      get_name_constant(type, len, constant_nameandtype->descriptor_index);
+      return 0;
+    }
+      else
+    {
+      break;
+    }
+  }
+
+  return -1;
+}
+
+int JavaClass::get_class_name(char *name, int len, int index)
+{
+struct constant_fieldref_t *constant_fieldref;
+struct constant_methodref_t *constant_methodref;
+struct constant_class_t *constant_class;
+int tag,offset;
+void *heap;
+
+  name[0] = 0;
+
+  while(1)
+  {
+    if (index > constant_pool_count) { return -1; }
+ 
+    offset = constant_pool[index];
+    heap = (void *)(((uint8_t *)constants_heap) + offset);
+    tag = constants_heap[offset];
+
+    if (tag == CONSTANT_FIELDREF)
+    {
+      constant_fieldref = (constant_fieldref_t *)heap;
+      index = constant_fieldref->class_index;
+    }
+      else
+    if (tag == CONSTANT_METHODREF)
+    {
+      constant_methodref = (constant_methodref_t *)heap;
+      index = constant_methodref->class_index;
+    }
+      else
+    if (tag == CONSTANT_CLASS)
+    {
+      constant_class = (constant_class_t *)heap;
+      get_name_constant(name, len, constant_class->name_index);
+      return 0;
+    }
+      else
+    {
+      break;
+    }
+  }
+
+  return -1;
 }
 
 JavaClass::~JavaClass()
@@ -639,7 +729,7 @@ char name[256];
   for (count = 0; count < methods_count; count++)
   {
     method=(struct methods_t *)(methods_heap + methods[count]);
-    get_constant(name, sizeof(name), method->name_index);
+    get_name_constant(name, sizeof(name), method->name_index);
     printf("                ----- %d -----\n", count);
     printf("         access_flags: %d", method->access_flags);
     print_access(method->access_flags);

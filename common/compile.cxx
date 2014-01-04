@@ -1460,9 +1460,12 @@ printf("code_len=%d\n", code_len);
         pc+=3;
 #ifdef DEBUG
         {
+          char class_name[128];
           char name[128];
-          java_class->get_field_name(name, sizeof(name), ref);
-          printf("getstatic '%s'\n", name);
+          char type[128];
+          java_class->get_ref_name_type(name, type, sizeof(name), ref);
+          java_class->get_class_name(class_name, sizeof(class_name), ref);
+          printf("getstatic '%s as %s' from %s\n", name, type, class_name);
         }
 #endif
         // FIXME - need to test for private/protected and that it's a field
