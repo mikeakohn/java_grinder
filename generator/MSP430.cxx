@@ -539,3 +539,65 @@ int MSP430::stack_alu(const char *instr)
   return 0;
 }
 
+// GPIO functions
+int MSP430::ioport_set_pins_as_input()
+{
+  return -1;
+}
+
+int MSP430::ioport_set_pins_as_output()
+{
+  return -1;
+}
+
+int MSP430::ioport_set_pins_value()
+{
+  return -1;
+}
+
+int MSP430::ioport_set_pins_high()
+{
+  return -1;
+}
+
+int MSP430::ioport_set_pins_low()
+{
+  return -1;
+}
+
+int MSP430::ioport_set_pin_as_output()
+{
+  return -1;
+}
+
+int MSP430::ioport_set_pin_as_input()
+{
+  return -1;
+}
+
+int MSP430::ioport_set_pin_high()
+{
+  return -1;
+}
+
+int MSP430::ioport_set_pin_low()
+{
+  return -1;
+}
+
+int MSP430::ioport_is_pin_input_high()
+{
+  return -1;
+}
+
+int MSP430::ioport_get_port_input_value()
+{
+  return -1;
+}
+
+int MSP430::ioport_set_port_output_value()
+{
+  return -1;
+}
+
+

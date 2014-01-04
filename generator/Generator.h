@@ -61,6 +61,20 @@ public:
   virtual int brk() = 0;
   virtual void close() = 0;
 
+  // GPIO functions
+  virtual int ioport_set_pins_as_input() = 0;
+  virtual int ioport_set_pins_as_output() = 0;
+  virtual int ioport_set_pins_value() = 0;
+  virtual int ioport_set_pins_high() = 0;
+  virtual int ioport_set_pins_low() = 0;
+  virtual int ioport_set_pin_as_output() = 0;
+  virtual int ioport_set_pin_as_input() = 0;
+  virtual int ioport_set_pin_high() = 0;
+  virtual int ioport_set_pin_low() = 0;
+  virtual int ioport_is_pin_input_high() = 0;
+  virtual int ioport_get_port_input_value() = 0;
+  virtual int ioport_set_port_output_value() = 0;
+
 protected:
   FILE *out;
   int label_count;

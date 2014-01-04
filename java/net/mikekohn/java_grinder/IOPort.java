@@ -58,7 +58,7 @@ abstract public class IOPort
     return false;
   }
 
-  public static int getPortOutputValue()
+  public static int getPortInputValue()
   {
     return 0;
   }

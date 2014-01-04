@@ -16,18 +16,20 @@
 #include "JavaClass.h"
 
 int ioport(JavaClass *java_class, Generator *generator, char *method_name, int port);
+#if 0
 int ioport_setPinsAsInput_I(JavaClass *java_class, Generator *generator);
 int ioport_setPinsAsOutput_I(JavaClass *java_class, Generator *generator);
-int ioport_setPinsValue(JavaClass *java_class, Generator *generator);
-int ioport_setPinsHight(JavaClass *java_class, Generator *generator);
-int ioport_setPinsLow(JavaClass *java_class, Generator *generator);
-int ioport_setPinAsOutput(JavaClass *java_class, Generator *generator);
-int ioport_setPinAsInput(JavaClass *java_class, Generator *generator);
-int ioport_setPinHigh(JavaClass *java_class, Generator *generator);
-int ioport_setPinLow(JavaClass *java_class, Generator *generator);
-int ioport_isPinInputHigh(JavaClass *java_class, Generator *generator);
+int ioport_setPinsValue_I(JavaClass *java_class, Generator *generator);
+int ioport_setPinsHigh_I(JavaClass *java_class, Generator *generator);
+int ioport_setPinsLow_I(JavaClass *java_class, Generator *generator);
+int ioport_setPinAsOutput_I(JavaClass *java_class, Generator *generator);
+int ioport_setPinAsInput_I(JavaClass *java_class, Generator *generator);
+int ioport_setPinHigh_I(JavaClass *java_class, Generator *generator);
+int ioport_setPinLow_I(JavaClass *java_class, Generator *generator);
+int ioport_isPinInputHigh_I(JavaClass *java_class, Generator *generator);
 int ioport_getPortOuputValue(JavaClass *java_class, Generator *generator);
-int ioport_setPortOuputValue(JavaClass *java_class, Generator *generator);
+int ioport_setPortOuputValue_I(JavaClass *java_class, Generator *generator);
+#endif
 
 #endif
 

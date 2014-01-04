@@ -59,6 +59,21 @@ public:
   virtual int brk();
   virtual void close();
 
+  // GPIO functions
+  virtual int ioport_set_pins_as_input();
+  virtual int ioport_set_pins_as_output();
+  virtual int ioport_set_pins_value();
+  virtual int ioport_set_pins_high();
+  virtual int ioport_set_pins_low();
+  virtual int ioport_set_pin_as_output();
+  virtual int ioport_set_pin_as_input();
+  virtual int ioport_set_pin_high();
+  virtual int ioport_set_pin_low();
+  virtual int ioport_is_pin_input_high();
+  virtual int ioport_get_port_input_value();
+  virtual int ioport_set_port_output_value();
+
+
 private:
   int reg;            // count number of registers are are using as stack
   int stack;          // count how many things we put on the stack

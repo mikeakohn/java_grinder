@@ -388,4 +388,17 @@ void DSPIC::close()
 {
 }
 
+// GPIO functions
+int DSPIC::ioport_set_pins_as_input() { return -1; }
+int DSPIC::ioport_set_pins_as_output() { return -1; }
+int DSPIC::ioport_set_pins_value() { return -1; }
+int DSPIC::ioport_set_pins_high() { return -1; }
+int DSPIC::ioport_set_pins_low() { return -1; }
+int DSPIC::ioport_set_pin_as_output() { return -1; }
+int DSPIC::ioport_set_pin_as_input() { return -1; }
+int DSPIC::ioport_set_pin_high() { return -1; }
+int DSPIC::ioport_set_pin_low() { return -1; }
+int DSPIC::ioport_is_pin_input_high() { return -1; }
+int DSPIC::ioport_get_port_input_value() { return -1; }
+int DSPIC::ioport_set_port_output_value() { return -1; }
 
