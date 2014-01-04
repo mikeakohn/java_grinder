@@ -16,43 +16,12 @@
 
 #include "JavaClass.h"
 #include "compile.h"
-#include "invoke_virtual.h"
+#include "invoke.h"
 #include "table_java_instr.h"
 
 // http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html
 
 #define UNIMPL() printf("Opcode (%d) '%s' unimplemented\n", bytes[pc], table_java_instr[(int)bytes[pc]].name); ret = -1;
-
-#ifdef DEBUG
-#if 0
-static void stack_dump(unsigned int *stack, unsigned char *stack_types, int stack_ptr)
-{
-int n;
-
-  printf("---- Stack Dump (size=%d) -----\n", stack_ptr);
-  for (n = 0; n < stack_ptr; n++)
-  {
-    printf("%d ",stack[n]);
-    if (stack_types[n] == JAVA_TYPE_INTEGER)
-    { printf("Integer"); }
-      else
-    if (stack_types[n] == JAVA_TYPE_LONG)
-    { printf("Long"); }
-      else
-    if (stack_types[n] == JAVA_TYPE_FLOAT)
-    { printf("Float %f", *((float*)(void*)(&stack[n]))); }
-      else
-    if (stack_types[n] == JAVA_TYPE_DOUBLE)
-    { printf("Double"); }
-      else
-    if (stack_types[n] == JAVA_TYPE_REF)
-    { printf("Ref"); }
-
-    printf("\n");
-  }
-}
-#endif
-#endif
 
 static void fill_label_map(uint8_t *label_map, int label_map_len, uint8_t *bytes, int code_len, int pc_start)
 {
@@ -129,13 +98,6 @@ const float fzero = 0.0;
 const float fone = 1.0;
 const float ftwo = 2.0;
 int wide = 0;
-//int local_vars_stack[LOCAL_SIZE];
-//int *local_vars;
-//float fvalue1,fvalue2;
-//int value1,value2;
-//long long lvalue1,lvalue2;
-//double dvalue1,dvalue2;
-//int value1;
 int pc_start;
 int max_stack;
 int max_locals;
@@ -156,9 +118,11 @@ uint16_t operand_stack_ptr = 0;
     strcpy(method_name, "error");
   }
 
-  if (strcmp(method_name, "<init>") == 0)
+  printf("--- Compiling method '%s'\n", method_name);
+
+  if (strcmp(method_name, "<init>") == 0 || method_name[0] == 0)
   {
-    printf("Skipping constructor\n");
+    printf("Skipping method <--\n");
     return 0;
   }
 
@@ -1498,86 +1462,7 @@ printf("code_len=%d\n", code_len);
           break;
         }
         
-        invoke_virtual(java_class, ref, operand_stack[--operand_stack_ptr], generator);
-#if 0
-        // printf("Opcode (0xb6) invokevirtual unimplemented\n");
-        // FIXME - Hack (this should probably be in a function somewhere)
-        {
-          struct constant_methodref_t *constant_method;
-          struct constant_class_t *constant_class;
-          struct constant_utf8_t *constant_utf8;
-          struct constant_nameandtype_t *constant_nameandtype;
-#ifdef DEBUG
-          int n;
-#endif
-          constant_method = ((constant_methodref_t *)java_class->constants_heap) + java_class->constant_pool[ref];
-          if (constant_method->tag != CONSTANT_METHODREF)
-          {
-            printf("Exception: reference is not a method\n");
-            goto leave;
-          }
-
-          constant_class = ((constant_class_t *)java_class->constants_heap) + java_class->constant_pool[constant_method->class_index];
-          constant_utf8 = ((constant_utf8_t *)java_class->constants_heap) + java_class->constant_pool[constant_class->name_index];
-          constant_nameandtype = ((constant_nameandtype_t *)java_class->constants_heap) + java_class->constant_pool[constant_method->name_and_type_index];
-#ifdef DEBUG
-          printf("Call to class: ");
-          for (n = 0; n < constant_utf8->length; n++)
-          {
-            printf("%c", constant_utf8->bytes[n]);
-          }
-          printf("\n");
-#endif
-          constant_utf8 = ((constant_utf8_t *)java_class->constants_heap) + java_class->constant_pool[constant_nameandtype->name_index];
-#ifdef DEBUG
-          printf("Call to method: ");
-          for (n = 0; n < constant_utf8->length; n++)
-          {
-            printf("%c", constant_utf8->bytes[n]);
-          }
-          printf("\n");
-#endif
-          if (strncmp((char*)constant_utf8->bytes, "println", constant_utf8->length)!=0)
-          {
-            printf("We only support println right now (and not even very well :)\n");
-            goto leave;
-          }
-          constant_utf8 = ((constant_utf8_t *)java_class->constants_heap) + java_class->constant_pool[constant_nameandtype->descriptor_index];
-
-#ifdef DEBUG
-          printf("Call to signature: ");
-          for (n = 0; n < constant_utf8->length; n++)
-          {
-            printf("%c", constant_utf8->bytes[n]);
-          }
-          printf("\n");
-#endif
-
-          if (constant_utf8->bytes[1] == 'I')
-          {
-            //value1 = POP_INTEGER(); // FIXME.. wrong
-            value1 = 0;
-            printf("%d\n",value1);
-          }
-            else
-          if (constant_utf8->bytes[1] == 'F')
-          {
-            float f1;
-            //f1 = POP_FLOAT(); // FIXME.. wrong
-            f1 = 0;
-            printf("%f\n", f1);
-          }
-            else
-          {
-            printf("Cannot println this type %c\n",constant_utf8->bytes[1]);
-            goto leave;
-          }
-        }
-        //ref = POP_REF(); // FIXME.. wrong
-        // printf("invokevirtual %d\n",GET_PC_UINT16(1));
-        ref = 0;  // FIXME.. wrong
-#endif
-
+        ret = invoke_virtual(java_class, ref, operand_stack[--operand_stack_ptr], generator);
         pc += 3;
         break;
 
@@ -1586,14 +1471,16 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 184: // invokestatic (0xb8)
-        UNIMPL()
+        ref = GET_PC_UINT16(1);
+        ret = invoke_static(java_class, ref, generator);
+        pc += 3;
         break;
 
       case 185: // invokeinterface (0xb9)
         UNIMPL()
         break;
 
-      case 186: // xxxunusedxxx1 (0xba)
+      case 186: // invokedynamic (0xba)
         UNIMPL()
         break;
 

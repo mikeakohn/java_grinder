@@ -6,7 +6,7 @@ JOBJS=\
   $(PKG_DIR)/IOPort0.class \
   $(PKG_DIR)/IOPort1.class
 
-default:
+default: $(JOBJS)
 
 %.class: %.java
 	javac -classpath . -d ../build $*.java

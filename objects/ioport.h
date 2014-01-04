@@ -15,8 +15,9 @@
 #include "Generator.h"
 #include "JavaClass.h"
 
-int ioport_setPinsAsInput(JavaClass *java_class, Generator *generator);
-int ioport_setPinsAsOutput(JavaClass *java_class, Generator *generator);
+int ioport(JavaClass *java_class, Generator *generator, char *method_name, int port);
+int ioport_setPinsAsInput_I(JavaClass *java_class, Generator *generator);
+int ioport_setPinsAsOutput_I(JavaClass *java_class, Generator *generator);
 int ioport_setPinsValue(JavaClass *java_class, Generator *generator);
 int ioport_setPinsHight(JavaClass *java_class, Generator *generator);
 int ioport_setPinsLow(JavaClass *java_class, Generator *generator);

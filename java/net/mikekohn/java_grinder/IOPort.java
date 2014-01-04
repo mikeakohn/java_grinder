@@ -63,7 +63,7 @@ abstract public class IOPort
     return 0;
   }
 
-  public static void setPortOutputValue()
+  public static void setPortOutputValue(int value)
   {
   }
 }

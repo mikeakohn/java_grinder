@@ -7,6 +7,7 @@ default:
 tests:
 	@cd testing && make
 
+.PHONY: java
 java:
 	@cd java && make
 	@cd build && make jar

@@ -199,7 +199,7 @@ struct table_java_instr_t table_java_instr[] =
   { "invokespecial", 3, 0 }, // invokespecial (0xb7)
   { "invokestatic", 3, 0 }, // invokestatic (0xb8)
   { "invokeinterface", 4, 0 }, // invokeinterface (0xb9)
-  { "invokedynamic", 4, 0 }, // xxxunusedxxx1 (0xba)
+  { "invokedynamic", 4, 0 }, // invokedynamic (0xba)
   { "new", 1, 0 }, // new (0xbb)
   { "newarray", 1, 0 }, // newarray (0xbc)
   { "anewarray", 1, 0 }, // anewarray (0xbd)
