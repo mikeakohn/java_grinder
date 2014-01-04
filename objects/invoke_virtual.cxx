@@ -21,24 +21,36 @@
 static void get_function(char *function, char *method_name, char *method_type, char *field_name, char *field_class)
 {
 char *s;
+int ptr = 0;
 
   s = field_class;
   while(*s != 0)
   {
-    if (*s == '/') { field_class = s + 1; }
-    if (*s >='A' && *s <= 'Z') { *s ^= 32; } // convert to lower
+    if (*s == '/') { ptr = 0; s++; continue; }
+    function[ptr++] = *s | 32;
     s++;
   }
 
-  s = method_type;
+  function[ptr++] = '_';
+  s = field_name;
+  while (*s != 0) { function[ptr++] = *s; s++; }
+
+  function[ptr++] = '_';
+  s = method_name;
+  while (*s != 0) { function[ptr++] = *s; s++; }
+
+  function[ptr++] = '_';
+  s = method_type + 1;
   while(*s != 0)
   {
-    if (*s == '(') { method_type = s + 1; }
-    if (*s == ')') { *s = 0; break; }
+    //if (*s == '(') { method_type = s + 1; }
+    if (*s == ')') { break; }
+    function[ptr++] = *s;
     s++;
   }
 
-  sprintf(function, "%s_%s_%s_%s", field_class, field_name, method_name, method_type);
+  function[ptr] = 0;
+  //sprintf(function, "%s_%s_%s_%s", field_class, field_name, method_name, method_type);
 }
 
 int invoke_virtual(JavaClass *java_class, int method_id, int field_id, Generator *generator)
@@ -72,15 +84,17 @@ char function[256];
 
   printf("function: %s()\n", function);
 
-  if (strncmp("system_out_println", function, sizeof("system_out_println"-1)) == 0)
+  int ret = -1;
+  if (strcmp(field_class, "java/lang/System") == 0)
   {
-    return system_out_println(java_class, generator);
+    ret = java_lang_system(java_class, generator, function);
   }
 
+  if (ret == 0) { return 0; }
 
   printf("Function not implemented '%s'\n", function);
 
-  return 0;
+  return -1;
 }
 
 

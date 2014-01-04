@@ -9,13 +9,14 @@
  *
  */
 
-#ifndef _SYSTEM_H
-#define _SYSTEM_H
+#ifndef _JAVA_LANG_SYSTEM_H
+#define _JAVA_LANG_SYSTEM_H
 
 #include "Generator.h"
 #include "JavaClass.h"
 
-int system_out_println(JavaClass *java_class, Generator *generator);
+int java_lang_system(JavaClass *java_class, Generator *generator, char *function);
+//int system_out_println(JavaClass *java_class, Generator *generator);
 
 #endif
 
