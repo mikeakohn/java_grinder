@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Created-By: Michael Kohn
+Class-Path: JavaGrinder.jar
+Name: net/mikekohn/java_grinder
+

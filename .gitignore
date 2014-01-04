@@ -3,3 +3,4 @@ java_grinder
 .gitignore
 *.class
 *.asm
+*.jar
