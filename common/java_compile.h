@@ -14,9 +14,19 @@
 
 #include "Generator.h"
 #include "JavaClass.h"
-#include "JavaStack.h"
 
-int java_compile_method(JavaClass *java_class, int method_index, Generator *generator, JavaStack *stack, int stack_start_ptr);
+#define GET_PC_INT16(a) ((int16_t)(((uint16_t)bytes[pc+a+0])<<8|bytes[pc+a+1]))
+#define GET_PC_UINT16(a) (((uint16_t)bytes[pc+a+0])<<8|bytes[pc+a+1])
+#define GET_PC_INT32(a) ((int32_t)((uint32_t)bytes[pc+a+0])<<24| \
+                        ((uint32_t)bytes[pc+a+1])<<16|\
+                        ((uint32_t)bytes[pc+a+2])<<8|\
+                         bytes[pc+a+3])
+#define GET_PC_UINT32(a) (((uint32_t)bytes[pc+a+0])<<24| \
+                         ((uint32_t)bytes[pc+a+1])<<16|\
+                         ((uint32_t)bytes[pc+a+2])<<8|\
+                          bytes[pc+a+3])
+
+int java_compile_method(JavaClass *java_class, int method_index, Generator *generator);
 
 #endif
 

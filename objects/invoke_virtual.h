@@ -9,19 +9,13 @@
  *
  */
 
-#ifndef _JAVA_STACK_H
-#define _JAVA_STACK_H
+#ifndef _INVOKE_VIRTUAL_H
+#define _INVOKE_VIRTUAL_H
 
-class JavaStack
-{
-public:
-  JavaStack(int len);
-  ~JavaStack();
+#include "Generator.h"
+#include "JavaClass.h"
 
-  void *values;
-  void *types;
-  int len;
-};
+int invoke_virtual(JavaClass *java_class, int method_index, Generator *generator);
 
 #endif
 

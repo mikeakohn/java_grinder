@@ -4,17 +4,16 @@ public class Testing2
   static public void main(String args[])
   {
   int c;
-  float k;
+  int k = 5;
 
-    k = 100.0f;
-
-    for (c = 0; c < 1000000000; c++)
+    for (c = 0; c < 32; c++)
     {
       k = k + c;
     }
 
     System.out.println(k);
-    System.out.println(c);
+
+    while(true);
   }
 }
 

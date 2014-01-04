@@ -2,13 +2,13 @@ CC=gcc
 CXX=g++
 DEBUG=-DDEBUG -g
 #OPTIMIZATIONS=-march=nocona -mtune=nocona
-INCLUDES=-I../common -I../generator
+INCLUDES=-I../common -I../generator -I../objects
 CFLAGS=-Wall -O3 $(DEBUG) $(INCLUDES) $(OPTIMIZATIONS)
 LDFLAGS=
-VPATH=../generator:../common
+VPATH=../generator:../common:../objects
 
-CPUS=DSPIC.o MSP430.o ARM.o M6502.o
-OBJS=fileio.o Generator.o JavaClass.o java_compile.o JavaStack.o table_java_instr.o $(CPUS)
+CPUS=DSPIC.o MSP430.o MSP430X.o ARM.o M6502.o
+OBJS=fileio.o Generator.o invoke_virtual.o JavaClass.o java_compile.o JavaStack.o table_java_instr.o $(CPUS)
 
 default: $(OBJS)
 	$(CXX) -o ../java_grinder ../common/java_grinder.cxx \

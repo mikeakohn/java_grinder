@@ -59,7 +59,7 @@ public:
   virtual int brk();
   virtual void close();
 
-private:
+protected:
   int stack_alu(const char *instr);
   int reg;
   int stack;

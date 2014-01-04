@@ -13,7 +13,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "JavaStack.h"
 #include "JavaClass.h"
 #include "java_compile.h"
 #include "Generator.h"
@@ -21,13 +20,13 @@
 #include "DSPIC.h"
 #include "M6502.h"
 #include "MSP430.h"
+#include "MSP430X.h"
 
 #define STACK_LEN 65536
 
 int main(int argc, char *argv[])
 {
 FILE *in;
-JavaStack *java_stack;
 Generator *generator;
 JavaClass *java_class;
 int index;
@@ -48,6 +47,11 @@ int index;
   if (strcasecmp("msp430",argv[3]) == 0)
   {
     generator = new MSP430();
+  }
+    else
+  if (strcasecmp("msp430x",argv[3]) == 0)
+  {
+    generator = new MSP430X();
   }
     else
   if (strcasecmp("dspic",argv[3]) == 0)
@@ -75,7 +79,6 @@ int index;
     exit(1);
   }
 
-  java_stack = new JavaStack(STACK_LEN);
   java_class = new JavaClass(in);
 #ifdef DEBUG
   java_class->print();
@@ -83,10 +86,9 @@ int index;
 
   for (index = 0; index < java_class->methods_count; index++)
   {
-    java_compile_method(java_class, index, generator, java_stack, 0);
+    java_compile_method(java_class, index, generator);
   }
 
-  delete java_stack;
   delete generator;
 
   fclose(in);

@@ -1,5 +1,5 @@
 
-JOBJS=Testing.class
+JOBJS=Testing.class Testing2.class
 
 default: $(JOBJS)
 

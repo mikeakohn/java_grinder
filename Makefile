@@ -5,7 +5,7 @@ default:
 	@cd build && make
 	@cd java && make
 
-test:
+tests:
 	@cd testing && make
 
 %.class: %.java

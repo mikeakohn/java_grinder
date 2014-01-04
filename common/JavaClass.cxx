@@ -369,10 +369,26 @@ int JavaClass::get_method_name(char *name, int len, int index)
 {
 struct methods_t *method;
 
+  name[0] = 0;
   if (index >= methods_count) { return -1; }
 
-  method=(struct methods_t *)(methods_heap + methods[index]);
+  method = (struct methods_t *)(methods_heap + methods[index]);
   get_constant(name, sizeof(name), method->name_index);
+
+  return 0;
+}
+
+int JavaClass::get_field_name(char *name, int len, int index)
+{
+struct fields_t *field;
+
+printf("ref=%d fields_count=%d\n", index, fields_count);
+  name[0] = 0;
+  if (index >= fields_count) { return -1; }
+
+  field = (struct fields_t *)(fields_heap + fields[index]);
+printf("field->name_index=%d\n\n", field->name_index);
+  get_constant(name, sizeof(name), field->name_index);
 
   return 0;
 }

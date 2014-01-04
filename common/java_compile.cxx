@@ -14,35 +14,14 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "JavaStack.h"
 #include "JavaClass.h"
 #include "java_compile.h"
+#include "invoke_virtual.h"
 #include "table_java_instr.h"
 
 // http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html
 
-// Size the stack/local_vars should be before malloc'ing a heap
-#ifdef FRAME_STACK
-#define STACK_SIZE 256
-#endif
-
 #define UNIMPL() printf("Opcode (%d) '%s' unimplemented\n", bytes[pc], table_java_instr[(int)bytes[pc]].name); ret = -1;
-
-#define LOCAL_SIZE 32
-
-//#define PUSH_LONG(gen_value) ((int16_t *)(void *)&stack_types)[stack_ptr]=(JAVA_TYPE_LONG<<8)|JAVA_TYPE_LONG; *(long long *)stack_values=gen_value; stack_values+=2;
-
-#define GET_PC_INT16(a) ((short int)(((unsigned short int)bytes[pc+a+0])<<8|bytes[pc+a+1]))
-#define GET_PC_UINT16(a) (((unsigned short int)bytes[pc+a+0])<<8|bytes[pc+a+1])
-#define GET_PC_INT32(a) ((int)((unsigned int)bytes[pc+a+0])<<24| \
-                        ((unsigned int)bytes[pc+a+1])<<16|\
-                        ((unsigned int)bytes[pc+a+2])<<8|\
-                         bytes[pc+a+3])
-#define GET_PC_UINT32(a) (((unsigned int)bytes[pc+a+0])<<24| \
-                         ((unsigned int)bytes[pc+a+1])<<16|\
-                         ((unsigned int)bytes[pc+a+2])<<8|\
-                          bytes[pc+a+3])
-
 
 #ifdef DEBUG
 #if 0
@@ -141,9 +120,9 @@ int address;
   }
 }
 
-int java_compile_method(JavaClass *java_class, int method_index, Generator *generator, JavaStack *java_stack, int stack_start_ptr)
+int java_compile_method(JavaClass *java_class, int method_id, Generator *generator)
 {
-struct methods_t *method = (struct methods_t *)(java_class->methods_heap + java_class->methods[method_index]);
+struct methods_t *method = (struct methods_t *)(java_class->methods_heap + java_class->methods[method_id]);
 unsigned char *bytes = method->attributes[0].info;
 int pc;
 const float fzero = 0.0;
@@ -156,19 +135,11 @@ int wide = 0;
 //int value1,value2;
 //long long lvalue1,lvalue2;
 //double dvalue1,dvalue2;
-int value1;
+//int value1;
 int pc_start;
 int max_stack;
 int max_locals;
 int code_len;
-#ifdef FRAME_STACK
-//uint32_t stack_stack[STACK_SIZE];
-//uint8_t stack_types_stack[STACK_SIZE];
-#endif
-//uint32_t *stack_values = NULL;
-//uint32_t *stack_values_start = NULL;
-//uint8_t *stack_types = NULL;
-//int stack_ptr = 0;
 uint32_t ref;
 struct generic_32bit_t *gen32;
 struct constant_float_t *constant_float;
@@ -176,8 +147,11 @@ uint8_t *label_map;
 int ret = 0;
 char label[16];
 char method_name[64];
+uint16_t *operand_stack;
+uint16_t operand_stack_ptr = 0;
 
-  if (java_class->get_method_name(method_name, sizeof(method_name), method_index) != 0)
+
+  if (java_class->get_method_name(method_name, sizeof(method_name), method_id) != 0)
   {
     strcpy(method_name, "error");
   }
@@ -200,6 +174,7 @@ char method_name[64];
   pc = pc_start;
 
   generator->method_start(max_locals, method_name);
+  operand_stack = (uint16_t *)alloca(max_stack * sizeof(uint16_t));
 
   int label_map_len = (code_len / 8) + 1;
   label_map = (uint8_t *)alloca(label_map_len);
@@ -210,30 +185,6 @@ printf("pc=%d\n", pc);
 printf("max_stack=%d\n", max_stack);
 printf("max_locals=%d\n", max_locals);
 printf("code_len=%d\n", code_len);
-#endif
-
-#if 0
-#ifdef FRAME_STACK
-  if (max_stack > STACK_SIZE)
-  {
-    //stack = malloc(max_stack*(sizeof(int)));
-    //stack_types = malloc(max_stack);
-  }
-    else
-  {
-    //stack_values = stack_stack;
-    //stack_types = stack_types;
-  }
-#else
-  //stack_values_start = (uint32_t *)((uint8_t *)java_stack->values + (stack_start_ptr * sizeof(int)));
-  //stack_values = stack_values_start;
-  //stack_types = ((uint8_t *)java_stack->types) + stack_start_ptr;
-#endif
-
-  if (max_locals > LOCAL_SIZE)
-  { local_vars = (int *)malloc(max_locals * (sizeof(int))); }
-    else
-  { local_vars = local_vars_stack; }
 #endif
 
   while(1)
@@ -1504,13 +1455,20 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 178: // getstatic (0xb2)
-        UNIMPL()
+        ref = GET_PC_UINT16(1);
+        operand_stack[operand_stack_ptr++] = ref;
         pc+=3;
+#ifdef DEBUG
+        {
+          char name[128];
+          java_class->get_field_name(name, sizeof(name), ref);
+          printf("getstatic '%s'\n", name);
+        }
+#endif
         // FIXME - need to test for private/protected and that it's a field
         // printf("getstatic %d\n",GET_PC_UINT16(1));
         //PUSH_REF(GET_PC_UINT16(1));
         break;
-
       case 179: // putstatic (0xb3)
         UNIMPL()
         pc+=3;
@@ -1527,8 +1485,10 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 182: // invokevirtual (0xb6)
-        // printf("Opcode (0xb6) invokevirtual unimplemented\n");
         ref = GET_PC_UINT16(1);
+        invoke_virtual(java_class, ref, generator);
+#if 0
+        // printf("Opcode (0xb6) invokevirtual unimplemented\n");
         // FIXME - Hack (this should probably be in a function somewhere)
         {
           struct constant_methodref_t *constant_method;
@@ -1604,6 +1564,7 @@ printf("code_len=%d\n", code_len);
         //ref = POP_REF(); // FIXME.. wrong
         // printf("invokevirtual %d\n",GET_PC_UINT16(1));
         ref = 0;  // FIXME.. wrong
+#endif
 
         pc += 3;
         break;
@@ -1770,24 +1731,12 @@ printf("code_len=%d\n", code_len);
     //stack_dump(stack_values_start, stack_types, stack_ptr);
 #endif
 
-    // Is this even needed?
-    //if (pc >= code_len + 8) { pc = pc - code_len; }
-    //else if (pc < 8) { pc = pc + code_len; }
-
     //printf("pc=%d opcode=%d (0x%02x)\n", pc - pc_start, bytes[pc], bytes[pc]);
     if (pc - pc_start >= code_len) { break; }
   }
-leave:
+//leave:
 
   generator->method_end(max_locals);
-
-#if 0
-  if (local_vars != local_vars_stack) { free(local_vars); }
-#ifdef FRAME_STACK
-  //if (stack_values != stack_stack) { free(stack_value); }
-  if (stack_types != stack_types_stack) { free(stack_types); }
-#endif
-#endif
 
   return 0;
 }
