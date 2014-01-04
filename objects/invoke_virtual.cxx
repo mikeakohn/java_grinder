@@ -15,7 +15,7 @@
 #include <stdint.h>
 
 #include "JavaClass.h"
-#include "java_compile.h"
+#include "compile.h"
 
 int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
 {

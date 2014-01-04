@@ -14,7 +14,7 @@
 #include <string.h>
 
 #include "JavaClass.h"
-#include "java_compile.h"
+#include "compile.h"
 #include "Generator.h"
 #include "ARM.h"
 #include "DSPIC.h"
@@ -86,7 +86,7 @@ int index;
 
   for (index = 0; index < java_class->methods_count; index++)
   {
-    java_compile_method(java_class, index, generator);
+    compile_method(java_class, index, generator);
   }
 
   delete generator;

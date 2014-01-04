@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _JAVA_COMPILE_H
-#define _JAVA_COMPILE_H
+#ifndef _COMPILE_H
+#define _COMPILE_H
 
 #include "Generator.h"
 #include "JavaClass.h"
@@ -26,7 +26,7 @@
                          ((uint32_t)bytes[pc+a+2])<<8|\
                           bytes[pc+a+3])
 
-int java_compile_method(JavaClass *java_class, int method_index, Generator *generator);
+int compile_method(JavaClass *java_class, int method_id, Generator *generator);
 
 #endif
 

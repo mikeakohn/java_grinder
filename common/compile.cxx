@@ -15,7 +15,7 @@
 #include <stdint.h>
 
 #include "JavaClass.h"
-#include "java_compile.h"
+#include "compile.h"
 #include "invoke_virtual.h"
 #include "table_java_instr.h"
 
@@ -120,7 +120,7 @@ int address;
   }
 }
 
-int java_compile_method(JavaClass *java_class, int method_id, Generator *generator)
+int compile_method(JavaClass *java_class, int method_id, Generator *generator)
 {
 struct methods_t *method = (struct methods_t *)(java_class->methods_heap + java_class->methods[method_id]);
 unsigned char *bytes = method->attributes[0].info;
