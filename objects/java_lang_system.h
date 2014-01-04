@@ -9,13 +9,13 @@
  *
  */
 
-#ifndef _INVOKE_VIRTUAL_H
-#define _INVOKE_VIRTUAL_H
+#ifndef _SYSTEM_H
+#define _SYSTEM_H
 
 #include "Generator.h"
 #include "JavaClass.h"
 
-int invoke_virtual(JavaClass *java_class, int method_id, int field_id, Generator *generator);
+int system_out_println(JavaClass *java_class, Generator *generator);
 
 #endif
 

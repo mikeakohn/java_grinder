@@ -16,99 +16,69 @@
 
 #include "JavaClass.h"
 #include "compile.h"
+#include "java_lang_system.h"
 
-int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
+static void get_function(char *function, char *method_name, char *method_type, char *field_name, char *field_class)
 {
-char method_name[128];
+char *s;
 
-  if (java_class->get_method_name(method_name, sizeof(method_name), method_id) != 0)
+  s = field_class;
+  while(*s != 0)
   {
-    printf("Error: Couldn't get method name for method_id %d\n", method_id);
+    if (*s == '/') { field_class = s + 1; }
+    if (*s >='A' && *s <= 'Z') { *s ^= 32; } // convert to lower
+    s++;
+  }
+
+  s = method_type;
+  while(*s != 0)
+  {
+    if (*s == '(') { method_type = s + 1; }
+    if (*s == ')') { *s = 0; break; }
+    s++;
+  }
+
+  sprintf(function, "%s_%s_%s_%s", field_class, field_name, method_name, method_type);
+}
+
+int invoke_virtual(JavaClass *java_class, int method_id, int field_id, Generator *generator)
+{
+char field_name[128];
+char field_type[128];
+char field_class[128];
+char method_name[128];
+char method_type[128];
+char method_class[128];
+char function[256];
+
+  if (java_class->get_ref_name_type(field_name, field_type, sizeof(field_name), field_id) !=0 ||
+      java_class->get_class_name(field_class, sizeof(field_class), field_id) != 0)
+  {
+    printf("Error: Could not field info for field_id %d\n", field_id);
     return -1;
   }
 
-  printf("invoke_virtual: '%s'\n", method_name);
-
-#if 0
-
-  // FIXME - Hack (this should probably be in a function somewhere)
+  if (java_class->get_class_name(method_class, sizeof(method_class), method_id) != 0 ||
+      java_class->get_ref_name_type(method_name, method_type, sizeof(method_name), method_id) != 0)
   {
-    struct constant_methodref_t *constant_method;
-    struct constant_class_t *constant_class;
-    struct constant_utf8_t *constant_utf8;
-    struct constant_nameandtype_t *constant_nameandtype;
-#ifdef DEBUG
-    int n;
-#endif
-    constant_method = ((constant_methodref_t *)java_class->constants_heap) + java_class->constant_pool[ref];
-    if (constant_method->tag != CONSTANT_METHODREF)
-    {
-      printf("Exception: reference is not a method\n");
-      goto leave;
-    }
-
-    constant_class = ((constant_class_t *)java_class->constants_heap) + java_class->constant_pool[constant_method->class_index];
-    constant_utf8 = ((constant_utf8_t *)java_class->constants_heap) + java_class->constant_pool[constant_class->name_index];
-    constant_nameandtype = ((constant_nameandtype_t *)java_class->constants_heap) + java_class->constant_pool[constant_method->name_and_type_index];
-#ifdef DEBUG
-    printf("Call to class: ");
-    for (n = 0; n < constant_utf8->length; n++)
-    {
-      printf("%c", constant_utf8->bytes[n]);
-    }
-    printf("\n");
-#endif
-    constant_utf8 = ((constant_utf8_t *)java_class->constants_heap) + java_class->constant_pool[constant_nameandtype->name_index];
-#ifdef DEBUG
-    printf("Call to method: ");
-    for (n = 0; n < constant_utf8->length; n++)
-    {
-      printf("%c", constant_utf8->bytes[n]);
-    }
-    printf("\n");
-#endif
-    if (strncmp((char*)constant_utf8->bytes, "println", constant_utf8->length)!=0)
-    {
-      printf("We only support println right now (and not even very well :)\n");
-      goto leave;
-    }
-    constant_utf8 = ((constant_utf8_t *)java_class->constants_heap) + java_class->constant_pool[constant_nameandtype->descriptor_index];
-
-#ifdef DEBUG
-    printf("Call to signature: ");
-    for (n = 0; n < constant_utf8->length; n++)
-    {
-      printf("%c", constant_utf8->bytes[n]);
-    }
-    printf("\n");
-#endif
-
-    if (constant_utf8->bytes[1] == 'I')
-    {
-      //value1 = POP_INTEGER(); // FIXME.. wrong
-      value1 = 0;
-      printf("%d\n",value1);
-    }
-      else
-    if (constant_utf8->bytes[1] == 'F')
-    {
-      float f1;
-      //f1 = POP_FLOAT(); // FIXME.. wrong
-      f1 = 0;
-      printf("%f\n", f1);
-    }
-      else
-    {
-      printf("Cannot println this type %c\n",constant_utf8->bytes[1]);
-      goto leave;
-    }
+    printf("Error: Couldn't get name and type for method_id %d\n", method_id);
+    return -1;
   }
 
-  //ref = POP_REF(); // FIXME.. wrong
-  // printf("invokevirtual %d\n",GET_PC_UINT16(1));
-  ref = 0;  // FIXME.. wrong
+  printf("field: '%s as %s' from %s\n", field_name, field_type, field_class);
+  printf("method: '%s as %s' from %s\n", method_name, method_type, method_class);
 
-#endif
+  get_function(function, method_name, method_type, field_name, field_class);
+
+  printf("function: %s()\n", function);
+
+  if (strncmp("system_out_println", function, sizeof("system_out_println"-1)) == 0)
+  {
+    return system_out_println(java_class, generator);
+  }
+
+
+  printf("Function not implemented '%s'\n", function);
 
   return 0;
 }

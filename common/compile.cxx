@@ -1459,6 +1459,7 @@ printf("code_len=%d\n", code_len);
         operand_stack[operand_stack_ptr++] = ref;
         pc+=3;
 #ifdef DEBUG
+#if 0
         {
           char class_name[128];
           char name[128];
@@ -1467,6 +1468,7 @@ printf("code_len=%d\n", code_len);
           java_class->get_class_name(class_name, sizeof(class_name), ref);
           printf("getstatic '%s as %s' from %s\n", name, type, class_name);
         }
+#endif
 #endif
         // FIXME - need to test for private/protected and that it's a field
         // printf("getstatic %d\n",GET_PC_UINT16(1));
@@ -1489,7 +1491,14 @@ printf("code_len=%d\n", code_len);
 
       case 182: // invokevirtual (0xb6)
         ref = GET_PC_UINT16(1);
-        invoke_virtual(java_class, ref, generator);
+        if (operand_stack_ptr == 0)
+        {
+          printf("Error: empty operand_stack\n");
+          ret = -1;
+          break;
+        }
+        
+        invoke_virtual(java_class, ref, operand_stack[--operand_stack_ptr], generator);
 #if 0
         // printf("Opcode (0xb6) invokevirtual unimplemented\n");
         // FIXME - Hack (this should probably be in a function somewhere)
