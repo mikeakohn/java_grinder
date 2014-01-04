@@ -13,7 +13,7 @@ package net.mikekohn.java_grinder;
 
 abstract public class IOPort
 {
-  private IOPort()
+  protected IOPort()
   {
   }
 
@@ -55,13 +55,15 @@ abstract public class IOPort
 
   public static boolean isPinInputHigh(int pin)
   {
+    return false;
   }
 
   public static int getPortOutputValue()
   {
+    return 0;
   }
 
-  public static int setPortOutputValue()
+  public static void setPortOutputValue()
   {
   }
 }

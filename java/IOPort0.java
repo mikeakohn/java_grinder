@@ -11,9 +11,11 @@
 
 package net.mikekohn.java_grinder;
 
+import net.mikekohn.java_grinder.IOPort;
+
 public class IOPort0 extends IOPort
 {
-  private IOPort0()
+  protected IOPort0()
   {
   }
 }

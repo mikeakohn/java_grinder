@@ -13,7 +13,7 @@ package net.mikekohn.java_grinder;
 
 public class IOPort1 extends IOPort
 {
-  private IOPort1()
+  protected IOPort1()
   {
   }
 }
