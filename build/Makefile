@@ -21,4 +21,6 @@ test: $(JOBJS)
 %.o: %.cxx %.h
 	$(CXX) -c $< -o $*.o $(CFLAGS)
 
+jar:
+	jar cvfm JavaGrinder.jar Manifest.txt net
 
