@@ -1,14 +1,13 @@
 /**
  *  Java Grinder
- *  Author: The Naken Crew
+ *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.naken.cc/
+ *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2013 by The Naken Crew
+ * Copyright 2014 by Michael Kohn
  *
  */
-
 
 #define __STDC_FORMAT_MACROS
 
