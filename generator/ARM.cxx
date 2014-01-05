@@ -217,16 +217,16 @@ void ARM::close()
 }
 
 // GPIO functions
-int ARM::ioport_set_pins_as_input() { return -1; }
-int ARM::ioport_set_pins_as_output() { return -1; }
-int ARM::ioport_set_pins_value() { return -1; }
-int ARM::ioport_set_pins_high() { return -1; }
-int ARM::ioport_set_pins_low() { return -1; }
-int ARM::ioport_set_pin_as_output() { return -1; }
-int ARM::ioport_set_pin_as_input() { return -1; }
-int ARM::ioport_set_pin_high() { return -1; }
-int ARM::ioport_set_pin_low() { return -1; }
-int ARM::ioport_is_pin_input_high() { return -1; }
-int ARM::ioport_get_port_input_value() { return -1; }
-int ARM::ioport_set_port_output_value() { return -1; }
+int ARM::ioport_setPinsAsInput() { return -1; }
+int ARM::ioport_setPinsAsOutput() { return -1; }
+int ARM::ioport_setPinsValue() { return -1; }
+int ARM::ioport_setPinsHigh() { return -1; }
+int ARM::ioport_setPinsLow() { return -1; }
+int ARM::ioport_setPinAsOutput() { return -1; }
+int ARM::ioport_setPinAsInput() { return -1; }
+int ARM::ioport_setPinHigh() { return -1; }
+int ARM::ioport_setPinLow() { return -1; }
+int ARM::ioport_isPinInputHigh() { return -1; }
+int ARM::ioport_getPortInputValue() { return -1; }
+int ARM::ioport_setPortOutputValue() { return -1; }
 

@@ -40,7 +40,8 @@ MSP430::MSP430() : reg(0), stack(0), label_count(0)
 
 MSP430::~MSP430()
 {
-
+  fprintf(out, "  .org 0xfffe\n");
+  fprintf(out, "  dw start\n");
 }
 
 int MSP430::open(char *filename)
@@ -52,7 +53,11 @@ int MSP430::open(char *filename)
   fprintf(out, ".include \"msp430x2xx.inc\"\n\n");
 
   // Add any set up items (stack, registers, etc)
-  fprintf(out, "start:\n\n");
+  fprintf(out, "  .org 0xf800\n");
+  fprintf(out, "start:\n");
+  fprintf(out, "  mov.w #(WDTPW|WDTHOLD), &WDTCTL\n");
+  fprintf(out, "  mov.w #0x0280, SP\n");
+  fprintf(out, "  jmp main\n\n");
 
   return 0;
 }
@@ -68,8 +73,8 @@ void MSP430::method_start(int local_count, const char *name)
 
   // main() function goes here
   fprintf(out, "%s:\n", name);
-  fprintf(out, "  mov sp, r12\n");
-  fprintf(out, "  sub #0x%x, sp\n", local_count * 2);
+  fprintf(out, "  mov.w SP, r12\n");
+  fprintf(out, "  sub.w #0x%x, SP\n", local_count * 2);
 }
 
 void MSP430::method_end(int local_count)
@@ -103,17 +108,19 @@ int MSP430::push_integer(int32_t n)
 
 int MSP430::push_integer_local(int index)
 {
-  fprintf(out, "  mov.w r12, r15\n");
-  fprintf(out, "  sub #0x%02x, r15\n", LOCALS(index));
+  //fprintf(out, "  mov.w r12, r15\n");
+  //fprintf(out, "  sub.w #0x%02x, r15\n", LOCALS(index));
 
   if (reg < 8)
   {
-    fprintf(out, "  mov.w @r15, r%d\n", REG_STACK(reg));
+    //fprintf(out, "  mov.w @r15, r%d\n", REG_STACK(reg));
+    fprintf(out, "  mov.w -%d(r12), r%d\n", LOCALS(index), REG_STACK(reg));
     reg++;
   }
     else
   {
-    fprintf(out, "  push @r15\n");
+    //fprintf(out, "  push @r15\n");
+    fprintf(out, "  push -%d(r12)\n", LOCALS(index));
     stack++;
   }
 
@@ -179,13 +186,13 @@ int MSP430::pop_integer_local(int index)
 {
   if (stack > 0)
   {
-    fprintf(out, "  pop -%d(r12)\n", index);
+    fprintf(out, "  pop -%d(r12)\n", LOCALS(index));
     stack--;
   }
     else
   if (reg > 0)
   {
-    fprintf(out, "  mov.w r%d, -%d(r12)\n", REG_STACK(reg), index);
+    fprintf(out, "  mov.w r%d, -%d(r12)\n", REG_STACK(reg-1), LOCALS(index));
     reg--;
   }
 
@@ -212,7 +219,7 @@ int MSP430::dup()
 {
   if (stack > 0)
   {
-    fprintf(out, "  push @sp\n");
+    fprintf(out, "  push @SP\n");
     stack++;
   }
     else
@@ -247,14 +254,14 @@ int MSP430::swap()
   if (stack == 1)
   {
     fprintf(out, "  mov.w r%d, r15\n", REG_STACK(reg-1));
-    fprintf(out, "  mov.w @sp, r%d\n", REG_STACK(reg-1));
-    fprintf(out, "  mov.w r15, 0(sp)\n");
+    fprintf(out, "  mov.w @SP, r%d\n", REG_STACK(reg-1));
+    fprintf(out, "  mov.w r15, 0(SP)\n");
   }
     else
   {
-    fprintf(out, "  mov.w (2)sp, r15\n");
-    fprintf(out, "  mov.w @sp, 2(sp)\n");
-    fprintf(out, "  mov.w r15, 0(sp)\n");
+    fprintf(out, "  mov.w (2)SP, r15\n");
+    fprintf(out, "  mov.w @SP, 2(SP)\n");
+    fprintf(out, "  mov.w r15, 0(SP)\n");
   }
 
   return 0;
@@ -288,7 +295,7 @@ int MSP430::neg_integer()
 {
   if (stack >= 1)
   {
-    fprintf(out, "  neg.w @sp\n");
+    fprintf(out, "  neg.w @SP\n");
     stack--;
   }
     else
@@ -318,7 +325,7 @@ int MSP430::shift_left_integer()
 
   if (stack > 0)
   {
-    fprintf(out, "  rla.w @sp\n");
+    fprintf(out, "  rla.w @SP\n");
   }
     else
   {
@@ -352,7 +359,7 @@ int MSP430::shift_right_integer()
 
   if (stack > 0)
   {
-    fprintf(out, "  rra.w @sp\n");
+    fprintf(out, "  rra.w @SP\n");
   }
     else
   {
@@ -386,7 +393,7 @@ int MSP430::shift_right_uinteger()
 
   if (stack > 0)
   {
-    fprintf(out, "  rra.w @sp\n");
+    fprintf(out, "  rra.w @SP\n");
   }
     else
   {
@@ -426,7 +433,7 @@ int MSP430::jump_cond(const char *label, int cond)
 {
   if (stack > 0)
   {
-    fprintf(out, "  cmp.w #0, 0(sp)\n");
+    fprintf(out, "  cmp.w #0, 0(SP)\n");
   }
     else
   {
@@ -442,12 +449,12 @@ int MSP430::jump_cond_integer(const char *label, int cond)
 {
   if (stack > 1)
   {
-    fprintf(out, "  cmp.w 2(sp), 4(sp)\n");
+    fprintf(out, "  cmp.w 2(SP), 4(SP)\n");
   }
     else
   if (stack == 1)
   {
-    fprintf(out, "  cmp.w 2(sp), r%d\n", REG_STACK(reg-1));
+    fprintf(out, "  cmp.w 2(SP), r%d\n", REG_STACK(reg-1));
   }
     else
   {
@@ -463,7 +470,7 @@ int MSP430::return_local(int index, int local_count)
 {
   fprintf(out, "  mov.w -%d(w12), r15\n", LOCALS(index));
 
-  fprintf(out, "  mov.w r12, sp\n");
+  fprintf(out, "  mov.w r12, SP\n");
   fprintf(out, "  ret\n");
 
   return 0;
@@ -473,14 +480,14 @@ int MSP430::return_integer(int local_count)
 {
   if (stack > 0)
   {
-    fprintf(out, "  mov.w @sp, r15\n");
+    fprintf(out, "  mov.w @SP, r15\n");
   }
     else
   {
     fprintf(out, "  mov.w r%d, r15\n", REG_STACK(reg - 1));
   }
 
-  fprintf(out, "  mov.w r12, sp\n");
+  fprintf(out, "  mov.w r12, SP\n");
   fprintf(out, "  ret\n");
 
   return 0;
@@ -488,7 +495,7 @@ int MSP430::return_integer(int local_count)
 
 int MSP430::return_void(int local_count)
 {
-  fprintf(out, "  mov r12, sp\n");
+  fprintf(out, "  mov r12, SP\n");
   fprintf(out, "  ret\n");
 
   return 0;
@@ -514,6 +521,8 @@ int MSP430::brk()
 
 void MSP430::close()
 {
+  fprintf(out, "    .org 0xfffe\n");
+  fprintf(out, "    dw start\n");
 }
 
 int MSP430::stack_alu(const char *instr)
@@ -533,71 +542,107 @@ int MSP430::stack_alu(const char *instr)
     else
   {
     fprintf(out, "  pop r15\n");
-    fprintf(out, "  %s.w r15, @sp\n", instr);
+    fprintf(out, "  %s.w r15, @SP\n", instr);
   }
 
   return 0;
 }
 
 // GPIO functions
-int MSP430::ioport_set_pins_as_input()
+int MSP430::ioport_setPinsAsInput()
+{
+  if (stack == 0)
+  {
+    fprintf(out, "  bic.b r%d, &P1DIR\n", REG_STACK(reg-1));
+    reg--;
+  }
+    else
+  {
+    fprintf(out, "  pop.w r15\n");
+    fprintf(out, "  bic.b r15, &P1DIR\n");
+    stack--;
+  }
+
+  return 0;
+}
+
+int MSP430::ioport_setPinsAsOutput()
+{
+  if (stack == 0)
+  {
+    fprintf(out, "  bis.b r%d, &P1DIR\n", REG_STACK(reg-1));
+    reg--;
+  }
+    else
+  {
+    fprintf(out, "  pop.w r15\n");
+    fprintf(out, "  bis.b r15, &P1DIR\n");
+    stack--;
+  }
+
+  return 0;
+}
+
+int MSP430::ioport_setPinsValue()
 {
   return -1;
 }
 
-int MSP430::ioport_set_pins_as_output()
+int MSP430::ioport_setPinsHigh()
 {
   return -1;
 }
 
-int MSP430::ioport_set_pins_value()
+int MSP430::ioport_setPinsLow()
 {
   return -1;
 }
 
-int MSP430::ioport_set_pins_high()
+int MSP430::ioport_setPinAsOutput()
 {
   return -1;
 }
 
-int MSP430::ioport_set_pins_low()
+int MSP430::ioport_setPinAsInput()
 {
   return -1;
 }
 
-int MSP430::ioport_set_pin_as_output()
+int MSP430::ioport_setPinHigh()
 {
   return -1;
 }
 
-int MSP430::ioport_set_pin_as_input()
+int MSP430::ioport_setPinLow()
 {
   return -1;
 }
 
-int MSP430::ioport_set_pin_high()
+int MSP430::ioport_isPinInputHigh()
 {
   return -1;
 }
 
-int MSP430::ioport_set_pin_low()
+int MSP430::ioport_getPortInputValue()
 {
   return -1;
 }
 
-int MSP430::ioport_is_pin_input_high()
+int MSP430::ioport_setPortOutputValue()
 {
-  return -1;
-}
+  if (stack == 0)
+  {
+    fprintf(out, "  mov.b r%d, &P1OUT\n", REG_STACK(reg-1));
+    reg--;
+  }
+    else
+  {
+    fprintf(out, "  pop.w r15\n");
+    fprintf(out, "  mov.b r15, &P1OUT\n");
+    stack--;
+  }
 
-int MSP430::ioport_get_port_input_value()
-{
-  return -1;
-}
-
-int MSP430::ioport_set_port_output_value()
-{
-  return -1;
+  return 0;
 }
 
 

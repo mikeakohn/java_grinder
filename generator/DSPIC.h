@@ -60,19 +60,18 @@ public:
   virtual void close();
 
   // GPIO functions
-  virtual int ioport_set_pins_as_input();
-  virtual int ioport_set_pins_as_output();
-  virtual int ioport_set_pins_value();
-  virtual int ioport_set_pins_high();
-  virtual int ioport_set_pins_low();
-  virtual int ioport_set_pin_as_output();
-  virtual int ioport_set_pin_as_input();
-  virtual int ioport_set_pin_high();
-  virtual int ioport_set_pin_low();
-  virtual int ioport_is_pin_input_high();
-  virtual int ioport_get_port_input_value();
-  virtual int ioport_set_port_output_value();
-
+  virtual int ioport_setPinsAsInput();
+  virtual int ioport_setPinsAsOutput();
+  virtual int ioport_setPinsValue();
+  virtual int ioport_setPinsHigh();
+  virtual int ioport_setPinsLow();
+  virtual int ioport_setPinAsOutput();
+  virtual int ioport_setPinAsInput();
+  virtual int ioport_setPinHigh();
+  virtual int ioport_setPinLow();
+  virtual int ioport_isPinInputHigh();
+  virtual int ioport_getPortInputValue();
+  virtual int ioport_setPortOutputValue();
 
 private:
   int reg;            // count number of registers are are using as stack

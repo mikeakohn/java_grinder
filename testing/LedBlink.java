@@ -11,11 +11,9 @@ public class LedBlink
 
     while(true)
     {
-      IOPort0.setPinHigh(2);
-      IOPort0.setPinLow(1);
+      IOPort0.setPortOutputValue(2);
       for (n = 0; n < 16384; n++);
-      IOPort0.setPinHigh(1);
-      IOPort0.setPinLow(2);
+      IOPort0.setPortOutputValue(1);
       for (n = 0; n < 16384; n++);
     }
   }
