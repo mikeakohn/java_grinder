@@ -212,9 +212,11 @@ int ARM::brk()
   return 0;
 }
 
+#if 0
 void ARM::close()
 {
 }
+#endif
 
 // GPIO functions
 int ARM::ioport_setPinsAsInput() { return -1; }

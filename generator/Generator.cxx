@@ -23,6 +23,7 @@ Generator::Generator() : label_count(0)
 
 Generator::~Generator()
 {
+  fclose(out);
 }
 
 int Generator::open(char *filename)
@@ -38,10 +39,11 @@ int Generator::open(char *filename)
   return 0;
 }
 
+#if 0
 void Generator::close()
 {
-  fclose(out);
 }
+#endif
 
 void Generator::label(char *name)
 {

@@ -59,7 +59,7 @@ public:
   virtual int jump(const char *name) = 0;
   virtual int call(const char *name) = 0;
   virtual int brk() = 0;
-  virtual void close() = 0;
+  //virtual void close() = 0;
 
   // GPIO functions
   virtual int ioport_setPinsAsInput() = 0;

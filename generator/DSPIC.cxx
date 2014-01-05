@@ -384,9 +384,11 @@ int DSPIC::brk()
   return 0;
 }
 
+#if 0
 void DSPIC::close()
 {
 }
+#endif
 
 // GPIO functions
 int DSPIC::ioport_setPinsAsInput() { return -1; }

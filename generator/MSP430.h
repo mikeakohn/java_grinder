@@ -14,10 +14,16 @@
 
 #include "Generator.h"
 
+enum
+{
+  MSP430G2231,
+  MSP430G2553,
+};
+
 class MSP430 : public Generator
 {
 public:
-  MSP430();
+  MSP430(uint8_t chip_type);
   virtual ~MSP430();
 
   virtual int open(char *filename);
@@ -57,7 +63,7 @@ public:
   virtual int jump(const char *name);
   virtual int call(const char *name);
   virtual int brk();
-  virtual void close();
+  //virtual void close();
 
   // GPIO functions
   virtual int ioport_setPinsAsInput();
@@ -78,6 +84,8 @@ protected:
   int reg;
   int stack;
   int label_count;
+  int stack_start;
+  int flash_start;
 };
 
 #endif

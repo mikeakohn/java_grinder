@@ -18,7 +18,7 @@
 class MSP430X : public MSP430
 {
 public:
-  MSP430X();
+  MSP430X(uint8_t chip_type);
   virtual ~MSP430X();
 
   virtual int shift_left_integer();

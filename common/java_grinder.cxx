@@ -33,7 +33,7 @@ int index;
 
   if (argc != 4)
   {
-    printf("Usage: %s <class> <outfile> <dspic/msp430/m6502/arm>\n", argv[0]);
+    printf("Usage: %s <class> <outfile> <dspic/msp430g2231/msp430g2553/m6502/arm>\n", argv[0]);
     exit(0);
   }
 
@@ -44,14 +44,19 @@ int index;
     exit(1);
   }
 
-  if (strcasecmp("msp430",argv[3]) == 0)
+  if (strcasecmp("msp430g2231",argv[3]) == 0)
   {
-    generator = new MSP430();
+    generator = new MSP430(MSP430G2231);
+  }
+    else
+  if (strcasecmp("msp430g2553",argv[3]) == 0)
+  {
+    generator = new MSP430(MSP430G2553);
   }
     else
   if (strcasecmp("msp430x",argv[3]) == 0)
   {
-    generator = new MSP430X();
+    generator = new MSP430X(0);
   }
     else
   if (strcasecmp("dspic",argv[3]) == 0)

@@ -30,7 +30,7 @@
 #define REG_STACK(a) (a + 4)
 #define LOCALS(a) ((a * 2) + 2)
 
-MSP430X::MSP430X()
+MSP430X::MSP430X(uint8_t chip_type) : MSP430(chip_type)
 {
 
 }

@@ -207,9 +207,11 @@ int M6502::brk()
   return 0;
 }
 
+#if 0
 void M6502::close()
 {
 }
+#endif
 
 // GPIO functions
 int M6502::ioport_setPinsAsInput() { return -1; }

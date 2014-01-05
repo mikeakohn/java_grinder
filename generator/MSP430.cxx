@@ -33,15 +33,28 @@
 // FIXME - This isn't quite right
 static const char *cond_str[] = { "jz", "jnz", "jl", "jle", "jg", "jge" };
 
-MSP430::MSP430() : reg(0), stack(0), label_count(0)
+MSP430::MSP430(uint8_t chip_type) : reg(0), stack(0), label_count(0)
 {
-
+  switch(chip_type)
+  {
+    case MSP430G2231:
+      flash_start = 0xf800;
+      stack_start = 0x0280;
+      break;
+    case MSP430G2553:
+      flash_start = 0xc000;
+      stack_start = 0x0400;
+      break;
+    default:
+      flash_start = 0xf800;
+      stack_start = 0x0280;
+  }
 }
 
 MSP430::~MSP430()
 {
-  fprintf(out, "  .org 0xfffe\n");
-  fprintf(out, "  dw start\n");
+  fprintf(out, ".org 0xfffe\n");
+  fprintf(out, "  dw start\n\n");
 }
 
 int MSP430::open(char *filename)
@@ -53,7 +66,7 @@ int MSP430::open(char *filename)
   fprintf(out, ".include \"msp430x2xx.inc\"\n\n");
 
   // Add any set up items (stack, registers, etc)
-  fprintf(out, "  .org 0xf800\n");
+  fprintf(out, ".org 0xf800\n");
   fprintf(out, "start:\n");
   fprintf(out, "  mov.w #(WDTPW|WDTHOLD), &WDTCTL\n");
   fprintf(out, "  mov.w #0x0280, SP\n");
@@ -519,11 +532,13 @@ int MSP430::brk()
   return -1;
 }
 
+#if 0
 void MSP430::close()
 {
   fprintf(out, "    .org 0xfffe\n");
   fprintf(out, "    dw start\n");
 }
+#endif
 
 int MSP430::stack_alu(const char *instr)
 {
