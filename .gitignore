@@ -1,5 +1,5 @@
 *.o
-java_grinder
+^java_grinder$
 .gitignore
 *.class
 *.asm

@@ -391,16 +391,16 @@ void DSPIC::close()
 #endif
 
 // GPIO functions
-int DSPIC::ioport_setPinsAsInput() { return -1; }
-int DSPIC::ioport_setPinsAsOutput() { return -1; }
-int DSPIC::ioport_setPinsValue() { return -1; }
-int DSPIC::ioport_setPinsHigh() { return -1; }
-int DSPIC::ioport_setPinsLow() { return -1; }
-int DSPIC::ioport_setPinAsOutput() { return -1; }
-int DSPIC::ioport_setPinAsInput() { return -1; }
-int DSPIC::ioport_setPinHigh() { return -1; }
-int DSPIC::ioport_setPinLow() { return -1; }
-int DSPIC::ioport_isPinInputHigh() { return -1; }
-int DSPIC::ioport_getPortInputValue() { return -1; }
-int DSPIC::ioport_setPortOutputValue() { return -1; }
+int DSPIC::ioport_setPinsAsInput(int port) { return -1; }
+int DSPIC::ioport_setPinsAsOutput(int port) { return -1; }
+int DSPIC::ioport_setPinsValue(int port) { return -1; }
+int DSPIC::ioport_setPinsHigh(int port) { return -1; }
+int DSPIC::ioport_setPinsLow(int port) { return -1; }
+int DSPIC::ioport_setPinAsOutput(int port) { return -1; }
+int DSPIC::ioport_setPinAsInput(int port) { return -1; }
+int DSPIC::ioport_setPinHigh(int port) { return -1; }
+int DSPIC::ioport_setPinLow(int port) { return -1; }
+int DSPIC::ioport_isPinInputHigh(int port) { return -1; }
+int DSPIC::ioport_getPortInputValue(int port) { return -1; }
+int DSPIC::ioport_setPortOutputValue(int port) { return -1; }
 

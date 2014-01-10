@@ -11,9 +11,9 @@
 
 package net.mikekohn.java_grinder;
 
-public class UART
+abstract public class UART
 {
-  private UART()
+  protected UART()
   {
   }
 

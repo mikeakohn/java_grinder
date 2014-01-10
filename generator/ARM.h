@@ -60,18 +60,18 @@ public:
   //virtual void close();
 
   // GPIO functions
-  virtual int ioport_setPinsAsInput();
-  virtual int ioport_setPinsAsOutput();
-  virtual int ioport_setPinsValue();
-  virtual int ioport_setPinsHigh();
-  virtual int ioport_setPinsLow();
-  virtual int ioport_setPinAsOutput();
-  virtual int ioport_setPinAsInput();
-  virtual int ioport_setPinHigh();
-  virtual int ioport_setPinLow();
-  virtual int ioport_isPinInputHigh();
-  virtual int ioport_getPortInputValue();
-  virtual int ioport_setPortOutputValue();
+  virtual int ioport_setPinsAsInput(int port);
+  virtual int ioport_setPinsAsOutput(int port);
+  virtual int ioport_setPinsValue(int port);
+  virtual int ioport_setPinsHigh(int port);
+  virtual int ioport_setPinsLow(int port);
+  virtual int ioport_setPinAsOutput(int port);
+  virtual int ioport_setPinAsInput(int port);
+  virtual int ioport_setPinHigh(int port);
+  virtual int ioport_setPinLow(int port);
+  virtual int ioport_isPinInputHigh(int port);
+  virtual int ioport_getPortInputValue(int port);
+  virtual int ioport_setPortOutputValue(int port);
 };
 
 #endif

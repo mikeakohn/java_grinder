@@ -213,17 +213,3 @@ void M6502::close()
 }
 #endif
 
-// GPIO functions
-int M6502::ioport_setPinsAsInput() { return -1; }
-int M6502::ioport_setPinsAsOutput() { return -1; }
-int M6502::ioport_setPinsValue() { return -1; }
-int M6502::ioport_setPinsHigh() { return -1; }
-int M6502::ioport_setPinsLow() { return -1; }
-int M6502::ioport_setPinAsOutput() { return -1; }
-int M6502::ioport_setPinAsInput() { return -1; }
-int M6502::ioport_setPinHigh() { return -1; }
-int M6502::ioport_setPinLow() { return -1; }
-int M6502::ioport_isPinInputHigh() { return -1; }
-int M6502::ioport_getPortInputValue() { return -1; }
-int M6502::ioport_setPortOutputValue() { return -1; }
-

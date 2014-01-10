@@ -564,96 +564,96 @@ int MSP430::stack_alu(const char *instr)
 }
 
 // GPIO functions
-int MSP430::ioport_setPinsAsInput()
+int MSP430::ioport_setPinsAsInput(int port)
 {
   if (stack == 0)
   {
-    fprintf(out, "  bic.b r%d, &P1DIR\n", REG_STACK(reg-1));
+    fprintf(out, "  bic.b r%d, &P%dDIR\n", REG_STACK(reg-1), port+1);
     reg--;
   }
     else
   {
     fprintf(out, "  pop.w r15\n");
-    fprintf(out, "  bic.b r15, &P1DIR\n");
+    fprintf(out, "  bic.b r15, &P%dDIR\n", port+1);
     stack--;
   }
 
   return 0;
 }
 
-int MSP430::ioport_setPinsAsOutput()
+int MSP430::ioport_setPinsAsOutput(int port)
 {
   if (stack == 0)
   {
-    fprintf(out, "  bis.b r%d, &P1DIR\n", REG_STACK(reg-1));
+    fprintf(out, "  bis.b r%d, &P%dDIR\n", REG_STACK(reg-1), port+1);
     reg--;
   }
     else
   {
     fprintf(out, "  pop.w r15\n");
-    fprintf(out, "  bis.b r15, &P1DIR\n");
+    fprintf(out, "  bis.b r15, &P%dDIR\n", port+1);
     stack--;
   }
 
   return 0;
 }
 
-int MSP430::ioport_setPinsValue()
+int MSP430::ioport_setPinsValue(int port)
 {
   return -1;
 }
 
-int MSP430::ioport_setPinsHigh()
+int MSP430::ioport_setPinsHigh(int port)
 {
   return -1;
 }
 
-int MSP430::ioport_setPinsLow()
+int MSP430::ioport_setPinsLow(int port)
 {
   return -1;
 }
 
-int MSP430::ioport_setPinAsOutput()
+int MSP430::ioport_setPinAsOutput(int port)
 {
   return -1;
 }
 
-int MSP430::ioport_setPinAsInput()
+int MSP430::ioport_setPinAsInput(int port)
 {
   return -1;
 }
 
-int MSP430::ioport_setPinHigh()
+int MSP430::ioport_setPinHigh(int port)
 {
   return -1;
 }
 
-int MSP430::ioport_setPinLow()
+int MSP430::ioport_setPinLow(int port)
 {
   return -1;
 }
 
-int MSP430::ioport_isPinInputHigh()
+int MSP430::ioport_isPinInputHigh(int port)
 {
   return -1;
 }
 
-int MSP430::ioport_getPortInputValue()
+int MSP430::ioport_getPortInputValue(int port)
 {
   return -1;
 }
 
-int MSP430::ioport_setPortOutputValue()
+int MSP430::ioport_setPortOutputValue(int port)
 {
   if (stack == 0)
   {
-    fprintf(out, "  mov.b r%d, &P1OUT\n", REG_STACK(reg-1));
+    fprintf(out, "  mov.b r%d, &P%dOUT\n", REG_STACK(reg-1), port+1);
     reg--;
   }
     else
   {
     fprintf(out, "  pop.w r15\n");
-    fprintf(out, "  mov.b r15, &P1OUT\n");
+    fprintf(out, "  mov.b r15, &P%dOUT\n", port+1);
     stack--;
   }
 

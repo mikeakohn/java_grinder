@@ -58,21 +58,6 @@ public:
   virtual int call(const char *name);
   virtual int brk();
   //virtual void close();
-
-  // GPIO functions
-  virtual int ioport_setPinsAsInput();
-  virtual int ioport_setPinsAsOutput();
-  virtual int ioport_setPinsValue();
-  virtual int ioport_setPinsHigh();
-  virtual int ioport_setPinsLow();
-  virtual int ioport_setPinAsOutput();
-  virtual int ioport_setPinAsInput();
-  virtual int ioport_setPinHigh();
-  virtual int ioport_setPinLow();
-  virtual int ioport_isPinInputHigh();
-  virtual int ioport_getPortInputValue();
-  virtual int ioport_setPortOutputValue();
-
 };
 
 #endif

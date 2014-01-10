@@ -62,18 +62,35 @@ public:
   //virtual void close() = 0;
 
   // GPIO functions
-  virtual int ioport_setPinsAsInput() = 0;
-  virtual int ioport_setPinsAsOutput() = 0;
-  virtual int ioport_setPinsValue() = 0;
-  virtual int ioport_setPinsHigh() = 0;
-  virtual int ioport_setPinsLow() = 0;
-  virtual int ioport_setPinAsOutput() = 0;
-  virtual int ioport_setPinAsInput() = 0;
-  virtual int ioport_setPinHigh() = 0;
-  virtual int ioport_setPinLow() = 0;
-  virtual int ioport_isPinInputHigh() = 0;
-  virtual int ioport_getPortInputValue() = 0;
-  virtual int ioport_setPortOutputValue() = 0;
+  virtual int ioport_setPinsAsInput(int port) { return -1; }
+  virtual int ioport_setPinsAsOutput(int port) { return -1; }
+  virtual int ioport_setPinsValue(int port) { return -1; }
+  virtual int ioport_setPinsHigh(int port) { return -1; }
+  virtual int ioport_setPinsLow(int port) { return -1; }
+  virtual int ioport_setPinAsOutput(int port) { return -1; }
+  virtual int ioport_setPinAsInput(int port) { return -1; }
+  virtual int ioport_setPinHigh(int port) { return -1; }
+  virtual int ioport_setPinLow(int port) { return -1; }
+  virtual int ioport_isPinInputHigh(int port) { return -1; }
+  virtual int ioport_getPortInputValue(int port) { return -1; }
+  virtual int ioport_setPortOutputValue(int port) { return -1; }
+
+  // UART functions
+  virtual int uart_init(int port) { return -1; }
+  virtual int uart_send(int port) { return -1; }
+  virtual int uart_read(int port) { return -1; }
+  virtual int uart_isDataAvailable(int port) { return -1; }
+  virtual int uart_isSendReady(int port) { return -1; }
+
+  // SPI functions
+  virtual int spi_init(int port) { return -1; }
+  virtual int spi_send(int port) { return -1; }
+  virtual int spi_read(int port) { return -1; }
+  virtual int spi_isDataAvailable(int port) { return -1; }
+  virtual int spi_isSendReady(int port) { return -1; }
+
+  // CPU functions
+  virtual int setClock16() { return -1; }
 
 protected:
   FILE *out;

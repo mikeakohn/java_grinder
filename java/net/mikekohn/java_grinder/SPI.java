@@ -11,9 +11,9 @@
 
 package net.mikekohn.java_grinder;
 
-public class SPI
+abstract public class SPI
 {
-  private SPI()
+  protected SPI()
   {
   }
 
