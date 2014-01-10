@@ -66,10 +66,10 @@ int MSP430::open(char *filename)
   fprintf(out, ".include \"msp430x2xx.inc\"\n\n");
 
   // Add any set up items (stack, registers, etc)
-  fprintf(out, ".org 0xf800\n");
+  fprintf(out, ".org 0x%04x\n", flash_start);
   fprintf(out, "start:\n");
   fprintf(out, "  mov.w #(WDTPW|WDTHOLD), &WDTCTL\n");
-  fprintf(out, "  mov.w #0x0280, SP\n");
+  fprintf(out, "  mov.w #0x%04x, SP\n", stack_start);
   fprintf(out, "  jmp main\n\n");
 
   return 0;
