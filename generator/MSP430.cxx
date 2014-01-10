@@ -660,4 +660,78 @@ int MSP430::ioport_setPortOutputValue(int port)
   return 0;
 }
 
+// UART functions
+int MSP430::uart_init(int port)
+{
+  return -1;
+}
+
+int MSP430::uart_send(int port)
+{
+  return -1;
+}
+
+int MSP430::uart_read(int port)
+{
+  return -1;
+}
+
+int MSP430::uart_isDataAvailable(int port)
+{
+  return -1;
+}
+
+int MSP430::uart_isSendReady(int port)
+{
+  return -1;
+}
+
+// SPI functions
+int MSP430::spi_init(int port)
+{
+  return -1;
+}
+
+int MSP430::spi_send(int port)
+{
+  return -1;
+}
+
+int MSP430::spi_read(int port)
+{
+  return -1;
+}
+
+int MSP430::spi_isDataAvailable(int port)
+{
+  return -1;
+}
+
+int MSP430::spi_isSendReady(int port)
+{
+  return -1;
+}
+
+// CPU functions
+int MSP430::cpu_setClock16()
+{
+  fprintf(out, ";; Set MCLK to 16 MHz with DCO\n");
+  fprintf(out, "mov.b #DCO_4, &DCOCTL\n");
+  fprintf(out, "mov.b #RSEL_15, &BCSCTL1\n");
+  fprintf(out, "mov.b #0, &BCSCTL2\n\n");
+
+  return 0;
+}
+
+// Memory
+int MSP430::memory_read()
+{
+  return -1;
+}
+
+int MSP430::memory_write()
+{
+  return -1;
+}
+
 

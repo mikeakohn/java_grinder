@@ -90,7 +90,11 @@ public:
   virtual int spi_isSendReady(int port) { return -1; }
 
   // CPU functions
-  virtual int setClock16() { return -1; }
+  virtual int cpu_setClock16() { return -1; }
+
+  // Memory
+  virtual int memory_read() { return -1; }
+  virtual int memory_write() { return -1; }
 
 protected:
   FILE *out;

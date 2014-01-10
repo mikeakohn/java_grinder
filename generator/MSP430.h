@@ -79,6 +79,27 @@ public:
   virtual int ioport_getPortInputValue(int port);
   virtual int ioport_setPortOutputValue(int port);
 
+  // UART functions
+  virtual int uart_init(int port);
+  virtual int uart_send(int port);
+  virtual int uart_read(int port);
+  virtual int uart_isDataAvailable(int port);
+  virtual int uart_isSendReady(int port);
+
+  // SPI functions
+  virtual int spi_init(int port);
+  virtual int spi_send(int port);
+  virtual int spi_read(int port);
+  virtual int spi_isDataAvailable(int port);
+  virtual int spi_isSendReady(int port);
+
+  // CPU functions
+  virtual int cpu_setClock16();
+
+  // Memory
+  virtual int memory_read();
+  virtual int memory_write();
+
 protected:
   int stack_alu(const char *instr);
   int reg;
