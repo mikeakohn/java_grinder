@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 
 #include "MSP430.h"
@@ -33,7 +34,7 @@
 // FIXME - This isn't quite right
 static const char *cond_str[] = { "jz", "jnz", "jl", "jle", "jg", "jge" };
 
-MSP430::MSP430(uint8_t chip_type) : reg(0), stack(0), label_count(0)
+MSP430::MSP430(uint8_t chip_type) : reg(0), stack(0), label_count(0), need_read_spi(0)
 {
   switch(chip_type)
   {
@@ -53,6 +54,19 @@ MSP430::MSP430(uint8_t chip_type) : reg(0), stack(0), label_count(0)
 
 MSP430::~MSP430()
 {
+  if (need_read_spi)
+  {
+    fprintf(out, "; spi_send_char(r15)\n");
+    fprintf(out, "spi_send_char:\n");
+    fprintf(out, "  mov.b r15, &USISRL\n");
+    fprintf(out, "  mov.b #8, &USICNT\n");
+    fprintf(out, "wait_spi_read_write:\n");
+    fprintf(out, "  bit.b #USIIFG, &USICTL1\n");
+    fprintf(out, "  jz wait_spi_read_write\n");
+    fprintf(out, "  mov.b &USISRL, r15\n");
+    fprintf(out, "  ret\n\n");
+  }
+
   fprintf(out, ".org 0xfffe\n");
   fprintf(out, "  dw start\n\n");
 }
@@ -666,25 +680,70 @@ int MSP430::uart_isSendReady(int port)
 // SPI functions
 int MSP430::spi_init(int port)
 {
-  return -1;
+  char dst[16];
+  fprintf(out, "  ;; Set up SPI\n");
+  fprintf(out, "  mov.b #(USIPE7|USIPE6|USIPE5|USIMST|USIOE|USISWRST), &USICTL0\n");
+  pop_reg(out, dst);
+  fprintf(out, "  mov.b %s, r14\n", dst);
+  fprintf(out, "  rrc.b r14\n");
+  fprintf(out, "  rrc.b r14\n");
+  fprintf(out, "  and.b #0x80, r14 ; CPHA/USICKPH\n");
+  //fprintf(out, "  mov.b #USICKPH, &USICTL1\n");
+  fprintf(out, "  mov.b r14, &USICTL1\n");
+  //fprintf(out, "  mov.b #(USIDIV_7|USISSEL_2), &USICKCTL ; div 128, SMCLK\n");
+  fprintf(out, "  mov.b %s, r14\n", dst);
+  fprintf(out, "  and.b #0x02, r14\n");
+  pop_reg(out, dst);
+  // If this came off the stack, let's put it in a register, if not let's
+  // just use the register.
+  if (dst[0] != 'r')
+  {
+    fprintf(out, "  mov.b %s, r15\n", dst);
+    strcpy(dst, "r15");
+  }
+  fprintf(out, "  rrc.b %s\n", dst);
+  fprintf(out, "  rrc.b %s\n", dst);
+  fprintf(out, "  rrc.b %s\n", dst);
+  fprintf(out, "  rrc.b %s\n", dst);
+  fprintf(out, "  and.b #0xe0, %s ; DIV\n", dst);
+  fprintf(out, "  or.b %s, r14 ; DIV\n", dst);
+  fprintf(out, "  mov.b r14, &USICKCTL ; DIV and CPOL/USICKPL\n");
+  fprintf(out, "  bic.b #USISWRST, &USICTL0      ; clear reset\n\n");
+
+  return 0;
 }
 
 int MSP430::spi_send(int port)
 {
-  return -1;
+  char dst[16];
+  pop_reg(out, dst);
+
+  fprintf(out, "  mov.b %s, r15\n", dst);
+  fprintf(out, "  call #_read_spi\n");
+
+  need_read_spi = 1;
+
+  return 0;
 }
 
 int MSP430::spi_read(int port)
 {
-  return -1;
+  fprintf(out, "  call #_read_spi\n");
+
+  need_read_spi = 1;
+
+  return 0;
 }
 
 int MSP430::spi_isDataAvailable(int port)
 {
-  return -1;
+  fprintf(out, "  mov.b &USICTL1, r15\n");
+  fprintf(out, "  and.b #USIIFG, r15\n");
+
+  return 0;
 }
 
-int MSP430::spi_isSendReady(int port)
+int MSP430::spi_isBusy(int port)
 {
   return -1;
 }

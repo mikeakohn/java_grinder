@@ -91,7 +91,7 @@ public:
   virtual int spi_send(int port);
   virtual int spi_read(int port);
   virtual int spi_isDataAvailable(int port);
-  virtual int spi_isSendReady(int port);
+  virtual int spi_isBusy(int port);
 
   // CPU functions
   virtual int cpu_setClock16();
@@ -111,6 +111,7 @@ protected:
   int label_count;
   int stack_start;
   int flash_start;
+  int need_read_spi:1;
 };
 
 #endif
