@@ -50,7 +50,7 @@ int l;
     attribute = (struct attributes_t *)(attributes_heap + attributes[count]);
     attribute->attribute_name_index = read_int16(in);
     attribute->attribute_length = read_int32(in);
-    if (fread(attribute->info, 1, attribute->attribute_length, in));
+    if (fread(attribute->info, 1, attribute->attribute_length, in)) {}
   }
 #endif
 }
@@ -99,7 +99,7 @@ int n,l,r;
       attribute = (struct attributes_t *)(fields_heap + fields[count]+n);
       attribute->attribute_name_index = read_int16(in);
       attribute->attribute_length = read_int32(in);
-      if (fread(attribute->info, 1, attribute->attribute_length, in));
+      if (fread(attribute->info, 1, attribute->attribute_length, in)) {}
       n = n + 6 + attribute->attribute_length;
     }
   }
@@ -149,7 +149,7 @@ int n,l,r;
       attribute = (struct attributes_t *)(methods_heap + methods[count] + n);
       attribute->attribute_name_index = read_int16(in);
       attribute->attribute_length = read_int32(in);
-      if (fread(attribute->info, 1, attribute->attribute_length, in));
+      if (fread(attribute->info, 1, attribute->attribute_length, in)) {}
       n = n + 6 + attribute->attribute_length;
     }
   }
@@ -270,7 +270,7 @@ int ch;
         utf8 = (struct constant_utf8_t *)constant;
         utf8->tag = ch;
         utf8->length = read_int16(in);
-        if (fread(utf8->bytes, 1, utf8->length, in));
+        if (fread(utf8->bytes, 1, utf8->length, in)) {}
         break;
 
       default:
