@@ -93,8 +93,10 @@ public:
   virtual int cpu_setClock16() { return -1; }
 
   // Memory
-  virtual int memory_read() { return -1; }
-  virtual int memory_write() { return -1; }
+  virtual int memory_read8() { return -1; }
+  virtual int memory_write8() { return -1; }
+  virtual int memory_read16() { return -1; }
+  virtual int memory_write16() { return -1; }
 
 protected:
   FILE *out;

@@ -540,29 +540,6 @@ void MSP430::close()
 }
 #endif
 
-int MSP430::stack_alu(const char *instr)
-{
-  if (stack == 0)
-  {
-    fprintf(out, "  %s.w r%d, r%d\n", instr, REG_STACK(reg-1), REG_STACK(reg-2));
-    reg--;
-  }
-    else
-  if (stack == 1)
-  {
-    fprintf(out, "  pop r15\n");
-    fprintf(out, "  %s.w 15, r%d\n", instr, REG_STACK(reg-1));
-    stack--;
-  }
-    else
-  {
-    fprintf(out, "  pop r15\n");
-    fprintf(out, "  %s.w r15, @SP\n", instr);
-  }
-
-  return 0;
-}
-
 // GPIO functions
 int MSP430::ioport_setPinsAsInput(int port)
 {
@@ -715,23 +692,147 @@ int MSP430::spi_isSendReady(int port)
 // CPU functions
 int MSP430::cpu_setClock16()
 {
-  fprintf(out, ";; Set MCLK to 16 MHz with DCO\n");
-  fprintf(out, "mov.b #DCO_4, &DCOCTL\n");
-  fprintf(out, "mov.b #RSEL_15, &BCSCTL1\n");
-  fprintf(out, "mov.b #0, &BCSCTL2\n\n");
+  fprintf(out, "  ;; Set MCLK to 16 MHz with DCO\n");
+  fprintf(out, "  mov.b #DCO_4, &DCOCTL\n");
+  fprintf(out, "  mov.b #RSEL_15, &BCSCTL1\n");
+  fprintf(out, "  mov.b #0, &BCSCTL2\n\n");
 
   return 0;
 }
 
 // Memory
-int MSP430::memory_read()
+int MSP430::memory_read8()
 {
-  return -1;
+  if (stack != 0)
+  {
+    fprintf(out, "  mov.b @SP, 0(SP)\n\n");
+  }
+    else
+  {
+    fprintf(out, "  mov.b @r%d, r%d\n\n", REG_STACK(reg-1), REG_STACK(reg-1));
+  }
+
+  return 0;
 }
 
-int MSP430::memory_write()
+int MSP430::memory_write8()
 {
-  return -1;
+  if (stack >= 2)
+  {
+    fprintf(out, "  mov.w 2(SP), r15\n");
+    fprintf(out, "  mov.b @SP, 0(r15)\n");
+    fprintf(out, "  sub.w #4, SP\n");
+    stack -= 2;
+  }
+    else
+  if (stack == 1)
+  {
+    //fprintf(out, "  mov.w @SP, 0(r%d)\n\n", REG_STACK(reg-1));
+    fprintf(out, "  pop.b 0(r%d)\n", REG_STACK(reg-1));
+    reg--;
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  mov.b r%d, 0(r%d)\n", REG_STACK(reg-1), REG_STACK(reg-2));
+    reg -= 2;
+  }
+
+  return 0;
+}
+
+int MSP430::memory_read16()
+{
+  if (stack != 0)
+  {
+    fprintf(out, "  mov.w @SP, 0(SP)\n\n");
+  }
+    else
+  {
+    fprintf(out, "  mov.w @r%d, r%d\n\n", REG_STACK(reg-1), REG_STACK(reg-1));
+  }
+
+  return 0;
+}
+
+int MSP430::memory_write16()
+{
+  if (stack >= 2)
+  {
+    fprintf(out, "  mov.w 2(SP), r15\n");
+    fprintf(out, "  mov.w @SP, 0(r15)\n");
+    fprintf(out, "  sub.w #4, SP\n");
+    stack -= 2;
+  }
+    else
+  if (stack == 1)
+  {
+    //fprintf(out, "  mov.w @SP, 0(r%d)\n\n", REG_STACK(reg-1));
+    fprintf(out, "  pop 0(r%d)\n", REG_STACK(reg-1));
+    reg--;
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  mov.w r%d, 0(r%d)\n", REG_STACK(reg-1), REG_STACK(reg-2));
+    reg -= 2;
+  }
+
+  return 0;
+}
+
+// Protected functions
+void MSP430::push_reg(FILE *out, char *dst)
+{
+  if (reg < 8)
+  {
+    sprintf(dst, "r%d", REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "pop r15\n");
+    sprintf(dst, "r15");
+    stack++;
+  }
+}
+
+void MSP430::pop_reg(FILE *out, char *dst)
+{
+  if (reg < 8)
+  {
+    reg--;
+    sprintf(dst, "r%d", REG_STACK(reg));
+  }
+    else
+  {
+    stack--;
+    fprintf(out, "  pop r15\n");
+    sprintf(dst, "r15");
+  }
+}
+
+int MSP430::stack_alu(const char *instr)
+{
+  if (stack == 0)
+  {
+    fprintf(out, "  %s.w r%d, r%d\n", instr, REG_STACK(reg-1), REG_STACK(reg-2));
+    reg--;
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  pop r15\n");
+    fprintf(out, "  %s.w 15, r%d\n", instr, REG_STACK(reg-1));
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  pop r15\n");
+    fprintf(out, "  %s.w r15, @SP\n", instr);
+  }
+
+  return 0;
 }
 
 

@@ -17,12 +17,21 @@ public class Memory
   {
   }
 
-  public static int read(int address)
+  public static byte read8(int address)
   {
     return 0;
   }
 
-  public static void write(int address, int value)
+  public static void write8(int address, byte value)
+  {
+  }
+
+  public static short read16(int address)
+  {
+    return 0;
+  }
+
+  public static void write16(int address, short value)
   {
   }
 }

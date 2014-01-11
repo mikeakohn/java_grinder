@@ -18,6 +18,7 @@
 #include "compile.h"
 #include "invoke.h"
 #include "ioport.h"
+#include "memory.h"
 #include "java_lang_system.h"
 
 static void get_virtual_function(char *function, char *method_name, char *method_type, char *field_name, char *field_class)
@@ -153,6 +154,11 @@ char function[256];
     if (strcmp(cls, "IOPort1") == 0)
     {
       ret = ioport(java_class, generator, function, 1);
+    }
+      else
+    if (strcmp(cls, "Memory") == 0)
+    {
+      ret = memory(java_class, generator, function);
     } 
   }
 

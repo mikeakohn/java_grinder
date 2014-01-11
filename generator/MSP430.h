@@ -97,11 +97,15 @@ public:
   virtual int cpu_setClock16();
 
   // Memory
-  virtual int memory_read();
-  virtual int memory_write();
+  virtual int memory_read8();
+  virtual int memory_write8();
+  virtual int memory_read16();
+  virtual int memory_write16();
 
 protected:
   int stack_alu(const char *instr);
+  void push_reg(FILE *out, char *reg);
+  void pop_reg(FILE *out, char *reg);
   int reg;
   int stack;
   int label_count;

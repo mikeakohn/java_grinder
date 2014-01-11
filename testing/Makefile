@@ -1,5 +1,5 @@
 
-JOBJS=Testing.class Testing2.class LedBlink.class
+JOBJS=Testing.class Testing2.class LedBlink.class SPITest.class
 
 default: $(JOBJS)
 
