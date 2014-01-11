@@ -29,7 +29,7 @@ int spi_init_II(JavaClass *java_class, Generator *generator, int port)
   return generator->spi_init(port);
 }
 
-int spi_send_B(JavaClass *java_class, Generator *generator, int port)
+int spi_send_I(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->spi_send(port);
 }
@@ -52,7 +52,7 @@ int spi_isBusy(JavaClass *java_class, Generator *generator, int port)
 int spi(JavaClass *java_class, Generator *generator, char *function, int port)
 {
   CHECK_FUNC(init_II)
-  CHECK_FUNC(send_B)
+  CHECK_FUNC(send_I)
   CHECK_FUNC(read)
   CHECK_FUNC(isDataAvailable)
   CHECK_FUNC(isBusy)

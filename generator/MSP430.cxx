@@ -56,13 +56,13 @@ MSP430::~MSP430()
 {
   if (need_read_spi)
   {
-    fprintf(out, "; spi_send_char(r15)\n");
-    fprintf(out, "spi_send_char:\n");
+    fprintf(out, "; _read_spi(r15)\n");
+    fprintf(out, "_read_spi:\n");
     fprintf(out, "  mov.b r15, &USISRL\n");
     fprintf(out, "  mov.b #8, &USICNT\n");
-    fprintf(out, "wait_spi_read_write:\n");
+    fprintf(out, "_read_spi_wait:\n");
     fprintf(out, "  bit.b #USIIFG, &USICTL1\n");
-    fprintf(out, "  jz wait_spi_read_write\n");
+    fprintf(out, "  jz _read_spi_wait\n");
     fprintf(out, "  mov.b &USISRL, r15\n");
     fprintf(out, "  ret\n\n");
   }
@@ -705,8 +705,8 @@ int MSP430::spi_init(int port)
   fprintf(out, "  rrc.b %s\n", dst);
   fprintf(out, "  rrc.b %s\n", dst);
   fprintf(out, "  rrc.b %s\n", dst);
-  fprintf(out, "  and.b #0xe0, %s ; DIV\n", dst);
-  fprintf(out, "  or.b %s, r14 ; DIV\n", dst);
+  fprintf(out, "  and.b #0xe0, %s\n", dst);
+  fprintf(out, "  or.b %s, r14\n", dst);
   fprintf(out, "  mov.b r14, &USICKCTL ; DIV and CPOL/USICKPL\n");
   fprintf(out, "  bic.b #USISWRST, &USICTL0      ; clear reset\n\n");
 
@@ -720,6 +720,7 @@ int MSP430::spi_send(int port)
 
   fprintf(out, "  mov.b %s, r15\n", dst);
   fprintf(out, "  call #_read_spi\n");
+  push_reg(out, "r15");
 
   need_read_spi = 1;
 
@@ -729,6 +730,7 @@ int MSP430::spi_send(int port)
 int MSP430::spi_read(int port)
 {
   fprintf(out, "  call #_read_spi\n");
+  push_reg(out, "r15");
 
   need_read_spi = 1;
 
@@ -739,6 +741,7 @@ int MSP430::spi_isDataAvailable(int port)
 {
   fprintf(out, "  mov.b &USICTL1, r15\n");
   fprintf(out, "  and.b #USIIFG, r15\n");
+  push_reg(out, "r15");
 
   return 0;
 }
@@ -841,33 +844,32 @@ int MSP430::memory_write16()
 }
 
 // Protected functions
-void MSP430::push_reg(FILE *out, char *dst)
+void MSP430::push_reg(FILE *out, const char *dst)
 {
   if (reg < 8)
   {
-    sprintf(dst, "r%d", REG_STACK(reg));
+    fprintf(out, "  mov.w %s, r%d\n", dst, REG_STACK(reg));
     reg++;
   }
     else
   {
-    fprintf(out, "pop r15\n");
-    sprintf(dst, "r15");
+    fprintf(out, "  push %s\n", dst);
     stack++;
   }
 }
 
 void MSP430::pop_reg(FILE *out, char *dst)
 {
-  if (reg < 8)
-  {
-    reg--;
-    sprintf(dst, "r%d", REG_STACK(reg));
-  }
-    else
+  if (stack > 0)
   {
     stack--;
     fprintf(out, "  pop r15\n");
     sprintf(dst, "r15");
+  }
+    else
+  {
+    reg--;
+    sprintf(dst, "r%d", REG_STACK(reg));
   }
 }
 

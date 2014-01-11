@@ -104,7 +104,7 @@ public:
 
 protected:
   int stack_alu(const char *instr);
-  void push_reg(FILE *out, char *reg);
+  void push_reg(FILE *out, const char *reg);
   void pop_reg(FILE *out, char *reg);
   int reg;
   int stack;

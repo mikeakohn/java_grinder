@@ -39,14 +39,14 @@ abstract public class SPI
   }
 
   /** send and receive a byte */
-  public static int send(byte c)
+  public static int send(int c)
   {
     System.out.println("Sent char " + c);
     return 0;
   }
 
   /** receive a byte */
-  public static byte read()
+  public static int read()
   {
     return 0;
   }

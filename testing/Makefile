@@ -1,5 +1,10 @@
 
-JOBJS=Testing.class Testing2.class LedBlink.class SPITest.class MemoryTest.class
+JOBJS=Testing.class \
+      Testing2.class \
+      LedBlink.class \
+      MemoryTest.class \
+      MethodCall.class \
+      SPITest.class
 
 default: $(JOBJS)
 
