@@ -17,9 +17,24 @@
 #include "JavaClass.h"
 #include "compile.h"
 #include "invoke.h"
+#include "cpu.h"
 #include "ioport.h"
 #include "memory.h"
+#include "spi.h"
+#include "uart.h"
 #include "java_lang_system.h"
+
+#define CHECK_WITH_PORT(a,b,c) \
+    if (strcmp(cls, #a#c) == 0) \
+    { \
+      ret = b(java_class, generator, function, c); \
+    }
+
+#define CHECK(a,b) \
+    if (strcmp(cls, #a) == 0) \
+    { \
+      ret = b(java_class, generator, function); \
+    }
 
 static void get_virtual_function(char *function, char *method_name, char *method_type, char *field_name, char *field_class)
 {
@@ -146,20 +161,20 @@ char function[256];
   {
     char *cls = method_class + len;
 
-    if (strcmp(cls, "IOPort0") == 0)
-    {
-      ret = ioport(java_class, generator, function, 0);
-    }
+    CHECK(CPU, cpu)
+    CHECK_WITH_PORT(IOPort, ioport, 0)
+    CHECK_WITH_PORT(IOPort, ioport, 1)
+    CHECK_WITH_PORT(IOPort, ioport, 2)
+    CHECK_WITH_PORT(IOPort, ioport, 3)
+    CHECK_WITH_PORT(IOPort, ioport, 4)
+    CHECK_WITH_PORT(IOPort, ioport, 5)
+    CHECK(Memory, memory)
+    CHECK_WITH_PORT(SPI, spi, 0)
+    CHECK_WITH_PORT(SPI, spi, 1)
+    CHECK_WITH_PORT(UART, uart, 0)
+    CHECK_WITH_PORT(UART, uart, 1)
       else
-    if (strcmp(cls, "IOPort1") == 0)
-    {
-      ret = ioport(java_class, generator, function, 1);
-    }
-      else
-    if (strcmp(cls, "Memory") == 0)
-    {
-      ret = memory(java_class, generator, function);
-    } 
+    {}
   }
 
   if (ret == 0) { return 0; }

@@ -26,7 +26,7 @@ abstract public class SPI
      System.out.println("Sent char " + c);
   }
 
-  public static byte read(byte c)
+  public static byte read()
   {
     return 0;
   }

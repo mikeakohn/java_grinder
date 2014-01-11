@@ -16,7 +16,7 @@
 
 #include "JavaClass.h"
 #include "compile.h"
-#include "ioport.h"
+#include "memory.h"
 
 #define CHECK_FUNC(funct) \
   if (strncmp(#funct, function, sizeof(#funct)-1) == 0) \
