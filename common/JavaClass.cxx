@@ -20,6 +20,85 @@
 #include "fileio.h"
 #include "JavaClass.h"
 
+JavaClass::JavaClass(FILE *in) :
+  interfaces(NULL),
+  fields(NULL),
+  methods(NULL),
+  attributes(NULL),
+  constants_heap(NULL),
+  fields_heap(NULL),
+  methods_heap(NULL),
+  attributes_heap(NULL)
+{
+int t;
+
+  //memset(java_class, 0, sizeof(struct java_class_t));
+
+  magic = read_int32(in);
+  minor_version = read_int16(in);
+  major_version = read_int16(in);
+
+  constant_pool_count = read_int16(in);
+  if (constant_pool_count!=0)
+  {
+    constant_pool = (int *)malloc((constant_pool_count + 1) * sizeof(int));
+    memset(constant_pool, 0, (constant_pool_count + 1) * sizeof(int));
+    read_constant_pool(in);
+  }
+
+  access_flags = read_int16(in);
+  this_class = read_int16(in);
+  super_class = read_int16(in);
+  interfaces_count = read_int16(in);
+
+  if (interfaces_count != 0)
+  {
+    interfaces = (int *)malloc(interfaces_count * sizeof(int));
+    for (t = 0; t < interfaces_count; t++)
+    {
+      interfaces[t] = read_int16(in);
+    }
+  }
+
+  fields_count = read_int16(in);
+  if (fields_count != 0)
+  {
+    fields = (int *)malloc(fields_count * sizeof(int));
+    memset(fields, 0, fields_count * sizeof(int));
+    read_fields(in);
+  }
+
+  methods_count = read_int16(in);
+  if (methods_count != 0)
+  {
+    methods = (int *)malloc(methods_count * sizeof(int));
+    memset(methods, 0, methods_count * sizeof(int));
+    read_methods(in);
+  }
+
+  attributes_count = read_int16(in);
+  if (attributes_count != 0)
+  {
+    attributes = (int *)malloc(attributes_count * sizeof(int));
+    memset(attributes, 0, attributes_count * sizeof(int));
+    read_attributes(in);
+  }
+}
+
+JavaClass::~JavaClass()
+{
+  if (constant_pool != NULL) { free(constant_pool); }
+  if (interfaces != NULL) { free(interfaces); }
+  if (fields != NULL) { free(fields); }
+  if (methods != NULL) { free(methods); }
+  if (attributes != NULL) { free(attributes); }
+
+  if (constants_heap != NULL) { free(constants_heap); }
+  if (fields_heap != NULL) { free(fields_heap); }
+  if (methods_heap != NULL) { free(methods_heap); }
+  if (attributes_heap != NULL) { free(attributes_heap); }
+}
+
 void JavaClass::read_attributes(FILE *in)
 {
 long marker;
@@ -284,71 +363,6 @@ int ch;
  * can see dead people.  That's what you get for reading my source
  * code!  :)  */
 
-JavaClass::JavaClass(FILE *in) :
-  interfaces(NULL),
-  fields(NULL),
-  methods(NULL),
-  attributes(NULL),
-  constants_heap(NULL),
-  fields_heap(NULL),
-  methods_heap(NULL),
-  attributes_heap(NULL)
-{
-int t;
-
-  //memset(java_class, 0, sizeof(struct java_class_t));
-
-  magic = read_int32(in);
-  minor_version = read_int16(in);
-  major_version = read_int16(in);
-
-  constant_pool_count = read_int16(in);
-  if (constant_pool_count!=0)
-  {
-    constant_pool = (int *)malloc((constant_pool_count + 1) * sizeof(int));
-    memset(constant_pool, 0, (constant_pool_count + 1) * sizeof(int));
-    read_constant_pool(in);
-  }
-
-  access_flags = read_int16(in);
-  this_class = read_int16(in);
-  super_class = read_int16(in);
-  interfaces_count = read_int16(in);
-
-  if (interfaces_count != 0)
-  {
-    interfaces = (int *)malloc(interfaces_count * sizeof(int));
-    for (t = 0; t < interfaces_count; t++)
-    {
-      interfaces[t] = read_int16(in);
-    }
-  }
-
-  fields_count = read_int16(in);
-  if (fields_count != 0)
-  {
-    fields = (int *)malloc(fields_count * sizeof(int));
-    memset(fields, 0, fields_count * sizeof(int));
-    read_fields(in);
-  }
-
-  methods_count = read_int16(in);
-  if (methods_count != 0)
-  {
-    methods = (int *)malloc(methods_count * sizeof(int));
-    memset(methods, 0, methods_count * sizeof(int));
-    read_methods(in);
-  }
-
-  attributes_count = read_int16(in);
-  if (attributes_count != 0)
-  {
-    attributes = (int *)malloc(attributes_count * sizeof(int));
-    memset(attributes, 0, attributes_count * sizeof(int));
-    read_attributes(in);
-  }
-}
-
 int JavaClass::get_name_constant(char *name, int len, int index)
 {
 struct constant_utf8_t *constant_utf8;
@@ -380,7 +394,7 @@ struct methods_t *method;
   if (index >= methods_count) { return -1; }
 
   method = (struct methods_t *)(methods_heap + methods[index]);
-  get_name_constant(name, sizeof(name), method->name_index);
+  get_name_constant(name, len, method->name_index);
 
   return 0;
 }
@@ -393,7 +407,7 @@ struct fields_t *field;
   if (index >= fields_count) { return -1; }
 
   field = (struct fields_t *)(fields_heap + fields[index]);
-  get_name_constant(name, sizeof(name), field->name_index);
+  get_name_constant(name, len, field->name_index);
 
   return 0;
 }
@@ -488,20 +502,6 @@ void *heap;
   }
 
   return -1;
-}
-
-JavaClass::~JavaClass()
-{
-  if (constant_pool != NULL) { free(constant_pool); }
-  if (interfaces != NULL) { free(interfaces); }
-  if (fields != NULL) { free(fields); }
-  if (methods != NULL) { free(methods); }
-  if (attributes != NULL) { free(attributes); }
-
-  if (constants_heap != NULL) { free(constants_heap); }
-  if (fields_heap != NULL) { free(fields_heap); }
-  if (methods_heap != NULL) { free(methods_heap); }
-  if (attributes_heap != NULL) { free(attributes_heap); }
 }
 
 #ifdef DEBUG

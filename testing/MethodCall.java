@@ -10,14 +10,24 @@ public class MethodCall
 
     a = 7;
     b = 11;
-    n = add_nums(a,b);
+    n = add_nums(a,b) + 1;
+
+    nothing(n,n);
 
     while(true);
   }
 
   static public int add_nums(int a, int b)
   {
-    return a+b;
+    int n;
+
+    n = a + b;
+
+    return n;
+  }
+
+  static public void nothing(int a, int b)
+  {
   }
 }
 

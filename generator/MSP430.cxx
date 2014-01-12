@@ -541,13 +541,21 @@ int MSP430::jump(const char *name)
 
 int MSP430::call(const char *name)
 {
+  // FIXME - do we need to push the register stack?
   fprintf(out, "  call #%s\n", name);
   return 0;
 }
 
-int MSP430::invoke_static_method(const char *name)
+int MSP430::invoke_static_method(const char *name, int params, int is_void)
 {
-  return -1;
+int n;
+
+  printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
+
+  for (n = 0; n < reg; n++)  { fprintf(out, "  push r%d\n", n); }
+  fprintf(out, "  call #%s\n", name);
+  for (n = reg-1; n >= 0; n--)  { fprintf(out, "  pop r%d\n", n); }
+  return 0;
 }
 
 int MSP430::brk()

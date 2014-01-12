@@ -377,7 +377,7 @@ int DSPIC::call(const char *name)
   return 0;
 }
 
-int DSPIC::invoke_static_method(const char *name)
+int DSPIC::invoke_static_method(const char *name, int params, int is_void)
 {
   return -1;
 }

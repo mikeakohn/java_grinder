@@ -36,7 +36,7 @@
       ret = b(java_class, generator, function); \
     }
 
-static void get_virtual_function(char *function, char *method_name, char *method_type, char *field_name, char *field_class)
+static void get_virtual_function(char *function, char *method_name, char *method_sig, char *field_name, char *field_class)
 {
 char *s;
 int ptr = 0;
@@ -58,20 +58,45 @@ int ptr = 0;
   while (*s != 0) { function[ptr++] = *s; s++; }
 
   function[ptr++] = '_';
-  s = method_type + 1;
+  s = method_sig + 1;
   while(*s != 0)
   {
-    //if (*s == '(') { method_type = s + 1; }
+    //if (*s == '(') { method_sig = s + 1; }
     if (*s == ')') { break; }
     function[ptr++] = *s;
     s++;
   }
 
   function[ptr] = 0;
-  //sprintf(function, "%s_%s_%s_%s", field_class, field_name, method_name, method_type);
+  //sprintf(function, "%s_%s_%s_%s", field_class, field_name, method_name, method_sig);
 }
 
-static void get_static_function(char *function, char *method_name, char *method_type)
+static void get_signature(char *signature, int *params, int *is_void)
+{
+  *params = 0;
+  *is_void = 0;
+
+  while(*signature != 0)
+  {
+    if (*signature == '(')
+    {
+    }
+      else
+    if (*signature == ')')
+    {
+      *is_void = (signature[1] == 'V') ? 1 : 0;
+      break;
+    }
+      else
+    {
+      (*params)++;
+    }
+
+    signature++;
+  }
+}
+
+static void get_static_function(char *function, char *method_name, char *method_sig)
 {
 char *s;
 int ptr = 0;
@@ -80,7 +105,7 @@ int ptr = 0;
   while (*s != 0) { function[ptr++] = *s; s++; }
 
   function[ptr++] = '_';
-  s = method_type + 1;
+  s = method_sig + 1;
   while(*s != 0)
   {
     if (*s == ')') { break; }
@@ -97,7 +122,7 @@ char field_name[128];
 char field_type[128];
 char field_class[128];
 char method_name[128];
-char method_type[128];
+char method_sig[128];
 char method_class[128];
 char function[256];
 
@@ -111,16 +136,16 @@ char function[256];
   }
 
   if (java_class->get_class_name(method_class, sizeof(method_class), method_id) != 0 ||
-      java_class->get_ref_name_type(method_name, method_type, sizeof(method_name), method_id) != 0)
+      java_class->get_ref_name_type(method_name, method_sig, sizeof(method_name), method_id) != 0)
   {
     printf("Error: Couldn't get name and type for method_id %d\n", method_id);
     return -1;
   }
 
   printf("field: '%s as %s' from %s\n", field_name, field_type, field_class);
-  printf("method: '%s as %s' from %s\n", method_name, method_type, method_class);
+  printf("method: '%s as %s' from %s\n", method_name, method_sig, method_class);
 
-  get_virtual_function(function, method_name, method_type, field_name, field_class);
+  get_virtual_function(function, method_name, method_sig, field_name, field_class);
 
   printf("function: %s()\n", function);
 
@@ -140,22 +165,22 @@ char function[256];
 int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
 {
 char method_name[128];
-char method_type[128];
+char method_sig[128];
 char method_class[128];
 char function[256];
 
   printf("invoke_static()\n");
 
   if (java_class->get_class_name(method_class, sizeof(method_class), method_id) != 0 ||
-      java_class->get_ref_name_type(method_name, method_type, sizeof(method_name), method_id) != 0)
+      java_class->get_ref_name_type(method_name, method_sig, sizeof(method_name), method_id) != 0)
   {
     printf("Error: Couldn't get name and type for method_id %d\n", method_id);
     return -1;
   }
 
-  printf("method: '%s as %s' from %s\n", method_name, method_type, method_class);
+  printf("method: '%s as %s' from %s\n", method_name, method_sig, method_class);
 
-  get_static_function(function, method_name, method_type);
+  get_static_function(function, method_name, method_sig);
 
   printf("function: %s()\n", function);
   int ret = -1;
@@ -184,7 +209,9 @@ char function[256];
   {
     if (strcmp(method_class, java_class->class_name) == 0)
     {
-      ret = generator->invoke_static_method(function);
+      int params,is_void;
+      get_signature(method_sig, &params, &is_void);
+      ret = generator->invoke_static_method(function, params, is_void);
     }
   }
 

@@ -207,7 +207,7 @@ int ARM::call(const char *name)
   return -1;
 }
 
-int ARM::invoke_static_method(const char *name)
+int ARM::invoke_static_method(const char *name, int params, int is_void)
 {
   return -1;
 }

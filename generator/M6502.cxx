@@ -202,7 +202,7 @@ int M6502::call(const char *name)
   return -1;
 }
 
-int M6502::invoke_static_method(const char *name)
+int M6502::invoke_static_method(const char *name, int params, int is_void)
 {
   return -1;
 }
