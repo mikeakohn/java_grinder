@@ -24,20 +24,22 @@ void JavaClass::read_attributes(FILE *in)
 {
 long marker;
 int count;
-int len;
+int len = 0;
 int l;
 
   marker = ftell(in);
 
   for (count = 0; count < attributes_count; count++)
   {
-    attributes[count] = ftell(in) - marker;
+    //attributes[count] = ftell(in) - marker;
+    attributes[count] = len;
     fseek(in, 2, SEEK_CUR);
     l=read_int32(in);
     fseek(in, l, SEEK_CUR);
+    len += sizeof(struct attributes_t) + l;
   }
 
-  len = ftell(in) - marker;
+  //len = ftell(in) - marker;
   attributes_heap = (uint8_t *)malloc(len);
   fseek(in, marker, SEEK_SET);
 
@@ -111,16 +113,16 @@ int n,l,r;
   // Compute how much memory to malloc()
   for (count = 0; count < methods_count; count++)
   {
-    methods[count] = ftell(in) - marker;
+    //methods[count] = ftell(in) - marker;
+    methods[count] = len;
     fseek(in, 6, SEEK_CUR);   // sizeof struct methods_t
     n = read_int16(in);       // attribute count
     len += sizeof(struct methods_t);
     for (r = 0; r < n; r++)
     {
-      len += sizeof(struct attributes_t);
       fseek(in, 2, SEEK_CUR); // attribute name
       l = read_int32(in);     // attribute len
-      len += l;
+      len += sizeof(struct attributes_t) + l;
       fseek(in, l, SEEK_CUR); // attribute data
       //attribute_count++;
     }
@@ -140,7 +142,7 @@ int n,l,r;
     method->name_index = read_int16(in);
     method->descriptor_index = read_int16(in);
     method->attribute_count = read_int16(in);
-    n = 8;
+    n = sizeof(struct methods_t);
     for (r = 0; r < method->attribute_count; r++)
     {
       attribute = (struct attributes_t *)(methods_heap + methods[count] + n);
