@@ -2,15 +2,15 @@
 #JOBJS=$(shell ls *.java | sed 's/\.java/\.class/')
 
 default:
-	@cd build && make
+	@+make -C build
 
 tests:
-	@cd testing && make
+	@+make -C testing
 
 .PHONY: java
 java:
-	@cd java && make
-	@cd build && make jar
+	@+make -C java
+	@make -C build jar
 
 %.class: %.java
 	javac $*.java
