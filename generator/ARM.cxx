@@ -54,162 +54,167 @@ void ARM::method_end(int local_count)
 
 int ARM::push_integer(int32_t n)
 {
-  return 0;
+  return -1;
 }
 
 int ARM::push_integer_local(int index)
 {
-  return 0;
+  return -1;
 }
 
 int ARM::push_long(int64_t n)
 {
-  return 0;
+  return -1;
 }
 
 int ARM::push_float(float f)
 {
-  return 0;
+  return -1;
 }
 
 int ARM::push_double(double f)
 {
-  return 0;
+  return -1;
 }
 
 int ARM::push_byte(int8_t b)
 {
-  return 0;
+  return -1;
 }
 
 int ARM::push_short(int16_t s)
 {
-  return 0;
+  return -1;
 }
 
 int ARM::pop_integer_local(int index)
 {
-  return 0;
+  return -1;
 }
 
 int ARM::pop()
 {
-  return 0;
+  return -1;
 }
 
 int ARM::dup()
 {
-  return 0;
+  return -1;
 }
 
 int ARM::dup2()
 {
-  return 0;
+  return -1;
 }
 
 int ARM::swap()
 {
-  return 0;
+  return -1;
 }
 
 int ARM::add_integers()
 {
-  return 0;
+  return -1;
 }
 
 int ARM::sub_integers()
 {
-  return 0;
+  return -1;
 }
 
 int ARM::mul_integers()
 {
-  return 0;
+  return -1;
 }
 
 int ARM::div_integers()
 {
-  return 0;
+  return -1;
 }
 
 int ARM::neg_integer()
 {
-  return 0;
+  return -1;
 }
 
 int ARM::shift_left_integer()
 {
-  return 0;
+  return -1;
 }
 
 int ARM::shift_right_integer()
 {
-  return 0;
+  return -1;
 }
 
 int ARM::shift_right_uinteger()
 {
-  return 0;
+  return -1;
 }
 
 int ARM::and_integer()
 {
-  return 0;
+  return -1;
 }
 
 int ARM::or_integer()
 {
-  return 0;
+  return -1;
 }
 
 int ARM::xor_integer()
 {
-  return 0;
+  return -1;
 }
 
 int ARM::inc_integer(int index, int num)
 {
-  return 0;
+  return -1;
 }
 
 int ARM::jump_cond(const char *label, int cond)
 {
-  return 0;
+  return -1;
 }
 
 int ARM::jump_cond_integer(const char *label, int cond)
 {
-  return 0;
+  return -1;
 }
 
 int ARM::return_local(int index, int local_count)
 {
-  return 0;
+  return -1;
 }
 
 int ARM::return_integer(int local_count)
 {
-  return 0;
+  return -1;
 }
 
 int ARM::return_void(int local_count)
 {
-  return 0;
+  return -1;
 }
 
 int ARM::jump(const char *name)
 {
-  return 0;
+  return -1;
 }
 
 int ARM::call(const char *name)
 {
-  return 0;
+  return -1;
+}
+
+int ARM::invoke_static_method(const char *name)
+{
+  return -1;
 }
 
 int ARM::brk()
 {
-  return 0;
+  return -1;
 }
 
 #if 0

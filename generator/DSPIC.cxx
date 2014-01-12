@@ -150,13 +150,11 @@ int DSPIC::push_long(int64_t n)
 
 int DSPIC::push_float(float f)
 {
-  printf("Error: float is not currently supported.\n");
   return -1;
 }
 
 int DSPIC::push_double(double f)
 {
-  printf("Error: double is not currently supported.\n");
   return -1;
 }
 
@@ -198,27 +196,27 @@ int DSPIC::push_short(int16_t s)
 
 int DSPIC::pop_integer_local(int index)
 {
-  return 0;
+  return -1;
 }
 
 int DSPIC::pop()
 {
-  return 0;
+  return -1;
 }
 
 int DSPIC::dup()
 {
-  return 0;
+  return -1;
 }
 
 int DSPIC::dup2()
 {
-  return 0;
+  return -1;
 }
 
 int DSPIC::swap()
 {
-  return 0;
+  return -1;
 }
 
 int DSPIC::add_integers()
@@ -243,57 +241,57 @@ int DSPIC::add_integers()
 
 int DSPIC::sub_integers()
 {
-  return 0;
+  return -1;
 }
 
 int DSPIC::mul_integers()
 {
-  return 0;
+  return -1;
 }
 
 int DSPIC::div_integers()
 {
-  return 0;
+  return -1;
 }
 
 int DSPIC::neg_integer()
 {
-  return 0;
+  return -1;
 }
 
 int DSPIC::shift_left_integer()
 {
-  return 0;
+  return -1;
 }
 
 int DSPIC::shift_right_integer()
 {
-  return 0;
+  return -1;
 }
 
 int DSPIC::shift_right_uinteger()
 {
-  return 0;
+  return -1;
 }
 
 int DSPIC::and_integer()
 {
-  return 0;
+  return -1;
 }
 
 int DSPIC::or_integer()
 {
-  return 0;
+  return -1;
 }
 
 int DSPIC::xor_integer()
 {
-  return 0;
+  return -1;
 }
 
 int DSPIC::inc_integer(int index, int num)
 {
-  return 0;
+  return -1;
 }
 
 int DSPIC::jump_cond(const char *label, int cond)
@@ -379,9 +377,14 @@ int DSPIC::call(const char *name)
   return 0;
 }
 
+int DSPIC::invoke_static_method(const char *name)
+{
+  return -1;
+}
+
 int DSPIC::brk()
 {
-  return 0;
+  return -1;
 }
 
 #if 0

@@ -101,6 +101,8 @@ char method_type[128];
 char method_class[128];
 char function[256];
 
+  printf("invoke_virtual()\n");
+
   if (java_class->get_ref_name_type(field_name, field_type, sizeof(field_name), field_id) !=0 ||
       java_class->get_class_name(field_class, sizeof(field_class), field_id) != 0)
   {
@@ -142,6 +144,8 @@ char method_type[128];
 char method_class[128];
 char function[256];
 
+  printf("invoke_static()\n");
+
   if (java_class->get_class_name(method_class, sizeof(method_class), method_id) != 0 ||
       java_class->get_ref_name_type(method_name, method_type, sizeof(method_name), method_id) != 0)
   {
@@ -175,6 +179,13 @@ char function[256];
     CHECK_WITH_PORT(UART, uart, 1)
       else
     {}
+  }
+    else
+  {
+    if (strcmp(method_class, java_class->class_name) == 0)
+    {
+      ret = generator->invoke_static_method(function);
+    }
   }
 
   if (ret == 0) { return 0; }

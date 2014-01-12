@@ -540,9 +540,13 @@ int MSP430::call(const char *name)
   return 0;
 }
 
+int MSP430::invoke_static_method(const char *name)
+{
+  return -1;
+}
+
 int MSP430::brk()
 {
-  printf("brk unimplemented\n");
   return -1;
 }
 

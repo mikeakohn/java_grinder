@@ -58,6 +58,7 @@ public:
   virtual int return_void(int local_count) = 0;
   virtual int jump(const char *name) = 0;
   virtual int call(const char *name) = 0;
+  virtual int invoke_static_method(const char *name) = 0;
   virtual int brk() = 0;
   //virtual void close() = 0;
 
