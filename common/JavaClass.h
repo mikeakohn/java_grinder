@@ -50,98 +50,98 @@
 
 struct generic_twoint16_t
 {
-  unsigned char tag;
+  uint8_t tag;
   int16_t int1;
   int16_t int2;
 };
 
 struct generic_32bit_t
 {
-  unsigned char tag;
+  uint8_t tag;
   int32_t value;
 };
 
 struct generic_64bit_t
 {
-  unsigned char tag;
+  uint8_t tag;
   int64_t value;
 };
 
 struct constant_class_t
 {
-  unsigned char tag;
+  uint8_t tag;
   int16_t name_index;
 };
 
 struct constant_fieldref_t
 {
-  unsigned char tag;
+  uint8_t tag;
   int16_t class_index;
   int16_t name_and_type_index;
 };
 
 struct constant_methodref_t
 {
-  unsigned char tag;
+  uint8_t tag;
   int16_t class_index;
   int16_t name_and_type_index;
 };
 
 struct constant_interfacemethodref_t
 {
-  unsigned char tag;
+  uint8_t tag;
   int16_t class_index;
   int16_t name_and_type_index;
 };
 
 struct constant_string_t
 {
-  unsigned char tag;
+  uint8_t tag;
   int16_t string_index;
 };
 
 struct constant_integer_t
 {
-  unsigned char tag;
+  uint8_t tag;
   int32_t value;
 };
 
 struct constant_float_t
 {
-  unsigned char tag;
+  uint8_t tag;
   float value;
 };
 
 struct constant_long_t
 {
-  unsigned char tag;
+  uint8_t tag;
   int64_t value;
 };
 
 struct constant_double_t
 {
-  unsigned char tag;
+  uint8_t tag;
   double value;
 };
 
 struct constant_nameandtype_t
 {
-  unsigned char tag;
+  uint8_t tag;
   int16_t name_index;
   int16_t descriptor_index;
 };
 
 struct constant_utf8_t
 {
-  unsigned char tag;
+  uint8_t tag;
   int16_t length;
   unsigned char bytes[];
 };
 
 struct attributes_t
 {
-  int16_t attribute_name_index;
-  int32_t attribute_length;
+  int16_t name_index;
+  int32_t length;
   unsigned char info[];
 };
 
@@ -191,6 +191,8 @@ public:
   int *methods;
   int16_t attributes_count;
   int *attributes;
+
+  char class_name[128];
 
   // Extra Crap (these should be voids *'s really.. it was easier to make
   //             them unsigned char * at first)

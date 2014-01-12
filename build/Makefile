@@ -3,7 +3,8 @@ CXX=g++
 DEBUG=-DDEBUG -g
 #OPTIMIZATIONS=-march=nocona -mtune=nocona
 INCLUDES=-I../common -I../generator -I../objects
-CFLAGS=-Wall -O3 $(DEBUG) $(INCLUDES) $(OPTIMIZATIONS)
+#CFLAGS=-Wall -O3 $(DEBUG) $(INCLUDES) $(OPTIMIZATIONS)
+CFLAGS=-Wall $(DEBUG) $(INCLUDES) $(OPTIMIZATIONS)
 LDFLAGS=
 VPATH=../generator:../common:../objects
 

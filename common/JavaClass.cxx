@@ -38,21 +38,17 @@ int l;
   }
 
   len = ftell(in) - marker;
-  attributes_heap = (unsigned char *)malloc(len);
+  attributes_heap = (uint8_t *)malloc(len);
   fseek(in, marker, SEEK_SET);
 
-#ifdef BIG_INDIAN
-  (void)fread(attributes_heap, 1, len, in);
-#else
   struct attributes_t *attribute;
   for (count = 0; count < attributes_count; count++)
   {
     attribute = (struct attributes_t *)(attributes_heap + attributes[count]);
-    attribute->attribute_name_index = read_int16(in);
-    attribute->attribute_length = read_int32(in);
-    if (fread(attribute->info, 1, attribute->attribute_length, in)) {}
+    attribute->name_index = read_int16(in);
+    attribute->length = read_int32(in);
+    if (fread(attribute->info, 1, attribute->length, in)) {}
   }
-#endif
 }
 
 void JavaClass::read_fields(FILE *in)
@@ -77,13 +73,10 @@ int n,l,r;
     }
   }
 
-  len = ftell(in)-marker;
-  fields_heap = (unsigned char *)malloc(len);
+  len = ftell(in) - marker;
+  fields_heap = (uint8_t *)malloc(len);
   fseek(in, marker, SEEK_SET);
 
-#ifdef BIG_INDIAN
-  if (fread(fields_heap, 1, len, in));
-#else
   struct attributes_t *attribute;
   struct fields_t *field;
   for (count = 0; count < fields_count; count++)
@@ -97,43 +90,47 @@ int n,l,r;
     for (r = 0; r<field->attribute_count; r++)
     {
       attribute = (struct attributes_t *)(fields_heap + fields[count]+n);
-      attribute->attribute_name_index = read_int16(in);
-      attribute->attribute_length = read_int32(in);
-      if (fread(attribute->info, 1, attribute->attribute_length, in)) {}
-      n = n + 6 + attribute->attribute_length;
+      attribute->name_index = read_int16(in);
+      attribute->length = read_int32(in);
+      if (fread(attribute->info, 1, attribute->length, in)) {}
+      n = n + 6 + attribute->length;
     }
   }
-#endif
 }
 
 void JavaClass::read_methods(FILE *in)
 {
 long marker;
 int count;
-int len;
+int len = 0;
 int n,l,r;
 
   marker = ftell(in);
+  //int attribute_count = 0;
 
+  // Compute how much memory to malloc()
   for (count = 0; count < methods_count; count++)
   {
     methods[count] = ftell(in) - marker;
-    fseek(in, 6, SEEK_CUR);
-    n = read_int16(in);
+    fseek(in, 6, SEEK_CUR);   // sizeof struct methods_t
+    n = read_int16(in);       // attribute count
+    len += sizeof(struct methods_t);
     for (r = 0; r < n; r++)
     {
-      fseek(in, 2, SEEK_CUR);
-      l = read_int32(in);
-      fseek(in, l, SEEK_CUR);
+      len += sizeof(struct attributes_t);
+      fseek(in, 2, SEEK_CUR); // attribute name
+      l = read_int32(in);     // attribute len
+      len += l;
+      fseek(in, l, SEEK_CUR); // attribute data
+      //attribute_count++;
     }
   }
 
-  len = ftell(in)-marker;
-  methods_heap = (unsigned char *)malloc(len);
+  //len = ftell(in) - marker;
+  //len += attribute_count * 2;
+  methods_heap = (uint8_t *)malloc(len);
   fseek(in, marker, SEEK_SET);
-#ifdef BIG_INDIAN
-  if (fread(methods_heap, 1, len, in));
-#else
+
   struct attributes_t *attribute;
   struct methods_t *method;
   for (count = 0; count < methods_count; count++)
@@ -147,13 +144,12 @@ int n,l,r;
     for (r = 0; r < method->attribute_count; r++)
     {
       attribute = (struct attributes_t *)(methods_heap + methods[count] + n);
-      attribute->attribute_name_index = read_int16(in);
-      attribute->attribute_length = read_int32(in);
-      if (fread(attribute->info, 1, attribute->attribute_length, in)) {}
-      n = n + 6 + attribute->attribute_length;
+      attribute->name_index = read_int16(in);
+      attribute->length = read_int32(in);
+      if (fread(attribute->info, 1, attribute->length, in)) {}
+      n = n + 6 + attribute->length;
     }
   }
-#endif
 }
 
 void JavaClass::read_constant_pool(FILE *in)
@@ -212,8 +208,9 @@ int ch;
     }
   }
 
-  // len=ftell(in)-marker;
-  constants_heap = (unsigned char *)malloc(len);
+  //len = ftell(in) - marker;
+  //printf("%d %ld\n", len, ftell(in) - marker);
+  constants_heap = (uint8_t *)malloc(len);
   fseek(in, marker, SEEK_SET);
 
   // fread(constants_heap, 1, len, in);
@@ -514,6 +511,7 @@ void JavaClass::print_access(int a)
 
 void JavaClass::print()
 {
+char name[128];
 int r;
 
   printf("   MagicNumber: 0x%02x%02x%02x%02x\n",((magic>>24)&0xff),
@@ -528,6 +526,7 @@ int r;
   else if (major_version == 48) printf("1.4");
   else if (major_version == 49) printf("5.0");
   else if (major_version == 50) printf("6.0");
+  else if (major_version == 51) printf("7");
   else { printf("???"); }
 
   printf(")\n");
@@ -538,8 +537,10 @@ int r;
   print_access(access_flags);
   printf("\n");
 
-  printf("     ThisClass: %d\n", this_class);
-  printf("    SuperClass: %d\n", super_class);
+  get_class_name(class_name, sizeof(class_name), this_class);
+  printf("     ThisClass: %s (%d)\n", class_name, this_class);
+  get_class_name(name, sizeof(name), super_class);
+  printf("    SuperClass: %s (%d)\n", name, super_class);
   printf("InterfaceCount: %d\n", interfaces_count);
   for (r = 0; r < interfaces_count; r++)
   {
@@ -668,10 +669,10 @@ int count,r;
   {
     attribute=(struct attributes_t *)(attributes_heap + attributes[count]);
     printf("                ----- %d -----\n", count);
-    printf("         name_index: %d\n", attribute->attribute_name_index);
-    printf("             length: %d\n", attribute->attribute_length);
+    printf("         name_index: %d\n", attribute->name_index);
+    printf("             length: %d\n", attribute->length);
     printf("               info: { ");
-    for (r = 0; r < attribute->attribute_length; r++)
+    for (r = 0; r < attribute->length; r++)
     {
       printf("%02x ", attribute->info[r]);
     }
@@ -703,16 +704,16 @@ int count,r,n;
     {
       attribute=(struct attributes_t *)(fields_heap + fields[count]+n);
       printf("                ----- %d -----\n", r);
-      printf("         name_index: %d\n", attribute->attribute_name_index);
-      printf("             length: %d\n", attribute->attribute_length);
+      printf("         name_index: %d\n", attribute->name_index);
+      printf("             length: %d\n", attribute->length);
       printf("               info: { ");
-      for (r=0; r<attribute->attribute_length; r++)
+      for (r=0; r<attribute->length; r++)
       {
         printf("%02x ",attribute->info[r]);
       }
       printf("}\n");
 
-      n=n+6+attribute->attribute_length;
+      n=n+6+attribute->length;
     }
   }
 }
@@ -728,7 +729,7 @@ char name[256];
 
   for (count = 0; count < methods_count; count++)
   {
-    method=(struct methods_t *)(methods_heap + methods[count]);
+    method = (struct methods_t *)(methods_heap + methods[count]);
     get_name_constant(name, sizeof(name), method->name_index);
     printf("                ----- %d -----\n", count);
     printf("         access_flags: %d", method->access_flags);
@@ -741,18 +742,18 @@ char name[256];
     n = 8;
     for (r = 0; r < method->attribute_count; r++)
     {
-      attribute = (struct attributes_t *)(methods_heap + methods[count]+n);
-    printf("                ----- %d -----\n", r);
-      printf("         name_index: %d\n", attribute->attribute_name_index);
-      printf("             length: %d\n", attribute->attribute_length);
+      attribute = (struct attributes_t *)(methods_heap + methods[count] + n);
+      printf("                ----- %d -----\n", r);
+      printf("         name_index: %d\n", attribute->name_index);
+      printf("             length: %d\n", attribute->length);
       printf("               info: { ");
-      for (r = 0; r < attribute->attribute_length; r++)
+      for (r = 0; r < attribute->length; r++)
       {
         printf("%02x ", attribute->info[r]);
       }
       printf("}\n");
 
-      n = n + 6 + attribute->attribute_length;
+      n = n + 6 + attribute->length;
     }
   }
 }
