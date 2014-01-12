@@ -298,7 +298,7 @@ int t;
   if (constant_pool_count!=0)
   {
     constant_pool = (int *)malloc((constant_pool_count + 1) * sizeof(int));
-    memset(constant_pool, 0, constant_pool_count * sizeof(int));
+    memset(constant_pool, 0, (constant_pool_count + 1) * sizeof(int));
     read_constant_pool(in);
   }
 
