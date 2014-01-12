@@ -108,6 +108,7 @@ protected:
   void push_reg(FILE *out, const char *reg);
   void pop_reg(FILE *out, char *reg);
   int reg;
+  int reg_max;
   int stack;
   int label_count;
   int stack_start;

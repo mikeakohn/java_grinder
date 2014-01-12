@@ -34,7 +34,12 @@
 // FIXME - This isn't quite right
 static const char *cond_str[] = { "jz", "jnz", "jl", "jle", "jg", "jge" };
 
-MSP430::MSP430(uint8_t chip_type) : reg(0), stack(0), label_count(0), need_read_spi(0)
+MSP430::MSP430(uint8_t chip_type) :
+  reg(0),
+  reg_max(6),
+  stack(0),
+  label_count(0),
+  need_read_spi(0)
 {
   switch(chip_type)
   {
@@ -119,7 +124,7 @@ int MSP430::push_integer(int32_t n)
 
   uint16_t value = (n & 0xffff);
 
-  if (reg < 8)
+  if (reg < reg_max)
   {
     fprintf(out, "  mov.w #0x%02x, r%d\n", value, REG_STACK(reg));
     reg++;
@@ -138,7 +143,7 @@ int MSP430::push_integer_local(int index)
   //fprintf(out, "  mov.w r12, r15\n");
   //fprintf(out, "  sub.w #0x%02x, r15\n", LOCALS(index));
 
-  if (reg < 8)
+  if (reg < reg_max)
   {
     //fprintf(out, "  mov.w @r15, r%d\n", REG_STACK(reg));
     fprintf(out, "  mov.w -%d(r12), r%d\n", LOCALS(index), REG_STACK(reg));
@@ -177,7 +182,7 @@ int MSP430::push_byte(int8_t b)
   int16_t n = b;
   uint16_t value = (n & 0xffff);
 
-  if (reg < 8)
+  if (reg < reg_max)
   {
     fprintf(out, "  mov #0x%02x, r%d\n", value, REG_STACK(reg));
     reg++;
@@ -195,7 +200,7 @@ int MSP430::push_short(int16_t s)
 {
   uint16_t value = (s & 0xffff);
 
-  if (reg < 8)
+  if (reg < reg_max)
   {
     fprintf(out, "  mov #0x%02x, r%d\n", value, REG_STACK(reg));
     reg++;
@@ -250,7 +255,7 @@ int MSP430::dup()
     stack++;
   }
     else
-  if (reg == 8)
+  if (reg == reg_max)
   {
     fprintf(out, "  push r%d\n", REG_STACK(7));
     stack++;
@@ -850,7 +855,7 @@ int MSP430::memory_write16()
 // Protected functions
 void MSP430::push_reg(FILE *out, const char *dst)
 {
-  if (reg < 8)
+  if (reg < reg_max)
   {
     fprintf(out, "  mov.w %s, r%d\n", dst, REG_STACK(reg));
     reg++;
