@@ -284,7 +284,15 @@ int ch;
  * can see dead people.  That's what you get for reading my source
  * code!  :)  */
 
-JavaClass::JavaClass(FILE *in)
+JavaClass::JavaClass(FILE *in) :
+  interfaces(NULL),
+  fields(NULL),
+  methods(NULL),
+  attributes(NULL),
+  constants_heap(NULL),
+  fields_heap(NULL),
+  methods_heap(NULL),
+  attributes_heap(NULL)
 {
 int t;
 
@@ -484,16 +492,16 @@ void *heap;
 
 JavaClass::~JavaClass()
 {
-  if (constant_pool != 0) free(constant_pool);
-  if (interfaces != 0) free(interfaces);
-  if (fields != 0) free(fields);
-  if (methods != 0) free(methods);
-  if (attributes != 0) free(attributes);
+  if (constant_pool != NULL) { free(constant_pool); }
+  if (interfaces != NULL) { free(interfaces); }
+  if (fields != NULL) { free(fields); }
+  if (methods != NULL) { free(methods); }
+  if (attributes != NULL) { free(attributes); }
 
-  if (constants_heap != 0) free(constants_heap);
-  if (fields_heap != 0) free(fields_heap);
-  if (methods_heap != 0) free(methods_heap);
-  if (attributes_heap != 0) free(attributes_heap);
+  if (constants_heap != NULL) { free(constants_heap); }
+  if (fields_heap != NULL) { free(fields_heap); }
+  if (methods_heap != NULL) { free(methods_heap); }
+  if (attributes_heap != NULL) { free(attributes_heap); }
 }
 
 #ifdef DEBUG

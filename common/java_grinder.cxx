@@ -95,6 +95,7 @@ int index;
   }
 
   delete generator;
+  delete java_class;
 
   fclose(in);
 
