@@ -109,6 +109,7 @@ uint8_t *label_map;
 int ret = 0;
 char label[16];
 char method_name[64];
+char method_sig[64];
 uint16_t *operand_stack;
 uint16_t operand_stack_ptr = 0;
 
@@ -118,12 +119,25 @@ uint16_t operand_stack_ptr = 0;
     strcpy(method_name, "error");
   }
 
-  printf("--- Compiling method '%s'  method_id=%d\n", method_name, method_id);
+  printf("--- Compiling method '%s' '%s'  method_id=%d\n", method_name, method_sig, method_id);
 
   if (strcmp(method_name, "<init>") == 0 || method_name[0] == 0)
   {
     printf("Skipping method <--\n");
     return 0;
+  }
+
+  if (strcmp(method_name, "main") != 0)
+  {
+    if (java_class->get_ref_name_type(method_name, method_sig, sizeof(method_name), method_id) == 0)
+    {
+      char *s = method_sig + 1;
+      while(*s != ')' && *s != 0) { s++; }
+      *s = 0;
+      method_sig[0] = '_';
+      strcat(method_name, method_sig);
+      printf("Using method name '%s'\n", method_name);
+    }
   }
 
   // bytes points to the method attributes info for the method.

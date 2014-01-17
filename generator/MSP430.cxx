@@ -580,12 +580,12 @@ int n;
   {
     if (stack_vars > 0)
     {
-      fprintf(out, "  mov.w (%d)SP, (%d)SP\n", stack_vars, local-2);
+      fprintf(out, "  mov.w %d(SP), %d(SP)\n", stack_vars, local-2);
       stack_vars--;
     }
       else
     {
-      fprintf(out, "  mov.w r%d, (%d)SP\n", REG_STACK(reg_vars-1), local-2);
+      fprintf(out, "  mov.w r%d, %d(SP)\n", REG_STACK(reg_vars-1), local-2);
       reg_vars--;
     }
 
