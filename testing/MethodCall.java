@@ -5,14 +5,14 @@ public class MethodCall
 {
   static public void main(String args[])
   {
-    int n;
     int a,b;
+    int n;
 
     a = 7;
     b = 11;
     n = add_nums(a,b) + 1;
 
-    nothing(n,n);
+    nothing(n,a);
 
     while(true);
   }

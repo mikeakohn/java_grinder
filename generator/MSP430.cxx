@@ -28,6 +28,17 @@
 // r12 points to locals
 // r15 is temp
 
+// Function calls:
+// Push params left to right:  add_nums(a,b) =
+//
+// [   ] <-- SP
+// [ret]
+//  ...   (push used registers :( )
+// [ b ]
+// [ a ]
+//
+// ret value is r15
+
 #define REG_STACK(a) (a + 4)
 #define LOCALS(a) ((a * 2) + 2)
 
@@ -512,11 +523,13 @@ int MSP430::return_integer(int local_count)
 {
   if (stack > 0)
   {
-    fprintf(out, "  mov.w @SP, r15\n");
+    fprintf(out, "  pop.w @SP, r15\n");
+    stack--;
   }
     else
   {
     fprintf(out, "  mov.w r%d, r15\n", REG_STACK(reg - 1));
+    reg--;
   }
 
   fprintf(out, "  mov.w r12, SP\n");
@@ -548,13 +561,65 @@ int MSP430::call(const char *name)
 
 int MSP430::invoke_static_method(const char *name, int params, int is_void)
 {
+int local;
+int stack_vars = stack;
+int reg_vars = reg;
 int n;
 
   printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
 
-  for (n = 0; n < reg; n++)  { fprintf(out, "  push r%d\n", n); }
+  // Push all used registers on the stack
+  for (n = 0; n < reg; n++)  { fprintf(out, "  push r%d\n", REG_STACK(n)); }
+
+  // Copy parameters onto the stack so they are local variables in
+  // the called method.  Start with -2 because the return value will
+  // be at 0.
+  local = (params * -2);
+  while(params != 0)
+  {
+    if (stack_vars > 0)
+    {
+      fprintf(out, "  mov.w (%d)SP, (%d)SP\n", stack_vars, local);
+      stack_vars--;
+    }
+      else
+    {
+      fprintf(out, "  mov.w r%d, (%d)SP\n", reg_vars, local);
+      reg_vars--;
+    }
+    params += 2;
+  }
+
+  // Make the call
   fprintf(out, "  call #%s\n", name);
-  for (n = reg-1; n >= 0; n--)  { fprintf(out, "  pop r%d\n", n); }
+
+  // Pop all used registers off the stack
+  for (n = reg-1; n >= 0; n--)  { fprintf(out, "  pop r%d\n", REG_STACK(n)); }
+
+  // Pop all params off the Java stack
+  if ((stack - stack_vars) > 0)
+  {
+    fprintf(out, "  sub.w #%d, SP\n", (stack - stack_vars) * 2);
+    params -= (stack - stack_vars);
+  }
+
+  if (params != 0)
+  {
+    reg -= params;
+  }
+
+  // Put r15 on the top of the stack
+  if (reg < reg_max)
+  {
+    fprintf(out, "  mov.w r15, r%d\n", REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  push r15\n");
+    stack++;
+  }
+
   return 0;
 }
 
