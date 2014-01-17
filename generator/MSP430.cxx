@@ -555,6 +555,7 @@ int MSP430::jump(const char *name)
 int MSP430::call(const char *name)
 {
   // FIXME - do we need to push the register stack?
+  // This is for the Java instruction jsr.
   fprintf(out, "  call #%s\n", name);
   return 0;
 }
@@ -575,19 +576,20 @@ int n;
   // the called method.  Start with -2 because the return value will
   // be at 0.
   local = (params * -2);
-  while(params != 0)
+  while(local != 0)
   {
     if (stack_vars > 0)
     {
-      fprintf(out, "  mov.w (%d)SP, (%d)SP\n", stack_vars, local);
+      fprintf(out, "  mov.w (%d)SP, (%d)SP\n", stack_vars, local-2);
       stack_vars--;
     }
       else
     {
-      fprintf(out, "  mov.w r%d, (%d)SP\n", reg_vars, local);
+      fprintf(out, "  mov.w r%d, (%d)SP\n", REG_STACK(reg_vars-1), local-2);
       reg_vars--;
     }
-    params += 2;
+
+    local += 2;
   }
 
   // Make the call
@@ -608,16 +610,19 @@ int n;
     reg -= params;
   }
 
-  // Put r15 on the top of the stack
-  if (reg < reg_max)
+  if (!is_void)
   {
-    fprintf(out, "  mov.w r15, r%d\n", REG_STACK(reg));
-    reg++;
-  }
-    else
-  {
-    fprintf(out, "  push r15\n");
-    stack++;
+    // Put r15 on the top of the stack
+    if (reg < reg_max)
+    {
+      fprintf(out, "  mov.w r15, r%d\n", REG_STACK(reg));
+      reg++;
+    }
+      else
+    {
+      fprintf(out, "  push r15\n");
+      stack++;
+    }
   }
 
   return 0;
