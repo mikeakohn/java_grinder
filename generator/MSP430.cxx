@@ -783,6 +783,8 @@ int MSP430::uart_isSendReady(int port)
 // SPI functions
 int MSP430::spi_init(int port)
 {
+  if (port != 0) { return -1; }
+
   char dst[16];
   fprintf(out, "  ;; Set up SPI\n");
   fprintf(out, "  mov.b #(USIPE7|USIPE6|USIPE5|USIMST|USIOE|USISWRST), &USICTL0\n");
@@ -818,6 +820,8 @@ int MSP430::spi_init(int port)
 
 int MSP430::spi_send(int port)
 {
+  if (port != 0) { return -1; }
+
   char dst[16];
   pop_reg(out, dst);
 
@@ -832,6 +836,8 @@ int MSP430::spi_send(int port)
 
 int MSP430::spi_read(int port)
 {
+  if (port != 0) { return -1; }
+
   fprintf(out, "  call #_read_spi\n");
   push_reg(out, "r15");
 
@@ -842,6 +848,8 @@ int MSP430::spi_read(int port)
 
 int MSP430::spi_isDataAvailable(int port)
 {
+  if (port != 0) { return -1; }
+
   fprintf(out, "  mov.b &USICTL1, r15\n");
   fprintf(out, "  and.b #USIIFG, r15\n");
   push_reg(out, "r15");
@@ -854,6 +862,24 @@ int MSP430::spi_isBusy(int port)
   return -1;
 }
 
+int MSP430::spi_disable(int port)
+{
+  if (port != 0) { return -1; }
+
+  fprintf(out, "  bic.b #USIPE7|USIPE6|USIPE5, &USICTL1\n");
+
+  return 0;
+}
+
+int MSP430::spi_enable(int port)
+{
+  if (port != 0) { return -1; }
+
+  fprintf(out, "  bis.b #USIPE7|USIPE6|USIPE5, &USICTL1\n");
+
+  return 0;
+}
+
 // CPU functions
 int MSP430::cpu_setClock16()
 {
@@ -861,6 +887,13 @@ int MSP430::cpu_setClock16()
   fprintf(out, "  mov.b #DCO_4, &DCOCTL\n");
   fprintf(out, "  mov.b #RSEL_15, &BCSCTL1\n");
   fprintf(out, "  mov.b #0, &BCSCTL2\n\n");
+
+  return 0;
+}
+
+int MSP430::cpu_nop()
+{
+  fprintf(out, "  nop\n");
 
   return 0;
 }

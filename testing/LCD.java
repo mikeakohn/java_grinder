@@ -49,8 +49,10 @@ public class LCD
     // Not sure how fast this can be
     SPI0.init(SPI0.DIV8, 0);
 
-    // Setup IO port
-    IOPort0.setPinsAsOutput(1);
+    // Setup IO port.
+    // Pin 3 is LCD reset
+    // Pin 4 is /CS
+    IOPort0.setPinsAsOutput(0x18);
     IOPort0.setPinsValue(0);
 
     // Reset LCD
@@ -60,35 +62,35 @@ public class LCD
     delay();
 
     // Display Control
-    SPI0.send(DISCTL);
-    SPI0.send(0);
-    SPI0.send(0x20);
-    SPI0.send(0);
+    lcdWrite(DISCTL);
+    lcdWrite(0);
+    lcdWrite(0x20);
+    lcdWrite(0);
 
     // Common Scan Direction
-    SPI0.send(COMSCN);
-    SPI0.send(1);
+    lcdWrite(COMSCN);
+    lcdWrite(1);
 
     // Internal Oscillator On
-    SPI0.send(OSCON);
+    lcdWrite(OSCON);
 
     // Sleep Out
-    SPI0.send(SLPOUT);
+    lcdWrite(SLPOUT);
 
     // Power Control
-    SPI0.send(PWRCTR);
-    SPI0.send(0x0f);
+    lcdWrite(PWRCTR);
+    lcdWrite(0x0f);
 
     // Inverse Display
-    SPI0.send(DISINV);
-    SPI0.send(1);
-    SPI0.send(0);
-    SPI0.send(2);
+    lcdWrite(DISINV);
+    lcdWrite(1);
+    lcdWrite(0);
+    lcdWrite(2);
 
     // Electronic Volume Control
-    SPI0.send(VOLCTR);
-    SPI0.send(32);
-    SPI0.send(3);
+    lcdWrite(VOLCTR);
+    lcdWrite(32);
+    lcdWrite(3);
 
     delay();
 
@@ -100,20 +102,20 @@ public class LCD
   public static void drawInit()
   {
     // Data Scan Direction
-    SPI0.send(DATCTL);
-    SPI0.send(0);
-    SPI0.send(0);
-    SPI0.send(2);
+    lcdWrite(DATCTL);
+    lcdWrite(0);
+    lcdWrite(0);
+    lcdWrite(2);
 
     // Page Address Set
-    SPI0.send(PASET);
-    SPI0.send(0);
-    SPI0.send(131);
+    lcdWrite(PASET);
+    lcdWrite(0);
+    lcdWrite(131);
 
     // Column Address Set
-    SPI0.send(CASET);
-    SPI0.send(0);
-    SPI0.send(131);
+    lcdWrite(CASET);
+    lcdWrite(0);
+    lcdWrite(131);
   }
 
   public static void drawImage()
@@ -127,6 +129,34 @@ public class LCD
     {
       SPI0.send(0xff);
     }
+  }
+
+  public static void lcdWrite(int a)
+  {
+  int n;
+
+    // /CS = 0
+    IOPort0.setPinsLow(0x10);
+
+    // Manually clock out a bit to SPI
+    SPI0.disable();
+    IOPort0.setPinsHigh(0x20);
+    CPU.nop();
+    CPU.nop();
+    CPU.nop();
+    CPU.nop();
+    IOPort0.setPinsLow(0x20);
+    CPU.nop();
+    CPU.nop();
+    CPU.nop();
+    CPU.nop();
+    SPI0.enable();
+
+    // Hardware clock out the rest of the bits
+    SPI0.send(a);
+
+    // /CS = 1
+    IOPort0.setPinsHigh(0x10);
   }
 
   public static void delay()

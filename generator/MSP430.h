@@ -93,9 +93,12 @@ public:
   virtual int spi_read(int port);
   virtual int spi_isDataAvailable(int port);
   virtual int spi_isBusy(int port);
+  virtual int spi_disable(int port);
+  virtual int spi_enable(int port);
 
   // CPU functions
   virtual int cpu_setClock16();
+  virtual int cpu_nop();
 
   // Memory
   virtual int memory_read8();

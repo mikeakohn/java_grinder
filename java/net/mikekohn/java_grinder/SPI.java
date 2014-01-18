@@ -51,14 +51,26 @@ abstract public class SPI
     return 0;
   }
 
+  /** Returns true if data is available on the SPI bus. */
   public static boolean isDataAvailable()
   {
     return false;
   }
 
+  /** Returns true if data is being transfered on the SPI bus. */
   public static boolean isBusy()
   {
     return false;
+  }
+
+  /** Turn off SPI so alternate peripherals can use pins. */
+  public static void disable()
+  {
+  }
+
+  /** Turn on SPI after disable() was called (not needed after init()). */
+  public static void enable()
+  {
   }
 }
 

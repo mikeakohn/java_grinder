@@ -29,9 +29,15 @@ int cpu_setClock16(JavaClass *java_class, Generator *generator)
   return generator->cpu_setClock16();
 }
 
+int cpu_nop(JavaClass *java_class, Generator *generator)
+{
+  return generator->cpu_nop();
+}
+
 int cpu(JavaClass *java_class, Generator *generator, char *function)
 {
   CHECK_FUNC(setClock16)
+  CHECK_FUNC(nop)
 
   return -1;
 }

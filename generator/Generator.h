@@ -89,9 +89,12 @@ public:
   virtual int spi_read(int port) { return -1; }
   virtual int spi_isDataAvailable(int port) { return -1; }
   virtual int spi_isBusy(int port) { return -1; }
+  virtual int spi_disable(int port) { return -1; }
+  virtual int spi_enable(int port) { return -1; }
 
   // CPU functions
   virtual int cpu_setClock16() { return -1; }
+  virtual int cpu_nop() { return -1; }
 
   // Memory
   virtual int memory_read8() { return -1; }

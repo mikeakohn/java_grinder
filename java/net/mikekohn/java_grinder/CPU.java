@@ -23,5 +23,10 @@ public class CPU
   public static void setClock16()
   {
   }
+
+  /** Insert a CPU level NOP */
+  public static void nop()
+  {
+  }
 }
 

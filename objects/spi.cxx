@@ -49,6 +49,16 @@ int spi_isBusy(JavaClass *java_class, Generator *generator, int port)
   return generator->spi_isBusy(port);
 }
 
+int spi_disable(JavaClass *java_class, Generator *generator, int port)
+{
+  return generator->spi_disable(port);
+}
+
+int spi_enable(JavaClass *java_class, Generator *generator, int port)
+{
+  return generator->spi_enable(port);
+}
+
 int spi(JavaClass *java_class, Generator *generator, char *function, int port)
 {
   CHECK_FUNC(init_II)
@@ -56,9 +66,10 @@ int spi(JavaClass *java_class, Generator *generator, char *function, int port)
   CHECK_FUNC(read)
   CHECK_FUNC(isDataAvailable)
   CHECK_FUNC(isBusy)
+  CHECK_FUNC(disable)
+  CHECK_FUNC(enable)
 
   return -1;
 }
-
 
 
