@@ -119,7 +119,7 @@ uint16_t operand_stack_ptr = 0;
     strcpy(method_name, "error");
   }
 
-  printf("--- Compiling method '%s' '%s'  method_id=%d\n", method_name, method_sig, method_id);
+  printf("--- Compiling method '%s' method_id=%d\n", method_name, method_id);
 
   if (strcmp(method_name, "<init>") == 0 || method_name[0] == 0)
   {

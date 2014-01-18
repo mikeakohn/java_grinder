@@ -1,5 +1,6 @@
 PKG_DIR=net/mikekohn/java_grinder
 JOBJS=\
+  $(PKG_DIR)/CPU.class \
   $(PKG_DIR)/IOPort.class \
   $(PKG_DIR)/IOPort0.class \
   $(PKG_DIR)/IOPort1.class \

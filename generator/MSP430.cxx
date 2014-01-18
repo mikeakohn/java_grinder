@@ -565,12 +565,22 @@ int MSP430::invoke_static_method(const char *name, int params, int is_void)
 int local;
 int stack_vars = stack;
 int reg_vars = reg;
+int saved_registers;
 int n;
 
   printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
 
-  // Push all used registers on the stack
-  for (n = 0; n < reg; n++)  { fprintf(out, "  push r%d\n", REG_STACK(n)); }
+  // Push all used registers on the stack except the ones that are pulled
+  // out for parameters.
+  saved_registers = reg - (params - stack);
+  for (n = 0; n < saved_registers; n++)
+  {
+    fprintf(out, "  push r%d\n", REG_STACK(n));
+  }
+
+  // Push pointer to local variables to the stack because the called
+  // method will trash it.
+  fprintf(out, "  push r12\n");
 
   // Copy parameters onto the stack so they are local variables in
   // the called method.  Start with -2 because the return value will
@@ -595,8 +605,14 @@ int n;
   // Make the call
   fprintf(out, "  call #%s\n", name);
 
+  // Pop the local variables pointer
+  fprintf(out, "  pop r12\n");
+
   // Pop all used registers off the stack
-  for (n = reg-1; n >= 0; n--)  { fprintf(out, "  pop r%d\n", REG_STACK(n)); }
+  for (n = saved_registers-1; n >= 0; n--)
+  {
+    fprintf(out, "  pop r%d\n", REG_STACK(n));
+  }
 
   // Pop all params off the Java stack
   if ((stack - stack_vars) > 0)

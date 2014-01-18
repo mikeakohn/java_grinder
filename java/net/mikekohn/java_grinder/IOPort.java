@@ -25,7 +25,7 @@ abstract public class IOPort
   {
   }
 
-  public static void setPinsValue(int mask)
+  public static void setPinsValue(int value)
   {
   }
 

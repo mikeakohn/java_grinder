@@ -2,6 +2,7 @@
 JOBJS=Testing.class \
       Testing2.class \
       LedBlink.class \
+      LCD.class \
       MemoryTest.class \
       MethodCall.class \
       SPITest.class
