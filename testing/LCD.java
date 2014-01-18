@@ -59,25 +59,33 @@ public class LCD
     IOPort0.setPinsHigh(1);
     delay();
 
+    // Display Control
     SPI0.send(DISCTL);
     SPI0.send(0);
     SPI0.send(0x20);
     SPI0.send(0);
 
+    // Common Scan Direction
     SPI0.send(COMSCN);
     SPI0.send(1);
 
+    // Internal Oscillator On
     SPI0.send(OSCON);
+
+    // Sleep Out
     SPI0.send(SLPOUT);
 
+    // Power Control
     SPI0.send(PWRCTR);
     SPI0.send(0x0f);
 
+    // Inverse Display
     SPI0.send(DISINV);
     SPI0.send(1);
     SPI0.send(0);
     SPI0.send(2);
 
+    // Electronic Volume Control
     SPI0.send(VOLCTR);
     SPI0.send(32);
     SPI0.send(3);
@@ -91,15 +99,18 @@ public class LCD
 
   public static void drawInit()
   {
+    // Data Scan Direction
     SPI0.send(DATCTL);
     SPI0.send(0);
     SPI0.send(0);
     SPI0.send(2);
 
+    // Page Address Set
     SPI0.send(PASET);
     SPI0.send(0);
     SPI0.send(131);
 
+    // Column Address Set
     SPI0.send(CASET);
     SPI0.send(0);
     SPI0.send(131);
