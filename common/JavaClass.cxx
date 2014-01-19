@@ -247,7 +247,6 @@ int ch;
 
   for (count = 0; count < constant_pool_count - 1; count++)
   {
-    // constant_pool[count+1] = ftell(in) - marker;
     constant_pool[count+1] = len;
 
     ch = getc(in);
@@ -287,19 +286,14 @@ int ch;
         break;
 
       default:
-        printf("Error: Uknown constant type (please email author)\n");
+        printf("Error: Uknown constant type %d (please email author)\n", ch);
         exit(1);
         break;
     }
   }
 
-  //len = ftell(in) - marker;
-  //printf("%d %ld\n", len, ftell(in) - marker);
   constants_heap = (uint8_t *)malloc(len);
   fseek(in, marker, SEEK_SET);
-
-  // fread(constants_heap, 1, len, in);
-  // Alla dina Indianer tillbeho:r oss
 
   void *constant;
   struct generic_twoint16_t *gen2int;
@@ -310,7 +304,6 @@ int ch;
 
   for (count = 0; count < constant_pool_count - 1; count++)
   {
-    //constant_pool = (void *)(((int8_t *)constants_heap) + constant_pool[count+1]);
     constant = constants_heap + constant_pool[count+1];
 
     ch = getc(in);
@@ -699,14 +692,16 @@ void JavaClass::print_attributes()
 {
 struct attributes_t *attribute;
 int count,r;
+char name[256];
 
   printf("----- Attributes: %d\n", attributes_count);
 
   for (count = 0; count < attributes_count; count++)
   {
     attribute=(struct attributes_t *)(attributes_heap + attributes[count]);
+    get_name_constant(name, sizeof(name), attribute->name_index);
     printf("                ----- %d -----\n", count);
-    printf("         name_index: %d\n", attribute->name_index);
+    printf("         name_index: %d (%s)\n", attribute->name_index, name);
     printf("             length: %d\n", attribute->length);
     printf("               info: { ");
     for (r = 0; r < attribute->length; r++)
@@ -722,26 +717,31 @@ void JavaClass::print_fields()
 struct attributes_t *attribute;
 struct fields_t *field;
 int count,r,n;
+char name[256];
+char desc[256];
 
   printf("----- FieldCount: %d\n", fields_count);
 
   for (count = 0; count < fields_count; count++)
   {
     field = (struct fields_t *)(fields_heap + fields[count]);
+    get_name_constant(name, sizeof(name), field->name_index);
+    get_name_constant(desc, sizeof(desc), field->descriptor_index);
     printf("                ----- %d -----\n", count);
     printf("         access_flags: %d", field->access_flags);
     print_access(field->access_flags);
     printf("\n");
-    printf("           name_index: %d\n", field->name_index);
-    printf("     descriptor_index: %d\n", field->descriptor_index);
+    printf("           name_index: %d (%s)\n", field->name_index, name);
+    printf("     descriptor_index: %d (%s)\n", field->descriptor_index, desc);
     printf("      attribute_count: %d\n", field->attribute_count);
 
     n = 8;
     for (r = 0; r < field->attribute_count; r++)
     {
       attribute=(struct attributes_t *)(fields_heap + fields[count]+n);
-      printf("                ----- %d -----\n", r);
-      printf("         name_index: %d\n", attribute->name_index);
+      printf("                ----- attr %d -----\n", r);
+      get_name_constant(name, sizeof(name), attribute->name_index);
+      printf("         name_index: %d (%s)\n", attribute->name_index, name);
       printf("             length: %d\n", attribute->length);
       printf("               info: { ");
       for (r=0; r<attribute->length; r++)
@@ -761,6 +761,7 @@ struct attributes_t *attribute;
 struct methods_t *method;
 int count,r,n;
 char name[256];
+char desc[256];
 
   printf("----- MethodCount: %d\n", methods_count);
 
@@ -768,20 +769,22 @@ char name[256];
   {
     method = (struct methods_t *)(methods_heap + methods[count]);
     get_name_constant(name, sizeof(name), method->name_index);
+    get_name_constant(desc, sizeof(desc), method->descriptor_index);
     printf("                ----- %d -----\n", count);
     printf("         access_flags: %d", method->access_flags);
     print_access(method->access_flags);
     printf("\n");
     printf("           name_index: %d (%s)\n", method->name_index, name);
-    printf("     descriptor_index: %d\n", method->descriptor_index);
+    printf("     descriptor_index: %d (%s)\n", method->descriptor_index, desc);
     printf("      attribute_count: %d\n", method->attribute_count);
 
     n = 8;
     for (r = 0; r < method->attribute_count; r++)
     {
       attribute = (struct attributes_t *)(methods_heap + methods[count] + n);
-      printf("                ----- %d -----\n", r);
-      printf("         name_index: %d\n", attribute->name_index);
+      printf("                ----- attr %d -----\n", r);
+      get_name_constant(name, sizeof(name), attribute->name_index);
+      printf("         name_index: %d (%s)\n", attribute->name_index, name);
       printf("             length: %d\n", attribute->length);
       printf("               info: { ");
       for (r = 0; r < attribute->length; r++)
