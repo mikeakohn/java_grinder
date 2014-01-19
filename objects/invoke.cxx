@@ -113,6 +113,7 @@ int ptr = 0;
     s++;
   }
 
+  if (ptr > 1 && function[ptr-1] == '_') { function[ptr-1] = 0; }
   function[ptr] = 0;
 }
 

@@ -56,9 +56,9 @@ public class LCD
     IOPort0.setPinsValue(0);
 
     // Reset LCD
-    IOPort0.setPinsLow(1);
+    IOPort0.setPinsLow(0x08);
     delay();
-    IOPort0.setPinsHigh(1);
+    IOPort0.setPinsHigh(0x08);
     delay();
 
     // Display Control
