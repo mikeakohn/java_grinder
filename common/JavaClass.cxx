@@ -39,7 +39,7 @@ int t;
   major_version = read_int16(in);
 
   constant_pool_count = read_int16(in);
-  if (constant_pool_count!=0)
+  if (constant_pool_count != 0)
   {
     constant_pool = (int *)malloc((constant_pool_count + 1) * sizeof(int));
     memset(constant_pool, 0, (constant_pool_count + 1) * sizeof(int));
@@ -259,31 +259,31 @@ int ch;
       case CONSTANT_INTERFACEMETHODREF:
       case CONSTANT_NAMEANDTYPE:
         fseek(in, 4, SEEK_CUR);
-        len = len + sizeof(struct generic_twoint16_t);
+        len += sizeof(struct generic_twoint16_t);
         break;
 
       case CONSTANT_INTEGER:
       case CONSTANT_FLOAT:
         fseek(in, 4, SEEK_CUR);
-        len = len + sizeof(struct generic_32bit_t);
+        len += sizeof(struct generic_32bit_t);
         break;
 
       case CONSTANT_CLASS:
       case CONSTANT_STRING:
         fseek(in, 2, SEEK_CUR);
-        len = len + sizeof(struct constant_class_t);
+        len += sizeof(struct constant_class_t);
         break;
 
       case CONSTANT_LONG:
       case CONSTANT_DOUBLE:
         fseek(in, 8, SEEK_CUR);
-        len = len + sizeof(struct constant_double_t);
+        len += sizeof(struct constant_double_t);
         break;
 
       case CONSTANT_UTF8:
         ch = read_int16(in);
         fseek(in, ch, SEEK_CUR);
-        len = len + 2 + 2 + ch;
+        len += sizeof(struct constant_utf8_t) + ch;
         break;
 
       default:

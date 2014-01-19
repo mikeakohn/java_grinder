@@ -135,14 +135,14 @@ struct constant_utf8_t
 {
   uint8_t tag;
   int16_t length;
-  unsigned char bytes[];
+  uint8_t bytes[];
 };
 
 struct attributes_t
 {
   int16_t name_index;
   int32_t length;
-  unsigned char info[];
+  uint8_t info[];
 };
 
 struct fields_t
