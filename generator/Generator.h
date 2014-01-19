@@ -74,7 +74,7 @@ public:
   virtual int ioport_setPinLow(int port) { return -1; }
   virtual int ioport_isPinInputHigh(int port) { return -1; }
   virtual int ioport_getPortInputValue(int port) { return -1; }
-  virtual int ioport_setPortOutputValue(int port) { return -1; }
+  //virtual int ioport_setPortOutputValue(int port) { return -1; }
 
   // UART functions
   virtual int uart_init(int port) { return -1; }

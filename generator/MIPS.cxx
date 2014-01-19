@@ -235,5 +235,5 @@ int MIPS::ioport_setPinHigh(int port) { return -1; }
 int MIPS::ioport_setPinLow(int port) { return -1; }
 int MIPS::ioport_isPinInputHigh(int port) { return -1; }
 int MIPS::ioport_getPortInputValue(int port) { return -1; }
-int MIPS::ioport_setPortOutputValue(int port) { return -1; }
+//int MIPS::ioport_setPortOutputValue(int port) { return -1; }
 

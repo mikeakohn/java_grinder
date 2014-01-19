@@ -157,7 +157,7 @@ char function[256];
 
   if (ret == 0) { return 0; }
 
-  printf("Function not implemented '%s'\n", function);
+  printf("--> Function not implemented '%s'\n", function);
 
   return -1;
 }
@@ -217,7 +217,7 @@ char function[256];
 
   if (ret == 0) { return 0; }
 
-  printf("Function not implemented '%s'\n", function);
+  printf("--> Function not implemented '%s'\n", function);
 
   return -1;
 }

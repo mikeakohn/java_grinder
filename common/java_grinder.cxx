@@ -90,9 +90,15 @@ int index;
 #endif
 
   int method_count = java_class->get_method_count();
+  int ret = 0;
   for (index = 0; index < method_count; index++)
   {
-    compile_method(java_class, index, generator);
+    if (compile_method(java_class, index, generator) != 0)
+    {
+      printf("** Error compiling class.\n");
+      ret = -1;
+      break;
+    }
   }
 
   delete generator;
@@ -100,7 +106,7 @@ int index;
 
   fclose(in);
 
-  return 0;
+  return ret;
 }
 
 

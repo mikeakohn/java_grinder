@@ -405,5 +405,5 @@ int DSPIC::ioport_setPinHigh(int port) { return -1; }
 int DSPIC::ioport_setPinLow(int port) { return -1; }
 int DSPIC::ioport_isPinInputHigh(int port) { return -1; }
 int DSPIC::ioport_getPortInputValue(int port) { return -1; }
-int DSPIC::ioport_setPortOutputValue(int port) { return -1; }
+//int DSPIC::ioport_setPortOutputValue(int port) { return -1; }
 

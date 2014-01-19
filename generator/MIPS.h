@@ -72,7 +72,7 @@ public:
   virtual int ioport_setPinLow(int port);
   virtual int ioport_isPinInputHigh(int port);
   virtual int ioport_getPortInputValue(int port);
-  virtual int ioport_setPortOutputValue(int port);
+  //virtual int ioport_setPortOutputValue(int port);
 };
 
 #endif

@@ -109,7 +109,6 @@ uint8_t *label_map;
 int ret = 0;
 char label[16];
 char method_name[64];
-char method_sig[64];
 uint16_t *operand_stack;
 uint16_t operand_stack_ptr = 0;
 
@@ -129,15 +128,18 @@ uint16_t operand_stack_ptr = 0;
 
   if (strcmp(method_name, "main") != 0)
   {
-    if (java_class->get_ref_name_type(method_name, method_sig, sizeof(method_name), method_id) == 0)
-    {
+    char method_sig[64];
+    java_class->get_name_constant(method_sig, sizeof(method_sig), method->descriptor_index);
+    //char *method_sig = java_class->get_constant(method->descriptor_index);
+    //if (java_class->get_ref_name_type(method_name, method_sig, sizeof(method_name), method_id) == 0)
+    //{
       char *s = method_sig + 1;
       while(*s != ')' && *s != 0) { s++; }
       *s = 0;
       method_sig[0] = '_';
-      strcat(method_name, method_sig);
+      if (method_sig[1] != 0 ) { strcat(method_name, method_sig); }
       printf("Using method name '%s'\n", method_name);
-    }
+    //}
   }
 
   // bytes points to the method attributes info for the method.
@@ -1659,7 +1661,7 @@ printf("code_len=%d\n", code_len);
 
   generator->method_end(max_locals);
 
-  return 0;
+  return ret;
 }
 
 

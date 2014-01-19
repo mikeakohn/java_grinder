@@ -235,5 +235,5 @@ int ARM::ioport_setPinHigh(int port) { return -1; }
 int ARM::ioport_setPinLow(int port) { return -1; }
 int ARM::ioport_isPinInputHigh(int port) { return -1; }
 int ARM::ioport_getPortInputValue(int port) { return -1; }
-int ARM::ioport_setPortOutputValue(int port) { return -1; }
+//int ARM::ioport_setPortOutputValue(int port) { return -1; }
 

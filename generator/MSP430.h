@@ -78,7 +78,7 @@ public:
   virtual int ioport_setPinLow(int port);
   virtual int ioport_isPinInputHigh(int port);
   virtual int ioport_getPortInputValue(int port);
-  virtual int ioport_setPortOutputValue(int port);
+  //virtual int ioport_setPortOutputValue(int port);
 
   // UART functions
   virtual int uart_init(int port);
@@ -107,6 +107,7 @@ public:
   virtual int memory_write16();
 
 protected:
+  int set_periph(const char *instr, const char *periph);
   int stack_alu(const char *instr);
   void push_reg(FILE *out, const char *reg);
   void pop_reg(FILE *out, char *reg);

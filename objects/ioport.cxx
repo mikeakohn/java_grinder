@@ -79,10 +79,12 @@ int ioport_getPortInputValue(JavaClass *java_class, Generator *generator, int po
   return generator->ioport_getPortInputValue(port);
 }
 
+#if 0
 int ioport_setPortOutputValue_I(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->ioport_setPortOutputValue(port);
 }
+#endif
 
 int ioport(JavaClass *java_class, Generator *generator, char *function, int port)
 {
@@ -97,7 +99,7 @@ int ioport(JavaClass *java_class, Generator *generator, char *function, int port
   CHECK_FUNC(setPinLow_I)
   CHECK_FUNC(isPinInputHigh_I)
   CHECK_FUNC(getPortInputValue)
-  CHECK_FUNC(setPortOutputValue_I)
+  //CHECK_FUNC(setPortOutputValue_I)
 
   return -1;
 }

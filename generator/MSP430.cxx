@@ -668,6 +668,10 @@ void MSP430::close()
 // GPIO functions
 int MSP430::ioport_setPinsAsInput(int port)
 {
+  char periph[32];
+  sprintf(periph, "P%dDIR", port+1);
+  return set_periph("bic", periph);
+# if 0
   if (stack == 0)
   {
     fprintf(out, "  bic.b r%d, &P%dDIR\n", REG_STACK(reg-1), port+1);
@@ -681,10 +685,15 @@ int MSP430::ioport_setPinsAsInput(int port)
   }
 
   return 0;
+#endif
 }
 
 int MSP430::ioport_setPinsAsOutput(int port)
 {
+  char periph[32];
+  sprintf(periph, "P%dDIR", port+1);
+  return set_periph("bis", periph);
+#if 0
   if (stack == 0)
   {
     fprintf(out, "  bis.b r%d, &P%dDIR\n", REG_STACK(reg-1), port+1);
@@ -698,21 +707,43 @@ int MSP430::ioport_setPinsAsOutput(int port)
   }
 
   return 0;
+#endif
 }
 
 int MSP430::ioport_setPinsValue(int port)
 {
-  return -1;
+  char periph[32];
+  sprintf(periph, "P%dOUT", port+1);
+  return set_periph("mov", periph);
+#if 0
+  if (stack == 0)
+  {
+    fprintf(out, "  mov.b r%d, &P%dDIR\n", REG_STACK(reg-1), port+1);
+    reg--;
+  }
+    else
+  {
+    fprintf(out, "  pop.w r15\n");
+    fprintf(out, "  mov.b r15, &P%dDIR\n", port+1);
+    stack--;
+  }
+
+  return 0;
+#endif
 }
 
 int MSP430::ioport_setPinsHigh(int port)
 {
-  return -1;
+  char periph[32];
+  sprintf(periph, "P%dOUT", port+1);
+  return set_periph("bis", periph);
 }
 
 int MSP430::ioport_setPinsLow(int port)
 {
-  return -1;
+  char periph[32];
+  sprintf(periph, "P%dOUT", port+1);
+  return set_periph("bic", periph);
 }
 
 int MSP430::ioport_setPinAsOutput(int port)
@@ -745,6 +776,7 @@ int MSP430::ioport_getPortInputValue(int port)
   return -1;
 }
 
+#if 0
 int MSP430::ioport_setPortOutputValue(int port)
 {
   if (stack == 0)
@@ -761,6 +793,7 @@ int MSP430::ioport_setPortOutputValue(int port)
 
   return 0;
 }
+#endif
 
 // UART functions
 int MSP430::uart_init(int port)
@@ -1015,6 +1048,23 @@ void MSP430::pop_reg(FILE *out, char *dst)
     reg--;
     sprintf(dst, "r%d", REG_STACK(reg));
   }
+}
+
+int MSP430::set_periph(const char *instr, const char *periph)
+{
+  if (stack == 0)
+  {
+    fprintf(out, "  %s.b r%d, &%s\n", instr, REG_STACK(reg-1), periph);
+    reg--;
+  }
+    else
+  {
+    fprintf(out, "  pop.w r15\n");
+    fprintf(out, "  %s.b r15, &%s\n", instr, periph);
+    stack--;
+  }
+
+  return 0;
 }
 
 int MSP430::stack_alu(const char *instr)
