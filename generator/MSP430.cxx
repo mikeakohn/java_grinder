@@ -50,7 +50,8 @@ MSP430::MSP430(uint8_t chip_type) :
   reg_max(6),
   stack(0),
   label_count(0),
-  need_read_spi(0)
+  need_read_spi(0),
+  is_main(0)
 {
   switch(chip_type)
   {
@@ -114,8 +115,11 @@ void MSP430::method_start(int local_count, const char *name)
   reg = 0;
   stack = 0;
 
+  is_main = (strcmp(name, "main") == 0) ? 1 : 0;
+
   // main() function goes here
   fprintf(out, "%s:\n", name);
+  if (!is_main) { fprintf(out, "  push r12\n"); }
   fprintf(out, "  mov.w SP, r12\n");
   fprintf(out, "  sub.w #0x%x, SP\n", local_count * 2);
 }
@@ -514,6 +518,7 @@ int MSP430::return_local(int index, int local_count)
   fprintf(out, "  mov.w -%d(w12), r15\n", LOCALS(index));
 
   fprintf(out, "  mov.w r12, SP\n");
+  if (!is_main) { fprintf(out, "  pop r12\n"); }
   fprintf(out, "  ret\n");
 
   return 0;
@@ -533,6 +538,7 @@ int MSP430::return_integer(int local_count)
   }
 
   fprintf(out, "  mov.w r12, SP\n");
+  if (!is_main) { fprintf(out, "  pop r12\n"); }
   fprintf(out, "  ret\n");
 
   return 0;
@@ -541,6 +547,7 @@ int MSP430::return_integer(int local_count)
 int MSP430::return_void(int local_count)
 {
   fprintf(out, "  mov r12, SP\n");
+  if (!is_main) { fprintf(out, "  pop r12\n"); }
   fprintf(out, "  ret\n");
 
   return 0;
@@ -580,22 +587,22 @@ int n;
 
   // Push pointer to local variables to the stack because the called
   // method will trash it.
-  fprintf(out, "  push r12\n");
+  //fprintf(out, "  push r12\n");
 
   // Copy parameters onto the stack so they are local variables in
-  // the called method.  Start with -2 because the return value will
-  // be at 0.
+  // the called method.  Start with -4 because the return address will
+  // be at 0 and r12 will be at 2.
   local = (params * -2);
   while(local != 0)
   {
     if (stack_vars > 0)
     {
-      fprintf(out, "  mov.w %d(SP), %d(SP)\n", stack_vars, local-2);
+      fprintf(out, "  mov.w %d(SP), %d(SP)\n", stack_vars, local-4);
       stack_vars--;
     }
       else
     {
-      fprintf(out, "  mov.w r%d, %d(SP)\n", REG_STACK(reg_vars-1), local-2);
+      fprintf(out, "  mov.w r%d, %d(SP)\n", REG_STACK(reg_vars-1), local-4);
       reg_vars--;
     }
 
@@ -606,7 +613,7 @@ int n;
   fprintf(out, "  call #%s\n", name);
 
   // Pop the local variables pointer
-  fprintf(out, "  pop r12\n");
+  //fprintf(out, "  pop r12\n");
 
   // Pop all used registers off the stack
   for (n = saved_registers-1; n >= 0; n--)
@@ -636,6 +643,7 @@ int n;
     }
       else
     {
+      // REVIEW - This looks wrong
       fprintf(out, "  push r15\n");
       stack++;
     }

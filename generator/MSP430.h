@@ -116,7 +116,8 @@ protected:
   int label_count;
   int stack_start;
   int flash_start;
-  int need_read_spi:1;
+  bool need_read_spi:1;
+  bool is_main:1;
 };
 
 #endif

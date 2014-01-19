@@ -1358,6 +1358,11 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 169: // ret (0xa9)
+        // FIXME - "Continue execution from address taken from a local
+        // variable #index (the asymmetry with jsr is intentional).
+        // The hell does that mean?  jsr pushes the return address on the
+        // stack.. this thing shouldn't have to have an index.
+#if 0
         if (wide == 1)
         {
           //pc = local_vars[GET_PC_UINT16(1)];
@@ -1371,6 +1376,8 @@ printf("code_len=%d\n", code_len);
           ret = generator->return_local(bytes[pc+1], max_locals);
           pc += 2;
         }
+#endif
+        ret = -1;
         break;
 
       case 170: // tableswitch (0xaa)
