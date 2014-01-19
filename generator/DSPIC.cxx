@@ -18,6 +18,7 @@
 
 #include "DSPIC.h"
 
+#define REG_STACK(a) (a + 1)
 #define LOCAL_VAR(i) (i * 2)
 
 // ABI is:
@@ -27,17 +28,16 @@
 // w3 ..
 // w4 ..
 // w5 ..
-// w6 ..
-// w7 ..
-// w8 ..
-// w9 top of stack 
-// w10 pointer to locals
+// w6 top of stack
+// w12 pointer to locals
+//
+// Stack on dsPIC moves value to [sp] and then increments sp by 2 (odd).
 
 static const char *cond_str[] = { "z", "nz", "lt", "le", "gt", "ge" };
 
-DSPIC::DSPIC() : reg(0), stack(0)
+DSPIC::DSPIC(uint8_t chip_type) : reg(0), reg_max(6), stack(0)
 {
-
+  this->chip_type = chip_type;
 }
 
 DSPIC::~DSPIC()
@@ -51,7 +51,15 @@ int DSPIC::open(char *filename)
 
   // For now we only support a specific chip
   fprintf(out, ".dspic\n");
-  fprintf(out, ".include \"p30f3012.inc\"\n\n");
+
+  switch(chip_type)
+  {
+    case DSPIC30F3012:
+      fprintf(out, ".include \"p30f3012.inc\"\n\n");
+      break;
+    default:
+      printf("Unknown chip type.\n");
+  }
 
   // Add any set up items (stack, registers, etc)
   fprintf(out, "start:\n\n");
@@ -59,9 +67,11 @@ int DSPIC::open(char *filename)
   return 0;
 }
 
+#if 0
 void DSPIC::serial_init()
 {
 }
+#endif
 
 void DSPIC::method_start(int local_count, const char *name)
 {
@@ -70,8 +80,8 @@ void DSPIC::method_start(int local_count, const char *name)
 
   // main() function goes here
   fprintf(out, "%s:\n", name);
-  fprintf(out, "  mov sp, w10\n");
-  fprintf(out, "  sub #0x%x, sp\n", local_count * 2);
+  fprintf(out, "  mov sp, w12\n");
+  fprintf(out, "  add #0x%x, sp\n", local_count * 2);
 }
 
 void DSPIC::method_end(int local_count)
@@ -108,7 +118,7 @@ int DSPIC::push_integer(int32_t n)
 
 int DSPIC::push_integer_local(int index)
 {
-  fprintf(out, "  mov [w10-#%d], w0\n", LOCAL_VAR(index));
+  fprintf(out, "  mov [w12-#%d], w0\n", LOCAL_VAR(index));
 
   if (reg < 8)
   {
@@ -331,12 +341,15 @@ int DSPIC::jump_cond_integer(const char *label, int cond)
 
 int DSPIC::return_local(int index, int local_count)
 {
-  fprintf(out, "  mov [w10-#%d], w0\n", LOCAL_VAR(index));
+#if 0
+  fprintf(out, "  mov [w12-#%d], w0\n", LOCAL_VAR(index));
   //fprintf(out, "  add #0x%x, sp\n", local_count * 2);
-  fprintf(out, "  mov w10, sp\n");
+  fprintf(out, "  mov w12, sp\n");
   fprintf(out, "  ret\n");
 
   return 0;
+#endif
+  return -1;
 }
 
 int DSPIC::return_integer(int local_count)
@@ -351,7 +364,7 @@ int DSPIC::return_integer(int local_count)
   }
 
   //fprintf(out, "  add #0x%x, sp\n", local_count * 2);
-  fprintf(out, "  mov w10, sp\n");
+  fprintf(out, "  mov w12, sp\n");
   fprintf(out, "  ret\n");
   return 0;
 }
@@ -359,7 +372,7 @@ int DSPIC::return_integer(int local_count)
 int DSPIC::return_void(int local_count)
 {
   //fprintf(out, "  add #0x%x, sp\n", local_count * 2);
-  fprintf(out, "  mov w10, sp\n");
+  fprintf(out, "  mov w12, sp\n");
   fprintf(out, "  ret\n");
 
   return 0;
@@ -406,4 +419,77 @@ int DSPIC::ioport_setPinLow(int port) { return -1; }
 int DSPIC::ioport_isPinInputHigh(int port) { return -1; }
 int DSPIC::ioport_getPortInputValue(int port) { return -1; }
 //int DSPIC::ioport_setPortOutputValue(int port) { return -1; }
+
+// SPI functions
+int DSPIC::spi_init(int port)
+{
+  return -1;
+}
+
+int DSPIC::spi_send(int port)
+{
+  return -1;
+}
+
+int DSPIC::spi_read(int port)
+{
+  return -1;
+}
+
+int DSPIC::spi_isDataAvailable(int port)
+{
+  return -1;
+}
+
+int DSPIC::spi_isBusy(int port)
+{
+  return -1;
+}
+
+int DSPIC::spi_disable(int port)
+{
+  return -1;
+}
+
+int DSPIC::spi_enable(int port)
+{
+  return -1;
+}
+
+
+// CPU functions
+int DSPIC::cpu_setClock16()
+{
+  return -1;
+}
+
+int DSPIC::cpu_nop()
+{
+  fprintf(out, "  nop\n");
+  return 0;
+}
+
+
+// Memory
+int DSPIC::memory_read8()
+{
+  return -1;
+}
+
+int DSPIC::memory_write8()
+{
+  return -1;
+}
+
+int DSPIC::memory_read16()
+{
+  return -1;
+}
+
+int DSPIC::memory_write16()
+{
+  return -1;
+}
+
+
 

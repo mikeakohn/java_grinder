@@ -106,9 +106,11 @@ int MSP430::open(char *filename)
   return 0;
 }
 
+#if 0
 void MSP430::serial_init()
 {
 }
+#endif
 
 void MSP430::method_start(int local_count, const char *name)
 {

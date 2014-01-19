@@ -59,9 +59,9 @@ int index;
     generator = new MSP430X(0);
   }
     else
-  if (strcasecmp("dspic",argv[3]) == 0)
+  if (strcasecmp("dspic30f3012",argv[3]) == 0)
   {
-    generator = new DSPIC();
+    generator = new DSPIC(DSPIC30F3012);
   }
     else
   if (strcasecmp("m6502",argv[3]) == 0)

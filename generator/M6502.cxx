@@ -35,9 +35,11 @@ int M6502::open(char *filename)
   return 0;
 }
 
+#if 0
 void M6502::serial_init()
 {
 }
+#endif
 
 void M6502::method_start(int local_count, const char *name)
 {

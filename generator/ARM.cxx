@@ -40,9 +40,11 @@ int ARM::open(char *filename)
   return 0;
 }
 
+#if 0
 void ARM::serial_init()
 {
 }
+#endif
 
 void ARM::method_start(int local_count, const char *name)
 {

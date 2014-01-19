@@ -14,15 +14,20 @@
 
 #include "Generator.h"
 
+enum
+{
+  DSPIC30F3012,
+};
+
 class DSPIC : public Generator
 {
 public:
-  DSPIC();
+  DSPIC(uint8_t chip_type);
   virtual ~DSPIC();
 
   virtual int open(char *filename);
 
-  virtual void serial_init();
+  //virtual void serial_init();
   virtual void method_start(int local_count, const char *name);
   virtual void method_end(int local_count);
   virtual int push_integer(int32_t n);
@@ -74,9 +79,30 @@ public:
   virtual int ioport_getPortInputValue(int port);
   //virtual int ioport_setPortOutputValue(int port);
 
+  // SPI functions
+  virtual int spi_init(int port);
+  virtual int spi_send(int port);
+  virtual int spi_read(int port);
+  virtual int spi_isDataAvailable(int port);
+  virtual int spi_isBusy(int port);
+  virtual int spi_disable(int port);
+  virtual int spi_enable(int port);
+
+  // CPU functions
+  virtual int cpu_setClock16();
+  virtual int cpu_nop();
+
+  // Memory
+  virtual int memory_read8();
+  virtual int memory_write8();
+  virtual int memory_read16();
+  virtual int memory_write16();
+
 private:
   int reg;            // count number of registers are are using as stack
+  int reg_max;        // size of register stack 
   int stack;          // count how many things we put on the stack
+  uint8_t chip_type;
 };
 
 #endif

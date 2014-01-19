@@ -40,9 +40,11 @@ int MIPS::open(char *filename)
   return 0;
 }
 
+#if 0
 void MIPS::serial_init()
 {
 }
+#endif
 
 void MIPS::method_start(int local_count, const char *name)
 {

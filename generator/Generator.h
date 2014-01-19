@@ -24,7 +24,7 @@ public:
   void label(char *name);
 
   //virtual int init() = 0;
-  virtual void serial_init() = 0;
+  //virtual void serial_init() = 0;
   virtual void method_start(int local_count, const char *name) = 0;
   virtual void method_end(int local_count) = 0;
   virtual int push_integer(int32_t n) = 0;
