@@ -136,25 +136,28 @@ void JavaClass::read_fields(FILE *in)
 {
 long marker;
 int count;
-int len;
+int len = 0;
 int n,l,r;
 
   marker = ftell(in);
 
   for (count = 0; count < fields_count; count++)
   {
-    fields[count] = ftell(in) - marker;
+    //fields[count] = ftell(in) - marker;
+    fields[count] = len;
     fseek(in, 6, SEEK_CUR);
     n = read_int16(in);
+    len += sizeof(struct fields_t);
     for (r = 0; r < n; r++)
     {
       fseek(in, 2, SEEK_CUR);
       l = read_int32(in);
+      len += sizeof(struct attributes_t) + l;
       fseek(in, l, SEEK_CUR);
     }
   }
 
-  len = ftell(in) - marker;
+  //len = ftell(in) - marker;
   fields_heap = (uint8_t *)malloc(len);
   fseek(in, marker, SEEK_SET);
 
@@ -167,8 +170,8 @@ int n,l,r;
     field->name_index = read_int16(in);
     field->descriptor_index = read_int16(in);
     field->attribute_count = read_int16(in);
-    n = 8;
-    for (r = 0; r<field->attribute_count; r++)
+    n = sizeof(struct fields_t);
+    for (r = 0; r < field->attribute_count; r++)
     {
       attribute = (struct attributes_t *)(fields_heap + fields[count]+n);
       attribute->name_index = read_int16(in);
@@ -284,7 +287,8 @@ int ch;
         break;
 
       default:
-        printf("Error: Uknown constant type\n");
+        printf("Error: Uknown constant type (please email author)\n");
+        exit(1);
         break;
     }
   }
@@ -502,6 +506,29 @@ void *heap;
   }
 
   return -1;
+}
+
+const char *JavaClass::tag_as_string(int tag)
+{
+  const char *tags[] =
+  {
+    "???",
+    "UTF8",               // 1
+    "???",
+    "INTEGER",            // 3
+    "FLOAT",              // 4
+    "LONG",               // 5
+    "DOUBLE",             // 6
+    "CLASS",              // 7
+    "STRING",             // 8
+    "FIELDREF",           // 9
+    "METHODREF",          // 10
+    "INTERFACEMETHODREF", // 11
+    "NAMEANDTYPE",        // 12
+  };
+
+  if (tag < 0 || tag > 12) { return "???"; }
+  return tags[tag];
 }
 
 #ifdef DEBUG

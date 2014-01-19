@@ -291,7 +291,7 @@ printf("code_len=%d\n", code_len);
         }
           else
         {
-          printf("Cannot ldc this type\n");
+          printf("Cannot ldc this type %d=>'%s' pc=%d\n", gen32->tag, JavaClass::tag_as_string(gen32->tag), pc);
           ret = -1;
         }
 

@@ -174,6 +174,7 @@ public:
   int get_field_name(char *name, int len, int index);
   int get_ref_name_type(char *name, char *type, int len, int index);
   int get_class_name(char *name, int len, int index);
+  static const char *tag_as_string(int tag);
 
   int32_t magic;
   int16_t minor_version;

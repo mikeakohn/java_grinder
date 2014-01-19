@@ -11,6 +11,8 @@
 
 package net.mikekohn.java_grinder;
 
+// http://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus
+
 abstract public class SPI
 {
   static public final int DIV1 = 0;
