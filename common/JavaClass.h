@@ -174,33 +174,19 @@ public:
   int get_field_name(char *name, int len, int index);
   int get_ref_name_type(char *name, char *type, int len, int index);
   int get_class_name(char *name, int len, int index);
+  void *get_constant(int index);
+  struct methods_t *get_method(int index);
+  int get_method_count() { return methods_count; }
   static const char *tag_as_string(int tag);
 
   int32_t magic;
   int16_t minor_version;
   int16_t major_version;
-  int16_t constant_pool_count;
-  int *constant_pool;  // len = contant_pool_count - 1 (points in the heap)
   int16_t access_flags;
   int16_t this_class;
   int16_t super_class;
-  int16_t interfaces_count;
-  int *interfaces;
-  int16_t fields_count;
-  int *fields;
-  int16_t methods_count;
-  int *methods;
-  int16_t attributes_count;
-  int *attributes;
 
   char class_name[128];
-
-  // Extra Crap (these should be voids *'s really.. it was easier to make
-  //             them unsigned char * at first)
-  uint8_t *constants_heap;
-  uint8_t *fields_heap;
-  uint8_t *methods_heap;
-  uint8_t *attributes_heap;
 
 private:
   void read_attributes(FILE *in);
@@ -214,6 +200,26 @@ private:
   void print_fields();
   void print_methods();
 #endif
+
+  // Counts of fields, methods, etc.
+  uint16_t constant_pool_count;
+  uint16_t interfaces_count;
+  uint16_t fields_count;
+  uint16_t methods_count;
+  uint16_t attributes_count;
+
+  // Indexed pointers into the heaps.
+  int *constant_pool;  // len = contant_pool_count - 1 (points in the heap)
+  uint16_t *interfaces;
+  int *fields;
+  int *methods;
+  int *attributes;
+
+  // Where all the data is stored.
+  uint8_t *constants_heap;
+  uint8_t *fields_heap;
+  uint8_t *methods_heap;
+  uint8_t *attributes_heap;
 };
 
 #endif

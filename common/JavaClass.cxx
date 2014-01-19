@@ -21,6 +21,7 @@
 #include "JavaClass.h"
 
 JavaClass::JavaClass(FILE *in) :
+  constant_pool(NULL),
   interfaces(NULL),
   fields(NULL),
   methods(NULL),
@@ -53,7 +54,7 @@ int t;
 
   if (interfaces_count != 0)
   {
-    interfaces = (int *)malloc(interfaces_count * sizeof(int));
+    interfaces = (uint16_t *)malloc(interfaces_count * sizeof(uint16_t));
     for (t = 0; t < interfaces_count; t++)
     {
       interfaces[t] = read_int16(in);
@@ -522,6 +523,16 @@ const char *JavaClass::tag_as_string(int tag)
 
   if (tag < 0 || tag > 12) { return "???"; }
   return tags[tag];
+}
+
+void *JavaClass::get_constant(int index)
+{
+  return constants_heap + constant_pool[index];
+}
+
+struct methods_t *JavaClass::get_method(int index)
+{
+  return (struct methods_t *)(methods_heap + methods[index]);
 }
 
 #ifdef DEBUG

@@ -89,7 +89,8 @@ int index;
   java_class->print();
 #endif
 
-  for (index = 0; index < java_class->methods_count; index++)
+  int method_count = java_class->get_method_count();
+  for (index = 0; index < method_count; index++)
   {
     compile_method(java_class, index, generator);
   }

@@ -91,7 +91,7 @@ int address;
 
 int compile_method(JavaClass *java_class, int method_id, Generator *generator)
 {
-struct methods_t *method = (struct methods_t *)(java_class->methods_heap + java_class->methods[method_id]);
+struct methods_t *method = java_class->get_method(method_id);
 unsigned char *bytes = method->attributes[0].info;
 int pc;
 const float fzero = 0.0;
@@ -270,7 +270,8 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 18: // ldc (0x12)
-        gen32 = ((generic_32bit_t *)java_class->constants_heap) + java_class->constant_pool[bytes[pc+1]];
+        gen32 = (generic_32bit_t *)java_class->get_constant(bytes[pc+1]);
+
         if (gen32->tag == CONSTANT_INTEGER)
         {
           //PUSH_INTEGER(gen32->value);
