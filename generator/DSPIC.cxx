@@ -19,7 +19,7 @@
 #include "DSPIC.h"
 
 #define REG_STACK(a) (a + 1)
-#define LOCAL_VAR(i) (i * 2)
+#define LOCALS(i) (i * 2)
 
 // ABI is:
 // w0 temp
@@ -128,7 +128,7 @@ int DSPIC::push_integer(int32_t n)
 
 int DSPIC::push_integer_local(int index)
 {
-  fprintf(out, "  mov [w12-#%d], w0\n", LOCAL_VAR(index));
+  fprintf(out, "  mov [w12-#%d], w0\n", LOCALS(index));
 
   if (reg < reg_max)
   {
@@ -406,7 +406,7 @@ int DSPIC::jump_cond_integer(const char *label, int cond)
 int DSPIC::return_local(int index, int local_count)
 {
 #if 0
-  fprintf(out, "  mov [w12-#%d], w0\n", LOCAL_VAR(index));
+  fprintf(out, "  mov [w12-#%d], w0\n", LOCALS(index));
   //fprintf(out, "  add #0x%x, sp\n", local_count * 2);
   fprintf(out, "  mov w12, sp\n");
   fprintf(out, "  ret\n");
@@ -455,11 +455,6 @@ int DSPIC::call(const char *name)
 }
 
 int DSPIC::invoke_static_method(const char *name, int params, int is_void)
-{
-  return -1;
-}
-
-int DSPIC::brk()
 {
 int local;
 int stack_vars = stack;
@@ -535,6 +530,11 @@ int n;
   }
 
   return 0;
+}
+
+int DSPIC::brk()
+{
+  return -1;
 }
 
 #if 0
