@@ -115,10 +115,10 @@ protected:
   int reg_max;
   int stack;
   int label_count;
-  int stack_start;
-  int flash_start;
   bool need_read_spi:1;
   bool is_main:1;
+  int stack_start;
+  int flash_start;
 };
 
 #endif

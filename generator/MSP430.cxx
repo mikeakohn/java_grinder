@@ -252,7 +252,7 @@ int MSP430::pop()
 {
   if (stack > 0)
   {
-    fprintf(out, "  pop cg\n");
+    fprintf(out, "  pop r15\n");
     stack--;
   }
     else
@@ -274,7 +274,7 @@ int MSP430::dup()
     else
   if (reg == reg_max)
   {
-    fprintf(out, "  push r%d\n", REG_STACK(7));
+    fprintf(out, "  push r%d\n", REG_STACK(reg-1));
     stack++;
   }
     else
@@ -342,7 +342,7 @@ int MSP430::div_integers()
 
 int MSP430::neg_integer()
 {
-  if (stack >= 1)
+  if (stack > 0)
   {
     fprintf(out, "  neg.w @SP\n");
     stack--;
@@ -1080,7 +1080,7 @@ int MSP430::stack_alu(const char *instr)
   if (stack == 1)
   {
     fprintf(out, "  pop r15\n");
-    fprintf(out, "  %s.w 15, r%d\n", instr, REG_STACK(reg-1));
+    fprintf(out, "  %s.w r15, r%d\n", instr, REG_STACK(reg-1));
     stack--;
   }
     else

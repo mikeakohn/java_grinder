@@ -30,12 +30,17 @@
 // w5 ..
 // w6 top of stack
 // w12 pointer to locals
+// w13 temp
 //
 // Stack on dsPIC moves value to [sp] and then increments sp by 2 (odd).
 
 static const char *cond_str[] = { "z", "nz", "lt", "le", "gt", "ge" };
 
-DSPIC::DSPIC(uint8_t chip_type) : reg(0), reg_max(6), stack(0)
+DSPIC::DSPIC(uint8_t chip_type) :
+  reg(0),
+  reg_max(6),
+  stack(0),
+  is_main(0)
 {
   this->chip_type = chip_type;
 }
@@ -56,12 +61,17 @@ int DSPIC::open(char *filename)
   {
     case DSPIC30F3012:
       fprintf(out, ".include \"p30f3012.inc\"\n\n");
+      flash_start = 0x100;
       break;
     default:
       printf("Unknown chip type.\n");
   }
 
+  fprintf(out, ".org 0\n");
+  fprintf(out, "  goto start\n\n");
+
   // Add any set up items (stack, registers, etc)
+  fprintf(out, ".org %d\n", flash_start);
   fprintf(out, "start:\n\n");
 
   return 0;
@@ -101,9 +111,9 @@ int DSPIC::push_integer(int32_t n)
 
   uint16_t value = (n & 0xffff);
 
-  if (reg < 8)
+  if (reg < reg_max)
   {
-    fprintf(out, "  mov #0x%02x, w%d\n", value, (reg + 1));
+    fprintf(out, "  mov #0x%02x, w%d\n", value, REG_STACK(reg));
     reg++;
   }
     else
@@ -120,9 +130,9 @@ int DSPIC::push_integer_local(int index)
 {
   fprintf(out, "  mov [w12-#%d], w0\n", LOCAL_VAR(index));
 
-  if (reg < 8)
+  if (reg < reg_max)
   {
-    fprintf(out, "  mov w0, w%d\n", (reg + 1));
+    fprintf(out, "  mov w0, w%d\n", REG_STACK(reg));
     reg++;
   }
     else
@@ -136,35 +146,19 @@ int DSPIC::push_integer_local(int index)
 
 int DSPIC::push_long(int64_t n)
 {
-  if (n > 65535 || n < -32768)
-  {
-    printf("Error: literal value %" PRId64 " bigger than 16 bit.\n", n);
-    return -1;
-  }
-
-  uint16_t value = (n & 0xffff);
-
-  if (reg < 8)
-  {
-    fprintf(out, "  mov #0x%02x, w%d\n", value, (reg + 1));
-    reg++;
-  }
-    else
-  {
-    fprintf(out, "  mov #0x%02x, w0\n", value);
-    fprintf(out, "  push w0\n");
-    stack++;
-  }
-  return 0;
+  printf("long is not supported right now\n");
+  return -1;
 }
 
 int DSPIC::push_float(float f)
 {
+  printf("float is not supported right now\n");
   return -1;
 }
 
 int DSPIC::push_double(double f)
 {
+  printf("double is not supported right now\n");
   return -1;
 }
 
@@ -172,9 +166,9 @@ int DSPIC::push_byte(int8_t b)
 {
   uint16_t value = ((int32_t)b)&0xffff;
 
-  if (reg < 8)
+  if (reg < reg_max)
   {
-    fprintf(out, "  mov #0x%02x, w%d\n", value, (reg + 1));
+    fprintf(out, "  mov #0x%02x, w%d\n", value, REG_STACK(reg));
     reg++;
   }
     else
@@ -190,9 +184,9 @@ int DSPIC::push_short(int16_t s)
 {
   uint16_t value = s;
 
-  if (reg < 8)
+  if (reg < reg_max)
   {
-    fprintf(out, "  mov #0x%02x, w%d\n", value, (reg + 1));
+    fprintf(out, "  mov #0x%02x, w%d\n", value, REG_STACK(reg));
     reg++;
   }
     else
@@ -206,113 +200,178 @@ int DSPIC::push_short(int16_t s)
 
 int DSPIC::pop_integer_local(int index)
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  pop w0\n");
+    fprintf(out, "  mov.w w0, [w12 + %d]\n", LOCALS(index));
+    stack--;
+  }
+    else
+  if (reg > 0)
+  {
+    fprintf(out, "  mov.w w%d, [w12 + %d]\n", REG_STACK(reg-1), LOCALS(index));
+    reg--;
+  }
+
+  return 0;
 }
 
 int DSPIC::pop()
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  pop w0\n");
+    stack--;
+  }
+    else
+  if (reg > 0)
+  {
+    reg--;
+  }
+
+  return 0;
 }
 
 int DSPIC::dup()
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  push [SP]\n");
+    stack++;
+  }
+    else
+  if (reg == reg_max)
+  {
+    fprintf(out, "  push w%d\n", REG_STACK(reg-1));
+    stack++;
+  }
+    else
+  {
+    fprintf(out, "  mov.w w%d, w%d\n", REG_STACK(reg-1), REG_STACK(reg));
+    reg++;
+  }
+
+  return 0;
 }
 
 int DSPIC::dup2()
 {
+  printf("Need to implement dup2()\n");
   return -1;
 }
 
 int DSPIC::swap()
 {
-  return -1;
-}
-
-int DSPIC::add_integers()
-{
-  if (reg < 7)
+  if (stack == 0)
   {
-    fprintf(out, "  add w%d, w%d, w%d\n", reg, reg - 1, reg - 1);
-    reg--;
+    fprintf(out, "  mov.w w%d, w0\n", REG_STACK(reg-1));
+    fprintf(out, "  mov.w w%d, w%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+    fprintf(out, "  mov.w w0, w%d\n", REG_STACK(reg-2));
   }
     else
-  if (reg == 7)
+  if (stack == 1)
   {
-
+    fprintf(out, "  mov.w w%d, w0\n", REG_STACK(reg-1));
+    fprintf(out, "  mov.w [SP-2], w%d\n", REG_STACK(reg-1));
+    fprintf(out, "  mov.w w0, [SP-2]\n");
   }
     else
   {
+    fprintf(out, "  mov.w [SP-4], w0\n");
+    fprintf(out, "  mov.w [SP-2], w13\n");
+    fprintf(out, "  mov.w w13, [SP-4]\n");
+    fprintf(out, "  mov.w w0, [SP-2]\n");
   }
-
 
   return 0;
 }
 
+int DSPIC::add_integers()
+{
+  return stack_alu("add");
+}
+
 int DSPIC::sub_integers()
 {
-  return -1;
+  return stack_alu("sub");
 }
 
 int DSPIC::mul_integers()
 {
-  return -1;
+  return stack_alu("mul");
 }
 
 int DSPIC::div_integers()
 {
-  return -1;
+  return stack_alu("div");
 }
 
 int DSPIC::neg_integer()
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  mov.w [SP-2], w0\n");
+    fprintf(out, "  neg.w w0, w0\n");
+    fprintf(out, "  mov.w w0, [SP-2]\n");
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  neg.w w%d, w%d\n", REG_STACK(reg-1), REG_STACK(reg-1));
+  }
+
+  return 0;
 }
 
 int DSPIC::shift_left_integer()
 {
-  return -1;
+  return stack_shift("sl");
 }
 
 int DSPIC::shift_right_integer()
 {
-  return -1;
+  return stack_shift("asr");
 }
 
 int DSPIC::shift_right_uinteger()
 {
-  return -1;
+  return stack_shift("lr");
 }
 
 int DSPIC::and_integer()
 {
-  return -1;
+  return stack_alu("and");
 }
 
 int DSPIC::or_integer()
 {
-  return -1;
+  return stack_alu("or");
 }
 
 int DSPIC::xor_integer()
 {
-  return -1;
+  return stack_alu("xor");
 }
 
 int DSPIC::inc_integer(int index, int num)
 {
-  return -1;
+  fprintf(out, "  mov [w12+%d], w0\n", LOCALS(index));
+  fprintf(out, "  add w0, #%d, w0\n", num);
+  fprintf(out, "  mov w0, [w12+%d]\n", LOCALS(index));
+
+  return 0;
 }
 
 int DSPIC::jump_cond(const char *label, int cond)
 {
-  if (reg < 8)
+  if (stack > 0)
   {
-    fprintf(out, "  cmp #0, w%d\n", reg);
+    fprintf(out, "  mov [SP-2], w0\n");
+    fprintf(out, "  cp #0, w0\n");
   }
     else
   {
-    //fprintf(out, "  cmp #0, [sp+%d]\n", reg);
+    fprintf(out, "  cp #0, w%d\n", reg);
   }
 
   fprintf(out, "  bra %s, %s\n", cond_str[cond], label);
@@ -321,17 +380,22 @@ int DSPIC::jump_cond(const char *label, int cond)
 
 int DSPIC::jump_cond_integer(const char *label, int cond)
 {
-  if (reg < 7)
+  if (stack > 1)
   {
-    fprintf(out, "  cmp w%d, w%d, w%d\n", reg, reg - 1, reg - 1);
+    fprintf(out, "  mov [SP-2], w0\n");
+    fprintf(out, "  mov [SP-4], w13\n");
+    //fprintf(out, "  cmp.w 2(SP), 4(SP)\n");
+    fprintf(out, "  cp w0, w13\n");
   }
     else
-  if (reg == 7)
+  if (stack == 1)
   {
-
+    fprintf(out, "  mov [SP-2], w0\n");
+    fprintf(out, "  cp w0, w%d\n", REG_STACK(reg-1));
   }
     else
   {
+    fprintf(out, "  cp w%d, w%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
   }
 
   fprintf(out, "  bra %s, %s\n", cond_str[cond], label);
@@ -354,25 +418,25 @@ int DSPIC::return_local(int index, int local_count)
 
 int DSPIC::return_integer(int local_count)
 {
-  if (reg < 8)
+  if (stack > 0)
   {
-    fprintf(out, "  mov w%d, w0\n", reg - 1 + 1);
+    fprintf(out, "  mov [sp-2], w0\n");
   }
-    else
+    else 
   {
-    fprintf(out, "  mov [sp+2], w0\n");
+    fprintf(out, "  mov w%d, w0\n", REG_STACK(reg - 1));
   }
 
-  //fprintf(out, "  add #0x%x, sp\n", local_count * 2);
   fprintf(out, "  mov w12, sp\n");
+  if (!is_main) { fprintf(out, "  pop w12\n"); }
   fprintf(out, "  ret\n");
   return 0;
 }
 
 int DSPIC::return_void(int local_count)
 {
-  //fprintf(out, "  add #0x%x, sp\n", local_count * 2);
   fprintf(out, "  mov w12, sp\n");
+  if (!is_main) { fprintf(out, "  pop w12\n"); }
   fprintf(out, "  ret\n");
 
   return 0;
@@ -397,7 +461,80 @@ int DSPIC::invoke_static_method(const char *name, int params, int is_void)
 
 int DSPIC::brk()
 {
-  return -1;
+int local;
+int stack_vars = stack;
+int reg_vars = reg;
+int saved_registers;
+int n;
+
+  printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
+
+  // Push all used registers on the stack except the ones that are pulled
+  // out for parameters.
+  saved_registers = reg - (params - stack);
+  for (n = 0; n < saved_registers; n++)
+  {
+    fprintf(out, "  push w%d\n", REG_STACK(n));
+  }
+
+  // Copy parameters onto the stack so they are local variables in
+  // the called method.  Start with -4 because the return address will
+  // be at 0 and r12 will be at 2.
+  local = (params * -2);
+  while(local != 0)
+  {
+    if (stack_vars > 0)
+    {
+      fprintf(out, "  mov %d(SP), %d(SP)\n", stack_vars, local-4);
+      stack_vars--;
+    }
+      else
+    {
+      fprintf(out, "  mov w%d, %d(SP)\n", REG_STACK(reg_vars-1), local-4);
+      reg_vars--;
+    }
+
+    local += 2;
+  }
+
+  // Make the call
+  fprintf(out, "  call %s\n", name);
+
+  // Pop all used registers off the stack
+  for (n = saved_registers-1; n >= 0; n--)
+  {
+    fprintf(out, "  pop w%d\n", REG_STACK(n));
+  }
+
+  // Pop all params off the Java stack
+  if ((stack - stack_vars) > 0)
+  {
+    fprintf(out, "  sub #%d, SP\n", (stack - stack_vars) * 2);
+    params -= (stack - stack_vars);
+  }
+
+  if (params != 0)
+  {
+    reg -= params;
+  }
+
+  if (!is_void)
+  {
+    // Put r15 on the top of the stack
+    if (reg < reg_max)
+    {
+      fprintf(out, "  mov.w w0, w%d\n", REG_STACK(reg));
+      reg++;
+    }
+      else
+    {
+      // REVIEW - This looks wrong
+      fprintf(out, "  push w0\n");
+      stack++;
+    }
+  }
+
+  return 0;
 }
 
 #if 0
@@ -491,5 +628,53 @@ int DSPIC::memory_write16()
   return -1;
 }
 
+int DSPIC::stack_alu(const char *instr)
+{
+  if (stack == 0)
+  {
+    fprintf(out, "  %s.w w%d, w%d\n", instr, REG_STACK(reg-1), REG_STACK(reg-2));
+    reg--;
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  pop w0\n");
+    fprintf(out, "  %s.w w0, w%d\n", instr, REG_STACK(reg-1));
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  pop w0\n");
+    fprintf(out, "  %s.w w0, [SP-2]\n", instr);
+  }
 
+  return 0;
+}
+
+int DSPIC::stack_shift(const char *instr)
+{
+  if (stack >= 2)
+  {
+    fprintf(out, "  pop w0\n");
+    fprintf(out, "  pop w13\n");
+    fprintf(out, "  %s w13, w0, w13\n", instr);
+    fprintf(out, "  push w13\n");
+    stack--;
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  pop w0\n");
+    fprintf(out, "  %s w%d, w0, w%d\n", instr, REG_STACK(reg-1), REG_STACK(reg-1));
+    stack--;
+  }
+    else
+  if (reg > 0)
+  {
+    fprintf(out, "  %s w%d, w%d, w%d\n", instr, REG_STACK(reg-2), REG_STACK(reg-1), REG_STACK(reg-2));
+    reg--;
+  }
+
+  return 0;
+}
 

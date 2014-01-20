@@ -99,10 +99,15 @@ public:
   virtual int memory_write16();
 
 private:
+  int stack_alu(const char *instr);
+  int stack_shift(const char *instr);
+
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 
   int stack;          // count how many things we put on the stack
   uint8_t chip_type;
+  bool is_main;
+  int flash_start;
 };
 
 #endif
