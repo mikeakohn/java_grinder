@@ -854,7 +854,8 @@ int MSP430::spi_init(int port)
   fprintf(out, "  rrc.b %s\n", dst);
   fprintf(out, "  rrc.b %s\n", dst);
   fprintf(out, "  and.b #0xe0, %s\n", dst);
-  fprintf(out, "  or.b %s, r14\n", dst);
+  fprintf(out, "  bis.b %s, r14\n", dst);
+  fprintf(out, "  bis.b #USISSEL_2, r14\n");
   fprintf(out, "  mov.b r14, &USICKCTL ; DIV and CPOL/USICKPL\n");
   fprintf(out, "  bic.b #USISWRST, &USICTL0      ; clear reset\n\n");
 
@@ -909,7 +910,7 @@ int MSP430::spi_disable(int port)
 {
   if (port != 0) { return -1; }
 
-  fprintf(out, "  bic.b #USIPE7|USIPE6|USIPE5, &USICTL1\n");
+  fprintf(out, "  bic.b #USIPE7|USIPE6|USIPE5, &USICTL0\n");
 
   return 0;
 }
@@ -918,7 +919,7 @@ int MSP430::spi_enable(int port)
 {
   if (port != 0) { return -1; }
 
-  fprintf(out, "  bis.b #USIPE7|USIPE6|USIPE5, &USICTL1\n");
+  fprintf(out, "  bis.b #USIPE7|USIPE6|USIPE5, &USICTL0\n");
 
   return 0;
 }

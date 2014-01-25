@@ -47,7 +47,7 @@ public class LCD
     CPU.setClock16();
 
     // Not sure how fast this can be
-    SPI0.init(SPI0.DIV8, 0);
+    SPI0.init(SPI0.DIV8, 2);
 
     // Setup IO port.
     // Pin 3 is LCD reset

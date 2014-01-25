@@ -16,8 +16,8 @@ java:
 	javac $*.java
 
 grind:
-	./java_grinder testing/MethodCall.class out.asm msp430g2231
-	naken_asm -I /storage/git/naken_asm/include/msp430_old -l out.asm
+	./java_grinder testing/LCD.class out.asm msp430g2231
+	naken_asm -I /storage/git/naken_asm/include/msp430 -l out.asm
 
 clean:
 	@rm -f *.o java_grinder build/*.o *.asm *.lst *.hex
