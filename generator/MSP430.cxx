@@ -482,11 +482,14 @@ int MSP430::jump_cond(const char *label, int cond)
 {
   if (stack > 0)
   {
-    fprintf(out, "  cmp.w #0, 0(SP)\n");
+    fprintf(out, "  add.w #2, SP\n");
+    fprintf(out, "  cmp.w #0, -2(SP)\n");
+    stack--;
   }
     else
   {
     fprintf(out, "  cmp.w #0, r%d\n", REG_STACK(reg-1));
+    reg--;
   }
 
   fprintf(out, "  %s %s\n", cond_str[cond], label);
@@ -498,16 +501,22 @@ int MSP430::jump_cond_integer(const char *label, int cond)
 {
   if (stack > 1)
   {
-    fprintf(out, "  cmp.w 2(SP), 4(SP)\n");
+    fprintf(out, "  add.w #4, SP\n");
+    fprintf(out, "  cmp.w -4(SP), -2(SP)\n");
+    stack -= 2;
   }
     else
   if (stack == 1)
   {
-    fprintf(out, "  cmp.w 2(SP), r%d\n", REG_STACK(reg-1));
+    fprintf(out, "  add.w #2, SP\n");
+    fprintf(out, "  cmp.w -2(SP), r%d\n", REG_STACK(reg-1));
+    stack--;
+    reg--;
   }
     else
   {
     fprintf(out, "  cmp.w r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+    reg -= 2;
   }
 
   fprintf(out, "  %s %s\n", cond_str[cond], label);
