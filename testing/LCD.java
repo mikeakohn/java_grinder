@@ -63,9 +63,10 @@ public class LCD
 
   static public void main(String args[])
   {
-    int x=50,y=30;
+    int x=60,y=30;
     int dx=1,dy=1;
     int n;
+    int del;
 
     // Set the DCO to 16MHz
     CPU.setClock16();
@@ -121,9 +122,35 @@ public class LCD
         lcdData(0x0f);
       }
 
+/*
       // Erase box
       setArea(x, y, x+23, y+23);
       for (n = 0; n < 24*24/2; n++)
+      {
+        lcdData(0x0f);
+        lcdData(0x00);
+        lcdData(0xf0);
+      }
+*/
+
+      //del = (dx == 1) ? x : x+23;
+      if (dx == 1) { del = x; }
+      else { del = x+23; }
+
+      setArea(del, y, del, y+23);
+      for (n = 0; n < 24/2; n++)
+      {
+        lcdData(0x0f);
+        lcdData(0x00);
+        lcdData(0xf0);
+      }
+
+      //del = (dy == 1) ? y : y+23;
+      if (dy == 1) { del = y; }
+      else { del = y+23; }
+
+      setArea(x, del, x+23, del);
+      for (n = 0; n < 24/2; n++)
       {
         lcdData(0x0f);
         lcdData(0x00);
@@ -134,7 +161,7 @@ public class LCD
       y += dy;
 
       if (x >= 131-30) { dx = -1; }
-      if (y >= 131-30) { dy = -1; }
+      if (y >= 133-30) { dy = -1; }
       if (x == 0) { dx = 1; }
       if (y == 0) { dy = 1; }
     }
