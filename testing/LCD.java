@@ -5,39 +5,61 @@ import net.mikekohn.java_grinder.IOPort0;
 
 public class LCD
 {
-  static final int DISON = 0xAF;
-  static final int DISOFF = 0xAE;
-  static final int DISNOR = 0xA6;
-  static final int DISINV = 0xA7;
-  static final int COMSCN = 0xBB;
-  static final int DISCTL = 0xCA;
-  static final int SLPIN = 0x95;
-  static final int SLPOUT = 0x94;
-  static final int PASET = 0x75;
-  static final int CASET = 0x15;
-  static final int DATCTL = 0xBC;
-  static final int RGBSET8 = 0xCE;
-  static final int RAMWR = 0x5C;
-  static final int RAMRD = 0x5D;
-  static final int PTLIN = 0xA8;
-  static final int PTLOUT = 0xA9;
-  static final int RMWIN = 0xE0;
-  static final int RMWOUT = 0xEE;
-  static final int ASCSET = 0xAA;
-  static final int SCSTART = 0xAB;
-  static final int OSCON = 0xD1;
-  static final int PWRCTR = 0x20;
-  static final int VOLCTR = 0x81;
-  static final int VOLUP = 0xD6;
-  static final int VOLDOWN = 0xD7;
-  static final int TMPGRD = 0x82;
-  static final int EPCTIN = 0xCD;
-  static final int EPCOUT = 0xCC;
-  static final int EPMWR = 0xFC;
-  static final int EPMRD = 0xFD;
-  static final int EPSRRD1 = 0x7C;
-  static final int EPSRRD2 = 0x7D;
-  static final int NO_OP = 0x25;
+  // For Philips base Nokia 6100 LCD
+  static final int NOP = 0x00;      // nop
+  static final int SWRESET = 0x01;  // software reset
+  static final int BSTROFF = 0x02;  // booster voltage OFF
+  static final int BSTRON = 0x03;   // booster voltage ON
+  static final int RDDIDIF = 0x04;  // read display identification
+  static final int RDDST = 0x09;    // read display status
+  static final int SLEEPIN = 0x10;  // sleep in
+  static final int SLEEPOUT = 0x11; // sleep out
+  static final int PTLON = 0x12;    // partial display mode
+  static final int NORON = 0x13;    // display normal mode
+  static final int INVOFF = 0x20;   // inversion OFF
+  static final int INVON = 0x21;    // inversion ON
+  static final int DALO = 0x22;     // all pixel OFF
+  static final int DAL = 0x23;      // all pixel ON
+  static final int SETCON = 0x25;   // write contrast
+  static final int DISPOFF = 0x28;  // display OFF
+  static final int DISPON = 0x29;   // display ON
+  static final int CASET = 0x2A;    // column address set
+  static final int PASET = 0x2B;    // page address set
+  static final int RAMWR = 0x2C;    // memory write
+  static final int RGBSET = 0x2D;   // colour set
+  static final int PTLAR = 0x30;    // partial area
+  static final int VSCRDEF = 0x33;  // vertical scrolling definition
+  static final int TEOFF = 0x34;    // test mode
+  static final int TEON = 0x35;     // test mode
+  static final int MADCTL = 0x36;   // memory access control
+  static final int SEP = 0x37;      // vertical scrolling start address
+  static final int IDMOFF = 0x38;   // idle mode OFF
+  static final int IDMON = 0x39;    // idle mode ON
+  static final int COLMOD = 0x3A;   // interface pixel format
+  static final int SETVOP = 0xB0;   // set Vop
+  static final int BRS = 0xB4;      // bottom row swap
+  static final int TRS = 0xB6;      // top row swap
+  static final int DISCTR = 0xB9;   // display control
+  static final int DOR = 0xBA;      // data order
+  static final int TCDFE = 0xBD;    // enable/disable DF temp compensation
+  static final int TCVOPE = 0xBF;   // enable/disable Vop temp comp
+  static final int EC = 0xC0;       // internal or external oscillator
+  static final int SETMUL = 0xC2;   // set multiplication factor
+  static final int TCVOPAB = 0xC3;  // set TCVOP slopes A and B
+  static final int TCVOPCD = 0xC4;  // set TCVOP slopes c and d
+  static final int TCDF = 0xC5;     // set divider frequency
+  static final int DF8COLOR = 0xC6; // set divider frequency 8-color mode
+  static final int SETBS = 0xC7;    // set bias system
+  static final int RDTEMP = 0xC8;   // temperature read back
+  static final int NLI = 0xC9;      // n-line inversion
+  static final int RDID1 = 0xDA;    // read ID1
+  static final int RDID2 = 0xDB;    // read ID2
+  static final int RDID3 = 0xDC;    // read ID3
+
+  static final int LCD_RESET = 0x08;
+  static final int SPI_CS = 0x10;
+  static final int SPI_CLK = 0x20;
+  static final int SPI_SDO = 0x40;
 
   static public void main(String args[])
   {
@@ -52,111 +74,118 @@ public class LCD
     // Setup IO port.
     // Pin 3 is LCD reset
     // Pin 4 is /CS
-    IOPort0.setPinsAsOutput(0x18);
-    IOPort0.setPinsValue(0);
+    // Pin 5 is SCLK
+    // Pin 6 is SDO
+    IOPort0.setPinsAsOutput(LCD_RESET|SPI_CS|SPI_CLK|SPI_SDO);
+    IOPort0.setPinsValue(LCD_RESET|SPI_CS|SPI_CLK);
 
     // Reset LCD
-    IOPort0.setPinsLow(0x08);
+    IOPort0.setPinsLow(LCD_RESET);
     delay();
-    IOPort0.setPinsHigh(0x08);
+    IOPort0.setPinsHigh(LCD_RESET);
     delay();
 
-    // Display Control
-    lcdWrite(DISCTL);
-    lcdWrite(0);
-    lcdWrite(0x20);
-    lcdWrite(0);
+    // Wake up
+    lcdCommand(SLEEPOUT);
 
-    // Common Scan Direction
-    lcdWrite(COMSCN);
-    lcdWrite(1);
+    // Set contrast
+    lcdCommand(SETCON);
+    lcdData(0x40);
 
-    // Internal Oscillator On
-    lcdWrite(OSCON);
+    // Set color mode (12 bit)
+    lcdCommand(COLMOD);
+    lcdData(0x03);
 
-    // Sleep Out
-    lcdWrite(SLPOUT);
+    // Reverse some stuff
+    lcdCommand(MADCTL);
+    lcdData(0xc8);
 
-    // Power Control
-    lcdWrite(PWRCTR);
-    lcdWrite(0x0f);
-
-    // Inverse Display
-    lcdWrite(DISINV);
-    lcdWrite(1);
-    lcdWrite(0);
-    lcdWrite(2);
-
-    // Electronic Volume Control
-    lcdWrite(VOLCTR);
-    lcdWrite(32);
-    lcdWrite(3);
+    // Display On (should already be on by reset, but owell)
+    lcdCommand(DISPON);
 
     delay();
 
-    drawImage();
+    clearDisplay();
 
     while(true);
   }
 
-  public static void drawInit()
+  public static void drawArea(int x0, int x1, int y0, int y1)
   {
-    // Data Scan Direction
-    lcdWrite(DATCTL);
-    lcdWrite(0);
-    lcdWrite(0);
-    lcdWrite(2);
-
     // Page Address Set
-    lcdWrite(PASET);
-    lcdWrite(0);
-    lcdWrite(131);
+    lcdCommand(PASET);
+    lcdData(x0);
+    lcdData(x1);
 
     // Column Address Set
-    lcdWrite(CASET);
-    lcdWrite(0);
-    lcdWrite(131);
+    lcdCommand(CASET);
+    lcdData(y0);
+    lcdData(y1);
   }
 
-  public static void drawImage()
+  public static void clearDisplay()
   {
   int n;
 
-    drawInit();
-    SPI0.send(RAMWR);
+    drawArea(0,131, 0,131);
+    lcdCommand(RAMWR);
 
-    for (n = 0; n < 50; n++)
+    for (n = 0; n < 132*132/2; n++)
     {
-      SPI0.send(0xff);
+      lcdData(0x0f);
+      lcdData(0x00);
+      lcdData(0xf0);
     }
   }
 
-  public static void lcdWrite(int a)
+  public static void lcdCommand(int a)
   {
   int n;
+    IOPort0.setPinsLow(SPI_SDO);
 
     // /CS = 0
-    IOPort0.setPinsLow(0x10);
-
-    // Manually clock out a bit to SPI
-    SPI0.disable();
-    IOPort0.setPinsHigh(0x20);
-    CPU.nop();
-    CPU.nop();
-    CPU.nop();
-    CPU.nop();
-    IOPort0.setPinsLow(0x20);
-    CPU.nop();
-    CPU.nop();
-    CPU.nop();
-    CPU.nop();
-    SPI0.enable();
+    IOPort0.setPinsLow(SPI_CS);
+    clock();
 
     // Hardware clock out the rest of the bits
     SPI0.send(a);
 
     // /CS = 1
-    IOPort0.setPinsHigh(0x10);
+    IOPort0.setPinsHigh(SPI_CS);
+  }
+
+  public static void lcdData(int a)
+  {
+  int n;
+    IOPort0.setPinsHigh(SPI_SDO);
+
+    // /CS = 0
+    IOPort0.setPinsLow(SPI_CS);
+    clock();
+    IOPort0.setPinsLow(SPI_SDO);
+
+    // Hardware clock out the rest of the bits
+    SPI0.send(a);
+
+    // /CS = 1
+    IOPort0.setPinsHigh(SPI_CS);
+  }
+
+  public static void clock()
+  {
+    // Manually clock out a bit to SPI
+    SPI0.disable();
+    IOPort0.setPinsLow(SPI_CLK);
+    CPU.nop();
+    CPU.nop();
+    CPU.nop();
+    CPU.nop();
+    IOPort0.setPinsHigh(SPI_CLK);
+    CPU.nop();
+    CPU.nop();
+    CPU.nop();
+    CPU.nop();
+    SPI0.enable();
   }
 
   public static void delay()
