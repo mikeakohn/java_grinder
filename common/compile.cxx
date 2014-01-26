@@ -61,7 +61,7 @@ int address;
           int16_t offset = GET_PC_INT16(1);
           address = (pc + offset) - pc_start;
           if (address < 0) { printf("Internal error: %s:%d\n", __FILE__, __LINE__); return; }
-          label_map[address / 8] = 1 << (address % 8);
+          label_map[address / 8] |= 1 << (address % 8);
           break;
         }
         case 0xc8:  // goto_w
@@ -70,7 +70,7 @@ int address;
           int32_t offset = GET_PC_INT32(1);
           address = (pc + offset) - pc_start;
           if (address < 0) { printf("Internal error: %s:%d\n", __FILE__, __LINE__); return; }
-          label_map[address / 8] = 1 << (address % 8);
+          label_map[address / 8] |= 1 << (address % 8);
           break;
         }
       default:
@@ -130,16 +130,13 @@ uint16_t operand_stack_ptr = 0;
   {
     char method_sig[64];
     java_class->get_name_constant(method_sig, sizeof(method_sig), method->descriptor_index);
-    //char *method_sig = java_class->get_constant(method->descriptor_index);
-    //if (java_class->get_ref_name_type(method_name, method_sig, sizeof(method_name), method_id) == 0)
-    //{
-      char *s = method_sig + 1;
-      while(*s != ')' && *s != 0) { s++; }
-      *s = 0;
-      method_sig[0] = '_';
-      if (method_sig[1] != 0 ) { strcat(method_name, method_sig); }
-      printf("Using method name '%s'\n", method_name);
-    //}
+
+    char *s = method_sig + 1;
+    while(*s != ')' && *s != 0) { s++; }
+    *s = 0;
+    method_sig[0] = '_';
+    if (method_sig[1] != 0 ) { strcat(method_name, method_sig); }
+    printf("Using method name '%s'\n", method_name);
   }
 
   // bytes points to the method attributes info for the method.
