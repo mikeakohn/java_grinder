@@ -15,7 +15,7 @@ java:
 %.class: %.java
 	javac $*.java
 
-grind:
+grind: tests
 	./java_grinder testing/LCD.class out.asm msp430g2231
 	naken_asm -I /storage/git/naken_asm/include/msp430 -l out.asm
 

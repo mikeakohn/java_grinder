@@ -63,6 +63,8 @@ public class LCD
 
   static public void main(String args[])
   {
+    int x=50,y=30;
+    int dx=1,dy=1;
     int n;
 
     // Set the DCO to 16MHz
@@ -83,6 +85,7 @@ public class LCD
     IOPort0.setPinsLow(LCD_RESET);
     delay();
     IOPort0.setPinsHigh(LCD_RESET);
+    delay();
     delay();
 
     // Wake up
@@ -107,10 +110,37 @@ public class LCD
 
     clearDisplay();
 
-    while(true);
+    while(true)
+    {
+      // Draw a red box
+      setArea(x, y, x+23, y+23);
+      for (n = 0; n < 24*24/2; n++)
+      {
+        lcdData(0x00);
+        lcdData(0xf0);
+        lcdData(0x0f);
+      }
+
+      // Erase box
+      setArea(x, y, x+23, y+23);
+      for (n = 0; n < 24*24/2; n++)
+      {
+        lcdData(0x0f);
+        lcdData(0x00);
+        lcdData(0xf0);
+      }
+
+      x += dx;
+      y += dy;
+
+      if (x >= 131-30) { dx = -1; }
+      if (y >= 131-30) { dy = -1; }
+      if (x == 0) { dx = 1; }
+      if (y == 0) { dy = 1; }
+    }
   }
 
-  public static void drawArea(int x0, int x1, int y0, int y1)
+  public static void setArea(int x0, int y0, int x1, int y1)
   {
     // Page Address Set
     lcdCommand(PASET);
@@ -121,14 +151,16 @@ public class LCD
     lcdCommand(CASET);
     lcdData(y0);
     lcdData(y1);
+
+    // Ready to write
+    lcdCommand(RAMWR);
   }
 
   public static void clearDisplay()
   {
   int n;
 
-    drawArea(0,131, 0,131);
-    lcdCommand(RAMWR);
+    setArea(0,0, 131,131);
 
     for (n = 0; n < 132*132/2; n++)
     {
