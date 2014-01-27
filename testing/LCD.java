@@ -5,7 +5,7 @@ import net.mikekohn.java_grinder.IOPort0;
 
 public class LCD
 {
-  // For Philips base Nokia 6100 LCD
+  // For Philips base Nokia 6100 LCD, we use these commands
   static final int NOP = 0x00;      // nop
   static final int SWRESET = 0x01;  // software reset
   static final int BSTROFF = 0x02;  // booster voltage OFF
@@ -56,6 +56,7 @@ public class LCD
   static final int RDID2 = 0xDB;    // read ID2
   static final int RDID3 = 0xDC;    // read ID3
 
+  // The masks for the IO pins used to communicate with the LCD.
   static final int LCD_RESET = 0x08;
   static final int SPI_CS = 0x10;
   static final int SPI_CLK = 0x20;
@@ -94,7 +95,7 @@ public class LCD
 
     // Set contrast
     lcdCommand(SETCON);
-    lcdData(0x40);
+    lcdData(0x30);
 
     // Set color mode (12 bit)
     lcdCommand(COLMOD);
@@ -113,26 +114,16 @@ public class LCD
 
     while(true)
     {
-      // Draw a red box
+      // Draw a blue box
       setArea(x, y, x+23, y+23);
       for (n = 0; n < 24*24/2; n++)
       {
-        lcdData(0x00);
         lcdData(0xf0);
         lcdData(0x0f);
-      }
-
-/*
-      // Erase box
-      setArea(x, y, x+23, y+23);
-      for (n = 0; n < 24*24/2; n++)
-      {
-        lcdData(0x0f);
         lcdData(0x00);
-        lcdData(0xf0);
       }
-*/
 
+      // FIXME - this fails for some reason.
       //del = (dx == 1) ? x : x+23;
       if (dx == 1) { del = x; }
       else { del = x+23; }
@@ -145,6 +136,7 @@ public class LCD
         lcdData(0xf0);
       }
 
+      // FIXME - this fails for some reason.
       //del = (dy == 1) ? y : y+23;
       if (dy == 1) { del = y; }
       else { del = y+23; }
@@ -157,9 +149,11 @@ public class LCD
         lcdData(0xf0);
       }
 
+      // Move the box by 1 pixel
       x += dx;
       y += dy;
 
+      // If bounds are hit, change the direction of the box.
       if (x >= 131-30) { dx = -1; }
       if (y >= 133-30) { dy = -1; }
       if (x == 0) { dx = 1; }
@@ -167,6 +161,9 @@ public class LCD
     }
   }
 
+  /** This function tells the LCD (x0,y0) to (x1,y1) area to draw
+      into.  The next data bytes written to the LCD will be 12 bit
+      color information */
   public static void setArea(int x0, int y0, int x1, int y1)
   {
     // Page Address Set
@@ -183,12 +180,14 @@ public class LCD
     lcdCommand(RAMWR);
   }
 
+  /** Draw green pixels over the whole display. */
   public static void clearDisplay()
   {
   int n;
 
     setArea(0,0, 131,131);
 
+    // Write out 12 bit color information.. 2 pixels at a time.
     for (n = 0; n < 132*132/2; n++)
     {
       lcdData(0x0f);
@@ -197,6 +196,8 @@ public class LCD
     }
   }
 
+  /** Send a 9 bit command to the LCD display.  Bit 8 is always a 0 for
+      a command */
   public static void lcdCommand(int a)
   {
   int n;
@@ -213,6 +214,8 @@ public class LCD
     IOPort0.setPinsHigh(SPI_CS);
   }
 
+  /** Send a 9 bit data byte to the LCD display.  Bit 8 is always a 1 for
+      data */
   public static void lcdData(int a)
   {
   int n;
@@ -232,7 +235,8 @@ public class LCD
 
   public static void clock()
   {
-    // Manually clock out a bit to SPI
+    // Manually clock out a bit to SPI since MSP430 hardware only supports
+    // 8 bit or 16 bit data.
     SPI0.disable();
     IOPort0.setPinsLow(SPI_CLK);
     CPU.nop();
