@@ -193,42 +193,18 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 3: // iconst_0 (0x03)
-        ret = generator->push_integer(0);
-        pc++;
-        break;
-
       case 4: // iconst_1 (0x04)
-        ret = generator->push_integer(1);
-        pc++;
-        break;
-
       case 5: // iconst_2 (0x05)
-        ret = generator->push_integer(2);
-        pc++;
-        break;
-
       case 6: // iconst_3 (0x06)
-        ret = generator->push_integer(3);
-        pc++;
-        break;
-
       case 7: // iconst_4 (0x07)
-        ret = generator->push_integer(4);
-        pc++;
-        break;
-
       case 8: // iconst_5 (0x08)
-        ret = generator->push_integer(5);
+        ret = generator->push_integer(bytes[pc]-3);
         pc++;
         break;
 
-      case 9: // lconst_0 (0x09)
-        ret = generator->push_long(0);
-        pc++;
-        break;
-
+      case 9:  // lconst_0 (0x09)
       case 10: // lconst_1 (0x0a)
-        ret = generator->push_long(1);
+        ret = generator->push_long(bytes[pc]-9);
         pc++;
         break;
 
@@ -311,7 +287,6 @@ printf("code_len=%d\n", code_len);
       case 21: // iload (0x15)
         if (wide == 1)
         {
-          wide = 0;
           //PUSH_INTEGER(local_vars[GET_PC_UINT16(1)]);
           ret = generator->push_integer_local(GET_PC_UINT16(1));
           pc += 3;
@@ -328,7 +303,6 @@ printf("code_len=%d\n", code_len);
         UNIMPL()
         if (wide == 1)
         {
-          wide = 0;
           //PUSH_LONG(*((long long *)(local_vars+GET_PC_UINT16(1))));
           pc += 3;
         }
@@ -343,7 +317,6 @@ printf("code_len=%d\n", code_len);
         UNIMPL()
         if (wide == 1)
         {
-          wide = 0;
           //PUSH_FLOAT_I(local_vars[GET_PC_UINT16(1)]);
           pc += 3;
         }
@@ -358,7 +331,6 @@ printf("code_len=%d\n", code_len);
         UNIMPL()
         if (wide == 1)
         {
-          wide = 0;
           //PUSH_LONG(*((long long *)(local_vars+GET_PC_UINT16(1))));
           pc += 3;
         }
@@ -382,45 +354,20 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 26: // iload_0 (0x1a)
-        //PUSH_INTEGER(local_vars[0]);
-        ret = generator->push_integer_local(0);
-        pc++;
-        break;
-
       case 27: // iload_1 (0x1b)
-        //PUSH_INTEGER(local_vars[1]);
-        ret = generator->push_integer_local(1);
-        pc++;
-        break;
-
       case 28: // iload_2 (0x1c)
-        //PUSH_INTEGER(local_vars[2]);
-        ret = generator->push_integer_local(2);
-        pc++;
-        break;
-
       case 29: // iload_3 (0x1d)
-        //PUSH_INTEGER(local_vars[3]);
-        ret = generator->push_integer_local(3);
+        // Push a local integer variable on the stack
+        ret = generator->push_integer_local(bytes[pc]-26);
         pc++;
         break;
 
       case 30: // lload_0 (0x1e)
-        UNIMPL()
-        pc++;
-        break;
-
       case 31: // lload_1 (0x1f)
-        UNIMPL()
-        pc++;
-        break;
-
       case 32: // lload_2 (0x20)
-        UNIMPL()
-        pc++;
-        break;
-
       case 33: // lload_3 (0x21)
+        // push a local long variable on the stack
+        //ret = generator->push_long_local(bytes[pc]-30);
         UNIMPL()
         pc++;
         break;
@@ -535,7 +482,6 @@ printf("code_len=%d\n", code_len);
           ret = generator->pop_integer_local(GET_PC_UINT16(1));
           //local_vars[GET_PC_UINT16(1)]=POP_INTEGER();
           pc += 3;
-          wide = 0;
         }
           else
         {
@@ -594,45 +540,20 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 59: // istore_0 (0x3b)
-        //local_vars[0] = POP_INTEGER();
-        ret = generator->pop_integer_local(0);
-        pc++;
-        break;
-
       case 60: // istore_1 (0x3c)
-        //local_vars[1] = POP_INTEGER();
-        ret = generator->pop_integer_local(1);
-        pc++;
-        break;
-
       case 61: // istore_2 (0x3d)
-        //local_vars[2] = POP_INTEGER();
-        ret = generator->pop_integer_local(2);
-        pc++;
-        break;
-
       case 62: // istore_3 (0x3e)
-        //local_vars[3] = POP_INTEGER();
-        ret = generator->pop_integer_local(3);
+        // Pop integer off stack and store in local variable
+        ret = generator->pop_integer_local(bytes[pc]-59);
         pc++;
         break;
 
       case 63: // lstore_0 (0x3f)
-        UNIMPL()
-        pc++;
-        break;
-
       case 64: // lstore_1 (0x40)
-        UNIMPL()
-        pc++;
-        break;
-
       case 65: // lstore_2 (0x41)
-        UNIMPL()
-        pc++;
-        break;
-
       case 66: // lstore_3 (0x42)
+        // Pop long off stack and store in local variable
+        //ret = generator->pop_long_local(bytes[pc]-63);
         UNIMPL()
         pc++;
         break;
@@ -742,23 +663,20 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 87: // pop (0x57)
+        // Pop off stack and discard
         ret = generator->pop();
-        //POP_NULL();
         pc++;
         break;
 
       case 88: // pop2 (0x58)
-        //POP_NULL();
-        //POP_NULL();
+        // Pop 2 things off stack and discard
         ret = generator->pop();
         ret = generator->pop();
         pc++;
         break;
 
       case 89: // dup (0x59)
-        //value1 = POP_INTEGER();
-        //PUSH_INTEGER(value1);
-        //PUSH_INTEGER(value1);
+        // Take top value on stack, and push it again
         ret = generator->dup();
         pc++;
         break;
@@ -774,12 +692,8 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 92: // dup2 (0x5c)
-        //value2 = POP_INTEGER();
-        //value1 = POP_INTEGER();
-        //PUSH_INTEGER(value1);
-        //PUSH_INTEGER(value2);
-        //PUSH_INTEGER(value1);
-        //PUSH_INTEGER(value2);
+        // Take the top 2 values on the stack and push them again
+        // value1,value2 becomes: value1,value2,value1,value2
         ret = generator->dup2();
         pc++;
         break;
@@ -795,132 +709,98 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 95: // swap (0x5f)
-        //value2 = POP_INTEGER();
-        //value1 = POP_INTEGER();
-        //PUSH_INTEGER(value2);
-        //PUSH_INTEGER(value1);
+        // Take the top two values on the stack and switch them
         ret = generator->swap();
         pc++;
         break;
 
       case 96: // iadd (0x60)
-        //value1 = POP_INTEGER();
-        //value2 = POP_INTEGER();
-        //value1 = value1+value2;
-        //PUSH_INTEGER(value1);
+        // Pop top two integers from stack, add them, push result
         ret = generator->add_integers();
         pc++;
         break;
 
       case 97: // ladd (0x61)
+        // Pop top two longs from stack, add them, push result
+        // ret = generator->add_longs();
         UNIMPL()
-        //lvalue1 = POP_LONG();
-        //lvalue2 = POP_LONG();
-        //lvalue1 = lvalue1+lvalue2;
-        //PUSH_LONG(lvalue1);
-        //ret = generator->add_longs();
         pc++;
         break;
 
       case 98: // fadd (0x62)
+        // Pop top two floats from stack, add them, push result
+        // ret = generator->add_floats();
         UNIMPL()
-        //fvalue1 = POP_FLOAT();
-        //fvalue2 = POP_FLOAT();
-        //fvalue1 = fvalue1+fvalue2;
-        //PUSH_FLOAT(fvalue1);
-        //ret = generator->add_floats();
         pc++;
         break;
 
       case 99: // dadd (0x63)
+        // Pop top two doubles from stack, add them, push result
+        // ret = generator->add_doubles();
         UNIMPL()
-        //dvalue1 = POP_DOUBLE();
-        //dvalue2 = POP_DOUBLE();
-        //dvalue1 = dvalue1+dvalue2;
-        //PUSH_DOUBLE(dvalue1);
-        //ret = generator->add_doubles();
         pc++;
         break;
 
       case 100: // isub (0x64)
-        //value1 = POP_INTEGER();
-        //value2 = POP_INTEGER();
-        //value1 = value2-value1;
-        //PUSH_INTEGER(value1);
+        // Pop top two integers from stack, subtract them, push result
+        // *(stack-1) - *(stack-0)
         ret = generator->sub_integers();
         pc++;
         break;
 
       case 101: // lsub (0x65)
+        // Pop top two longs from stack, subtract them, push result
+        // *(stack-1) - *(stack-0)
+        // ret = generator->sub_longs();
         UNIMPL()
-        //lvalue1 = POP_LONG();
-        //lvalue2 = POP_LONG();
-        //lvalue1 = lvalue2-lvalue1;
-        //PUSH_LONG(lvalue1);
-        //ret = generator->sub_longs();
         pc++;
         break;
 
       case 102: // fsub (0x66)
+        // Pop top two floats from stack, subtract them, push result
+        // *(stack-1) - *(stack-0)
+        // ret = generator->sub_floats();
         UNIMPL()
-        //fvalue1 = POP_FLOAT();
-        //fvalue2 = POP_FLOAT();
-        //fvalue1 = fvalue2-fvalue1;
-        //PUSH_FLOAT(fvalue1);
-        //ret = generator->sub_floats();
         pc++;
         break;
 
       case 103: // dsub (0x67)
+        // Pop top two doubles from stack, subtract them, push result
+        // *(stack-1) - *(stack-0)
+        // ret = generator->sub_doubles();
         UNIMPL()
-        //dvalue1 = POP_DOUBLE();
-        //dvalue2 = POP_DOUBLE();
-        //dvalue1 = dvalue2-dvalue1;
-        //PUSH_DOUBLE(dvalue1);
-        //ret = generator->sub_doubles();
         pc++;
         break;
 
       case 104: // imul (0x68)
-        //value1 = POP_INTEGER();
-        //value2 = POP_INTEGER();
-        //value1 = value2*value1;
-        //PUSH_INTEGER(value1);
+        // Pop top two integers from stack, multiply them, push result
         ret = generator->mul_integers();
         pc++;
         break;
 
       case 105: // lmul (0x69)
+        // Pop top two longs from stack, multiply them, push result
+        // ret = generator->mul_longs();
         UNIMPL()
-        //lvalue1 = POP_LONG();
-        //lvalue2 = POP_LONG();
-        //lvalue1 = lvalue2*lvalue1;
-        //PUSH_LONG(lvalue1);
-        //ret = generator->mul_longs();
         pc++;
         break;
 
       case 106: // fmul (0x6a)
+        // Pop top two floats from stack, multiply them, push result
+        // ret = generator->mul_floats();
         UNIMPL()
-        //fvalue1 = POP_FLOAT();
-        //fvalue2 = POP_FLOAT();
-        //fvalue1 = fvalue2*fvalue1;
-        //PUSH_FLOAT(fvalue1);
-        //ret = generator->mul_floats();
         pc++;
         break;
 
       case 107: // dmul (0x6b)
+        // Pop top two doubles from stack, multiply them, push result
+        // ret = generator->mul_doubles();
         UNIMPL()
-        //dvalue1 = POP_DOUBLE();
-        //dvalue2 = POP_DOUBLE();
-        //dvalue1 = dvalue2*dvalue1;
-        //PUSH_DOUBLE(dvalue1);
-        //ret = generator->mul_doubles();
         pc++;
         break;
 
       case 108: // idiv (0x6c)
+        // Pop top two integers from stack, divide them, push result
         ret = generator->div_integers();
         pc++;
         break;
@@ -961,11 +841,13 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 116: // ineg (0x74)
+        // negate the top integer on the stack
         ret = generator->neg_integer();
         pc++;
         break;
 
       case 117: // lneg (0x75)
+        // negate the top long on the stack
         UNIMPL()
         pc++;
         break;
@@ -981,64 +863,79 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 120: // ishl (0x78)
+        // Pop two integer values from stack shift left and push result
+        // *(stack-1) << *(stack-0)
         ret = generator->shift_left_integer();
         pc++;
         break;
 
       case 121: // lshl (0x79)
+        // Pop two long values from stack shift left and push result
+        // *(stack-1) << *(stack-0)
         UNIMPL()
         pc++;
         break;
 
       case 122: // ishr (0x7a)
+        // Pop two integer values from stack shift right and push result
+        // *(stack-1) >> *(stack-0)
         ret = generator->shift_right_integer();
         pc++;
         break;
 
       case 123: // lshr (0x7b)
+        // Pop two long values from stack shift right and push result
+        // *(stack-1) >> *(stack-0)
         UNIMPL()
         pc++;
         break;
 
       case 124: // iushr (0x7c)
+        // Pop two unsigned integer values from stack shift left and push result
+        // *(stack-1) <<< *(stack-0)
         ret = generator->shift_right_uinteger();
         pc++;
         break;
 
       case 125: // lushr (0x7d)
+        // Pop two unsigned long values from stack shift left and push result
+        // *(stack-1) <<< *(stack-0)
         UNIMPL()
         pc++;
         break;
 
       case 126: // iand (0x7e)
-        //value1 = POP_INTEGER();
-        //value2 = POP_INTEGER();
-        //PUSH_INTEGER(value1&value2);
+        // Pop top two integers from stack, and them, push result
         ret = generator->and_integer();
         pc++;
         break;
 
       case 127: // land (0x7f)
+        // Pop top two longs from stack, and them, push result
         UNIMPL()
         pc++;
         break;
 
       case 128: // ior (0x80)
+        // Pop top two integers from stack, or them, push result
         ret = generator->or_integer();
         pc++;
         break;
 
       case 129: // lor (0x81)
+        // Pop top two longs from stack, or them, push result
         UNIMPL()
         pc++;
         break;
 
       case 130: // ixor (0x82)
+        // Pop top two ints from stack, xor them, push result
         ret = generator->xor_integer();
         pc++;
         break;
 
       case 131: // lxor (0x83)
+        // Pop top two longs from stack, xor them, push result
         UNIMPL()
         pc++;
         break;
@@ -1049,7 +946,6 @@ printf("code_len=%d\n", code_len);
           //local_vars[GET_PC_UINT16(1)] += GET_PC_INT16(3);
           ret = generator->inc_integer(GET_PC_UINT16(1), GET_PC_INT16(3));
           pc += 5;
-          wide = 0;
         }
           else
         {
@@ -1060,112 +956,91 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 133: // i2l (0x85)
+        // Pop top integer from stack and push as a long
         UNIMPL()
-        //value1 = POP_INTEGER();
-        //lvalue1 = value1;
-        //PUSH_LONG(lvalue1);
         pc++;
         break;
 
       case 134: // i2f (0x86)
+        // Pop top integer from stack and push as a float
         UNIMPL()
-        //value1 = POP_INTEGER();
-        //fvalue1 = value1;
-        //PUSH_FLOAT(fvalue1);
         pc++;
         break;
 
       case 135: // i2d (0x87)
+        // Pop top integer from stack and push as a double
         UNIMPL()
-        //value1 = POP_INTEGER();
-        //dvalue1 = value1;
-        //PUSH_DOUBLE(dvalue1);
         pc++;
         break;
 
       case 136: // l2i (0x88)
+        // Pop top long from stack and push as a integer
         UNIMPL()
-        //lvalue1 = POP_LONG();
-        //value1 = (int)lvalue1;
-        //PUSH_INTEGER(value1);
         pc++;
         break;
 
       case 137: // l2f (0x89)
+        // Pop top long from stack and push as a float
         UNIMPL()
-        //lvalue1 = POP_LONG();
-        //fvalue1 = lvalue1;
-        //PUSH_FLOAT(fvalue1);
         pc++;
         break;
 
       case 138: // l2d (0x8a)
+        // Pop top long from stack and push as a double
         UNIMPL()
-        //lvalue1 = POP_LONG();
-        //dvalue1 = lvalue1;
-        //PUSH_DOUBLE(dvalue1);
         pc++;
         break;
 
       case 139: // f2i (0x8b)
+        // Pop top float from stack and push as a integer
         UNIMPL()
-        //fvalue1 = POP_FLOAT();
-        //value1 = fvalue1;
-        //PUSH_INTEGER(value1);
         pc++;
         break;
 
       case 140: // f2l (0x8c)
+        // Pop top float from stack and push as a long
         UNIMPL()
-        //fvalue1 = POP_FLOAT();
-        //lvalue1 = fvalue1;
-        //PUSH_LONG(lvalue1);
         pc++;
         break;
 
       case 141: // f2d (0x8d)
+        // Pop top float from stack and push as a double
         UNIMPL()
-        //fvalue1 = POP_FLOAT();
-        //dvalue1 = fvalue1;
-        //PUSH_INTEGER(dvalue1);
         pc++;
         break;
 
       case 142: // d2i (0x8e)
+        // Pop top double from stack and push as a integer
         UNIMPL()
-        //dvalue1 = POP_DOUBLE();
-        //value1 = dvalue1;
-        //PUSH_INTEGER(value1);
         pc++;
         break;
 
       case 143: // d2l (0x8f)
+        // Pop top double from stack and push as a long
         UNIMPL()
-        //dvalue1 = POP_DOUBLE();
-        //lvalue1 = dvalue1;
-        //PUSH_LONG(lvalue1);
         pc++;
         break;
 
       case 144: // d2f (0x90)
+        // Pop top double from stack and push as a float
         UNIMPL()
-        //dvalue1 = POP_DOUBLE();
-        //fvalue1 = dvalue1;
-        //PUSH_FLOAT(fvalue1);
         pc++;
         break;
 
       case 145: // i2b (0x91)
+        // Pop top integer from stack and push as a byte
         UNIMPL()
         pc++;
         break;
 
       case 146: // i2c (0x92)
+        // Pop top integer from stack and push as a char
         UNIMPL()
         pc++;
         break;
 
       case 147: // i2s (0x93)
+        // Pop top integer from stack and push as a short
         UNIMPL()
         pc++;
         break;
@@ -1367,7 +1242,6 @@ printf("code_len=%d\n", code_len);
           //pc = local_vars[GET_PC_UINT16(1)];
           ret = generator->return_local(GET_PC_UINT16(1), max_locals);
           pc += 3;
-          wide = 0;
         }
           else
         {
@@ -1396,7 +1270,6 @@ printf("code_len=%d\n", code_len);
         //PUSH_INTEGER(value1);
         ret = generator->return_integer(max_locals);
         pc++;
-        //goto leave;
         break;
 
       case 173: // lreturn (0xad)
@@ -1406,7 +1279,6 @@ printf("code_len=%d\n", code_len);
         //stack_values = java_stack->values;
         //stack_types = java_stack->types;
         //PUSH_LONG(lvalue1);
-        //goto leave;
         break;
 
       case 174: // freturn (0xae)
@@ -1416,7 +1288,6 @@ printf("code_len=%d\n", code_len);
         //stack_values = java_stack->values;
         //stack_types = java_stack->types;
         //PUSH_INTEGER(value1);
-        //goto leave;
         break;
 
       case 175: // dreturn (0xaf)
@@ -1426,7 +1297,6 @@ printf("code_len=%d\n", code_len);
         //stack_values = java_stack->values;
         //stack_types = java_stack->types;
         //PUSH_LONG(dvalue1);
-        //goto leave;
         break;
 
       case 176: // areturn (0xb0)
@@ -1544,7 +1414,7 @@ printf("code_len=%d\n", code_len);
       case 196: // wide (0xc4)
         wide=1;
         pc++;
-        break;
+        continue;
 
       case 197: // multianewarray (0xc5)
         UNIMPL()
@@ -1653,8 +1523,9 @@ printf("code_len=%d\n", code_len);
 
     //printf("pc=%d opcode=%d (0x%02x)\n", pc - pc_start, bytes[pc], bytes[pc]);
     if (pc - pc_start >= code_len) { break; }
+
+    wide = 0;
   }
-//leave:
 
   generator->method_end(max_locals);
 
