@@ -43,7 +43,9 @@
 #define LOCALS(a) ((a * 2) + 2)
 
 // FIXME - This isn't quite right
+//                                EQ    NE     LESS  LESS EQ GR   GR E
 static const char *cond_str[] = { "jz", "jnz", "jl", "jle", "jg", "jge" };
+//                                                    rev    rev
 
 MSP430::MSP430(uint8_t chip_type) :
   reg(0),
@@ -480,15 +482,36 @@ int MSP430::inc_integer(int index, int num)
 
 int MSP430::jump_cond(const char *label, int cond)
 {
+bool reverse = false;
+
+  // MSP430 doesn't have LESS_EQUAL or GREATER so change them
+  if (cond == COND_LESS_EQUAL)
+  {
+    reverse = true;
+    cond = COND_GREATER_EQUAL;
+    fprintf(out, "  mov.w #0, r15\n");
+  }
+    else
+  if (cond == COND_GREATER)
+  {
+    reverse = true;
+    cond = COND_LESS;
+    fprintf(out, "  mov.w #0, r15\n");
+  }
+
   if (stack > 0)
   {
     fprintf(out, "  add.w #2, SP\n");
-    fprintf(out, "  cmp.w #0, -2(SP)\n");
+    if (reverse == false) { fprintf(out, "  cmp.w #0, -2(SP)\n"); }
+    else { fprintf(out, "  cmp.w -2(SP), r15\n"); }
     stack--;
   }
     else
   {
-    fprintf(out, "  cmp.w #0, r%d\n", REG_STACK(reg-1));
+    if (reverse == false)
+    { fprintf(out, "  cmp.w #0, r%d\n", REG_STACK(reg-1));}
+      else
+    { fprintf(out, "  cmp.w r%d, r15\n", REG_STACK(reg-1));}
     reg--;
   }
 
@@ -499,23 +522,53 @@ int MSP430::jump_cond(const char *label, int cond)
 
 int MSP430::jump_cond_integer(const char *label, int cond)
 {
+bool reverse = false;
+
+  // MSP430 doesn't have LESS_EQUAL or GREATER so change them
+  if (cond == COND_LESS_EQUAL)
+  {
+    reverse = true;
+    cond = COND_GREATER_EQUAL;
+  }
+    else
+  if (cond == COND_GREATER)
+  {
+    reverse = true;
+    cond = COND_LESS;
+  }
+
   if (stack > 1)
   {
     fprintf(out, "  add.w #4, SP\n");
-    fprintf(out, "  cmp.w -4(SP), -2(SP)\n");
+
+    if (reverse == false) { fprintf(out, "  cmp.w -4(SP), -2(SP)\n"); }
+    else { fprintf(out, "  cmp.w -2(SP), -4(SP)\n"); }
+
     stack -= 2;
   }
     else
   if (stack == 1)
   {
     fprintf(out, "  add.w #2, SP\n");
-    fprintf(out, "  cmp.w -2(SP), r%d\n", REG_STACK(reg-1));
+    if (reverse == false)
+    { fprintf(out, "  cmp.w -2(SP), r%d\n", REG_STACK(reg-1)); }
+      else
+    { fprintf(out, "  cmp.w r%d, -2(SP)\n", REG_STACK(reg-1)); }
+
     stack--;
     reg--;
   }
     else
   {
-    fprintf(out, "  cmp.w r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+    if (reverse == false)
+    {
+      fprintf(out, "  cmp.w r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+    }
+      else
+    {
+      fprintf(out, "  cmp.w r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+    }
+
     reg -= 2;
   }
 
