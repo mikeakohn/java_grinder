@@ -17,5 +17,7 @@ abstract public class DSP
   {
   }
 
+  public static void addABAndStoreInA() { }
+  public static void addABAndStoreInB() { }
 }
 

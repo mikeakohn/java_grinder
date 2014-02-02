@@ -1,6 +1,7 @@
 
 JOBJS=Testing.class \
       Testing2.class \
+      DSPTest.class \
       LedBlink.class \
       LCD.class \
       MemoryTest.class \

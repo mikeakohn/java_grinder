@@ -102,6 +102,11 @@ public:
   virtual int memory_read16() { return -1; }
   virtual int memory_write16() { return -1; }
 
+  // DSP (dsPIC stuff)
+  virtual int dsp_add_ab_and_store_in_a() { return -1; }
+  virtual int dsp_add_ab_and_store_in_b() { return -1; }
+
+
 protected:
   FILE *out;
   int label_count;

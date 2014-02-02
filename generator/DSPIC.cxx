@@ -729,6 +729,20 @@ int DSPIC::memory_write16()
   return -1;
 }
 
+// DSP (dsPIC stuff)
+int DSPIC::dsp_add_ab_and_store_in_a()
+{
+  fprintf(out, "  add A\n");
+  return 0;
+}
+
+int DSPIC::dsp_add_ab_and_store_in_b()
+{
+  fprintf(out, "  add B\n");
+  return 0;
+}
+
+
 void DSPIC::pop_reg(FILE *out, char *dst)
 {
   if (stack > 0)

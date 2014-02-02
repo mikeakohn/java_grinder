@@ -18,6 +18,7 @@
 #include "compile.h"
 #include "invoke.h"
 #include "cpu.h"
+#include "dsp.h"
 #include "ioport.h"
 #include "memory.h"
 #include "spi.h"
@@ -199,6 +200,7 @@ char function[256];
     CHECK_WITH_PORT(IOPort, ioport, 4)
     CHECK_WITH_PORT(IOPort, ioport, 5)
     CHECK(Memory, memory)
+    CHECK(DSP, dsp)
     CHECK_WITH_PORT(SPI, spi, 0)
     CHECK_WITH_PORT(SPI, spi, 1)
     CHECK_WITH_PORT(UART, uart, 0)

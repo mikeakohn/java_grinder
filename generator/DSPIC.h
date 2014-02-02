@@ -99,6 +99,10 @@ public:
   virtual int memory_read16();
   virtual int memory_write16();
 
+  // DSP (dsPIC stuff)
+  virtual int dsp_add_ab_and_store_in_a();
+  virtual int dsp_add_ab_and_store_in_b();
+
 private:
   void pop_reg(FILE *out, char *dst);
   int set_periph(const char *instr, const char *periph, bool reverse=false);
