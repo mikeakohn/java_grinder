@@ -12,9 +12,23 @@ public class LedBlink
     while(true)
     {
       IOPort0.setPinsValue(2);
-      for (n = 0; n < 16384; n++);
+      for (n = 0; n < 16738; n++);
+      //delay();
       IOPort0.setPinsValue(1);
-      for (n = 0; n < 16384; n++);
+      for (n = 0; n < 16738; n++);
+      //delay();
+    }
+  }
+
+  // Since the default speed on the dsPIC I'm using is so much faster than
+  // the MSP430 I'm using, this delay is for the dsPIC.
+  static public void delay()
+  {
+    int a,b;
+
+    for (b = 0; b < 10; b++)
+    {
+      for (a = 0; a < 16384; a++);
     }
   }
 }

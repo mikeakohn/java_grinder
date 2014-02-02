@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 #include <inttypes.h>
 
@@ -76,7 +77,8 @@ int DSPIC::open(char *filename)
 
   // Add any set up items (stack, registers, etc)
   fprintf(out, ".org %d\n", flash_start);
-  fprintf(out, "start:\n\n");
+  fprintf(out, "start:\n");
+  fprintf(out, "  mov #0x800, SP\n\n");
 
   return 0;
 }
@@ -92,8 +94,11 @@ void DSPIC::method_start(int local_count, const char *name)
   reg = 0;
   stack = 0;
 
+  is_main = (strcmp(name, "main") == 0) ? 1 : 0;
+
   // main() function goes here
   fprintf(out, "%s:\n", name);
+  if (!is_main) { fprintf(out, "  push w12\n"); }
   fprintf(out, "  mov sp, w12\n");
   fprintf(out, "  add #0x%x, sp\n", local_count * 2);
 }
@@ -132,7 +137,7 @@ int DSPIC::push_integer(int32_t n)
 
 int DSPIC::push_integer_local(int index)
 {
-  fprintf(out, "  mov [w12-%d], w0\n", LOCALS(index));
+  fprintf(out, "  mov [w12+%d], w0\n", LOCALS(index));
 
   if (reg < reg_max)
   {
@@ -389,17 +394,22 @@ int DSPIC::jump_cond_integer(const char *label, int cond)
     fprintf(out, "  mov [SP-2], w0\n");
     fprintf(out, "  mov [SP-4], w13\n");
     //fprintf(out, "  cmp.w 2(SP), 4(SP)\n");
-    fprintf(out, "  cp w0, w13\n");
+    //fprintf(out, "  cp w0, w13\n");
+    fprintf(out, "  cp w13, w0\n");
+    stack -= 2;
   }
     else
   if (stack == 1)
   {
     fprintf(out, "  mov [SP-2], w0\n");
-    fprintf(out, "  cp w0, w%d\n", REG_STACK(reg-1));
+    fprintf(out, "  cp w%d, w0\n", REG_STACK(reg-1));
+    stack--;
+    reg--;
   }
     else
   {
-    fprintf(out, "  cp w%d, w%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+    fprintf(out, "  cp w%d, w%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+    reg -= 2;
   }
 
   fprintf(out, "  bra %s, %s\n", cond_str[cond], label);
@@ -433,7 +443,7 @@ int DSPIC::return_integer(int local_count)
 
   fprintf(out, "  mov w12, sp\n");
   if (!is_main) { fprintf(out, "  pop w12\n"); }
-  fprintf(out, "  ret\n");
+  fprintf(out, "  return\n");
   return 0;
 }
 
@@ -441,7 +451,7 @@ int DSPIC::return_void(int local_count)
 {
   fprintf(out, "  mov w12, sp\n");
   if (!is_main) { fprintf(out, "  pop w12\n"); }
-  fprintf(out, "  ret\n");
+  fprintf(out, "  return\n");
 
   return 0;
 }
@@ -478,7 +488,7 @@ int n;
 
   // Copy parameters onto the stack so they are local variables in
   // the called method.  Start with -4 because the return address will
-  // be at 0 and r12 will be at 2.
+  // be at 0 and w12 will be at 2.
   local = (params * -2);
   while(local != 0)
   {
@@ -566,24 +576,20 @@ int DSPIC::ioport_setPinsValue(int port)
 {
   char periph[32];
   sprintf(periph, "PORT%c", port+'A');
-  return set_periph("mov", periph, true);
 
-#if 0
   if (stack == 0)
   {
-    fprintf(out, "  mov.b w%d, w0\n", REG_STACK(reg-1));
+    fprintf(out, "  mov w%d, %s\n", REG_STACK(reg-1), periph);
     reg--;
   }
     else
   {
-    fprintf(out, "  pop.w w0\n");
+    fprintf(out, "  pop w0\n");
+    fprintf(out, "  mov %s\n", periph);
     stack--;
   }
 
-  fprintf(out, "  mov.b %s\n", periph);
-
   return 0;
-#endif
 }
 
 int DSPIC::ioport_setPinsHigh(int port)
@@ -633,6 +639,13 @@ int DSPIC::ioport_getPortInputValue(int port)
 // SPI functions
 int DSPIC::spi_init(int port)
 {
+char dst[16];
+
+  if (port != 0) { return -1; }
+
+  fprintf(out, "  ;; Set up SPI\n");
+  pop_reg(out, dst);
+
   return -1;
 }
 
@@ -701,21 +714,36 @@ int DSPIC::memory_write16()
   return -1;
 }
 
+void DSPIC::pop_reg(FILE *out, char *dst)
+{
+  if (stack > 0)
+  {
+    stack--;
+    fprintf(out, "  pop w0\n");
+    sprintf(dst, "w0");
+  }
+    else
+  {
+    reg--;
+    sprintf(dst, "w%d", REG_STACK(reg));
+  }
+}
+
 int DSPIC::set_periph(const char *instr, const char *periph, bool reverse)
 {
   if (stack == 0)
   {
-    fprintf(out, "  mov.b w%d, w0\n", REG_STACK(reg-1));
+    fprintf(out, "  mov w%d, w0\n", REG_STACK(reg-1));
     reg--;
   }
     else
   {
-    fprintf(out, "  pop.w w0\n");
+    fprintf(out, "  pop w0\n");
     stack--;
   }
 
-  if (reverse) { fprintf(out, "  xor.b #0xff, w0\n"); }
-  fprintf(out, "  %s.b %s\n", instr, periph);
+  if (reverse) { fprintf(out, "  xor #0xff, w0\n"); }
+  fprintf(out, "  %s %s\n", instr, periph);
 
   return 0;
 }

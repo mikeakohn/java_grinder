@@ -100,6 +100,7 @@ public:
   virtual int memory_write16();
 
 private:
+  void pop_reg(FILE *out, char *dst);
   int set_periph(const char *instr, const char *periph, bool reverse=false);
   int stack_alu(const char *instr);
   int stack_shift(const char *instr);
