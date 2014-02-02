@@ -30,8 +30,8 @@
 // w4 ..
 // w5 ..
 // w6 top of stack
-// w12 pointer to locals
 // w13 temp
+// w14 pointer to locals
 //
 // Stack on dsPIC moves value to [sp] and then increments sp by 2 (odd).
 
@@ -100,9 +100,18 @@ void DSPIC::method_start(int local_count, const char *name)
 
   // main() function goes here
   fprintf(out, "%s:\n", name);
-  if (!is_main) { fprintf(out, "  push w12\n"); }
-  fprintf(out, "  mov sp, w12\n");
-  fprintf(out, "  add #0x%x, sp\n", local_count * 2);
+  if (!is_main)
+  {
+    //fprintf(out, "  push w14\n");
+    //fprintf(out, "  mov sp, w14\n");
+    //fprintf(out, "  add #0x%x, sp\n", local_count * 2);
+    fprintf(out, "  lnk #0x%x\n", local_count * 2);
+  }
+    else
+  {
+    fprintf(out, "  mov sp, w14\n");
+    fprintf(out, "  add #0x%x, sp\n", local_count * 2);
+  }
 }
 
 void DSPIC::method_end(int local_count)
@@ -139,7 +148,7 @@ int DSPIC::push_integer(int32_t n)
 
 int DSPIC::push_integer_local(int index)
 {
-  fprintf(out, "  mov [w12+%d], w0\n", LOCALS(index));
+  fprintf(out, "  mov [w14+%d], w0\n", LOCALS(index));
 
   if (reg < reg_max)
   {
@@ -214,13 +223,13 @@ int DSPIC::pop_integer_local(int index)
   if (stack > 0)
   {
     fprintf(out, "  pop w0\n");
-    fprintf(out, "  mov.w w0, [w12+%d]\n", LOCALS(index));
+    fprintf(out, "  mov.w w0, [w14+%d]\n", LOCALS(index));
     stack--;
   }
     else
   if (reg > 0)
   {
-    fprintf(out, "  mov.w w%d, [w12+%d]\n", REG_STACK(reg-1), LOCALS(index));
+    fprintf(out, "  mov.w w%d, [w14+%d]\n", REG_STACK(reg-1), LOCALS(index));
     reg--;
   }
 
@@ -366,9 +375,9 @@ int DSPIC::xor_integer()
 
 int DSPIC::inc_integer(int index, int num)
 {
-  fprintf(out, "  mov [w12+%d], w0\n", LOCALS(index));
+  fprintf(out, "  mov [w14+%d], w0\n", LOCALS(index));
   fprintf(out, "  add w0, #%d, w0\n", num);
-  fprintf(out, "  mov w0, [w12+%d]\n", LOCALS(index));
+  fprintf(out, "  mov w0, [w14+%d]\n", LOCALS(index));
 
   return 0;
 }
@@ -422,9 +431,9 @@ int DSPIC::jump_cond_integer(const char *label, int cond)
 int DSPIC::return_local(int index, int local_count)
 {
 #if 0
-  fprintf(out, "  mov [w12-#%d], w0\n", LOCALS(index));
+  fprintf(out, "  mov [w14-#%d], w0\n", LOCALS(index));
   //fprintf(out, "  add #0x%x, sp\n", local_count * 2);
-  fprintf(out, "  mov w12, sp\n");
+  fprintf(out, "  mov w14, sp\n");
   fprintf(out, "  ret\n");
 
   return 0;
@@ -443,16 +452,18 @@ int DSPIC::return_integer(int local_count)
     fprintf(out, "  mov w%d, w0\n", REG_STACK(reg - 1));
   }
 
-  fprintf(out, "  mov w12, sp\n");
-  if (!is_main) { fprintf(out, "  pop w12\n"); }
+  fprintf(out, "  ulnk\n");
+  //fprintf(out, "  mov w14, sp\n");
+  //if (!is_main) { fprintf(out, "  pop w14\n"); }
   fprintf(out, "  return\n");
   return 0;
 }
 
 int DSPIC::return_void(int local_count)
 {
-  fprintf(out, "  mov w12, sp\n");
-  if (!is_main) { fprintf(out, "  pop w12\n"); }
+  //fprintf(out, "  mov w14, sp\n");
+  //if (!is_main) { fprintf(out, "  pop w14\n"); }
+  fprintf(out, "  ulnk\n");
   fprintf(out, "  return\n");
 
   return 0;
@@ -490,7 +501,7 @@ int n;
 
   // Copy parameters onto the stack so they are local variables in
   // the called method.  Start with -4 because the return address will
-  // be at 0 and w12 will be at 2.
+  // be at 0 and w14 will be at 2.
   local = (params * -2);
   while(local != 0)
   {
