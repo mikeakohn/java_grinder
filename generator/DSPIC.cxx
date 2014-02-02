@@ -75,7 +75,9 @@ int DSPIC::open(char *filename)
   fprintf(out, ".org 0\n");
   fprintf(out, "  goto start\n\n");
 
-  // Add any set up items (stack, registers, etc)
+  // Add any set up items (stack, registers, etc).  On some CPU's (dsPICF3012)
+  // SP is automatically set but some it's not.  So for now we'll just set it.
+  // Also, not sure what to do with SPLIM.
   fprintf(out, ".org %d\n", flash_start);
   fprintf(out, "start:\n");
   fprintf(out, "  mov #0x800, SP\n\n");
@@ -644,6 +646,8 @@ char dst[16];
   if (port != 0) { return -1; }
 
   fprintf(out, "  ;; Set up SPI\n");
+  fprintf(out, "  mov #0x00, w0\n");
+  fprintf(out, "  mov w0, SPI0CON1\n");
   pop_reg(out, dst);
 
   return -1;
