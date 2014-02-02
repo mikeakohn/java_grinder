@@ -735,21 +735,6 @@ int MSP430::ioport_setPinsAsInput(int port)
   char periph[32];
   sprintf(periph, "P%dDIR", port+1);
   return set_periph("bic", periph);
-# if 0
-  if (stack == 0)
-  {
-    fprintf(out, "  bic.b r%d, &P%dDIR\n", REG_STACK(reg-1), port+1);
-    reg--;
-  }
-    else
-  {
-    fprintf(out, "  pop.w r15\n");
-    fprintf(out, "  bic.b r15, &P%dDIR\n", port+1);
-    stack--;
-  }
-
-  return 0;
-#endif
 }
 
 int MSP430::ioport_setPinsAsOutput(int port)
@@ -757,21 +742,6 @@ int MSP430::ioport_setPinsAsOutput(int port)
   char periph[32];
   sprintf(periph, "P%dDIR", port+1);
   return set_periph("bis", periph);
-#if 0
-  if (stack == 0)
-  {
-    fprintf(out, "  bis.b r%d, &P%dDIR\n", REG_STACK(reg-1), port+1);
-    reg--;
-  }
-    else
-  {
-    fprintf(out, "  pop.w r15\n");
-    fprintf(out, "  bis.b r15, &P%dDIR\n", port+1);
-    stack--;
-  }
-
-  return 0;
-#endif
 }
 
 int MSP430::ioport_setPinsValue(int port)
@@ -779,21 +749,6 @@ int MSP430::ioport_setPinsValue(int port)
   char periph[32];
   sprintf(periph, "P%dOUT", port+1);
   return set_periph("mov", periph);
-#if 0
-  if (stack == 0)
-  {
-    fprintf(out, "  mov.b r%d, &P%dDIR\n", REG_STACK(reg-1), port+1);
-    reg--;
-  }
-    else
-  {
-    fprintf(out, "  pop.w r15\n");
-    fprintf(out, "  mov.b r15, &P%dDIR\n", port+1);
-    stack--;
-  }
-
-  return 0;
-#endif
 }
 
 int MSP430::ioport_setPinsHigh(int port)

@@ -17,6 +17,7 @@
 enum
 {
   DSPIC30F3012,
+  DSPIC33FJ06GS101A,
 };
 
 class DSPIC : public Generator
@@ -99,6 +100,7 @@ public:
   virtual int memory_write16();
 
 private:
+  int set_periph(const char *instr, const char *periph, bool reverse=false);
   int stack_alu(const char *instr);
   int stack_shift(const char *instr);
 

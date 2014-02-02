@@ -64,6 +64,11 @@ int index;
     generator = new DSPIC(DSPIC30F3012);
   }
     else
+  if (strcasecmp("dspic33fj06gs101a",argv[3]) == 0)
+  {
+    generator = new DSPIC(DSPIC33FJ06GS101A);
+  }
+    else
   if (strcasecmp("m6502",argv[3]) == 0)
   {
     generator = new M6502();

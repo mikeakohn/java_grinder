@@ -63,6 +63,10 @@ int DSPIC::open(char *filename)
       fprintf(out, ".include \"p30f3012.inc\"\n\n");
       flash_start = 0x100;
       break;
+    case DSPIC33FJ06GS101A:
+      fprintf(out, ".include \"p33fj06gs101a.inc\"\n\n");
+      flash_start = 0x100;
+      break;
     default:
       printf("Unknown chip type.\n");
   }
@@ -128,7 +132,7 @@ int DSPIC::push_integer(int32_t n)
 
 int DSPIC::push_integer_local(int index)
 {
-  fprintf(out, "  mov [w12-#%d], w0\n", LOCALS(index));
+  fprintf(out, "  mov [w12-%d], w0\n", LOCALS(index));
 
   if (reg < reg_max)
   {
@@ -203,13 +207,13 @@ int DSPIC::pop_integer_local(int index)
   if (stack > 0)
   {
     fprintf(out, "  pop w0\n");
-    fprintf(out, "  mov.w w0, [w12 + %d]\n", LOCALS(index));
+    fprintf(out, "  mov.w w0, [w12+%d]\n", LOCALS(index));
     stack--;
   }
     else
   if (reg > 0)
   {
-    fprintf(out, "  mov.w w%d, [w12 + %d]\n", REG_STACK(reg-1), LOCALS(index));
+    fprintf(out, "  mov.w w%d, [w12+%d]\n", REG_STACK(reg-1), LOCALS(index));
     reg--;
   }
 
@@ -544,18 +548,87 @@ void DSPIC::close()
 #endif
 
 // GPIO functions
-int DSPIC::ioport_setPinsAsInput(int port) { return -1; }
-int DSPIC::ioport_setPinsAsOutput(int port) { return -1; }
-int DSPIC::ioport_setPinsValue(int port) { return -1; }
-int DSPIC::ioport_setPinsHigh(int port) { return -1; }
-int DSPIC::ioport_setPinsLow(int port) { return -1; }
-int DSPIC::ioport_setPinAsOutput(int port) { return -1; }
-int DSPIC::ioport_setPinAsInput(int port) { return -1; }
-int DSPIC::ioport_setPinHigh(int port) { return -1; }
-int DSPIC::ioport_setPinLow(int port) { return -1; }
-int DSPIC::ioport_isPinInputHigh(int port) { return -1; }
-int DSPIC::ioport_getPortInputValue(int port) { return -1; }
-//int DSPIC::ioport_setPortOutputValue(int port) { return -1; }
+int DSPIC::ioport_setPinsAsInput(int port)
+{
+  char periph[32];
+  sprintf(periph, "TRIS%c", port+'A');
+  return set_periph("ior", periph);
+}
+
+int DSPIC::ioport_setPinsAsOutput(int port)
+{
+  char periph[32];
+  sprintf(periph, "TRIS%c", port+'A');
+  return set_periph("and", periph, true);
+}
+
+int DSPIC::ioport_setPinsValue(int port)
+{
+  char periph[32];
+  sprintf(periph, "PORT%c", port+'A');
+  return set_periph("mov", periph, true);
+
+#if 0
+  if (stack == 0)
+  {
+    fprintf(out, "  mov.b w%d, w0\n", REG_STACK(reg-1));
+    reg--;
+  }
+    else
+  {
+    fprintf(out, "  pop.w w0\n");
+    stack--;
+  }
+
+  fprintf(out, "  mov.b %s\n", periph);
+
+  return 0;
+#endif
+}
+
+int DSPIC::ioport_setPinsHigh(int port)
+{
+  char periph[32];
+  sprintf(periph, "PORT%c", port+'A');
+  return set_periph("ior", periph);
+}
+
+int DSPIC::ioport_setPinsLow(int port)
+{
+  char periph[32];
+  sprintf(periph, "PORT%c", port+'A');
+  return set_periph("and", periph, true);
+}
+
+int DSPIC::ioport_setPinAsOutput(int port)
+{
+  return -1;
+}
+
+int DSPIC::ioport_setPinAsInput(int port)
+{
+  return -1;
+}
+
+int DSPIC::ioport_setPinHigh(int port)
+{
+  return -1;
+}
+
+int DSPIC::ioport_setPinLow(int port)
+{
+  return -1;
+}
+
+int DSPIC::ioport_isPinInputHigh(int port)
+{
+  return -1;
+}
+
+int DSPIC::ioport_getPortInputValue(int port)
+{
+  return -1;
+}
 
 // SPI functions
 int DSPIC::spi_init(int port)
@@ -626,6 +699,25 @@ int DSPIC::memory_read16()
 int DSPIC::memory_write16()
 {
   return -1;
+}
+
+int DSPIC::set_periph(const char *instr, const char *periph, bool reverse)
+{
+  if (stack == 0)
+  {
+    fprintf(out, "  mov.b w%d, w0\n", REG_STACK(reg-1));
+    reg--;
+  }
+    else
+  {
+    fprintf(out, "  pop.w w0\n");
+    stack--;
+  }
+
+  if (reverse) { fprintf(out, "  xor.b #0xff, w0\n"); }
+  fprintf(out, "  %s.b %s\n", instr, periph);
+
+  return 0;
 }
 
 int DSPIC::stack_alu(const char *instr)
