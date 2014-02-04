@@ -34,10 +34,34 @@ int dsp_addABAndStoreInB(JavaClass *java_class, Generator *generator)
   return generator->dsp_add_ab_and_store_in_b();
 }
 
+int dsp_addToA(JavaClass *java_class, Generator *generator)
+{
+  return generator->dsp_add_to_a();
+}
+
+int dsp_addToB(JavaClass *java_class, Generator *generator)
+{
+  return generator->dsp_add_to_b();
+}
+
+int dsp_squareAndAddToA(JavaClass *java_class, Generator *generator)
+{
+  return generator->dsp_square_and_add_to_a();
+}
+
+int dsp_squareAndAddToB(JavaClass *java_class, Generator *generator)
+{
+  return generator->dsp_square_and_add_to_b();
+}
+
 int dsp(JavaClass *java_class, Generator *generator, char *function)
 {
   CHECK_FUNC(addABAndStoreInA)
   CHECK_FUNC(addABAndStoreInB)
+  CHECK_FUNC(addToA)
+  CHECK_FUNC(addToB)
+  CHECK_FUNC(squareAndAddToA)
+  CHECK_FUNC(squareAndAddToB)
 
   return -1;
 }

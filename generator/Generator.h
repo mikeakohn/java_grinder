@@ -105,7 +105,10 @@ public:
   // DSP (dsPIC stuff)
   virtual int dsp_add_ab_and_store_in_a() { return -1; }
   virtual int dsp_add_ab_and_store_in_b() { return -1; }
-
+  virtual int dsp_add_to_a() { return -1; }
+  virtual int dsp_add_to_b() { return -1; }
+  virtual int dsp_square_and_add_to_a() { return -1; }
+  virtual int dsp_square_and_add_to_b() { return -1; }
 
 protected:
   FILE *out;

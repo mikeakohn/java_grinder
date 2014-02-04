@@ -19,27 +19,31 @@
 
 #include "DSPIC.h"
 
-#define REG_STACK(a) (a + 1)
+#define REG_STACK(a) (stack_regs[a])
 #define LOCALS(i) (i * 2)
 
 // ABI is:
 // w0 temp
-// w1 bottom of stack
+// w4 start of stack
+// w5 ..
+// w6 ..
+// w1 ..
 // w2 ..
 // w3 ..
-// w4 ..
-// w5 ..
-// w6 top of stack
+// w8 ..
+// w9 ..
+// w10 end of stack
 // w13 temp
 // w14 pointer to locals
 //
 // Stack on dsPIC moves value to [sp] and then increments sp by 2 (odd).
 
 static const char *cond_str[] = { "z", "nz", "lt", "le", "gt", "ge" };
+static int8_t stack_regs[] = { 4, 5, 6, 1, 2, 3, 8, 9, 10 };
 
 DSPIC::DSPIC(uint8_t chip_type) :
   reg(0),
-  reg_max(6),
+  reg_max(sizeof(stack_regs)),
   stack(0),
   is_main(0)
 {
@@ -739,6 +743,64 @@ int DSPIC::dsp_add_ab_and_store_in_a()
 int DSPIC::dsp_add_ab_and_store_in_b()
 {
   fprintf(out, "  add B\n");
+  return 0;
+}
+
+int DSPIC::dsp_add_to_a()
+{
+char dst[16];
+
+  pop_reg(out, dst);
+  fprintf(out, "  add %s, A\n", dst);
+  return 0;
+}
+
+int DSPIC::dsp_add_to_b()
+{
+char dst[16];
+
+  pop_reg(out, dst);
+  fprintf(out, "  add %s, B\n", dst);
+  return 0;
+}
+
+int DSPIC::dsp_square_and_add_to_a()
+{
+char dst[16];
+int reg_num = reg > 0 ? (REG_STACK(reg-1)) : -1;
+
+  if (stack > 0 || reg == -1)
+  {
+    pop_reg(out, dst);
+    fprintf(out, "  mov %s, w7\n", dst);
+    fprintf(out, "  mpy w7, A\n");
+  }
+    else
+  {
+    reg--;
+    fprintf(out, "  mpy w%d*w%d, A\n", reg_num, reg_num);
+  }
+
+  return 0;
+}
+
+int DSPIC::dsp_square_and_add_to_b()
+{
+char dst[16];
+int reg_num = reg > 0 ? (REG_STACK(reg-1)) : -1;
+
+  if (stack > 0 || reg == -1)
+  {
+    pop_reg(out, dst);
+    fprintf(out, "  mov %s, w7\n", dst);
+    fprintf(out, "  mpy w7, B\n");
+  }
+    else
+  {
+    reg--;
+    fprintf(out, "  mpy w%d*w%d, A\n", reg_num, reg_num);
+  }
+
   return 0;
 }
 

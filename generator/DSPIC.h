@@ -102,6 +102,10 @@ public:
   // DSP (dsPIC stuff)
   virtual int dsp_add_ab_and_store_in_a();
   virtual int dsp_add_ab_and_store_in_b();
+  virtual int dsp_add_to_a();
+  virtual int dsp_add_to_b();
+  virtual int dsp_square_and_add_to_a();
+  virtual int dsp_square_and_add_to_b();
 
 private:
   void pop_reg(FILE *out, char *dst);

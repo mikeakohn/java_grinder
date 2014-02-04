@@ -19,5 +19,9 @@ abstract public class DSP
 
   public static void addABAndStoreInA() { }
   public static void addABAndStoreInB() { }
+  public static void addToA(int n) { }
+  public static void addToB(int n) { }
+  public static void squareAndAddToA(int n) { }
+  public static void squareAndAddToB(int n) { }
 }
 
