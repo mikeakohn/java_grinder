@@ -26,7 +26,6 @@
 // w0 temp
 // w4 start of stack
 // w5 ..
-// w6 ..
 // w1 ..
 // w2 ..
 // w3 ..
@@ -39,7 +38,7 @@
 // Stack on dsPIC moves value to [sp] and then increments sp by 2 (odd).
 
 static const char *cond_str[] = { "z", "nz", "lt", "le", "gt", "ge" };
-static int8_t stack_regs[] = { 4, 5, 6, 1, 2, 3, 8, 9, 10 };
+static int8_t stack_regs[] = { 4, 5, 1, 2, 3, 8, 9, 10 };
 
 DSPIC::DSPIC(uint8_t chip_type) :
   reg(0),
@@ -789,7 +788,7 @@ int DSPIC::dsp_square_and_add_to_b()
 char dst[16];
 int reg_num = reg > 0 ? (REG_STACK(reg-1)) : -1;
 
-  if (stack > 0 || reg == -1)
+  if (stack > 0 || reg_num < 4 || reg_num > 7 )
   {
     pop_reg(out, dst);
     fprintf(out, "  mov %s, w7\n", dst);
@@ -804,6 +803,47 @@ int reg_num = reg > 0 ? (REG_STACK(reg-1)) : -1;
   return 0;
 }
 
+int DSPIC::dsp_mul_and_add_to_a()
+{
+  return -1;
+}
+
+int DSPIC::dsp_mul_and_add_to_b()
+{
+  return -1;
+}
+
+int DSPIC::dsp_mul_and_sub_from_a()
+{
+  return -1;
+}
+
+int DSPIC::dsp_mul_and_sub_from_b()
+{
+  return -1;
+}
+
+int DSPIC::dsp_mul(char *instr)
+{
+#if 0
+char dst[16];
+int reg_num = reg > 0 ? (REG_STACK(reg-1)) : -1;
+
+  if (stack > 0 || reg_num < 4 || reg_num > 7 )
+  {
+    pop_reg(out, dst);
+    fprintf(out, "  mov %s, w7\n", dst);
+    fprintf(out, "  mpy w7, B\n");
+  }
+    else
+  {
+    reg--;
+    fprintf(out, "  mpy w%d*w%d, A\n", reg_num, reg_num);
+  }
+#endif
+
+  return 0;
+}
 
 void DSPIC::pop_reg(FILE *out, char *dst)
 {

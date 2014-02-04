@@ -23,5 +23,9 @@ abstract public class DSP
   public static void addToB(int n) { }
   public static void squareAndAddToA(int n) { }
   public static void squareAndAddToB(int n) { }
+  public static void mulAndAddToA(int a, int b) { }
+  public static void mulAndAddToB(int a, int b) { }
+  public static void mulAndSubFromA(int a, int b) { }
+  public static void mulAndSubFromB(int a, int b) { }
 }
 

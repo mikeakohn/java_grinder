@@ -24,12 +24,12 @@
     return cpu_##funct(java_class, generator); \
   }
 
-int cpu_setClock16(JavaClass *java_class, Generator *generator)
+static int cpu_setClock16(JavaClass *java_class, Generator *generator)
 {
   return generator->cpu_setClock16();
 }
 
-int cpu_nop(JavaClass *java_class, Generator *generator)
+static int cpu_nop(JavaClass *java_class, Generator *generator)
 {
   return generator->cpu_nop();
 }

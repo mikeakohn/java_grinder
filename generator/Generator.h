@@ -109,6 +109,10 @@ public:
   virtual int dsp_add_to_b() { return -1; }
   virtual int dsp_square_and_add_to_a() { return -1; }
   virtual int dsp_square_and_add_to_b() { return -1; }
+  virtual int dsp_mul_and_add_to_a() { return -1; }
+  virtual int dsp_mul_and_add_to_b() { return -1; }
+  virtual int dsp_mul_and_sub_from_a() { return -1; }
+  virtual int dsp_mul_and_sub_from_b() { return -1; }
 
 protected:
   FILE *out;

@@ -24,22 +24,22 @@
     return memory_##funct(java_class, generator); \
   }
 
-int memory_read8_I(JavaClass *java_class, Generator *generator)
+static int memory_read8_I(JavaClass *java_class, Generator *generator)
 {
   return generator->memory_read8();
 }
 
-int memory_write8_IB(JavaClass *java_class, Generator *generator)
+static int memory_write8_IB(JavaClass *java_class, Generator *generator)
 {
   return generator->memory_write8();
 }
 
-int memory_read16_I(JavaClass *java_class, Generator *generator)
+static int memory_read16_I(JavaClass *java_class, Generator *generator)
 {
   return generator->memory_read16();
 }
 
-int memory_write16_IS(JavaClass *java_class, Generator *generator)
+static int memory_write16_IS(JavaClass *java_class, Generator *generator)
 {
   return generator->memory_write16();
 }

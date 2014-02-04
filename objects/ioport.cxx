@@ -24,63 +24,63 @@
     return ioport_##funct(java_class, generator, port); \
   }
 
-int ioport_setPinsAsInput_I(JavaClass *java_class, Generator *generator, int port)
+static int ioport_setPinsAsInput_I(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->ioport_setPinsAsInput(port);
 }
 
-int ioport_setPinsAsOutput_I(JavaClass *java_class, Generator *generator, int port)
+static int ioport_setPinsAsOutput_I(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->ioport_setPinsAsOutput(port);
 }
 
-int ioport_setPinsValue_I(JavaClass *java_class, Generator *generator, int port)
+static int ioport_setPinsValue_I(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->ioport_setPinsValue(port);
 }
 
-int ioport_setPinsHigh_I(JavaClass *java_class, Generator *generator, int port)
+static int ioport_setPinsHigh_I(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->ioport_setPinsHigh(port);
 }
 
-int ioport_setPinsLow_I(JavaClass *java_class, Generator *generator, int port)
+static int ioport_setPinsLow_I(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->ioport_setPinsLow(port);
 }
 
-int ioport_setPinAsOutput_I(JavaClass *java_class, Generator *generator, int port)
+static int ioport_setPinAsOutput_I(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->ioport_setPinAsOutput(port);
 }
 
-int ioport_setPinAsInput_I(JavaClass *java_class, Generator *generator, int port)
+static int ioport_setPinAsInput_I(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->ioport_setPinAsInput(port);
 }
 
-int ioport_setPinHigh_I(JavaClass *java_class, Generator *generator, int port)
+static int ioport_setPinHigh_I(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->ioport_setPinHigh(port);
 }
 
-int ioport_setPinLow_I(JavaClass *java_class, Generator *generator, int port)
+static int ioport_setPinLow_I(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->ioport_setPinLow(port);
 }
 
-int ioport_isPinInputHigh_I(JavaClass *java_class, Generator *generator, int port)
+static int ioport_isPinInputHigh_I(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->ioport_isPinInputHigh(port);
 }
 
-int ioport_getPortInputValue(JavaClass *java_class, Generator *generator, int port)
+static int ioport_getPortInputValue(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->ioport_getPortInputValue(port);
 }
 
 #if 0
-int ioport_setPortOutputValue_I(JavaClass *java_class, Generator *generator, int port)
+static int ioport_setPortOutputValue_I(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->ioport_setPortOutputValue(port);
 }

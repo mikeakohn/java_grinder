@@ -24,27 +24,27 @@
     return uart_##funct(java_class, generator, port); \
   }
 
-int uart_init_III(JavaClass *java_class, Generator *generator, int port)
+static int uart_init_III(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->uart_init(port);
 }
 
-int uart_send_B(JavaClass *java_class, Generator *generator, int port)
+static int uart_send_B(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->uart_send(port);
 }
 
-int uart_read(JavaClass *java_class, Generator *generator, int port)
+static int uart_read(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->uart_read(port);
 }
 
-int uart_isDataAvailable(JavaClass *java_class, Generator *generator, int port)
+static int uart_isDataAvailable(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->uart_isDataAvailable(port);
 }
 
-int uart_isSendReady(JavaClass *java_class, Generator *generator, int port)
+static int uart_isSendReady(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->uart_isSendReady(port);
 }

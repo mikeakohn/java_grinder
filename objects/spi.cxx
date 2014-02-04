@@ -24,37 +24,37 @@
     return spi_##funct(java_class, generator, port); \
   }
 
-int spi_init_II(JavaClass *java_class, Generator *generator, int port)
+static int spi_init_II(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->spi_init(port);
 }
 
-int spi_send_I(JavaClass *java_class, Generator *generator, int port)
+static int spi_send_I(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->spi_send(port);
 }
 
-int spi_read(JavaClass *java_class, Generator *generator, int port)
+static int spi_read(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->spi_read(port);
 }
 
-int spi_isDataAvailable(JavaClass *java_class, Generator *generator, int port)
+static int spi_isDataAvailable(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->spi_isDataAvailable(port);
 }
 
-int spi_isBusy(JavaClass *java_class, Generator *generator, int port)
+static int spi_isBusy(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->spi_isBusy(port);
 }
 
-int spi_disable(JavaClass *java_class, Generator *generator, int port)
+static int spi_disable(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->spi_disable(port);
 }
 
-int spi_enable(JavaClass *java_class, Generator *generator, int port)
+static int spi_enable(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->spi_enable(port);
 }
