@@ -745,6 +745,36 @@ int DSPIC::dsp_clear_b()
   return 0;
 }
 
+int DSPIC::dsp_load_a()
+{
+char dst[16];
+
+  pop_reg(out, dst);
+  fprintf(out, "  lac %s, A\n", dst);
+  return 0;
+}
+
+int DSPIC::dsp_load_b()
+{
+char dst[16];
+
+  pop_reg(out, dst);
+  fprintf(out, "  lac %s, B\n", dst);
+  return 0;
+}
+
+int DSPIC::dsp_neg_a()
+{
+  fprintf(out, "  neg A\n");
+  return 0;
+}
+
+int DSPIC::dsp_neg_b()
+{
+  fprintf(out, "  neg B\n");
+  return 0;
+}
+
 int DSPIC::dsp_add_ab_and_store_in_a()
 {
   fprintf(out, "  add A\n");
@@ -775,54 +805,44 @@ char dst[16];
   return 0;
 }
 
-int DSPIC::dsp_square_and_add_to_a()
+int DSPIC::dsp_square_to_a()
 {
-char dst[16];
-int reg_num = reg > 0 ? (REG_STACK(reg-1)) : -1;
-
-  if (stack > 0 || reg == -1)
-  {
-    pop_reg(out, dst);
-    fprintf(out, "  mov %s, w7\n", dst);
-    fprintf(out, "  mpy w7*w7, A\n");
-  }
-    else
-  {
-    reg--;
-    fprintf(out, "  mpy w%d*w%d, A\n", reg_num, reg_num);
-  }
-
-  return 0;
+  return dsp_square("mpy", "A");
 }
 
-int DSPIC::dsp_square_and_add_to_b()
+int DSPIC::dsp_square_to_b()
 {
-char dst[16];
-int reg_num = reg > 0 ? (REG_STACK(reg-1)) : -1;
-
-  if (stack > 0 || reg_num < 4 || reg_num > 7 )
-  {
-    pop_reg(out, dst);
-    fprintf(out, "  mov %s, w7\n", dst);
-    fprintf(out, "  mpy w7*w7, B\n");
-  }
-    else
-  {
-    reg--;
-    fprintf(out, "  mpy w%d*w%d, B\n", reg_num, reg_num);
-  }
-
-  return 0;
+  return dsp_square("mpy", "B");
 }
 
-int DSPIC::dsp_mul_and_add_to_a()
+int DSPIC::dsp_mul_to_a()
 {
   return dsp_mul("mpy", "A");
 }
 
-int DSPIC::dsp_mul_and_add_to_b()
+int DSPIC::dsp_mul_to_b()
 {
   return dsp_mul("mpy", "B");
+}
+
+int DSPIC::dsp_square_and_add_to_a()
+{
+  return dsp_square("mac", "A");
+}
+
+int DSPIC::dsp_square_and_add_to_b()
+{
+  return dsp_square("mac", "B");
+}
+
+int DSPIC::dsp_mul_and_add_to_a()
+{
+  return dsp_mul("mac", "A");
+}
+
+int DSPIC::dsp_mul_and_add_to_b()
+{
+  return dsp_mul("mac", "B");
 }
 
 int DSPIC::dsp_mul_and_sub_from_a()
@@ -835,7 +855,7 @@ int DSPIC::dsp_mul_and_sub_from_b()
   return dsp_mul("msc", "B");
 }
 
-int DSPIC::dsp_mul(char *instr, char *accum)
+int DSPIC::dsp_mul(const char *instr, const char *accum)
 {
 char dst[16];
 int reg_num1 = reg > 1 ? (REG_STACK(reg-1)) : -1;
@@ -861,6 +881,26 @@ int reg_num2 = reg > 1 ? (REG_STACK(reg-2)) : -1;
     pop_reg(out, dst);
     fprintf(out, "  mov %s, w6\n", dst);
     fprintf(out, "  %s w6*w7, %s\n", instr, accum);
+  }
+
+  return 0;
+}
+
+int DSPIC::dsp_square(const char *instr, const char *accum)
+{
+char dst[16];
+int reg_num = reg > 0 ? (REG_STACK(reg-1)) : -1;
+
+  if (stack > 0 || reg == -1)
+  {
+    pop_reg(out, dst);
+    fprintf(out, "  mov %s, w7\n", dst);
+    fprintf(out, "  %s w7*w7, %s\n", instr, accum);
+  }
+    else
+  {
+    reg--;
+    fprintf(out, "  %s w%d*w%d, %s\n", instr, reg_num, reg_num, accum);
   }
 
   return 0;

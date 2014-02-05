@@ -102,10 +102,18 @@ public:
   // DSP (dsPIC stuff)
   virtual int dsp_clear_a();
   virtual int dsp_clear_b();
+  virtual int dsp_load_a();
+  virtual int dsp_load_b();
+  virtual int dsp_neg_a();
+  virtual int dsp_neg_b();
   virtual int dsp_add_ab_and_store_in_a();
   virtual int dsp_add_ab_and_store_in_b();
   virtual int dsp_add_to_a();
   virtual int dsp_add_to_b();
+  virtual int dsp_square_to_a();
+  virtual int dsp_square_to_b();
+  virtual int dsp_mul_to_a();
+  virtual int dsp_mul_to_b();
   virtual int dsp_square_and_add_to_a();
   virtual int dsp_square_and_add_to_b();
   virtual int dsp_mul_and_add_to_a();
@@ -114,7 +122,8 @@ public:
   virtual int dsp_mul_and_sub_from_b();
 
 private:
-  int dsp_mul(char *instr, char *accum);
+  int dsp_mul(const char *instr, const char *accum);
+  int dsp_square(const char *instr, const char *accum);
   void pop_reg(FILE *out, char *dst);
   int set_periph(const char *instr, const char *periph, bool reverse=false);
   int stack_alu(const char *instr);
