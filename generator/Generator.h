@@ -105,6 +105,10 @@ public:
   // DSP (dsPIC stuff)
   virtual int dsp_get_a() { return -1; }
   virtual int dsp_get_b() { return -1; }
+  virtual int dsp_get_upper_a() { return -1; }
+  virtual int dsp_get_upper_b() { return -1; }
+  virtual int dsp_get_lower_a() { return -1; }
+  virtual int dsp_get_lower_b() { return -1; }
   virtual int dsp_get_rounded_a() { return -1; }
   virtual int dsp_get_rounded_b() { return -1; }
   virtual int dsp_clear_a() { return -1; }
@@ -123,16 +127,16 @@ public:
   virtual int dsp_square_to_b() { return -1; }
   virtual int dsp_mul_to_a() { return -1; }
   virtual int dsp_mul_to_b() { return -1; }
-  virtual int dsp_euclidean_distance_to_a() { return -1; }
-  virtual int dsp_euclidean_distance_to_b() { return -1; }
+  //virtual int dsp_euclidean_distance_to_a() { return -1; }
+  //virtual int dsp_euclidean_distance_to_b() { return -1; }
   virtual int dsp_square_and_add_to_a() { return -1; }
   virtual int dsp_square_and_add_to_b() { return -1; }
   virtual int dsp_mul_and_add_to_a() { return -1; }
   virtual int dsp_mul_and_add_to_b() { return -1; }
   virtual int dsp_mul_and_sub_from_a() { return -1; }
   virtual int dsp_mul_and_sub_from_b() { return -1; }
-  virtual int dsp_euclidean_distance_and_add_to_a() { return -1; }
-  virtual int dsp_euclidean_distance_and_add_to_b() { return -1; }
+  //virtual int dsp_euclidean_distance_and_add_to_a() { return -1; }
+  //virtual int dsp_euclidean_distance_and_add_to_b() { return -1; }
   virtual int dsp_shift_a() { return -1; }
   virtual int dsp_shift_b() { return -1; }
 

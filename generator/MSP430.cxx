@@ -848,7 +848,7 @@ int MSP430::spi_init(int port)
   char dst[16];
   fprintf(out, "  ;; Set up SPI\n");
   fprintf(out, "  mov.b #(USIPE7|USIPE6|USIPE5|USIMST|USIOE|USISWRST), &USICTL0\n");
-  pop_reg(out, dst);
+  pop_reg(dst);
   fprintf(out, "  mov.b %s, r14\n", dst);
   fprintf(out, "  rrc.b r14\n");
   fprintf(out, "  rrc.b r14\n");
@@ -858,7 +858,7 @@ int MSP430::spi_init(int port)
   //fprintf(out, "  mov.b #(USIDIV_7|USISSEL_2), &USICKCTL ; div 128, SMCLK\n");
   fprintf(out, "  mov.b %s, r14\n", dst);
   fprintf(out, "  and.b #0x02, r14\n");
-  pop_reg(out, dst);
+  pop_reg(dst);
   // If this came off the stack, let's put it in a register, if not let's
   // just use the register.
   if (dst[0] != 'r')
@@ -884,11 +884,11 @@ int MSP430::spi_send(int port)
   if (port != 0) { return -1; }
 
   char dst[16];
-  pop_reg(out, dst);
+  pop_reg(dst);
 
   fprintf(out, "  mov.b %s, r15\n", dst);
   fprintf(out, "  call #_read_spi\n");
-  push_reg(out, "r15");
+  push_reg("r15");
 
   need_read_spi = 1;
 
@@ -900,7 +900,7 @@ int MSP430::spi_read(int port)
   if (port != 0) { return -1; }
 
   fprintf(out, "  call #_read_spi\n");
-  push_reg(out, "r15");
+  push_reg("r15");
 
   need_read_spi = 1;
 
@@ -913,7 +913,7 @@ int MSP430::spi_isDataAvailable(int port)
 
   fprintf(out, "  mov.b &USICTL1, r15\n");
   fprintf(out, "  and.b #USIIFG, r15\n");
-  push_reg(out, "r15");
+  push_reg("r15");
 
   return 0;
 }
@@ -1041,7 +1041,7 @@ int MSP430::memory_write16()
 }
 
 // Protected functions
-void MSP430::push_reg(FILE *out, const char *dst)
+void MSP430::push_reg(const char *dst)
 {
   if (reg < reg_max)
   {
@@ -1055,7 +1055,7 @@ void MSP430::push_reg(FILE *out, const char *dst)
   }
 }
 
-void MSP430::pop_reg(FILE *out, char *dst)
+void MSP430::pop_reg(char *dst)
 {
   if (stack > 0)
   {

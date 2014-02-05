@@ -102,6 +102,10 @@ public:
   // DSP (dsPIC stuff)
   virtual int dsp_get_a();
   virtual int dsp_get_b();
+  virtual int dsp_get_upper_a();
+  virtual int dsp_get_upper_b();
+  virtual int dsp_get_lower_a();
+  virtual int dsp_get_lower_b();
   virtual int dsp_get_rounded_a();
   virtual int dsp_get_rounded_b();
   virtual int dsp_clear_a();
@@ -120,23 +124,25 @@ public:
   virtual int dsp_square_to_b();
   virtual int dsp_mul_to_a();
   virtual int dsp_mul_to_b();
-  virtual int dsp_euclidean_distance_to_a();
-  virtual int dsp_euclidean_distance_to_b();
+  //virtual int dsp_euclidean_distance_to_a();
+  //virtual int dsp_euclidean_distance_to_b();
   virtual int dsp_square_and_add_to_a();
   virtual int dsp_square_and_add_to_b();
   virtual int dsp_mul_and_add_to_a();
   virtual int dsp_mul_and_add_to_b();
   virtual int dsp_mul_and_sub_from_a();
   virtual int dsp_mul_and_sub_from_b();
-  virtual int dsp_euclidean_distance_and_add_to_a();
-  virtual int dsp_euclidean_distance_and_add_to_b();
+  //virtual int dsp_euclidean_distance_and_add_to_a();
+  //virtual int dsp_euclidean_distance_and_add_to_b();
   virtual int dsp_shift_a();
   virtual int dsp_shift_b();
 
 private:
   int dsp_mul(const char *instr, const char *accum);
   int dsp_square(const char *instr, const char *accum);
-  void pop_reg(FILE *out, char *dst);
+  int dsp_store(const char *instr, const char *accum, int shift);
+  void pop_reg(char *dst);
+  //void push_w0();
   int set_periph(const char *instr, const char *periph, bool reverse=false);
   int stack_alu(const char *instr);
   int stack_shift(const char *instr);

@@ -5,12 +5,6 @@ public class DSPTest
 {
   static public void main(String args[])
   {
-    int a;
-
-    a = DSP.getA();
-    b = DSP.getB();
-    a = DSP.getRoundedA();
-    b = DSP.getRoundedB();
   }
 
   static public void single()
@@ -40,8 +34,8 @@ public class DSPTest
     DSP.squareToB(n);
     DSP.mulToA(50,m);
     DSP.mulToB(n,m);
-    DSP.euclideanDistanceToA(50,m);
-    DSP.euclideanDistanceToB(n,m);
+    //DSP.euclideanDistanceToA(50,m);
+    //DSP.euclideanDistanceToB(n,m);
   }
 
   static public void add_accum()
@@ -55,8 +49,20 @@ public class DSPTest
     DSP.mulAndAddToB(10,16);
     DSP.mulAndSubFromA(10,m);
     DSP.mulAndSubFromB(n,16);
-    DSP.euclideanDistanceAndAddToA(50,m);
-    DSP.euclideanDistanceAndAddToB(n,m);
+    //DSP.euclideanDistanceAndAddToA(50,m);
+    //DSP.euclideanDistanceAndAddToB(n,m);
+  }
+
+  static public void store_accum()
+  {
+    int n;
+    n = DSP.getA();
+    n = DSP.getB();
+    n = DSP.getUpperA();
+    n = DSP.getUpperB();
+    n = DSP.getLowerA();
+    n = DSP.getLowerB();
+    DSP.getA();
   }
 }
 

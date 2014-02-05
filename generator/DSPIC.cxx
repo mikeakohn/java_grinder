@@ -662,7 +662,7 @@ char dst[16];
   fprintf(out, "  ;; Set up SPI\n");
   fprintf(out, "  mov #0x00, w0\n");
   fprintf(out, "  mov w0, SPI0CON1\n");
-  pop_reg(out, dst);
+  pop_reg(dst);
 
   return -1;
 }
@@ -757,24 +757,43 @@ int DSPIC::memory_write16()
 // DSP (dsPIC stuff)
 int DSPIC::dsp_get_a()
 {
-  return -1;
+  return dsp_store("sac", "A", 0);
 }
 
 int DSPIC::dsp_get_b()
 {
-  return -1;
+  return dsp_store("sac", "B", 0);
+}
+
+int DSPIC::dsp_get_upper_a()
+{
+  return dsp_store("sac", "A", 7);
+}
+
+int DSPIC::dsp_get_upper_b()
+{
+  return dsp_store("sac", "B", 7);
+}
+
+int DSPIC::dsp_get_lower_a()
+{
+  return dsp_store("sac", "A", -8);
+}
+
+int DSPIC::dsp_get_lower_b()
+{
+  return dsp_store("sac", "B", -8);
 }
 
 int DSPIC::dsp_get_rounded_a()
 {
-  return -1;
+  return dsp_store("sac.r", "A", 0);
 }
 
 int DSPIC::dsp_get_rounded_b()
 {
-  return -1;
+  return dsp_store("sac.r", "B", 0);
 }
-
 
 int DSPIC::dsp_clear_a()
 {
@@ -792,7 +811,7 @@ int DSPIC::dsp_load_a()
 {
 char dst[16];
 
-  pop_reg(out, dst);
+  pop_reg(dst);
   fprintf(out, "  lac %s, A\n", dst);
   return 0;
 }
@@ -801,7 +820,7 @@ int DSPIC::dsp_load_b()
 {
 char dst[16];
 
-  pop_reg(out, dst);
+  pop_reg(dst);
   fprintf(out, "  lac %s, B\n", dst);
   return 0;
 }
@@ -846,7 +865,7 @@ int DSPIC::dsp_add_to_a()
 {
 char dst[16];
 
-  pop_reg(out, dst);
+  pop_reg(dst);
   fprintf(out, "  add %s, A\n", dst);
   return 0;
 }
@@ -855,7 +874,7 @@ int DSPIC::dsp_add_to_b()
 {
 char dst[16];
 
-  pop_reg(out, dst);
+  pop_reg(dst);
   fprintf(out, "  add %s, B\n", dst);
   return 0;
 }
@@ -880,6 +899,7 @@ int DSPIC::dsp_mul_to_b()
   return dsp_mul("mpy", "B");
 }
 
+#if 0
 int DSPIC::dsp_euclidean_distance_to_a()
 {
   return dsp_mul("ed", "A");
@@ -889,6 +909,7 @@ int DSPIC::dsp_euclidean_distance_to_b()
 {
   return dsp_mul("ed", "B");
 }
+#endif
 
 int DSPIC::dsp_square_and_add_to_a()
 {
@@ -920,6 +941,7 @@ int DSPIC::dsp_mul_and_sub_from_b()
   return dsp_mul("msc", "B");
 }
 
+#if 0
 int DSPIC::dsp_euclidean_distance_and_add_to_a()
 {
   return dsp_mul("edac", "A");
@@ -929,13 +951,14 @@ int DSPIC::dsp_euclidean_distance_and_add_to_b()
 {
   return dsp_mul("edac", "B");
 }
+#endif
 
 int DSPIC::dsp_shift_a()
 {
 char dst[16];
 
-  pop_reg(out, dst);
-  fprintf(out, "  lac A, %s\n", dst);
+  pop_reg(dst);
+  fprintf(out, "  sftac A, %s\n", dst);
   return 0;
 }
 
@@ -943,8 +966,8 @@ int DSPIC::dsp_shift_b()
 {
 char dst[16];
 
-  pop_reg(out, dst);
-  fprintf(out, "  lac B, %s\n", dst);
+  pop_reg(dst);
+  fprintf(out, "  sftac B, %s\n", dst);
   return 0;
 }
 
@@ -969,9 +992,9 @@ int reg_num2 = reg > 1 ? (REG_STACK(reg-2)) : -1;
   }
     else
   {
-    pop_reg(out, dst);
+    pop_reg(dst);
     fprintf(out, "  mov %s, w7\n", dst);
-    pop_reg(out, dst);
+    pop_reg(dst);
     fprintf(out, "  mov %s, w6\n", dst);
     fprintf(out, "  %s w6*w7, %s\n", instr, accum);
   }
@@ -986,7 +1009,7 @@ int reg_num = reg > 0 ? (REG_STACK(reg-1)) : -1;
 
   if (stack > 0 || reg == -1)
   {
-    pop_reg(out, dst);
+    pop_reg(dst);
     fprintf(out, "  mov %s, w7\n", dst);
     fprintf(out, "  %s w7*w7, %s\n", instr, accum);
   }
@@ -999,7 +1022,29 @@ int reg_num = reg > 0 ? (REG_STACK(reg-1)) : -1;
   return 0;
 }
 
-void DSPIC::pop_reg(FILE *out, char *dst)
+int DSPIC::dsp_store(const char *instr, const char *accum, int shift)
+{
+char shift_str[32];
+
+  if (shift != 0) { sprintf(shift_str, "#%d, ", shift); }
+  else { shift_str[0] = 0; }
+
+  if (reg < reg_max)
+  {
+    fprintf(out, "  %s %s, %sw%d\n", instr, accum, shift_str, REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  %s %s, %sw0\n", instr, accum, shift_str);
+    fprintf(out, "  push w0\n");
+    stack++;
+  }
+
+  return 0;
+}
+
+void DSPIC::pop_reg(char *dst)
 {
   if (stack > 0)
   {
@@ -1013,6 +1058,22 @@ void DSPIC::pop_reg(FILE *out, char *dst)
     sprintf(dst, "w%d", REG_STACK(reg));
   }
 }
+
+#if 0
+void DSPIC::push_w0()
+{
+  if (stack > 0)
+  {
+    fprintf(out, "  push w0\n");
+    stack++;
+  }
+    else
+  {
+    sprintf(dst, "  mov w0, w%d", REG_STACK(reg));
+    reg++;
+  }
+}
+#endif
 
 int DSPIC::set_periph(const char *instr, const char *periph, bool reverse)
 {
