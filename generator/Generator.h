@@ -43,6 +43,7 @@ public:
   virtual int sub_integers() = 0;
   virtual int mul_integers() = 0;
   virtual int div_integers() = 0;
+  virtual int mod_integers() = 0;
   virtual int neg_integer() = 0;
   virtual int shift_left_integer() = 0;
   virtual int shift_right_integer() = 0;

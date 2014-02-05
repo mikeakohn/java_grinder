@@ -134,6 +134,11 @@ int MIPS::div_integers()
   return -1;
 }
 
+int MIPS::mod_integers()
+{
+  return -1;
+}
+
 int MIPS::neg_integer()
 {
   return -1;

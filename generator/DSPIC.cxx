@@ -331,6 +331,12 @@ int DSPIC::div_integers()
   return stack_alu("div");
 }
 
+int DSPIC::mod_integers()
+{
+  //return stack_alu("mod");
+  return -1;
+}
+
 int DSPIC::neg_integer()
 {
   if (stack > 0)
@@ -662,9 +668,26 @@ char dst[16];
   if (port != 0) { return -1; }
 
   fprintf(out, "  ;; Set up SPI\n");
-  fprintf(out, "  mov #0x00, w0\n");
+  // This chip needs the RP pins set.
+  if (chip_type == DSPIC33FJ06GS101A)
+  {
+    fprintf(out, "  ; SDI is on RP3\n");
+    fprintf(out, "  mov #SDI1R3, w0\n");
+    fprintf(out, "  mov w0, RPINR20\n");
+
+    fprintf(out, "  ; SDO is on RP2\n");
+    fprintf(out, "  mov #0x7, w0\n");
+    fprintf(out, "  mov w0, RPOR2\n");
+
+    fprintf(out, "  ; SCLK is on RP1\n");
+    fprintf(out, "  mov #0x8, w0\n");
+    fprintf(out, "  mov w0, RPOR1\n");
+  }
+
+  fprintf(out, "  mov #(1<<MSTEN), w0\n");
   fprintf(out, "  mov w0, SPI0CON1\n");
   pop_reg(dst);
+  fprintf(out, "  mov w0, w13\n");
 
   return -1;
 }

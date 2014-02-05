@@ -492,6 +492,11 @@ int MSP430::div_integers()
   return 0;
 }
 
+int MSP430::mod_integers()
+{
+  return -1;
+}
+
 int MSP430::neg_integer()
 {
   if (stack > 0)

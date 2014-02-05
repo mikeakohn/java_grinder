@@ -129,6 +129,11 @@ int M6502::div_integers()
   return -1;
 }
 
+int M6502::mod_integers()
+{
+  return -1;
+}
+
 int M6502::neg_integer()
 {
   return -1;

@@ -41,6 +41,7 @@ public:
   virtual int sub_integers();
   virtual int mul_integers();
   virtual int div_integers();
+  virtual int mod_integers();
   virtual int neg_integer();
   virtual int shift_left_integer();
   virtual int shift_right_integer();

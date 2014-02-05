@@ -821,7 +821,8 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 112: // irem (0x70)
-        UNIMPL()
+        // Pop top two integers from stack, divide them, push result
+        ret = generator->mod_integers();
         pc++;
         break;
 

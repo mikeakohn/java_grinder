@@ -134,6 +134,11 @@ int ARM::div_integers()
   return -1;
 }
 
+int ARM::mod_integers()
+{
+  return -1;
+}
+
 int ARM::neg_integer()
 {
   return -1;
