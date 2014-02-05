@@ -23,7 +23,7 @@
 #define LOCALS(i) (i * 2)
 
 // ABI is:
-// w0 temp
+// w0 temp, return value from method call
 // w4 start of stack
 // w5 ..
 // w1 ..
@@ -716,13 +716,13 @@ int DSPIC::memory_read8()
 {
   if (stack != 0)
   {
-    fprintf(out, "  mov.b [SP-2], w0\n");
+    fprintf(out, "  mov.w [SP-2], w0\n");
+    fprintf(out, "  mov.b [w0], w0\n");
     fprintf(out, "  mov.b w0, [SP-2]\n");
   }
     else
   {
-    fprintf(out, "  mov.b [w%d], w0\n", REG_STACK(reg-1));
-    fprintf(out, "  mov.b w0, [w%d]\n", REG_STACK(reg-1));
+    fprintf(out, "  mov.b [w%d], w%d\n", REG_STACK(reg-1), REG_STACK(reg-1));
   }
 
   return 0;
@@ -730,7 +730,29 @@ int DSPIC::memory_read8()
 
 int DSPIC::memory_write8()
 {
-  return -1;
+  if (stack >= 2)
+  {
+    fprintf(out, "  pop w0\n");
+    fprintf(out, "  mov.w [SP-2], w13\n");
+    fprintf(out, "  mov.b w0, [w13]\n");
+    stack--;
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  pop w0\n");
+    fprintf(out, "  mov.b w0, [w%d]\n", REG_STACK(reg-1));
+    stack--;
+  }
+    else
+  {
+    //fprintf(out, "  mov.b w%d, w0\n", REG_STACK(reg-1));
+    //fprintf(out, "  mov.b w0, [w%d]\n", REG_STACK(reg-2));
+    fprintf(out, "  mov.b w%d, [w%d]\n", REG_STACK(reg-1), REG_STACK(reg-2));
+    reg--;
+  }
+
+  return 0;
 }
 
 int DSPIC::memory_read16()
@@ -738,12 +760,12 @@ int DSPIC::memory_read16()
   if (stack != 0)
   {
     fprintf(out, "  mov.w [SP-2], w0\n");
+    fprintf(out, "  mov.w [w0], w0\n");
     fprintf(out, "  mov.w w0, [SP-2]\n");
   }
     else
   {
-    fprintf(out, "  mov.w [w%d], w0\n", REG_STACK(reg-1));
-    fprintf(out, "  mov.w w0, [w%d]\n", REG_STACK(reg-1));
+    fprintf(out, "  mov.w [w%d], w%d\n", REG_STACK(reg-1), REG_STACK(reg-1));
   }
 
   return 0;
@@ -751,7 +773,29 @@ int DSPIC::memory_read16()
 
 int DSPIC::memory_write16()
 {
-  return -1;
+  if (stack >= 2)
+  {
+    fprintf(out, "  pop w0\n");
+    fprintf(out, "  mov.w [SP-2], w13\n");
+    fprintf(out, "  mov.w w0, [w13]\n");
+    stack--;
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  pop w0\n");
+    fprintf(out, "  mov.w w0, [w%d]\n", REG_STACK(reg-1));
+    stack--;
+  }
+    else
+  {
+    //fprintf(out, "  mov.w w%d, w0\n", REG_STACK(reg-1));
+    //fprintf(out, "  mov.w w0, [w%d]\n", REG_STACK(reg-2));
+    fprintf(out, "  mov.w w%d, [w%d]\n", REG_STACK(reg-1), REG_STACK(reg-2));
+    reg--;
+  }
+
+  return 0;
 }
 
 // DSP (dsPIC stuff)

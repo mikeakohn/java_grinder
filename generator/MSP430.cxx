@@ -1004,11 +1004,11 @@ int MSP430::memory_read16()
 {
   if (stack != 0)
   {
-    fprintf(out, "  mov.w @SP, 0(SP)\n\n");
+    fprintf(out, "  mov.w @SP, 0(SP)\n");
   }
     else
   {
-    fprintf(out, "  mov.w @r%d, r%d\n\n", REG_STACK(reg-1), REG_STACK(reg-1));
+    fprintf(out, "  mov.w @r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-1));
   }
 
   return 0;
