@@ -44,7 +44,8 @@ DSPIC::DSPIC(uint8_t chip_type) :
   reg(0),
   reg_max(sizeof(stack_regs)),
   stack(0),
-  is_main(0)
+  is_main(false),
+  need_stack_set(false)
 {
   this->chip_type = chip_type;
 }
@@ -70,6 +71,7 @@ int DSPIC::open(char *filename)
     case DSPIC33FJ06GS101A:
       fprintf(out, ".include \"p33fj06gs101a.inc\"\n\n");
       flash_start = 0x100;
+      need_stack_set = true;
       break;
     default:
       printf("Unknown chip type.\n");
@@ -83,7 +85,7 @@ int DSPIC::open(char *filename)
   // Also, not sure what to do with SPLIM.
   fprintf(out, ".org %d\n", flash_start);
   fprintf(out, "start:\n");
-  fprintf(out, "  mov #0x800, SP\n\n");
+  if (need_stack_set) { fprintf(out, "  mov #0x800, SP\n\n"); }
 
   return 0;
 }
@@ -99,7 +101,7 @@ void DSPIC::method_start(int local_count, const char *name)
   reg = 0;
   stack = 0;
 
-  is_main = (strcmp(name, "main") == 0) ? 1 : 0;
+  is_main = (strcmp(name, "main") == 0) ? true : false;
 
   // main() function goes here
   fprintf(out, "%s:\n", name);

@@ -152,6 +152,7 @@ private:
   int stack;          // count how many things we put on the stack
   uint8_t chip_type;
   bool is_main;
+  bool need_stack_set;
   int flash_start;
 };
 
