@@ -103,6 +103,10 @@ public:
   virtual int memory_write16() { return -1; }
 
   // DSP (dsPIC stuff)
+  virtual int dsp_get_a() { return -1; }
+  virtual int dsp_get_b() { return -1; }
+  virtual int dsp_get_rounded_a() { return -1; }
+  virtual int dsp_get_rounded_b() { return -1; }
   virtual int dsp_clear_a() { return -1; }
   virtual int dsp_clear_b() { return -1; }
   virtual int dsp_load_a() { return -1; }
@@ -111,18 +115,26 @@ public:
   virtual int dsp_neg_b() { return -1; }
   virtual int dsp_add_ab_and_store_in_a() { return -1; }
   virtual int dsp_add_ab_and_store_in_b() { return -1; }
+  virtual int dsp_sub_ab_and_store_in_a() { return -1; }
+  virtual int dsp_sub_ba_and_store_in_b() { return -1; }
   virtual int dsp_add_to_a() { return -1; }
   virtual int dsp_add_to_b() { return -1; }
   virtual int dsp_square_to_a() { return -1; }
   virtual int dsp_square_to_b() { return -1; }
   virtual int dsp_mul_to_a() { return -1; }
   virtual int dsp_mul_to_b() { return -1; }
+  virtual int dsp_euclidean_distance_to_a() { return -1; }
+  virtual int dsp_euclidean_distance_to_b() { return -1; }
   virtual int dsp_square_and_add_to_a() { return -1; }
   virtual int dsp_square_and_add_to_b() { return -1; }
   virtual int dsp_mul_and_add_to_a() { return -1; }
   virtual int dsp_mul_and_add_to_b() { return -1; }
   virtual int dsp_mul_and_sub_from_a() { return -1; }
   virtual int dsp_mul_and_sub_from_b() { return -1; }
+  virtual int dsp_euclidean_distance_and_add_to_a() { return -1; }
+  virtual int dsp_euclidean_distance_and_add_to_b() { return -1; }
+  virtual int dsp_shift_a() { return -1; }
+  virtual int dsp_shift_b() { return -1; }
 
 protected:
   FILE *out;

@@ -714,7 +714,18 @@ int DSPIC::cpu_nop()
 // Memory
 int DSPIC::memory_read8()
 {
-  return -1;
+  if (stack != 0)
+  {
+    fprintf(out, "  mov.b [SP-2], w0\n");
+    fprintf(out, "  mov.b w0, [SP-2]\n");
+  }
+    else
+  {
+    fprintf(out, "  mov.b [w%d], w0\n", REG_STACK(reg-1));
+    fprintf(out, "  mov.b w0, [w%d]\n", REG_STACK(reg-1));
+  }
+
+  return 0;
 }
 
 int DSPIC::memory_write8()
@@ -724,7 +735,18 @@ int DSPIC::memory_write8()
 
 int DSPIC::memory_read16()
 {
-  return -1;
+  if (stack != 0)
+  {
+    fprintf(out, "  mov.w [SP-2], w0\n");
+    fprintf(out, "  mov.w w0, [SP-2]\n");
+  }
+    else
+  {
+    fprintf(out, "  mov.w [w%d], w0\n", REG_STACK(reg-1));
+    fprintf(out, "  mov.w w0, [w%d]\n", REG_STACK(reg-1));
+  }
+
+  return 0;
 }
 
 int DSPIC::memory_write16()
@@ -733,6 +755,27 @@ int DSPIC::memory_write16()
 }
 
 // DSP (dsPIC stuff)
+int DSPIC::dsp_get_a()
+{
+  return -1;
+}
+
+int DSPIC::dsp_get_b()
+{
+  return -1;
+}
+
+int DSPIC::dsp_get_rounded_a()
+{
+  return -1;
+}
+
+int DSPIC::dsp_get_rounded_b()
+{
+  return -1;
+}
+
+
 int DSPIC::dsp_clear_a()
 {
   fprintf(out, "  clr A\n");
@@ -787,6 +830,18 @@ int DSPIC::dsp_add_ab_and_store_in_b()
   return 0;
 }
 
+int DSPIC::dsp_sub_ab_and_store_in_a()
+{
+  fprintf(out, "  sub A\n");
+  return 0;
+}
+
+int DSPIC::dsp_sub_ba_and_store_in_b()
+{
+  fprintf(out, "  sub B\n");
+  return 0;
+}
+
 int DSPIC::dsp_add_to_a()
 {
 char dst[16];
@@ -825,6 +880,16 @@ int DSPIC::dsp_mul_to_b()
   return dsp_mul("mpy", "B");
 }
 
+int DSPIC::dsp_euclidean_distance_to_a()
+{
+  return dsp_mul("ed", "A");
+}
+
+int DSPIC::dsp_euclidean_distance_to_b()
+{
+  return dsp_mul("ed", "B");
+}
+
 int DSPIC::dsp_square_and_add_to_a()
 {
   return dsp_square("mac", "A");
@@ -853,6 +918,34 @@ int DSPIC::dsp_mul_and_sub_from_a()
 int DSPIC::dsp_mul_and_sub_from_b()
 {
   return dsp_mul("msc", "B");
+}
+
+int DSPIC::dsp_euclidean_distance_and_add_to_a()
+{
+  return dsp_mul("edac", "A");
+}
+
+int DSPIC::dsp_euclidean_distance_and_add_to_b()
+{
+  return dsp_mul("edac", "B");
+}
+
+int DSPIC::dsp_shift_a()
+{
+char dst[16];
+
+  pop_reg(out, dst);
+  fprintf(out, "  lac A, %s\n", dst);
+  return 0;
+}
+
+int DSPIC::dsp_shift_b()
+{
+char dst[16];
+
+  pop_reg(out, dst);
+  fprintf(out, "  lac B, %s\n", dst);
+  return 0;
 }
 
 int DSPIC::dsp_mul(const char *instr, const char *accum)

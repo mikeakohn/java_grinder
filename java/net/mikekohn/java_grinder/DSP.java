@@ -17,6 +17,14 @@ abstract public class DSP
   {
   }
 
+  /** Return value of A */
+  public static int getA() { }
+  /** Return value of B */
+  public static int getB() { }
+  /** Return value of A rounded */
+  public static int getRoundedA() { }
+  /** Return value of B rounded */
+  public static int getRoundedB() { }
   /** Clear Accum A */
   public static void clearA() { }
   /** Clear Accum B */
@@ -33,6 +41,10 @@ abstract public class DSP
   public static void addABAndStoreInA() { }
   /** Add Accum A with Accum B and store in Accum B */
   public static void addABAndStoreInB() { }
+  /** Sub Accum A with Accum B (A-B) and store in Accum A */
+  public static void subBAAndStoreInA() { }
+  /** Sub Accum A with Accum B (B-A) and store in Accum B */
+  public static void subABAndStoreInB() { }
   /** Add to Accum A */
   public static void addToA(int n) { }
   /** Add to Accum B */
@@ -45,6 +57,10 @@ abstract public class DSP
   public static void mulToA(int n, int m) { }
   /** Multiply and store result in Accum B */
   public static void mulToB(int n, int m) { }
+  /** Euclidean distance to A */
+  public static void euclideanDistanceToA(int n, int m) { }
+  /** Euclidean distance to B */
+  public static void euclideanDistanceToB(int n, int m) { }
   /** Square and add result in Accum A */
   public static void squareAndAddToA(int n) { }
   /** Square and add result in Accum B */
@@ -57,5 +73,13 @@ abstract public class DSP
   public static void mulAndSubFromA(int n, int m) { }
   /** Multiply and substract result from Accum B */
   public static void mulAndSubFromB(int n, int m) { }
+  /** Euclidean distance added to A */
+  public static void euclideanDistanceAndAddToA(int n, int m) { }
+  /** Euclidean distance added to B */
+  public static void euclideanDistanceAndAddToB(int n, int m) { }
+  /** Arithmetic shift accumulator A (-16 to 16 bits only) */
+  public static void shiftA(int n) { }
+  /** Arithmetic shift accumulator B (-16 to 16 bits only) */
+  public static void shiftB(int n) { }
 }
 
