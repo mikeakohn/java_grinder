@@ -145,7 +145,7 @@ private:
   void pop_reg(char *dst);
   //void push_w0();
   int set_periph(const char *instr, const char *periph, bool reverse=false);
-  int stack_alu(const char *instr);
+  int stack_alu(const char *instr, bool is_divide=false);
   int stack_shift(const char *instr);
 
   int reg;            // count number of registers are are using as stack

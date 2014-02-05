@@ -38,7 +38,7 @@
 // Stack on dsPIC moves value to [sp] and then increments sp by 2 (odd).
 
 static const char *cond_str[] = { "z", "nz", "lt", "le", "gt", "ge" };
-static int8_t stack_regs[] = { 5, 4, 1, 2, 3, 8, 9, 10 };
+static int8_t stack_regs[] = { 5, 4, 11, 2, 3, 8, 9, 10 };
 
 DSPIC::DSPIC(uint8_t chip_type) :
   reg(0),
@@ -328,13 +328,24 @@ int DSPIC::mul_integers()
 
 int DSPIC::div_integers()
 {
-  return stack_alu("div");
+  stack_alu("div.s", true);
+
+  // Result of divide is in w0
+  if (stack > 0) { fprintf(out, "  mov.w w0, [SP-2]\n"); }
+  else { fprintf(out, "  mov.w w0, w%d\n", REG_STACK(reg-1)); }
+
+  return 0;
 }
 
 int DSPIC::mod_integers()
 {
-  //return stack_alu("mod");
-  return -1;
+  stack_alu("div.s", true);
+
+  // Remainder of divide is in w1
+  if (stack > 0) { fprintf(out, "  mov.w w1, [SP-2]\n"); }
+  else { fprintf(out, "  mov.w w1, w%d\n", REG_STACK(reg-1)); }
+
+  return 0;
 }
 
 int DSPIC::neg_integer()
@@ -1163,10 +1174,11 @@ int DSPIC::set_periph(const char *instr, const char *periph, bool reverse)
   return 0;
 }
 
-int DSPIC::stack_alu(const char *instr)
+int DSPIC::stack_alu(const char *instr, bool is_divide)
 {
   if (stack == 0)
   {
+    if (is_divide) { fprintf(out, "  repeat #17\n"); }
     fprintf(out, "  %s.w w%d, w%d\n", instr, REG_STACK(reg-1), REG_STACK(reg-2));
     reg--;
   }
@@ -1174,12 +1186,14 @@ int DSPIC::stack_alu(const char *instr)
   if (stack == 1)
   {
     fprintf(out, "  pop w0\n");
+    if (is_divide) { fprintf(out, "  repeat #17\n"); }
     fprintf(out, "  %s.w w0, w%d\n", instr, REG_STACK(reg-1));
     stack--;
   }
     else
   {
     fprintf(out, "  pop w0\n");
+    if (is_divide) { fprintf(out, "  repeat #17\n"); }
     fprintf(out, "  %s.w w0, [SP-2]\n", instr);
   }
 
