@@ -395,7 +395,7 @@ int saved_registers;
 
   if(saved_registers != 2)
   {
-    for (n = 0; n < saved_registers; n++)
+    for (n = 0; n < reg; n++)
     {
       fprintf(out, "  push r%d\n", REG_STACK(n));
     }
@@ -403,7 +403,7 @@ int saved_registers;
 
   if (stack == 0)
   {
-    if(reg != 2)
+    if(saved_registers != 2)
     {
       fprintf(out, "  mov r%d, r5\n", REG_STACK(reg-1));
       fprintf(out, "  mov r%d, r4\n", REG_STACK(reg-2));
@@ -456,7 +456,7 @@ int saved_registers;
 
   if (stack == 0)
   {
-    if(reg != 2)
+    if(saved_registers != 2)
     {
       fprintf(out, "  mov r%d, r5\n", REG_STACK(reg-1));
       fprintf(out, "  mov r%d, r4\n", REG_STACK(reg-2));
