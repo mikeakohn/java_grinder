@@ -53,6 +53,8 @@ MSP430::MSP430(uint8_t chip_type) :
   stack(0),
   label_count(0),
   need_read_spi(0),
+  need_mul_integers(0),
+  need_div_integers(0),
   is_main(0)
 {
   switch(chip_type)
@@ -84,6 +86,76 @@ MSP430::~MSP430()
     fprintf(out, "  jz _read_spi_wait\n");
     fprintf(out, "  mov.b &USISRL, r15\n");
     fprintf(out, "  ret\n\n");
+  }
+  if (need_mul_integers)
+  {
+    fprintf(out, "; _mul a * b\n");
+    fprintf(out, "_mul_integers:\n");
+    // save ret value in r10
+    fprintf(out, "  pop r10\n");
+    fprintf(out, "  pop r12\n");
+    fprintf(out, "  pop r13\n");
+    fprintf(out, "  clr r14\n");
+    fprintf(out, "  mov r14, r15\n");
+    fprintf(out, "  mov r14, r11\n");
+    fprintf(out, "  tst r12\n");
+    fprintf(out, "  jge _mul2\n");
+    fprintf(out, "  mov #-1, r11\n");
+    fprintf(out, "  jmp _mul2\n");
+    fprintf(out, "_mul6:\n");
+    fprintf(out, "  add r12, r15\n");
+    fprintf(out, "  addc r11, r14\n");
+    fprintf(out, "_mul1:\n");
+    fprintf(out, "  rla r12\n");
+    fprintf(out, "  rlc r11\n");
+    fprintf(out, "_mul2:\n");
+    fprintf(out, "  rra r13\n");
+    fprintf(out, "  jc _mul5\n");
+    fprintf(out, "  jne _mul1\n");
+    fprintf(out, "  jmp _mul4\n");
+    fprintf(out, "_mul5:\n");
+    fprintf(out, "  sub r12, r15\n");
+    fprintf(out, "  subc r11, r14\n");
+    fprintf(out, "_mul3:\n");
+    fprintf(out, "  rla r12\n");
+    fprintf(out, "  rlc r11\n");
+    fprintf(out, "  rra r13\n");
+    fprintf(out, "  jnc _mul6\n");
+    fprintf(out, "  cmp #0FFFFh, r13\n");
+    fprintf(out, "  jne _mul3\n");
+    fprintf(out, "_mul4:\n");
+    // restore ret value
+    fprintf(out, "  push r10\n");
+    fprintf(out, "  ret\n\n");
+  }
+
+  if (need_div_integers)
+  {
+    fprintf(out, "; _div a / b (remainder in r14)\n");
+    fprintf(out, "_div_integers:\n");
+    // save ret value in r10
+    fprintf(out, "  pop r10\n");
+    fprintf(out, "  pop r12\n");
+    fprintf(out, "  pop r13\n");
+    fprintf(out, "  mov #16, r11\n");
+    fprintf(out, "  clr r14\n");
+
+    fprintf(out, "_div1:\n");
+    fprintf(out, "  rla r12\n");
+    fprintf(out, "  rlc r14\n");
+    fprintf(out, "  bis #1, r12\n");
+    fprintf(out, "  sub r13, r14\n");
+    fprintf(out, "  jge _div2\n");
+    fprintf(out, "  add r13, r14\n");
+    fprintf(out, "  bic #1, r12\n");
+
+    fprintf(out, "_div2:\n");
+    fprintf(out, "  dec r11\n");
+    fprintf(out, "  jnz _div1\n");
+    fprintf(out, "  mov r12, r15\n");
+    // restore ret value
+    fprintf(out, "  push r10\n");
+    fprintf(out, "  ret\n");
   }
 
   fprintf(out, ".org 0xfffe\n");
@@ -330,16 +402,94 @@ int MSP430::sub_integers()
 
 int MSP430::mul_integers()
 {
-  printf("mul not supported yet\n");
+  fprintf(out, "  push r10\n");
+  fprintf(out, "  push r11\n");
+  fprintf(out, "  push r12\n");
+  fprintf(out, "  push r13\n");
+  fprintf(out, "  push r14\n");
+  fprintf(out, "  push r15\n");
 
-  return -1;
+  if (stack == 0)
+  {
+    fprintf(out, "  push r%d\n", REG_STACK(reg-1));
+    fprintf(out, "  push r%d\n", REG_STACK(reg-2));
+    fprintf(out, "  call #_mul_integers\n");
+    fprintf(out, "  mov r15, r%d\n", REG_STACK(reg-2));
+    reg--;
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  pop r15\n");
+    fprintf(out, "  push r15\n");
+    fprintf(out, "  push r%d\n", REG_STACK(reg-1));
+    fprintf(out, "  call #_mul_integers\n");
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  pop r15\n");
+    fprintf(out, "  push r15\n");
+    fprintf(out, "  push @SP\n");
+    fprintf(out, "  call #_mul_integers\n");
+  }
+
+  fprintf(out, "  pop r15\n");
+  fprintf(out, "  pop r14\n");
+  fprintf(out, "  pop r13\n");
+  fprintf(out, "  pop r12\n");
+  fprintf(out, "  pop r11\n");
+  fprintf(out, "  pop r10\n");
+
+  need_mul_integers = 1;
+
+  return 0;
 }
 
 int MSP430::div_integers()
 {
-  printf("div not supported yet\n");
+  fprintf(out, "  push r10\n");
+  fprintf(out, "  push r11\n");
+  fprintf(out, "  push r12\n");
+  fprintf(out, "  push r13\n");
+  fprintf(out, "  push r14\n");
+  fprintf(out, "  push r15\n");
 
-  return -1;
+  if (stack == 0)
+  {
+    fprintf(out, "  push r%d\n", REG_STACK(reg-1));
+    fprintf(out, "  push r%d\n", REG_STACK(reg-2));
+    fprintf(out, "  call #_div_integers\n");
+    fprintf(out, "  mov r15, r%d\n", REG_STACK(reg-2));
+    reg--;
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  pop r15\n");
+    fprintf(out, "  push r15\n");
+    fprintf(out, "  push r%d\n", REG_STACK(reg-1));
+    fprintf(out, "  call #_div_integers\n");
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  pop r15\n");
+    fprintf(out, "  push r15\n");
+    fprintf(out, "  push @SP\n");
+    fprintf(out, "  call #_div_integers\n");
+  }
+
+  fprintf(out, "  pop r15\n");
+  fprintf(out, "  pop r14\n");
+  fprintf(out, "  pop r13\n");
+  fprintf(out, "  pop r12\n");
+  fprintf(out, "  pop r11\n");
+  fprintf(out, "  pop r10\n");
+
+  need_div_integers = 1;
+
+  return 0;
 }
 
 int MSP430::neg_integer()
