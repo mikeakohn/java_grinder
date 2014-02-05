@@ -24,6 +24,16 @@
     return dsp_##funct(java_class, generator); \
   }
 
+static int dsp_clearA(JavaClass *java_class, Generator *generator)
+{
+  return generator->dsp_clear_a();
+}
+
+static int dsp_clearB(JavaClass *java_class, Generator *generator)
+{
+  return generator->dsp_clear_b();
+}
+
 static int dsp_addABAndStoreInA(JavaClass *java_class, Generator *generator)
 {
   return generator->dsp_add_ab_and_store_in_a();
@@ -76,6 +86,8 @@ static int dsp_mulAndSubFromB(JavaClass *java_class, Generator *generator)
 
 int dsp(JavaClass *java_class, Generator *generator, char *function)
 {
+  CHECK_FUNC(clearA)
+  CHECK_FUNC(clearB)
   CHECK_FUNC(addABAndStoreInA)
   CHECK_FUNC(addABAndStoreInB)
   CHECK_FUNC(addToA)

@@ -17,6 +17,8 @@ abstract public class DSP
   {
   }
 
+  public static void clearA() { }
+  public static void clearB() { }
   public static void addABAndStoreInA() { }
   public static void addABAndStoreInB() { }
   public static void addToA(int n) { }

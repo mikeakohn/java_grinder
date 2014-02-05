@@ -38,7 +38,7 @@
 // Stack on dsPIC moves value to [sp] and then increments sp by 2 (odd).
 
 static const char *cond_str[] = { "z", "nz", "lt", "le", "gt", "ge" };
-static int8_t stack_regs[] = { 4, 5, 1, 2, 3, 8, 9, 10 };
+static int8_t stack_regs[] = { 5, 4, 1, 2, 3, 8, 9, 10 };
 
 DSPIC::DSPIC(uint8_t chip_type) :
   reg(0),
@@ -733,6 +733,18 @@ int DSPIC::memory_write16()
 }
 
 // DSP (dsPIC stuff)
+int DSPIC::dsp_clear_a()
+{
+  fprintf(out, "  clr A\n");
+  return 0;
+}
+
+int DSPIC::dsp_clear_b()
+{
+  fprintf(out, "  clr B\n");
+  return 0;
+}
+
 int DSPIC::dsp_add_ab_and_store_in_a()
 {
   fprintf(out, "  add A\n");
@@ -772,7 +784,7 @@ int reg_num = reg > 0 ? (REG_STACK(reg-1)) : -1;
   {
     pop_reg(out, dst);
     fprintf(out, "  mov %s, w7\n", dst);
-    fprintf(out, "  mpy w7, A\n");
+    fprintf(out, "  mpy w7*w7, A\n");
   }
     else
   {
@@ -792,12 +804,12 @@ int reg_num = reg > 0 ? (REG_STACK(reg-1)) : -1;
   {
     pop_reg(out, dst);
     fprintf(out, "  mov %s, w7\n", dst);
-    fprintf(out, "  mpy w7, B\n");
+    fprintf(out, "  mpy w7*w7, B\n");
   }
     else
   {
     reg--;
-    fprintf(out, "  mpy w%d*w%d, A\n", reg_num, reg_num);
+    fprintf(out, "  mpy w%d*w%d, B\n", reg_num, reg_num);
   }
 
   return 0;
@@ -805,42 +817,51 @@ int reg_num = reg > 0 ? (REG_STACK(reg-1)) : -1;
 
 int DSPIC::dsp_mul_and_add_to_a()
 {
-  return -1;
+  return dsp_mul("mpy", "A");
 }
 
 int DSPIC::dsp_mul_and_add_to_b()
 {
-  return -1;
+  return dsp_mul("mpy", "B");
 }
 
 int DSPIC::dsp_mul_and_sub_from_a()
 {
-  return -1;
+  return dsp_mul("msc", "A");
 }
 
 int DSPIC::dsp_mul_and_sub_from_b()
 {
-  return -1;
+  return dsp_mul("msc", "B");
 }
 
-int DSPIC::dsp_mul(char *instr)
+int DSPIC::dsp_mul(char *instr, char *accum)
 {
-#if 0
 char dst[16];
-int reg_num = reg > 0 ? (REG_STACK(reg-1)) : -1;
+int reg_num1 = reg > 1 ? (REG_STACK(reg-1)) : -1;
+int reg_num2 = reg > 1 ? (REG_STACK(reg-2)) : -1;
 
-  if (stack > 0 || reg_num < 4 || reg_num > 7 )
+  if (reg_num1 > reg_num2)
   {
-    pop_reg(out, dst);
-    fprintf(out, "  mov %s, w7\n", dst);
-    fprintf(out, "  mpy w7, B\n");
+    int x;
+    x = reg_num1;
+    reg_num1 = reg_num2;
+    reg_num2 = x;
+  }
+
+  if (stack == 0 && reg_num1 == 4 && reg_num2 == 5)
+  {
+    reg -= 2;
+    fprintf(out, "  %s w%d*w%d, %s\n", instr, reg_num1, reg_num2, accum);
   }
     else
   {
-    reg--;
-    fprintf(out, "  mpy w%d*w%d, A\n", reg_num, reg_num);
+    pop_reg(out, dst);
+    fprintf(out, "  mov %s, w7\n", dst);
+    pop_reg(out, dst);
+    fprintf(out, "  mov %s, w6\n", dst);
+    fprintf(out, "  %s w6*w7, %s\n", instr, accum);
   }
-#endif
 
   return 0;
 }

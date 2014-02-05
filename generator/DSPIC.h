@@ -100,6 +100,8 @@ public:
   virtual int memory_write16();
 
   // DSP (dsPIC stuff)
+  virtual int dsp_clear_a();
+  virtual int dsp_clear_b();
   virtual int dsp_add_ab_and_store_in_a();
   virtual int dsp_add_ab_and_store_in_b();
   virtual int dsp_add_to_a();
@@ -112,7 +114,7 @@ public:
   virtual int dsp_mul_and_sub_from_b();
 
 private:
-  int dsp_mul(char *instr);
+  int dsp_mul(char *instr, char *accum);
   void pop_reg(FILE *out, char *dst);
   int set_periph(const char *instr, const char *periph, bool reverse=false);
   int stack_alu(const char *instr);
