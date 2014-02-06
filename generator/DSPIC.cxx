@@ -698,39 +698,126 @@ char dst[16];
   fprintf(out, "  mov #(1<<MSTEN), w0\n");
   fprintf(out, "  mov w0, SPI0CON1\n");
   pop_reg(dst);
-  fprintf(out, "  mov w0, w13\n");
+  if (strcmp(dst, "w0") == 0)
+  {
+    fprintf(out, "  mov w0, w13\n");
+    strcpy(dst, "w13");
+  }
+    else
+  {
+    fprintf(out, "  mov %s, w0\n", dst);
+  }
+  fprintf(out, "  and #2, w0\n");
+  fprintf(out, "  asl #5, w0\n");
+  fprintf(out, "  and #1, %s\n", dst);
+  fprintf(out, "  asl #8, %s\n", dst);
+  fprintf(out, "  ior %s, w0\n", dst);
+  fprintf(out, "  asl #1, %s\n", dst);
+  fprintf(out, "  ior %s, w0\n", dst);
+  fprintf(out, "  ior SPI0CON1\n");
+
+  pop_reg(dst);
+  fprintf(out, "  ; primary_prescale=(div>>1)&0x3\n");
+  fprintf(out, "  ; secondary_prescale=((div&1)&0x7)<<2)\n");
+  if (strcmp(dst, "w0") == 0)
+  {
+    fprintf(out, "  mov w0, w13\n");
+    strcpy(dst, "w13");
+  }
+    else
+  {
+    fprintf(out, "  mov %s, w0\n", dst);
+  }
+  fprintf(out, "  asr w0, #1, w0\n");
+  fprintf(out, "  xor #3, w0\n");
+  fprintf(out, "  and #1, %s\n", dst);
+  fprintf(out, "  xor #7, %s\n", dst);
+  fprintf(out, "  asl #2, %s\n", dst);
+  fprintf(out, "  ior %s, w0\n", dst);
+  fprintf(out, "  ior SPI0CON1\n");
+
+  fprintf(out, "  mov #(1<<SPIEN), w0\n");
+  fprintf(out, "  ior SPI1STAT\n");
 
   return -1;
 }
 
 int DSPIC::spi_send(int port)
 {
-  return -1;
+char dst[16];
+
+  pop_reg(dst);
+  fprintf(out, "  mov %s, SPI1BUF\n", dst);
+
+  return 0;
 }
 
 int DSPIC::spi_read(int port)
 {
-  return -1;
+  if (reg < reg_max)
+  {
+    fprintf(out, "  mov SPI1BUF, w%d\n", REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  push SPI1BUF\n");
+    stack++;
+  }
+
+  return 0;
 }
 
 int DSPIC::spi_isDataAvailable(int port)
 {
-  return -1;
+  if (reg < reg_max)
+  {
+    fprintf(out, "  mov SPI1STAT, w%d\n", REG_STACK(reg));
+    fprintf(out, "  and #(1<<SPIRBF), w%d\n", REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  mov SPI1STAT, w0\n");
+    fprintf(out, "  and #(1<<SPIRBF), w0\n");
+    fprintf(out, "  push w0\n");
+    stack++;
+  }
+
+  return 0;
 }
 
 int DSPIC::spi_isBusy(int port)
 {
-  return -1;
+  if (reg < reg_max)
+  {
+    fprintf(out, "  mov SPI1STAT, w%d\n", REG_STACK(reg));
+    fprintf(out, "  and #(1<<SPITBF), w%d\n", REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  mov SPI1STAT, w0\n");
+    fprintf(out, "  and #(1<<SPITBF), w0\n");
+    fprintf(out, "  push w0\n");
+    stack++;
+  }
+
+  return 0;
 }
 
 int DSPIC::spi_disable(int port)
 {
-  return -1;
+  fprintf(out, "  mov #0xffff^(1<<SPIEN), w0\n");
+  fprintf(out, "  and SPI1STAT\n");
+  return 0;
 }
 
 int DSPIC::spi_enable(int port)
 {
-  return -1;
+  fprintf(out, "  mov #(1<<SPIEN), w0\n");
+  fprintf(out, "  ior SPI1STAT\n");
+  return 0;
 }
 
 

@@ -20,8 +20,10 @@ grind: tests
 	naken_asm -I /storage/git/naken_asm/include/msp430 -l out.asm
 
 dsp: tests
-	./java_grinder testing/DSPTest.class out.asm dspic33fj06gs101a
-	naken_asm -l -I /storage/git/naken_asm/include out.asm
+	./java_grinder testing/LedBlink.class led_blink.asm dspic33fj06gs101a
+	naken_asm -l -I /storage/git/naken_asm/include -o led_blink.hex led_blink.asm
+	./java_grinder testing/LCDDSPIC.class lcd_blink.asm dspic33fj06gs101a
+	naken_asm -l -I /storage/git/naken_asm/include -o lcd_dspic.hex lcd_blink.asm
 
 clean:
 	@rm -f *.o java_grinder build/*.o *.asm *.lst *.hex

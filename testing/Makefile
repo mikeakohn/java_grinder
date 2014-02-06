@@ -4,6 +4,7 @@ JOBJS=Testing.class \
       DSPTest.class \
       LedBlink.class \
       LCD.class \
+      LCDDSPIC.class \
       MemoryTest.class \
       MethodCall.class \
       SPITest.class
