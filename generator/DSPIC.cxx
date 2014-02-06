@@ -409,11 +409,11 @@ int DSPIC::jump_cond(const char *label, int cond)
   if (stack > 0)
   {
     fprintf(out, "  mov [SP-2], w0\n");
-    fprintf(out, "  cp #0, w0\n");
+    fprintf(out, "  cp0 w0\n");
   }
     else
   {
-    fprintf(out, "  cp #0, w%d\n", reg);
+    fprintf(out, "  cp0 w%d\n", reg);
   }
 
   fprintf(out, "  bra %s, %s\n", cond_str[cond], label);
@@ -529,12 +529,12 @@ int n;
   {
     if (stack_vars > 0)
     {
-      fprintf(out, "  mov %d(SP), %d(SP)\n", stack_vars, local-4);
+      fprintf(out, "  mov [SP%d], [SP%d]\n", stack_vars, local-4);
       stack_vars--;
     }
       else
     {
-      fprintf(out, "  mov w%d, %d(SP)\n", REG_STACK(reg_vars-1), local-4);
+      fprintf(out, "  mov w%d, [SP%d]\n", REG_STACK(reg_vars-1), local-4);
       reg_vars--;
     }
 
@@ -696,7 +696,7 @@ char dst[16];
   }
 
   fprintf(out, "  mov #(1<<MSTEN), w0\n");
-  fprintf(out, "  mov w0, SPI0CON1\n");
+  fprintf(out, "  mov w0, SPI1CON1\n");
   pop_reg(dst);
   if (strcmp(dst, "w0") == 0)
   {
@@ -708,13 +708,13 @@ char dst[16];
     fprintf(out, "  mov %s, w0\n", dst);
   }
   fprintf(out, "  and #2, w0\n");
-  fprintf(out, "  asl #5, w0\n");
+  fprintf(out, "  sl w0, #5, w0\n");
   fprintf(out, "  and #1, %s\n", dst);
-  fprintf(out, "  asl #8, %s\n", dst);
-  fprintf(out, "  ior %s, w0\n", dst);
-  fprintf(out, "  asl #1, %s\n", dst);
-  fprintf(out, "  ior %s, w0\n", dst);
-  fprintf(out, "  ior SPI0CON1\n");
+  fprintf(out, "  sl %s, #8, %s\n", dst, dst);
+  fprintf(out, "  ior %s, w0, w0\n", dst);
+  fprintf(out, "  sl %s, #1, %s\n", dst, dst);
+  fprintf(out, "  ior %s, w0, w0\n", dst);
+  fprintf(out, "  ior SPI1CON1\n");
 
   pop_reg(dst);
   fprintf(out, "  ; primary_prescale=(div>>1)&0x3\n");
@@ -732,14 +732,14 @@ char dst[16];
   fprintf(out, "  xor #3, w0\n");
   fprintf(out, "  and #1, %s\n", dst);
   fprintf(out, "  xor #7, %s\n", dst);
-  fprintf(out, "  asl #2, %s\n", dst);
-  fprintf(out, "  ior %s, w0\n", dst);
-  fprintf(out, "  ior SPI0CON1\n");
+  fprintf(out, "  sl %s, #2, %s\n", dst, dst);
+  fprintf(out, "  ior %s, w0, w0\n", dst);
+  fprintf(out, "  ior SPI1CON1\n");
 
   fprintf(out, "  mov #(1<<SPIEN), w0\n");
   fprintf(out, "  ior SPI1STAT\n");
 
-  return -1;
+  return 0;
 }
 
 int DSPIC::spi_send(int port)
@@ -1266,7 +1266,7 @@ int DSPIC::stack_alu(const char *instr, bool is_divide)
   if (stack == 0)
   {
     if (is_divide) { fprintf(out, "  repeat #17\n"); }
-    fprintf(out, "  %s.w w%d, w%d\n", instr, REG_STACK(reg-1), REG_STACK(reg-2));
+    fprintf(out, "  %s.w w%d, w%d, w%d\n", instr, REG_STACK(reg-1), REG_STACK(reg-2), REG_STACK(reg-2));
     reg--;
   }
     else
@@ -1274,7 +1274,7 @@ int DSPIC::stack_alu(const char *instr, bool is_divide)
   {
     fprintf(out, "  pop w0\n");
     if (is_divide) { fprintf(out, "  repeat #17\n"); }
-    fprintf(out, "  %s.w w0, w%d\n", instr, REG_STACK(reg-1));
+    fprintf(out, "  %s.w w0, w%d, w%d\n", instr, REG_STACK(reg-1), REG_STACK(reg-1));
     stack--;
   }
     else
