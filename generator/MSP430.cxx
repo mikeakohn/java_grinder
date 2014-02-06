@@ -91,70 +91,56 @@ MSP430::~MSP430()
   {
     fprintf(out, "; _mul a * b\n");
     fprintf(out, "_mul_integers:\n");
-    // save ret value in r10
-    fprintf(out, "  pop r10\n");
-    fprintf(out, "  pop r12\n");
-    fprintf(out, "  pop r13\n");
-    fprintf(out, "  clr r14\n");
-    fprintf(out, "  mov r14, r15\n");
-    fprintf(out, "  mov r14, r11\n");
-    fprintf(out, "  tst r12\n");
+    fprintf(out, "  clr r7\n");
+    fprintf(out, "  mov r7, r15\n");
+    fprintf(out, "  mov r7, r6\n");
+    fprintf(out, "  tst r4\n");
     fprintf(out, "  jge _mul2\n");
-    fprintf(out, "  mov #-1, r11\n");
+    fprintf(out, "  mov #-1, r6\n");
     fprintf(out, "  jmp _mul2\n");
     fprintf(out, "_mul6:\n");
-    fprintf(out, "  add r12, r15\n");
-    fprintf(out, "  addc r11, r14\n");
+    fprintf(out, "  add r4, r15\n");
+    fprintf(out, "  addc r6, r7\n");
     fprintf(out, "_mul1:\n");
-    fprintf(out, "  rla r12\n");
-    fprintf(out, "  rlc r11\n");
+    fprintf(out, "  rla r4\n");
+    fprintf(out, "  rlc r6\n");
     fprintf(out, "_mul2:\n");
-    fprintf(out, "  rra r13\n");
+    fprintf(out, "  rra r5\n");
     fprintf(out, "  jc _mul5\n");
     fprintf(out, "  jne _mul1\n");
     fprintf(out, "  jmp _mul4\n");
     fprintf(out, "_mul5:\n");
-    fprintf(out, "  sub r12, r15\n");
-    fprintf(out, "  subc r11, r14\n");
+    fprintf(out, "  sub r4, r15\n");
+    fprintf(out, "  subc r6, r7\n");
     fprintf(out, "_mul3:\n");
-    fprintf(out, "  rla r12\n");
-    fprintf(out, "  rlc r11\n");
-    fprintf(out, "  rra r13\n");
+    fprintf(out, "  rla r4\n");
+    fprintf(out, "  rlc r6\n");
+    fprintf(out, "  rra r5\n");
     fprintf(out, "  jnc _mul6\n");
-    fprintf(out, "  cmp #0FFFFh, r13\n");
+    fprintf(out, "  cmp #0FFFFh, r5\n");
     fprintf(out, "  jne _mul3\n");
     fprintf(out, "_mul4:\n");
-    // restore ret value
-    fprintf(out, "  push r10\n");
+    fprintf(out, "  mov r15, r4\n");
     fprintf(out, "  ret\n\n");
   }
 
   if (need_div_integers)
   {
-    fprintf(out, "; _div a / b (remainder in r14)\n");
+    fprintf(out, "; _div a / b (remainder in r7)\n");
     fprintf(out, "_div_integers:\n");
-    // save ret value in r10
-    fprintf(out, "  pop r10\n");
-    fprintf(out, "  pop r12\n");
-    fprintf(out, "  pop r13\n");
-    fprintf(out, "  mov #16, r11\n");
-    fprintf(out, "  clr r14\n");
-
+    fprintf(out, "  mov #16, r6\n");
+    fprintf(out, "  clr r7\n");
     fprintf(out, "_div1:\n");
-    fprintf(out, "  rla r12\n");
-    fprintf(out, "  rlc r14\n");
-    fprintf(out, "  bis #1, r12\n");
-    fprintf(out, "  sub r13, r14\n");
+    fprintf(out, "  rla r4\n");
+    fprintf(out, "  rlc r7\n");
+    fprintf(out, "  bis #1, r4\n");
+    fprintf(out, "  sub r5, r7\n");
     fprintf(out, "  jge _div2\n");
-    fprintf(out, "  add r13, r14\n");
-    fprintf(out, "  bic #1, r12\n");
-
+    fprintf(out, "  add r5, r7\n");
+    fprintf(out, "  bic #1, r4\n");
     fprintf(out, "_div2:\n");
-    fprintf(out, "  dec r11\n");
+    fprintf(out, "  dec r6\n");
     fprintf(out, "  jnz _div1\n");
-    fprintf(out, "  mov r12, r15\n");
-    // restore ret value
-    fprintf(out, "  push r10\n");
     fprintf(out, "  ret\n");
   }
 
@@ -402,44 +388,51 @@ int MSP430::sub_integers()
 
 int MSP430::mul_integers()
 {
-  fprintf(out, "  push r10\n");
-  fprintf(out, "  push r11\n");
-  fprintf(out, "  push r12\n");
-  fprintf(out, "  push r13\n");
-  fprintf(out, "  push r14\n");
-  fprintf(out, "  push r15\n");
+int n;
+int saved_registers;
+
+  saved_registers = reg;
+
+  if(saved_registers != 2)
+  {
+    for (n = 0; n < reg; n++)
+    {
+      fprintf(out, "  push r%d\n", REG_STACK(n));
+    }
+  }
 
   if (stack == 0)
   {
-    fprintf(out, "  push r%d\n", REG_STACK(reg-1));
-    fprintf(out, "  push r%d\n", REG_STACK(reg-2));
+    if(saved_registers != 2)
+    {
+      fprintf(out, "  mov r%d, r5\n", REG_STACK(reg-1));
+      fprintf(out, "  mov r%d, r4\n", REG_STACK(reg-2));
+    }
     fprintf(out, "  call #_mul_integers\n");
-    fprintf(out, "  mov r15, r%d\n", REG_STACK(reg-2));
     reg--;
   }
     else
   if (stack == 1)
   {
-    fprintf(out, "  pop r15\n");
-    fprintf(out, "  push r15\n");
-    fprintf(out, "  push r%d\n", REG_STACK(reg-1));
+    fprintf(out, "  mov r15, r5\n");
+    fprintf(out, "  mov r%d, r4\n", REG_STACK(reg-1));
     fprintf(out, "  call #_mul_integers\n");
     stack--;
   }
     else
   {
-    fprintf(out, "  pop r15\n");
-    fprintf(out, "  push r15\n");
-    fprintf(out, "  push @SP\n");
+    fprintf(out, "  mov r15, r5\n");
+    fprintf(out, "  mov @SP, r4\n");
     fprintf(out, "  call #_mul_integers\n");
   }
 
-  fprintf(out, "  pop r15\n");
-  fprintf(out, "  pop r14\n");
-  fprintf(out, "  pop r13\n");
-  fprintf(out, "  pop r12\n");
-  fprintf(out, "  pop r11\n");
-  fprintf(out, "  pop r10\n");
+  if(saved_registers != 2)
+  {
+    for (n = saved_registers-1; n >= 0; n--)
+    {
+      fprintf(out, "  pop r%d\n", REG_STACK(n));
+    }
+  }
 
   need_mul_integers = 1;
 
@@ -448,44 +441,51 @@ int MSP430::mul_integers()
 
 int MSP430::div_integers()
 {
-  fprintf(out, "  push r10\n");
-  fprintf(out, "  push r11\n");
-  fprintf(out, "  push r12\n");
-  fprintf(out, "  push r13\n");
-  fprintf(out, "  push r14\n");
-  fprintf(out, "  push r15\n");
+int n;
+int saved_registers;
+
+  saved_registers = reg;
+
+  if(saved_registers != 2)
+  {
+    for (n = 0; n < saved_registers; n++)
+    {
+      fprintf(out, "  push r%d\n", REG_STACK(n));
+    }
+  }
 
   if (stack == 0)
   {
-    fprintf(out, "  push r%d\n", REG_STACK(reg-1));
-    fprintf(out, "  push r%d\n", REG_STACK(reg-2));
+    if(saved_registers != 2)
+    {
+      fprintf(out, "  mov r%d, r5\n", REG_STACK(reg-1));
+      fprintf(out, "  mov r%d, r4\n", REG_STACK(reg-2));
+    }
     fprintf(out, "  call #_div_integers\n");
-    fprintf(out, "  mov r15, r%d\n", REG_STACK(reg-2));
     reg--;
   }
     else
   if (stack == 1)
   {
-    fprintf(out, "  pop r15\n");
-    fprintf(out, "  push r15\n");
-    fprintf(out, "  push r%d\n", REG_STACK(reg-1));
+    fprintf(out, "  mov r15, r5\n");
+    fprintf(out, "  mov r%d, r4\n", REG_STACK(reg-1));
     fprintf(out, "  call #_div_integers\n");
     stack--;
   }
     else
   {
-    fprintf(out, "  pop r15\n");
-    fprintf(out, "  push r15\n");
-    fprintf(out, "  push @SP\n");
+    fprintf(out, "  mov r15, r5\n");
+    fprintf(out, "  mov @SP, r4\n");
     fprintf(out, "  call #_div_integers\n");
   }
 
-  fprintf(out, "  pop r15\n");
-  fprintf(out, "  pop r14\n");
-  fprintf(out, "  pop r13\n");
-  fprintf(out, "  pop r12\n");
-  fprintf(out, "  pop r11\n");
-  fprintf(out, "  pop r10\n");
+  if(saved_registers != 2)
+  {
+    for (n = saved_registers-1; n >= 0; n--)
+    {
+      fprintf(out, "  pop r%d\n", REG_STACK(n));
+    }
+  }
 
   need_div_integers = 1;
 
