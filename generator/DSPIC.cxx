@@ -610,7 +610,7 @@ int DSPIC::ioport_setPinsAsOutput(int port)
 int DSPIC::ioport_setPinsValue(int port)
 {
   char periph[32];
-  sprintf(periph, "PORT%c", port+'A');
+  sprintf(periph, "LAT%c", port+'A');
 
   if (stack == 0)
   {
@@ -630,14 +630,14 @@ int DSPIC::ioport_setPinsValue(int port)
 int DSPIC::ioport_setPinsHigh(int port)
 {
   char periph[32];
-  sprintf(periph, "PORT%c", port+'A');
+  sprintf(periph, "LAT%c", port+'A');
   return set_periph("ior", periph);
 }
 
 int DSPIC::ioport_setPinsLow(int port)
 {
   char periph[32];
-  sprintf(periph, "PORT%c", port+'A');
+  sprintf(periph, "LAT%c", port+'A');
   return set_periph("and", periph, true);
 }
 
@@ -808,15 +808,13 @@ int DSPIC::spi_isBusy(int port)
 
 int DSPIC::spi_disable(int port)
 {
-  fprintf(out, "  mov #0xffff^(1<<SPIEN), w0\n");
-  fprintf(out, "  and SPI1STAT\n");
+  fprintf(out, "  bclr SPI1STAT, #SPIEN\n");
   return 0;
 }
 
 int DSPIC::spi_enable(int port)
 {
-  fprintf(out, "  mov #(1<<SPIEN), w0\n");
-  fprintf(out, "  ior SPI1STAT\n");
+  fprintf(out, "  bset SPI1STAT, #SPIEN\n");
   return 0;
 }
 
