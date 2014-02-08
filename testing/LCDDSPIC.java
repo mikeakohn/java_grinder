@@ -2,6 +2,7 @@
 import net.mikekohn.java_grinder.SPI0;
 import net.mikekohn.java_grinder.CPU;
 import net.mikekohn.java_grinder.IOPort1;
+import net.mikekohn.java_grinder.DSP;
 
 // Unfortunately this has to be different than the MSP430 since
 // different pins are being used to do this.
@@ -168,37 +169,57 @@ public class LCDDSPIC
   static void mandel(int rs, int re, int is, int ie)
   {
     int zi,zr;
-    int tr,ti;
-    int dx=(re-rs)/60;
-    int dy=(ie-is)/22;
-    int rs_save=rs;
+    //int tr,ti;
+    int dx = (re - rs) / 60;
+    int dy = (ie - is) / 22;
+    int rs_save = rs;
     int count;
     int x,y;
+    int t;
 
-    for (y=0; y<22; y++)
+    for (y = 0; y < 22; y++)
     {
-      rs=rs_save;
-      for (x=0; x<60; x++)
+      rs = rs_save;
+      for (x = 0; x < 60; x++)
       {
-        zr=0;
-        zi=0;
+        zr = 0;
+        zi = 0;
+        //DSP.clearA();
+        //DSP.clearB();
 
-        for (count=0; count<256; count++)
+        count = 255;
+        while(count >= 0)
         {
-          tr=((zr*zr)>>8)-((zi*zi)>>8);
-          ti=2*((zr*zi)>>8);
-          if (((tr*tr)>>8)+((ti*ti)>>8)>4<<8) { break; }
-          zr=tr+rs;
-          zi=ti+is;
+          //tr = ((zr * zr) >> 8) - ((zi * zi) >> 8);
+          DSP.squareToA(zr);
+          DSP.squareToB(zi);
+          DSP.subABAndStoreInA();
+
+          //ti = 2 * ((zr * zi) >> 8);
+          DSP.mulToB(zr,zi);
+          DSP.shiftB(-1);
+
+          //zr = tr + rs;
+          //zi = ti + is;
+          zr = DSP.getLowerA() + rs;
+          zi = DSP.getLowerB() + is;
+
+          //if (((tr * tr) >> 8) + ((ti * ti) >> 8) > 4 << 8) { break; }
+          DSP.squareToA(zr);
+          DSP.squareAndAddToA(zi);
+          t = DSP.getLowerA();
+          if (t > 4 << 8) { break; }
+
+          count--;
         }
 
-        System.out.print(count/32);
-        rs+=dx;
+        System.out.print(count / 32);
+        rs += dx;
       }
 
       System.out.println();
 
-      is+=dy;
+      is += dy;
     }
   }
 

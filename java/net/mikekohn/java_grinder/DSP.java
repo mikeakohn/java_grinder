@@ -151,7 +151,8 @@ abstract public class DSP
   /** Euclidean distance added to B */
   //public static void euclideanDistanceAndAddToB(int n, int m) { }
 
-  /** Arithmetic shift accumulator A (-16 to 16 bits only) */
+  /** Arithmetic shift accumulator A (-16 to 16 bits only).
+      Negative n means shift left, positive is shift right. */
   public static void shiftA(int n)
   {
     if (n > 0 && n <= 16) { A = A >> n; }
