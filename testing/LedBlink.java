@@ -11,13 +11,20 @@ public class LedBlink
 
     while(true)
     {
-      IOPort0.setPinsValue(2);
-      for (n = 0; n < 16738; n++);
-      //delay();
-      IOPort0.setPinsValue(1);
-      for (n = 0; n < 16738; n++);
-      //delay();
+      setLeds(2,0);
+      //IOPort0.setPinsValue(2);
+      //for (n = 0; n < 16738; n++);
+      delay();
+      setLeds(1,0);
+      //IOPort0.setPinsValue(1);
+      //for (n = 0; n < 16738; n++);
+      delay();
     }
+  }
+
+  static public void setLeds(int n, int a)
+  {
+    IOPort0.setPinsValue(n);
   }
 
   // Since the default speed on the dsPIC I'm using is so much faster than

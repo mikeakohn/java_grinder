@@ -52,7 +52,8 @@ DSPIC::DSPIC(uint8_t chip_type) :
 
 DSPIC::~DSPIC()
 {
-
+  fprintf(out, ".org __FICD\n");
+  fprintf(out, "  dc32 0xffcf\n");
 }
 
 int DSPIC::open(char *filename)
@@ -110,7 +111,7 @@ void DSPIC::method_start(int local_count, const char *name)
     //fprintf(out, "  push w14\n");
     //fprintf(out, "  mov sp, w14\n");
     //fprintf(out, "  add #0x%x, sp\n", local_count * 2);
-    fprintf(out, "  lnk #0x%x\n", local_count * 2);
+    if (local_count != 0) { fprintf(out, "  lnk #0x%x\n", local_count * 2); }
   }
     else
   {
@@ -413,7 +414,7 @@ int DSPIC::jump_cond(const char *label, int cond)
   }
     else
   {
-    fprintf(out, "  cp0 w%d\n", reg);
+    fprintf(out, "  cp0 w%d\n", REG_STACK(reg-1));
   }
 
   fprintf(out, "  bra %s, %s\n", cond_str[cond], label);
@@ -474,7 +475,7 @@ int DSPIC::return_integer(int local_count)
     fprintf(out, "  mov w%d, w0\n", REG_STACK(reg - 1));
   }
 
-  fprintf(out, "  ulnk\n");
+  if (local_count != 0) { fprintf(out, "  ulnk\n"); }
   //fprintf(out, "  mov w14, sp\n");
   //if (!is_main) { fprintf(out, "  pop w14\n"); }
   fprintf(out, "  return\n");
@@ -485,7 +486,7 @@ int DSPIC::return_void(int local_count)
 {
   //fprintf(out, "  mov w14, sp\n");
   //if (!is_main) { fprintf(out, "  pop w14\n"); }
-  fprintf(out, "  ulnk\n");
+  if (local_count != 0) { fprintf(out, "  ulnk\n"); }
   fprintf(out, "  return\n");
 
   return 0;
@@ -524,21 +525,21 @@ int n;
   // Copy parameters onto the stack so they are local variables in
   // the called method.  Start with -4 because the return address will
   // be at 0 and w14 will be at 2.
-  local = (params * -2);
-  while(local != 0)
+  local = (params * 2);
+  while(local > 0)
   {
     if (stack_vars > 0)
     {
-      fprintf(out, "  mov [SP%d], [SP%d]\n", stack_vars, local-4);
+      fprintf(out, "  mov [SP%d], [SP+%d]\n", stack_vars, local+4);
       stack_vars--;
     }
       else
     {
-      fprintf(out, "  mov w%d, [SP%d]\n", REG_STACK(reg_vars-1), local-4);
+      fprintf(out, "  mov w%d, [SP+%d]\n", REG_STACK(reg_vars-1), local+4);
       reg_vars--;
     }
 
-    local += 2;
+    local -= 2;
   }
 
   // Make the call
@@ -682,17 +683,17 @@ char dst[16];
   // This chip needs the RP pins set.
   if (chip_type == DSPIC33FJ06GS101A)
   {
-    fprintf(out, "  ; SDI is on RP3\n");
-    fprintf(out, "  mov #SDI1R3, w0\n");
+    fprintf(out, "  ; SDI is on RP2\n");
+    fprintf(out, "  mov #SDI1R2, w0\n");
     fprintf(out, "  mov w0, RPINR20\n");
 
-    fprintf(out, "  ; SDO is on RP2\n");
-    fprintf(out, "  mov #0x7, w0\n");
-    fprintf(out, "  mov w0, RPOR2\n");
+    fprintf(out, "  ; SDO is on RP3\n");
+    fprintf(out, "  mov #(0x7<<8), w0\n");
+    fprintf(out, "  mov w0, RPOR1     ; controls RP2, RP3\n");
 
     fprintf(out, "  ; SCLK is on RP1\n");
-    fprintf(out, "  mov #0x8, w0\n");
-    fprintf(out, "  mov w0, RPOR1\n");
+    fprintf(out, "  mov #(0x8<<8), w0\n");
+    fprintf(out, "  mov w0, RPOR0     ; controls RP0, RP1\n");
   }
 
   fprintf(out, "  mov #(1<<MSTEN), w0\n");
@@ -768,7 +769,7 @@ int DSPIC::spi_read(int port)
   return 0;
 }
 
-int DSPIC::spi_isDataAvailable(int port)
+int DSPIC::spi_is_data_available(int port)
 {
   if (reg < reg_max)
   {
@@ -787,7 +788,7 @@ int DSPIC::spi_isDataAvailable(int port)
   return 0;
 }
 
-int DSPIC::spi_isBusy(int port)
+int DSPIC::spi_is_busy(int port)
 {
   if (reg < reg_max)
   {
@@ -817,7 +818,6 @@ int DSPIC::spi_enable(int port)
   fprintf(out, "  bset SPI1STAT, #SPIEN\n");
   return 0;
 }
-
 
 // CPU functions
 int DSPIC::cpu_setClock16()

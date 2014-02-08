@@ -88,8 +88,8 @@ public:
   virtual int spi_init(int port) { return -1; }
   virtual int spi_send(int port) { return -1; }
   virtual int spi_read(int port) { return -1; }
-  virtual int spi_isDataAvailable(int port) { return -1; }
-  virtual int spi_isBusy(int port) { return -1; }
+  virtual int spi_is_data_available(int port) { return -1; }
+  virtual int spi_is_busy(int port) { return -1; }
   virtual int spi_disable(int port) { return -1; }
   virtual int spi_enable(int port) { return -1; }
 

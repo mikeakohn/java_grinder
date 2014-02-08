@@ -85,8 +85,8 @@ public:
   virtual int spi_init(int port);
   virtual int spi_send(int port);
   virtual int spi_read(int port);
-  virtual int spi_isDataAvailable(int port);
-  virtual int spi_isBusy(int port);
+  virtual int spi_is_data_available(int port);
+  virtual int spi_is_busy(int port);
   virtual int spi_disable(int port);
   virtual int spi_enable(int port);
 
