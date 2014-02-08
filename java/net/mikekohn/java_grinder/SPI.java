@@ -43,7 +43,7 @@ abstract public class SPI
   /** send and receive a byte */
   public static int send(int c)
   {
-    System.out.println("Sent char " + c);
+    //System.out.println("Sent char " + c);
     return 0;
   }
 
@@ -56,7 +56,7 @@ abstract public class SPI
   /** Returns true if data is available on the SPI bus. */
   public static boolean isDataAvailable()
   {
-    return false;
+    return true;
   }
 
   /** Returns true if data is being transfered on the SPI bus. */
