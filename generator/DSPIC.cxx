@@ -329,7 +329,7 @@ int DSPIC::mul_integers()
 
 int DSPIC::div_integers()
 {
-  stack_alu("div.s", true);
+  stack_alu_div();
 
   // Result of divide is in w0
   if (stack > 0) { fprintf(out, "  mov.w w0, [SP-2]\n"); }
@@ -340,7 +340,7 @@ int DSPIC::div_integers()
 
 int DSPIC::mod_integers()
 {
-  stack_alu("div.s", true);
+  stack_alu_div();
 
   // Remainder of divide is in w1
   if (stack > 0) { fprintf(out, "  mov.w w1, [SP-2]\n"); }
@@ -378,7 +378,7 @@ int DSPIC::shift_right_integer()
 
 int DSPIC::shift_right_uinteger()
 {
-  return stack_shift("lr");
+  return stack_shift("lsr");
 }
 
 int DSPIC::and_integer()
@@ -388,7 +388,7 @@ int DSPIC::and_integer()
 
 int DSPIC::or_integer()
 {
-  return stack_alu("or");
+  return stack_alu("ior");
 }
 
 int DSPIC::xor_integer()
@@ -398,8 +398,18 @@ int DSPIC::xor_integer()
 
 int DSPIC::inc_integer(int index, int num)
 {
+int8_t n = (int8_t)num;
+
   fprintf(out, "  mov [w14+%d], w0\n", LOCALS(index));
-  fprintf(out, "  add w0, #%d, w0\n", num);
+  if (n >= 0)
+  {
+    fprintf(out, "  add #%d, w0\n", n);
+  }
+    else
+  {
+    fprintf(out, "  sub #%d, w0\n", -n);
+  }
+
   fprintf(out, "  mov w0, [w14+%d]\n", LOCALS(index));
 
   return 0;
@@ -409,12 +419,15 @@ int DSPIC::jump_cond(const char *label, int cond)
 {
   if (stack > 0)
   {
-    fprintf(out, "  mov [SP-2], w0\n");
+    //fprintf(out, "  mov [SP-2], w0\n");
+    fprintf(out, "  pop w0\n");
     fprintf(out, "  cp0 w0\n");
+    stack--;
   }
     else
   {
     fprintf(out, "  cp0 w%d\n", REG_STACK(reg-1));
+    reg--;
   }
 
   fprintf(out, "  bra %s, %s\n", cond_str[cond], label);
@@ -1259,11 +1272,10 @@ int DSPIC::set_periph(const char *instr, const char *periph, bool reverse)
   return 0;
 }
 
-int DSPIC::stack_alu(const char *instr, bool is_divide)
+int DSPIC::stack_alu(const char *instr)
 {
   if (stack == 0)
   {
-    if (is_divide) { fprintf(out, "  repeat #17\n"); }
     fprintf(out, "  %s.w w%d, w%d, w%d\n", instr, REG_STACK(reg-1), REG_STACK(reg-2), REG_STACK(reg-2));
     reg--;
   }
@@ -1271,15 +1283,39 @@ int DSPIC::stack_alu(const char *instr, bool is_divide)
   if (stack == 1)
   {
     fprintf(out, "  pop w0\n");
-    if (is_divide) { fprintf(out, "  repeat #17\n"); }
     fprintf(out, "  %s.w w0, w%d, w%d\n", instr, REG_STACK(reg-1), REG_STACK(reg-1));
     stack--;
   }
     else
   {
     fprintf(out, "  pop w0\n");
-    if (is_divide) { fprintf(out, "  repeat #17\n"); }
     fprintf(out, "  %s.w w0, [SP-2]\n", instr);
+  }
+
+  return 0;
+}
+
+int DSPIC::stack_alu_div()
+{
+  if (stack == 0)
+  {
+    fprintf(out, "  repeat #17\n");
+    fprintf(out, "  div.s w%d, w%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+    reg--;
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  pop w0\n");
+    fprintf(out, "  repeat #17\n");
+    fprintf(out, "  div.s w0, w%d\n", REG_STACK(reg-1));
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  pop w0\n");
+    fprintf(out, "  repeat #17\n");
+    fprintf(out, "  div.s w0, [SP-2]\n");
   }
 
   return 0;

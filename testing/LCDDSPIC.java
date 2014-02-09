@@ -1,6 +1,7 @@
 
 import net.mikekohn.java_grinder.SPI0;
 import net.mikekohn.java_grinder.CPU;
+import net.mikekohn.java_grinder.IOPort0;
 import net.mikekohn.java_grinder.IOPort1;
 import net.mikekohn.java_grinder.DSP;
 
@@ -116,6 +117,7 @@ public class LCDDSPIC
 
     clearDisplay();
     mandel(-2<<8, 1<<8, -1<<8, 1<<8);
+    long_delay();
 
     while(true)
     {
@@ -170,17 +172,27 @@ public class LCDDSPIC
   {
     int zi,zr;
     //int tr,ti;
-    int dx = (re - rs) / 60;
-    int dy = (ie - is) / 22;
+    //int dx = (re - rs) / 126;
+    //int dy = (ie - is) / 126;
+    //-2<<8, 1<<8, -1<<8, 1<<8
+    int dx = ((-2<<8) - (1<<8)) / 126;
+    int dy = ((-1<<8) - (1<<8)) / 126;
     int rs_save = rs;
     int count;
     int x,y;
     int t;
+    int color = 0;
+    int pixel_num = 0;
 
-    for (y = 0; y < 22; y++)
+    setArea(0, 0, 125, 125);
+
+    IOPort0.setPinsAsOutput(0x3);
+    IOPort0.setPinsValue(0x0);
+
+    for (y = 0; y < 126; y++)
     {
       rs = rs_save;
-      for (x = 0; x < 60; x++)
+      for (x = 0; x < 126; x++)
       {
         zr = 0;
         zi = 0;
@@ -188,7 +200,8 @@ public class LCDDSPIC
         //DSP.clearB();
 
         count = 255;
-        while(count >= 0)
+        //t = 0;
+        while(count >= 0) // && t < 4 << 8)
         {
           //tr = ((zr * zr) >> 8) - ((zi * zi) >> 8);
           DSP.squareToA(zr);
@@ -213,11 +226,34 @@ public class LCDDSPIC
           count--;
         }
 
-        System.out.print(count / 32);
+        //System.out.print(count / 32);
+        if (count == 0) { color |= 0x000; pixel_num += 3; }
+        else { color |= 0xff0; pixel_num += 3; }
+
+        if (pixel_num == 3)
+        {
+          lcdData(color >>> 4);
+          //lcdData(0xff);
+          color = (color & 0xf) << 12;
+          pixel_num -= 2;
+          IOPort0.setPinsValue(0x1);
+        }
+          else
+        if (pixel_num == 4)
+        {
+          lcdData(color >>> 8);
+          lcdData(color & 0xff);
+          //lcdData(0x0f);
+          //lcdData(0xf0);
+          color = 0;
+          pixel_num = 0;
+          IOPort0.setPinsValue(0x2);
+        }
+
         rs += dx;
       }
 
-      System.out.println();
+      //System.out.println();
 
       is += dy;
     }
@@ -321,6 +357,15 @@ public class LCDDSPIC
     for (a = 0; a < 3; a++)
     {
       for (n = 0; n < 65535; n++) { }
+    }
+  }
+
+  public static void long_delay()
+  {
+    int n,a;
+    for (a = 0; a < 30; a++)
+    {
+      for (n = 0; n < 30000; n++) { }
     }
   }
 }
