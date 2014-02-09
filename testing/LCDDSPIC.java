@@ -172,11 +172,11 @@ public class LCDDSPIC
   {
     int zi,zr;
     //int tr,ti;
-    //int dx = (re - rs) / 126;
-    //int dy = (ie - is) / 126;
+    int dx = (re - rs) / 126;
+    int dy = (ie - is) / 126;
     //-2<<8, 1<<8, -1<<8, 1<<8
-    int dx = ((-2<<8) - (1<<8)) / 126;
-    int dy = ((-1<<8) - (1<<8)) / 126;
+    //int dx = ((1<<8) - (-2<<8)) / 126;
+    //int dy = ((1<<8) - (-1<<8)) / 126;
     int rs_save = rs;
     int count;
     int x,y;
@@ -201,7 +201,7 @@ public class LCDDSPIC
 
         count = 255;
         //t = 0;
-        while(count >= 0) // && t < 4 << 8)
+        while(count > 0) // && t < 4 << 8)
         {
           //tr = ((zr * zr) >> 8) - ((zi * zi) >> 8);
           DSP.squareToA(zr);
@@ -228,6 +228,7 @@ public class LCDDSPIC
 
         //System.out.print(count / 32);
         if (count == 0) { color |= 0x000; pixel_num += 3; }
+        else if (count == 255) { color |= 0x00f; pixel_num += 3; }
         else { color |= 0xff0; pixel_num += 3; }
 
         if (pixel_num == 3)
