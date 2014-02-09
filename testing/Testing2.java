@@ -5,6 +5,7 @@ public class Testing2
   {
   int c;
   int k = 5;
+  int a = -1;
 
     for (c = 0; c < 32; c++)
     {

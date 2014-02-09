@@ -23,6 +23,8 @@
 
 #define UNIMPL() printf("Opcode (%d) '%s' unimplemented\n", bytes[pc], table_java_instr[(int)bytes[pc]].name); ret = -1;
 
+//#define CONST_STACK_SIZE 4
+
 static void fill_label_map(uint8_t *label_map, int label_map_len, uint8_t *bytes, int code_len, int pc_start)
 {
 int pc = pc_start;
@@ -111,6 +113,9 @@ char label[16];
 char method_name[64];
 uint16_t *operand_stack;
 uint16_t operand_stack_ptr = 0;
+//uint32_t const_stack[CONST_STACK_SIZE];
+//int const_stack_ptr = 0;
+int const_val;
 
 
   if (java_class->get_method_name(method_name, sizeof(method_name), method_id) != 0)
@@ -164,7 +169,7 @@ printf("max_locals=%d\n", max_locals);
 printf("code_len=%d\n", code_len);
 #endif
 
-  while(1)
+  while(pc - pc_start < code_len)
   {
     int address = pc - pc_start;
 #ifdef DEBUG
@@ -188,17 +193,14 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 2: // iconst_m1 (0x02)
-        ret = generator->push_integer(-1);
-        pc++;
-        break;
-
       case 3: // iconst_0 (0x03)
       case 4: // iconst_1 (0x04)
       case 5: // iconst_2 (0x05)
       case 6: // iconst_3 (0x06)
       case 7: // iconst_4 (0x07)
       case 8: // iconst_5 (0x08)
-        ret = generator->push_integer(bytes[pc]-3);
+        const_val = uint8_t(bytes[pc])-3;
+        ret = generator->push_integer(const_val);
         pc++;
         break;
 
@@ -1523,7 +1525,7 @@ printf("code_len=%d\n", code_len);
 #endif
 
     //printf("pc=%d opcode=%d (0x%02x)\n", pc - pc_start, bytes[pc], bytes[pc]);
-    if (pc - pc_start >= code_len) { break; }
+    //if (pc - pc_start >= code_len) { break; }
 
     wide = 0;
   }
