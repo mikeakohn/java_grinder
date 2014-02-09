@@ -122,6 +122,8 @@ public class LCDDSPIC
       long_delay();
       mandel(-1<<8, 1<<7, -1<<7, 1<<7);
       long_delay();
+      mandel(-2<<7, 0<<8, -1<<7, 0<<8);
+      long_delay();
       clearDisplay();
 
       for (t = 0; t < 500; t++)
@@ -205,7 +207,7 @@ public class LCDDSPIC
         //DSP.clearA();
         //DSP.clearB();
 
-        count = 255;
+        count = 127;
         //t = 0;
         while(count > 0) // && t < 4 << 8)
         {
@@ -232,8 +234,8 @@ public class LCDDSPIC
           count--;
         }
 
-        count = count >> 5;
-        System.out.print(count);
+        count = count >> 4;
+        //System.out.print(count);
 
         // This would be so much nicer as a lookup table, but we don't
         // support arrays yet.
@@ -271,7 +273,7 @@ public class LCDDSPIC
         rs += dx;
       }
 
-      System.out.println();
+      //System.out.println();
 
       is += dy;
     }
