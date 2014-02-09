@@ -71,7 +71,7 @@ public class LCDDSPIC
   {
     int x=60,y=30;
     int dx=1,dy=1;
-    int n;
+    int n,t;
     int del;
 
     // Set the DCO to 16MHz
@@ -115,56 +115,62 @@ public class LCDDSPIC
 
     delay();
 
-    clearDisplay();
-    mandel(-2<<8, 1<<8, -1<<8, 1<<8);
-    long_delay();
-
     while(true)
     {
-      // Draw a blue box
-      setArea(x, y, x+23, y+23);
-      for (n = 0; n < 24*24/2; n++)
+      clearDisplay();
+      mandel(-2<<8, 1<<8, -1<<8, 1<<8);
+      long_delay();
+      mandel(-1<<8, 1<<7, -1<<7, 1<<7);
+      long_delay();
+      clearDisplay();
+
+      for (t = 0; t < 500; t++)
       {
-        lcdData(0xf0);
-        lcdData(0x0f);
-        lcdData(0x00);
+        // Draw a blue box
+        setArea(x, y, x+23, y+23);
+        for (n = 0; n < 24*24/2; n++)
+        {
+          lcdData(0xf0);
+          lcdData(0x0f);
+          lcdData(0x00);
+        }
+
+        // FIXME - this fails for some reason.
+        //del = (dx == 1) ? x : x+23;
+        if (dx == 1) { del = x; }
+        else { del = x+23; }
+
+        setArea(del, y, del, y+23);
+        for (n = 0; n < 24/2; n++)
+        {
+          lcdData(0x0f);
+          lcdData(0x00);
+          lcdData(0xf0);
+        }
+
+        // FIXME - this fails for some reason.
+        //del = (dy == 1) ? y : y+23;
+        if (dy == 1) { del = y; }
+        else { del = y+23; }
+
+        setArea(x, del, x+23, del);
+        for (n = 0; n < 24/2; n++)
+        {
+          lcdData(0x0f);
+          lcdData(0x00);
+          lcdData(0xf0);
+        }
+
+        // Move the box by 1 pixel
+        x += dx;
+        y += dy;
+
+        // If bounds are hit, change the direction of the box.
+        if (x >= 131-30) { dx = -1; }
+        if (y >= 133-30) { dy = -1; }
+        if (x == 0) { dx = 1; }
+        if (y == 0) { dy = 1; }
       }
-
-      // FIXME - this fails for some reason.
-      //del = (dx == 1) ? x : x+23;
-      if (dx == 1) { del = x; }
-      else { del = x+23; }
-
-      setArea(del, y, del, y+23);
-      for (n = 0; n < 24/2; n++)
-      {
-        lcdData(0x0f);
-        lcdData(0x00);
-        lcdData(0xf0);
-      }
-
-      // FIXME - this fails for some reason.
-      //del = (dy == 1) ? y : y+23;
-      if (dy == 1) { del = y; }
-      else { del = y+23; }
-
-      setArea(x, del, x+23, del);
-      for (n = 0; n < 24/2; n++)
-      {
-        lcdData(0x0f);
-        lcdData(0x00);
-        lcdData(0xf0);
-      }
-
-      // Move the box by 1 pixel
-      x += dx;
-      y += dy;
-
-      // If bounds are hit, change the direction of the box.
-      if (x >= 131-30) { dx = -1; }
-      if (y >= 133-30) { dy = -1; }
-      if (x == 0) { dx = 1; }
-      if (y == 0) { dy = 1; }
     }
   }
 
@@ -226,10 +232,21 @@ public class LCDDSPIC
           count--;
         }
 
-        //System.out.print(count / 32);
-        if (count == 0) { color |= 0x000; pixel_num += 3; }
-        else if (count == 255) { color |= 0x00f; pixel_num += 3; }
-        else { color |= 0xff0; pixel_num += 3; }
+        count = count >> 5;
+        System.out.print(count);
+
+        // This would be so much nicer as a lookup table, but we don't
+        // support arrays yet.
+        if (count == 0) { color |= 0x000; }
+        else if (count == 1) { color |= 0x0f0; }
+        else if (count == 2) { color |= 0xf00; }
+        else if (count == 3) { color |= 0xff0; }
+        else if (count == 4) { color |= 0x0ff; }
+        else if (count == 5) { color |= 0xf0f; }
+        else if (count == 6) { color |= 0x505; }
+        else { color |= 0xfff; }
+
+        pixel_num += 3;
 
         if (pixel_num == 3)
         {
@@ -254,7 +271,7 @@ public class LCDDSPIC
         rs += dx;
       }
 
-      //System.out.println();
+      System.out.println();
 
       is += dy;
     }
