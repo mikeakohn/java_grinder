@@ -1276,20 +1276,22 @@ int DSPIC::stack_alu(const char *instr)
 {
   if (stack == 0)
   {
-    fprintf(out, "  %s.w w%d, w%d, w%d\n", instr, REG_STACK(reg-1), REG_STACK(reg-2), REG_STACK(reg-2));
+    fprintf(out, "  %s.w w%d, w%d, w%d\n", instr, REG_STACK(reg-2), REG_STACK(reg-1), REG_STACK(reg-2));
     reg--;
   }
     else
   if (stack == 1)
   {
     fprintf(out, "  pop w0\n");
-    fprintf(out, "  %s.w w0, w%d, w%d\n", instr, REG_STACK(reg-1), REG_STACK(reg-1));
+    fprintf(out, "  %s.w w%d, w0, w%d\n", instr, REG_STACK(reg-1), REG_STACK(reg-1));
     stack--;
   }
     else
   {
     fprintf(out, "  pop w0\n");
-    fprintf(out, "  %s.w w0, [SP-2]\n", instr);
+    fprintf(out, "  pop w1\n");
+    fprintf(out, "  %s.w w1, w0, w0\n", instr);
+    fprintf(out, "  push w0\n");
   }
 
   return 0;
@@ -1300,7 +1302,7 @@ int DSPIC::stack_alu_div()
   if (stack == 0)
   {
     fprintf(out, "  repeat #17\n");
-    fprintf(out, "  div.s w%d, w%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+    fprintf(out, "  div.s w%d, w%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
     reg--;
   }
     else
@@ -1308,7 +1310,7 @@ int DSPIC::stack_alu_div()
   {
     fprintf(out, "  pop w0\n");
     fprintf(out, "  repeat #17\n");
-    fprintf(out, "  div.s w0, w%d\n", REG_STACK(reg-1));
+    fprintf(out, "  div.s w%d, w0\n", REG_STACK(reg-1));
     stack--;
   }
     else
