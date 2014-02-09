@@ -154,16 +154,19 @@ int DSPIC::push_integer(int32_t n)
 
 int DSPIC::push_integer_local(int index)
 {
-  fprintf(out, "  mov [w14+%d], w0\n", LOCALS(index));
 
   if (reg < reg_max)
   {
-    fprintf(out, "  mov w0, w%d\n", REG_STACK(reg));
+    //fprintf(out, "  mov [w14+%d], w0\n", LOCALS(index));
+    //fprintf(out, "  mov w0, w%d\n", REG_STACK(reg));
+    fprintf(out, "  mov [w14+%d], w%d\n", LOCALS(index), REG_STACK(reg));
     reg++;
   }
     else
   {
-    fprintf(out, "  push w0\n");
+    //fprintf(out, "  mov [w14+%d], w0\n", LOCALS(index));
+    //fprintf(out, "  push w0\n");
+    fprintf(out, "  push [w14+%d]\n", LOCALS(index));
     stack++;
   }
 
