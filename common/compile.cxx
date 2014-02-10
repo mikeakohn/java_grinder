@@ -91,10 +91,39 @@ int address;
   }
 }
 
+static int optimize_const(Generator *generator, uint8_t *bytes, int pc, int pc_end, int const_val)
+{
+  // istore_x
+  if (bytes[pc] >= 0x3b && bytes[pc] <= 0x3e) // istore_x
+  {
+    if (generator->set_integer_local(bytes[pc] - 0x3b, const_val) != 0)
+    { return 0; }
+    return 1;
+  }
+
+  // istore
+  if (pc + 1 < pc_end && bytes[pc] == 0x36)
+  {
+    if (generator->set_integer_local(bytes[pc+1], const_val) != 0)
+    { return 0; }
+    return 2;
+  }
+
+  // istore wide
+  if (pc + 2 < pc_end && bytes[pc] == 0xc4 && bytes[pc+1] == 0x36)
+  {
+    if (generator->set_integer_local(GET_PC_UINT16(1), const_val) != 0)
+    { return 0; }
+    return 3;
+  }
+
+  return 0;
+}
+
 int compile_method(JavaClass *java_class, int method_id, Generator *generator)
 {
 struct methods_t *method = java_class->get_method(method_id);
-unsigned char *bytes = method->attributes[0].info;
+uint8_t *bytes = method->attributes[0].info;
 int pc;
 const float fzero = 0.0;
 const float fone = 1.0;
@@ -116,7 +145,6 @@ uint16_t operand_stack_ptr = 0;
 //uint32_t const_stack[CONST_STACK_SIZE];
 //int const_stack_ptr = 0;
 int const_val;
-
 
   if (java_class->get_method_name(method_name, sizeof(method_name), method_id) != 0)
   {
@@ -200,7 +228,16 @@ printf("code_len=%d\n", code_len);
       case 7: // iconst_4 (0x07)
       case 8: // iconst_5 (0x08)
         const_val = uint8_t(bytes[pc])-3;
-        ret = generator->push_integer(const_val);
+        ret = optimize_const(generator, bytes, pc + 1, pc_start + code_len, const_val);
+        if (ret == 0)
+        {
+          ret = generator->push_integer(const_val);
+        }
+          else
+        {
+          pc += ret;
+          ret = 0;
+        }
         pc++;
         break;
 
@@ -237,12 +274,36 @@ printf("code_len=%d\n", code_len);
 
       case 16: // bipush (0x10)
         //PUSH_BYTE((char)bytes[pc+1])
-        ret = generator->push_byte((char)bytes[pc+1]);
-        pc+=2;
+        const_val = (int8_t)bytes[pc+1];
+        ret = optimize_const(generator, bytes, pc + 2, pc_start + code_len, const_val);
+        if (ret == 0)
+        {
+          // FIXME - I don't think push_byte() is really needed.
+          // push_integer() is probably more correct.
+          ret = generator->push_byte(const_val);
+        }
+          else
+        {
+          pc += ret;
+          ret = 0;
+        }
+        pc += 2;
         break;
 
       case 17: // sipush (0x11)
-        ret = generator->push_short((bytes[pc+1]<<8)|(bytes[pc+2]));
+        const_val = (int16_t)((bytes[pc+1]<<8)|(bytes[pc+2]));
+        ret = optimize_const(generator, bytes, pc + 3, pc_start + code_len, const_val);
+        if (ret == 0)
+        {
+          // FIXME - I don't think push_short() is really needed.
+          // push_integer() is probably more correct.
+          ret = generator->push_short(const_val);
+        }
+          else
+        {
+          pc += ret;
+          ret = 0;
+        }
         pc+=3;
         break;
 
@@ -252,7 +313,17 @@ printf("code_len=%d\n", code_len);
         if (gen32->tag == CONSTANT_INTEGER)
         {
           //PUSH_INTEGER(gen32->value);
-          ret = generator->push_integer(gen32->value);
+          const_val = gen32->value;
+          ret = optimize_const(generator, bytes, pc + 2, pc_start + code_len, const_val);
+          if (ret == 0)
+          {
+            ret = generator->push_integer(const_val);
+          }
+            else
+          {
+            pc += ret;
+            ret = 0;
+          }
         }
           else
         if (gen32->tag == CONSTANT_FLOAT)

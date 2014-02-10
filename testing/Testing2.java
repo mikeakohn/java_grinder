@@ -4,7 +4,7 @@ public class Testing2
   static public void main(String args[])
   {
   int c;
-  int k = 5;
+  int k = 10;
   int a = -1;
 
     for (c = 0; c < 32; c++)

@@ -29,6 +29,7 @@ public:
   virtual void method_end(int local_count) = 0;
   virtual int push_integer(int32_t n) = 0;
   virtual int push_integer_local(int index) = 0;
+  virtual int set_integer_local(int index, int value) { return -1; }
   virtual int push_long(int64_t n) = 0;
   virtual int push_float(float f) = 0;
   virtual int push_double(double f) = 0;

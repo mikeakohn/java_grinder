@@ -16,8 +16,10 @@ java:
 	javac $*.java
 
 grind: tests
-	./java_grinder testing/LCD.class out.asm msp430g2231
-	naken_asm -I /storage/git/naken_asm/include/msp430 -l out.asm
+	./java_grinder testing/LCD.class lcd_msp430.asm msp430g2231
+	naken_asm -I /storage/git/naken_asm/include/msp430 -l -o lcd_msp430.hex lcd_msp430.asm
+	./java_grinder testing/MethodCall.class method_call_msp430.asm msp430g2231
+	naken_asm -I /storage/git/naken_asm/include/msp430 -l -o method_call_msp430.hex method_call_msp430.asm
 
 dsp: tests
 	./java_grinder testing/LedBlink.class led_blink.asm dspic33fj06gs101a

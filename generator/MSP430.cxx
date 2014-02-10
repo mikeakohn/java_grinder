@@ -308,6 +308,15 @@ int MSP430::pop_integer_local(int index)
   return 0;
 }
 
+int MSP430::set_integer_local(int index, int value)
+{
+  // Optimization to remove Java stack operations
+  if (value < -32768 || value > 0xffff) { return -1; }
+  fprintf(out, "  mov.w #%d, -%d(r12)\n", value, LOCALS(index));
+
+  return 0;
+}
+
 int MSP430::pop()
 {
   if (stack > 0)
