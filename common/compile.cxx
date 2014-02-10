@@ -91,7 +91,7 @@ int address;
   }
 }
 
-static int optimize_const(Generator *generator, uint8_t *bytes, int pc, int pc_end, int const_val)
+static int optimize_const(JavaClass *java_class, Generator *generator, uint8_t *bytes, int pc, int pc_end, int const_val)
 {
   // istore_x
   if (bytes[pc] >= 0x3b && bytes[pc] <= 0x3e) // istore_x
@@ -113,6 +113,15 @@ static int optimize_const(Generator *generator, uint8_t *bytes, int pc, int pc_e
   if (pc + 2 < pc_end && bytes[pc] == 0xc4 && bytes[pc+1] == 0x36)
   {
     if (generator->set_integer_local(GET_PC_UINT16(1), const_val) != 0)
+    { return 0; }
+    return 3;
+  }
+
+  // invokestatic
+  if (pc + 2 < pc_end && bytes[pc] == 0xb8)
+  {
+    int ref = GET_PC_UINT16(1);
+    if (invoke_static_one_const(java_class, ref, generator, const_val) != 0)
     { return 0; }
     return 3;
   }
@@ -228,7 +237,7 @@ printf("code_len=%d\n", code_len);
       case 7: // iconst_4 (0x07)
       case 8: // iconst_5 (0x08)
         const_val = uint8_t(bytes[pc])-3;
-        ret = optimize_const(generator, bytes, pc + 1, pc_start + code_len, const_val);
+        ret = optimize_const(java_class, generator, bytes, pc + 1, pc_start + code_len, const_val);
         if (ret == 0)
         {
           ret = generator->push_integer(const_val);
@@ -275,7 +284,7 @@ printf("code_len=%d\n", code_len);
       case 16: // bipush (0x10)
         //PUSH_BYTE((char)bytes[pc+1])
         const_val = (int8_t)bytes[pc+1];
-        ret = optimize_const(generator, bytes, pc + 2, pc_start + code_len, const_val);
+        ret = optimize_const(java_class, generator, bytes, pc + 2, pc_start + code_len, const_val);
         if (ret == 0)
         {
           // FIXME - I don't think push_byte() is really needed.
@@ -292,7 +301,7 @@ printf("code_len=%d\n", code_len);
 
       case 17: // sipush (0x11)
         const_val = (int16_t)((bytes[pc+1]<<8)|(bytes[pc+2]));
-        ret = optimize_const(generator, bytes, pc + 3, pc_start + code_len, const_val);
+        ret = optimize_const(java_class, generator, bytes, pc + 3, pc_start + code_len, const_val);
         if (ret == 0)
         {
           // FIXME - I don't think push_short() is really needed.
@@ -314,7 +323,7 @@ printf("code_len=%d\n", code_len);
         {
           //PUSH_INTEGER(gen32->value);
           const_val = gen32->value;
-          ret = optimize_const(generator, bytes, pc + 2, pc_start + code_len, const_val);
+          ret = optimize_const(java_class, generator, bytes, pc + 2, pc_start + code_len, const_val);
           if (ret == 0)
           {
             ret = generator->push_integer(const_val);

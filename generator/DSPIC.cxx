@@ -785,7 +785,7 @@ int DSPIC::spi_read(int port)
   return 0;
 }
 
-int DSPIC::spi_is_data_available(int port)
+int DSPIC::spi_isDataAvailable(int port)
 {
   if (reg < reg_max)
   {

@@ -41,7 +41,7 @@ static int spi_read(JavaClass *java_class, Generator *generator, int port)
 
 static int spi_isDataAvailable(JavaClass *java_class, Generator *generator, int port)
 {
-  return generator->spi_is_data_available(port);
+  return generator->spi_isDataAvailable(port);
 }
 
 static int spi_isBusy(JavaClass *java_class, Generator *generator, int port)
@@ -72,4 +72,8 @@ int spi(JavaClass *java_class, Generator *generator, char *function, int port)
   return -1;
 }
 
+int spi(JavaClass *java_class, Generator *generator, char *function, int port, int const_val)
+{
+  return -1;
+}
 

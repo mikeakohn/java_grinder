@@ -16,6 +16,7 @@
 #include "JavaClass.h"
 
 int spi(JavaClass *java_class, Generator *generator, char *method_name, int port);
+int spi(JavaClass *java_class, Generator *generator, char *method_name, int port, int const_val);
 
 #endif
 

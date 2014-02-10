@@ -70,8 +70,11 @@ public:
 
   // GPIO functions
   virtual int ioport_setPinsAsInput(int port);
+  virtual int ioport_setPinsAsInput(int port, int const_val);
   virtual int ioport_setPinsAsOutput(int port);
+  virtual int ioport_setPinsAsOutput(int port, int const_val);
   virtual int ioport_setPinsValue(int port);
+  virtual int ioport_setPinsValue(int port, int const_val);
   virtual int ioport_setPinsHigh(int port);
   virtual int ioport_setPinsLow(int port);
   virtual int ioport_setPinAsOutput(int port);
@@ -93,7 +96,7 @@ public:
   virtual int spi_init(int port);
   virtual int spi_send(int port);
   virtual int spi_read(int port);
-  virtual int spi_is_data_available(int port);
+  virtual int spi_isDataAvailable(int port);
   virtual int spi_is_busy(int port);
   virtual int spi_disable(int port);
   virtual int spi_enable(int port);

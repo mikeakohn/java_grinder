@@ -17,6 +17,7 @@
 
 int invoke_virtual(JavaClass *java_class, int method_id, int field_id, Generator *generator);
 int invoke_static(JavaClass *java_class, int method_id, Generator *generator);
+int invoke_static_one_const(JavaClass *java_class, int method_id, Generator *generator, int const_val);
 
 #endif
 

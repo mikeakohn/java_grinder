@@ -901,6 +901,14 @@ int MSP430::ioport_setPinsAsInput(int port)
   return set_periph("bic", periph);
 }
 
+int MSP430::ioport_setPinsAsInput(int port, int const_val)
+{
+  char periph[32];
+  sprintf(periph, "P%dDIR", port+1);
+  fprintf(out, "  bic.b #%d, &%s\n", const_val, periph);
+  return 0;
+}
+
 int MSP430::ioport_setPinsAsOutput(int port)
 {
   char periph[32];
@@ -908,11 +916,27 @@ int MSP430::ioport_setPinsAsOutput(int port)
   return set_periph("bis", periph);
 }
 
+int MSP430::ioport_setPinsAsOutput(int port, int const_val)
+{
+  char periph[32];
+  sprintf(periph, "P%dDIR", port+1);
+  fprintf(out, "  bis.b #%d, &%s\n", const_val, periph);
+  return 0;
+}
+
 int MSP430::ioport_setPinsValue(int port)
 {
   char periph[32];
   sprintf(periph, "P%dOUT", port+1);
   return set_periph("mov", periph);
+}
+
+int MSP430::ioport_setPinsValue(int port, int const_val)
+{
+  char periph[32];
+  sprintf(periph, "P%dOUT", port+1);
+  fprintf(out, "  mov.b #%d, &%s\n", const_val, periph);
+  return 0;
 }
 
 int MSP430::ioport_setPinsHigh(int port)
@@ -1071,7 +1095,7 @@ int MSP430::spi_read(int port)
   return 0;
 }
 
-int MSP430::spi_is_data_available(int port)
+int MSP430::spi_isDataAvailable(int port)
 {
   if (port != 0) { return -1; }
 

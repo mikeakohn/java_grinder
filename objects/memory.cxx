@@ -54,5 +54,10 @@ int memory(JavaClass *java_class, Generator *generator, char *function)
   return -1;
 }
 
+int memory(JavaClass *java_class, Generator *generator, char *function, int const_val)
+{
+  return -1;
+}
+
 
 

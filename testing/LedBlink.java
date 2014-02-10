@@ -11,12 +11,12 @@ public class LedBlink
 
     while(true)
     {
-      setLeds(2,0);
-      //IOPort0.setPinsValue(2);
+      //setLeds(2,0);
+      IOPort0.setPinsValue(2);
       //for (n = 0; n < 16738; n++);
       delay();
-      setLeds(1,0);
-      //IOPort0.setPinsValue(1);
+      //setLeds(1,0);
+      IOPort0.setPinsValue(1);
       //for (n = 0; n < 16738; n++);
       delay();
     }

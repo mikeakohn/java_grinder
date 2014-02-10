@@ -37,6 +37,18 @@
       ret = b(java_class, generator, function); \
     }
 
+#define CHECK_WITH_PORT_CONST(a,b,c) \
+    if (strcmp(cls, #a#c) == 0) \
+    { \
+      ret = b(java_class, generator, function, c, const_val); \
+    }
+
+#define CHECK_CONST(a,b) \
+    if (strcmp(cls, #a) == 0) \
+    { \
+      ret = b(java_class, generator, function, const_val); \
+    }
+
 static void get_virtual_function(char *function, char *method_name, char *method_sig, char *field_name, char *field_class)
 {
 char *s;
@@ -225,5 +237,53 @@ char function[256];
   return -1;
 }
 
+int invoke_static_one_const(JavaClass *java_class, int method_id, Generator *generator, int const_val)
+{
+char method_name[128];
+char method_sig[128];
+char method_class[128];
+char function[256];
+
+  printf("invoke_static_one_const()\n");
+
+  if (java_class->get_class_name(method_class, sizeof(method_class), method_id) != 0 ||
+      java_class->get_ref_name_type(method_name, method_sig, sizeof(method_name), method_id) != 0)
+  {
+    printf("Error: Couldn't get name and type for method_id %d\n", method_id);
+    return -1;
+  }
+
+  //printf("method: '%s as %s' from %s\n", method_name, method_sig, method_class);
+
+  get_static_function(function, method_name, method_sig);
+
+  //printf("function: %s()\n", function);
+  int ret = -1;
+
+  size_t len = sizeof("net/mikekohn/java_grinder/") - 1;
+
+  if (strncmp("net/mikekohn/java_grinder/", method_class, len)!=0)
+  {
+    return -1;
+  }
+
+  char *cls = method_class + len;
+
+  CHECK_WITH_PORT_CONST(IOPort, ioport, 0)
+  CHECK_WITH_PORT_CONST(IOPort, ioport, 1)
+  CHECK_WITH_PORT_CONST(IOPort, ioport, 2)
+  CHECK_WITH_PORT_CONST(IOPort, ioport, 3)
+  CHECK_WITH_PORT_CONST(IOPort, ioport, 4)
+  CHECK_WITH_PORT_CONST(IOPort, ioport, 5)
+  CHECK_CONST(Memory, memory)
+  CHECK_WITH_PORT_CONST(SPI, spi, 0)
+  CHECK_WITH_PORT_CONST(SPI, spi, 1)
+    else
+  {}
+
+  if (ret == 0) { return 0; }
+
+  return -1;
+}
 
 
