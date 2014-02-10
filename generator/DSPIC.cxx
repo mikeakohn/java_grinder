@@ -53,7 +53,7 @@ DSPIC::DSPIC(uint8_t chip_type) :
 DSPIC::~DSPIC()
 {
   fprintf(out, ".org __FICD\n");
-  fprintf(out, "  dc32 0xffcf\n");
+  fprintf(out, "  dc32 0xffcf\n\n");
 }
 
 int DSPIC::open(char *filename)
@@ -663,9 +663,23 @@ int DSPIC::ioport_setPinAsOutput(int port)
   return -1;
 }
 
+int DSPIC::ioport_setPinAsOutput(int port, int const_val)
+{
+  if (const_val < 0 || const_val > 15) { return -1; }
+  fprintf(out, "  bclr TRIS%c, #%d\n", port+'A', const_val);
+  return 0;
+}
+
 int DSPIC::ioport_setPinAsInput(int port)
 {
   return -1;
+}
+
+int DSPIC::ioport_setPinAsInput(int port, int const_val)
+{
+  if (const_val < 0 || const_val > 15) { return -1; }
+  fprintf(out, "  bset TRIS%c, #%d\n", port+'A', const_val);
+  return 0;
 }
 
 int DSPIC::ioport_setPinHigh(int port)
@@ -673,9 +687,23 @@ int DSPIC::ioport_setPinHigh(int port)
   return -1;
 }
 
+int DSPIC::ioport_setPinHigh(int port, int const_val)
+{
+  if (const_val < 0 || const_val > 15) { return -1; }
+  fprintf(out, "  bset LAT%c, #%d\n", port+'A', const_val);
+  return 0;
+}
+
 int DSPIC::ioport_setPinLow(int port)
 {
   return -1;
+}
+
+int DSPIC::ioport_setPinLow(int port, int const_val)
+{
+  if (const_val < 0 || const_val > 15) { return -1; }
+  fprintf(out, "  bclr LAT%c, #%d\n", port+'A', const_val);
+  return 0;
 }
 
 int DSPIC::ioport_isPinInputHigh(int port)

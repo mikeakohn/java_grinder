@@ -74,9 +74,13 @@ public:
   virtual int ioport_setPinsHigh(int port) { return -1; }
   virtual int ioport_setPinsLow(int port) { return -1; }
   virtual int ioport_setPinAsOutput(int port) { return -1; }
+  virtual int ioport_setPinAsOutput(int port, int const_val) { return -1; }
   virtual int ioport_setPinAsInput(int port) { return -1; }
+  virtual int ioport_setPinAsInput(int port, int const_val) { return -1; }
   virtual int ioport_setPinHigh(int port) { return -1; }
+  virtual int ioport_setPinHigh(int port, int const_val) { return -1; }
   virtual int ioport_setPinLow(int port) { return -1; }
+  virtual int ioport_setPinLow(int port, int const_val) { return -1; }
   virtual int ioport_isPinInputHigh(int port) { return -1; }
   virtual int ioport_getPortInputValue(int port) { return -1; }
   //virtual int ioport_setPortOutputValue(int port) { return -1; }

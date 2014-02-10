@@ -62,10 +62,10 @@ public class LCDDSPIC
   static final int RDID3 = 0xDC;    // read ID3
 
   // The masks for the IO pins used to communicate with the LCD.
-  static final int LCD_RESET = 0x01;
-  static final int SPI_CS = 0x10;
-  static final int SPI_CLK = 0x02;
-  static final int SPI_SDO = 0x08;
+  static final int LCD_RESET = 0;
+  static final int SPI_CS = 4;
+  static final int SPI_CLK = 1;
+  static final int SPI_SDO = 3;
 
   static public void main(String args[])
   {
@@ -85,13 +85,13 @@ public class LCDDSPIC
     // Pin 1 is SCLK
     // Pin 3 is SDO
     // Pin 4 is /CS
-    IOPort1.setPinsAsOutput(LCD_RESET|SPI_CS|SPI_CLK|SPI_SDO);
-    IOPort1.setPinsValue(LCD_RESET|SPI_CS|SPI_CLK);
+    IOPort1.setPinsAsOutput((1<<LCD_RESET)|(1<<SPI_CS)|(1<<SPI_CLK)|(1<<SPI_SDO));
+    IOPort1.setPinsValue((1<<LCD_RESET)|(1<<SPI_CS)|(1<<SPI_CLK));
 
     // Reset LCD
-    IOPort1.setPinsLow(LCD_RESET);
+    IOPort1.setPinLow(LCD_RESET);
     delay();
-    IOPort1.setPinsHigh(LCD_RESET);
+    IOPort1.setPinHigh(LCD_RESET);
     delay();
     delay();
 
@@ -319,10 +319,10 @@ public class LCDDSPIC
   public static void lcdCommand(int a)
   {
   int n;
-    IOPort1.setPinsLow(SPI_SDO);
+    IOPort1.setPinLow(SPI_SDO);
 
     // /CS = 0
-    IOPort1.setPinsLow(SPI_CS);
+    IOPort1.setPinLow(SPI_CS);
     clock();
 
     // Hardware clock out the rest of the bits
@@ -330,7 +330,7 @@ public class LCDDSPIC
     while(!SPI0.isDataAvailable());
 
     // /CS = 1
-    IOPort1.setPinsHigh(SPI_CS);
+    IOPort1.setPinHigh(SPI_CS);
   }
 
   /** Send a 9 bit data byte to the LCD display.  Bit 8 is always a 1 for
@@ -338,19 +338,19 @@ public class LCDDSPIC
   public static void lcdData(int a)
   {
   int n;
-    IOPort1.setPinsHigh(SPI_SDO);
+    IOPort1.setPinHigh(SPI_SDO);
 
     // /CS = 0
-    IOPort1.setPinsLow(SPI_CS);
+    IOPort1.setPinLow(SPI_CS);
     clock();
-    IOPort1.setPinsLow(SPI_SDO);
+    IOPort1.setPinLow(SPI_SDO);
 
     // Hardware clock out the rest of the bits
     SPI0.send(a);
     while(!SPI0.isDataAvailable());
 
     // /CS = 1
-    IOPort1.setPinsHigh(SPI_CS);
+    IOPort1.setPinHigh(SPI_CS);
   }
 
   public static void clock()
@@ -358,12 +358,12 @@ public class LCDDSPIC
     // Manually clock out a bit to SPI since MSP430 hardware only supports
     // 8 bit or 16 bit data.
     SPI0.disable();
-    IOPort1.setPinsLow(SPI_CLK);
+    IOPort1.setPinLow(SPI_CLK);
     CPU.nop();
     CPU.nop();
     CPU.nop();
     CPU.nop();
-    IOPort1.setPinsHigh(SPI_CLK);
+    IOPort1.setPinHigh(SPI_CLK);
     CPU.nop();
     CPU.nop();
     CPU.nop();
