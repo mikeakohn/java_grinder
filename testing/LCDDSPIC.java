@@ -95,6 +95,9 @@ public class LCDDSPIC
     delay();
     delay();
 
+    // /CS = 0
+    IOPort1.setPinLow(SPI_CS);
+
     // Wake up
     lcdCommand(SLEEPOUT);
 
@@ -113,6 +116,9 @@ public class LCDDSPIC
     // Display On (should already be on by reset, but owell)
     lcdCommand(DISPON);
 
+    // /CS = 1
+    IOPort1.setPinHigh(SPI_CS);
+
     delay();
 
     while(true)
@@ -125,6 +131,9 @@ public class LCDDSPIC
       mandel(-2<<7, 0<<8, -1<<7, 0<<8);
       long_delay();
       clearDisplay();
+
+      // /CS = 0
+      IOPort1.setPinLow(SPI_CS);
 
       for (t = 0; t < 500; t++)
       {
@@ -173,6 +182,9 @@ public class LCDDSPIC
         if (x == 0) { dx = 1; }
         if (y == 0) { dy = 1; }
       }
+
+      // /CS = 1
+      IOPort1.setPinHigh(SPI_CS);
     }
   }
 
@@ -191,6 +203,9 @@ public class LCDDSPIC
     int t;
     int color = 0;
     int pixel_num = 0;
+
+    // /CS = 0
+    IOPort1.setPinLow(SPI_CS);
 
     setArea(0, 0, 125, 125);
 
@@ -277,6 +292,9 @@ public class LCDDSPIC
 
       is += dy;
     }
+
+    // /CS = 1
+    IOPort1.setPinHigh(SPI_CS);
   }
 
   /** This function tells the LCD (x0,y0) to (x1,y1) area to draw
@@ -303,6 +321,9 @@ public class LCDDSPIC
   {
   int n;
 
+    // /CS = 0
+    IOPort1.setPinLow(SPI_CS);
+
     setArea(0,0, 131,131);
 
     // Write out 12 bit color information.. 2 pixels at a time.
@@ -312,6 +333,9 @@ public class LCDDSPIC
       lcdData(0x00);
       lcdData(0xf0);
     }
+
+    // /CS = 1
+    IOPort1.setPinHigh(SPI_CS);
   }
 
   /** Send a 9 bit command to the LCD display.  Bit 8 is always a 0 for
@@ -319,10 +343,11 @@ public class LCDDSPIC
   public static void lcdCommand(int a)
   {
   int n;
+
     IOPort1.setPinLow(SPI_SDO);
 
     // /CS = 0
-    IOPort1.setPinLow(SPI_CS);
+    //IOPort1.setPinLow(SPI_CS);
     clock();
 
     // Hardware clock out the rest of the bits
@@ -330,7 +355,7 @@ public class LCDDSPIC
     while(!SPI0.isDataAvailable());
 
     // /CS = 1
-    IOPort1.setPinHigh(SPI_CS);
+    //IOPort1.setPinHigh(SPI_CS);
   }
 
   /** Send a 9 bit data byte to the LCD display.  Bit 8 is always a 1 for
@@ -338,10 +363,11 @@ public class LCDDSPIC
   public static void lcdData(int a)
   {
   int n;
+
     IOPort1.setPinHigh(SPI_SDO);
 
     // /CS = 0
-    IOPort1.setPinLow(SPI_CS);
+    //IOPort1.setPinLow(SPI_CS);
     clock();
     IOPort1.setPinLow(SPI_SDO);
 
@@ -350,7 +376,7 @@ public class LCDDSPIC
     while(!SPI0.isDataAvailable());
 
     // /CS = 1
-    IOPort1.setPinHigh(SPI_CS);
+    //IOPort1.setPinHigh(SPI_CS);
   }
 
   public static void clock()

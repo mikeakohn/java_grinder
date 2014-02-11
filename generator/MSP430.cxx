@@ -1147,7 +1147,7 @@ int MSP430::spi_isDataAvailable(int port)
   return 0;
 }
 
-int MSP430::spi_is_busy(int port)
+int MSP430::spi_isBusy(int port)
 {
   return -1;
 }

@@ -26,186 +26,186 @@
 
 static int dsp_getA(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_get_a();
+  return generator->dsp_getA();
 }
 
 static int dsp_getB(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_get_b();
+  return generator->dsp_getB();
 }
 
 static int dsp_getUpperA(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_get_upper_a();
+  return generator->dsp_getUpperA();
 }
 
 static int dsp_getUpperB(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_get_upper_b();
+  return generator->dsp_getUpperB();
 }
 
 static int dsp_getLowerA(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_get_lower_a();
+  return generator->dsp_getLowerA();
 }
 
 static int dsp_getLowerB(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_get_lower_b();
+  return generator->dsp_getLowerB();
 }
 
 static int dsp_getRoundedA(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_get_rounded_a();
+  return generator->dsp_getRoundedA();
 }
 
 static int dsp_getRoundedB(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_get_rounded_b();
+  return generator->dsp_getRoundedB();
 }
 
 static int dsp_clearA(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_clear_a();
+  return generator->dsp_clearA();
 }
 
 static int dsp_clearB(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_clear_b();
+  return generator->dsp_clearB();
 }
 
 static int dsp_loadA(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_load_a();
+  return generator->dsp_loadA();
 }
 
 static int dsp_loadB(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_load_b();
+  return generator->dsp_loadB();
 }
 
 static int dsp_negA(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_neg_a();
+  return generator->dsp_negA();
 }
 
 static int dsp_negB(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_neg_b();
+  return generator->dsp_negB();
 }
 
 static int dsp_addABAndStoreInA(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_add_ab_and_store_in_a();
+  return generator->dsp_addABAndStoreInA();
 }
 
 static int dsp_addABAndStoreInB(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_add_ab_and_store_in_b();
+  return generator->dsp_addABAndStoreInB();
 }
 
 static int dsp_subABAndStoreInA(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_sub_ab_and_store_in_a();
+  return generator->dsp_subABAndStoreInA();
 }
 
 static int dsp_subBAAndStoreInB(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_sub_ba_and_store_in_b();
+  return generator->dsp_subBAAndStoreInB();
 }
 
 static int dsp_addToA(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_add_to_a();
+  return generator->dsp_addToA();
 }
 
 static int dsp_addToB(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_add_to_b();
+  return generator->dsp_addToB();
 }
 
 static int dsp_squareToA(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_square_to_a();
+  return generator->dsp_squareToA();
 }
 
 static int dsp_squareToB(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_square_to_b();
+  return generator->dsp_squareToB();
 }
 
 static int dsp_mulToA(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_mul_to_a();
+  return generator->dsp_mulToA();
 }
 
 static int dsp_mulToB(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_mul_to_b();
+  return generator->dsp_mulToB();
 }
 
 #if 0
 static int dsp_euclideanDistanceToA(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_mul_to_a();
+  return generator->dsp_mulToA();
 }
 
 static int dsp_euclideanDistanceToB(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_mul_to_b();
+  return generator->dsp_mulToB();
 }
 #endif
 
 static int dsp_squareAndAddToA(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_square_and_add_to_a();
+  return generator->dsp_squareAndAddToA();
 }
 
 static int dsp_squareAndAddToB(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_square_and_add_to_b();
+  return generator->dsp_squareAndAddToB();
 }
 
 static int dsp_mulAndAddToA(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_mul_and_add_to_a();
+  return generator->dsp_mulAndAddToA();
 }
 
 static int dsp_mulAndAddToB(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_mul_and_add_to_b();
+  return generator->dsp_mulAndAddToB();
 }
 
 static int dsp_mulAndSubFromA(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_mul_and_sub_from_a();
+  return generator->dsp_mulAndSubFromA();
 }
 
 static int dsp_mulAndSubFromB(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_mul_and_sub_from_b();
+  return generator->dsp_mulAndSubFromB();
 }
 
 #if 0
 static int dsp_euclideanDistanceAndAddToA(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_euclidean_distance_and_add_to_a();
+  return generator->dsp_euclideanDistanceAndAddToA();
 }
 
 static int dsp_euclideanDistanceAndAddToB(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_euclidean_distance_and_add_to_b();
+  return generator->dsp_euclideanDistanceAndAddToB();
 }
 #endif
 
 static int dsp_shiftA(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_shift_a();
+  return generator->dsp_shiftA();
 }
 
 static int dsp_shiftB(JavaClass *java_class, Generator *generator)
 {
-  return generator->dsp_shift_b();
+  return generator->dsp_shiftB();
 }
 
 int dsp(JavaClass *java_class, Generator *generator, char *function)

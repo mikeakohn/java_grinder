@@ -904,7 +904,7 @@ int DSPIC::spi_isDataAvailable(int port)
   return 0;
 }
 
-int DSPIC::spi_is_busy(int port)
+int DSPIC::spi_isBusy(int port)
 {
   if (reg < reg_max)
   {
@@ -1036,59 +1036,59 @@ int DSPIC::memory_write16()
 }
 
 // DSP (dsPIC stuff)
-int DSPIC::dsp_get_a()
+int DSPIC::dsp_getA()
 {
   return dsp_store("sac", "A", 0);
 }
 
-int DSPIC::dsp_get_b()
+int DSPIC::dsp_getB()
 {
   return dsp_store("sac", "B", 0);
 }
 
-int DSPIC::dsp_get_upper_a()
+int DSPIC::dsp_getUpperA()
 {
   return dsp_store("sac", "A", 7);
 }
 
-int DSPIC::dsp_get_upper_b()
+int DSPIC::dsp_getUpperB()
 {
   return dsp_store("sac", "B", 7);
 }
 
-int DSPIC::dsp_get_lower_a()
+int DSPIC::dsp_getLowerA()
 {
   return dsp_store("sac", "A", -8);
 }
 
-int DSPIC::dsp_get_lower_b()
+int DSPIC::dsp_getLowerB()
 {
   return dsp_store("sac", "B", -8);
 }
 
-int DSPIC::dsp_get_rounded_a()
+int DSPIC::dsp_getRoundedA()
 {
   return dsp_store("sac.r", "A", 0);
 }
 
-int DSPIC::dsp_get_rounded_b()
+int DSPIC::dsp_getRoundedB()
 {
   return dsp_store("sac.r", "B", 0);
 }
 
-int DSPIC::dsp_clear_a()
+int DSPIC::dsp_clearA()
 {
   fprintf(out, "  clr A\n");
   return 0;
 }
 
-int DSPIC::dsp_clear_b()
+int DSPIC::dsp_clearB()
 {
   fprintf(out, "  clr B\n");
   return 0;
 }
 
-int DSPIC::dsp_load_a()
+int DSPIC::dsp_loadA()
 {
 char dst[16];
 
@@ -1097,7 +1097,7 @@ char dst[16];
   return 0;
 }
 
-int DSPIC::dsp_load_b()
+int DSPIC::dsp_loadB()
 {
 char dst[16];
 
@@ -1106,43 +1106,43 @@ char dst[16];
   return 0;
 }
 
-int DSPIC::dsp_neg_a()
+int DSPIC::dsp_negA()
 {
   fprintf(out, "  neg A\n");
   return 0;
 }
 
-int DSPIC::dsp_neg_b()
+int DSPIC::dsp_negB()
 {
   fprintf(out, "  neg B\n");
   return 0;
 }
 
-int DSPIC::dsp_add_ab_and_store_in_a()
+int DSPIC::dsp_addABAndStoreInA()
 {
   fprintf(out, "  add A\n");
   return 0;
 }
 
-int DSPIC::dsp_add_ab_and_store_in_b()
+int DSPIC::dsp_addABAndStoreInB()
 {
   fprintf(out, "  add B\n");
   return 0;
 }
 
-int DSPIC::dsp_sub_ab_and_store_in_a()
+int DSPIC::dsp_subABAndStoreInA()
 {
   fprintf(out, "  sub A\n");
   return 0;
 }
 
-int DSPIC::dsp_sub_ba_and_store_in_b()
+int DSPIC::dsp_subBAAndStoreInB()
 {
   fprintf(out, "  sub B\n");
   return 0;
 }
 
-int DSPIC::dsp_add_to_a()
+int DSPIC::dsp_addToA()
 {
 char dst[16];
 
@@ -1151,7 +1151,7 @@ char dst[16];
   return 0;
 }
 
-int DSPIC::dsp_add_to_b()
+int DSPIC::dsp_addToB()
 {
 char dst[16];
 
@@ -1160,81 +1160,81 @@ char dst[16];
   return 0;
 }
 
-int DSPIC::dsp_square_to_a()
+int DSPIC::dsp_squareToA()
 {
   return dsp_square("mpy", "A");
 }
 
-int DSPIC::dsp_square_to_b()
+int DSPIC::dsp_squareToB()
 {
   return dsp_square("mpy", "B");
 }
 
-int DSPIC::dsp_mul_to_a()
+int DSPIC::dsp_mulToA()
 {
   return dsp_mul("mpy", "A");
 }
 
-int DSPIC::dsp_mul_to_b()
+int DSPIC::dsp_mulToB()
 {
   return dsp_mul("mpy", "B");
 }
 
 #if 0
-int DSPIC::dsp_euclidean_distance_to_a()
+int DSPIC::dsp_euclideanDistanceToA()
 {
   return dsp_mul("ed", "A");
 }
 
-int DSPIC::dsp_euclidean_distance_to_b()
+int DSPIC::dsp_euclideanDistanceToB()
 {
   return dsp_mul("ed", "B");
 }
 #endif
 
-int DSPIC::dsp_square_and_add_to_a()
+int DSPIC::dsp_squareAndAddToA()
 {
   return dsp_square("mac", "A");
 }
 
-int DSPIC::dsp_square_and_add_to_b()
+int DSPIC::dsp_squareAndAddToB()
 {
   return dsp_square("mac", "B");
 }
 
-int DSPIC::dsp_mul_and_add_to_a()
+int DSPIC::dsp_mulAndAddToA()
 {
   return dsp_mul("mac", "A");
 }
 
-int DSPIC::dsp_mul_and_add_to_b()
+int DSPIC::dsp_mulAndAddToB()
 {
   return dsp_mul("mac", "B");
 }
 
-int DSPIC::dsp_mul_and_sub_from_a()
+int DSPIC::dsp_mulAndSubFromA()
 {
   return dsp_mul("msc", "A");
 }
 
-int DSPIC::dsp_mul_and_sub_from_b()
+int DSPIC::dsp_mulAndSubFromB()
 {
   return dsp_mul("msc", "B");
 }
 
 #if 0
-int DSPIC::dsp_euclidean_distance_and_add_to_a()
+int DSPIC::dsp_euclideanDistanceAndAddToA()
 {
   return dsp_mul("edac", "A");
 }
 
-int DSPIC::dsp_euclidean_distance_and_add_to_b()
+int DSPIC::dsp_euclideanDistanceAndAddToB()
 {
   return dsp_mul("edac", "B");
 }
 #endif
 
-int DSPIC::dsp_shift_a()
+int DSPIC::dsp_shiftA()
 {
 char dst[16];
 
@@ -1243,7 +1243,7 @@ char dst[16];
   return 0;
 }
 
-int DSPIC::dsp_shift_b()
+int DSPIC::dsp_shiftB()
 {
 char dst[16];
 
