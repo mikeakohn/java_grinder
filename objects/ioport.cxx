@@ -35,6 +35,11 @@ static int ioport_setPinsAsInput_I(JavaClass *java_class, Generator *generator, 
   return generator->ioport_setPinsAsInput(port);
 }
 
+static int ioport_setPinsAsInput_I(JavaClass *java_class, Generator *generator, int port, int const_val)
+{
+  return generator->ioport_setPinsAsInput(port, const_val);
+}
+
 static int ioport_setPinsAsOutput_I(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->ioport_setPinsAsOutput(port);
@@ -60,9 +65,19 @@ static int ioport_setPinsHigh_I(JavaClass *java_class, Generator *generator, int
   return generator->ioport_setPinsHigh(port);
 }
 
+static int ioport_setPinsHigh_I(JavaClass *java_class, Generator *generator, int port, int const_val)
+{
+  return generator->ioport_setPinsHigh(port, const_val);
+}
+
 static int ioport_setPinsLow_I(JavaClass *java_class, Generator *generator, int port)
 {
   return generator->ioport_setPinsLow(port);
+}
+
+static int ioport_setPinsLow_I(JavaClass *java_class, Generator *generator, int port, int const_val)
+{
+  return generator->ioport_setPinsLow(port, const_val);
 }
 
 static int ioport_setPinAsOutput_I(JavaClass *java_class, Generator *generator, int port)
@@ -142,8 +157,11 @@ int ioport(JavaClass *java_class, Generator *generator, char *method_name, int p
 
 int ioport(JavaClass *java_class, Generator *generator, char *method_name, int port, int const_val)
 {
+  CHECK_FUNC_CONST(setPinsAsInput_I)
   CHECK_FUNC_CONST(setPinsAsOutput_I)
   CHECK_FUNC_CONST(setPinsValue_I)
+  CHECK_FUNC_CONST(setPinsHigh_I)
+  CHECK_FUNC_CONST(setPinsLow_I)
   CHECK_FUNC_CONST(setPinAsOutput_I)
   CHECK_FUNC_CONST(setPinAsInput_I)
   CHECK_FUNC_CONST(setPinHigh_I)

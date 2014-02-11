@@ -25,6 +25,16 @@
 
 //#define CONST_STACK_SIZE 4
 
+static uint8_t cond_table[] =
+{
+  COND_EQUAL,         // 159 (0x9f) if_icmpeq
+  COND_NOT_EQUAL,     // 160 (0xa0) if_icmpne
+  COND_LESS,          // 161 (0xa1) if_icmplt
+  COND_GREATER_EQUAL, // 162 (0xa2) if_icmpge
+  COND_GREATER,       // 163 (0xa3) if_icmpgt
+  COND_LESS_EQUAL,    // 164 (0xa4) if_icmple
+};
+
 static void fill_label_map(uint8_t *label_map, int label_map_len, uint8_t *bytes, int code_len, int pc_start)
 {
 int pc = pc_start;
@@ -91,7 +101,8 @@ int address;
   }
 }
 
-static int optimize_const(JavaClass *java_class, Generator *generator, uint8_t *bytes, int pc, int pc_end, int const_val)
+// FIXME - Too many parameters :(.
+static int optimize_const(JavaClass *java_class, Generator *generator, char *method_name, uint8_t *bytes, int pc, int pc_end, int address, int const_val)
 {
   // istore_x
   if (bytes[pc] >= 0x3b && bytes[pc] <= 0x3e) // istore_x
@@ -126,6 +137,21 @@ static int optimize_const(JavaClass *java_class, Generator *generator, uint8_t *
     return 3;
   }
 
+  // 159 (0x9f) if_icmpeq
+  // 160 (0xa0) if_icmpne
+  // 161 (0xa1) if_icmplt
+  // 162 (0xa2) if_icmpge
+  // 163 (0xa3) if_icmpgt
+  // 164 (0xa4) if_icmple
+  if (pc + 2 < pc_end && bytes[pc] >= 0x9f && bytes[pc] <= 0xa4)
+  {
+    char label[128];
+    sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
+    if (generator->jump_cond_integer(label, cond_table[bytes[pc]-159], const_val) == -1)
+    { return 0; }
+    return 3;
+  }
+
   return 0;
 }
 
@@ -147,7 +173,7 @@ struct generic_32bit_t *gen32;
 struct constant_float_t *constant_float;
 uint8_t *label_map;
 int ret = 0;
-char label[16];
+char label[128];
 char method_name[64];
 uint16_t *operand_stack;
 uint16_t operand_stack_ptr = 0;
@@ -237,7 +263,7 @@ printf("code_len=%d\n", code_len);
       case 7: // iconst_4 (0x07)
       case 8: // iconst_5 (0x08)
         const_val = uint8_t(bytes[pc])-3;
-        ret = optimize_const(java_class, generator, bytes, pc + 1, pc_start + code_len, const_val);
+        ret = optimize_const(java_class, generator, method_name, bytes, pc + 1, pc_start + code_len, address + 1, const_val);
         if (ret == 0)
         {
           ret = generator->push_integer(const_val);
@@ -284,7 +310,7 @@ printf("code_len=%d\n", code_len);
       case 16: // bipush (0x10)
         //PUSH_BYTE((char)bytes[pc+1])
         const_val = (int8_t)bytes[pc+1];
-        ret = optimize_const(java_class, generator, bytes, pc + 2, pc_start + code_len, const_val);
+        ret = optimize_const(java_class, generator, method_name, bytes, pc + 2, pc_start + code_len, address + 2, const_val);
         if (ret == 0)
         {
           // FIXME - I don't think push_byte() is really needed.
@@ -301,7 +327,7 @@ printf("code_len=%d\n", code_len);
 
       case 17: // sipush (0x11)
         const_val = (int16_t)((bytes[pc+1]<<8)|(bytes[pc+2]));
-        ret = optimize_const(java_class, generator, bytes, pc + 3, pc_start + code_len, const_val);
+        ret = optimize_const(java_class, generator, method_name, bytes, pc + 3, pc_start + code_len, address + 3, const_val);
         if (ret == 0)
         {
           // FIXME - I don't think push_short() is really needed.
@@ -323,7 +349,7 @@ printf("code_len=%d\n", code_len);
         {
           //PUSH_INTEGER(gen32->value);
           const_val = gen32->value;
-          ret = optimize_const(java_class, generator, bytes, pc + 2, pc_start + code_len, const_val);
+          ret = optimize_const(java_class, generator, method_name, bytes, pc + 2, pc_start + code_len, address + 2, const_val);
           if (ret == 0)
           {
             ret = generator->push_integer(const_val);
@@ -1154,8 +1180,13 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 153: // ifeq (0x99)
+      case 154: // ifne (0x9a)
+      case 155: // iflt (0x9b)
+      case 156: // ifge (0x9c)
+      case 157: // ifgt (0x9d)
+      case 158: // ifle (0x9e)
         sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
-        ret = generator->jump_cond(label, COND_EQUAL);
+        ret = generator->jump_cond(label, cond_table[bytes[pc]-153]);
         pc += 3;
         //value1 = POP_INTEGER();
         //if (value1 == 0)
@@ -1164,125 +1195,16 @@ printf("code_len=%d\n", code_len);
         //{ pc += 3; }
         break;
 
-      case 154: // ifne (0x9a)
-        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
-        ret = generator->jump_cond(label, COND_NOT_EQUAL);
-        pc += 3;
-        //value1 = POP_INTEGER();
-        //if (value1 != 0)
-        //{ pc += GET_PC_INT16(1); }
-        //  else
-        //{ pc += 3; }
-        break;
-
-      case 155: // iflt (0x9b)
-        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
-        ret = generator->jump_cond(label, COND_LESS);
-        pc += 3;
-        //value1 = POP_INTEGER();
-        //if (value1 < 0)
-        //{ pc += GET_PC_INT16(1); }
-        //  else
-        //{ pc += 3; }
-        break;
-
-      case 156: // ifge (0x9c)
-        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
-        ret = generator->jump_cond(label, COND_GREATER_EQUAL);
-        pc += 3;
-        //value1 = POP_INTEGER();
-        //if (value1 >= 0)
-        //{ pc += GET_PC_INT16(1); }
-        //  else
-        //{ pc += 3; }
-        break;
-
-      case 157: // ifgt (0x9d)
-        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
-        ret = generator->jump_cond(label, COND_GREATER);
-        pc += 3;
-        //value1 = POP_INTEGER();
-        //if (value1 > 0)
-        //{ pc += GET_PC_INT16(1); }
-        //  else
-        //{ pc += 3; }
-        break;
-
-      case 158: // ifle (0x9e)
-        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
-        ret = generator->jump_cond(label, COND_LESS_EQUAL);
-        pc += 3;
-        //value1 = POP_INTEGER();
-        //if (value1 <= 0)
-        //{ pc += GET_PC_INT16(1); }
-        //  else
-        //{ pc += 3; }
-        break;
-
       case 159: // if_icmpeq (0x9f)
-        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
-        ret = generator->jump_cond_integer(label, COND_EQUAL);
-        pc += 3;
-        //value1 = POP_INTEGER();
-        //value2 = POP_INTEGER();
-        //if (value2 == value1)
-        //{ pc += GET_PC_INT16(1); }
-        //  else
-        //{ pc += 3; }
-        break;
-
       case 160: // if_icmpne (0xa0)
-        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
-        ret = generator->jump_cond_integer(label, COND_NOT_EQUAL);
-        pc += 3;
-        //value1 = POP_INTEGER();
-        //value2 = POP_INTEGER();
-        //if (value2 != value1)
-        //{ pc += GET_PC_INT16(1); }
-        //  else
-        //{ pc += 3; }
-        break;
-
       case 161: // if_icmplt (0xa1)
-        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
-        ret = generator->jump_cond_integer(label, COND_LESS);
-        pc += 3;
-        //value1 = POP_INTEGER();
-        //value2 = POP_INTEGER();
-        //if (value2 < value1)
-        //{ pc += GET_PC_INT16(1); }
-        //  else
-        //{ pc += 3; }
-        break;
-
       case 162: // if_icmpge (0xa2)
-        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
-        ret = generator->jump_cond_integer(label, COND_GREATER_EQUAL);
-        pc += 3;
-        //value1 = POP_INTEGER();
-        //value2 = POP_INTEGER();
-        //if (value2 >= value1)
-        //{ pc += GET_PC_INT16(1); }
-        //  else
-        //{ pc += 3; }
-        break;
-
       case 163: // if_icmpgt (0xa3)
-        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
-        ret = generator->jump_cond_integer(label, COND_GREATER);
-        pc += 3;
-        //value1 = POP_INTEGER();
-        //value2 = POP_INTEGER();
-        //if (value2 > value1)
-        //{ pc += GET_PC_INT16(1); }
-        //  else
-        //{ pc += 3; }
-        break;
-
       case 164: // if_icmple (0xa4)
         sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
-        ret = generator->jump_cond_integer(label, COND_LESS_EQUAL);
+        ret = generator->jump_cond_integer(label, cond_table[bytes[pc]-159]);
         pc += 3;
+
         //value1 = POP_INTEGER();
         //value2 = POP_INTEGER();
         //if (value2 <= value1)

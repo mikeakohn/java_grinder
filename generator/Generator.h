@@ -55,6 +55,7 @@ public:
   virtual int inc_integer(int index, int num) = 0;
   virtual int jump_cond(const char *label, int cond) = 0;
   virtual int jump_cond_integer(const char *label, int cond) = 0;
+  virtual int jump_cond_integer(const char *label, int cond, int const_val) { return -1; } 
   virtual int return_local(int index, int local_count) = 0;
   virtual int return_integer(int local_count) = 0;
   virtual int return_void(int local_count) = 0;
@@ -72,7 +73,9 @@ public:
   virtual int ioport_setPinsValue(int port) { return -1; }
   virtual int ioport_setPinsValue(int port, int const_val) { return -1; }
   virtual int ioport_setPinsHigh(int port) { return -1; }
+  virtual int ioport_setPinsHigh(int port, int const_val) { return -1; }
   virtual int ioport_setPinsLow(int port) { return -1; }
+  virtual int ioport_setPinsLow(int port, int const_val) { return -1; }
   virtual int ioport_setPinAsOutput(int port) { return -1; }
   virtual int ioport_setPinAsOutput(int port, int const_val) { return -1; }
   virtual int ioport_setPinAsInput(int port) { return -1; }

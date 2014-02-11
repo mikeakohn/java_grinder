@@ -617,11 +617,47 @@ int DSPIC::ioport_setPinsAsInput(int port)
   return set_periph("ior", periph);
 }
 
+int DSPIC::ioport_setPinsAsInput(int port, int const_val)
+{
+  char periph[32];
+  sprintf(periph, "TRIS%c", port+'A');
+
+  int pin = get_pin_number(const_val);
+  if (pin == -1)
+  {
+    fprintf(out, "  mov #0x%04x, w0\n", const_val);
+    fprintf(out, "  ior %s\n", periph);
+    return 0;
+  }
+
+  fprintf(out, "  bset %s, #%d\n", periph, pin);
+
+  return 0;
+}
+
 int DSPIC::ioport_setPinsAsOutput(int port)
 {
   char periph[32];
   sprintf(periph, "TRIS%c", port+'A');
   return set_periph("and", periph, true);
+}
+
+int DSPIC::ioport_setPinsAsOutput(int port, int const_val)
+{
+  char periph[32];
+  sprintf(periph, "TRIS%c", port+'A');
+
+  int pin = get_pin_number(const_val);
+  if (pin == -1)
+  {
+    fprintf(out, "  mov #0x%04x, w0\n", const_val^0xffff);
+    fprintf(out, "  and %s\n", periph);
+    return 0;
+  }
+
+  fprintf(out, "  bclr %s, #%d\n", periph, pin);
+
+  return 0;
 }
 
 int DSPIC::ioport_setPinsValue(int port)
@@ -651,11 +687,47 @@ int DSPIC::ioport_setPinsHigh(int port)
   return set_periph("ior", periph);
 }
 
+int DSPIC::ioport_setPinsHigh(int port, int const_val)
+{
+  char periph[32];
+  sprintf(periph, "LAT%c", port+'A');
+
+  int pin = get_pin_number(const_val);
+  if (pin == -1)
+  {
+    fprintf(out, "  mov #0x%04x, w0\n", const_val);
+    fprintf(out, "  ior %s\n", periph);
+    return 0;
+  }
+
+  fprintf(out, "  bset %s, #%d\n", periph, pin);
+
+  return 0;
+}
+
 int DSPIC::ioport_setPinsLow(int port)
 {
   char periph[32];
   sprintf(periph, "LAT%c", port+'A');
   return set_periph("and", periph, true);
+}
+
+int DSPIC::ioport_setPinsLow(int port, int const_val)
+{
+  char periph[32];
+  sprintf(periph, "LAT%c", port+'A');
+
+  int pin = get_pin_number(const_val);
+  if (pin == -1)
+  {
+    fprintf(out, "  mov #0x%04x, w0\n", const_val^0xffff);
+    fprintf(out, "  and %s\n", periph);
+    return 0;
+  }
+
+  fprintf(out, "  bclr %s, #%d\n", periph, pin);
+
+  return 0;
 }
 
 int DSPIC::ioport_setPinAsOutput(int port)
@@ -1379,5 +1451,22 @@ int DSPIC::stack_shift(const char *instr)
   }
 
   return 0;
+}
+
+int DSPIC::get_pin_number(int const_val)
+{
+int n,pin=-1;
+
+  for (n = 0; n < 8; n++)
+  {
+    if ((const_val & (1 << n)) != 0)
+    {
+      // if more than one pin is 1, we can't use it.
+      if (pin != -1) { return -1; }
+      pin = n;
+    }
+  }
+
+  return pin;
 }
 

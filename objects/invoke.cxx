@@ -253,11 +253,11 @@ char function[256];
     return -1;
   }
 
-  //printf("method: '%s as %s' from %s\n", method_name, method_sig, method_class);
+  printf("const method: '%s as %s' from %s\n", method_name, method_sig, method_class);
 
   get_static_function(function, method_name, method_sig);
 
-  //printf("function: %s()\n", function);
+  printf("const function: %s()\n", function);
   int ret = -1;
 
   size_t len = sizeof("net/mikekohn/java_grinder/") - 1;

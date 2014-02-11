@@ -69,10 +69,14 @@ public:
 
   // GPIO functions
   virtual int ioport_setPinsAsInput(int port);
+  virtual int ioport_setPinsAsInput(int port, int const_val);
   virtual int ioport_setPinsAsOutput(int port);
+  virtual int ioport_setPinsAsOutput(int port, int const_val);
   virtual int ioport_setPinsValue(int port);
   virtual int ioport_setPinsHigh(int port);
+  virtual int ioport_setPinsHigh(int port, int const_val);
   virtual int ioport_setPinsLow(int port);
+  virtual int ioport_setPinsLow(int port, int const_val);
   virtual int ioport_setPinAsOutput(int port);
   virtual int ioport_setPinAsOutput(int port, int const_val);
   virtual int ioport_setPinAsInput(int port);
@@ -152,6 +156,7 @@ private:
   int stack_alu(const char *instr);
   int stack_alu_div();
   int stack_shift(const char *instr);
+  int get_pin_number(int const_val);
 
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 

@@ -741,6 +741,47 @@ bool reverse = false;
   return 0;
 }
 
+int MSP430::jump_cond_integer(const char *label, int cond, int const_val)
+{
+bool reverse = false;
+
+  // MSP430 doesn't have LESS_EQUAL or GREATER so change them
+  if (cond == COND_LESS_EQUAL)
+  {
+    reverse = true;
+    cond = COND_GREATER_EQUAL;
+  }
+    else
+  if (cond == COND_GREATER)
+  {
+    reverse = true;
+    cond = COND_LESS;
+  }
+
+  if (stack >= 1)
+  {
+    return -1;
+  }
+    else
+  {
+    if (reverse == false)
+    {
+      fprintf(out, "  cmp.w #%d, r%d\n", const_val, REG_STACK(reg-1));
+    }
+      else
+    {
+      //fprintf(out, "  cmp.w r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+      return -1;
+    }
+
+    reg -= 1;
+  }
+
+  fprintf(out, "  %s %s\n", cond_str[cond], label);
+
+  return 0;
+}
+
 int MSP430::return_local(int index, int local_count)
 {
   fprintf(out, "  mov.w -%d(w12), r15\n", LOCALS(index));
