@@ -864,16 +864,31 @@ int DSPIC::spi_init(int port, int clock_divisor, int mode)
   int spre = (clock_divisor & 1) ^ 0x7;
   int ppre = (clock_divisor >> 1) ^ 0x3;
 
-  fprintf(out, ";; Set up SPI\n");
-  fprintf(out, "mov #(1<<MSTEN)|%s%s(%d<<2)|(%d), w0\n",
+  fprintf(out, "  ;; Set up SPI\n");
+  // This chip needs the RP pins set.
+  if (chip_type == DSPIC33FJ06GS101A)
+  {
+    fprintf(out, "  ; SDI is on RP2\n");
+    fprintf(out, "  mov #SDI1R2, w0\n");
+    fprintf(out, "  mov w0, RPINR20\n");
+
+    fprintf(out, "  ; SDO is on RP3\n");
+    fprintf(out, "  mov #(0x7<<8), w0\n");
+    fprintf(out, "  mov w0, RPOR1     ; controls RP2, RP3\n");
+
+    fprintf(out, "  ; SCLK is on RP1\n");
+    fprintf(out, "  mov #(0x8<<8), w0\n");
+    fprintf(out, "  mov w0, RPOR0     ; controls RP0, RP1\n");
+  }
+  fprintf(out, "  mov #(1<<MSTEN)|%s%s(%d<<2)|(%d), w0\n",
     (mode & 2) == 0 ? "":"(1<<CKP)|",
     (mode &1) == 0 ? "" : "(1<<CKE)|",
     spre, ppre);
-  fprintf(out, "mov w0, SPI1CON1\n");
-  fprintf(out, "mov #(1<<SPIEN), w0\n");
-  fprintf(out, "mov w0, SPI1STAT\n\n");
+  fprintf(out, "  mov w0, SPI1CON1\n");
+  fprintf(out, "  mov #(1<<SPIEN), w0\n");
+  fprintf(out, "  mov w0, SPI1STAT\n\n");
 
-  return -1;
+  return 0;
 }
 
 int DSPIC::spi_send(int port)

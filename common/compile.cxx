@@ -104,6 +104,8 @@ int address;
 // FIXME - Too many parameters :(.
 static int optimize_const(JavaClass *java_class, Generator *generator, char *method_name, uint8_t *bytes, int pc, int pc_end, int address, int const_val)
 {
+int const_vals[2];
+
   // istore_x
   if (bytes[pc] >= 0x3b && bytes[pc] <= 0x3e) // istore_x
   {
@@ -128,15 +130,6 @@ static int optimize_const(JavaClass *java_class, Generator *generator, char *met
     return 3;
   }
 
-  // invokestatic
-  if (pc + 2 < pc_end && bytes[pc] == 0xb8)
-  {
-    int ref = GET_PC_UINT16(1);
-    if (invoke_static_one_const(java_class, ref, generator, const_val) != 0)
-    { return 0; }
-    return 3;
-  }
-
   // 159 (0x9f) if_icmpeq
   // 160 (0xa0) if_icmpne
   // 161 (0xa1) if_icmplt
@@ -151,6 +144,37 @@ static int optimize_const(JavaClass *java_class, Generator *generator, char *met
     { return 0; }
     return 3;
   }
+
+  // invokestatic with one const
+  if (pc + 2 < pc_end && bytes[pc] == 0xb8)
+  {
+    int ref = GET_PC_UINT16(1);
+    if (invoke_static(java_class, ref, generator, &const_val, 1) != 0)
+    { return 0; }
+    return 3;
+  }
+
+  // invokestatic with two const
+  // 02 (0x02) iconst_m1
+  // 03 (0x03) iconst_0
+  // 04 (0x04) iconst_1
+  // 05 (0x05) iconst_2
+  // 06 (0x06) iconst_3
+  // 07 (0x07) iconst_4
+  // 08 (0x08) iconst_5
+  if (pc + 3 < pc_end &&
+      bytes[pc] >= 0x02 && bytes[pc] <= 0x08 &&
+      bytes[pc+1] == 0xb8)
+  {
+    const_vals[0] = const_val;
+    const_vals[1] = (int8_t)bytes[pc] - 3;
+    int ref = GET_PC_UINT16(2);
+    if (invoke_static(java_class, ref, generator, const_vals, 2) != 0)
+    { return 0; }
+    return 4;
+  }
+
+  // FIXME - add more invoke(const,const) combinations.
 
   return 0;
 }

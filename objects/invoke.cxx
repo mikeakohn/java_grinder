@@ -40,13 +40,25 @@
 #define CHECK_WITH_PORT_CONST(a,b,c) \
     if (strcmp(cls, #a#c) == 0) \
     { \
-      ret = b(java_class, generator, function, c, const_val); \
+      ret = b(java_class, generator, function, c, const_vals[0]); \
     }
 
 #define CHECK_CONST(a,b) \
     if (strcmp(cls, #a) == 0) \
     { \
-      ret = b(java_class, generator, function, const_val); \
+      ret = b(java_class, generator, function, const_vals[0]); \
+    }
+
+#define CHECK_WITH_PORT_CONST_2(a,b,c) \
+    if (strcmp(cls, #a#c) == 0) \
+    { \
+      ret = b(java_class, generator, function, c, const_vals[0], const_vals[1]); \
+    }
+
+#define CHECK_CONST_2(a,b) \
+    if (strcmp(cls, #a) == 0) \
+    { \
+      ret = b(java_class, generator, function, const_vals[0], const_vals[1]); \
     }
 
 static void get_virtual_function(char *function, char *method_name, char *method_sig, char *field_name, char *field_class)
@@ -237,14 +249,14 @@ char function[256];
   return -1;
 }
 
-int invoke_static_one_const(JavaClass *java_class, int method_id, Generator *generator, int const_val)
+int invoke_static(JavaClass *java_class, int method_id, Generator *generator, int *const_vals, int const_count)
 {
 char method_name[128];
 char method_sig[128];
 char method_class[128];
 char function[256];
 
-  printf("invoke_static_one_const()\n");
+  printf("const invoke_static()\n");
 
   if (java_class->get_class_name(method_class, sizeof(method_class), method_id) != 0 ||
       java_class->get_ref_name_type(method_name, method_sig, sizeof(method_name), method_id) != 0)
@@ -269,19 +281,32 @@ char function[256];
 
   char *cls = method_class + len;
 
-  CHECK_WITH_PORT_CONST(IOPort, ioport, 0)
-  CHECK_WITH_PORT_CONST(IOPort, ioport, 1)
-  CHECK_WITH_PORT_CONST(IOPort, ioport, 2)
-  CHECK_WITH_PORT_CONST(IOPort, ioport, 3)
-  CHECK_WITH_PORT_CONST(IOPort, ioport, 4)
-  CHECK_WITH_PORT_CONST(IOPort, ioport, 5)
-  CHECK_CONST(Memory, memory)
-  CHECK_WITH_PORT_CONST(SPI, spi, 0)
-  CHECK_WITH_PORT_CONST(SPI, spi, 1)
+  if (const_count == 1)
+  {
+    CHECK_WITH_PORT_CONST(IOPort, ioport, 0)
+    CHECK_WITH_PORT_CONST(IOPort, ioport, 1)
+    CHECK_WITH_PORT_CONST(IOPort, ioport, 2)
+    CHECK_WITH_PORT_CONST(IOPort, ioport, 3)
+    CHECK_WITH_PORT_CONST(IOPort, ioport, 4)
+    CHECK_WITH_PORT_CONST(IOPort, ioport, 5)
+    CHECK_CONST(Memory, memory)
+    CHECK_WITH_PORT_CONST(SPI, spi, 0)
+    CHECK_WITH_PORT_CONST(SPI, spi, 1)
+      else
+    {}
+  }
     else
-  {}
+  if (const_count == 2)
+  {
+    CHECK_WITH_PORT_CONST_2(SPI, spi, 0)
+    CHECK_WITH_PORT_CONST_2(SPI, spi, 1)
+      else
+    {}
+  }
 
   if (ret == 0) { return 0; }
+
+  printf("invoke static const NOPE\n");
 
   return -1;
 }

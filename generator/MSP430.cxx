@@ -1110,14 +1110,14 @@ int MSP430::spi_init(int port)
 
 int MSP430::spi_init(int port, int clock_divisor, int mode)
 {
-  fprintf(out, ";; Set up SPI\n");
-  fprintf(out, "mov.b #(USIPE7|USIPE6|USIPE5|USIMST|USIOE|USISWRST), &USICTL0\n");
-  fprintf(out, "mov.b #%s, &USICTL1\n",
+  fprintf(out, "  ;; Set up SPI\n");
+  fprintf(out, "  mov.b #(USIPE7|USIPE6|USIPE5|USIMST|USIOE|USISWRST), &USICTL0\n");
+  fprintf(out, "  mov.b #%s, &USICTL1\n",
     (mode & 1) == 0 ? "0":"|USICKPH");
-  fprintf(out, "mov.b #USIDIV_%d|USISSEL_2%s, &USICKCTL\n",
+  fprintf(out, "  mov.b #USIDIV_%d|USISSEL_2%s, &USICKCTL\n",
     clock_divisor,
     (mode & 2) == 0 ? "":"|USICKPL");
-  fprintf(out, "bic.b #USISWRST, &USICTL0      ; clear reset\n\n");
+  fprintf(out, "  bic.b #USISWRST, &USICTL0      ; clear reset\n\n");
 
   return 0;
 }
