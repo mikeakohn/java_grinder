@@ -97,6 +97,7 @@ public:
 
   // SPI functions
   virtual int spi_init(int port) { return -1; }
+  virtual int spi_init(int port, int clock_divisor, int mode) { return -1; }
   virtual int spi_send(int port) { return -1; }
   virtual int spi_read(int port) { return -1; }
   virtual int spi_isDataAvailable(int port) { return -1; }

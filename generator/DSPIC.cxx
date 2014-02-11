@@ -859,6 +859,23 @@ char dst[16];
   return 0;
 }
 
+int DSPIC::spi_init(int port, int clock_divisor, int mode)
+{
+  int spre = (clock_divisor & 1) ^ 0x7;
+  int ppre = (clock_divisor >> 1) ^ 0x3;
+
+  fprintf(out, ";; Set up SPI\n");
+  fprintf(out, "mov #(1<<MSTEN)|%s%s(%d<<2)|(%d), w0\n",
+    (mode & 2) == 0 ? "":"(1<<CKP)|",
+    (mode &1) == 0 ? "" : "(1<<CKE)|",
+    spre, ppre);
+  fprintf(out, "mov w0, SPI1CON1\n");
+  fprintf(out, "mov #(1<<SPIEN), w0\n");
+  fprintf(out, "mov w0, SPI1STAT\n\n");
+
+  return -1;
+}
+
 int DSPIC::spi_send(int port)
 {
 char dst[16];
