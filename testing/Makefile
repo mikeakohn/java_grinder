@@ -1,5 +1,6 @@
 
-JOBJS=Testing.class \
+JOBJS=Arrays.class \
+      Testing.class \
       Testing2.class \
       DSPTest.class \
       LedBlink.class \

@@ -260,7 +260,7 @@ printf("code_len=%d\n", code_len);
   {
     int address = pc - pc_start;
 #ifdef DEBUG
-    printf("pc=%d opcode=%d (0x%02x)\n", address, bytes[pc], bytes[pc]);
+    printf("pc=%d %s opcode=%d (0x%02x)\n", address, table_java_instr[bytes[pc]].name, bytes[pc], bytes[pc]);
 #endif
     if ((label_map[address / 8] & (1 << (address % 8))) != 0)
     {
@@ -604,7 +604,8 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 53: // saload (0x35)
-        UNIMPL()
+        printf("WARNING!!!!!!!!!!!!!!! half implemented\n");
+        //UNIMPL()
         pc++;
         break;
 
@@ -1417,7 +1418,19 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 190: // arraylength (0xbe)
-        UNIMPL()
+        //printf("operand_stack=%d\n", operand_stack[--operand_stack_ptr]);
+        printf("operand_stack_ptr=%d\n", operand_stack_ptr);
+        gen32 = (generic_32bit_t *)java_class->get_constant(operand_stack[--operand_stack_ptr]);
+        printf("tag=%d\n", gen32->tag);
+        if (gen32->tag == CONSTANT_FIELDREF)
+        {
+          constant_fieldref_t *field_ref = (struct constant_fieldref_t *)gen32;
+          printf("class_index=%d name_and_type=%d\n", field_ref->class_index, field_ref->name_and_type_index);
+        }
+
+        printf("WARNING!!!!!!!!!!!!!!! half implemented\n");
+        pc++;
+        //UNIMPL()
         break;
 
       case 191: // athrow (0xbf)

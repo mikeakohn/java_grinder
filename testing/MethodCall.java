@@ -1,6 +1,4 @@
 
-import net.mikekohn.java_grinder.Memory;
-
 public class MethodCall
 {
   static public void main(String args[])
