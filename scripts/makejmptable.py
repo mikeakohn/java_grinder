@@ -32,12 +32,12 @@ while 1:
     for t in range(last_opcode+1, opcode):
       print "      case "+str(t)+": // "+tokens[2]+" "+tokens[1]
       #print "        printf(\""+tokens[1]+" "+tokens[2]+"\\n\");"
-    print "        break;\n"
+    #print "        break;\n"
 
   print "      case "+str(opcode)+": // "+tokens[2]+" "+tokens[1]
   #print "        printf(\""+tokens[1]+" "+tokens[2]+"\\n\");"
-  print "        printf(\"Opcode "+tokens[1]+" "+tokens[2]+" unimplemented\\n\");"
-  print "        break;\n"
+  #print "        printf(\"Opcode "+tokens[1]+" "+tokens[2]+" unimplemented\\n\");"
+  #print "        break;\n"
 
   last_opcode = opcode
 
