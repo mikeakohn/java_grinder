@@ -13,9 +13,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "Generator.h"
 #include "JavaClass.h"
 #include "compile.h"
-#include "Generator.h"
+#include "execute_static.h"
 #include "ARM.h"
 #include "DSPIC.h"
 #include "M6502.h"
@@ -29,6 +30,7 @@ int main(int argc, char *argv[])
 FILE *in;
 Generator *generator;
 JavaClass *java_class;
+char method_name[32];
 int index;
 
   if (argc != 4)
@@ -98,6 +100,20 @@ int index;
   int ret = 0;
   for (index = 0; index < method_count; index++)
   {
+    if (java_class->get_method_name(method_name, sizeof(method_name), index) == 0)
+    {
+      if (strcmp("<clinit>", method_name) == 0)
+      {
+        if (execute_static(java_class, index, generator) != 0)
+        {
+          printf("** Error setting statics.\n");
+          ret = -1;
+          break;
+        }
+        continue;
+      }
+    }
+
     if (compile_method(java_class, index, generator) != 0)
     {
       printf("** Error compiling class.\n");

@@ -24,7 +24,21 @@
 // how to add the other code to the init section.  Maybe the trick is to
 // generate a brand new Java function and compile it.
 
-#define UNIMPL() printf("Unimplemented\n"); return -1;
+#define UNIMPL() { printf("Unimplemented\n"); ret = -1; break; }
+#define CHECK_STACK() \
+        if (stack_ptr < 2) \
+        { \
+          printf("Error: stack < 2\n"); \
+          ret = -1; \
+          break; \
+        }
+#define CHECK_BOUNDS() \
+        if (index > array_len) \
+        { \
+          printf("Error: array index %d out of bounds\n", index); \
+          ret = -1; \
+          break; \
+        }
 
 int execute_static(JavaClass *java_class, int method_id, Generator *generator)
 {
@@ -39,6 +53,13 @@ int code_len;
 int32_t *stack;
 int32_t temp;
 int stack_ptr;
+int32_t *array = NULL;
+int array_len;
+int array_alloc_size = 0;
+int index;
+int ret;
+
+  printf("--- Executing static code\n");
 
   // bytes points to the method attributes info for the method.
   max_stack = ((int)bytes[0]<<8) | ((int)bytes[1]);
@@ -62,6 +83,7 @@ int stack_ptr;
     int address = pc - pc_start;
 #ifdef DEBUG
     printf("pc=%d %s opcode=%d (0x%02x)\n", address, table_java_instr[bytes[pc]].name, bytes[pc], bytes[pc]);
+#endif
 
     switch(bytes[pc])
     {
@@ -77,8 +99,10 @@ int stack_ptr;
       case 8: // iconst_5 (0x08)
         stack[stack_ptr++] = bytes[pc] - 0x03;
         break;
-      case 9: // lconst_0 (0x09)
+      case 9:  // lconst_0 (0x09)
       case 10: // lconst_1 (0x0a)
+        stack[stack_ptr++] = bytes[pc] - 0x09;
+        break;
       case 11: // fconst_0 (0x0b)
       case 12: // fconst_1 (0x0c)
       case 13: // fconst_2 (0x0d)
@@ -150,14 +174,36 @@ int stack_ptr;
       case 76: // astore_1 (0x4c)
       case 77: // astore_2 (0x4d)
       case 78: // astore_3 (0x4e)
+        UNIMPL();
       case 79: // iastore (0x4f)
+        CHECK_STACK();
+        index = stack[stack_ptr-2];
+        CHECK_BOUNDS();
+        array[index] = stack[stack_ptr-1];
+        stack_ptr -= 3;
+        break;
       case 80: // lastore (0x50)
       case 81: // fastore (0x51)
       case 82: // dastore (0x52)
       case 83: // aastore (0x53)
+        UNIMPL();
       case 84: // bastore (0x54)
+        CHECK_STACK();
+        index = stack[stack_ptr-2];
+        CHECK_BOUNDS();
+        array[index] = stack[stack_ptr-1];
+        stack_ptr -= 3;
+        break;
       case 85: // castore (0x55)
+        UNIMPL();
       case 86: // sastore (0x56)
+        CHECK_STACK();
+        index = stack[stack_ptr-2];
+        //printf("index=%d value=%d\n", index, stack_ptr-1);
+        CHECK_BOUNDS();
+        array[index] = stack[stack_ptr-1];
+        stack_ptr -= 3;
+        break;
       case 87: // pop (0x57)
         stack_ptr--;
         break;
@@ -165,7 +211,7 @@ int stack_ptr;
         stack_ptr -= 2;
         break;
       case 89: // dup (0x59)
-        temp = stack[stack_ptr];
+        temp = stack[stack_ptr-1];
         stack[stack_ptr++] = temp;
         break;
       case 90: // dup_x1 (0x5a)
@@ -255,10 +301,21 @@ int stack_ptr;
       case 174: // freturn (0xae)
       case 175: // dreturn (0xaf)
       case 176: // areturn (0xb0)
+        UNIMPL()
       case 177: // return (0xb1)
+        ret = 1;
+        break;
       case 178: // getstatic (0xb2)
+        UNIMPL()
       case 179: // putstatic (0xb3)
+        for (int n = 0; n < array_len; n++)
+        {
+          printf(" %d", array[n]);
+        }
+        printf("\n");
+        break;
       case 180: // getfield (0xb4)
+        UNIMPL()
       case 181: // putfield (0xb5)
       case 182: // invokevirtual (0xb6)
       case 183: // invokespecial (0xb7)
@@ -266,7 +323,25 @@ int stack_ptr;
       case 185: // invokeinterface (0xb9)
       case 186: // xxxunusedxxx1 (0xba)
       case 187: // new (0xbb)
+        UNIMPL()
       case 188: // newarray (0xbc)
+        if (stack_ptr < 1)
+        {
+          printf("Error: stack < 1\n");
+          ret = -1;
+          break;
+        }
+        array_len = stack[stack_ptr-1];
+        stack[stack_ptr-1] = 0; // FIXME - put the new array on the stack
+        printf("array_len=%d\n", array_len);
+        if (array_len > array_alloc_size)
+        {
+          array_alloc_size = array_len < 8192 ? 8192 : array_len;
+          array = (int32_t *)realloc(array, array_alloc_size * sizeof(int32_t));
+          memset(array, 0, array_len * sizeof(int32_t));
+        }
+        stack_ptr--;
+        break;
       case 189: // anewarray (0xbd)
       case 190: // arraylength (0xbe)
       case 191: // athrow (0xbf)
@@ -340,21 +415,23 @@ int stack_ptr;
       case 255: // impdep2 (0xff)
         UNIMPL()
     }
-#endif
 
+    if (ret == 0) { break; }
     if (stack_ptr < 0 || stack_ptr > max_stack)
     {
       printf("Stack error: stack_ptr=%d max_stack=%d\n", stack_ptr, max_stack);
-      return -1;
+      ret = -1;
+      break;
     }
 
-    if (wide == 1) { pc += table_java_instr[bytes[pc]].normal; }
-    else { pc += table_java_instr[bytes[pc]].wide; }
+    if (wide == 1) { pc += table_java_instr[bytes[pc]].wide; }
+    else { pc += table_java_instr[bytes[pc]].normal; }
 
     wide = 0;
   }
 
-
+  if (array != NULL) { free(array); }
+  if (ret == -1) { return -1; }
 
   return 0;
 }
