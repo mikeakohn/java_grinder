@@ -13,6 +13,7 @@
 #define _GENERATOR_H
 
 #include <stdio.h>
+#include <stdint.h>
 
 class Generator
 {
@@ -63,6 +64,7 @@ public:
   virtual int call(const char *name) = 0;
   virtual int invoke_static_method(const char *name, int params, int is_void) = 0;
   virtual int brk() = 0;
+  virtual int insert_array(const char *name, int32_t *data, int len, uint8_t type) = 0;
   //virtual void close() = 0;
 
   // GPIO functions
@@ -166,6 +168,15 @@ enum
   COND_LESS_EQUAL,
   COND_GREATER,
   COND_GREATER_EQUAL,
+};
+
+enum
+{
+  TYPE_BYTE,
+  TYPE_SHORT,
+  TYPE_CHAR,
+  TYPE_INT,
+  TYPE_LONG,
 };
 
 #if 0

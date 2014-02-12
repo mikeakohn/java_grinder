@@ -65,6 +65,7 @@ public:
   virtual int call(const char *name);
   virtual int invoke_static_method(const char *name, int params, int is_void);
   virtual int brk();
+  virtual int insert_array(const char *name, int32_t *data, int len, uint8_t type);
   //virtual void close();
 
   // GPIO functions

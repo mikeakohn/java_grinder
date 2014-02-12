@@ -25,10 +25,10 @@
 // generate a brand new Java function and compile it.
 
 #define UNIMPL() { printf("Unimplemented\n"); ret = -1; break; }
-#define CHECK_STACK() \
-        if (stack_ptr < 2) \
+#define CHECK_STACK(n) \
+        if (stack_ptr < n) \
         { \
-          printf("Error: stack < 2\n"); \
+          printf("Error: stack < %d\n", n); \
           ret = -1; \
           break; \
         }
@@ -56,6 +56,7 @@ int stack_ptr;
 int32_t *array = NULL;
 int array_len;
 int array_alloc_size = 0;
+char field_name[128];
 int index;
 int ret;
 
@@ -89,8 +90,8 @@ int ret;
     {
       case 0: // nop (0x00)
       case 1: // aconst_null (0x01)
-      case 2: // iconst_m1 (0x02)
         UNIMPL();
+      case 2: // iconst_m1 (0x02)
       case 3: // iconst_0 (0x03)
       case 4: // iconst_1 (0x04)
       case 5: // iconst_2 (0x05)
@@ -176,7 +177,7 @@ int ret;
       case 78: // astore_3 (0x4e)
         UNIMPL();
       case 79: // iastore (0x4f)
-        CHECK_STACK();
+        CHECK_STACK(2);
         index = stack[stack_ptr-2];
         CHECK_BOUNDS();
         array[index] = stack[stack_ptr-1];
@@ -188,7 +189,7 @@ int ret;
       case 83: // aastore (0x53)
         UNIMPL();
       case 84: // bastore (0x54)
-        CHECK_STACK();
+        CHECK_STACK(2);
         index = stack[stack_ptr-2];
         CHECK_BOUNDS();
         array[index] = stack[stack_ptr-1];
@@ -197,7 +198,7 @@ int ret;
       case 85: // castore (0x55)
         UNIMPL();
       case 86: // sastore (0x56)
-        CHECK_STACK();
+        CHECK_STACK(2);
         index = stack[stack_ptr-2];
         //printf("index=%d value=%d\n", index, stack_ptr-1);
         CHECK_BOUNDS();
@@ -308,11 +309,20 @@ int ret;
       case 178: // getstatic (0xb2)
         UNIMPL()
       case 179: // putstatic (0xb3)
+        CHECK_STACK(1);
+        if (java_class->get_field_name(field_name, sizeof(field_name), stack[--stack_ptr]) != 0)
+        {
+          printf("Error retrieving field name %d\n", stack[stack_ptr]);
+          ret = -1;
+          break;
+        }
+        printf("field_name=%s len=%d\n", field_name, array_len);
         for (int n = 0; n < array_len; n++)
         {
           printf(" %d", array[n]);
         }
         printf("\n");
+        generator->insert_array(field_name, array, array_len, TYPE_INT);
         break;
       case 180: // getfield (0xb4)
         UNIMPL()
@@ -325,12 +335,7 @@ int ret;
       case 187: // new (0xbb)
         UNIMPL()
       case 188: // newarray (0xbc)
-        if (stack_ptr < 1)
-        {
-          printf("Error: stack < 1\n");
-          ret = -1;
-          break;
-        }
+        CHECK_STACK(1);
         array_len = stack[stack_ptr-1];
         stack[stack_ptr-1] = 0; // FIXME - put the new array on the stack
         printf("array_len=%d\n", array_len);

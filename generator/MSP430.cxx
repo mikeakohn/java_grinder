@@ -921,6 +921,27 @@ int n;
   return 0;
 }
 
+int MSP430::insert_array(const char *name, int32_t *data, int len, uint8_t type)
+{
+int n;
+
+  fprintf(out, "  dw %d   ; %s.length\n", len, name);
+  fprintf(out, "%s:\n", name);
+
+  for (n = 0; n < len; n++)
+  {
+    if ((n % 8) == 0) { fprintf(out, "  dw"); }
+    else { fprintf(out, ","); }
+    fprintf(out, " 0x%04x", (uint16_t)data[n]);
+
+    if (((n + 1) % 8) == 0) { fprintf(out, "\n"); }
+  }
+
+  fprintf(out, "\n\n");
+
+  return 0;
+}
+
 int MSP430::brk()
 {
   return -1;

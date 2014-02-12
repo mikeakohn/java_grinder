@@ -224,6 +224,11 @@ int MIPS::brk()
   return -1;
 }
 
+int MIPS::insert_array(const char *name, int32_t *data, int len, uint8_t type)
+{
+  return -1;
+}
+
 #if 0
 void MIPS::close()
 {

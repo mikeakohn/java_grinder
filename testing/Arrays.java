@@ -1,7 +1,7 @@
 
 public class Arrays
 {
-  static public final short[] numbers = { 1, 5, 2, 0, 2, 1 };
+  static public final short[] numbers = { 1, 5, 2, 0, 2, -1 };
 
   static public void main(String args[])
   {
