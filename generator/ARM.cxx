@@ -226,6 +226,15 @@ int ARM::brk()
 
 int ARM::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 {
+  if (type == TYPE_BYTE)
+  { return insert_db(name, data, len, TYPE_INT); }
+    else
+  if (type == TYPE_SHORT)
+  { return insert_dw(name, data, len, TYPE_INT); }
+    else
+  if (type == TYPE_INT)
+  { return insert_dc32(name, data, len, TYPE_INT); }
+
   return -1;
 }
 

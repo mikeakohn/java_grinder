@@ -156,6 +156,10 @@ public:
   virtual int dsp_shiftB() { return -1; }
 
 protected:
+  int insert_db(const char *name, int32_t *data, int len, uint8_t len_type);
+  int insert_dw(const char *name, int32_t *data, int len, uint8_t len_type);
+  int insert_dc32(const char *name, int32_t *data, int len, uint8_t len_type);
+
   FILE *out;
   int label_count;
 };

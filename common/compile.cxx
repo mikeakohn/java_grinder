@@ -1419,13 +1419,28 @@ printf("code_len=%d\n", code_len);
 
       case 190: // arraylength (0xbe)
         //printf("operand_stack=%d\n", operand_stack[--operand_stack_ptr]);
-        printf("operand_stack_ptr=%d\n", operand_stack_ptr);
+        printf("operand_stack_ptr=%d %d\n", operand_stack_ptr, operand_stack[operand_stack_ptr-1]);
         gen32 = (generic_32bit_t *)java_class->get_constant(operand_stack[--operand_stack_ptr]);
         printf("tag=%d\n", gen32->tag);
         if (gen32->tag == CONSTANT_FIELDREF)
         {
+          char field_name[64];
+          char type[64];
           constant_fieldref_t *field_ref = (struct constant_fieldref_t *)gen32;
           printf("class_index=%d name_and_type=%d\n", field_ref->class_index, field_ref->name_and_type_index);
+          if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), operand_stack[operand_stack_ptr]) != 0)
+          {
+            printf("Error retrieving field name const_index=%d\n", operand_stack[operand_stack_ptr]);
+            ret = -1;
+            break;
+          }
+printf("field_name=%s\n", field_name);
+        }
+          else
+        {
+          printf("Error: tag not supported\n");
+          ret = -1;
+          break;
         }
 
         printf("WARNING!!!!!!!!!!!!!!! half implemented\n");

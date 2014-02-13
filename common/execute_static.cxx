@@ -55,8 +55,10 @@ int32_t temp;
 int stack_ptr;
 int32_t *array = NULL;
 int array_len;
+int array_type;
 int array_alloc_size = 0;
 char field_name[128];
+char type[128];
 int index;
 int ret;
 
@@ -310,19 +312,43 @@ int ret;
         UNIMPL()
       case 179: // putstatic (0xb3)
         CHECK_STACK(1);
-        if (java_class->get_field_name(field_name, sizeof(field_name), stack[--stack_ptr]) != 0)
+        index = (bytes[pc+1] << 8) | bytes[pc+2];
+        printf("id=%d stack_ptr=%d const=%d\n", stack[stack_ptr-1], stack_ptr, index);
+        stack_ptr--;  // <-- this is our made up index which here is always 0
+        if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), index) != 0)
         {
           printf("Error retrieving field name %d\n", stack[stack_ptr]);
           ret = -1;
           break;
         }
-        printf("field_name=%s len=%d\n", field_name, array_len);
+        printf("field_name=%s type=%s len=%d\n", field_name, type, array_len);
+        printf("array_type=%d\n", array_type);
         for (int n = 0; n < array_len; n++)
         {
           printf(" %d", array[n]);
         }
         printf("\n");
-        generator->insert_array(field_name, array, array_len, TYPE_INT);
+        if (array_type == ARRAY_TYPE_BOOLEAN ||
+            array_type == ARRAY_TYPE_BYTE)
+        {
+          generator->insert_array(field_name, array, array_len, TYPE_BYTE);
+        }
+          else
+        if (array_type == ARRAY_TYPE_CHAR ||
+            array_type == ARRAY_TYPE_SHORT)
+        {
+          generator->insert_array(field_name, array, array_len, TYPE_SHORT);
+        }
+          else
+        if (array_type == ARRAY_TYPE_INT)
+        {
+          generator->insert_array(field_name, array, array_len, TYPE_INT);
+        }
+          else
+        {
+          printf("Unsupported array type\n");
+          ret = -1;
+        }
         break;
       case 180: // getfield (0xb4)
         UNIMPL()
@@ -338,7 +364,8 @@ int ret;
         CHECK_STACK(1);
         array_len = stack[stack_ptr-1];
         stack[stack_ptr-1] = 0; // FIXME - put the new array on the stack
-        printf("array_len=%d\n", array_len);
+        array_type = bytes[pc+1];
+        printf("array_len=%d type=%d\n", array_len, array_type);
         if (array_len > array_alloc_size)
         {
           array_alloc_size = array_len < 8192 ? 8192 : array_len;
