@@ -606,7 +606,10 @@ int DSPIC::brk()
 int DSPIC::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 {
   if (type == TYPE_BYTE)
-  { return insert_db(name, data, len, TYPE_SHORT); }
+  {
+    fprintf(out, ".align 16\n");
+    return insert_db(name, data, len, TYPE_SHORT);
+  }
     else
   if (type == TYPE_SHORT)
   { return insert_dw(name, data, len, TYPE_SHORT); }
@@ -616,6 +619,42 @@ int DSPIC::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 
   return -1;
 }
+
+int DSPIC::push_array_length(const char *name, int field_id)
+{
+  return -1;
+}
+
+int DSPIC::array_read_byte(const char *name, int field_id)
+{
+  return -1;
+}
+
+int DSPIC::array_read_short(const char *name, int field_id)
+{
+  return -1;
+}
+
+int DSPIC::array_read_int(const char *name, int field_id)
+{
+  return -1;
+}
+
+int DSPIC::array_write_byte(const char *name, int field_id)
+{
+  return -1;
+}
+
+int DSPIC::array_write_short(const char *name, int field_id)
+{
+  return -1;
+}
+
+int DSPIC::array_write_int(const char *name, int field_id)
+{
+  return -1;
+}
+
 
 #if 0
 void DSPIC::close()

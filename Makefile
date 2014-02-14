@@ -27,6 +27,10 @@ dsp: tests
 	./java_grinder testing/LCDDSPIC.class lcd_dspic.asm dspic33fj06gs101a
 	naken_asm -l -I /storage/git/naken_asm/include -o lcd_dspic.hex lcd_dspic.asm
 
+array:
+	./java_grinder testing/Arrays.class arrays.asm msp430g2231
+	naken_asm -I /storage/git/naken_asm/include/msp430 -l -o arrays.hex arrays.asm
+
 clean:
 	@rm -f *.o java_grinder build/*.o *.asm *.lst *.hex
 	@rm -f java/*.class testing/*.class build/*.jar

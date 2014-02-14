@@ -238,6 +238,41 @@ int ARM::insert_array(const char *name, int32_t *data, int len, uint8_t type)
   return -1;
 }
 
+int ARM::push_array_length(const char *name, int field_id)
+{
+  return -1;
+}
+
+int ARM::array_read_byte(const char *name, int field_id)
+{
+  return -1;
+}
+
+int ARM::array_read_short(const char *name, int field_id)
+{
+  return -1;
+}
+
+int ARM::array_read_int(const char *name, int field_id)
+{
+  return -1;
+}
+
+int ARM::array_write_byte(const char *name, int field_id)
+{
+  return -1;
+}
+
+int ARM::array_write_short(const char *name, int field_id)
+{
+  return -1;
+}
+
+int ARM::array_write_int(const char *name, int field_id)
+{
+  return -1;
+}
+
 #if 0
 void ARM::close()
 {

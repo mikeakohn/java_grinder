@@ -26,6 +26,7 @@
 // r10
 // r11 top of stack
 // r12 points to locals
+// r13 points to arrays
 // r15 is temp
 
 // Function calls:
@@ -921,10 +922,18 @@ int n;
   return 0;
 }
 
+int MSP430::brk()
+{
+  return -1;
+}
+
 int MSP430::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 {
   if (type == TYPE_BYTE)
-  { return insert_db(name, data, len, TYPE_SHORT); }
+  {
+    fprintf(out, ".align 16\n");
+    return insert_db(name, data, len, TYPE_SHORT);
+  }
     else
   if (type == TYPE_SHORT)
   { return insert_dw(name, data, len, TYPE_SHORT); }
@@ -935,7 +944,68 @@ int MSP430::insert_array(const char *name, int32_t *data, int len, uint8_t type)
   return -1;
 }
 
-int MSP430::brk()
+int MSP430::push_array_length(const char *name, int field_id)
+{
+  fprintf(out, "  mov.w #%s-2, r13\n", name);
+
+  if (reg < reg_max)
+  {
+    //fprintf(out, "  mov.w (-2)r13, r%d\n", reg);
+    fprintf(out, "  mov.w @r13, r%d\n", REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    //fprintf(out, "  push (-2)r13\n");
+    fprintf(out, "  push @r13\n");
+    stack++;
+  }
+
+  return 0;
+}
+
+int MSP430::array_read_byte(const char *name, int field_id)
+{
+  return -1;
+}
+
+int MSP430::array_read_short(const char *name, int field_id)
+{
+  fprintf(out, "  mov.w #%s, r13\n", name);
+
+  if (stack > 0)
+  {
+    fprintf(out, "  pop r15\n");
+    fprintf(out, "  rla.w r15\n");
+    fprintf(out, "  add.w r15, r13\n");
+    fprintf(out, "  push.w @r13\n");
+  }
+    else
+  {
+    fprintf(out, "  rla.w r%d\n", REG_STACK(reg-1));
+    fprintf(out, "  add.w r%d, r13\n", REG_STACK(reg-1));
+    fprintf(out, "  mov.w @r13, r%d\n", REG_STACK(reg-1));
+  }
+
+  return 0;
+}
+
+int MSP430::array_read_int(const char *name, int field_id)
+{
+  return -1;
+}
+
+int MSP430::array_write_byte(const char *name, int field_id)
+{
+  return -1;
+}
+
+int MSP430::array_write_short(const char *name, int field_id)
+{
+  return -1;
+}
+
+int MSP430::array_write_int(const char *name, int field_id)
 {
   return -1;
 }
