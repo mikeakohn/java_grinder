@@ -179,6 +179,82 @@ int const_vals[2];
   return 0;
 }
 
+static int array_load(JavaClass *java_class, Generator *generator, int constant_id, uint8_t array_type)
+{
+generic_32bit_t *gen32;
+char field_name[64];
+char type[64];
+
+  gen32 = (generic_32bit_t *)java_class->get_constant(constant_id);
+
+  if (gen32->tag == CONSTANT_FIELDREF)
+  {
+    constant_fieldref_t *field_ref = (struct constant_fieldref_t *)gen32;
+    printf("class_index=%d name_and_type=%d\n", field_ref->class_index, field_ref->name_and_type_index);
+
+    if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), constant_id) != 0)
+    {
+      printf("Error retrieving field name const_index=%d\n", constant_id);
+      return -1;
+    }
+
+    // FIXME - Do we get this from the array or from the instruction
+    if (array_type == ARRAY_TYPE_BYTE)
+    { return generator->array_read_byte(field_name, 0); }
+      else
+    if (array_type == ARRAY_TYPE_SHORT)
+    { return generator->array_read_short(field_name, 0); }
+      else
+    if (array_type == ARRAY_TYPE_INT)
+    { return generator->array_read_int(field_name, 0); }
+  }
+    else
+  {
+    printf("Error: tag not supported\n");
+    return -1;
+  }
+
+  return -1;
+}
+
+static int array_store(JavaClass *java_class, Generator *generator, int constant_id, uint8_t array_type)
+{
+generic_32bit_t *gen32;
+char field_name[64];
+char type[64];
+
+  gen32 = (generic_32bit_t *)java_class->get_constant(constant_id);
+
+  if (gen32->tag == CONSTANT_FIELDREF)
+  {
+    constant_fieldref_t *field_ref = (struct constant_fieldref_t *)gen32;
+    printf("class_index=%d name_and_type=%d\n", field_ref->class_index, field_ref->name_and_type_index);
+
+    if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), constant_id) != 0)
+    {
+      printf("Error retrieving field name const_index=%d\n", constant_id);
+      return -1;
+    }
+
+    // FIXME - Do we get this from the array or from the instruction
+    if (array_type == ARRAY_TYPE_BYTE)
+    { return generator->array_write_byte(field_name, 0); }
+      else
+    if (array_type == ARRAY_TYPE_SHORT)
+    { return generator->array_write_short(field_name, 0); }
+      else
+    if (array_type == ARRAY_TYPE_INT)
+    { return generator->array_write_int(field_name, 0); }
+  }
+    else
+  {
+    printf("Error: tag not supported\n");
+    return -1;
+  }
+
+  return -1;
+}
+
 int compile_method(JavaClass *java_class, int method_id, Generator *generator)
 {
 struct methods_t *method = java_class->get_method(method_id);
@@ -569,7 +645,11 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 46: // iaload (0x2e)
-        UNIMPL()
+        if (operand_stack_ptr == 0)
+        { ret = -1; }
+          else
+        { ret = array_load(java_class, generator, operand_stack[--operand_stack_ptr], ARRAY_TYPE_INT); }
+
         pc++;
         break;
 
@@ -594,7 +674,11 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 51: // baload (0x33)
-        UNIMPL()
+        if (operand_stack_ptr == 0)
+        { ret = -1; }
+          else
+        { ret = array_load(java_class, generator, operand_stack[--operand_stack_ptr], ARRAY_TYPE_BYTE); }
+
         pc++;
         break;
 
@@ -604,29 +688,10 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 53: // saload (0x35)
-        printf("operand_stack_ptr=%d %d\n", operand_stack_ptr, operand_stack[operand_stack_ptr-1]);
-        gen32 = (generic_32bit_t *)java_class->get_constant(operand_stack[--operand_stack_ptr]);
-        if (gen32->tag == CONSTANT_FIELDREF)
-        {
-          char field_name[64];
-          char type[64];
-          constant_fieldref_t *field_ref = (struct constant_fieldref_t *)gen32;
-          printf("class_index=%d name_and_type=%d\n", field_ref->class_index, field_ref->name_and_type_index);
-          if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), operand_stack[operand_stack_ptr]) != 0)
-          {
-            printf("Error retrieving field name const_index=%d\n", operand_stack[operand_stack_ptr]);
-            ret = -1;
-            break;
-          }
-
-          ret = generator->array_read_short(field_name, 0);
-        }
+        if (operand_stack_ptr == 0)
+        { ret = -1; }
           else
-        {
-          printf("Error: tag not supported\n");
-          ret = -1;
-          break;
-        }
+        { ret = array_load(java_class, generator, operand_stack[--operand_stack_ptr], ARRAY_TYPE_SHORT); }
 
         pc++;
         break;
@@ -778,7 +843,11 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 79: // iastore (0x4f)
-        UNIMPL()
+        if (operand_stack_ptr == 0)
+        { ret = -1; }
+          else
+        { ret = array_store(java_class, generator, operand_stack[--operand_stack_ptr], ARRAY_TYPE_BYTE); }
+
         pc++;
         break;
 
@@ -803,7 +872,11 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 84: // bastore (0x54)
-        UNIMPL()
+        if (operand_stack_ptr == 0)
+        { ret = -1; }
+          else
+        { ret = array_store(java_class, generator, operand_stack[--operand_stack_ptr], ARRAY_TYPE_BYTE); }
+
         pc++;
         break;
 
@@ -813,7 +886,11 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 86: // sastore (0x56)
-        UNIMPL()
+        if (operand_stack_ptr == 0)
+        { ret = -1; }
+          else
+        { ret = array_store(java_class, generator, operand_stack[--operand_stack_ptr], ARRAY_TYPE_INT); }
+
         pc++;
         break;
 

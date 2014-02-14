@@ -27,6 +27,7 @@
 // r11 top of stack
 // r12 points to locals
 // r13 points to arrays
+// r14 is temp
 // r15 is temp
 
 // Function calls:
@@ -966,7 +967,23 @@ int MSP430::push_array_length(const char *name, int field_id)
 
 int MSP430::array_read_byte(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  mov.w #%s, r13\n", name);
+
+  if (stack > 0)
+  {
+    fprintf(out, "  pop r15\n");
+    fprintf(out, "  add.w r15, r13\n");
+    fprintf(out, "  sxt @r13\n");
+    fprintf(out, "  push.w @r13\n");
+  }
+    else
+  {
+    fprintf(out, "  add.w r%d, r13\n", REG_STACK(reg-1));
+    fprintf(out, "  sxt @r%d\n", REG_STACK(reg-1));
+    fprintf(out, "  mov.w @r13, r%d\n", REG_STACK(reg-1));
+  }
+
+  return 0;
 }
 
 int MSP430::array_read_short(const char *name, int field_id)
@@ -992,22 +1009,84 @@ int MSP430::array_read_short(const char *name, int field_id)
 
 int MSP430::array_read_int(const char *name, int field_id)
 {
-  return -1;
+  return array_read_short(name, field_id);
 }
 
 int MSP430::array_write_byte(const char *name, int field_id)
 {
-  return -1;
+  if (stack > 2)
+  {
+    fprintf(out, "  pop.w r15\n");
+    fprintf(out, "  pop.w r13\n");
+    fprintf(out, "  rla.w r13\n");
+    fprintf(out, "  add.w #%s, r13\n", name);
+    fprintf(out, "  mov.b r15, @r13\n");
+    stack -= 2;
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  mov.w #%s, r13\n", name);
+    fprintf(out, "  pop.w r15\n");
+    fprintf(out, "  rla.w r%d\n", REG_STACK(reg-1));
+    fprintf(out, "  add.w r%d, r13\n", REG_STACK(reg-1));
+    fprintf(out, "  mov.b r15, @r13\n");
+
+    stack--;
+    reg--;
+  }
+    else
+  {
+    fprintf(out, "  mov.w #%s, r13\n", name);
+    fprintf(out, "  rla.w r%d\n", REG_STACK(reg-2));
+    fprintf(out, "  add.w r%d, r13\n", REG_STACK(reg-2));
+    fprintf(out, "  mov.b r%d, @r13\n", REG_STACK(reg-1));
+
+    reg -= 2;
+  }
+
+  return 0;
 }
 
 int MSP430::array_write_short(const char *name, int field_id)
 {
-  return -1;
+  if (stack > 2)
+  {
+    fprintf(out, "  pop.w r15\n");
+    fprintf(out, "  pop.w r13\n");
+    fprintf(out, "  rla.w r13\n");
+    fprintf(out, "  add.w #%s, r13\n", name);
+    fprintf(out, "  mov.w r15, @r13\n");
+    stack -= 2;
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  mov.w #%s, r13\n", name);
+    fprintf(out, "  pop.w r15\n");
+    fprintf(out, "  rla.w r%d\n", REG_STACK(reg-1));
+    fprintf(out, "  add.w r%d, r13\n", REG_STACK(reg-1));
+    fprintf(out, "  mov.w r15, @r13\n");
+
+    stack--;
+    reg--;
+  }
+    else
+  {
+    fprintf(out, "  mov.w #%s, r13\n", name);
+    fprintf(out, "  rla.w r%d\n", REG_STACK(reg-2));
+    fprintf(out, "  add.w r%d, r13\n", REG_STACK(reg-2));
+    fprintf(out, "  mov.w r%d, @r13\n", REG_STACK(reg-1));
+
+    reg -= 2;
+  }
+
+  return 0;
 }
 
 int MSP430::array_write_int(const char *name, int field_id)
 {
-  return -1;
+  return array_write_short(name, field_id);
 }
 
 #if 0
