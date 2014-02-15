@@ -19,13 +19,31 @@ public class Arrays
     return total;
   }
 
+  static public int create_array()
+  {
+    int[] a = new int[5];
+    int n,i = 0;
+
+    for (n = 0; n < a.length; n++)
+    {
+      a[n] = n + 3;
+    }
+
+    for (n = 0; n < a.length; n++)
+    {
+      i += a[n];
+    }
+
+    return i;
+  }
+
   static public void main(String args[])
   {
     int a;
 
     a = calc_array();
     blah = a;
-    another = blah + 1;
+    another = a + create_array(); 
 
     //System.out.println(a);
 

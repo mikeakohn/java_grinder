@@ -33,12 +33,14 @@ public:
   virtual void method_end(int local_count);
   virtual int push_integer(int32_t n);
   virtual int push_integer_local(int index);
+  virtual int push_ref_local(int index);
   virtual int push_long(int64_t n);
   virtual int push_float(float f);
   virtual int push_double(double f);
   virtual int push_byte(int8_t b);
   virtual int push_short(int16_t s);
   virtual int pop_integer_local(int index);
+  virtual int pop_ref_local(int index);
   virtual int pop();
   virtual int dup();
   virtual int dup2();
@@ -67,6 +69,7 @@ public:
   virtual int put_static(const char *name, int index);
   virtual int get_static(const char *name, int index);
   virtual int brk();
+  virtual int new_array(uint8_t type);
   virtual int insert_array(const char *name, int32_t *data, int len, uint8_t type);
   virtual int push_array_length(const char *name, int field_id);
   virtual int array_read_byte(const char *name, int field_id);

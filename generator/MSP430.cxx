@@ -232,6 +232,11 @@ int MSP430::push_integer_local(int index)
   return 0;
 }
 
+int MSP430::push_ref_local(int index)
+{
+  return push_integer_local(index);
+}
+
 int MSP430::push_long(int64_t n)
 {
   printf("long is not supported right now\n");
@@ -302,6 +307,11 @@ int MSP430::pop_integer_local(int index)
   }
 
   return 0;
+}
+
+int MSP430::pop_ref_local(int index)
+{
+  return pop_integer_local(index);
 }
 
 int MSP430::set_integer_local(int index, int value)
@@ -955,6 +965,64 @@ int MSP430::get_static(const char *name, int index)
 int MSP430::brk()
 {
   return -1;
+}
+
+int MSP430::new_array(uint8_t type)
+{
+  // ref = heap + 2
+  // heap = heap + sizeof(array) + 2 (to hold the length of the array)
+
+  if (stack > 0)
+  {
+    // r14 is the length of the array
+    // r15 points to heap free area
+    // array len goes to array[-1]
+    fprintf(out, "  pop r14\n");
+    fprintf(out, "  mov.w &heap, r15\n");
+    fprintf(out, "  mov.w r14, @r15\n");
+
+    if (type == TYPE_SHORT || type == TYPE_INT)
+    {
+      // if int or short double the len of array for space (16 bit)
+      fprintf(out, "  rla r14\n");
+    }
+
+    // Add 2 to the length of the array to account for array[-1]
+    fprintf(out, "  add.w #2, r14\n");
+
+    // Increase where the heap points to by num of bytes allocated
+    fprintf(out, "  add.w r14, &heap\n");
+
+    // r15 should point to array[0] instead of array[-1] and is now top of stack
+    fprintf(out, "  add.w #2, r15\n");
+    fprintf(out, "  push r15\n");
+
+  }
+    else
+  {
+    // r15 points to heap free area
+    // array len goes to array[-1]
+    fprintf(out, "  mov.w &heap, r15\n");
+    fprintf(out, "  mov.w r%d, @r15\n", REG_STACK(reg-1));
+
+    if (type == TYPE_SHORT || type == TYPE_INT)
+    {
+      // if int or short double the len of array for space (16 bit)
+      fprintf(out, "  rla r%d\n", REG_STACK(reg-1));
+    }
+
+    // Add 2 to the length of the array to account for array[-1]
+    fprintf(out, "  add.w #2, r%d\n", REG_STACK(reg-1));
+
+    // Increase where the heap points to by num of bytes allocated
+    fprintf(out, "  add.w r%d, &heap\n", REG_STACK(reg-1));
+
+    // r15 should point to array[0] instead of array[-1] and is now top of stack
+    fprintf(out, "  add.w #2, r15\n");
+    fprintf(out, "  mov.w r15, r%d\n", REG_STACK(reg-1));
+  }
+
+  return 0;
 }
 
 int MSP430::insert_array(const char *name, int32_t *data, int len, uint8_t type)

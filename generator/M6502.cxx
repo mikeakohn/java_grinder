@@ -94,6 +94,11 @@ int M6502::push_integer_local(int index)
   return -1;
 }
 
+int M6502::push_ref_local(int index)
+{
+  return -1;
+}
+
 int M6502::push_long(int64_t n)
 {
   return -1;
@@ -120,6 +125,11 @@ int M6502::push_short(int16_t s)
 }
 
 int M6502::pop_integer_local(int index)
+{
+  return -1;
+}
+
+int M6502::pop_ref_local(int index)
 {
   return -1;
 }
@@ -260,6 +270,11 @@ int M6502::get_static(const char *name, int index)
 }
 
 int M6502::brk()
+{
+  return -1;
+}
+
+int M6502::new_array(uint8_t type)
 {
   return -1;
 }

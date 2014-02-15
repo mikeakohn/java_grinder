@@ -550,17 +550,29 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 25: // aload (0x19)
-        UNIMPL()
+      {
+        int index;
         if (wide == 1)
         {
+          index = GET_PC_UINT16(1);
           pc += 3;
         }
           else
         {
+          index = bytes[pc+1];
           pc += 2;
         }
-        break;
 
+        if (bytes[pc] == 0xbe) // arraylength
+        {
+          operand_stack[operand_stack_ptr++] = index;
+        }
+          else
+        {
+          ret = generator->push_ref_local(index);
+        }
+        break;
+      }
       case 26: // iload_0 (0x1a)
       case 27: // iload_1 (0x1b)
       case 28: // iload_2 (0x1c)
@@ -625,22 +637,18 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 42: // aload_0 (0x2a)
-        UNIMPL()
-        pc++;
-        break;
-
       case 43: // aload_1 (0x2b)
-        UNIMPL()
-        pc++;
-        break;
-
       case 44: // aload_2 (0x2c)
-        UNIMPL()
-        pc++;
-        break;
-
       case 45: // aload_3 (0x2d)
-        UNIMPL()
+        if (bytes[pc+1] == 0xbe) // arraylength
+        {
+          operand_stack[operand_stack_ptr++] = bytes[pc]-42;
+        }
+          else
+        {
+          // Push a local ref variable on the stack
+          ret = generator->push_ref_local(bytes[pc]-42);
+        }
         pc++;
         break;
 
@@ -748,13 +756,14 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 58: // astore (0x3a)
-        UNIMPL()
         if (wide == 1)
         {
+          ret = generator->pop_ref_local(GET_PC_UINT16(1));
           pc += 3;
         }
           else
         {
+          ret = generator->pop_ref_local(bytes[pc+1]);
           pc += 2;
         }
         break;
@@ -823,22 +832,11 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 75: // astore_0 (0x4b)
-        UNIMPL()
-        pc++;
-        break;
-
       case 76: // astore_1 (0x4c)
-        UNIMPL()
-        pc++;
-        break;
-
       case 77: // astore_2 (0x4d)
-        UNIMPL()
-        pc++;
-        break;
-
       case 78: // astore_3 (0x4e)
-        UNIMPL()
+        // Pop ref off stack and store in local variable
+        ret = generator->pop_ref_local(bytes[pc]-75);
         pc++;
         break;
 
@@ -1531,7 +1529,8 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 188: // newarray (0xbc)
-        UNIMPL()
+        ret = generator->new_array(bytes[pc+1]);
+        pc += 2;
         break;
 
       case 189: // anewarray (0xbd)

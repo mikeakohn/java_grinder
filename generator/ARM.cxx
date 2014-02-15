@@ -98,6 +98,11 @@ int ARM::push_integer_local(int index)
   return -1;
 }
 
+int ARM::push_ref_local(int index)
+{
+  return push_integer_local(index);
+}
+
 int ARM::push_long(int64_t n)
 {
   return -1;
@@ -126,6 +131,11 @@ int ARM::push_short(int16_t s)
 int ARM::pop_integer_local(int index)
 {
   return -1;
+}
+
+int ARM::pop_ref_local(int index)
+{
+  return pop_integer_local(index);
 }
 
 int ARM::pop()
@@ -264,6 +274,11 @@ int ARM::get_static(const char *name, int index)
 }
 
 int ARM::brk()
+{
+  return -1;
+}
+
+int ARM::new_array(uint8_t type)
 {
   return -1;
 }

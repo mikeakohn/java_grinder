@@ -35,6 +35,7 @@ public:
   virtual void method_end(int local_count) = 0;
   virtual int push_integer(int32_t n) = 0;
   virtual int push_integer_local(int index) = 0;
+  virtual int push_ref_local(int index) = 0;
   virtual int set_integer_local(int index, int value) { return -1; }
   virtual int push_long(int64_t n) = 0;
   virtual int push_float(float f) = 0;
@@ -42,6 +43,7 @@ public:
   virtual int push_byte(int8_t b) = 0;
   virtual int push_short(int16_t s) = 0;
   virtual int pop_integer_local(int index) = 0;
+  virtual int pop_ref_local(int index) = 0;
   virtual int pop() = 0;
   virtual int dup() = 0;
   virtual int dup2() = 0;
@@ -71,6 +73,7 @@ public:
   virtual int put_static(const char *name, int index) = 0;
   virtual int get_static(const char *name, int index) = 0;
   virtual int brk() = 0;
+  virtual int new_array(uint8_t type) = 0;
   virtual int insert_array(const char *name, int32_t *data, int len, uint8_t type) = 0;
   virtual int push_array_length(const char *name, int field_id) = 0;
   virtual int array_read_byte(const char *name, int field_id) = 0;

@@ -99,6 +99,11 @@ int MIPS::push_integer_local(int index)
   return -1;
 }
 
+int MIPS::push_ref_local(int index)
+{
+  return push_ref_local(index);
+}
+
 int MIPS::push_long(int64_t n)
 {
   return -1;
@@ -127,6 +132,11 @@ int MIPS::push_short(int16_t s)
 int MIPS::pop_integer_local(int index)
 {
   return -1;
+}
+
+int MIPS::pop_ref_local(int index)
+{
+  return pop_integer_local(index);
 }
 
 int MIPS::pop()
@@ -265,6 +275,11 @@ int MIPS::get_static(const char *name, int index)
 }
 
 int MIPS::brk()
+{
+  return -1;
+}
+
+int MIPS::new_array(uint8_t type)
 {
   return -1;
 }

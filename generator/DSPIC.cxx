@@ -188,7 +188,6 @@ int DSPIC::push_integer(int32_t n)
 
 int DSPIC::push_integer_local(int index)
 {
-
   if (reg < reg_max)
   {
     //fprintf(out, "  mov [w14+%d], w0\n", LOCALS(index));
@@ -205,6 +204,11 @@ int DSPIC::push_integer_local(int index)
   }
 
   return 0;
+}
+
+int DSPIC::push_ref_local(int index)
+{
+  return push_integer_local(index);
 }
 
 int DSPIC::push_long(int64_t n)
@@ -277,6 +281,11 @@ int DSPIC::pop_integer_local(int index)
   }
 
   return 0;
+}
+
+int DSPIC::pop_ref_local(int index)
+{
+  return pop_integer_local(index);
 }
 
 int DSPIC::pop()
@@ -643,6 +652,11 @@ int DSPIC::get_static(const char *name, int index)
 }
 
 int DSPIC::brk()
+{
+  return -1;
+}
+
+int DSPIC::new_array(uint8_t type)
 {
   return -1;
 }
