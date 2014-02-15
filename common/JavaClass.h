@@ -186,6 +186,8 @@ public:
   void *get_constant(int index);
   struct methods_t *get_method(int index);
   int get_method_count() { return methods_count; }
+  int get_field_count() { return fields_count; }
+  int get_field_index(const char *field_name);
   static const char *tag_as_string(int tag);
 
   int32_t magic;

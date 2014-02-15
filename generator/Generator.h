@@ -24,8 +24,12 @@ public:
   virtual int open(char *filename);
   void label(char *name);
 
-  //virtual int init() = 0;
-  //virtual void serial_init() = 0;
+  virtual int init_heap(int field_count) = 0;
+  virtual int insert_field_init_boolean(char *name, int index, int value) = 0;
+  virtual int insert_field_init_byte(char *name, int index, int value) = 0;
+  virtual int insert_field_init_short(char *name, int index, int value) = 0;
+  virtual int insert_field_init_int(char *name, int index, int value) = 0;
+  virtual int insert_field_init(char *name, int index) = 0;
   virtual void method_start(int local_count, const char *name) = 0;
   virtual void method_end(int local_count) = 0;
   virtual int push_integer(int32_t n) = 0;
@@ -161,6 +165,8 @@ public:
   //virtual int dsp_euclideanDistanceAndAddToB() { return -1; }
   virtual int dsp_shiftA() { return -1; }
   virtual int dsp_shiftB() { return -1; }
+
+  void add_newline();
 
 protected:
   int insert_db(const char *name, int32_t *data, int len, uint8_t len_type);

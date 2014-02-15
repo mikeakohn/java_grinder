@@ -28,7 +28,12 @@ public:
 
   virtual int open(char *filename);
 
-  //virtual void serial_init();
+  virtual int init_heap(int field_count);
+  virtual int insert_field_init_boolean(char *name, int index, int value);
+  virtual int insert_field_init_byte(char *name, int index, int value);
+  virtual int insert_field_init_short(char *name, int index, int value);
+  virtual int insert_field_init_int(char *name, int index, int value);
+  virtual int insert_field_init(char *name, int index);
   virtual void method_start(int local_count, const char *name);
   virtual void method_end(int local_count);
   virtual int push_integer(int32_t n);
@@ -126,6 +131,9 @@ protected:
   int stack_alu(const char *instr);
   void push_reg(const char *reg);
   void pop_reg(char *reg);
+  void insert_read_spi();
+  void insert_mul_integers();
+  void insert_div_integers();
   int reg;
   int reg_max;
   int stack;
@@ -134,8 +142,9 @@ protected:
   bool need_mul_integers:1;
   bool need_div_integers:1;
   bool is_main:1;
-  int stack_start;
-  int flash_start;
+  uint32_t ram_start;
+  uint32_t stack_start;
+  uint32_t flash_start;
 };
 
 #endif

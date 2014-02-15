@@ -40,11 +40,35 @@ int ARM::open(char *filename)
   return 0;
 }
 
-#if 0
-void ARM::serial_init()
+int ARM::init_heap(int field_count)
 {
+  return -1;
 }
-#endif
+
+int ARM::insert_field_init_boolean(char *name, int index, int value)
+{
+  return -1;
+}
+
+int ARM::insert_field_init_byte(char *name, int index, int value)
+{
+  return -1;
+}
+
+int ARM::insert_field_init_short(char *name, int index, int value)
+{
+  return -1;
+}
+
+int ARM::insert_field_init_int(char *name, int index, int value)
+{
+  return -1;
+}
+
+int ARM::insert_field_init(char *name, int index)
+{
+  return -1;
+}
 
 void ARM::method_start(int local_count, const char *name)
 {

@@ -153,5 +153,9 @@ int n;
   return 0;
 }
 
+void Generator::add_newline()
+{
+  fprintf(out, "\n");
+}
 
 

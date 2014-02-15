@@ -502,6 +502,52 @@ void *heap;
   return -1;
 }
 
+int JavaClass::get_field_index(const char *field_name)
+{
+struct attributes_t *attribute;
+struct fields_t *field;
+int count,r,n;
+char name[256];
+//char desc[256];
+
+  //printf("----- FieldCount: %d\n", fields_count);
+
+  for (count = 0; count < fields_count; count++)
+  {
+    field = (struct fields_t *)(fields_heap + fields[count]);
+    get_name_constant(name, sizeof(name), field->name_index);
+    if (strcmp(field_name, name) == 0) { return count; }
+    //get_name_constant(desc, sizeof(desc), field->descriptor_index);
+    //printf("                ----- %d -----\n", count);
+    //printf("         access_flags: %d", field->access_flags);
+    //print_access(field->access_flags);
+    //printf("\n");
+    //printf("           name_index: %d (%s)\n", field->name_index, name);
+    //printf("     descriptor_index: %d (%s)\n", field->descriptor_index, desc);
+    //printf("      attribute_count: %d\n", field->attribute_count);
+
+    n = 8;
+    for (r = 0; r < field->attribute_count; r++)
+    {
+      attribute=(struct attributes_t *)(fields_heap + fields[count]+n);
+      //printf("                ----- attr %d -----\n", r);
+      get_name_constant(name, sizeof(name), attribute->name_index);
+      //printf("         name_index: %d (%s)\n", attribute->name_index, name);
+      //printf("             length: %d\n", attribute->length);
+      //printf("               info: { ");
+      //for (r=0; r<attribute->length; r++)
+      //{
+      //  printf("%02x ",attribute->info[r]);
+      //}
+      //printf("}\n");
+
+      n=n+6+attribute->length;
+    }
+  }
+
+  return -1;
+}
+
 const char *JavaClass::tag_as_string(int tag)
 {
   const char *tags[] =

@@ -40,11 +40,35 @@ int MIPS::open(char *filename)
   return 0;
 }
 
-#if 0
-void MIPS::serial_init()
+int MIPS::init_heap(int field_count)
 {
+  return -1;
 }
-#endif
+
+int MIPS::insert_field_init_boolean(char *name, int index, int value)
+{
+  return -1;
+}
+
+int MIPS::insert_field_init_byte(char *name, int index, int value)
+{
+  return -1;
+}
+
+int MIPS::insert_field_init_short(char *name, int index, int value)
+{
+  return -1;
+}
+
+int MIPS::insert_field_init_int(char *name, int index, int value)
+{
+  return -1;
+}
+
+int MIPS::insert_field_init(char *name, int index)
+{
+  return -1;
+}
 
 void MIPS::method_start(int local_count, const char *name)
 {
@@ -272,12 +296,6 @@ int MIPS::array_write_int(const char *name, int field_id)
 {
   return -1;
 }
-
-#if 0
-void MIPS::close()
-{
-}
-#endif
 
 // GPIO functions
 int MIPS::ioport_setPinsAsInput(int port) { return -1; }

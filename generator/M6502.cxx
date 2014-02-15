@@ -35,11 +35,36 @@ int M6502::open(char *filename)
   return 0;
 }
 
-#if 0
-void M6502::serial_init()
+int M6502::init_heap(int field_count)
 {
+  return -1;
 }
-#endif
+
+int M6502::insert_field_init_boolean(char *name, int index, int value)
+{
+  return -1;
+}
+
+int M6502::insert_field_init_byte(char *name, int index, int value)
+{
+  return -1;
+}
+
+int M6502::insert_field_init_short(char *name, int index, int value)
+{
+  return -1;
+}
+
+int M6502::insert_field_init_int(char *name, int index, int value)
+{
+  return -1;
+}
+
+int M6502::insert_field_init(char *name, int index)
+{
+  return -1;
+}
+
 
 void M6502::method_start(int local_count, const char *name)
 {

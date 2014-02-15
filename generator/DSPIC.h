@@ -28,7 +28,12 @@ public:
 
   virtual int open(char *filename);
 
-  //virtual void serial_init();
+  virtual int init_heap(int field_count);
+  virtual int insert_field_init_boolean(char *name, int index, int value);
+  virtual int insert_field_init_byte(char *name, int index, int value);
+  virtual int insert_field_init_short(char *name, int index, int value);
+  virtual int insert_field_init_int(char *name, int index, int value);
+  virtual int insert_field_init(char *name, int index);
   virtual void method_start(int local_count, const char *name);
   virtual void method_end(int local_count);
   virtual int push_integer(int32_t n);

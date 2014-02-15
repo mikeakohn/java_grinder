@@ -40,7 +40,7 @@
           break; \
         }
 
-int execute_static(JavaClass *java_class, int method_id, Generator *generator)
+int execute_static(JavaClass *java_class, int method_id, Generator *generator, bool do_arrays)
 {
 struct methods_t *method = java_class->get_method(method_id);
 uint8_t *bytes = method->attributes[0].info;
@@ -321,33 +321,86 @@ int ret;
           ret = -1;
           break;
         }
+
         printf("field_name=%s type=%s len=%d\n", field_name, type, array_len);
-        printf("array_type=%d\n", array_type);
-        for (int n = 0; n < array_len; n++)
+        if (type[0] == '[')
         {
-          printf(" %d", array[n]);
-        }
-        printf("\n");
-        if (array_type == ARRAY_TYPE_BOOLEAN ||
-            array_type == ARRAY_TYPE_BYTE)
-        {
-          generator->insert_array(field_name, array, array_len, TYPE_BYTE);
+          printf("array_type=%d\n", array_type);
+
+          if (do_arrays)
+          {
+            // DEBUG output
+            for (int n = 0; n < array_len; n++)
+            {
+              printf(" %d", array[n]);
+            }
+            printf("\n");
+
+            if (array_type == ARRAY_TYPE_BOOLEAN ||
+                array_type == ARRAY_TYPE_BYTE)
+            {
+              generator->insert_array(field_name, array, array_len, TYPE_BYTE);
+            }
+              else
+            if (array_type == ARRAY_TYPE_CHAR ||
+                array_type == ARRAY_TYPE_SHORT)
+            {
+              generator->insert_array(field_name, array, array_len, TYPE_SHORT);
+            }
+              else
+            if (array_type == ARRAY_TYPE_INT)
+            {
+              generator->insert_array(field_name, array, array_len, TYPE_INT);
+            }
+              else
+            {
+              printf("Unsupported array type\n");
+              ret = -1;
+            }
+          }
+            else
+          {
+            index = java_class->get_field_index(field_name);
+            generator->insert_field_init(field_name, index);
+          }
         }
           else
-        if (array_type == ARRAY_TYPE_CHAR ||
-            array_type == ARRAY_TYPE_SHORT)
         {
-          generator->insert_array(field_name, array, array_len, TYPE_SHORT);
-        }
-          else
-        if (array_type == ARRAY_TYPE_INT)
-        {
-          generator->insert_array(field_name, array, array_len, TYPE_INT);
-        }
-          else
-        {
-          printf("Unsupported array type\n");
-          ret = -1;
+          int value = stack[stack_ptr];
+          index = java_class->get_field_index(field_name);
+          if (index == -1)
+          {
+            printf("Couldn't find %s\n", field_name);
+            ret = -1;
+            break;
+          }
+
+          if (strcmp(type, "Z") == 0) // boolean
+          {
+            ret = generator->insert_field_init_boolean(field_name, index, value);
+          }
+            else
+          if (strcmp(type, "B") == 0)
+          {
+            ret = generator->insert_field_init_byte(field_name, index, value);
+          }
+            else
+          if (strcmp(type, "S") == 0)
+          {
+            ret = generator->insert_field_init_short(field_name, index, value);
+          }
+            else
+          if (strcmp(type, "C") == 0)
+          {
+            ret = generator->insert_field_init_short(field_name, index, value);
+          }
+            else
+          if (strcmp(type, "I") == 0)
+          {
+            ret = generator->insert_field_init_int(field_name, index, value);
+          }
+            else
+          { ret = -1; }
         }
         break;
       case 180: // getfield (0xb4)

@@ -96,31 +96,78 @@ int index;
   java_class->print();
 #endif
 
+  generator->init_heap(java_class->get_field_count());
+
   int method_count = java_class->get_method_count();
   int ret = 0;
-  for (index = 0; index < method_count; index++)
+
+  do
   {
-    if (java_class->get_method_name(method_name, sizeof(method_name), index) == 0)
+    // Add all the static initializers
+    for (index = 0; index < method_count; index++)
     {
-      if (strcmp("<clinit>", method_name) == 0)
+      if (java_class->get_method_name(method_name, sizeof(method_name), index) == 0)
       {
-        if (execute_static(java_class, index, generator) != 0)
+        if (strcmp("<clinit>", method_name) == 0)
         {
-          printf("** Error setting statics.\n");
-          ret = -1;
-          break;
+          if (execute_static(java_class, index, generator, false) != 0)
+          {
+            printf("** Error setting statics.\n");
+            ret = -1;
+            break;
+          }
+          continue;
         }
-        continue;
       }
     }
 
-    if (compile_method(java_class, index, generator) != 0)
+    if (ret != 0) { break; }
+    generator->add_newline();
+
+    // Add the main function directly under init to save a jmp.
+    for (index = 0; index < method_count; index++)
     {
-      printf("** Error compiling class.\n");
-      ret = -1;
-      break;
+      if (java_class->get_method_name(method_name, sizeof(method_name), index) == 0)
+      {
+        if (strcmp(method_name, "main") == 0)
+        {
+          if (compile_method(java_class, index, generator) != 0)
+          {
+            printf("** Error compiling class.\n");
+            ret = -1;
+            break;
+          }
+        }
+      }
     }
-  }
+
+    if (ret != 0) { break; }
+
+    for (index = 0; index < method_count; index++)
+    {
+      if (java_class->get_method_name(method_name, sizeof(method_name), index) == 0)
+      {
+        if (strcmp(method_name, "main") == 0) { continue; }
+        if (strcmp("<clinit>", method_name) == 0)
+        {
+          if (execute_static(java_class, index, generator, true) != 0)
+          {
+            printf("** Error setting statics.\n");
+            ret = -1;
+            break;
+          }
+          continue;
+        }
+      }
+
+      if (compile_method(java_class, index, generator) != 0)
+      {
+        printf("** Error compiling class.\n");
+        ret = -1;
+        break;
+      }
+    }
+  } while(0);
 
   delete generator;
   delete java_class;

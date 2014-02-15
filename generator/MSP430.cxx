@@ -41,6 +41,12 @@
 //
 // ret value is r15
 
+// RAM organization:
+// RAM[0] = top of heap ptr
+// RAM[1] = static field 1
+// RAM[2] = static field 2
+// RAM[N] = static field N
+
 #define REG_STACK(a) (a + 4)
 #define LOCALS(a) ((a * 2) + 2)
 
@@ -59,6 +65,8 @@ MSP430::MSP430(uint8_t chip_type) :
   need_div_integers(0),
   is_main(0)
 {
+  ram_start = 0x0200;
+
   switch(chip_type)
   {
     case MSP430G2231:
@@ -77,74 +85,9 @@ MSP430::MSP430(uint8_t chip_type) :
 
 MSP430::~MSP430()
 {
-  if (need_read_spi)
-  {
-    fprintf(out, "; _read_spi(r15)\n");
-    fprintf(out, "_read_spi:\n");
-    fprintf(out, "  mov.b r15, &USISRL\n");
-    fprintf(out, "  mov.b #8, &USICNT\n");
-    fprintf(out, "_read_spi_wait:\n");
-    fprintf(out, "  bit.b #USIIFG, &USICTL1\n");
-    fprintf(out, "  jz _read_spi_wait\n");
-    fprintf(out, "  mov.b &USISRL, r15\n");
-    fprintf(out, "  ret\n\n");
-  }
-  if (need_mul_integers)
-  {
-    fprintf(out, "; _mul a * b\n");
-    fprintf(out, "_mul_integers:\n");
-    fprintf(out, "  clr r7\n");
-    fprintf(out, "  mov r7, r15\n");
-    fprintf(out, "  mov r7, r6\n");
-    fprintf(out, "  tst r4\n");
-    fprintf(out, "  jge _mul2\n");
-    fprintf(out, "  mov #-1, r6\n");
-    fprintf(out, "  jmp _mul2\n");
-    fprintf(out, "_mul6:\n");
-    fprintf(out, "  add r4, r15\n");
-    fprintf(out, "  addc r6, r7\n");
-    fprintf(out, "_mul1:\n");
-    fprintf(out, "  rla r4\n");
-    fprintf(out, "  rlc r6\n");
-    fprintf(out, "_mul2:\n");
-    fprintf(out, "  rra r5\n");
-    fprintf(out, "  jc _mul5\n");
-    fprintf(out, "  jne _mul1\n");
-    fprintf(out, "  jmp _mul4\n");
-    fprintf(out, "_mul5:\n");
-    fprintf(out, "  sub r4, r15\n");
-    fprintf(out, "  subc r6, r7\n");
-    fprintf(out, "_mul3:\n");
-    fprintf(out, "  rla r4\n");
-    fprintf(out, "  rlc r6\n");
-    fprintf(out, "  rra r5\n");
-    fprintf(out, "  jnc _mul6\n");
-    fprintf(out, "  cmp #0FFFFh, r5\n");
-    fprintf(out, "  jne _mul3\n");
-    fprintf(out, "_mul4:\n");
-    fprintf(out, "  mov r15, r4\n");
-    fprintf(out, "  ret\n\n");
-  }
-
-  if (need_div_integers)
-  {
-    fprintf(out, "; _div a / b (remainder in r7)\n");
-    fprintf(out, "_div_integers:\n");
-    fprintf(out, "  mov #16, r6\n");
-    fprintf(out, "  clr r7\n");
-    fprintf(out, "_div1:\n");
-    fprintf(out, "  rla r4\n");
-    fprintf(out, "  rlc r7\n");
-    fprintf(out, "  bis #1, r4\n");
-    fprintf(out, "  sub r5, r7\n");
-    fprintf(out, "  jge _div2\n");
-    fprintf(out, "  add r5, r7\n");
-    fprintf(out, "  bic #1, r4\n");
-    fprintf(out, "_div2:\n");
-    fprintf(out, "  dec r6\n");
-    fprintf(out, "  jnz _div1\n");
-    fprintf(out, "  ret\n");
-  }
+  if (need_read_spi) { insert_read_spi(); }
+  if (need_mul_integers) { insert_mul_integers(); }
+  if (need_div_integers) { insert_div_integers(); }
 
   fprintf(out, ".org 0xfffe\n");
   fprintf(out, "  dw start\n\n");
@@ -157,22 +100,57 @@ int MSP430::open(char *filename)
   // For now we only support a specific chip
   fprintf(out, ".msp430\n");
   fprintf(out, ".include \"msp430x2xx.inc\"\n\n");
+  fprintf(out, "ram_start .equ %04x\n", ram_start);
 
   // Add any set up items (stack, registers, etc)
   fprintf(out, ".org 0x%04x\n", flash_start);
   fprintf(out, "start:\n");
   fprintf(out, "  mov.w #(WDTPW|WDTHOLD), &WDTCTL\n");
   fprintf(out, "  mov.w #0x%04x, SP\n", stack_start);
-  fprintf(out, "  jmp main\n\n");
+  //fprintf(out, "  jmp main\n\n");
 
   return 0;
 }
 
-#if 0
-void MSP430::serial_init()
+int MSP430::init_heap(int field_count)
 {
+  fprintf(out, "  mov #ram_start+%d, &ram_start\n", (field_count + 1) * 2);
+  return 0;
 }
-#endif
+
+int MSP430::insert_field_init_boolean(char *name, int index, int value)
+{
+  value = (value == 0) ? 0: 1;
+  fprintf(out, "  mov #%d, &ram_start+%d ; %s\n", value, (index + 1) * 2, name);
+  return 0;
+}
+
+int MSP430::insert_field_init_byte(char *name, int index, int value)
+{
+  if (value < -128 || value > 255) { return -1; }
+  fprintf(out, "  mov #%d, &ram_start+%d ; %s\n", value, (index + 1) * 2, name);
+  return 0;
+}
+
+int MSP430::insert_field_init_short(char *name, int index, int value)
+{
+  if (value < -32768 || value > 65535) { return -1; }
+  fprintf(out, "  mov #%d, &ram_start+%d ; %s\n", value, (index + 1) * 2, name);
+  return 0;
+}
+
+int MSP430::insert_field_init_int(char *name, int index, int value)
+{
+  if (value < -32768 || value > 65535) { return -1; }
+  fprintf(out, "  mov #%d, &ram_start+%d ; %s\n", value, (index + 1) * 2, name);
+  return 0;
+}
+
+int MSP430::insert_field_init(char *name, int index)
+{
+  fprintf(out, "  mov #%s, &ram_start+%d\n", name, (index + 1) * 2);
+  return 0;
+}
 
 void MSP430::method_start(int local_count, const char *name)
 {
@@ -1516,4 +1494,73 @@ int MSP430::stack_alu(const char *instr)
   return 0;
 }
 
+void MSP430::insert_read_spi()
+{
+  fprintf(out, "; _read_spi(r15)\n");
+  fprintf(out, "_read_spi:\n");
+  fprintf(out, "  mov.b r15, &USISRL\n");
+  fprintf(out, "  mov.b #8, &USICNT\n");
+  fprintf(out, "_read_spi_wait:\n");
+  fprintf(out, "  bit.b #USIIFG, &USICTL1\n");
+  fprintf(out, "  jz _read_spi_wait\n");
+  fprintf(out, "  mov.b &USISRL, r15\n");
+  fprintf(out, "  ret\n\n");
+}
+
+void MSP430::insert_mul_integers()
+{
+  fprintf(out, "; _mul a * b\n");
+  fprintf(out, "_mul_integers:\n");
+  fprintf(out, "  clr r7\n");
+  fprintf(out, "  mov r7, r15\n");
+  fprintf(out, "  mov r7, r6\n");
+  fprintf(out, "  tst r4\n");
+  fprintf(out, "  jge _mul2\n");
+  fprintf(out, "  mov #-1, r6\n");
+  fprintf(out, "  jmp _mul2\n");
+  fprintf(out, "_mul6:\n");
+  fprintf(out, "  add r4, r15\n");
+  fprintf(out, "  addc r6, r7\n");
+  fprintf(out, "_mul1:\n");
+  fprintf(out, "  rla r4\n");
+  fprintf(out, "  rlc r6\n");
+  fprintf(out, "_mul2:\n");
+  fprintf(out, "  rra r5\n");
+  fprintf(out, "  jc _mul5\n");
+  fprintf(out, "  jne _mul1\n");
+  fprintf(out, "  jmp _mul4\n");
+  fprintf(out, "_mul5:\n");
+  fprintf(out, "  sub r4, r15\n");
+  fprintf(out, "  subc r6, r7\n");
+  fprintf(out, "_mul3:\n");
+  fprintf(out, "  rla r4\n");
+  fprintf(out, "  rlc r6\n");
+  fprintf(out, "  rra r5\n");
+  fprintf(out, "  jnc _mul6\n");
+  fprintf(out, "  cmp #0FFFFh, r5\n");
+  fprintf(out, "  jne _mul3\n");
+  fprintf(out, "_mul4:\n");
+  fprintf(out, "  mov r15, r4\n");
+  fprintf(out, "  ret\n\n");
+}
+
+void MSP430::insert_div_integers()
+{
+  fprintf(out, "; _div a / b (remainder in r7)\n");
+  fprintf(out, "_div_integers:\n");
+  fprintf(out, "  mov #16, r6\n");
+  fprintf(out, "  clr r7\n");
+  fprintf(out, "_div1:\n");
+  fprintf(out, "  rla r4\n");
+  fprintf(out, "  rlc r7\n");
+  fprintf(out, "  bis #1, r4\n");
+  fprintf(out, "  sub r5, r7\n");
+  fprintf(out, "  jge _div2\n");
+  fprintf(out, "  add r5, r7\n");
+  fprintf(out, "  bic #1, r4\n");
+  fprintf(out, "_div2:\n");
+  fprintf(out, "  dec r6\n");
+  fprintf(out, "  jnz _div1\n");
+  fprintf(out, "  ret\n");
+}
 
