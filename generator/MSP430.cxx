@@ -982,10 +982,18 @@ int MSP430::new_array(uint8_t type)
     fprintf(out, "  mov.w &heap_ptr, r15\n");
     fprintf(out, "  mov.w r14, 0(r15)\n");
 
-    if (type == TYPE_SHORT || type == TYPE_INT)
+    // Maybe this can be optimized by detecting a new array and a constant
+    // so the compile module can double / pad it and pass it here.
+    if (type == TYPE_SHORT || type == TYPE_CHAR || type == TYPE_INT)
     {
       // if int or short double the len of array for space (16 bit)
       fprintf(out, "  rla r14\n");
+    }
+      else
+    {
+      fprintf(out, "  mov.w r14, r13\n");
+      fprintf(out, "  and.w #1, r13\n");
+      fprintf(out, "  add.w r13, r14\n");
     }
 
     // Add 2 to the length of the array to account for array[-1]
@@ -1006,10 +1014,16 @@ int MSP430::new_array(uint8_t type)
     fprintf(out, "  mov.w &heap_ptr, r15\n");
     fprintf(out, "  mov.w r%d, 0(r15)\n", REG_STACK(reg-1));
 
-    if (type == TYPE_SHORT || type == TYPE_INT)
+    if (type == TYPE_SHORT || type == TYPE_CHAR || type == TYPE_INT)
     {
       // if int or short double the len of array for space (16 bit)
       fprintf(out, "  rla r%d\n", REG_STACK(reg-1));
+    }
+      else
+    {
+      fprintf(out, "  mov.w r%d, r13\n", REG_STACK(reg-1));
+      fprintf(out, "  and.w #1, r13\n");
+      fprintf(out, "  add.w r13, r%d\n", REG_STACK(reg-1));
     }
 
     // Add 2 to the length of the array to account for array[-1]
