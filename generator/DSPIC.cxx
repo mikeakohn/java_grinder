@@ -622,6 +622,11 @@ int n;
   return 0;
 }
 
+int DSPIC::put_static(int index)
+{
+  return -1;
+}
+
 int DSPIC::brk()
 {
   return -1;

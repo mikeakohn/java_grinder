@@ -243,6 +243,11 @@ int ARM::invoke_static_method(const char *name, int params, int is_void)
   return -1;
 }
 
+int ARM::put_static(int index)
+{
+  return -1;
+}
+
 int ARM::brk()
 {
   return -1;

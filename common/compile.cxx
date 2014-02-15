@@ -1459,10 +1459,24 @@ printf("code_len=%d\n", code_len);
         //PUSH_REF(GET_PC_UINT16(1));
         break;
       case 179: // putstatic (0xb3)
-        UNIMPL()
+      {
+        char field_name[64];
+        char type[64];
+        ref = GET_PC_UINT16(1);
+        gen32 = (generic_32bit_t *)java_class->get_constant(ref);
+
+        if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), ref) != 0)
+        {
+          printf("Error retrieving field name %d\n", ref);
+          ret = -1;
+          break;
+        }
+
+        int index = java_class->get_field_index(field_name);
+        generator->put_static(index);
         pc+=3;
         break;
-
+      }
       case 180: // getfield (0xb4)
         UNIMPL()
         pc+=3;

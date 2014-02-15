@@ -100,13 +100,15 @@ int MSP430::open(char *filename)
   // For now we only support a specific chip
   fprintf(out, ".msp430\n");
   fprintf(out, ".include \"msp430x2xx.inc\"\n\n");
-  fprintf(out, "ram_start .equ %04x\n", ram_start);
+
+  // Set where RAM starts
+  fprintf(out, "ram_start equ 0x%04x\n\n", ram_start);
 
   // Add any set up items (stack, registers, etc)
   fprintf(out, ".org 0x%04x\n", flash_start);
   fprintf(out, "start:\n");
   fprintf(out, "  mov.w #(WDTPW|WDTHOLD), &WDTCTL\n");
-  fprintf(out, "  mov.w #0x%04x, SP\n", stack_start);
+  fprintf(out, "  mov.w #0x%04x, SP\n\n", stack_start);
   //fprintf(out, "  jmp main\n\n");
 
   return 0;
@@ -114,6 +116,7 @@ int MSP430::open(char *filename)
 
 int MSP430::init_heap(int field_count)
 {
+  fprintf(out, "  ;; Set up heap and static initializers\n");
   fprintf(out, "  mov #ram_start+%d, &ram_start\n", (field_count + 1) * 2);
   return 0;
 }
@@ -901,6 +904,23 @@ int n;
   return 0;
 }
 
+int MSP430::put_static(int index)
+{
+  if (stack > 0)
+  {
+    fprintf(out, "  pop r15\n");
+    fprintf(out, "  mov r15, &ram_start+%d\n", (index + 1) * 2);
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  mov r%d, &ram_start+%d\n", REG_STACK(reg-1), (index + 1) * 2);
+    reg--;
+  }
+
+  return 0;
+}
+
 int MSP430::brk()
 {
   return -1;
@@ -915,10 +935,16 @@ int MSP430::insert_array(const char *name, int32_t *data, int len, uint8_t type)
   }
     else
   if (type == TYPE_SHORT)
-  { return insert_dw(name, data, len, TYPE_SHORT); }
+  {
+    fprintf(out, ".align 16\n");
+    return insert_dw(name, data, len, TYPE_SHORT);
+  }
     else
   if (type == TYPE_INT)
-  { return insert_dw(name, data, len, TYPE_SHORT); }
+  {
+    fprintf(out, ".align 16\n");
+    return insert_dw(name, data, len, TYPE_SHORT);
+  }
 
   return -1;
 }

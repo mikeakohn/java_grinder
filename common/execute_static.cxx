@@ -365,6 +365,7 @@ int ret;
           }
         }
           else
+        if (!do_arrays)
         {
           int value = stack[stack_ptr];
           index = java_class->get_field_index(field_name);

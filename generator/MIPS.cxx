@@ -243,6 +243,11 @@ int MIPS::invoke_static_method(const char *name, int params, int is_void)
   return -1;
 }
 
+int MIPS::put_static(int index)
+{
+  return -1;
+}
+
 int MIPS::brk()
 {
   return -1;
