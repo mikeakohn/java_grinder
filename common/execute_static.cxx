@@ -60,7 +60,7 @@ int array_alloc_size = 0;
 char field_name[128];
 char type[128];
 int index;
-int ret;
+int ret = 0;
 
   printf("--- Executing static code\n");
 
@@ -502,7 +502,7 @@ int ret;
         UNIMPL()
     }
 
-    if (ret == 0) { break; }
+    if (ret != 0) { break; }
     if (stack_ptr < 0 || stack_ptr > max_stack)
     {
       printf("Stack error: stack_ptr=%d max_stack=%d\n", stack_ptr, max_stack);
@@ -516,6 +516,7 @@ int ret;
     wide = 0;
   }
 
+printf("EXIT pc=%d ret=%d code_len=%d\n", pc, ret, code_len);
   if (array != NULL) { free(array); }
   if (ret == -1) { return -1; }
 

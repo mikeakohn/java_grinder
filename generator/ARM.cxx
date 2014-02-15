@@ -40,6 +40,16 @@ int ARM::open(char *filename)
   return 0;
 }
 
+int ARM::start_init()
+{
+  return -1;
+}
+
+int ARM::insert_static_field_define(const char *name, int index)
+{
+  return -1;
+}
+
 int ARM::init_heap(int field_count)
 {
   return -1;
@@ -243,7 +253,12 @@ int ARM::invoke_static_method(const char *name, int params, int is_void)
   return -1;
 }
 
-int ARM::put_static(int index)
+int ARM::put_static(const char *name, int index)
+{
+  return -1;
+}
+
+int ARM::get_static(const char *name, int index)
 {
   return -1;
 }

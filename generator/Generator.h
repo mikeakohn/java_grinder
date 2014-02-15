@@ -23,7 +23,8 @@ public:
 
   virtual int open(char *filename);
   void label(char *name);
-
+  virtual int start_init() = 0;
+  virtual int insert_static_field_define(const char *name, int index) = 0;
   virtual int init_heap(int field_count) = 0;
   virtual int insert_field_init_boolean(char *name, int index, int value) = 0;
   virtual int insert_field_init_byte(char *name, int index, int value) = 0;
@@ -67,7 +68,8 @@ public:
   virtual int jump(const char *name) = 0;
   virtual int call(const char *name) = 0;
   virtual int invoke_static_method(const char *name, int params, int is_void) = 0;
-  virtual int put_static(int index) = 0;
+  virtual int put_static(const char *name, int index) = 0;
+  virtual int get_static(const char *name, int index) = 0;
   virtual int brk() = 0;
   virtual int insert_array(const char *name, int32_t *data, int len, uint8_t type) = 0;
   virtual int push_array_length(const char *name, int field_id) = 0;

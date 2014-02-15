@@ -35,6 +35,16 @@ int M6502::open(char *filename)
   return 0;
 }
 
+int M6502::start_init()
+{
+  return -1;
+}
+
+int M6502::insert_static_field_define(const char *name, int index)
+{
+  return -1;
+}
+
 int M6502::init_heap(int field_count)
 {
   return -1;
@@ -239,7 +249,12 @@ int M6502::invoke_static_method(const char *name, int params, int is_void)
   return -1;
 }
 
-int M6502::put_static(int index)
+int M6502::put_static(const char *name, int index)
+{
+  return -1;
+}
+
+int M6502::get_static(const char *name, int index)
 {
   return -1;
 }

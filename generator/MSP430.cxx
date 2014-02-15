@@ -102,9 +102,15 @@ int MSP430::open(char *filename)
   fprintf(out, ".include \"msp430x2xx.inc\"\n\n");
 
   // Set where RAM starts
-  fprintf(out, "ram_start equ 0x%04x\n\n", ram_start);
+  fprintf(out, "ram_start equ 0x%04x\n", ram_start);
 
+  return 0;
+}
+
+int MSP430::start_init()
+{
   // Add any set up items (stack, registers, etc)
+  fprintf(out, "\n");
   fprintf(out, ".org 0x%04x\n", flash_start);
   fprintf(out, "start:\n");
   fprintf(out, "  mov.w #(WDTPW|WDTHOLD), &WDTCTL\n");
@@ -114,44 +120,51 @@ int MSP430::open(char *filename)
   return 0;
 }
 
+int MSP430::insert_static_field_define(const char *name, int index)
+{
+  fprintf(out, "%s equ ram_start+%d\n", name, (index + 1) * 2);
+  return 0;
+}
+
 int MSP430::init_heap(int field_count)
 {
   fprintf(out, "  ;; Set up heap and static initializers\n");
-  fprintf(out, "  mov #ram_start+%d, &ram_start\n", (field_count + 1) * 2);
+  fprintf(out, "  mov.w #ram_start+%d, &ram_start\n", (field_count + 1) * 2);
   return 0;
 }
 
 int MSP430::insert_field_init_boolean(char *name, int index, int value)
 {
   value = (value == 0) ? 0: 1;
-  fprintf(out, "  mov #%d, &ram_start+%d ; %s\n", value, (index + 1) * 2, name);
+  //fprintf(out, "  mov #%d, &ram_start+%d ; %s\n", value, (index + 1) * 2, name);
+  fprintf(out, "  mov.w #%d, &%s\n", value, name);
   return 0;
 }
 
 int MSP430::insert_field_init_byte(char *name, int index, int value)
 {
   if (value < -128 || value > 255) { return -1; }
-  fprintf(out, "  mov #%d, &ram_start+%d ; %s\n", value, (index + 1) * 2, name);
+  fprintf(out, "  mov.w #%d, &%s\n", value, name);
   return 0;
 }
 
 int MSP430::insert_field_init_short(char *name, int index, int value)
 {
   if (value < -32768 || value > 65535) { return -1; }
-  fprintf(out, "  mov #%d, &ram_start+%d ; %s\n", value, (index + 1) * 2, name);
+  fprintf(out, "  mov.w #%d, &%s\n", value, name);
   return 0;
 }
 
 int MSP430::insert_field_init_int(char *name, int index, int value)
 {
   if (value < -32768 || value > 65535) { return -1; }
-  fprintf(out, "  mov #%d, &ram_start+%d ; %s\n", value, (index + 1) * 2, name);
+  fprintf(out, "  mov.w #%d, &%s\n", value, name);
   return 0;
 }
 
 int MSP430::insert_field_init(char *name, int index)
 {
-  fprintf(out, "  mov #%s, &ram_start+%d\n", name, (index + 1) * 2);
+  fprintf(out, "  mov.w #_%s, &%s\n", name, name);
   return 0;
 }
 
@@ -904,18 +917,36 @@ int n;
   return 0;
 }
 
-int MSP430::put_static(int index)
+int MSP430::put_static(const char *name, int index)
 {
   if (stack > 0)
   {
     fprintf(out, "  pop r15\n");
-    fprintf(out, "  mov r15, &ram_start+%d\n", (index + 1) * 2);
+    //fprintf(out, "  mov r15, &ram_start+%d\n", (index + 1) * 2);
+    fprintf(out, "  mov r15, &%s\n", name);
     stack--;
   }
     else
   {
-    fprintf(out, "  mov r%d, &ram_start+%d\n", REG_STACK(reg-1), (index + 1) * 2);
+    //fprintf(out, "  mov r%d, &ram_start+%d\n", REG_STACK(reg-1), (index + 1) * 2);
+    fprintf(out, "  mov r%d, &%s\n", REG_STACK(reg-1), name);
     reg--;
+  }
+
+  return 0;
+}
+
+int MSP430::get_static(const char *name, int index)
+{
+  if (reg < reg_max)
+  {
+    fprintf(out, "  mov &%s, r%d\n", name, REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  pop &%s\n", name);
+    stack++;
   }
 
   return 0;
@@ -951,18 +982,19 @@ int MSP430::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 
 int MSP430::push_array_length(const char *name, int field_id)
 {
-  fprintf(out, "  mov.w #%s-2, r13\n", name);
+  //fprintf(out, "  mov.w #%s-2, r13\n", name);
+  fprintf(out, "  mov.w &%s, r13\n", name);
 
   if (reg < reg_max)
   {
-    //fprintf(out, "  mov.w (-2)r13, r%d\n", reg);
-    fprintf(out, "  mov.w @r13, r%d\n", REG_STACK(reg));
+    //fprintf(out, "  mov.w @r13, r%d\n", REG_STACK(reg));
+    fprintf(out, "  mov.w -2(r13), r%d\n", REG_STACK(reg));
     reg++;
   }
     else
   {
-    //fprintf(out, "  push (-2)r13\n");
-    fprintf(out, "  push @r13\n");
+    //fprintf(out, "  push @r13\n");
+    fprintf(out, "  push -2(r13)\n");
     stack++;
   }
 
@@ -971,7 +1003,7 @@ int MSP430::push_array_length(const char *name, int field_id)
 
 int MSP430::array_read_byte(const char *name, int field_id)
 {
-  fprintf(out, "  mov.w #%s, r13\n", name);
+  fprintf(out, "  mov.w &%s, r13\n", name);
 
   if (stack > 0)
   {
@@ -992,7 +1024,7 @@ int MSP430::array_read_byte(const char *name, int field_id)
 
 int MSP430::array_read_short(const char *name, int field_id)
 {
-  fprintf(out, "  mov.w #%s, r13\n", name);
+  fprintf(out, "  mov.w &%s, r13\n", name);
 
   if (stack > 0)
   {

@@ -1439,25 +1439,33 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 178: // getstatic (0xb2)
+      {
+        char field_name[64];
+        char type[64];
         ref = GET_PC_UINT16(1);
-        operand_stack[operand_stack_ptr++] = ref;
-        pc+=3;
-#ifdef DEBUG
-#if 0
+        gen32 = (generic_32bit_t *)java_class->get_constant(ref);
+
+
+        if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), ref) != 0)
         {
-          char class_name[128];
-          char name[128];
-          char type[128];
-          java_class->get_ref_name_type(name, type, sizeof(name), ref);
-          java_class->get_class_name(class_name, sizeof(class_name), ref);
-          printf("getstatic '%s as %s' from %s\n", name, type, class_name);
+          printf("Error retrieving field name %d\n", ref);
+          ret = -1;
+          break;
         }
-#endif
-#endif
-        // FIXME - need to test for private/protected and that it's a field
-        // printf("getstatic %d\n",GET_PC_UINT16(1));
-        //PUSH_REF(GET_PC_UINT16(1));
+
+        if (gen32->tag == CONSTANT_METHODREF || type[0] == '[')
+        {
+          operand_stack[operand_stack_ptr++] = ref;
+        }
+          else
+        {
+          int index = java_class->get_field_index(field_name);
+          generator->get_static(field_name, index);
+        }
+
+        pc+=3;
         break;
+      }
       case 179: // putstatic (0xb3)
       {
         char field_name[64];
@@ -1473,7 +1481,7 @@ printf("code_len=%d\n", code_len);
         }
 
         int index = java_class->get_field_index(field_name);
-        generator->put_static(index);
+        generator->put_static(field_name, index);
         pc+=3;
         break;
       }

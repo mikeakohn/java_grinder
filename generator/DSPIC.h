@@ -27,7 +27,8 @@ public:
   virtual ~DSPIC();
 
   virtual int open(char *filename);
-
+  virtual int start_init();
+  virtual int insert_static_field_define(const char *name, int index);
   virtual int init_heap(int field_count);
   virtual int insert_field_init_boolean(char *name, int index, int value);
   virtual int insert_field_init_byte(char *name, int index, int value);
@@ -69,7 +70,8 @@ public:
   virtual int jump(const char *name);
   virtual int call(const char *name);
   virtual int invoke_static_method(const char *name, int params, int is_void);
-  virtual int put_static(int index);
+  virtual int put_static(const char *name, int index);
+  virtual int get_static(const char *name, int index);
   virtual int brk();
   virtual int insert_array(const char *name, int32_t *data, int len, uint8_t type);
   virtual int push_array_length(const char *name, int field_id);

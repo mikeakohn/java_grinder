@@ -4,6 +4,7 @@ public class Arrays
   static public final short[] numbers = { 1, 5, 2, 0, 2, -1 };
   static public final byte[] mike = { 1, 2, 3 };
   static public int blah = 5;
+  static public int another = 3;
 
   static public int calc_array()
   {
@@ -24,6 +25,7 @@ public class Arrays
 
     a = calc_array();
     blah = a;
+    another = blah + 1;
 
     //System.out.println(a);
 

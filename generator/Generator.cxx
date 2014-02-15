@@ -63,7 +63,7 @@ int n;
   {
     fprintf(out, "  dc32 %d   ; %s.length\n", len, name);
   }
-  fprintf(out, "%s:\n", name);
+  fprintf(out, "_%s:\n", name);
 
   for (n = 0; n < len; n++)
   {
@@ -98,7 +98,7 @@ int n;
   {
     fprintf(out, "  dc32 %d   ; %s.length\n", len, name);
   }
-  fprintf(out, "%s:\n", name);
+  fprintf(out, "_%s:\n", name);
 
   for (n = 0; n < len; n++)
   {
@@ -136,7 +136,7 @@ int n;
     fprintf(out, "  dc32 %d   ; %s.length\n", len, name);
   }
 
-  fprintf(out, "%s:\n", name);
+  fprintf(out, "_%s:\n", name);
 
   for (n = 0; n < len; n++)
   {

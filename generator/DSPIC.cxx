@@ -78,6 +78,11 @@ int DSPIC::open(char *filename)
       printf("Unknown chip type.\n");
   }
 
+  return 0;
+}
+
+int DSPIC::start_init()
+{
   fprintf(out, ".org 0\n");
   fprintf(out, "  goto start\n\n");
 
@@ -89,6 +94,11 @@ int DSPIC::open(char *filename)
   if (need_stack_set) { fprintf(out, "  mov #0x800, SP\n\n"); }
 
   return 0;
+}
+
+int DSPIC::insert_static_field_define(const char *name, int index)
+{
+  return -1;
 }
 
 int DSPIC::init_heap(int field_count)
@@ -622,7 +632,12 @@ int n;
   return 0;
 }
 
-int DSPIC::put_static(int index)
+int DSPIC::put_static(const char *name, int index)
+{
+  return -1;
+}
+
+int DSPIC::get_static(const char *name, int index)
 {
   return -1;
 }

@@ -96,10 +96,19 @@ int index;
   java_class->print();
 #endif
 
-  generator->init_heap(java_class->get_field_count());
-
   int method_count = java_class->get_method_count();
+  int field_count = java_class->get_field_count();
   int ret = 0;
+
+  for (index = 0; index < field_count; index++)
+  {
+    char field_name[64];
+    java_class->get_field_name(field_name, sizeof(field_name), index);
+    generator->insert_static_field_define(field_name, index);
+  }
+
+  generator->start_init();
+  generator->init_heap(field_count);
 
   do
   {

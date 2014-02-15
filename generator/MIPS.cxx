@@ -40,6 +40,17 @@ int MIPS::open(char *filename)
   return 0;
 }
 
+int MIPS::start_init()
+{
+  return -1;
+}
+
+int MIPS::insert_static_field_define(const char *name, int index)
+{
+  return -1;
+}
+
+
 int MIPS::init_heap(int field_count)
 {
   return -1;
@@ -243,7 +254,12 @@ int MIPS::invoke_static_method(const char *name, int params, int is_void)
   return -1;
 }
 
-int MIPS::put_static(int index)
+int MIPS::put_static(const char *name, int index)
+{
+  return -1;
+}
+
+int MIPS::get_static(const char *name, int index)
 {
   return -1;
 }
