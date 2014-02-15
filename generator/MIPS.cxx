@@ -308,6 +308,21 @@ int MIPS::push_array_length(const char *name, int field_id)
   return -1;
 }
 
+int MIPS::array_read_byte()
+{
+  return -1;
+}
+
+int MIPS::array_read_short()
+{
+  return -1;
+}
+
+int MIPS::array_read_int()
+{
+  return -1;
+}
+
 int MIPS::array_read_byte(const char *name, int field_id)
 {
   return -1;

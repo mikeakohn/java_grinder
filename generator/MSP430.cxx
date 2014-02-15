@@ -103,6 +103,7 @@ int MSP430::open(char *filename)
 
   // Set where RAM starts
   fprintf(out, "ram_start equ 0x%04x\n", ram_start);
+  fprintf(out, "heap_ptr equ ram_start\n");
 
   return 0;
 }
@@ -978,8 +979,8 @@ int MSP430::new_array(uint8_t type)
     // r15 points to heap free area
     // array len goes to array[-1]
     fprintf(out, "  pop r14\n");
-    fprintf(out, "  mov.w &heap, r15\n");
-    fprintf(out, "  mov.w r14, @r15\n");
+    fprintf(out, "  mov.w &heap_ptr, r15\n");
+    fprintf(out, "  mov.w r14, 0(r15)\n");
 
     if (type == TYPE_SHORT || type == TYPE_INT)
     {
@@ -991,7 +992,7 @@ int MSP430::new_array(uint8_t type)
     fprintf(out, "  add.w #2, r14\n");
 
     // Increase where the heap points to by num of bytes allocated
-    fprintf(out, "  add.w r14, &heap\n");
+    fprintf(out, "  add.w r14, &heap_ptr\n");
 
     // r15 should point to array[0] instead of array[-1] and is now top of stack
     fprintf(out, "  add.w #2, r15\n");
@@ -1002,8 +1003,8 @@ int MSP430::new_array(uint8_t type)
   {
     // r15 points to heap free area
     // array len goes to array[-1]
-    fprintf(out, "  mov.w &heap, r15\n");
-    fprintf(out, "  mov.w r%d, @r15\n", REG_STACK(reg-1));
+    fprintf(out, "  mov.w &heap_ptr, r15\n");
+    fprintf(out, "  mov.w r%d, 0(r15)\n", REG_STACK(reg-1));
 
     if (type == TYPE_SHORT || type == TYPE_INT)
     {
@@ -1015,7 +1016,7 @@ int MSP430::new_array(uint8_t type)
     fprintf(out, "  add.w #2, r%d\n", REG_STACK(reg-1));
 
     // Increase where the heap points to by num of bytes allocated
-    fprintf(out, "  add.w r%d, &heap\n", REG_STACK(reg-1));
+    fprintf(out, "  add.w r%d, &heap_ptr\n", REG_STACK(reg-1));
 
     // r15 should point to array[0] instead of array[-1] and is now top of stack
     fprintf(out, "  add.w #2, r15\n");
@@ -1083,6 +1084,58 @@ int MSP430::push_array_length(const char *name, int field_id)
   }
 
   return 0;
+}
+
+int MSP430::array_read_byte()
+{
+int index_reg;
+int ref_reg;
+
+  array_get_registers(&index_reg, &ref_reg);
+  fprintf(out, "  add.w r%d, r%d\n", index_reg, ref_reg);
+
+  if (reg < reg_max)
+  {
+    fprintf(out, "  mov.w @r%d, r%d\n", ref_reg, REG_STACK(reg));
+    fprintf(out, "  sxt r%d\n", REG_STACK(reg)); 
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  mov.w @r%d, r15\n", ref_reg);
+    fprintf(out, "  sxt r15\n");
+    fprintf(out, "  push r15\n");
+    stack++;
+  }
+
+  return 0;
+}
+
+int MSP430::array_read_short()
+{
+int index_reg;
+int ref_reg;
+
+  array_get_registers(&index_reg, &ref_reg);
+  fprintf(out, "  rla.w r%d\n", index_reg);
+  fprintf(out, "  add.w r%d, r%d\n", index_reg, ref_reg);
+  if (reg < reg_max)
+  {
+    fprintf(out, "  mov.w @r%d, r%d\n", ref_reg, REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  push @r%d\n", ref_reg);
+    stack++;
+  }
+
+  return 0;
+}
+
+int MSP430::array_read_int()
+{
+  return array_read_short();
 }
 
 int MSP430::array_read_byte(const char *name, int field_id)
@@ -1778,4 +1831,34 @@ int MSP430::array_get_registers(int *value_reg, int *index_reg, int *ref_reg)
 
   return 0;
 }
+
+int MSP430::array_get_registers(int *index_reg, int *ref_reg)
+{
+  if (stack > 0)
+  {
+    fprintf(out, "  pop r14\n");
+    *index_reg = 14;
+    stack--;
+  }
+    else
+  {
+    *index_reg = REG_STACK(reg-1);
+    reg--;
+  }
+
+  if (stack > 0)
+  {
+    fprintf(out, "  pop r13\n");
+    *ref_reg = 13;
+    stack--;
+  }
+    else
+  {
+    *ref_reg = REG_STACK(reg-1);
+    reg--;
+  }
+
+  return 0;
+}
+
 

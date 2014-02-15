@@ -255,46 +255,6 @@ char type[64];
   return -1;
 }
 
-#if 0
-static int array_store(JavaClass *java_class, Generator *generator, uint8_t array_type)
-{
-generic_32bit_t *gen32;
-char field_name[64];
-char type[64];
-
-  gen32 = (generic_32bit_t *)java_class->get_constant(constant_id);
-
-  if (gen32->tag == CONSTANT_FIELDREF)
-  {
-    constant_fieldref_t *field_ref = (struct constant_fieldref_t *)gen32;
-    printf("class_index=%d name_and_type=%d\n", field_ref->class_index, field_ref->name_and_type_index);
-
-    if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), constant_id) != 0)
-    {
-      printf("Error retrieving field name const_index=%d\n", constant_id);
-      return -1;
-    }
-
-    // FIXME - Do we get this from the array or from the instruction
-    if (array_type == ARRAY_TYPE_BYTE)
-    { return generator->array_write_byte(); }
-      else
-    if (array_type == ARRAY_TYPE_SHORT)
-    { return generator->array_write_short(); }
-      else
-    if (array_type == ARRAY_TYPE_INT)
-    { return generator->array_write_int(); }
-  }
-    else
-  {
-    printf("Error: tag not supported\n");
-    return -1;
-  }
-
-  return -1;
-}
-#endif
-
 int compile_method(JavaClass *java_class, int method_id, Generator *generator)
 {
 struct methods_t *method = java_class->get_method(method_id);
@@ -702,7 +662,8 @@ printf("code_len=%d\n", code_len);
 
       case 46: // iaload (0x2e)
         if (operand_stack_ptr == 0)
-        { ret = -1; }
+        //{ ret = -1; }
+        { ret = generator->array_read_int(); }
           else
         { ret = array_load(java_class, generator, operand_stack[--operand_stack_ptr], ARRAY_TYPE_INT); }
 
@@ -890,7 +851,6 @@ printf("code_len=%d\n", code_len);
 
       case 79: // iastore (0x4f)
         if (operand_stack_ptr == 0)
-        //{ ret = -1; }
         { ret = generator->array_write_int(); }
           else
         { ret = array_store(java_class, generator, operand_stack[--operand_stack_ptr], ARRAY_TYPE_INT); }
@@ -920,7 +880,7 @@ printf("code_len=%d\n", code_len);
 
       case 84: // bastore (0x54)
         if (operand_stack_ptr == 0)
-        { ret = -1; }
+        { ret = generator->array_write_byte(); }
           else
         { ret = array_store(java_class, generator, operand_stack[--operand_stack_ptr], ARRAY_TYPE_BYTE); }
 
@@ -929,7 +889,7 @@ printf("code_len=%d\n", code_len);
 
       case 85: // castore (0x55)
         if (operand_stack_ptr == 0)
-        { ret = -1; }
+        { ret = generator->array_write_short(); }
           else
         { ret = array_store(java_class, generator, operand_stack[--operand_stack_ptr], ARRAY_TYPE_CHAR); }
         pc++;
@@ -937,7 +897,7 @@ printf("code_len=%d\n", code_len);
 
       case 86: // sastore (0x56)
         if (operand_stack_ptr == 0)
-        { ret = -1; }
+        { ret = generator->array_write_short(); }
           else
         { ret = array_store(java_class, generator, operand_stack[--operand_stack_ptr], ARRAY_TYPE_SHORT); }
 

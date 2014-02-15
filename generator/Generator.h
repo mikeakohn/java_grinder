@@ -77,6 +77,9 @@ public:
   virtual int insert_array(const char *name, int32_t *data, int len, uint8_t type) = 0;
   virtual int push_array_length() = 0;
   virtual int push_array_length(const char *name, int field_id) = 0;
+  virtual int array_read_byte() = 0;
+  virtual int array_read_short() = 0;
+  virtual int array_read_int() = 0;
   virtual int array_read_byte(const char *name, int field_id) = 0;
   virtual int array_read_short(const char *name, int field_id) = 0;
   virtual int array_read_int(const char *name, int field_id) = 0;
