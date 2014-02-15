@@ -77,10 +77,14 @@ public:
   virtual int brk();
   virtual int new_array(uint8_t type);
   virtual int insert_array(const char *name, int32_t *data, int len, uint8_t type);
+  virtual int push_array_length();
   virtual int push_array_length(const char *name, int field_id);
   virtual int array_read_byte(const char *name, int field_id);
   virtual int array_read_short(const char *name, int field_id);
   virtual int array_read_int(const char *name, int field_id);
+  virtual int array_write_byte();
+  virtual int array_write_short();
+  virtual int array_write_int();
   virtual int array_write_byte(const char *name, int field_id);
   virtual int array_write_short(const char *name, int field_id);
   virtual int array_write_int(const char *name, int field_id);

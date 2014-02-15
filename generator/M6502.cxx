@@ -284,6 +284,11 @@ int M6502::insert_array(const char *name, int32_t *data, int len, uint8_t type)
   return -1;
 }
 
+int M6502::push_array_length()
+{
+  return -1;
+}
+
 int M6502::push_array_length(const char *name, int field_id)
 {
   return -1;
@@ -300,6 +305,21 @@ int M6502::array_read_short(const char *name, int field_id)
 }
 
 int M6502::array_read_int(const char *name, int field_id)
+{
+  return -1;
+}
+
+int M6502::array_write_byte()
+{
+  return -1;
+}
+
+int M6502::array_write_short()
+{
+  return -1;
+}
+
+int M6502::array_write_int()
 {
   return -1;
 }

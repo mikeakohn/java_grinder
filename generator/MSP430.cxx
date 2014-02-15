@@ -1048,6 +1048,22 @@ int MSP430::insert_array(const char *name, int32_t *data, int len, uint8_t type)
   return -1;
 }
 
+int MSP430::push_array_length()
+{
+  if (stack > 0)
+  {
+    fprintf(out, "  pop r15\n");
+    fprintf(out, "  -2(r15), r15\n");
+    fprintf(out, "  push r15\n");
+  }
+    else
+  {
+    fprintf(out, "  mov.w -2(r%d), r%d\n", REG_STACK(reg-1), REG_STACK(reg-1));
+  }
+
+  return 0;
+}
+
 int MSP430::push_array_length(const char *name, int field_id)
 {
   //fprintf(out, "  mov.w #%s-2, r13\n", name);
@@ -1114,6 +1130,38 @@ int MSP430::array_read_short(const char *name, int field_id)
 int MSP430::array_read_int(const char *name, int field_id)
 {
   return array_read_short(name, field_id);
+}
+
+int MSP430::array_write_byte()
+{
+int value_reg;
+int index_reg;
+int ref_reg;
+
+  array_get_registers(&value_reg, &index_reg, &ref_reg);
+  fprintf(out, "  add.w r%d, r%d\n", index_reg, ref_reg);
+  fprintf(out, "  mov.b r%d, 0(r%d)\n", value_reg, ref_reg);
+
+  return 0;
+}
+
+int MSP430::array_write_short()
+{
+int value_reg;
+int index_reg;
+int ref_reg;
+
+  array_get_registers(&value_reg, &index_reg, &ref_reg);
+  fprintf(out, "  rla.w r%d\n", index_reg);
+  fprintf(out, "  add.w r%d, r%d\n", index_reg, ref_reg);
+  fprintf(out, "  mov.w r%d, 0(r%d)\n", value_reg, ref_reg);
+
+  return 0;
+}
+
+int MSP430::array_write_int()
+{
+  return array_write_short();
 }
 
 int MSP430::array_write_byte(const char *name, int field_id)
@@ -1688,5 +1736,46 @@ void MSP430::insert_div_integers()
   fprintf(out, "  dec r6\n");
   fprintf(out, "  jnz _div1\n");
   fprintf(out, "  ret\n");
+}
+
+int MSP430::array_get_registers(int *value_reg, int *index_reg, int *ref_reg)
+{
+  if (stack > 0)
+  {
+    fprintf(out, "  pop r15\n");
+    *value_reg = 15;
+    stack--;
+  }
+    else
+  {
+    *value_reg = REG_STACK(reg-1);
+    reg--;
+  }
+
+  if (stack > 0)
+  {
+    fprintf(out, "  pop r14\n");
+    *index_reg = 14;
+    stack--;
+  }
+    else
+  {
+    *index_reg = REG_STACK(reg-1);
+    reg--;
+  }
+
+  if (stack > 0)
+  {
+    fprintf(out, "  pop r13\n");
+    *ref_reg = 13;
+    stack--;
+  }
+    else
+  {
+    *ref_reg = REG_STACK(reg-1);
+    reg--;
+  }
+
+  return 0;
 }
 
