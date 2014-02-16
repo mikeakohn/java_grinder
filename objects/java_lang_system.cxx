@@ -27,7 +27,7 @@ static int system_out_println(JavaClass *java_class, Generator *generator)
 
 int java_lang_system(JavaClass *java_class, Generator *generator, char *function)
 {
-  if (strncmp("system_out_println", function, sizeof("system_out_println"-1)) == 0)
+  if (strncmp("system_out_println", function, sizeof("system_out_println")-1) == 0)
   {
     return system_out_println(java_class, generator);
   }
