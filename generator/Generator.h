@@ -24,7 +24,7 @@ public:
   virtual int open(char *filename);
   void label(char *name);
   virtual int start_init() = 0;
-  virtual int insert_static_field_define(const char *name, int index) = 0;
+  virtual int insert_static_field_define(const char *name, const char *type, int index) = 0;
   virtual int init_heap(int field_count) = 0;
   virtual int insert_field_init_boolean(char *name, int index, int value) = 0;
   virtual int insert_field_init_byte(char *name, int index, int value) = 0;
@@ -203,14 +203,14 @@ enum
 // This is redundant
 enum
 {
-TYPE_BOOLEAN=4,
-TYPE_CHAR=5,
-TYPE_FLOAT=6,
-TYPE_DOUBLE=7,
-TYPE_BYTE=8,
-TYPE_SHORT=9,
-TYPE_INT=10,
-TYPE_LONG=11,
+  TYPE_BOOLEAN=4,
+  TYPE_CHAR=5,
+  TYPE_FLOAT=6,
+  TYPE_DOUBLE=7,
+  TYPE_BYTE=8,
+  TYPE_SHORT=9,
+  TYPE_INT=10,
+  TYPE_LONG=11,
 };
 
 #if 0

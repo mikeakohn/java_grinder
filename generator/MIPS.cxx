@@ -45,7 +45,7 @@ int MIPS::start_init()
   return -1;
 }
 
-int MIPS::insert_static_field_define(const char *name, int index)
+int MIPS::insert_static_field_define(const char *name, const char *type, int index)
 {
   return -1;
 }

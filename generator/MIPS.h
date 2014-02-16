@@ -22,7 +22,7 @@ public:
 
   virtual int open(char *filename);
   virtual int start_init();
-  virtual int insert_static_field_define(const char *name, int index);
+  virtual int insert_static_field_define(const char *name, const char *type, int index);
   virtual int init_heap(int field_count);
   virtual int insert_field_init_boolean(char *name, int index, int value);
   virtual int insert_field_init_byte(char *name, int index, int value);

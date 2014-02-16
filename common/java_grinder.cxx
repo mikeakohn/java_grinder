@@ -103,8 +103,10 @@ int index;
   for (index = 0; index < field_count; index++)
   {
     char field_name[64];
+    char field_type[64];
     java_class->get_field_name(field_name, sizeof(field_name), index);
-    generator->insert_static_field_define(field_name, index);
+    java_class->get_field_type(field_type, sizeof(field_type), index);
+    generator->insert_static_field_define(field_name, field_type, index);
   }
 
   generator->start_init();

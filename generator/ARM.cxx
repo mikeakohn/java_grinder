@@ -45,7 +45,7 @@ int ARM::start_init()
   return -1;
 }
 
-int ARM::insert_static_field_define(const char *name, int index)
+int ARM::insert_static_field_define(const char *name, const char *type, int index)
 {
   return -1;
 }

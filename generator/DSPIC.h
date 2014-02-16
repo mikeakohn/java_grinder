@@ -28,7 +28,7 @@ public:
 
   virtual int open(char *filename);
   virtual int start_init();
-  virtual int insert_static_field_define(const char *name, int index);
+  virtual int insert_static_field_define(const char *name, const char *type, int index);
   virtual int init_heap(int field_count);
   virtual int insert_field_init_boolean(char *name, int index, int value);
   virtual int insert_field_init_byte(char *name, int index, int value);
@@ -184,6 +184,8 @@ private:
   int stack_alu_div();
   int stack_shift(const char *instr);
   int get_pin_number(int const_val);
+  int get_values_from_stack(int *value1, int *value2, int *value3);
+  int get_values_from_stack(int *value1, int *value2);
 
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 
@@ -191,7 +193,8 @@ private:
   uint8_t chip_type;
   bool is_main;
   bool need_stack_set;
-  int flash_start;
+  bool need_tables;
+  //int flash_start;
 };
 
 #endif

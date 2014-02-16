@@ -410,6 +410,19 @@ struct fields_t *field;
   return 0;
 }
 
+int JavaClass::get_field_type(char *type, int len, int index)
+{
+struct fields_t *field;
+
+  type[0] = 0;
+  if (index >= fields_count) { return -1; }
+
+  field = (struct fields_t *)(fields_heap + fields[index]);
+  get_name_constant(type, len, field->descriptor_index);
+
+  return 0;
+}
+
 int JavaClass::get_ref_name_type(char *name, char *type, int len, int index)
 {
 struct constant_fieldref_t *constant_fieldref;

@@ -24,14 +24,17 @@
 
 // ABI is:
 // w0 temp, return value from method call
+// w1 temp
 // w4 start of stack
 // w5 ..
-// w1 ..
+// w11 ..
 // w2 ..
 // w3 ..
 // w8 ..
 // w9 ..
 // w10 end of stack
+// w6 temp DSP, array ptr
+// w7 temp DSP, array index
 // w13 temp
 // w14 pointer to locals
 //
@@ -45,7 +48,8 @@ DSPIC::DSPIC(uint8_t chip_type) :
   reg_max(sizeof(stack_regs)),
   stack(0),
   is_main(false),
-  need_stack_set(false)
+  need_stack_set(false),
+  need_tables(false)
 {
   this->chip_type = chip_type;
 }
@@ -67,16 +71,20 @@ int DSPIC::open(char *filename)
   {
     case DSPIC30F3012:
       fprintf(out, ".include \"p30f3012.inc\"\n\n");
-      flash_start = 0x100;
+      //flash_start = 0x100;
       break;
     case DSPIC33FJ06GS101A:
       fprintf(out, ".include \"p33fj06gs101a.inc\"\n\n");
-      flash_start = 0x100;
+      //flash_start = 0x100;
       need_stack_set = true;
       break;
     default:
       printf("Unknown chip type.\n");
   }
+
+  // Set where RAM starts / ends
+  fprintf(out, "ram_start equ __DATA_BASE\n");
+  fprintf(out, "ram_end equ __DATA_BASE+__DATA_LENGTH\n");
 
   return 0;
 }
@@ -89,46 +97,92 @@ int DSPIC::start_init()
   // Add any set up items (stack, registers, etc).  On some CPU's (dsPICF3012)
   // SP is automatically set but some it's not.  So for now we'll just set it.
   // Also, not sure what to do with SPLIM.
-  fprintf(out, ".org %d\n", flash_start);
+  fprintf(out, ".org __CODE_BASE\n");
   fprintf(out, "start:\n");
-  if (need_stack_set) { fprintf(out, "  mov #0x800, SP\n\n"); }
+  if (need_stack_set) { fprintf(out, "  mov #__DATA_BASE, SP\n\n"); }
+  if (need_tables)
+  {
+    fprintf(out, "  ;; For reading out of flash, need table instructions\n");
+    fprintf(out, "  mov #0, w1\n");
+    fprintf(out, "  mov w1, TBLPAG\n\n");
+  }
 
   return 0;
 }
 
-int DSPIC::insert_static_field_define(const char *name, int index)
+int DSPIC::insert_static_field_define(const char *name, const char *type, int index)
 {
-  return -1;
+  if (type[0] == '[') { need_tables = true; }
+  fprintf(out, "%s equ ram_end-%d\n", name, (index + 2) * 2);
+
+  return 0;
 }
 
 int DSPIC::init_heap(int field_count)
 {
-  return -1;
+  fprintf(out, "  ;; Set up heap and static initializers\n");
+  fprintf(out, "  mov #ram_end-%d, w0\n", (field_count + 2) * 2);
+  fprintf(out, "  mov.w w0, ram_end-2\n");
+
+  return 0;
 }
 
 int DSPIC::insert_field_init_boolean(char *name, int index, int value)
 {
-  return -1;
+  //value = (value == 0) ? 0 : 1;
+  if (value == 0)
+  {
+    fprintf(out, "  clr %s\n", name);
+  }
+    else
+  {
+    fprintf(out, "  mov #1, w0\n");
+    fprintf(out, "  mov w0, %s\n", name);
+  }
+  return 0;
 }
 
 int DSPIC::insert_field_init_byte(char *name, int index, int value)
 {
-  return -1;
+  if (value < -128 || value > 255) { return -1; }
+  if (value == 0)
+  {
+    fprintf(out, "  clr %s\n", name);
+  }
+    else
+  {
+    fprintf(out, "  mov #%d, w0\n", (int8_t)value);
+    fprintf(out, "  mov w0, %s\n", name);
+  }
+
+  return 0;
 }
 
 int DSPIC::insert_field_init_short(char *name, int index, int value)
 {
-  return -1;
+  if (value < -32768 || value > 65535) { return -1; }
+  if (value == 0)
+  {
+    fprintf(out, "  clr %s\n", name);
+  }
+    else
+  {
+    fprintf(out, "  mov #%d, w0\n", value);
+    fprintf(out, "  mov w0, %s\n", name);
+  }
+  return 0;
 }
 
 int DSPIC::insert_field_init_int(char *name, int index, int value)
 {
-  return -1;
+  return insert_field_init_short(name, index, value);
 }
 
 int DSPIC::insert_field_init(char *name, int index)
 {
-  return -1;
+  fprintf(out, "  mov #_%s, w0\n", name);
+  fprintf(out, "  mov w0, %s\n", name);
+  return 0;
 }
 
 void DSPIC::method_start(int local_count, const char *name)
@@ -680,72 +734,202 @@ int DSPIC::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 
 int DSPIC::push_array_length()
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  pop w0\n");
+    fprintf(out, "  mov [w0-2], w0\n");
+    fprintf(out, "  push w0\n");
+  }
+    else
+  {
+    fprintf(out, "  mov.w [w%d-2], w0\n", REG_STACK(reg-1));
+    fprintf(out, "  mov.w w0, [w%d]\n", REG_STACK(reg-1));
+  }
+
+  return 0;
 }
 
 int DSPIC::push_array_length(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  mov %s, w13\n", name);
+
+  if (reg < reg_max)
+  {
+    fprintf(out, "  tblrdl [w13-2], w%d\n", REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  push [w13-2]\n");
+    stack++;
+  }
+
+  return 0;
 }
 
 int DSPIC::array_read_byte()
 {
-  return -1;
+int index_reg;
+int ref_reg;
+
+  get_values_from_stack(&index_reg, &ref_reg);
+  fprintf(out, "  sl w%d\n", index_reg);
+  fprintf(out, "  add w%d, w%d\n", index_reg, ref_reg);
+  if (reg < reg_max)
+  {
+    fprintf(out, "  mov.b [w%d], w%d\n", ref_reg, REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  push [w%d]\n", ref_reg);
+    stack++;
+  }
+
+  return 0;
 }
 
 int DSPIC::array_read_short()
 {
-  return -1;
+int index_reg;
+int ref_reg;
+
+  get_values_from_stack(&index_reg, &ref_reg);
+  fprintf(out, "  sl w%d\n", index_reg);
+  fprintf(out, "  add w%d, w%d\n", index_reg, ref_reg);
+  if (reg < reg_max)
+  {
+    fprintf(out, "  mov [w%d], w%d\n", ref_reg, REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  push [w%d]\n", ref_reg);
+    stack++;
+  }
+
+  return 0;
 }
 
 int DSPIC::array_read_int()
 {
-  return -1;
+  return array_read_short();
 }
 
 int DSPIC::array_read_byte(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  mov %s, w6\n", name);
+
+  if (stack > 0)
+  {
+    fprintf(out, "  pop w7\n");
+    fprintf(out, "  sl w7\n");
+    fprintf(out, "  add w7, w6, w6\n");
+    fprintf(out, "  mov [w6], w0\n");
+    fprintf(out, "  se w0, w0\n");
+    fprintf(out, "  push w0\n");
+  }
+    else
+  {
+    fprintf(out, "  sl w%d\n", REG_STACK(reg-1));
+    fprintf(out, "  add w%d, w6, w6\n", REG_STACK(reg-1));
+    fprintf(out, "  mov [w6], w%d\n", REG_STACK(reg-1));
+    fprintf(out, "  se w%d, w%d\n", REG_STACK(reg-1), REG_STACK(reg-1));
+  }
+
+  return 0;
 }
 
 int DSPIC::array_read_short(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  mov %s, w6\n", name);
+
+  if (stack > 0)
+  {
+    fprintf(out, "  pop w7\n");
+    fprintf(out, "  sl w7\n");
+    fprintf(out, "  add w7, w6, w6\n");
+    fprintf(out, "  push [w6]\n");
+  }
+    else
+  {
+    fprintf(out, "  sl w%d\n", REG_STACK(reg-1));
+    fprintf(out, "  add w%d, w6, w6\n", REG_STACK(reg-1));
+    fprintf(out, "  mov [w6], w%d\n", REG_STACK(reg-1));
+  }
+
+  return 0;
 }
 
 int DSPIC::array_read_int(const char *name, int field_id)
 {
-  return -1;
+  return array_read_short(name, field_id);
 }
 
 int DSPIC::array_write_byte()
 {
-  return -1;
+int value_reg;
+int index_reg;
+int ref_reg;
+
+  get_values_from_stack(&value_reg, &index_reg, &ref_reg);
+  fprintf(out, "  sl w%d\n", index_reg);
+  fprintf(out, "  add w%d, w%d, w%d\n", index_reg, ref_reg, ref_reg);
+  fprintf(out, "  mov.b w%d, [w%d]\n", value_reg, ref_reg);
+
+  return 0;
 }
 
 int DSPIC::array_write_short()
 {
-  return -1;
+int value_reg;
+int index_reg;
+int ref_reg;
+
+  get_values_from_stack(&value_reg, &index_reg, &ref_reg);
+  fprintf(out, "  sl w%d\n", index_reg);
+  fprintf(out, "  add w%d, w%d, w%d\n", index_reg, ref_reg, ref_reg);
+  fprintf(out, "  mov w%d, [w%d]\n", value_reg, ref_reg);
+
+  return 0;
 }
 
 int DSPIC::array_write_int()
 {
-  return -1;
+  return array_write_short();
 }
 
 int DSPIC::array_write_byte(const char *name, int field_id)
 {
-  return -1;
+int value_reg;
+int index_reg;
+
+  get_values_from_stack(&value_reg, &index_reg);
+
+  fprintf(out, "  sl w%d\n", index_reg);
+  fprintf(out, "  add %s, w%d\n", name, index_reg);
+  fprintf(out, "  mov.b w%d, [w%d]\n", value_reg, index_reg);
+
+  return 0;
 }
 
 int DSPIC::array_write_short(const char *name, int field_id)
 {
-  return -1;
+int value_reg;
+int index_reg;
+
+  get_values_from_stack(&value_reg, &index_reg);
+
+  fprintf(out, "  sl w%d\n", index_reg);
+  fprintf(out, "  add %s, w%d\n", name, index_reg);
+  fprintf(out, "  mov w%d, [w%d]\n", value_reg, index_reg);
+
+  return 0;
 }
 
 int DSPIC::array_write_int(const char *name, int field_id)
 {
-  return -1;
+  return array_write_short(name, field_id);
 }
 
 
@@ -1647,4 +1831,75 @@ int n,pin=-1;
 
   return pin;
 }
+
+int DSPIC::get_values_from_stack(int *value1, int *value2, int *value3)
+{
+  if (stack > 0)
+  {
+    fprintf(out, "  pop w0\n");
+    *value1 = 0;
+    stack--;
+  }
+    else
+  {
+    *value1 = REG_STACK(reg-1);
+    reg--;
+  }
+
+  if (stack > 0)
+  {
+    fprintf(out, "  pop w7\n");
+    *value2 = 7;
+    stack--;
+  }
+    else
+  {
+    *value2 = REG_STACK(reg-1);
+    reg--;
+  }
+
+  if (stack > 0)
+  {
+    fprintf(out, "  pop w6\n");
+    *value3 = 6;
+    stack--;
+  }
+    else
+  {
+    *value3 = REG_STACK(reg-1);
+    reg--;
+  }
+
+  return 0;
+}
+
+int DSPIC::get_values_from_stack(int *value1, int *value2)
+{
+  if (stack > 0)
+  {
+    fprintf(out, "  pop w7\n");
+    *value1 = 7;
+    stack--;
+  }
+    else
+  {
+    *value1 = REG_STACK(reg-1);
+    reg--;
+  }
+
+  if (stack > 0)
+  {
+    fprintf(out, "  pop w6\n");
+    *value2 = 6;
+    stack--;
+  }
+    else
+  {
+    *value2 = REG_STACK(reg-1);
+    reg--;
+  }
+
+  return 0;
+}
+
 

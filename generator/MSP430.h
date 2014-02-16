@@ -28,7 +28,7 @@ public:
 
   virtual int open(char *filename);
   virtual int start_init();
-  virtual int insert_static_field_define(const char *name, int index);
+  virtual int insert_static_field_define(const char *name, const char *type, int index);
   virtual int init_heap(int field_count);
   virtual int insert_field_init_boolean(char *name, int index, int value);
   virtual int insert_field_init_byte(char *name, int index, int value);
@@ -147,8 +147,8 @@ protected:
   void insert_read_spi();
   void insert_mul_integers();
   void insert_div_integers();
-  int array_get_registers(int *value_reg, int *index_reg, int *ref_reg);
-  int array_get_registers(int *index_reg, int *ref_reg);
+  int get_values_from_stack(int *value1, int *value2, int *value3);
+  int get_values_from_stack(int *value1, int *value2);
   int reg;
   int reg_max;
   int stack;

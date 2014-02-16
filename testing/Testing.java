@@ -12,6 +12,18 @@ public class Testing
     return a;
   }
 
+  static public int sub_nums(int a, int b)
+  {
+    int n;
+    for (n = 0; n < 10; n++)
+    {
+      a = a - 2;
+      a = a - b;
+    }
+
+    return a;
+  }
+
   static public void main(String args[])
   {
   int c;

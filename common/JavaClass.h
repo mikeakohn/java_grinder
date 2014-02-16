@@ -181,6 +181,7 @@ public:
   int get_name_constant(char *name, int len, int index);
   int get_method_name(char *name, int len, int index);
   int get_field_name(char *name, int len, int index);
+  int get_field_type(char *name, int len, int index);
   int get_ref_name_type(char *name, char *type, int len, int index);
   int get_class_name(char *name, int len, int index);
   void *get_constant(int index);

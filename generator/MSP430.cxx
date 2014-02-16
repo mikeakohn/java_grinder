@@ -121,7 +121,7 @@ int MSP430::start_init()
   return 0;
 }
 
-int MSP430::insert_static_field_define(const char *name, int index)
+int MSP430::insert_static_field_define(const char *name, const char *type, int index)
 {
   fprintf(out, "%s equ ram_start+%d\n", name, (index + 1) * 2);
   return 0;
@@ -136,7 +136,7 @@ int MSP430::init_heap(int field_count)
 
 int MSP430::insert_field_init_boolean(char *name, int index, int value)
 {
-  value = (value == 0) ? 0: 1;
+  value = (value == 0) ? 0 : 1;
   //fprintf(out, "  mov #%d, &ram_start+%d ; %s\n", value, (index + 1) * 2, name);
   fprintf(out, "  mov.w #%d, &%s\n", value, name);
   return 0;
@@ -145,7 +145,7 @@ int MSP430::insert_field_init_boolean(char *name, int index, int value)
 int MSP430::insert_field_init_byte(char *name, int index, int value)
 {
   if (value < -128 || value > 255) { return -1; }
-  fprintf(out, "  mov.w #%d, &%s\n", value, name);
+  fprintf(out, "  mov.w #%d, &%s\n", (int8_t)value, name);
   return 0;
 }
 
@@ -158,9 +158,7 @@ int MSP430::insert_field_init_short(char *name, int index, int value)
 
 int MSP430::insert_field_init_int(char *name, int index, int value)
 {
-  if (value < -32768 || value > 65535) { return -1; }
-  fprintf(out, "  mov.w #%d, &%s\n", value, name);
-  return 0;
+  return insert_field_init_short(name, index, value);
 }
 
 int MSP430::insert_field_init(char *name, int index)
@@ -1068,7 +1066,7 @@ int MSP430::push_array_length()
   if (stack > 0)
   {
     fprintf(out, "  pop r15\n");
-    fprintf(out, "  -2(r15), r15\n");
+    fprintf(out, "  mov.w -2(r15), r15\n");
     fprintf(out, "  push r15\n");
   }
     else
@@ -1105,7 +1103,7 @@ int MSP430::array_read_byte()
 int index_reg;
 int ref_reg;
 
-  array_get_registers(&index_reg, &ref_reg);
+  get_values_from_stack(&index_reg, &ref_reg);
   fprintf(out, "  add.w r%d, r%d\n", index_reg, ref_reg);
 
   if (reg < reg_max)
@@ -1130,7 +1128,7 @@ int MSP430::array_read_short()
 int index_reg;
 int ref_reg;
 
-  array_get_registers(&index_reg, &ref_reg);
+  get_values_from_stack(&index_reg, &ref_reg);
   fprintf(out, "  rla.w r%d\n", index_reg);
   fprintf(out, "  add.w r%d, r%d\n", index_reg, ref_reg);
   if (reg < reg_max)
@@ -1205,7 +1203,7 @@ int value_reg;
 int index_reg;
 int ref_reg;
 
-  array_get_registers(&value_reg, &index_reg, &ref_reg);
+  get_values_from_stack(&value_reg, &index_reg, &ref_reg);
   fprintf(out, "  add.w r%d, r%d\n", index_reg, ref_reg);
   fprintf(out, "  mov.b r%d, 0(r%d)\n", value_reg, ref_reg);
 
@@ -1218,7 +1216,7 @@ int value_reg;
 int index_reg;
 int ref_reg;
 
-  array_get_registers(&value_reg, &index_reg, &ref_reg);
+  get_values_from_stack(&value_reg, &index_reg, &ref_reg);
   fprintf(out, "  rla.w r%d\n", index_reg);
   fprintf(out, "  add.w r%d, r%d\n", index_reg, ref_reg);
   fprintf(out, "  mov.w r%d, 0(r%d)\n", value_reg, ref_reg);
@@ -1233,72 +1231,27 @@ int MSP430::array_write_int()
 
 int MSP430::array_write_byte(const char *name, int field_id)
 {
-  if (stack > 2)
-  {
-    fprintf(out, "  pop.w r15\n");
-    fprintf(out, "  pop.w r13\n");
-    fprintf(out, "  rla.w r13\n");
-    fprintf(out, "  add.w #%s, r13\n", name);
-    fprintf(out, "  mov.b r15, @r13\n");
-    stack -= 2;
-  }
-    else
-  if (stack == 1)
-  {
-    fprintf(out, "  mov.w #%s, r13\n", name);
-    fprintf(out, "  pop.w r15\n");
-    fprintf(out, "  rla.w r%d\n", REG_STACK(reg-1));
-    fprintf(out, "  add.w r%d, r13\n", REG_STACK(reg-1));
-    fprintf(out, "  mov.b r15, @r13\n");
+int value_reg;
+int index_reg;
 
-    stack--;
-    reg--;
-  }
-    else
-  {
-    fprintf(out, "  mov.w #%s, r13\n", name);
-    fprintf(out, "  rla.w r%d\n", REG_STACK(reg-2));
-    fprintf(out, "  add.w r%d, r13\n", REG_STACK(reg-2));
-    fprintf(out, "  mov.b r%d, @r13\n", REG_STACK(reg-1));
+  get_values_from_stack(&value_reg, &index_reg);
 
-    reg -= 2;
-  }
+  fprintf(out, "  add.w &%s, r%d\n", name, index_reg);
+  fprintf(out, "  mov.b r%d, 0(r%d)\n", value_reg, index_reg);
 
   return 0;
 }
 
 int MSP430::array_write_short(const char *name, int field_id)
 {
-  if (stack > 2)
-  {
-    fprintf(out, "  pop.w r15\n");
-    fprintf(out, "  pop.w r13\n");
-    fprintf(out, "  rla.w r13\n");
-    fprintf(out, "  add.w #%s, r13\n", name);
-    fprintf(out, "  mov.w r15, @r13\n");
-    stack -= 2;
-  }
-    else
-  if (stack == 1)
-  {
-    fprintf(out, "  mov.w #%s, r13\n", name);
-    fprintf(out, "  pop.w r15\n");
-    fprintf(out, "  rla.w r%d\n", REG_STACK(reg-1));
-    fprintf(out, "  add.w r%d, r13\n", REG_STACK(reg-1));
-    fprintf(out, "  mov.w r15, @r13\n");
+int value_reg;
+int index_reg;
 
-    stack--;
-    reg--;
-  }
-    else
-  {
-    fprintf(out, "  mov.w #%s, r13\n", name);
-    fprintf(out, "  rla.w r%d\n", REG_STACK(reg-2));
-    fprintf(out, "  add.w r%d, r13\n", REG_STACK(reg-2));
-    fprintf(out, "  mov.w r%d, @r13\n", REG_STACK(reg-1));
+  get_values_from_stack(&value_reg, &index_reg);
 
-    reg -= 2;
-  }
+  fprintf(out, "  rla.w r%d\n", index_reg);
+  fprintf(out, "  add.w &%s, r%d\n", name, index_reg);
+  fprintf(out, "  mov.w r%d, 0(r%d)\n", value_reg, index_reg);
 
   return 0;
 }
@@ -1805,70 +1758,70 @@ void MSP430::insert_div_integers()
   fprintf(out, "  ret\n");
 }
 
-int MSP430::array_get_registers(int *value_reg, int *index_reg, int *ref_reg)
+int MSP430::get_values_from_stack(int *value1, int *value2, int *value3)
 {
   if (stack > 0)
   {
     fprintf(out, "  pop r15\n");
-    *value_reg = 15;
+    *value1 = 15;
     stack--;
   }
     else
   {
-    *value_reg = REG_STACK(reg-1);
+    *value1 = REG_STACK(reg-1);
     reg--;
   }
 
   if (stack > 0)
   {
     fprintf(out, "  pop r14\n");
-    *index_reg = 14;
+    *value2 = 14;
     stack--;
   }
     else
   {
-    *index_reg = REG_STACK(reg-1);
+    *value2 = REG_STACK(reg-1);
     reg--;
   }
 
   if (stack > 0)
   {
     fprintf(out, "  pop r13\n");
-    *ref_reg = 13;
+    *value3 = 13;
     stack--;
   }
     else
   {
-    *ref_reg = REG_STACK(reg-1);
+    *value3 = REG_STACK(reg-1);
     reg--;
   }
 
   return 0;
 }
 
-int MSP430::array_get_registers(int *index_reg, int *ref_reg)
+int MSP430::get_values_from_stack(int *value1, int *value2)
 {
   if (stack > 0)
   {
     fprintf(out, "  pop r14\n");
-    *index_reg = 14;
+    *value1 = 14;
     stack--;
   }
     else
   {
-    *index_reg = REG_STACK(reg-1);
+    *value1 = REG_STACK(reg-1);
     reg--;
   }
 
   if (stack > 0)
   {
     fprintf(out, "  pop r13\n");
-    *ref_reg = 13;
+    *value2 = 13;
     stack--;
   }
     else
   {
-    *ref_reg = REG_STACK(reg-1);
+    *value2 = REG_STACK(reg-1);
     reg--;
   }
 
