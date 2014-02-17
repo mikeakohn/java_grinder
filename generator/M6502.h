@@ -86,6 +86,10 @@ public:
   virtual int array_write_short(const char *name, int field_id);
   virtual int array_write_int(const char *name, int field_id);
   //virtual void close();
+
+protected:
+  int stack;
+  bool is_main:1;
 };
 
 #endif
