@@ -823,7 +823,6 @@ int DSPIC::array_read_byte(const char *name, int field_id)
   if (stack > 0)
   {
     fprintf(out, "  pop w7\n");
-    fprintf(out, "  sl w7\n");
     fprintf(out, "  add w7, w6, w6\n");
     fprintf(out, "  mov [w6], w0\n");
     fprintf(out, "  se w0, w0\n");
@@ -831,7 +830,6 @@ int DSPIC::array_read_byte(const char *name, int field_id)
   }
     else
   {
-    fprintf(out, "  sl w%d\n", REG_STACK(reg-1));
     fprintf(out, "  add w%d, w6, w6\n", REG_STACK(reg-1));
     fprintf(out, "  mov [w6], w%d\n", REG_STACK(reg-1));
     fprintf(out, "  se w%d, w%d\n", REG_STACK(reg-1), REG_STACK(reg-1));

@@ -1131,6 +1131,7 @@ int ref_reg;
   get_values_from_stack(&index_reg, &ref_reg);
   fprintf(out, "  rla.w r%d\n", index_reg);
   fprintf(out, "  add.w r%d, r%d\n", index_reg, ref_reg);
+
   if (reg < reg_max)
   {
     fprintf(out, "  mov.w @r%d, r%d\n", ref_reg, REG_STACK(reg));
@@ -1158,14 +1159,15 @@ int MSP430::array_read_byte(const char *name, int field_id)
   {
     fprintf(out, "  pop r15\n");
     fprintf(out, "  add.w r15, r13\n");
-    fprintf(out, "  sxt @r13\n");
-    fprintf(out, "  push.w @r13\n");
+    fprintf(out, "  mov.b @r13, r15\n");
+    fprintf(out, "  sxt r15\n");
+    fprintf(out, "  push r15\n");
   }
     else
   {
     fprintf(out, "  add.w r%d, r13\n", REG_STACK(reg-1));
-    fprintf(out, "  sxt @r%d\n", REG_STACK(reg-1));
-    fprintf(out, "  mov.w @r13, r%d\n", REG_STACK(reg-1));
+    fprintf(out, "  mov.b @r13, r%d\n", REG_STACK(reg-1));
+    fprintf(out, "  sxt r%d\n", REG_STACK(reg-1));
   }
 
   return 0;

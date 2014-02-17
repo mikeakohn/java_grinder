@@ -76,7 +76,7 @@ int n;
       return -1;
     }
 
-    fprintf(out, " 0x%02x", (uint16_t)data[n]);
+    fprintf(out, " 0x%02x", (uint8_t)data[n]);
 
     if (((n + 1) % 8) == 0) { fprintf(out, "\n"); }
   }
@@ -143,7 +143,7 @@ int n;
     if ((n % 8) == 0) { fprintf(out, "  dc32"); }
     else { fprintf(out, ","); }
 
-    fprintf(out, " 0x%04x", (uint16_t)data[n]);
+    fprintf(out, " 0x%04x", (uint32_t)data[n]);
 
     if (((n + 1) % 8) == 0) { fprintf(out, "\n"); }
   }
