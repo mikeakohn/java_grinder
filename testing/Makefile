@@ -1,5 +1,6 @@
 
 JOBJS=Arrays.class \
+      GasDetector.class \
       Testing.class \
       Testing2.class \
       DSPTest.class \

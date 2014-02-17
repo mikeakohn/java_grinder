@@ -107,7 +107,9 @@ public:
   virtual int ioport_setPinAsOutput(int port);
   virtual int ioport_setPinAsInput(int port);
   virtual int ioport_setPinHigh(int port);
+  virtual int ioport_setPinHigh(int port, int const_val);
   virtual int ioport_setPinLow(int port);
+  virtual int ioport_setPinLow(int port, int const_val);
   virtual int ioport_isPinInputHigh(int port);
   virtual int ioport_getPortInputValue(int port);
   //virtual int ioport_setPortOutputValue(int port);

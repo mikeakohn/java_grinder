@@ -635,7 +635,7 @@ int MSP430::and_integer()
 
 int MSP430::or_integer()
 {
-  return stack_alu("or");
+  return stack_alu("bis");
 }
 
 int MSP430::xor_integer()
@@ -1296,7 +1296,7 @@ int MSP430::ioport_setPinsAsOutput(int port, int const_val)
 {
   char periph[32];
   sprintf(periph, "P%dDIR", port+1);
-  fprintf(out, "  bis.b #%d, &%s\n", const_val, periph);
+  fprintf(out, "  bis.b #0x%02x, &%s\n", const_val, periph);
   return 0;
 }
 
@@ -1344,9 +1344,23 @@ int MSP430::ioport_setPinHigh(int port)
   return -1;
 }
 
+int MSP430::ioport_setPinHigh(int port, int const_val)
+{
+  if (const_val < 0 || const_val > 7) { return -1; }
+  fprintf(out, "  bis.b #0x%02x, &P%dOUT\n", (1<<const_val), port+1);
+  return 0;
+}
+
 int MSP430::ioport_setPinLow(int port)
 {
   return -1;
+}
+
+int MSP430::ioport_setPinLow(int port, int const_val)
+{
+  if (const_val < 0 || const_val > 7) { return -1; }
+  fprintf(out, "  bic.b #0x%02x, &P%dOUT\n", (1<<const_val), port+1);
+  return 0;
 }
 
 int MSP430::ioport_isPinInputHigh(int port)

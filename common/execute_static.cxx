@@ -116,6 +116,8 @@ int ret = 0;
         stack[stack_ptr++] = (int8_t)bytes[pc+1];
         break;
       case 17: // sipush (0x11)
+        stack[stack_ptr++] = (int16_t)((bytes[pc+1]<<8) | bytes[pc+2]);
+        break;
       case 18: // ldc (0x12)
       case 19: // ldc_w (0x13)
       case 20: // ldc2_w (0x14)
