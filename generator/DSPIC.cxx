@@ -643,7 +643,8 @@ int n;
   {
     if (stack_vars > 0)
     {
-      fprintf(out, "  mov [SP%d], [SP+%d]\n", stack_vars, local+4);
+      fprintf(out, "  mov [SP-%d], w0\n", (stack-(stack_vars-1)) * 2);
+      fprintf(out, "  mov w0, [SP+%d]\n", local+4);
       stack_vars--;
     }
       else
