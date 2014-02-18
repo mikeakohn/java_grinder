@@ -871,7 +871,7 @@ int n;
   {
     if (stack_vars > 0)
     {
-      fprintf(out, "  mov.w %d(SP), %d(SP)\n", stack_vars, local-4);
+      fprintf(out, "  mov.w %d(SP), %d(SP)\n", (stack-stack_vars) * 2, local-4);
       stack_vars--;
     }
       else
