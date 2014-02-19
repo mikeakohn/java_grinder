@@ -130,6 +130,24 @@ int const_vals[2];
     return 3;
   }
 
+  if (bytes[pc] == 0x78)
+  {
+    if (generator->shift_left_integer(const_val) != 0) { return 0; }
+    return 1;
+  }
+
+  if (bytes[pc] == 0x7a)
+  {
+    if (generator->shift_right_integer(const_val) != 0) { return 0; }
+    return 1;
+  }
+
+  if (bytes[pc] == 0x7c)
+  {
+    if (generator->shift_right_uinteger(const_val) != 0) { return 0; }
+    return 1;
+  }
+
   // 159 (0x9f) if_icmpeq
   // 160 (0xa0) if_icmpne
   // 161 (0xa1) if_icmplt

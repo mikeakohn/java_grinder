@@ -560,6 +560,27 @@ int MSP430::shift_left_integer()
   return 0;
 }
 
+int MSP430::shift_left_integer(int count)
+{
+int n;
+
+  if (reg >= reg_max) { return -1; }
+
+  if (count >= 8)
+  {
+    fprintf(out, "  swapb r%d\n", REG_STACK(reg));
+    fprintf(out, "  and.w #0xff00, r%d\n", REG_STACK(reg));
+    count = count - 8;
+  }
+
+  for (n = 0; n < count; n ++)
+  {
+    fprintf(out, "  rla.w r%d\n", REG_STACK(reg));
+  }
+
+  return 0;
+}
+
 int MSP430::shift_right_integer()
 {
   // FIXME - for MSP430x, this can be sped up
@@ -594,6 +615,30 @@ int MSP430::shift_right_integer()
   return 0;
 }
 
+int MSP430::shift_right_integer(int count)
+{
+int n;
+
+  if (reg >= reg_max) { return -1; }
+  if (count >= 8) { return -1; }
+
+#if 0
+  if (count >= 8)
+  {
+    fprintf(out, "  swapb r%d\n", REG_STACK(reg));
+    fprintf(out, "  and.w #0xff00, r%d\n", REG_STACK(reg));
+    count = count - 8;
+  }
+#endif
+
+  for (n = 0; n < count; n ++)
+  {
+    fprintf(out, "  rra.w r%d\n", REG_STACK(reg));
+  }
+
+  return 0;
+}
+
 int MSP430::shift_right_uinteger()
 {
   // FIXME - for MSP430x, this can be sped up
@@ -624,6 +669,28 @@ int MSP430::shift_right_uinteger()
   fprintf(out, "  jnz label_%d\n", label_count);
 
   label_count++;
+
+  return 0;
+}
+
+int MSP430::shift_right_uinteger(int count)
+{
+int n;
+
+  if (reg >= reg_max) { return -1; }
+
+  if (count >= 8)
+  {
+    fprintf(out, "  swapb r%d\n", REG_STACK(reg));
+    fprintf(out, "  and.w #0x00ff, r%d\n", REG_STACK(reg));
+    count = count - 8;
+  }
+
+  fprintf(out, "  clrc\n");
+  for (n = 0; n < count; n ++)
+  {
+    fprintf(out, "  rrc.w r%d\n", REG_STACK(reg));
+  }
 
   return 0;
 }

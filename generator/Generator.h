@@ -55,8 +55,11 @@ public:
   virtual int mod_integers() = 0;
   virtual int neg_integer() = 0;
   virtual int shift_left_integer() = 0;
+  virtual int shift_left_integer(int count) { return -1; }
   virtual int shift_right_integer() = 0;
+  virtual int shift_right_integer(int count) { return -1; }
   virtual int shift_right_uinteger() = 0;
+  virtual int shift_right_uinteger(int count) { return -1; }
   virtual int and_integer() = 0;
   virtual int or_integer() = 0;
   virtual int xor_integer() = 0;
