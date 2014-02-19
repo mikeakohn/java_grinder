@@ -564,18 +564,18 @@ int MSP430::shift_left_integer(int count)
 {
 int n;
 
-  if (reg >= reg_max) { return -1; }
+  if (stack != 0) { return -1; }
 
   if (count >= 8)
   {
-    fprintf(out, "  swapb r%d\n", REG_STACK(reg));
-    fprintf(out, "  and.w #0xff00, r%d\n", REG_STACK(reg));
+    fprintf(out, "  swapb r%d\n", REG_STACK(reg-1));
+    fprintf(out, "  and.w #0xff00, r%d\n", REG_STACK(reg-1));
     count = count - 8;
   }
 
   for (n = 0; n < count; n ++)
   {
-    fprintf(out, "  rla.w r%d\n", REG_STACK(reg));
+    fprintf(out, "  rla.w r%d\n", REG_STACK(reg-1));
   }
 
   return 0;
@@ -619,7 +619,7 @@ int MSP430::shift_right_integer(int count)
 {
 int n;
 
-  if (reg >= reg_max) { return -1; }
+  if (stack != 0) { return -1; }
   if (count >= 8) { return -1; }
 
 #if 0
@@ -633,7 +633,7 @@ int n;
 
   for (n = 0; n < count; n ++)
   {
-    fprintf(out, "  rra.w r%d\n", REG_STACK(reg));
+    fprintf(out, "  rra.w r%d\n", REG_STACK(reg-1));
   }
 
   return 0;
@@ -677,19 +677,19 @@ int MSP430::shift_right_uinteger(int count)
 {
 int n;
 
-  if (reg >= reg_max) { return -1; }
+  if (stack != 0) { return -1; }
 
   if (count >= 8)
   {
-    fprintf(out, "  swapb r%d\n", REG_STACK(reg));
-    fprintf(out, "  and.w #0x00ff, r%d\n", REG_STACK(reg));
+    fprintf(out, "  swapb r%d\n", REG_STACK(reg-1));
+    fprintf(out, "  and.w #0x00ff, r%d\n", REG_STACK(reg-1));
     count = count - 8;
   }
 
   fprintf(out, "  clrc\n");
   for (n = 0; n < count; n ++)
   {
-    fprintf(out, "  rrc.w r%d\n", REG_STACK(reg));
+    fprintf(out, "  rrc.w r%d\n", REG_STACK(reg-1));
   }
 
   return 0;

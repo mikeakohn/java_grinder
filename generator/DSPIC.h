@@ -58,8 +58,11 @@ public:
   virtual int mod_integers();
   virtual int neg_integer();
   virtual int shift_left_integer();
+  virtual int shift_left_integer(int count);
   virtual int shift_right_integer();
+  virtual int shift_right_integer(int count);
   virtual int shift_right_uinteger();
+  virtual int shift_right_uinteger(int count);
   virtual int and_integer();
   virtual int or_integer();
   virtual int xor_integer();

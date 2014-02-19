@@ -471,14 +471,38 @@ int DSPIC::shift_left_integer()
   return stack_shift("sl");
 }
 
+int DSPIC::shift_left_integer(int count)
+{
+  if (stack == 0) { return -1; }
+  fprintf(out, "  sl w%d, #%d, w%d\n", REG_STACK(reg-1), count, REG_STACK(reg-1));
+
+  return 0;
+}
+
 int DSPIC::shift_right_integer()
 {
   return stack_shift("asr");
 }
 
+int DSPIC::shift_right_integer(int count)
+{
+  if (stack == 0) { return -1; }
+  fprintf(out, "  asr w%d, #%d, w%d\n", REG_STACK(reg-1), count, REG_STACK(reg-1));
+
+  return 0;
+}
+
 int DSPIC::shift_right_uinteger()
 {
   return stack_shift("lsr");
+}
+
+int DSPIC::shift_right_uinteger(int count)
+{
+  if (stack == 0) { return -1; }
+  fprintf(out, "  lsr w%d, #%d, w%d\n", REG_STACK(reg-1), count, REG_STACK(reg-1));
+
+  return 0;
 }
 
 int DSPIC::and_integer()
