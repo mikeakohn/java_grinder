@@ -1553,6 +1553,66 @@ int MSP430::cpu_nop()
   return 0;
 }
 
+// ADC
+int MSP430::adc_enable()
+{
+  fprintf(out, "  mov.w #ADC10ON|ADC10SHT_3, &ADC10CTL0 ; ADC On\n");
+  return 0;
+}
+
+int MSP430::adc_disable()
+{
+  fprintf(out, "  mov.w #0, &ADC10CTL0 ; ADC Off\n");
+  return 0;
+}
+
+int MSP430::adc_setChannel_I()
+{
+int value_reg;
+
+  get_values_from_stack(&value_reg);
+
+  fprintf(out, "  swapb r%d\n", value_reg);
+  fprintf(out, "  rla.w r%d\n", value_reg);
+  fprintf(out, "  rla.w r%d\n", value_reg);
+  fprintf(out, "  rla.w r%d\n", value_reg);
+  fprintf(out, "  rla.w r%d\n", value_reg);
+  fprintf(out, "  bis.w #ADC10SSEL_2|ADC10DIV_7, r%d\n", value_reg);
+  fprintf(out, "  mov.w r%d, &ADC10CTL1\n", value_reg);
+
+  return 0;
+}
+
+int MSP430::adc_setChannel_I(int channel)
+{
+  fprintf(out, "  mov.w #INCH_%d|ADC10SSEL_2|ADC10DIV_7, &ADC10CTL1", channel);
+  return 0;
+}
+
+int MSP430::adc_read()
+{
+  if (reg < reg_max)
+  {
+    fprintf(out, "  mov.w &ADC10MEM, r%d\n", REG_STACK(reg));
+    reg++;
+  }
+    else
+  if (reg < reg_max)
+  {
+    fprintf(out, "  mov.w &ADC10MEM, r15\n");
+    fprintf(out, "  push r15\n");
+    stack++;
+  }
+
+  fprintf(out, "adcbusy_%d:\n", label_count);
+  fprintf(out, "  bit.w #ADC10BUSY, &ADC10CTL1\n");
+  fprintf(out, "  jnz adcbusy_%d\n", label_count);
+  label_count++;
+
+  return 0;
+}
+
+
 // Memory
 int MSP430::memory_read8()
 {
@@ -1838,6 +1898,23 @@ int MSP430::get_values_from_stack(int *value1, int *value2)
     else
   {
     *value2 = REG_STACK(reg-1);
+    reg--;
+  }
+
+  return 0;
+}
+
+int MSP430::get_values_from_stack(int *value1)
+{
+  if (stack > 0)
+  {
+    fprintf(out, "  pop r15\n");
+    *value1 = 15;
+    stack--;
+  }
+    else
+  {
+    *value1 = REG_STACK(reg-1);
     reg--;
   }
 

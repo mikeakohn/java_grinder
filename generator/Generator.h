@@ -131,6 +131,13 @@ public:
   virtual int spi_disable(int port) { return -1; }
   virtual int spi_enable(int port) { return -1; }
 
+  // ADC functions
+  virtual int adc_enable() { return -1; }
+  virtual int adc_disable() { return -1; }
+  virtual int adc_setChannel_I() { return -1; }
+  virtual int adc_setChannel_I(int channel) { return -1; }
+  virtual int adc_read() { return -1; }
+
   // CPU functions
   virtual int cpu_setClock16() { return -1; }
   virtual int cpu_nop() { return -1; }

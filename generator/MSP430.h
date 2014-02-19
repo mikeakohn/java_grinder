@@ -131,6 +131,13 @@ public:
   virtual int spi_disable(int port);
   virtual int spi_enable(int port);
 
+  // ADC Functions
+  virtual int adc_enable();
+  virtual int adc_disable();
+  virtual int adc_setChannel_I();
+  virtual int adc_setChannel_I(int channel);
+  virtual int adc_read();
+
   // CPU functions
   virtual int cpu_setClock16();
   virtual int cpu_nop();
@@ -151,6 +158,7 @@ protected:
   void insert_div_integers();
   int get_values_from_stack(int *value1, int *value2, int *value3);
   int get_values_from_stack(int *value1, int *value2);
+  int get_values_from_stack(int *value1);
   int reg;
   int reg_max;
   int stack;

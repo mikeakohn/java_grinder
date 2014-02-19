@@ -17,6 +17,7 @@
 #include "JavaClass.h"
 #include "compile.h"
 #include "invoke.h"
+#include "adc.h"
 #include "cpu.h"
 #include "dsp.h"
 #include "ioport.h"
@@ -225,6 +226,7 @@ char function[256];
     CHECK_WITH_PORT(IOPort, ioport, 5)
     CHECK(Memory, memory)
     CHECK(DSP, dsp)
+    CHECK(ADC, adc)
     CHECK_WITH_PORT(SPI, spi, 0)
     CHECK_WITH_PORT(SPI, spi, 1)
     CHECK_WITH_PORT(UART, uart, 0)
@@ -290,6 +292,7 @@ char function[256];
     CHECK_WITH_PORT_CONST(IOPort, ioport, 4)
     CHECK_WITH_PORT_CONST(IOPort, ioport, 5)
     CHECK_CONST(Memory, memory)
+    CHECK_CONST(ADC, adc)
     CHECK_WITH_PORT_CONST(SPI, spi, 0)
     CHECK_WITH_PORT_CONST(SPI, spi, 1)
       else
