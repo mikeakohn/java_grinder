@@ -32,6 +32,15 @@ M6502::M6502() :
 
 M6502::~M6502()
 {
+  fprintf(out, "print_stack:\n");
+  fprintf(out, "  ldx #255\n");
+  fprintf(out, "print_stack_loop:\n");
+  fprintf(out, "  lda 0x100,x\n");
+  fprintf(out, "  sta 1024,x\n");
+  fprintf(out, "  dex\n");
+  fprintf(out, "  bne print_stack_loop\n");
+  fprintf(out, "  rts\n");
+
   fprintf(out, "result:\n");
   fprintf(out, "dw 0\n");
   fprintf(out, "temp:\n");
@@ -68,7 +77,7 @@ int M6502::open(char *filename)
   fprintf(out, "start:\n");
   fprintf(out, "  sei\n");
   fprintf(out, "  cld\n");
-  fprintf(out, "  ldx #0xff\n");
+  fprintf(out, "  ldx #0\n");
   fprintf(out, "  txs\n\n");
   //fprintf(out, "ram_start:\n");
 
@@ -187,10 +196,9 @@ int M6502::push_integer_local(int index)
 {
   fprintf(out, "; push_integer_local\n");
   fprintf(out, "  ldx locals\n");
-  fprintf(out, "  dex\n");
-  fprintf(out, "  lda 0x100 - %d,x\n", LOCALS(index));
+  fprintf(out, "  lda 0x101 - %d,x\n", LOCALS(index) + 1);
   fprintf(out, "  pha\n");
-  fprintf(out, "  lda 0xff - %d,x\n", LOCALS(index));
+  fprintf(out, "  lda 0x100 - %d,x\n", LOCALS(index) + 1);
   fprintf(out, "  pha\n");
   stack++;
   return 0;
@@ -249,11 +257,10 @@ int M6502::pop_integer_local(int index)
 {
   fprintf(out, "; pop_integer_local\n");
   fprintf(out, "  ldx locals\n");
-  fprintf(out, "  dex\n");
   fprintf(out, "  pla\n");
-  fprintf(out, "  sta 0xff - %d,x\n", LOCALS(index));
+  fprintf(out, "  sta 0x100 - %d,x\n", LOCALS(index) + 1);
   fprintf(out, "  pla\n");
-  fprintf(out, "  sta 0x100 - %d,x\n", LOCALS(index));
+  fprintf(out, "  sta 0x101 - %d,x\n", LOCALS(index) + 1);
   stack--;
   return 0;
 }
@@ -336,9 +343,11 @@ int M6502::add_integers()
   fprintf(out, "  pla\n");
   fprintf(out, "  adc result + 0\n");
   fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  pha\n");
   fprintf(out, "  txa\n");
   fprintf(out, "  adc result + 1\n");
   fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pha\n");
   fprintf(out, "; add_integers_end\n");
 
   return 0;
@@ -418,10 +427,9 @@ int M6502::return_local(int index, int local_count)
 {
   fprintf(out, "; return_local\n");
   fprintf(out, "  ldx locals\n");
-  fprintf(out, "  dex\n");
-  fprintf(out, "  lda 0x100 - %d, x\n", LOCALS(index));
+  fprintf(out, "  lda 0x101 - %d, x\n", LOCALS(index));
   fprintf(out, "  sta result + 0\n");
-  fprintf(out, "  lda 0xff - %d\n", LOCALS(index));
+  fprintf(out, "  lda 0x100 - %d\n", LOCALS(index));
   fprintf(out, "  sta result + 1\n");
 
   fprintf(out, "  ldx locals\n");
@@ -441,13 +449,11 @@ int M6502::return_local(int index, int local_count)
 int M6502::return_integer(int local_count)
 {
   fprintf(out, "; return_integer\n");
-/*
   fprintf(out, "  pla\n");
   fprintf(out, "  lda result + 1\n");
   fprintf(out, "  pla\n");
   fprintf(out, "  lda result + 0\n");
   stack--;
-*/
 
   fprintf(out, "  ldx locals\n");
   fprintf(out, "  txs\n");
@@ -511,10 +517,10 @@ int stack_vars = stack;
       //fprintf(out, "  mov.w %d(SP), %d(SP)\n", stack_vars, local-4);
       fprintf(out, "  tsx\n");
 
-      fprintf(out, "  lda 0xff + %d,x\n", (stack_vars) * 2);
-      fprintf(out, "  sta 0xff %d,x\n", local-4);
-      fprintf(out, "  lda 0x100 + %d,x\n", (stack_vars) * 2);
+      fprintf(out, "  lda 0x100 + %d,x\n", (stack - stack_vars) * 2 + 1);
       fprintf(out, "  sta 0x100 %d,x\n", local-4);
+      fprintf(out, "  lda 0x101 + %d,x\n", (stack - stack_vars) * 2 + 1);
+      fprintf(out, "  sta 0x101 %d,x\n", local-4);
       stack_vars--;
     }
 
@@ -529,8 +535,8 @@ int stack_vars = stack;
   {
     fprintf(out, "  tsx\n");
     fprintf(out, "  txa\n");
-    fprintf(out, "  sec\n");
-    fprintf(out, "  sbc #%d\n", (stack - stack_vars) * 2);
+    fprintf(out, "  clc\n");
+    fprintf(out, "  adc #%d\n", (stack - stack_vars) * 2);
     fprintf(out, "  tax\n");
     fprintf(out, "  txs\n");
 
