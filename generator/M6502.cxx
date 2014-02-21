@@ -504,15 +504,15 @@ int M6502::inc_integer(int index, int num)
 
 int M6502::jump_cond(const char *label, int cond)
 {
-  if (stack > 1)
+  if (stack > 0)
   {
     fprintf(out, "; jump_cond\n");
     fprintf(out, "  tsx\n");
     fprintf(out, "  txa\n");
     fprintf(out, "  clc\n");
-    fprintf(out, "  adc #4\n");
+    fprintf(out, "  adc #2\n");
     fprintf(out, "  tax\n");
-    fprintf(out, "  tsx\n");
+    fprintf(out, "  txs\n");
 
     // don't need to store, carry flag is all we need here
     fprintf(out, "  tsx\n");
@@ -543,7 +543,7 @@ int M6502::jump_cond(const char *label, int cond)
         break;
       // COND_GREATER_EQUAL
       case 3:
-        fprintf(out, "  bne #5\n");
+        fprintf(out, "  beq #2\n");
         fprintf(out, "  bmi #3\n");
         fprintf(out, "  jmp %s\n", label);
         break;
@@ -554,7 +554,7 @@ int M6502::jump_cond(const char *label, int cond)
         break;
       // COND_LESS_EQUAL
       case 5:
-        fprintf(out, "  bne #5\n");
+        fprintf(out, "  beq #2\n");
         fprintf(out, "  bpl #3\n");
         fprintf(out, "  jmp %s\n", label);
         break;
@@ -568,27 +568,24 @@ int M6502::jump_cond_integer(const char *label, int cond)
 {
   if (stack > 1)
   {
-    //fprintf(out, "  add.w #4, SP\n");
     fprintf(out, "; jump_cond_integer\n");
     fprintf(out, "  tsx\n");
     fprintf(out, "  txa\n");
     fprintf(out, "  clc\n");
     fprintf(out, "  adc #4\n");
     fprintf(out, "  tax\n");
-    fprintf(out, "  tsx\n");
+    fprintf(out, "  txs\n");
 
-    //fprintf(out, "  cmp.w -4(SP), -2(SP)\n");
     // don't need to store, carry flag is all we need here
     fprintf(out, "  tsx\n");
     fprintf(out, "  sec\n");
-    fprintf(out, "  lda 0x101 -4,x\n");
-    fprintf(out, "  sbc 0x101 -2,x\n");
-    fprintf(out, "  lda 0x100 -4,x\n");
-    fprintf(out, "  sbc 0x100 -2,x\n");
+    fprintf(out, "  lda 0x101 -2,x\n");
+    fprintf(out, "  sbc 0x101 -4,x\n");
+    fprintf(out, "  lda 0x100 -2,x\n");
+    fprintf(out, "  sbc 0x100 -4,x\n");
 
     stack -= 2;
 
-    //fprintf(out, "  %s %s\n", cond_str[cond], label);
     switch(cond)
     {
       // COND_EQUAL
@@ -626,7 +623,6 @@ int M6502::jump_cond_integer(const char *label, int cond)
     }
   }
 
-  return 0;
   return 0;
 }
 
@@ -702,7 +698,9 @@ int M6502::jump(const char *name)
 
 int M6502::call(const char *name)
 {
-  return -1;
+  fprintf(out, "  jsr %s\n", name);
+
+  return 0;
 }
 
 int M6502::invoke_static_method(const char *name, int params, int is_void)
@@ -767,12 +765,29 @@ int stack_vars = stack;
 
 int M6502::put_static(const char *name, int index)
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  pla\n");
+    fprintf(out, "  sta result + 1\n");
+    fprintf(out, "  sta %s\n", name + 1);
+    fprintf(out, "  pla\n");
+    fprintf(out, "  sta result + 0\n");
+    fprintf(out, "  sta %s\n", name + 0);
+    stack--;
+  }
+
+  return 0;
 }
 
 int M6502::get_static(const char *name, int index)
 {
-  return -1;
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta %s\n", name + 1);
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta %s\n", name + 0);
+  stack++;
+
+  return 0;
 }
 
 int M6502::brk()
