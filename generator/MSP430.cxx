@@ -398,7 +398,6 @@ int MSP430::add_integer()
 int MSP430::add_integer(int num)
 {
   fprintf(out, "  add.w #%d, r%d\n", num, REG_STACK(reg-1));
-  reg--;
   return 0;
 }
 
@@ -410,7 +409,6 @@ int MSP430::sub_integer()
 int MSP430::sub_integer(int num)
 {
   fprintf(out, "  sub.w #%d, r%d\n", num, REG_STACK(reg-1));
-  reg--;
   return 0;
 }
 
@@ -717,7 +715,6 @@ int MSP430::and_integer()
 int MSP430::and_integer(int num)
 {
   fprintf(out, "  and.w #%d, r%d\n", num, REG_STACK(reg-1));
-  reg--;
   return 0;
 }
 
@@ -729,7 +726,6 @@ int MSP430::or_integer()
 int MSP430::or_integer(int num)
 {
   fprintf(out, "  bis.w #%d, r%d\n", num, REG_STACK(reg-1));
-  reg--;
   return 0;
 }
 
@@ -741,7 +737,6 @@ int MSP430::xor_integer()
 int MSP430::xor_integer(int num)
 {
   fprintf(out, "  xor.w #%d, r%d\n", num, REG_STACK(reg-1));
-  reg--;
   return 0;
 }
 

@@ -91,8 +91,8 @@ public class GasDetector
 
     value = value >> 5;
 
-    //for (y = 4; y >= 0; y--)
-    for (y = 0; y <= 4; y++)
+    //for (y = 0; y <= 4; y++)
+    for (y = 4; y >= 0; y--)
     {
       moveCursor(70, y << 3);
 
