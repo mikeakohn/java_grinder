@@ -159,27 +159,27 @@ int MIPS::swap()
   return -1;
 }
 
-int MIPS::add_integers()
+int MIPS::add_integer()
 {
   return -1;
 }
 
-int MIPS::sub_integers()
+int MIPS::sub_integer()
 {
   return -1;
 }
 
-int MIPS::mul_integers()
+int MIPS::mul_integer()
 {
   return -1;
 }
 
-int MIPS::div_integers()
+int MIPS::div_integer()
 {
   return -1;
 }
 
-int MIPS::mod_integers()
+int MIPS::mod_integer()
 {
   return -1;
 }

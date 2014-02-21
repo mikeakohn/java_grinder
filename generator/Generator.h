@@ -48,11 +48,13 @@ public:
   virtual int dup() = 0;
   virtual int dup2() = 0;
   virtual int swap() = 0;
-  virtual int add_integers() = 0;
-  virtual int sub_integers() = 0;
-  virtual int mul_integers() = 0;
-  virtual int div_integers() = 0;
-  virtual int mod_integers() = 0;
+  virtual int add_integer() = 0;
+  virtual int add_integer(int num) { return -1; }
+  virtual int sub_integer() = 0;
+  virtual int sub_integer(int num) { return -1; }
+  virtual int mul_integer() = 0;
+  virtual int div_integer() = 0;
+  virtual int mod_integer() = 0;
   virtual int neg_integer() = 0;
   virtual int shift_left_integer() = 0;
   virtual int shift_left_integer(int count) { return -1; }
@@ -61,8 +63,11 @@ public:
   virtual int shift_right_uinteger() = 0;
   virtual int shift_right_uinteger(int count) { return -1; }
   virtual int and_integer() = 0;
+  virtual int and_integer(int num) { return -1; }
   virtual int or_integer() = 0;
+  virtual int or_integer(int num) { return -1; }
   virtual int xor_integer() = 0;
+  virtual int xor_integer(int num) { return -1; }
   virtual int inc_integer(int index, int num) = 0;
   virtual int jump_cond(const char *label, int cond) = 0;
   virtual int jump_cond_integer(const char *label, int cond) = 0;

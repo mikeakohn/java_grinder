@@ -148,6 +148,36 @@ int const_vals[2];
     return 1;
   }
 
+  if (bytes[pc] == 0x60)
+  {
+    if (generator->add_integer(const_val) != 0) { return 0; }
+    return 1;
+  }
+
+  if (bytes[pc] == 0x64)
+  {
+    if (generator->sub_integer(const_val) != 0) { return 0; }
+    return 1;
+  }
+
+  if (bytes[pc] == 0x7e)
+  {
+    if (generator->and_integer(const_val) != 0) { return 0; }
+    return 1;
+  }
+
+  if (bytes[pc] == 0x80)
+  {
+    if (generator->or_integer(const_val) != 0) { return 0; }
+    return 1;
+  }
+
+  if (bytes[pc] == 0x82)
+  {
+    if (generator->xor_integer(const_val) != 0) { return 0; }
+    return 1;
+  }
+
   // 159 (0x9f) if_icmpeq
   // 160 (0xa0) if_icmpne
   // 161 (0xa1) if_icmplt
@@ -976,7 +1006,7 @@ printf("code_len=%d\n", code_len);
 
       case 96: // iadd (0x60)
         // Pop top two integers from stack, add them, push result
-        ret = generator->add_integers();
+        ret = generator->add_integer();
         pc++;
         break;
 
@@ -1004,7 +1034,7 @@ printf("code_len=%d\n", code_len);
       case 100: // isub (0x64)
         // Pop top two integers from stack, subtract them, push result
         // *(stack-1) - *(stack-0)
-        ret = generator->sub_integers();
+        ret = generator->sub_integer();
         pc++;
         break;
 
@@ -1034,7 +1064,7 @@ printf("code_len=%d\n", code_len);
 
       case 104: // imul (0x68)
         // Pop top two integers from stack, multiply them, push result
-        ret = generator->mul_integers();
+        ret = generator->mul_integer();
         pc++;
         break;
 
@@ -1061,7 +1091,7 @@ printf("code_len=%d\n", code_len);
 
       case 108: // idiv (0x6c)
         // Pop top two integers from stack, divide them, push result
-        ret = generator->div_integers();
+        ret = generator->div_integer();
         pc++;
         break;
 
@@ -1082,7 +1112,7 @@ printf("code_len=%d\n", code_len);
 
       case 112: // irem (0x70)
         // Pop top two integers from stack, divide them, push result
-        ret = generator->mod_integers();
+        ret = generator->mod_integer();
         pc++;
         break;
 

@@ -327,7 +327,7 @@ int M6502::swap()
   return 0;
 }
 
-int M6502::add_integers()
+int M6502::add_integer()
 {
   fprintf(out, "; add_integers\n");
   fprintf(out, "  pla\n");
@@ -349,7 +349,7 @@ int M6502::add_integers()
   return 0;
 }
 
-int M6502::sub_integers()
+int M6502::sub_integer()
 {
   fprintf(out, "; sub_integers\n");
   fprintf(out, "  pla\n");
@@ -371,17 +371,17 @@ int M6502::sub_integers()
   return 0;
 }
 
-int M6502::mul_integers()
+int M6502::mul_integer()
 {
   return -1;
 }
 
-int M6502::div_integers()
+int M6502::div_integer()
 {
   return -1;
 }
 
-int M6502::mod_integers()
+int M6502::mod_integer()
 {
   return -1;
 }

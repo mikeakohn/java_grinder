@@ -51,11 +51,11 @@ public:
   virtual int dup();
   virtual int dup2();
   virtual int swap();
-  virtual int add_integers();
-  virtual int sub_integers();
-  virtual int mul_integers();
-  virtual int div_integers();
-  virtual int mod_integers();
+  virtual int add_integer();
+  virtual int sub_integer();
+  virtual int mul_integer();
+  virtual int div_integer();
+  virtual int mod_integer();
   virtual int neg_integer();
   virtual int shift_left_integer();
   virtual int shift_left_integer(int count);

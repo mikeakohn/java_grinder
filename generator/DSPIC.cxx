@@ -412,22 +412,22 @@ int DSPIC::swap()
   return 0;
 }
 
-int DSPIC::add_integers()
+int DSPIC::add_integer()
 {
   return stack_alu("add");
 }
 
-int DSPIC::sub_integers()
+int DSPIC::sub_integer()
 {
   return stack_alu("sub");
 }
 
-int DSPIC::mul_integers()
+int DSPIC::mul_integer()
 {
   return stack_alu("mul");
 }
 
-int DSPIC::div_integers()
+int DSPIC::div_integer()
 {
   stack_alu_div();
 
@@ -438,7 +438,7 @@ int DSPIC::div_integers()
   return 0;
 }
 
-int DSPIC::mod_integers()
+int DSPIC::mod_integer()
 {
   stack_alu_div();
 

@@ -158,27 +158,27 @@ int ARM::swap()
   return -1;
 }
 
-int ARM::add_integers()
+int ARM::add_integer()
 {
   return -1;
 }
 
-int ARM::sub_integers()
+int ARM::sub_integer()
 {
   return -1;
 }
 
-int ARM::mul_integers()
+int ARM::mul_integer()
 {
   return -1;
 }
 
-int ARM::div_integers()
+int ARM::div_integer()
 {
   return -1;
 }
 
-int ARM::mod_integers()
+int ARM::mod_integer()
 {
   return -1;
 }

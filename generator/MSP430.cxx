@@ -390,17 +390,31 @@ int MSP430::swap()
   return 0;
 }
 
-int MSP430::add_integers()
+int MSP430::add_integer()
 {
   return stack_alu("add");
 }
 
-int MSP430::sub_integers()
+int MSP430::add_integer(int num)
+{
+  fprintf(out, "  add.w #%d, r%d\n", num, REG_STACK(reg-1));
+  reg--;
+  return 0;
+}
+
+int MSP430::sub_integer()
 {
   return stack_alu("sub");
 }
 
-int MSP430::mul_integers()
+int MSP430::sub_integer(int num)
+{
+  fprintf(out, "  sub.w #%d, r%d\n", num, REG_STACK(reg-1));
+  reg--;
+  return 0;
+}
+
+int MSP430::mul_integer()
 {
 int n;
 int saved_registers;
@@ -453,7 +467,7 @@ int saved_registers;
   return 0;
 }
 
-int MSP430::div_integers()
+int MSP430::div_integer()
 {
 int n;
 int saved_registers;
@@ -506,7 +520,7 @@ int saved_registers;
   return 0;
 }
 
-int MSP430::mod_integers()
+int MSP430::mod_integer()
 {
   return -1;
 }
@@ -700,9 +714,23 @@ int MSP430::and_integer()
   return stack_alu("and");
 }
 
+int MSP430::and_integer(int num)
+{
+  fprintf(out, "  and.w #%d, r%d\n", num, REG_STACK(reg-1));
+  reg--;
+  return 0;
+}
+
 int MSP430::or_integer()
 {
   return stack_alu("bis");
+}
+
+int MSP430::or_integer(int num)
+{
+  fprintf(out, "  bis.w #%d, r%d\n", num, REG_STACK(reg-1));
+  reg--;
+  return 0;
 }
 
 int MSP430::xor_integer()
@@ -710,9 +738,16 @@ int MSP430::xor_integer()
   return stack_alu("xor");
 }
 
+int MSP430::xor_integer(int num)
+{
+  fprintf(out, "  xor.w #%d, r%d\n", num, REG_STACK(reg-1));
+  reg--;
+  return 0;
+}
+
 int MSP430::inc_integer(int index, int num)
 {
-  fprintf(out, "  add.w #%d, -%d(r12)\n", num, LOCALS(index));
+  fprintf(out, "  add.w #%d, -%d(r12)\n", (int8_t)num, LOCALS(index));
   return 0;
 }
 
