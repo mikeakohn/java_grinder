@@ -106,89 +106,69 @@ static int optimize_const(JavaClass *java_class, Generator *generator, char *met
 {
 int const_vals[2];
 
-  // istore_x
-  if (bytes[pc] >= 0x3b && bytes[pc] <= 0x3e) // istore_x
+  if (pc + table_java_instr[bytes[pc]].normal > pc_end)
   {
-    if (generator->set_integer_local(bytes[pc] - 0x3b, const_val) != 0)
-    { return 0; }
-    return 1;
+    return 0;
   }
 
-  // istore
-  if (pc + 1 < pc_end && bytes[pc] == 0x36)
+  switch (bytes[pc])
   {
-    if (generator->set_integer_local(bytes[pc+1], const_val) != 0)
-    { return 0; }
-    return 2;
+    case 54: // istore (0x36)
+      if (generator->set_integer_local(bytes[pc+1], const_val) != 0)
+      { return 0; }
+      return 2;
+    case 59: // istore_0 (0x3b)
+    case 60: // istore_1 (0x3c)
+    case 61: // istore_2 (0x3d)
+    case 62: // istore_3 (0x3e)
+      if (generator->set_integer_local(bytes[pc] - 0x3b, const_val) != 0)
+      { return 0; }
+      return 1;
+    case 96: // iadd (0x60)
+      if (generator->add_integer(const_val) != 0) { return 0; }
+      return 1;
+    case 100: // isub (0x64)
+      if (generator->sub_integer(const_val) != 0) { return 0; }
+      return 1;
+    case 120: // ishl (0x78)
+      if (generator->shift_left_integer(const_val) != 0) { return 0; }
+      return 1;
+    case 122: // ishr (0x7a)
+      if (generator->shift_right_integer(const_val) != 0) { return 0; }
+      return 1;
+    case 124: // iushr (0x7c)
+      if (generator->shift_right_uinteger(const_val) != 0) { return 0; }
+      return 1;
+    case 126: // iand (0x7e)
+      if (generator->and_integer(const_val) != 0) { return 0; }
+      return 1;
+    case 128: // ior (0x80)
+      if (generator->or_integer(const_val) != 0) { return 0; }
+      return 1;
+    case 130: // ixor (0x82)
+      if (generator->xor_integer(const_val) != 0) { return 0; }
+      return 1;
+    case 159: // if_icmpeq (0x9f)
+    case 160: // if_icmpne (0xa0)
+    case 161: // if_icmplt (0xa1)
+    case 162: // if_icmpge (0xa2)
+    case 163: // if_icmpgt (0xa3)
+    case 164: // if_icmple (0xa4)
+    {
+      char label[128];
+      sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
+      if (generator->jump_cond_integer(label, cond_table[bytes[pc]-159], const_val) == -1)
+      { return 0; }
+      return 3;
+    }
+    default:
+      break;
   }
 
   // istore wide
   if (pc + 2 < pc_end && bytes[pc] == 0xc4 && bytes[pc+1] == 0x36)
   {
     if (generator->set_integer_local(GET_PC_UINT16(1), const_val) != 0)
-    { return 0; }
-    return 3;
-  }
-
-  if (bytes[pc] == 0x78)
-  {
-    if (generator->shift_left_integer(const_val) != 0) { return 0; }
-    return 1;
-  }
-
-  if (bytes[pc] == 0x7a)
-  {
-    if (generator->shift_right_integer(const_val) != 0) { return 0; }
-    return 1;
-  }
-
-  if (bytes[pc] == 0x7c)
-  {
-    if (generator->shift_right_uinteger(const_val) != 0) { return 0; }
-    return 1;
-  }
-
-  if (bytes[pc] == 0x60)
-  {
-    if (generator->add_integer(const_val) != 0) { return 0; }
-    return 1;
-  }
-
-  if (bytes[pc] == 0x64)
-  {
-    if (generator->sub_integer(const_val) != 0) { return 0; }
-    return 1;
-  }
-
-  if (bytes[pc] == 0x7e)
-  {
-    if (generator->and_integer(const_val) != 0) { return 0; }
-    return 1;
-  }
-
-  if (bytes[pc] == 0x80)
-  {
-    if (generator->or_integer(const_val) != 0) { return 0; }
-    return 1;
-  }
-
-  if (bytes[pc] == 0x82)
-  {
-    if (generator->xor_integer(const_val) != 0) { return 0; }
-    return 1;
-  }
-
-  // 159 (0x9f) if_icmpeq
-  // 160 (0xa0) if_icmpne
-  // 161 (0xa1) if_icmplt
-  // 162 (0xa2) if_icmpge
-  // 163 (0xa3) if_icmpgt
-  // 164 (0xa4) if_icmple
-  if (pc + 2 < pc_end && bytes[pc] >= 0x9f && bytes[pc] <= 0xa4)
-  {
-    char label[128];
-    sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
-    if (generator->jump_cond_integer(label, cond_table[bytes[pc]-159], const_val) == -1)
     { return 0; }
     return 3;
   }
