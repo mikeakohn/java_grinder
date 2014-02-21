@@ -118,6 +118,7 @@ int M6502::insert_field_init_boolean(char *name, int index, int value)
   fprintf(out, "  sta %s\n", name + 0);
   fprintf(out, "  lda #%d\n", value >> 8);
   fprintf(out, "  sta %s\n", name + 1);
+
   return 0;
 }
 
@@ -201,6 +202,7 @@ int M6502::push_integer_local(int index)
   fprintf(out, "  lda 0x100 - %d,x\n", LOCALS(index) + 1);
   fprintf(out, "  pha\n");
   stack++;
+
   return 0;
 }
 
@@ -212,18 +214,21 @@ int M6502::push_ref_local(int index)
 int M6502::push_long(int64_t n)
 {
   printf("long is not supported right now\n");
+
   return -1;
 }
 
 int M6502::push_float(float f)
 {
   printf("float is not supported right now\n");
+
   return -1;
 }
 
 int M6502::push_double(double f)
 {
   printf("double is not supported right now\n");
+
   return -1;
 }
 
@@ -262,6 +267,7 @@ int M6502::pop_integer_local(int index)
   fprintf(out, "  pla\n");
   fprintf(out, "  sta 0x101 - %d,x\n", LOCALS(index) + 1);
   stack--;
+
   return 0;
 }
 
@@ -284,18 +290,10 @@ int M6502::pop()
 
 int M6502::dup()
 {
-//FIXME: slow
-  fprintf(out, "  pla\n");
-  fprintf(out, "  sta temp + 1\n");
-  fprintf(out, "  pla\n");
-  fprintf(out, "  sta temp + 0\n");
-  fprintf(out, "  lda temp + 0\n");
+  fprintf(out, "  tsx\n");
+  fprintf(out, "  lda 0x101,x\n");
   fprintf(out, "  pha\n");
-  fprintf(out, "  lda temp + 1\n");
-  fprintf(out, "  pha\n");
-  fprintf(out, "  lda temp + 0\n");
-  fprintf(out, "  pha\n");
-  fprintf(out, "  lda temp + 1\n");
+  fprintf(out, "  lda 0x100,x\n");
   fprintf(out, "  pha\n");
   stack++;
 
@@ -305,34 +303,33 @@ int M6502::dup()
 int M6502::dup2()
 {
   printf("Need to implement dup2()\n");
+
   return -1;
 }
 
 int M6502::swap()
 {
-//FIXME: slow
-  fprintf(out, "  pla\n");
-  fprintf(out, "  sta temp + 1\n");
-  fprintf(out, "  pla\n");
-  fprintf(out, "  sta temp + 0\n");
-  fprintf(out, "  pla\n");
-  fprintf(out, "  sta temp2 + 1\n");
-  fprintf(out, "  pla\n");
-  fprintf(out, "  sta temp2 + 0\n");
-  fprintf(out, "  lda temp2 + 0\n");
-  fprintf(out, "  pha\n");
-  fprintf(out, "  lda temp2 + 1\n");
-  fprintf(out, "  pha\n");
-  fprintf(out, "  lda temp + 0\n");
-  fprintf(out, "  pha\n");
-  fprintf(out, "  lda temp + 1\n");
-  fprintf(out, "  pha\n");
+  fprintf(out, "  tsx\n");
+  fprintf(out, "  lda 0x101,x\n");
+  fprintf(out, "  tay\n");
+  fprintf(out, "  lda 0x103,x\n");
+  fprintf(out, "  sta 0x101,x\n");
+  fprintf(out, "  tya\n");
+  fprintf(out, "  sta 0x103,x\n");
+  fprintf(out, "  tsx\n");
+  fprintf(out, "  lda 0x102,x\n");
+  fprintf(out, "  tay\n");
+  fprintf(out, "  lda 0x104,x\n");
+  fprintf(out, "  sta 0x102,x\n");
+  fprintf(out, "  tya\n");
+  fprintf(out, "  sta 0x104,x\n");
+
   return 0;
 }
 
 int M6502::add_integers()
 {
-  fprintf(out, "; add_integers_start\n");
+  fprintf(out, "; add_integers\n");
   fprintf(out, "  pla\n");
   fprintf(out, "  sta result + 1\n");
   fprintf(out, "  pla\n");
@@ -348,14 +345,30 @@ int M6502::add_integers()
   fprintf(out, "  adc result + 1\n");
   fprintf(out, "  sta result + 1\n");
   fprintf(out, "  pha\n");
-  fprintf(out, "; add_integers_end\n");
 
   return 0;
 }
 
 int M6502::sub_integers()
 {
-  return -1;
+  fprintf(out, "; sub_integers\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  tax\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sbc result + 0\n");
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  txa\n");
+  fprintf(out, "  sbc result + 1\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pha\n");
+
+  return 0;
 }
 
 int M6502::mul_integers()
@@ -375,7 +388,17 @@ int M6502::mod_integers()
 
 int M6502::neg_integer()
 {
-  return -1;
+  fprintf(out, "  pla\n");
+  fprintf(out, "  eor 0xff\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  eor 0xff\n");
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  lda result + 1\n");
+  fprintf(out, "  pha\n");
+
+  return 0;
 }
 
 int M6502::shift_left_integer()
@@ -395,32 +418,216 @@ int M6502::shift_right_uinteger()
 
 int M6502::and_integer()
 {
-  return -1;
+  fprintf(out, "; and_integers\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  tax\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  and result + 0\n");
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  txa\n");
+  fprintf(out, "  and result + 1\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pha\n");
+
+  return 0;
 }
 
 int M6502::or_integer()
 {
-  return -1;
+  fprintf(out, "; and_integers\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  tax\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  ora result + 0\n");
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  txa\n");
+  fprintf(out, "  ora result + 1\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pha\n");
+
+  return 0;
 }
 
 int M6502::xor_integer()
 {
-  return -1;
+  fprintf(out, "; and_integers\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  tax\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  eor result + 0\n");
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  txa\n");
+  fprintf(out, "  eor result + 1\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pha\n");
+
+  return 0;
 }
 
 int M6502::inc_integer(int index, int num)
 {
-  return -1;
+  if (num > 255 || num < -128)
+  {
+    printf("Error: literal value %d not 8-bit.\n", num);
+    return -1;
+  }
+
+  uint8_t value = num & 0xff;
+
+  fprintf(out, "; inc_integer\n");
+  fprintf(out, "  ldx locals\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda 0x101 - %d,x\n", LOCALS(index) + 1);
+  fprintf(out, "  adc 0x%02x\n", value);
+  fprintf(out, "  sta 0x101 - %d,x\n", LOCALS(index) + 1);
+  fprintf(out, "  lda 0x100 - %d,x\n", LOCALS(index) + 1);
+  fprintf(out, "  adc #0\n");
+  fprintf(out, "  sta 0x100 - %d,x\n", LOCALS(index) + 1);
+
+  return 0;
 }
 
 int M6502::jump_cond(const char *label, int cond)
 {
-  return -1;
+  if (stack > 1)
+  {
+    fprintf(out, "; jump_cond\n");
+    fprintf(out, "  tsx\n");
+    fprintf(out, "  txa\n");
+    fprintf(out, "  clc\n");
+    fprintf(out, "  adc #4\n");
+    fprintf(out, "  tax\n");
+    fprintf(out, "  tsx\n");
+
+    // don't need to store, carry flag is all we need here
+    fprintf(out, "  tsx\n");
+    fprintf(out, "  sec\n");
+    fprintf(out, "  lda 0x101 -2,x\n");
+    fprintf(out, "  sbc #0\n");
+    fprintf(out, "  lda 0x100 -2,x\n");
+    fprintf(out, "  sbc #0\n");
+
+    stack -= 2;
+
+    switch(cond)
+    {
+      // COND_EQUAL
+      case 0:
+        fprintf(out, "  bne #3\n");
+        fprintf(out, "  jmp %s\n", label);
+        break;
+      // COND_NOT_EQUAL
+      case 1:
+        fprintf(out, "  beq #3\n");
+        fprintf(out, "  jmp %s\n", label);
+        break;
+      // COND_LESS
+      case 2:
+        fprintf(out, "  bpl #3\n");
+        fprintf(out, "  jmp %s\n", label);
+        break;
+      // COND_GREATER_EQUAL
+      case 3:
+        fprintf(out, "  bne #5\n");
+        fprintf(out, "  bmi #3\n");
+        fprintf(out, "  jmp %s\n", label);
+        break;
+      // COND_GREATER
+      case 4:
+        fprintf(out, "  bmi #3\n");
+        fprintf(out, "  jmp %s\n", label);
+        break;
+      // COND_LESS_EQUAL
+      case 5:
+        fprintf(out, "  bne #5\n");
+        fprintf(out, "  bpl #3\n");
+        fprintf(out, "  jmp %s\n", label);
+        break;
+    }
+  }
+
+  return 0;
 }
 
 int M6502::jump_cond_integer(const char *label, int cond)
 {
-  return -1;
+  if (stack > 1)
+  {
+    //fprintf(out, "  add.w #4, SP\n");
+    fprintf(out, "; jump_cond_integer\n");
+    fprintf(out, "  tsx\n");
+    fprintf(out, "  txa\n");
+    fprintf(out, "  clc\n");
+    fprintf(out, "  adc #4\n");
+    fprintf(out, "  tax\n");
+    fprintf(out, "  tsx\n");
+
+    //fprintf(out, "  cmp.w -4(SP), -2(SP)\n");
+    // don't need to store, carry flag is all we need here
+    fprintf(out, "  tsx\n");
+    fprintf(out, "  sec\n");
+    fprintf(out, "  lda 0x101 -4,x\n");
+    fprintf(out, "  sbc 0x101 -2,x\n");
+    fprintf(out, "  lda 0x100 -4,x\n");
+    fprintf(out, "  sbc 0x100 -2,x\n");
+
+    stack -= 2;
+
+    //fprintf(out, "  %s %s\n", cond_str[cond], label);
+    switch(cond)
+    {
+      // COND_EQUAL
+      case 0:
+        fprintf(out, "  bne #3\n");
+        fprintf(out, "  jmp %s\n", label);
+        break;
+      // COND_NOT_EQUAL
+      case 1:
+        fprintf(out, "  beq #3\n");
+        fprintf(out, "  jmp %s\n", label);
+        break;
+      // COND_LESS
+      case 2:
+        fprintf(out, "  bpl #3\n");
+        fprintf(out, "  jmp %s\n", label);
+        break;
+      // COND_GREATER_EQUAL
+      case 3:
+        fprintf(out, "  beq #2\n");
+        fprintf(out, "  bmi #3\n");
+        fprintf(out, "  jmp %s\n", label);
+        break;
+      // COND_GREATER
+      case 4:
+        fprintf(out, "  bmi #3\n");
+        fprintf(out, "  jmp %s\n", label);
+        break;
+      // COND_LESS_EQUAL
+      case 5:
+        fprintf(out, "  beq #2\n");
+        fprintf(out, "  bpl #3\n");
+        fprintf(out, "  jmp %s\n", label);
+        break;
+    }
+  }
+
+  return 0;
+  return 0;
 }
 
 int M6502::return_local(int index, int local_count)
@@ -488,7 +695,9 @@ int M6502::return_void(int local_count)
 
 int M6502::jump(const char *name)
 {
-  return -1;
+  fprintf(out, "  jmp %s\n", name);
+
+  return 0;
 }
 
 int M6502::call(const char *name)
