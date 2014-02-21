@@ -518,7 +518,7 @@ int ret = 0;
     wide = 0;
   }
 
-printf("EXIT pc=%d ret=%d code_len=%d\n", pc, ret, code_len);
+  // printf("EXIT pc=%d ret=%d code_len=%d\n", pc, ret, code_len);
   if (array != NULL) { free(array); }
   if (ret == -1) { return -1; }
 

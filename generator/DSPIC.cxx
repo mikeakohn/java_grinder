@@ -522,16 +522,16 @@ int DSPIC::xor_integer()
 
 int DSPIC::inc_integer(int index, int num)
 {
-int8_t n = (int8_t)num;
+//int8_t n = (int8_t)num;
 
   fprintf(out, "  mov [w14+%d], w0\n", LOCALS(index));
-  if (n >= 0)
+  if (num >= 0)
   {
-    fprintf(out, "  add #%d, w0\n", n);
+    fprintf(out, "  add #%d, w0\n", num);
   }
     else
   {
-    fprintf(out, "  sub #%d, w0\n", -n);
+    fprintf(out, "  sub #%d, w0\n", -num);
   }
 
   fprintf(out, "  mov w0, [w14+%d]\n", LOCALS(index));

@@ -742,7 +742,7 @@ int MSP430::xor_integer(int num)
 
 int MSP430::inc_integer(int index, int num)
 {
-  fprintf(out, "  add.w #%d, -%d(r12)\n", (int8_t)num, LOCALS(index));
+  fprintf(out, "  add.w #%d, -%d(r12)\n", num, LOCALS(index));
   return 0;
 }
 
