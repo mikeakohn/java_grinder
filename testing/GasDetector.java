@@ -80,9 +80,13 @@ public class GasDetector
       lcdData(data[n]);
     }
 
-    drawMeter(100);
+    //drawMeter(100);
 
-    while(true);
+    while(true)
+    {
+      drawMeter(ADC.read());
+      long_delay();
+    }
   }
 
   public static void drawMeter(int value)
@@ -173,6 +177,15 @@ public class GasDetector
   {
     int n,a;
     for (a = 0; a < 3; a++)
+    {
+      for (n = 0; n < 65535; n++) { }
+    }
+  }
+
+  public static void long_delay()
+  {
+    int n,a;
+    for (a = 0; a < 20; a++)
     {
       for (n = 0; n < 65535; n++) { }
     }

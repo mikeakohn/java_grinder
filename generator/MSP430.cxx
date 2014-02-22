@@ -1688,6 +1688,12 @@ int MSP430::adc_setChannel_I(int channel)
 
 int MSP430::adc_read()
 {
+  fprintf(out, "  bis.w #ENC|ADC10SC, &ADC10CTL0\n");
+  fprintf(out, "adcbusy_%d:\n", label_count);
+  fprintf(out, "  bit.w #ADC10BUSY, &ADC10CTL1\n");
+  fprintf(out, "  jnz adcbusy_%d\n", label_count);
+  label_count++;
+
   if (reg < reg_max)
   {
     fprintf(out, "  mov.w &ADC10MEM, r%d\n", REG_STACK(reg));
@@ -1700,11 +1706,6 @@ int MSP430::adc_read()
     fprintf(out, "  push r15\n");
     stack++;
   }
-
-  fprintf(out, "adcbusy_%d:\n", label_count);
-  fprintf(out, "  bit.w #ADC10BUSY, &ADC10CTL1\n");
-  fprintf(out, "  jnz adcbusy_%d\n", label_count);
-  label_count++;
 
   return 0;
 }

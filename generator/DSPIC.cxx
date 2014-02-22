@@ -122,7 +122,7 @@ int DSPIC::init_heap(int field_count)
 {
   fprintf(out, "  ;; Set up heap and static initializers\n");
   fprintf(out, "  mov #ram_end-%d, w0\n", (field_count + 2) * 2);
-  fprintf(out, "  mov.w w0, ram_end-2\n");
+  fprintf(out, "  mov w0, ram_end-2\n");
 
   return 0;
 }
