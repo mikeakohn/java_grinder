@@ -25,7 +25,11 @@
 // r10
 // r11
 
-MIPS::MIPS()
+MIPS::MIPS() :
+  reg(0),
+  reg_max(6),
+  stack(0),
+  is_main(0)
 {
 
 }
