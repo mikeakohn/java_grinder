@@ -200,9 +200,13 @@ protected:
   int insert_db(const char *name, int32_t *data, int len, uint8_t len_type);
   int insert_dw(const char *name, int32_t *data, int len, uint8_t len_type);
   int insert_dc32(const char *name, int32_t *data, int len, uint8_t len_type);
+  int get_constant(uint32_t constant);
+  void write_constants();
 
   FILE *out;
   int label_count;
+  int constants_len;
+  uint32_t constants[16384];
 };
 
 enum

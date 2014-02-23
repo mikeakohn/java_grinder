@@ -16,7 +16,7 @@
 #include "MC68000.h"
 
 #define REG_STACK(a) (reg)
-#define LOCALS(i) (i * 2)
+#define LOCALS(i) (i * 4)
 
 // ABI is:
 // d0 - top of stack
@@ -25,6 +25,16 @@
 // d3
 // d4
 // d5 - bottom of stack
+// d6
+// d7
+// a0
+// a1
+// a2
+// a3
+// a4
+// a5 Pointer to heap
+// a6 Link register
+// a7 Stack Pointer
 
 MC68000::MC68000() :
   reg(0),
@@ -42,42 +52,65 @@ MC68000::~MC68000()
 
 int MC68000::open(char *filename)
 {
+  if (Generator::open(filename) != 0) { return -1; }
+
+  // For now we only support a specific chip
+  fprintf(out, ".680x0\n");
+
+  // Set where RAM starts / ends
+  // FIXME - Not sure what to set this to right now
+  fprintf(out, "ram_start equ 0\n");
+  fprintf(out, "ram_end equ 0x8000\n");
+
   return 0;
 }
 
 int MC68000::start_init()
 {
-  return -1;
+  // Add any set up items (stack, registers, etc).
+  //fprintf(out, ".org ???\n");
+  fprintf(out, "start:\n");
+
+  return 0;
 }
 
 int MC68000::insert_static_field_define(const char *name, const char *type, int index)
 {
-  return -1;
+  fprintf(out, "%s equ ram_start+%d\n", name, (index + 1) * 4);
+  return 0;
 }
 
 int MC68000::init_heap(int field_count)
 {
-  return -1;
+  fprintf(out, "  ;; Set up heap and static initializers\n");
+  fprintf(out, "  move.l #ram_start+%d, &ram_start\n", (field_count + 1) * 2);
+  return 0;
 }
 
 int MC68000::insert_field_init_boolean(char *name, int index, int value)
 {
-  return -1;
+  value = (value == 0) ? 0 : 1;
+
+  fprintf(out, "  mov.l #%d, %s\n", value, name);
+  return 0;
 }
 
 int MC68000::insert_field_init_byte(char *name, int index, int value)
 {
-  return -1;
+  fprintf(out, "  mov.l #%d, %s\n", value, name);
+  return 0;
 }
 
 int MC68000::insert_field_init_short(char *name, int index, int value)
 {
-  return -1;
+  fprintf(out, "  mov.l #%d, %s\n", value, name);
+  return 0;
 }
 
 int MC68000::insert_field_init_int(char *name, int index, int value)
 {
-  return -1;
+  fprintf(out, "  mov.l #%d, %s\n", value, name);
+  return 0;
 }
 
 int MC68000::insert_field_init(char *name, int index)

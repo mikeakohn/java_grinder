@@ -20,6 +20,8 @@
 #include "ARM.h"
 #include "DSPIC.h"
 #include "M6502.h"
+#include "MC68000.h"
+#include "MIPS.h"
 #include "MSP430.h"
 #include "MSP430X.h"
 
@@ -79,6 +81,16 @@ int index;
   if (strcasecmp("arm",argv[3]) == 0)
   {
     generator = new ARM();
+  }
+    else
+  if (strcasecmp("mc68000",argv[3]) == 0)
+  {
+    generator = new MC68000();
+  }
+    else
+  if (strcasecmp("mips",argv[3]) == 0)
+  {
+    generator = new MIPS();
   }
     else
   {

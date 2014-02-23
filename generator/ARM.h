@@ -106,6 +106,7 @@ protected:
   int reg_max;        // size of register stack 
   int stack;          // count how many things we put on the stack
   bool is_main : 1;
+  bool immediate_is_possible(int immediate);
 };
 
 #endif

@@ -15,7 +15,14 @@
 
 #include "MIPS.h"
 
+#define REG_STACK(a) (reg + 1)
+#define LOCALS(i) (i * 4)
+
 // ABI is:
+// r0 Always 0
+// r1 Start of stack
+// r2
+// r3
 // r4
 // r5
 // r6
@@ -24,10 +31,30 @@
 // r9
 // r10
 // r11
+// r12
+// r13
+// r14
+// r15 Top Of Stack
+// r16
+// r17
+// r18
+// r19
+// r20
+// r21
+// r22
+// r23
+// r24
+// r25
+// r26
+// r27
+// r28
+// r29 Stack pointer
+// r30 Frame pointer (link register)
+// r31 Return address
 
 MIPS::MIPS() :
   reg(0),
-  reg_max(6),
+  reg_max(15),
   stack(0),
   is_main(0)
 {
@@ -41,17 +68,32 @@ MIPS::~MIPS()
 
 int MIPS::open(char *filename)
 {
+  if (Generator::open(filename) != 0) { return -1; }
+
+  // For now we only support a specific chip
+  fprintf(out, ".mips\n");
+
+  // Set where RAM starts / ends
+  // FIXME - Not sure what to set this to right now
+  fprintf(out, "ram_start equ 0\n");
+  fprintf(out, "ram_end equ 0x8000\n");
+
   return 0;
 }
 
 int MIPS::start_init()
 {
-  return -1;
+  // Add any set up items (stack, registers, etc).
+  //fprintf(out, ".org ???\n");
+  fprintf(out, "start:\n");
+
+  return 0;
 }
 
 int MIPS::insert_static_field_define(const char *name, const char *type, int index)
 {
-  return -1;
+  fprintf(out, "%s equ ram_start+%d\n", name, (index + 1) * 4);
+  return 0;
 }
 
 

@@ -15,19 +15,30 @@
 
 #include "ARM.h"
 
+#define REG_STACK(a) (reg)
+#define LOCALS(i) (i * 4)
+
 // ABI is:
+// r0 Start of reg stack
+// r1
+// r2
 // r4
 // r5
 // r6
 // r7
 // r8
-// r9
-// r10
-// r11
+// r9 End of reg stack
+// r10 temp
+// r11 Statics pointer
+// r12 Constants pointer
+// r13 SP
+// r14 Link Register
+// r15 PC
+
 
 ARM::ARM() :
   reg(0),
-  reg_max(6),
+  reg_max(10),
   stack(0),
   is_main(0)
 {
@@ -36,22 +47,38 @@ ARM::ARM() :
 
 ARM::~ARM()
 {
-
+  write_constants();
 }
 
 int ARM::open(char *filename)
 {
+  if (Generator::open(filename) != 0) { return -1; }
+
+  // For now we only support a specific chip
+  fprintf(out, ".arm\n");
+
+  // Set where RAM starts / ends
+  // FIXME - Not sure what to set this to right now
+  //fprintf(out, "ram_start equ 0\n");
+  //fprintf(out, "ram_end equ 0x8000\n");
+
   return 0;
 }
 
 int ARM::start_init()
 {
-  return -1;
+  // Add any set up items (stack, registers, etc).
+  //fprintf(out, ".org ???\n");
+  fprintf(out, "start:\n");
+  fprintf(out, "  mov r11, #0 ; Point to memory holding static vars\n");
+
+  return 0;
 }
 
 int ARM::insert_static_field_define(const char *name, const char *type, int index)
 {
-  return -1;
+  fprintf(out, "%s equ %d\n", name, (index + 1) * 4);
+  return 0;
 }
 
 int ARM::init_heap(int field_count)
@@ -61,22 +88,38 @@ int ARM::init_heap(int field_count)
 
 int ARM::insert_field_init_boolean(char *name, int index, int value)
 {
-  return -1;
+  value = (value == 0) ? 0 : 1;
+
+  fprintf(out, "  mov r10, #%d\n", value);
+  fprintf(out, "  str r10, [r11,#%s]\n", name);
+  return 0;
 }
 
 int ARM::insert_field_init_byte(char *name, int index, int value)
 {
-  return -1;
+  return insert_field_init_int(name, index, value);
 }
 
 int ARM::insert_field_init_short(char *name, int index, int value)
 {
-  return -1;
+  return insert_field_init_int(name, index, value);
 }
 
 int ARM::insert_field_init_int(char *name, int index, int value)
 {
-  return -1;
+  if (immediate_is_possible(value))
+  {
+    fprintf(out, "  mov r10, #%d\n", value);
+    fprintf(out, "  str r10, [r11,#%s]\n", name);
+  }
+    else
+  {
+    int n = get_constant(value);
+    fprintf(out, "  ldr r10, [r12,#%d]\n", n * 4);
+    fprintf(out, "  str r10, [r11,#%s]\n", name);
+  }
+
+  return 0;
 }
 
 int ARM::insert_field_init(char *name, int index)
@@ -390,4 +433,20 @@ int ARM::ioport_setPinLow(int port) { return -1; }
 int ARM::ioport_isPinInputHigh(int port) { return -1; }
 int ARM::ioport_getPortInputValue(int port) { return -1; }
 //int ARM::ioport_setPortOutputValue(int port) { return -1; }
+
+bool ARM::immediate_is_possible(int immediate)
+{
+  uint32_t i = immediate;
+  int n;
+
+  for (n = 0; n < 16; n++)
+  {
+    if (i < 256) { return true; }
+    i=((i & 0xc0000000) >> 30) | (i << 2);
+  }
+
+  return false;
+}
+
+
 
