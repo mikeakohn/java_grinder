@@ -199,12 +199,16 @@ int MC68000::push_double(double f)
 
 int MC68000::push_byte(int8_t b)
 {
-  return -1;
+  int32_t value = (int32_t)b;
+
+  return push_integer(value);
 }
 
 int MC68000::push_short(int16_t s)
 {
-  return -1;
+  int32_t value = (int32_t)s;
+
+  return push_integer(value);
 }
 
 int MC68000::pop_integer_local(int index)
@@ -219,12 +223,30 @@ int MC68000::pop_ref_local(int index)
 
 int MC68000::pop()
 {
-  return -1;
+  fprintf(out, "  adda #4, SP\n");
+  return 0;
 }
 
 int MC68000::dup()
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  move.l (SP), -(SP)\n");
+    stack++;
+  }
+    else
+  if (reg == reg_max)
+  {
+    fprintf(out, "  move.l d%d, -(SP)\n", REG_STACK(reg-1));
+    stack++;
+  }
+    else
+  {
+    fprintf(out, "  move.l d%d, d%d\n", REG_STACK(reg-1), REG_STACK(reg));
+    reg++;
+  }
+
+  return 0;
 }
 
 int MC68000::dup2()
@@ -234,72 +256,194 @@ int MC68000::dup2()
 
 int MC68000::swap()
 {
-  return -1;
+  if (stack == 0)
+  {
+    fprintf(out, "  move.l d%d, d7\n", REG_STACK(reg-1));
+    fprintf(out, "  move.l d%d, d%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+    fprintf(out, "  move.l d7, d%d\n", REG_STACK(reg-2));
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  move.l d%d, d7\n", REG_STACK(reg-1));
+    fprintf(out, "  move.l (SP), d%d\n", REG_STACK(reg-1));
+    fprintf(out, "  move.l d7, (SP)\n");
+  }
+    else
+  {
+    fprintf(out, "  move.l (4,SP), d7\n");
+    fprintf(out, "  move.l (SP), (4,SP)\n");
+    fprintf(out, "  move.l d7, (SP)\n");
+  }
+
+  return 0;
 }
 
 int MC68000::add_integer()
 {
-  return -1;
+  return stack_alu("add");
+}
+
+int MC68000::add_integer(int num)
+{
+  fprintf(out, "  add.l #%d, d%d\n", num, REG_STACK(reg-1));
+  return 0;
 }
 
 int MC68000::sub_integer()
 {
-  return -1;
+  return stack_alu("sub");
+}
+
+int MC68000::sub_integer(int num)
+{
+  fprintf(out, "  sub.l #%d, d%d\n", num, REG_STACK(reg-1));
+  return 0;
 }
 
 int MC68000::mul_integer()
 {
-  return -1;
+  return stack_alu("muls");
+}
+
+int MC68000::mul_integer(int num)
+{
+  fprintf(out, "  muls.l #%d, d%d\n", num, REG_STACK(reg-1));
+  return 0;
 }
 
 int MC68000::div_integer()
 {
-  return -1;
+  return stack_alu("divs");
+}
+
+int MC68000::div_integer(int num)
+{
+  fprintf(out, "  divs.l #%d, d%d\n", num, REG_STACK(reg-1));
+  return 0;
 }
 
 int MC68000::mod_integer()
 {
-  return -1;
+  if (stack == 0)
+  {
+    fprintf(out, "  divs.l d%d, d%d:d%d\n", REG_STACK(reg-1), REG_STACK(reg-2), REG_STACK(reg-1));
+    reg--;
+  }
+    else
+  {
+    return -1;
+  }
+
+  return 0;
+}
+
+int MC68000::mod_integer(int num)
+{
+  if (stack == 0)
+  {
+    fprintf(out, "  divs.l #%d, r%d:r%d\n", num, REG_STACK(reg-2), REG_STACK(reg-1));
+  }
+    else
+  {
+    return -1;
+  }
+
+  return 0;
 }
 
 int MC68000::neg_integer()
 {
-  return -1;
+  if (stack == 0)
+  {
+    fprintf(out, "  neg.l d%d\n", REG_STACK(reg-1));
+  }
+    else
+  {
+    fprintf(out, "  neg.l (SP)\n");
+  }
+
+  return 0;
 }
 
 int MC68000::shift_left_integer()
 {
-  return -1;
+  return stack_alu("asl");
+}
+
+int MC68000::shift_left_integer(int num)
+{
+  fprintf(out, "  asl.l #%d, d%d\n", num, REG_STACK(reg-1));
+  return 0;
 }
 
 int MC68000::shift_right_integer()
 {
-  return -1;
+  return stack_alu("asr");
+}
+
+int MC68000::shift_right_integer(int num)
+{
+  fprintf(out, "  asr.l #%d, d%d\n", num, REG_STACK(reg-1));
+  return 0;
 }
 
 int MC68000::shift_right_uinteger()
 {
-  return -1;
+  return stack_alu("lsr");
+}
+
+int MC68000::shift_right_uinteger(int num)
+{
+  fprintf(out, "  lsr.l #%d, d%d\n", num, REG_STACK(reg-1));
+  return 0;
 }
 
 int MC68000::and_integer()
 {
-  return -1;
+  return stack_alu("and");
+}
+
+int MC68000::and_integer(int num)
+{
+  fprintf(out, "  and.l #%d, d%d\n", num, REG_STACK(reg-1));
+  return 0;
 }
 
 int MC68000::or_integer()
 {
-  return -1;
+  return stack_alu("or");
+}
+
+int MC68000::or_integer(int num)
+{
+  fprintf(out, "  or.l #%d, d%d\n", num, REG_STACK(reg-1));
+  return 0;
 }
 
 int MC68000::xor_integer()
 {
-  return -1;
+  return stack_alu("eor");
+}
+
+int MC68000::xor_integer(int num)
+{
+  fprintf(out, "  eor.l #%d, d%d\n", num, REG_STACK(reg-1));
+  return 0;
 }
 
 int MC68000::inc_integer(int index, int num)
 {
-  return -1;
+  if (num >= 1 && num <= 8)
+  {
+    fprintf(out, "  addq.l #%d, (-%d,a6)\n", num, index * 4);
+  }
+    else
+  {
+    fprintf(out, "  add.l #%d, (-%d,a6)\n", num, index * 4);
+  }
+
+  return 0;
 }
 
 int MC68000::jump_cond(const char *label, int cond)
@@ -464,5 +608,28 @@ void MC68000::close()
 {
 }
 #endif
+
+int MC68000::stack_alu(const char *instr)
+{
+  if (stack == 0)
+  {
+    fprintf(out, "  %s.l r%d, r%d\n", instr, REG_STACK(reg-1), REG_STACK(reg-2));
+    reg--;
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  %s.l (SP)+, r%d\n", instr, REG_STACK(reg-1));
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  move.l (SP)+, d7\n");
+    fprintf(out, "  %s.l d7, (SP)\n", instr);
+  }
+
+  return 0;
+}
+
 
 

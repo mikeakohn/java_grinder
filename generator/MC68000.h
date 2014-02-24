@@ -46,17 +46,28 @@ public:
   virtual int dup2();
   virtual int swap();
   virtual int add_integer();
+  virtual int add_integer(int num);
   virtual int sub_integer();
+  virtual int sub_integer(int num);
   virtual int mul_integer();
+  virtual int mul_integer(int num);
   virtual int div_integer();
+  virtual int div_integer(int num);
   virtual int mod_integer();
+  virtual int mod_integer(int num);
   virtual int neg_integer();
   virtual int shift_left_integer();
+  virtual int shift_left_integer(int num);
   virtual int shift_right_integer();
+  virtual int shift_right_integer(int num);
   virtual int shift_right_uinteger();
+  virtual int shift_right_uinteger(int num);
   virtual int and_integer();
+  virtual int and_integer(int num);
   virtual int or_integer();
+  virtual int or_integer(int num);
   virtual int xor_integer();
+  virtual int xor_integer(int num);
   virtual int inc_integer(int index, int num);
   virtual int jump_cond(const char *label, int cond);
   virtual int jump_cond_integer(const char *label, int cond);
@@ -92,6 +103,8 @@ protected:
   int reg_max;        // size of register stack 
   int stack;          // count how many things we put on the stack
   bool is_main : 1;
+
+  int stack_alu(const char *instr);
 };
 
 #endif
