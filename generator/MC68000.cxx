@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 
 #include "MC68000.h"
@@ -26,12 +27,12 @@
 // d4
 // d5 - bottom of stack
 // d6
-// d7
+// d7 - return value / temp
 // a0
 // a1
 // a2
 // a3
-// a4
+// a4 Pointer to statics
 // a5 Pointer to heap
 // a6 Link register
 // a7 Stack Pointer
@@ -91,49 +92,89 @@ int MC68000::insert_field_init_boolean(char *name, int index, int value)
 {
   value = (value == 0) ? 0 : 1;
 
-  fprintf(out, "  mov.l #%d, %s\n", value, name);
+  fprintf(out, "  move.l #%d, (%s,a4)\n", value, name);
   return 0;
 }
 
 int MC68000::insert_field_init_byte(char *name, int index, int value)
 {
-  fprintf(out, "  mov.l #%d, %s\n", value, name);
+  fprintf(out, "  move.l #%d, (%s,a4)\n", value, name);
   return 0;
 }
 
 int MC68000::insert_field_init_short(char *name, int index, int value)
 {
-  fprintf(out, "  mov.l #%d, %s\n", value, name);
+  fprintf(out, "  move.l #%d, (%s,a4)\n", value, name);
   return 0;
 }
 
 int MC68000::insert_field_init_int(char *name, int index, int value)
 {
-  fprintf(out, "  mov.l #%d, %s\n", value, name);
+  fprintf(out, "  move.l #%d, (%s,a4)\n", value, name);
   return 0;
 }
 
 int MC68000::insert_field_init(char *name, int index)
 {
-  return -1;
+  fprintf(out, "  move.l #_%s, (%s,a4)\n", name, name);
+  return 0;
 }
 
 void MC68000::method_start(int local_count, const char *name)
 {
+  reg = 0;
+  stack = 0;
+
+  is_main = (strcmp(name, "main") == 0) ? true : false;
+
+  // main() function goes here
+  fprintf(out, "%s:\n", name);
+  if (!is_main)
+  {
+    if (local_count != 0) { fprintf(out, "  link a6, #0x%x\n", local_count * 2); }
+  }
+    else
+  {
+    fprintf(out, "  movea.l SP, a6\n");
+    fprintf(out, "  sub.l #0x%x, SP\n", local_count * 2);
+  }
 }
 
 void MC68000::method_end(int local_count)
 {
+  fprintf(out, "\n");
 }
 
 int MC68000::push_integer(int32_t n)
 {
-  return -1;
+  if (reg < reg_max)
+  {
+    fprintf(out, "  move.l #0x%02x, d%d\n", n, REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  move.l #0x%02x, -(SP)\n", n);
+    stack++;
+  }
+
+  return 0;
 }
 
 int MC68000::push_integer_local(int index)
 {
-  return -1;
+  if (reg < reg_max)
+  {
+    fprintf(out, "  move.l (-%d,a6), d%d\n", LOCALS(index), REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  move.l (-%d,a6), -(SP)\n", LOCALS(index));
+    stack++;
+  }
+
+  return 0;
 }
 
 int MC68000::push_ref_local(int index)
@@ -278,12 +319,25 @@ int MC68000::return_local(int index, int local_count)
 
 int MC68000::return_integer(int local_count)
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  move.l (SP)+, d7\n");
+  }
+    else
+  {
+    fprintf(out, "  move.l d%d, d7\n", REG_STACK(reg - 1));
+  }
+
+  if (local_count != 0) { fprintf(out, "  ulnk\n"); }
+  fprintf(out, "  ret\n");
+  return 0;
 }
 
 int MC68000::return_void(int local_count)
 {
-  return -1;
+  if (local_count != 0) { fprintf(out, "  ulnk\n"); }
+  fprintf(out, "  ret\n");
+  return 0;
 }
 
 int MC68000::jump(const char *name)
