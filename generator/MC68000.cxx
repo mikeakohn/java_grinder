@@ -24,22 +24,24 @@
 // d1
 // d2
 // d3
-// d4
-// d5 - bottom of stack
-// d6
+// d4 - bottom of stack
+// d5 - temp
+// d6 - temp
 // d7 - return value / temp
-// a0
+// a0 - Temp pointer
 // a1
 // a2
 // a3
-// a4 Pointer to statics
-// a5 Pointer to heap
-// a6 Link register
-// a7 Stack Pointer
+// a4 - Pointer to statics
+// a5 - Pointer to heap
+// a6 - Link register
+// a7 - Stack Pointer
+
+static const char *cond_str[] = { "eq", "ne", "lt", "le", "gt", "ge" };
 
 MC68000::MC68000() :
   reg(0),
-  reg_max(6),
+  reg_max(5),
   stack(0),
   is_main(0)
 {
@@ -77,14 +79,15 @@ int MC68000::start_init()
 
 int MC68000::insert_static_field_define(const char *name, const char *type, int index)
 {
-  fprintf(out, "%s equ ram_start+%d\n", name, (index + 1) * 4);
+  fprintf(out, "%s equ ram_start+%d\n", name, index * 4);
   return 0;
 }
 
 int MC68000::init_heap(int field_count)
 {
   fprintf(out, "  ;; Set up heap and static initializers\n");
-  fprintf(out, "  move.l #ram_start+%d, &ram_start\n", (field_count + 1) * 2);
+  //fprintf(out, "  move.l #ram_start+%d, &ram_start\n", (field_count + 1) * 2);
+  fprintf(out, "  move.l #ram_start+%d, a5\n", field_count * 4);
   return 0;
 }
 
@@ -448,12 +451,49 @@ int MC68000::inc_integer(int index, int num)
 
 int MC68000::jump_cond(const char *label, int cond)
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  cmp.l #0, (SP)+\n");
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  cmp.l #0, d%d\n", REG_STACK(reg-1));
+    reg--;
+  }
+
+  fprintf(out, "  b%s %s\n", cond_str[cond], label);
+  return 0;
 }
 
 int MC68000::jump_cond_integer(const char *label, int cond)
 {
-  return -1;
+  if (stack > 1)
+  {
+    fprintf(out, "  move.l (SP)+, d7\n");
+    fprintf(out, "  cmp.w d7, (SP)+\n");
+
+    stack -= 2;
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  cmp.l (SP)+, r%d\n", REG_STACK(reg-1));
+
+    stack--;
+    reg--;
+  }
+    else
+  {
+    fprintf(out, "  cmp.l d%d, d%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+
+    reg -= 2;
+  }
+
+  fprintf(out, "  %s %s\n", cond_str[cond], label);
+
+  return 0;
+
 }
 
 int MC68000::return_local(int index, int local_count)
@@ -486,27 +526,132 @@ int MC68000::return_void(int local_count)
 
 int MC68000::jump(const char *name)
 {
-  return -1;
+  fprintf(out, "  bra %s\n", name);
+  return 0;
 }
 
 int MC68000::call(const char *name)
 {
-  return -1;
+  // REVIEW - Should this be callm?
+  fprintf(out, "  jsr %s\n", name);
+  return 0;
 }
 
 int MC68000::invoke_static_method(const char *name, int params, int is_void)
 {
-  return -1;
+int local;
+int stack_vars = stack;
+int reg_vars = reg;
+int saved_registers;
+int n;
+
+  printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
+
+  // Push all used registers on the stack except the ones that are pulled
+  // out for parameters.
+  saved_registers = reg - (params - stack);
+  for (n = 0; n < saved_registers; n++)
+  {
+    fprintf(out, "  move.l d%d, -(SP)\n", REG_STACK(n));
+  }
+
+  // Push pointer to local variables to the stack because the called
+  // method will trash it.
+  //fprintf(out, "  push r12\n");
+
+  // Copy parameters onto the stack so they are local variables in
+  // the called method.  Start with -4 because the return address will
+  // be at 0 and r12 will be at 2.
+  local = (params * -4);
+  while(local != 0)
+  {
+    if (stack_vars > 0)
+    {
+      fprintf(out, "  move.l (%d,SP), (%d,SP)\n", (stack-stack_vars) * 4, local-8);
+      stack_vars--;
+    }
+      else
+    {
+      fprintf(out, "  move.l d%d, (%d,SP)\n", REG_STACK(reg_vars-1), local-8);
+      reg_vars--;
+    }
+
+    local += 4;
+  }
+
+  // Make the call
+  fprintf(out, "  jsr %s\n", name);
+
+  // Pop the local variables pointer
+  //fprintf(out, "  pop r12\n");
+
+  // Pop all used registers off the stack
+  for (n = saved_registers-1; n >= 0; n--)
+  {
+    fprintf(out, "  move.l (SP)+, d%d\n", REG_STACK(n));
+  }
+
+  // Pop all params off the Java stack
+  if ((stack - stack_vars) > 0)
+  {
+    fprintf(out, "  sub.l #%d, SP\n", (stack - stack_vars) * 4);
+    params -= (stack - stack_vars);
+  }
+
+  if (params != 0)
+  {
+    reg -= params;
+  }
+
+  if (!is_void)
+  {
+    // Put r15 on the top of the stack
+    if (reg < reg_max)
+    {
+      fprintf(out, "  move.l d7, d%d\n", REG_STACK(reg));
+      reg++;
+    }
+      else
+    {
+      // REVIEW - This looks wrong
+      fprintf(out, "  move.l d7, -(SP)\n");
+      stack++;
+    }
+  }
+
+  return 0;
 }
 
 int MC68000::put_static(const char *name, int index)
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  mov (SP)+, %s\n", name);
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  mov d%d, %s\n", REG_STACK(reg-1), name);
+    reg--;
+  }
+
+  return 0;
 }
 
 int MC68000::get_static(const char *name, int index)
 {
-  return -1;
+  if (reg < reg_max)
+  {
+    fprintf(out, "  move.l %s, d%d\n", name, REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  move.l %s, -(SP)\n", name);
+    stack++;
+  }
+
+  return 0;
 }
 
 int MC68000::brk()
@@ -516,7 +661,42 @@ int MC68000::brk()
 
 int MC68000::new_array(uint8_t type)
 {
-  return -1;
+int array_length_reg;
+
+  // ref = heap + 4
+  // heap = heap + sizeof(array) + 4 (to hold the length of the array)
+
+  get_values_from_stack(&array_length_reg);
+  fprintf(out, "  move.l d%d, (a5)\n", array_length_reg); // store length @-1
+
+  if (type == TYPE_INT)
+  {
+    fprintf(out, "  lsl.l #2, d%d\n", array_length_reg);  // int is 4 bytes
+  }
+    else
+  if (type == TYPE_SHORT || type == TYPE_CHAR)
+  {
+    fprintf(out, "  lsl.l #1, d%d\n", array_length_reg);  // short is 2 bytes
+  }
+
+  fprintf(out, "  addq.l #4, a5\n");   // sizeof(array) + 4 (for array size)
+  if (reg < reg_max)
+  {
+    fprintf(out, "  move.l a5, d%d\n", REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  move.l a5, -(SP)\n");
+    stack++;
+  }
+  fprintf(out, "  add.l d%d, a5\n", array_length_reg);  // adjust heap ptr
+
+  // Need to align heap
+  fprintf(out, "  addq.l #3, a5\n");
+  fprintf(out, "  and.l #0xfffffffc, a5\n");
+
+  return 0;
 }
 
 int MC68000::insert_array(const char *name, int32_t *data, int len, uint8_t type)
@@ -535,42 +715,184 @@ int MC68000::insert_array(const char *name, int32_t *data, int len, uint8_t type
 
 int MC68000::push_array_length()
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  move.l (SP)+, a0\n");
+    fprintf(out, "  move.l (-4,a0), d7\n");
+    fprintf(out, "  move.l d7, -(SP)\n");
+  }
+    else
+  {
+    fprintf(out, "  move.l (-4,d%d), d%d\n", REG_STACK(reg-1), REG_STACK(reg-1));
+  }
+
+  return 0;
 }
 
 int MC68000::push_array_length(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  move.l (%s,a4), a0\n", name);
+
+  if (reg < reg_max)
+  {
+    fprintf(out, "  move.l (-4,a0), d%d\n", REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  move.l (-4,a0), d7\n");
+    fprintf(out, "  move.l d7, -(SP)\n");
+    stack++;
+  }
+
+  return 0;
 }
 
 int MC68000::array_read_byte()
 {
-  return -1;
+int index_reg;
+int ref_reg;
+
+  get_values_from_stack(&index_reg, &ref_reg);
+  fprintf(out, "  add.l d%d, d%d\n", index_reg, ref_reg);
+  fprintf(out, "  move.l d%d, a0\n", ref_reg);
+
+  if (reg < reg_max)
+  {
+    fprintf(out, "  move.b (a0), d%d\n", REG_STACK(reg));
+    fprintf(out, "  sxt d%d\n", REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  move.b (a0), d7\n");
+    fprintf(out, "  sxt d7\n");
+    fprintf(out, "  move.l d7, -(SP)\n");
+    stack++;
+  }
+
+  return 0;
 }
 
 int MC68000::array_read_short()
 {
-  return -1;
+int index_reg;
+int ref_reg;
+
+  get_values_from_stack(&index_reg, &ref_reg);
+  fprintf(out, "  lsl.l #1, d%d\n", index_reg);
+  fprintf(out, "  add.l d%d, d%d\n", index_reg, ref_reg);
+  fprintf(out, "  move.l d%d, a0\n", ref_reg);
+
+  if (reg < reg_max)
+  {
+    fprintf(out, "  move.w (a0), d%d\n", REG_STACK(reg));
+    fprintf(out, "  sxt d%d\n", REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  move.w (a0), d7\n");
+    fprintf(out, "  sxt d7\n");
+    fprintf(out, "  move.l d7, -(SP)\n");
+    stack++;
+  }
+
+  return 0;
 }
 
 int MC68000::array_read_int()
 {
-  return -1;
+int index_reg;
+int ref_reg;
+
+  get_values_from_stack(&index_reg, &ref_reg);
+  fprintf(out, "  lsl.l #2, d%d\n", index_reg);
+  fprintf(out, "  add.l d%d, d%d\n", index_reg, ref_reg);
+  fprintf(out, "  move.l d%d, a0\n", ref_reg);
+
+  if (reg < reg_max)
+  {
+    fprintf(out, "  move.l (a0), d%d\n", REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  move.l (a0), d7\n");
+    fprintf(out, "  move.l d7, -(SP)\n");
+    stack++;
+  }
+
+  return 0;
 }
 
 int MC68000::array_read_byte(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  move.l (%s,a4), a0\n", name);
+
+  if (stack > 0)
+  {
+    fprintf(out, "  add.l (SP)+, a0\n");
+    fprintf(out, "  move.b (a0), d7\n");
+    fprintf(out, "  sxt d7\n");
+    fprintf(out, "  move.l d7, -(SP)\n");
+  }
+    else
+  {
+    fprintf(out, "  add.l d%d, a0\n", REG_STACK(reg-1));
+    fprintf(out, "  move.b (a0), d%d\n", REG_STACK(reg-1));
+    fprintf(out, "  sxt d%d\n", REG_STACK(reg-1));
+  }
+
+  return 0;
 }
 
 int MC68000::array_read_short(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  move.l (%s,a4), a0\n", name);
+
+  if (stack > 0)
+  {
+    fprintf(out, "  move.l (SP)+, d7\n");
+    fprintf(out, "  lsl.l #1, d7\n");
+    fprintf(out, "  add.l d7, a0\n");
+    fprintf(out, "  move.w (a0), d7\n");
+    fprintf(out, "  sxt d7\n");
+    fprintf(out, "  move.l d7, -(SP)\n");
+  }
+    else
+  {
+    fprintf(out, "  lsl.l #1, d%d\n", REG_STACK(reg-1));
+    fprintf(out, "  add.l d%d, a0\n", REG_STACK(reg-1));
+    fprintf(out, "  move.w (a0), d%d\n", REG_STACK(reg-1));
+    fprintf(out, "  sxt d%d\n", REG_STACK(reg-1));
+  }
+
+  return 0;
 }
 
 int MC68000::array_read_int(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  move.l (%s,a4), a0\n", name);
+
+  if (stack > 0)
+  {
+    fprintf(out, "  move.l (SP)+, d7\n");
+    fprintf(out, "  lsl.l #2, d7\n");
+    fprintf(out, "  add.l d7, a0\n");
+    fprintf(out, "  move.l (a0), d7\n");
+    fprintf(out, "  sxt d7\n");
+    fprintf(out, "  move.l d7, -(SP)\n");
+  }
+    else
+  {
+    fprintf(out, "  lsl.l #2, d%d\n", REG_STACK(reg-1));
+    fprintf(out, "  add.l d%d, a0\n", REG_STACK(reg-1));
+    fprintf(out, "  move.l (a0), d%d\n", REG_STACK(reg-1));
+    fprintf(out, "  sxt d%d\n", REG_STACK(reg-1));
+  }
+
+  return 0;
 }
 
 int MC68000::array_write_byte()
@@ -631,5 +953,90 @@ int MC68000::stack_alu(const char *instr)
   return 0;
 }
 
+int MC68000::get_values_from_stack(int *value1, int *value2, int *value3)
+{
+  if (stack > 0)
+  {
+    fprintf(out, "  move.l (SP)+, d5\n");
+    *value1 = 5;
+    stack--;
+  }
+    else
+  {
+    *value1 = REG_STACK(reg-1);
+    reg--;
+  }
 
+  if (stack > 0)
+  {
+    fprintf(out, "  move.l (SP)+, d6\n");
+    *value2 = 6;
+    stack--;
+  }
+    else
+  {
+    *value2 = REG_STACK(reg-1);
+    reg--;
+  }
+
+  if (stack > 0)
+  {
+    fprintf(out, "  move.l (SP)+, d7\n");
+    *value3 = 7;
+    stack--;
+  }
+    else
+  {
+    *value3 = REG_STACK(reg-1);
+    reg--;
+  }
+
+  return 0;
+}
+
+int MC68000::get_values_from_stack(int *value1, int *value2)
+{
+  if (stack > 0)
+  {
+    fprintf(out, "  move.l (SP)+, d6\n");
+    *value1 = 6;
+    stack--;
+  }
+    else
+  {
+    *value1 = REG_STACK(reg-1);
+    reg--;
+  }
+
+  if (stack > 0)
+  {
+    fprintf(out, "  move.l (SP)+, d7\n");
+    *value2 = 7;
+    stack--;
+  }
+    else
+  {
+    *value2 = REG_STACK(reg-1);
+    reg--;
+  }
+
+  return 0;
+}
+
+int MC68000::get_values_from_stack(int *value1)
+{
+  if (stack > 0)
+  {
+    fprintf(out, "  move.l (SP)+, d6\n");
+    *value1 = 6;
+    stack--;
+  }
+    else
+  {
+    *value1 = REG_STACK(reg-1);
+    reg--;
+  }
+
+  return 0;
+}
 

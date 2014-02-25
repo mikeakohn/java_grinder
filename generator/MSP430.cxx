@@ -1051,7 +1051,7 @@ int MSP430::get_static(const char *name, int index)
   }
     else
   {
-    fprintf(out, "  pop &%s\n", name);
+    fprintf(out, "  push &%s\n", name);
     stack++;
   }
 
@@ -1086,9 +1086,9 @@ int MSP430::new_array(uint8_t type)
     }
       else
     {
-      fprintf(out, "  mov.w r14, r13\n");
-      fprintf(out, "  and.w #1, r13\n");
-      fprintf(out, "  add.w r13, r14\n");
+      //fprintf(out, "  mov.w r14, r13\n");
+      //fprintf(out, "  and.w #1, r13\n");
+      //fprintf(out, "  add.w r13, r14\n");
     }
 
     // Add 2 to the length of the array to account for array[-1]
@@ -1098,7 +1098,8 @@ int MSP430::new_array(uint8_t type)
     fprintf(out, "  add.w r14, &heap_ptr\n");
 
     // r15 should point to array[0] instead of array[-1] and is now top of stack
-    fprintf(out, "  add.w #2, r15\n");
+    fprintf(out, "  add.w #3, r15\n");  // Add 2 for len, add 1 and then
+    fprintf(out, "  and.w #1, r15\n");  // and 1 to word align
     fprintf(out, "  push r15\n");
 
   }
@@ -1116,9 +1117,9 @@ int MSP430::new_array(uint8_t type)
     }
       else
     {
-      fprintf(out, "  mov.w r%d, r13\n", REG_STACK(reg-1));
-      fprintf(out, "  and.w #1, r13\n");
-      fprintf(out, "  add.w r13, r%d\n", REG_STACK(reg-1));
+      //fprintf(out, "  mov.w r%d, r13\n", REG_STACK(reg-1));
+      //fprintf(out, "  and.w #1, r13\n");
+      //fprintf(out, "  add.w r13, r%d\n", REG_STACK(reg-1));
     }
 
     // Add 2 to the length of the array to account for array[-1]
@@ -1128,7 +1129,8 @@ int MSP430::new_array(uint8_t type)
     fprintf(out, "  add.w r%d, &heap_ptr\n", REG_STACK(reg-1));
 
     // r15 should point to array[0] instead of array[-1] and is now top of stack
-    fprintf(out, "  add.w #2, r15\n");
+    fprintf(out, "  add.w #3, r15\n");  // Add 2 for len and add 1
+    fprintf(out, "  and.w #1, r15\n");  // and 1 to align by word
     fprintf(out, "  mov.w r15, r%d\n", REG_STACK(reg-1));
   }
 

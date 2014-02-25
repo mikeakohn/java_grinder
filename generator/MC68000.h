@@ -105,6 +105,9 @@ protected:
   bool is_main : 1;
 
   int stack_alu(const char *instr);
+  int get_values_from_stack(int *value1, int *value2, int *value3);
+  int get_values_from_stack(int *value1, int *value2);
+  int get_values_from_stack(int *value1);
 };
 
 #endif
