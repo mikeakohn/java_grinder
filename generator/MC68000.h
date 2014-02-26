@@ -108,6 +108,7 @@ protected:
   int get_values_from_stack(int *value1, int *value2, int *value3);
   int get_values_from_stack(int *value1, int *value2);
   int get_values_from_stack(int *value1);
+  int get_ref_from_stack();
 };
 
 #endif
