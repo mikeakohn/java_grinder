@@ -35,6 +35,7 @@
 // r14 Link Register
 // r15 PC
 
+static const char *cond_str[] = { "eq", "ne", "lt", "le", "gt", "ge" };
 
 ARM::ARM() :
   reg(0),
@@ -137,7 +138,33 @@ void ARM::method_end(int local_count)
 
 int ARM::push_integer(int32_t n)
 {
-  return -1;
+int temp_reg;
+
+  if (reg < reg_max)
+  {
+    temp_reg = REG_STACK(reg);
+    fprintf(out, "  move.l #0x%02x, d%d\n", n, REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    temp_reg = 10;
+    stack++;
+  }
+
+  if (immediate_is_possible(value))
+  {
+    fprintf(out, "  mov r%d, #%d\n", temp_reg, value);
+  }
+    else
+  {
+    int n = get_constant(value);
+    fprintf(out, "  ldr r%d, [r12,#%d]\n", temp_reg, n * 4);
+  }
+
+  if (temp_reg == 10) { fprintf(out, "  push r10\n"); }
+
+  return 0;
 }
 
 int ARM::push_integer_local(int index)
@@ -167,12 +194,16 @@ int ARM::push_double(double f)
 
 int ARM::push_byte(int8_t b)
 {
-  return -1;
+  int32_t value = (int32_t)b;
+
+  return push_integer(value);
 }
 
 int ARM::push_short(int16_t s)
 {
-  return -1;
+  int32_t value = (int32_t)s;
+
+  return push_integer(value);
 }
 
 int ARM::pop_integer_local(int index)
