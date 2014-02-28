@@ -35,7 +35,7 @@
 // r14 Link Register
 // r15 PC
 
-static const char *cond_str[] = { "eq", "ne", "lt", "le", "gt", "ge" };
+//static const char *cond_str[] = { "eq", "ne", "lt", "le", "gt", "ge" };
 
 ARM::ARM() :
   reg(0),
@@ -138,6 +138,7 @@ void ARM::method_end(int local_count)
 
 int ARM::push_integer(int32_t n)
 {
+#if 0
 int temp_reg;
 
   if (reg < reg_max)
@@ -165,6 +166,8 @@ int temp_reg;
   if (temp_reg == 10) { fprintf(out, "  push r10\n"); }
 
   return 0;
+#endif
+  return -1;
 }
 
 int ARM::push_integer_local(int index)

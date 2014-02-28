@@ -24,6 +24,7 @@
 #include "memory.h"
 #include "spi.h"
 #include "uart.h"
+#include "c64_sid.h"
 #include "java_lang_system.h"
 
 #define CHECK_WITH_PORT(a,b,c) \
@@ -213,7 +214,16 @@ char function[256];
   int ret = -1;
 
   size_t len = sizeof("net/mikekohn/java_grinder/") - 1;
-  if (strncmp("net/mikekohn/java_grinder/", method_class, len)==0)
+  size_t len_c64 = sizeof("net/mikekohn/java_grinder/C64/") - 1;
+
+  if (strncmp("net/mikekohn/java_grinder/C64/", method_class, len_c64) == 0)
+  {
+    char *cls = method_class + len_c64;
+
+    CHECK(SID, c64_sid)
+  }
+    else
+  if (strncmp("net/mikekohn/java_grinder/", method_class, len) == 0)
   {
     char *cls = method_class + len;
 

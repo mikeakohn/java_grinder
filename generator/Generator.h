@@ -194,6 +194,9 @@ public:
   virtual int dsp_shiftA() { return -1; }
   virtual int dsp_shiftB() { return -1; }
 
+  // Commodore 64 stuff
+  virtual int c64_sid_setVolume() { return -1; }
+
   void add_newline();
 
 protected:

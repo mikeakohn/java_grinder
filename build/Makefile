@@ -8,9 +8,9 @@ CFLAGS=-Wall $(DEBUG) $(INCLUDES) $(OPTIMIZATIONS)
 LDFLAGS=
 VPATH=../generator:../common:../objects
 
-OBJECTS=invoke.o java_lang_system.o adc.o cpu.o dsp.o ioport.o memory.o spi.o uart.o
+API=invoke.o java_lang_system.o adc.o cpu.o dsp.o ioport.o memory.o spi.o uart.o c64_sid.o
 CPUS=DSPIC.o MC68000.o MIPS.o MSP430.o MSP430X.o ARM.o M6502.o
-OBJS=fileio.o Generator.o JavaClass.o compile.o execute_static.o table_java_instr.o $(CPUS) $(OBJECTS)
+OBJS=fileio.o Generator.o JavaClass.o compile.o execute_static.o table_java_instr.o $(CPUS) $(API)
 
 default: $(OBJS)
 	$(CXX) -o ../java_grinder ../common/java_grinder.cxx \

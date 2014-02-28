@@ -9,7 +9,8 @@ JOBJS=Arrays.class \
       LCDDSPIC.class \
       MemoryTest.class \
       MethodCall.class \
-      SPITest.class
+      SPITest.class \
+      CommodoreDemo.class
 
 default: $(JOBJS)
 

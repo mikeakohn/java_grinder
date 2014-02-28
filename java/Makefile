@@ -16,7 +16,8 @@ JOBJS=\
   $(PKG_DIR)/SPI1.class \
   $(PKG_DIR)/UART.class \
   $(PKG_DIR)/UART0.class \
-  $(PKG_DIR)/UART1.class
+  $(PKG_DIR)/UART1.class \
+  $(PKG_DIR)/C64/SID.class
 
 default: $(JOBJS)
 
