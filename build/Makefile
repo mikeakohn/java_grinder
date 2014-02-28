@@ -2,11 +2,11 @@ CC=gcc
 CXX=g++
 DEBUG=-DDEBUG -g
 #OPTIMIZATIONS=-march=nocona -mtune=nocona
-INCLUDES=-I../common -I../generator -I../objects
+INCLUDES=-I../common -I../generator -I../api
 #CFLAGS=-Wall -O3 $(DEBUG) $(INCLUDES) $(OPTIMIZATIONS)
 CFLAGS=-Wall $(DEBUG) $(INCLUDES) $(OPTIMIZATIONS)
 LDFLAGS=
-VPATH=../generator:../common:../objects
+VPATH=../generator:../common:../api
 
 API=invoke.o java_lang_system.o adc.o cpu.o dsp.o ioport.o memory.o spi.o uart.o c64_sid.o
 CPUS=DSPIC.o MC68000.o MIPS.o MSP430.o MSP430X.o ARM.o M6502.o
