@@ -25,6 +25,7 @@
 #include "spi.h"
 #include "uart.h"
 #include "c64_sid.h"
+#include "c64_vic.h"
 #include "java_lang_system.h"
 
 #define CHECK_WITH_PORT(a,b,c) \
@@ -220,7 +221,8 @@ char function[256];
   {
     char *cls = method_class + len_c64;
 
-    CHECK(SID, c64_sid)
+    CHECK(SID, c64_sid);
+    CHECK(VIC, c64_vic);
   }
     else
   if (strncmp("net/mikekohn/java_grinder/", method_class, len) == 0)

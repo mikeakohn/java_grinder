@@ -88,6 +88,9 @@ public:
   //virtual void close();
   virtual int get_values_from_stack(int num);
 
+  // VIC methods
+  virtual int c64_vic_border();
+
 protected:
   int stack;
   bool is_main:1;
