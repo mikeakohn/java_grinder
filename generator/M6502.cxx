@@ -21,7 +21,19 @@
 // X
 // Y
 
-#define LOCALS(a) ((a * 2) + 2)
+#define LOCALS(a) ((a * 2) + 1)
+
+/*
+static char *cond_string[] =
+{
+  "COND_EQUAL",
+  "COND_NOT_EQUAL",
+  "COND_LESS",
+  "COND_LESS_EQUAL",
+  "COND_GREATER",
+  "COND_GREATER_EQUAL"
+};
+*/
 
 M6502::M6502() :
   stack(0),
@@ -32,20 +44,34 @@ M6502::M6502() :
 
 M6502::~M6502()
 {
-  fprintf(out, "print_stack:\n");
-  fprintf(out, "  ldx #255\n");
+  fprintf(out, "print:\n");
+  fprintf(out, "  ldx #0\n");
   fprintf(out, "print_stack_loop:\n");
   fprintf(out, "  lda 0x100,x\n");
   fprintf(out, "  sta 1024,x\n");
   fprintf(out, "  dex\n");
   fprintf(out, "  bne print_stack_loop\n");
-  fprintf(out, "  rts\n");
+
+  fprintf(out, "  ldx #0\n");
+  fprintf(out, "print_heap_loop:\n");
+  fprintf(out, "  lda 49152,x\n");
+  fprintf(out, "  sta 1344,x\n");
+  fprintf(out, "  dex\n");
+  fprintf(out, "  bne print_heap_loop\n");
+  fprintf(out, "print_end:\n");
+  fprintf(out, "  jmp print_end\n");
 
   fprintf(out, "result:\n");
   fprintf(out, "dw 0\n");
+  fprintf(out, "length:\n");
+  fprintf(out, "dw 0\n");
   fprintf(out, "temp:\n");
   fprintf(out, "dw 0\n");
-  fprintf(out, "temp2:\n");
+  fprintf(out, "value1:\n");
+  fprintf(out, "dw 0\n");
+  fprintf(out, "value2:\n");
+  fprintf(out, "dw 0\n");
+  fprintf(out, "value3:\n");
   fprintf(out, "dw 0\n");
   fprintf(out, "locals:\n");
   fprintf(out, "db 0\n");
@@ -57,6 +83,10 @@ int M6502::open(char *filename)
 
   // assumes c64 for now (basic loader)
   fprintf(out, ".65xx\n");
+  fprintf(out, "ram_start equ 49152\n");
+  fprintf(out, "heap_ptr equ ram_start\n");
+  // for indirection
+  fprintf(out, "address equ 251\n");
 
   fprintf(out, ".org 0x07ff\n\n");
 
@@ -77,9 +107,8 @@ int M6502::open(char *filename)
   fprintf(out, "start:\n");
   fprintf(out, "  sei\n");
   fprintf(out, "  cld\n");
-  fprintf(out, "  ldx #0\n");
+  fprintf(out, "  ldx #0xff\n");
   fprintf(out, "  txs\n\n");
-  //fprintf(out, "ram_start:\n");
 
   return 0;
 }
@@ -91,23 +120,20 @@ int M6502::start_init()
 
 int M6502::insert_static_field_define(const char *name, const char *type, int index)
 {
-/*
   fprintf(out, "%s equ ram_start+%d\n", name, (index + 1) * 2);
-*/
-  return -1;
+
+  return 0;
 }
 
 int M6502::init_heap(int field_count)
 {
-/*
-  fprintf(out, "  ;; Set up heap and static initializers\n");
-  fprintf(out, "  lda ram_start+%d\n", ((field_count + 1) * 2) & 0xff);
+  fprintf(out, "  ; Set up heap and static initializers\n");
+  fprintf(out, "  lda #(ram_start+%d) & 0xff\n", (field_count + 1) * 2);
   fprintf(out, "  sta ram_start + 0\n");
-  fprintf(out, "  lda ram_start+%d\n", ((field_count + 1) * 2) >> 8);
+  fprintf(out, "  lda #(ram_start+%d) >> 8\n", (field_count + 1) * 2);
   fprintf(out, "  sta ram_start + 1\n");
+
   return 0;
-*/
-  return -1;
 }
 
 int M6502::insert_field_init_boolean(char *name, int index, int value)
@@ -124,24 +150,42 @@ int M6502::insert_field_init_boolean(char *name, int index, int value)
 
 int M6502::insert_field_init_byte(char *name, int index, int value)
 {
-  return -1;
+  if (value < -128 || value > 255) { return -1; }
+
+  fprintf(out, "  lda #%d\n", (int8_t)value & 0xff);
+  fprintf(out, "  sta %s\n", name + 0);
+  fprintf(out, "  lda #%d\n", (int8_t)value >> 8);
+  fprintf(out, "  sta %s\n", name + 1);
+
+  return 0;
 }
 
 int M6502::insert_field_init_short(char *name, int index, int value)
 {
-  return -1;
+  if (value < -32768 || value > 65535) { return -1; }
+
+  fprintf(out, "  lda #%d\n", value & 0xff);
+  fprintf(out, "  sta %s\n", name + 0);
+  fprintf(out, "  lda #%d\n", value >> 8);
+  fprintf(out, "  sta %s\n", name + 1);
+
+  return 0;
 }
 
 int M6502::insert_field_init_int(char *name, int index, int value)
 {
-  return -1;
+  return insert_field_init_short(name, index, value);
 }
 
 int M6502::insert_field_init(char *name, int index)
 {
-  return -1;
-}
+  fprintf(out, "  lda #_%s & 0xff\n", name);
+  fprintf(out, "  sta %s\n", name + 0);
+  fprintf(out, "  lda #_%s >> 8\n", name);
+  fprintf(out, "  sta %s\n", name + 1);
 
+  return 0;
+}
 
 void M6502::method_start(int local_count, const char *name)
 {
@@ -155,6 +199,7 @@ void M6502::method_start(int local_count, const char *name)
   if (!is_main)
   {
     fprintf(out, "  lda locals\n");
+    fprintf(out, "  pha\n");
     fprintf(out, "  pha\n");
   }
 
@@ -197,9 +242,9 @@ int M6502::push_integer_local(int index)
 {
   fprintf(out, "; push_integer_local\n");
   fprintf(out, "  ldx locals\n");
-  fprintf(out, "  lda 0x101 - %d,x\n", LOCALS(index) + 1);
+  fprintf(out, "  lda 0x101 - %d,x\n", LOCALS(index));
   fprintf(out, "  pha\n");
-  fprintf(out, "  lda 0x100 - %d,x\n", LOCALS(index) + 1);
+  fprintf(out, "  lda 0x100 - %d,x\n", LOCALS(index));
   fprintf(out, "  pha\n");
   stack++;
 
@@ -213,9 +258,7 @@ int M6502::push_ref_local(int index)
 
 int M6502::push_long(int64_t n)
 {
-  printf("long is not supported right now\n");
-
-  return -1;
+  return push_integer((int32_t)n);
 }
 
 int M6502::push_float(float f)
@@ -263,9 +306,9 @@ int M6502::pop_integer_local(int index)
   fprintf(out, "; pop_integer_local\n");
   fprintf(out, "  ldx locals\n");
   fprintf(out, "  pla\n");
-  fprintf(out, "  sta 0x100 - %d,x\n", LOCALS(index) + 1);
+  fprintf(out, "  sta 0x100 - %d,x\n", LOCALS(index));
   fprintf(out, "  pla\n");
-  fprintf(out, "  sta 0x101 - %d,x\n", LOCALS(index) + 1);
+  fprintf(out, "  sta 0x101 - %d,x\n", LOCALS(index));
   stack--;
 
   return 0;
@@ -309,26 +352,12 @@ int M6502::dup2()
 
 int M6502::swap()
 {
-  fprintf(out, "  tsx\n");
-  fprintf(out, "  lda 0x101,x\n");
-  fprintf(out, "  tay\n");
-  fprintf(out, "  lda 0x103,x\n");
-  fprintf(out, "  sta 0x101,x\n");
-  fprintf(out, "  tya\n");
-  fprintf(out, "  sta 0x103,x\n");
-  fprintf(out, "  tsx\n");
-  fprintf(out, "  lda 0x102,x\n");
-  fprintf(out, "  tay\n");
-  fprintf(out, "  lda 0x104,x\n");
-  fprintf(out, "  sta 0x102,x\n");
-  fprintf(out, "  tya\n");
-  fprintf(out, "  sta 0x104,x\n");
-
-  return 0;
+  return -1;
 }
 
 int M6502::add_integer()
 {
+/*
   fprintf(out, "; add_integers\n");
   fprintf(out, "  pla\n");
   fprintf(out, "  sta result + 1\n");
@@ -345,12 +374,13 @@ int M6502::add_integer()
   fprintf(out, "  adc result + 1\n");
   fprintf(out, "  sta result + 1\n");
   fprintf(out, "  pha\n");
-
-  return 0;
+*/
+  return -1;
 }
 
 int M6502::sub_integer()
 {
+/*
   fprintf(out, "; sub_integers\n");
   fprintf(out, "  pla\n");
   fprintf(out, "  sta result + 1\n");
@@ -369,6 +399,8 @@ int M6502::sub_integer()
   fprintf(out, "  pha\n");
 
   return 0;
+*/
+  return -1;
 }
 
 int M6502::mul_integer()
@@ -388,17 +420,7 @@ int M6502::mod_integer()
 
 int M6502::neg_integer()
 {
-  fprintf(out, "  pla\n");
-  fprintf(out, "  eor 0xff\n");
-  fprintf(out, "  sta result + 1\n");
-  fprintf(out, "  pla\n");
-  fprintf(out, "  eor 0xff\n");
-  fprintf(out, "  sta result + 0\n");
-  fprintf(out, "  pha\n");
-  fprintf(out, "  lda result + 1\n");
-  fprintf(out, "  pha\n");
-
-  return 0;
+  return -1;
 }
 
 int M6502::shift_left_integer()
@@ -418,6 +440,7 @@ int M6502::shift_right_uinteger()
 
 int M6502::and_integer()
 {
+/*
   fprintf(out, "; and_integers\n");
   fprintf(out, "  pla\n");
   fprintf(out, "  sta result + 1\n");
@@ -435,10 +458,13 @@ int M6502::and_integer()
   fprintf(out, "  pha\n");
 
   return 0;
+*/
+  return -1;
 }
 
 int M6502::or_integer()
 {
+/*
   fprintf(out, "; and_integers\n");
   fprintf(out, "  pla\n");
   fprintf(out, "  sta result + 1\n");
@@ -456,10 +482,13 @@ int M6502::or_integer()
   fprintf(out, "  pha\n");
 
   return 0;
+*/
+  return -1;
 }
 
 int M6502::xor_integer()
 {
+/*
   fprintf(out, "; and_integers\n");
   fprintf(out, "  pla\n");
   fprintf(out, "  sta result + 1\n");
@@ -477,33 +506,32 @@ int M6502::xor_integer()
   fprintf(out, "  pha\n");
 
   return 0;
+*/
+  return -1;
 }
 
 int M6502::inc_integer(int index, int num)
 {
-  if (num > 255 || num < -128)
-  {
-    printf("Error: literal value %d not 8-bit.\n", num);
-    return -1;
-  }
+  uint8_t lo = num & 0xff;
+  uint8_t hi = lo > 0x7f ? 0xff : 0x00;
 
-  uint8_t value = num & 0xff;
-
-  fprintf(out, "; inc_integer\n");
+  fprintf(out, "; inc_integer num = %d\n", num);
   fprintf(out, "  ldx locals\n");
   fprintf(out, "  clc\n");
-  fprintf(out, "  lda 0x101 - %d,x\n", LOCALS(index) + 1);
-  fprintf(out, "  adc 0x%02x\n", value);
-  fprintf(out, "  sta 0x101 - %d,x\n", LOCALS(index) + 1);
-  fprintf(out, "  lda 0x100 - %d,x\n", LOCALS(index) + 1);
-  fprintf(out, "  adc #0\n");
-  fprintf(out, "  sta 0x100 - %d,x\n", LOCALS(index) + 1);
+  fprintf(out, "  lda 0x101 - %d,x\n", LOCALS(index));
+  fprintf(out, "  adc #0x%02x\n", lo);
+  fprintf(out, "  sta 0x101 - %d,x\n", LOCALS(index));
+  fprintf(out, "  lda 0x100 - %d,x\n", LOCALS(index));
+  fprintf(out, "  adc #0x%02x\n", hi);
+  fprintf(out, "  sta 0x100 - %d,x\n", LOCALS(index));
 
   return 0;
 }
 
 int M6502::jump_cond(const char *label, int cond)
 {
+  bool reverse = false;
+
   if (stack > 0)
   {
     fprintf(out, "; jump_cond\n");
@@ -514,51 +542,86 @@ int M6502::jump_cond(const char *label, int cond)
     fprintf(out, "  tax\n");
     fprintf(out, "  txs\n");
 
-    // don't need to store, carry flag is all we need here
-    fprintf(out, "  tsx\n");
-    fprintf(out, "  sec\n");
-    fprintf(out, "  lda 0x101 -2,x\n");
-    fprintf(out, "  sbc #0\n");
-    fprintf(out, "  lda 0x100 -2,x\n");
-    fprintf(out, "  sbc #0\n");
+    if(cond == COND_LESS_EQUAL)
+    {
+      reverse = true;
+      cond = COND_GREATER_EQUAL;
+    }
+      else
+    if(cond == COND_GREATER)
+    {
+      reverse = true;
+      cond = COND_LESS;
+    }
 
-    stack -= 2;
-
+    //printf("jump_cond = %s, neg = %d\n", cond_string[cond], reverse == true ? 1 : 0);
     switch(cond)
     {
-      // COND_EQUAL
-      case 0:
+      case COND_EQUAL:
+        fprintf(out, "  lda 0x101 -2,x\n");
+        fprintf(out, "  cmp #0\n");
+        fprintf(out, "  bne #10\n");
+        fprintf(out, "  lda 0x102 -2,x\n");
+        fprintf(out, "  cmp #0\n");
         fprintf(out, "  bne #3\n");
         fprintf(out, "  jmp %s\n", label);
         break;
-      // COND_NOT_EQUAL
-      case 1:
+      case COND_NOT_EQUAL:
+        fprintf(out, "  lda 0x101 -2,x\n");
+        fprintf(out, "  cmp #0\n");
+        fprintf(out, "  beq #10\n");
+        fprintf(out, "  lda 0x102 -2,x\n");
+        fprintf(out, "  cmp #0\n");
         fprintf(out, "  beq #3\n");
         fprintf(out, "  jmp %s\n", label);
         break;
-      // COND_LESS
-      case 2:
-        fprintf(out, "  bpl #3\n");
-        fprintf(out, "  jmp %s\n", label);
+      case COND_LESS:
+        if(reverse == false)
+        {
+          fprintf(out, "  lda 0x101 -2,x\n");
+          fprintf(out, "  cmp #0\n");
+          fprintf(out, "  bne #10\n");
+          fprintf(out, "  lda 0x102 -2,x\n");
+          fprintf(out, "  cmp #0\n");
+          fprintf(out, "  bpl #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
+          else
+        {
+          fprintf(out, "  lda #0\n");
+          fprintf(out, "  cmp 0x101 -2,x\n");
+          fprintf(out, "  bne #10\n");
+          fprintf(out, "  lda #0\n");
+          fprintf(out, "  cmp 0x102 -2,x\n");
+          fprintf(out, "  bpl #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
         break;
-      // COND_GREATER_EQUAL
-      case 3:
-        fprintf(out, "  beq #2\n");
-        fprintf(out, "  bmi #3\n");
-        fprintf(out, "  jmp %s\n", label);
-        break;
-      // COND_GREATER
-      case 4:
-        fprintf(out, "  bmi #3\n");
-        fprintf(out, "  jmp %s\n", label);
-        break;
-      // COND_LESS_EQUAL
-      case 5:
-        fprintf(out, "  beq #2\n");
-        fprintf(out, "  bpl #3\n");
-        fprintf(out, "  jmp %s\n", label);
+      case COND_GREATER_EQUAL:
+        if(reverse == false)
+        {
+          fprintf(out, "  lda 0x101 -2,x\n");
+          fprintf(out, "  cmp #0\n");
+          fprintf(out, "  bne #10\n");
+          fprintf(out, "  lda 0x102 -2,x\n");
+          fprintf(out, "  cmp #0\n");
+          fprintf(out, "  bmi #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
+          else
+        {
+          fprintf(out, "  lda #0\n");
+          fprintf(out, "  cmp 0x101 -2,x\n");
+          fprintf(out, "  bne #10\n");
+          fprintf(out, "  lda #0\n");
+          fprintf(out, "  cmp 0x102 -2,x\n");
+          fprintf(out, "  bmi #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
         break;
     }
+
+    stack--;
   }
 
   return 0;
@@ -566,6 +629,8 @@ int M6502::jump_cond(const char *label, int cond)
 
 int M6502::jump_cond_integer(const char *label, int cond)
 {
+  bool reverse = false;
+
   if (stack > 1)
   {
     fprintf(out, "; jump_cond_integer\n");
@@ -576,51 +641,86 @@ int M6502::jump_cond_integer(const char *label, int cond)
     fprintf(out, "  tax\n");
     fprintf(out, "  txs\n");
 
-    // don't need to store, carry flag is all we need here
-    fprintf(out, "  tsx\n");
-    fprintf(out, "  sec\n");
-    fprintf(out, "  lda 0x101 -2,x\n");
-    fprintf(out, "  sbc 0x101 -4,x\n");
-    fprintf(out, "  lda 0x100 -2,x\n");
-    fprintf(out, "  sbc 0x100 -4,x\n");
+    if(cond == COND_LESS_EQUAL)
+    {
+      reverse = true;
+      cond = COND_GREATER_EQUAL;
+    }
+      else
+    if(cond == COND_GREATER)
+    {
+      reverse = true;
+      cond = COND_LESS;
+    }
 
-    stack -= 2;
-
+    //printf("jump_cond_integer = %s, neg = %d\n", cond_string[cond], reverse == true ? 1 : 0);
     switch(cond)
     {
-      // COND_EQUAL
-      case 0:
+      case COND_EQUAL:
+        fprintf(out, "  lda 0x101 -2,x\n");
+        fprintf(out, "  cmp 0x101 -4,x\n");
+        fprintf(out, "  bne #11\n");
+        fprintf(out, "  lda 0x102 -2,x\n");
+        fprintf(out, "  cmp 0x102 -4,x\n");
         fprintf(out, "  bne #3\n");
         fprintf(out, "  jmp %s\n", label);
         break;
-      // COND_NOT_EQUAL
-      case 1:
+      case COND_NOT_EQUAL:
+        fprintf(out, "  lda 0x101 -2,x\n");
+        fprintf(out, "  cmp 0x101 -4,x\n");
+        fprintf(out, "  beq #11\n");
+        fprintf(out, "  lda 0x102 -2,x\n");
+        fprintf(out, "  cmp 0x102 -4,x\n");
         fprintf(out, "  beq #3\n");
         fprintf(out, "  jmp %s\n", label);
         break;
-      // COND_LESS
-      case 2:
-        fprintf(out, "  bpl #3\n");
-        fprintf(out, "  jmp %s\n", label);
+      case COND_LESS:
+        if(reverse == false)
+        {
+          fprintf(out, "  lda 0x101 -2,x\n");
+          fprintf(out, "  cmp 0x101 -4,x\n");
+          fprintf(out, "  bne #11\n");
+          fprintf(out, "  lda 0x102 -2,x\n");
+          fprintf(out, "  cmp 0x102 -4,x\n");
+          fprintf(out, "  bpl #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
+          else
+        {
+          fprintf(out, "  lda 0x101 -4,x\n");
+          fprintf(out, "  cmp 0x101 -2,x\n");
+          fprintf(out, "  bne #11\n");
+          fprintf(out, "  lda 0x102 -4,x\n");
+          fprintf(out, "  cmp 0x102 -2,x\n");
+          fprintf(out, "  bpl #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
         break;
-      // COND_GREATER_EQUAL
-      case 3:
-        fprintf(out, "  beq #2\n");
-        fprintf(out, "  bmi #3\n");
-        fprintf(out, "  jmp %s\n", label);
-        break;
-      // COND_GREATER
-      case 4:
-        fprintf(out, "  bmi #3\n");
-        fprintf(out, "  jmp %s\n", label);
-        break;
-      // COND_LESS_EQUAL
-      case 5:
-        fprintf(out, "  beq #2\n");
-        fprintf(out, "  bpl #3\n");
-        fprintf(out, "  jmp %s\n", label);
+      case COND_GREATER_EQUAL:
+        if(reverse == false)
+        {
+          fprintf(out, "  lda 0x101 -2,x\n");
+          fprintf(out, "  cmp 0x101 -4,x\n");
+          fprintf(out, "  bne #11\n");
+          fprintf(out, "  lda 0x102 -2,x\n");
+          fprintf(out, "  cmp 0x102 -4,x\n");
+          fprintf(out, "  bmi #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
+          else
+        {
+          fprintf(out, "  lda 0x101 -4,x\n");
+          fprintf(out, "  cmp 0x101 -2,x\n");
+          fprintf(out, "  bne #11\n");
+          fprintf(out, "  lda 0x102 -4,x\n");
+          fprintf(out, "  cmp 0x102 -2,x\n");
+          fprintf(out, "  bmi #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
         break;
     }
+
+    stack -= 2;
   }
 
   return 0;
@@ -632,7 +732,7 @@ int M6502::return_local(int index, int local_count)
   fprintf(out, "  ldx locals\n");
   fprintf(out, "  lda 0x101 - %d, x\n", LOCALS(index));
   fprintf(out, "  sta result + 0\n");
-  fprintf(out, "  lda 0x100 - %d\n", LOCALS(index));
+  fprintf(out, "  lda 0x100 - %d, x\n", LOCALS(index));
   fprintf(out, "  sta result + 1\n");
 
   fprintf(out, "  ldx locals\n");
@@ -640,6 +740,7 @@ int M6502::return_local(int index, int local_count)
 
   if (!is_main)
   {
+    fprintf(out, "  pla\n");
     fprintf(out, "  pla\n");
     fprintf(out, "  sta locals\n");
   }
@@ -653,9 +754,9 @@ int M6502::return_integer(int local_count)
 {
   fprintf(out, "; return_integer\n");
   fprintf(out, "  pla\n");
-  fprintf(out, "  lda result + 1\n");
+  fprintf(out, "  sta result + 1\n");
   fprintf(out, "  pla\n");
-  fprintf(out, "  lda result + 0\n");
+  fprintf(out, "  sta result + 0\n");
   stack--;
 
   fprintf(out, "  ldx locals\n");
@@ -663,6 +764,7 @@ int M6502::return_integer(int local_count)
 
   if (!is_main)
   {
+    fprintf(out, "  pla\n");
     fprintf(out, "  pla\n");
     fprintf(out, "  sta locals\n");
   }
@@ -680,6 +782,7 @@ int M6502::return_void(int local_count)
 
   if (!is_main)
   {
+    fprintf(out, "  pla\n");
     fprintf(out, "  pla\n");
     fprintf(out, "  sta locals\n");
   }
@@ -724,9 +827,9 @@ int stack_vars = stack;
       //fprintf(out, "  mov.w %d(SP), %d(SP)\n", stack_vars, local-4);
       fprintf(out, "  tsx\n");
 
-      fprintf(out, "  lda 0x100 + %d,x\n", (stack - stack_vars) * 2 + 1);
-      fprintf(out, "  sta 0x100 %d,x\n", local-4);
-      fprintf(out, "  lda 0x101 + %d,x\n", (stack - stack_vars) * 2 + 1);
+      fprintf(out, "  lda 0x102 + %d,x\n", (stack - stack_vars) * 2);
+      fprintf(out, "  sta 0x102 %d,x\n", local-4);
+      fprintf(out, "  lda 0x101 + %d,x\n", (stack - stack_vars) * 2);
       fprintf(out, "  sta 0x101 %d,x\n", local-4);
       stack_vars--;
     }
@@ -797,84 +900,477 @@ int M6502::brk()
 
 int M6502::new_array(uint8_t type)
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "; new_array\n");
+    fprintf(out, "  pla\n");
+    fprintf(out, "  sta length + 1\n");
+    fprintf(out, "  pla\n");
+    fprintf(out, "  sta length + 0\n");
+
+    fprintf(out, "  lda heap_ptr + 0\n");
+    fprintf(out, "  sta result + 0\n");
+    fprintf(out, "  lda heap_ptr + 1\n");
+    fprintf(out, "  sta result + 1\n");
+
+    fprintf(out, "  lda result + 0\n");
+    fprintf(out, "  sta address + 0\n");
+    fprintf(out, "  lda result + 1\n");
+    fprintf(out, "  sta address + 1\n");
+    fprintf(out, "  ldy #0\n");
+    fprintf(out, "  lda length + 0\n");
+    fprintf(out, "  sta (address),y\n");
+    fprintf(out, "  ldy #1\n");
+    fprintf(out, "  lda length + 1\n");
+    fprintf(out, "  sta (address),y\n");
+
+    if (type == TYPE_SHORT || type == TYPE_CHAR || type == TYPE_INT)
+    {
+      fprintf(out, "  asl length + 0\n");
+      fprintf(out, "  rol length + 1\n");
+    }
+      else
+    {
+      fprintf(out, "  lda length + 0\n");
+      fprintf(out, "  sta temp + 0\n");
+      fprintf(out, "  lda length + 1\n");
+      fprintf(out, "  sta temp + 1\n");
+
+      fprintf(out, "  lda temp + 0\n");
+      fprintf(out, "  and #1\n");
+      fprintf(out, "  sta temp + 0\n");
+
+      fprintf(out, "  clc\n");
+      fprintf(out, "  lda length + 0\n");
+      fprintf(out, "  adc temp + 0\n");
+      fprintf(out, "  sta length + 0\n");
+      fprintf(out, "  lda length + 1\n");
+      fprintf(out, "  adc temp + 1\n");
+      fprintf(out, "  sta length + 1\n");
+    }
+
+    fprintf(out, "  clc\n");
+    fprintf(out, "  lda length + 0\n");
+    fprintf(out, "  adc #2\n");
+    fprintf(out, "  sta length + 0\n");
+    fprintf(out, "  lda length + 1\n");
+    fprintf(out, "  adc #0\n");
+    fprintf(out, "  sta length + 1\n");
+
+    fprintf(out, "  clc\n");
+    fprintf(out, "  lda heap_ptr + 0\n");
+    fprintf(out, "  adc length + 0\n");
+    fprintf(out, "  sta heap_ptr + 0\n");
+    fprintf(out, "  lda heap_ptr + 1\n");
+    fprintf(out, "  adc length + 1\n");
+    fprintf(out, "  sta heap_ptr + 1\n");
+
+    fprintf(out, "  clc\n");
+    fprintf(out, "  lda result + 0\n");
+    fprintf(out, "  adc #2\n");
+    fprintf(out, "  sta result + 0\n");
+    fprintf(out, "  lda result + 1\n");
+    fprintf(out, "  adc #0\n");
+    fprintf(out, "  sta result + 1\n");
+
+    fprintf(out, "  lda result + 0\n");
+    fprintf(out, "  pha\n");
+    fprintf(out, "  lda result + 1\n");
+    fprintf(out, "  pha\n");
+  }
+
+  return 0;
 }
 
 int M6502::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 {
-  return -1;
+  fprintf(out, "; insert_array\n");
+
+  if (type == TYPE_BYTE)
+  {
+    fprintf(out, ".align 16\n");
+    return insert_db(name, data, len, TYPE_SHORT);
+  }
+    else
+  if (type == TYPE_SHORT)
+  {
+    fprintf(out, ".align 16\n");
+    return insert_dw(name, data, len, TYPE_SHORT);
+  }
+    else
+  if (type == TYPE_INT)
+  {
+    fprintf(out, ".align 16\n");
+    return insert_dw(name, data, len, TYPE_SHORT);
+  }
+
+  return 0;
 }
 
 int M6502::push_array_length()
 {
-  return -1;
+  fprintf(out, "; push_array_length\n");
+
+  if (stack > 0)
+  {
+    fprintf(out, "  pla\n");
+    fprintf(out, "  sta result + 1\n");
+    fprintf(out, "  pla\n");
+    fprintf(out, "  sta result + 0\n");
+
+    fprintf(out, "  lda result + 0\n");
+    fprintf(out, "  sta address + 0\n");
+    fprintf(out, "  lda result + 1\n");
+    fprintf(out, "  sta address + 1\n");
+    fprintf(out, "  sec\n");
+    fprintf(out, "  lda address + 0\n");
+    fprintf(out, "  sbc #2\n");
+    fprintf(out, "  sta address + 0\n");
+    fprintf(out, "  lda address + 1\n");
+    fprintf(out, "  sbc #0\n");
+    fprintf(out, "  sta address + 1\n");
+
+    fprintf(out, "  ldy #0\n");
+    fprintf(out, "  lda (address),y\n");
+    fprintf(out, "  sta result + 0\n");
+    fprintf(out, "  ldy #1\n");
+    fprintf(out, "  lda (address),y)\n");
+    fprintf(out, "  sta result + 1\n");
+
+    fprintf(out, "  lda result + 0\n");
+    fprintf(out, "  pha\n");
+    fprintf(out, "  lda result + 1\n");
+    fprintf(out, "  pha\n");
+  }
+
+  return 0;
 }
 
 int M6502::push_array_length(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "; push_array_length2\n");
+
+  fprintf(out, "  lda %s + 0\n", name);
+  fprintf(out, "  sta temp + 0\n");
+  fprintf(out, "  lda %s + 1\n", name);
+  fprintf(out, "  sta temp + 1\n");
+
+  fprintf(out, "  sec\n");
+  fprintf(out, "  lda temp + 0\n");
+  fprintf(out, "  sbc #2\n");
+  fprintf(out, "  sta temp + 0\n");
+  fprintf(out, "  lda temp + 1\n");
+  fprintf(out, "  sbc #0\n");
+  fprintf(out, "  sta temp + 1\n");
+
+  fprintf(out, "  lda temp + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  lda temp + 1\n");
+  fprintf(out, "  pha\n");
+
+  stack++;
+
+  return 0;
 }
 
 int M6502::array_read_byte()
 {
-  return -1;
+  fprintf(out, "; array_read_byte\n");
+
+  get_values_from_stack(2);
+
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda value2 + 0\n");
+  fprintf(out, "  adc value1 + 0\n");
+  fprintf(out, "  sta value2 + 0\n");
+  fprintf(out, "  lda value2 + 1\n");
+  fprintf(out, "  adc value1 + 1\n");
+  fprintf(out, "  sta value2 + 1\n");
+
+  fprintf(out, "  lda value2 + 0\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda value2 + 1\n");
+  fprintf(out, "  sta address + 1\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "  lda (address),y\n");
+  fprintf(out, "  sta result + 0\n");
+
+  fprintf(out, "  lda result + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  pha\n");
+
+  stack++;
+
+  return 0;
 }
 
 int M6502::array_read_short()
 {
-  return -1;
+  return array_read_int();
 }
 
 int M6502::array_read_int()
 {
-  return -1;
+  fprintf(out, "; array_read_int\n");
+
+  get_values_from_stack(2);
+
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda value2 + 0\n");
+  fprintf(out, "  adc value1 + 0\n");
+  fprintf(out, "  sta value2 + 0\n");
+  fprintf(out, "  lda value2 + 1\n");
+  fprintf(out, "  adc value1 + 1\n");
+  fprintf(out, "  sta value2 + 1\n");
+
+  fprintf(out, "  lda value2 + 0\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda value2 + 1\n");
+  fprintf(out, "  sta address + 1\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "  lda (address),y\n");
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  ldy #1\n");
+  fprintf(out, "  lda (address),y\n");
+  fprintf(out, "  sta result + 1\n");
+
+  fprintf(out, "  lda result + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  lda result + 1\n");
+  fprintf(out, "  pha\n");
+
+  stack++;
+
+  return 0;
 }
 
 int M6502::array_read_byte(const char *name, int field_id)
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "; array_read_byte\n");
+
+    fprintf(out, "  lda %s & 0xff\n", name);
+    fprintf(out, "  sta address + 0\n");
+    fprintf(out, "  lda %s >> 8\n", name);
+    fprintf(out, "  sta address + 1\n");
+
+    fprintf(out, "  pla\n");
+    fprintf(out, "  sta result + 1\n");
+    fprintf(out, "  pla\n");
+    fprintf(out, "  sta result + 0\n");
+
+    fprintf(out, "  clc\n");
+    fprintf(out, "  lda address + 0\n");
+    fprintf(out, "  adc result + 0\n");
+    fprintf(out, "  sta address + 0\n");
+    fprintf(out, "  lda address + 1\n");
+    fprintf(out, "  adc result + 1\n");
+    fprintf(out, "  sta address + 1\n");
+
+    fprintf(out, "  ldy #0\n");
+    fprintf(out, "  lda (address),y\n");
+    fprintf(out, "  sta result + 0\n");
+    fprintf(out, "  bmi #7\n");
+    fprintf(out, "  sty result + 1\n");
+    fprintf(out, "  lda #0\n");
+    fprintf(out, "  beq #5\n");
+    fprintf(out, "  lda #0xff\n");
+    fprintf(out, "  sta result + 1\n");
+
+    fprintf(out, "  lda result + 0\n");
+    fprintf(out, "  pha\n");
+    fprintf(out, "  lda result + 1\n");
+    fprintf(out, "  pha\n");
+  }
+
+  return 0;
 }
 
 int M6502::array_read_short(const char *name, int field_id)
 {
-  return -1;
+  return array_read_short(name, field_id);
 }
 
 int M6502::array_read_int(const char *name, int field_id)
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "; array_read_int\n");
+
+    fprintf(out, "  lda %s & 0xff\n", name);
+    fprintf(out, "  sta address + 0\n");
+    fprintf(out, "  lda %s >> 8\n", name);
+    fprintf(out, "  sta address + 1\n");
+
+    fprintf(out, "  pla\n");
+    fprintf(out, "  sta result + 1\n");
+    fprintf(out, "  pla\n");
+    fprintf(out, "  sta result + 0\n");
+
+    fprintf(out, "  clc\n");
+    fprintf(out, "  lda address + 0\n");
+    fprintf(out, "  adc result + 0\n");
+    fprintf(out, "  sta address + 0\n");
+    fprintf(out, "  lda address + 1\n");
+    fprintf(out, "  adc result + 1\n");
+    fprintf(out, "  sta address + 1\n");
+
+    fprintf(out, "  ldy #0\n");
+    fprintf(out, "  lda (address),y\n");
+    fprintf(out, "  sta result + 0\n");
+    fprintf(out, "  ldy #1\n");
+    fprintf(out, "  lda (address),y\n");
+    fprintf(out, "  sta result + 1\n");
+
+    fprintf(out, "  lda result + 0\n");
+    fprintf(out, "  pha\n");
+    fprintf(out, "  lda result + 1\n");
+    fprintf(out, "  pha\n");
+  }
+
+  return 0;
 }
 
 int M6502::array_write_byte()
 {
-  return -1;
+  fprintf(out, "; array_write_byte\n");
+
+  get_values_from_stack(3);
+
+  fprintf(out, "  clc\n"); 
+  fprintf(out, "  lda value3 + 0\n"); 
+  fprintf(out, "  adc value2 + 0\n"); 
+  fprintf(out, "  sta address + 0\n"); 
+  fprintf(out, "  lda value3 + 1\n"); 
+  fprintf(out, "  adc value2 + 1\n"); 
+  fprintf(out, "  sta address + 1\n"); 
+
+  fprintf(out, "  ldy #0\n"); 
+  fprintf(out, "  lda value1 + 0\n"); 
+  fprintf(out, "  sta (address),y\n"); 
+
+  return 0;
 }
 
 int M6502::array_write_short()
 {
-  return -1;
+  return array_write_int();
 }
 
 int M6502::array_write_int()
 {
-  return -1;
+  fprintf(out, "; array_write_int\n");
+
+  get_values_from_stack(3);
+
+  fprintf(out, "  asl value2 + 0\n");
+  fprintf(out, "  rol value2 + 1\n");
+
+  fprintf(out, "  clc\n"); 
+  fprintf(out, "  lda value3 + 0\n"); 
+  fprintf(out, "  adc value2 + 0\n"); 
+  fprintf(out, "  sta address + 0\n"); 
+  fprintf(out, "  lda value3 + 1\n"); 
+  fprintf(out, "  adc value2 + 1\n"); 
+  fprintf(out, "  sta address + 1\n"); 
+
+  fprintf(out, "  ldy #0\n"); 
+  fprintf(out, "  lda value1 + 0\n"); 
+  fprintf(out, "  sta (address),y\n"); 
+  fprintf(out, "  ldy #1\n"); 
+  fprintf(out, "  lda value1 + 1\n"); 
+  fprintf(out, "  sta (address),y\n"); 
+
+  return 0;
 }
 
 int M6502::array_write_byte(const char *name, int field_id)
 {
-  return -1;
+  get_values_from_stack(2);
+
+  fprintf(out, "  clc\n"); 
+  fprintf(out, "  lda value2 + 0\n"); 
+  fprintf(out, "  adc %s + 0\n", name); 
+  //fprintf(out, "  sta value2 + 0\n"); 
+  fprintf(out, "  sta address + 0\n"); 
+  fprintf(out, "  lda value2 + 1\n"); 
+  fprintf(out, "  adc %s + 1\n", name); 
+  //fprintf(out, "  sta value2 + 1\n"); 
+  fprintf(out, "  sta address + 1\n"); 
+
+  fprintf(out, "  ldy #0\n"); 
+  fprintf(out, "  lda value1 + 0\n"); 
+  fprintf(out, "  sta (address),y\n"); 
+
+  return 0;
 }
 
 int M6502::array_write_short(const char *name, int field_id)
 {
-  return -1;
+  return array_write_int(name, field_id);
 }
 
 int M6502::array_write_int(const char *name, int field_id)
 {
-  return -1;
+  get_values_from_stack(2);
+
+  fprintf(out, "  asl value2 + 0\n");
+  fprintf(out, "  rol value2 + 1\n");
+
+  fprintf(out, "  clc\n"); 
+  fprintf(out, "  lda value2 + 0\n"); 
+  fprintf(out, "  adc %s + 0\n", name); 
+  //fprintf(out, "  sta value2 + 0\n"); 
+  fprintf(out, "  sta address + 0\n"); 
+  fprintf(out, "  lda value2 + 1\n"); 
+  fprintf(out, "  adc %s + 1\n", name); 
+  //fprintf(out, "  sta value2 + 1\n"); 
+  fprintf(out, "  sta address + 1\n"); 
+
+  fprintf(out, "  ldy #0\n"); 
+  fprintf(out, "  lda value1 + 0\n"); 
+  fprintf(out, "  sta (address),y\n"); 
+  fprintf(out, "  ldy #1\n"); 
+  fprintf(out, "  lda value1 + 1\n"); 
+  fprintf(out, "  sta (address),y\n"); 
+
+  return 0;
 }
 
+int M6502::get_values_from_stack(int num)
+{
+  fprintf(out, "; get_values_from_stack, num = %d\n", num);
+  if(num > 0)
+  {
+    fprintf(out, "  pla\n");
+    fprintf(out, "  sta value1 + 1\n");
+    fprintf(out, "  pla\n");
+    fprintf(out, "  sta value1 + 0\n");
+    stack--;
+  }
+
+  if(num > 1)
+  {
+    fprintf(out, "  pla\n");
+    fprintf(out, "  sta value2 + 1\n");
+    fprintf(out, "  pla\n");
+    fprintf(out, "  sta value2 + 0\n");
+    stack--;
+  }
+
+  if(num > 2)
+  {
+    fprintf(out, "  pla\n");
+    fprintf(out, "  sta value3 + 1\n");
+    fprintf(out, "  pla\n");
+    fprintf(out, "  sta value3 + 0\n");
+    stack--;
+  }
+
+  return 0;
+}
 
 #if 0
 void M6502::close()
