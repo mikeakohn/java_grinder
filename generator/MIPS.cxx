@@ -207,12 +207,28 @@ int MIPS::swap()
 
 int MIPS::add_integer()
 {
-  return -1;
+  return stack_alu("add"); 
+}
+
+int MIPS::add_integer(int num)
+{
+  if (stack != 0) { return -1; }
+  if (num < 0 || num > 0xffff) { return -1; }
+  fprintf(out, "  addi $t%d, $t%d, %d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
+  return 0;
 }
 
 int MIPS::sub_integer()
 {
-  return -1;
+  return stack_alu("sub"); 
+}
+
+int MIPS::sub_integer(int num)
+{
+  if (stack != 0) { return -1; }
+  if (num < 0 || num > 0xffff) { return -1; }
+  fprintf(out, "  subi $t%d, $t%d, %d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
+  return 0;
 }
 
 int MIPS::mul_integer()
@@ -240,7 +256,17 @@ int MIPS::shift_left_integer()
   return -1;
 }
 
+int MIPS::shift_left_integer(int num)
+{
+  return -1;
+}
+
 int MIPS::shift_right_integer()
+{
+  return -1;
+}
+
+int MIPS::shift_right_integer(int num)
 {
   return -1;
 }
@@ -250,19 +276,48 @@ int MIPS::shift_right_uinteger()
   return -1;
 }
 
-int MIPS::and_integer()
+int MIPS::shift_right_uinteger(int num)
 {
   return -1;
+}
+
+int MIPS::and_integer()
+{
+  return stack_alu("and"); 
+}
+
+int MIPS::and_integer(int num)
+{
+  if (stack != 0) { return -1; }
+  if (num < 0 || num > 0xffff) { return -1; }
+  fprintf(out, "  andi $t%d, $t%d, %d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
+  return 0;
 }
 
 int MIPS::or_integer()
 {
-  return -1;
+  return stack_alu("or"); 
+}
+
+int MIPS::or_integer(int num)
+{
+  if (stack != 0) { return -1; }
+  if (num < 0 || num > 0xffff) { return -1; }
+  fprintf(out, "  ori $t%d, $t%d, %d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
+  return 0;
 }
 
 int MIPS::xor_integer()
 {
-  return -1;
+  return stack_alu("xor"); 
+}
+
+int MIPS::xor_integer(int num)
+{
+  if (stack != 0) { return -1; }
+  if (num < 0 || num > 0xffff) { return -1; }
+  fprintf(out, "  xori $t%d, $t%d, %d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
+  return 0;
 }
 
 int MIPS::inc_integer(int index, int num)
@@ -427,4 +482,30 @@ int MIPS::ioport_setPinLow(int port) { return -1; }
 int MIPS::ioport_isPinInputHigh(int port) { return -1; }
 int MIPS::ioport_getPortInputValue(int port) { return -1; }
 //int MIPS::ioport_setPortOutputValue(int port) { return -1; }
+
+int MIPS::stack_alu(const char *instr)
+{
+  if (stack == 0)
+  {
+    fprintf(out, "  %s $t%d, $t%d, $t%d\n", instr, REG_STACK(reg-2), REG_STACK(reg-2), REG_STACK(reg-1));
+    reg--;
+  }
+    else
+  if (stack == 1)
+  {
+    // FIXME
+    fprintf(out, "  error r15\n");
+    fprintf(out, "  %s.w r15, r%d\n", instr, REG_STACK(reg-1));
+    stack--;
+  }
+    else
+  {
+    // FIXME
+    fprintf(out, "  error r15\n");
+    fprintf(out, "  %s.w r15, @SP\n", instr);
+  }
+
+  return 0;
+}
+
 

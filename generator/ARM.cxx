@@ -17,6 +17,14 @@
 
 #define REG_STACK(a) (reg)
 #define LOCALS(i) (i * 4)
+// We want to use a full descending stack.
+// SP points to last occupied.
+// PUSH will decrement SP, and move value
+// POP will move value, increment SP
+// There are some STMFD and LDMFD instructions, but I don't see why I'd
+// need them here
+#define PUSH_REG(r) fprintf(out, "  str r%d, [SP,#-4]!\n", r);
+#define POP_REG(r) fprintf(out, "  ldr r%d, [SP],#4\n", r);
 
 // ABI is:
 // r0 Start of reg stack
@@ -26,8 +34,8 @@
 // r5
 // r6
 // r7
-// r8
-// r9 End of reg stack
+// r8 End of reg stack
+// r9 temp
 // r10 temp
 // r11 Statics pointer
 // r12 Constants pointer
@@ -39,7 +47,7 @@ static const char *cond_str[] = { "eq", "ne", "lt", "le", "gt", "ge" };
 
 ARM::ARM() :
   reg(0),
-  reg_max(10),
+  reg_max(9),
   stack(0),
   is_main(0)
 {
@@ -71,7 +79,6 @@ int ARM::start_init()
   // Add any set up items (stack, registers, etc).
   //fprintf(out, ".org ???\n");
   fprintf(out, "start:\n");
-  fprintf(out, "  mov r11, #0 ; Point to memory holding static vars\n");
 
   return 0;
 }
@@ -84,7 +91,10 @@ int ARM::insert_static_field_define(const char *name, const char *type, int inde
 
 int ARM::init_heap(int field_count)
 {
-  return -1;
+  fprintf(out, "  ;; Set up heap and static initializers\n");
+  //fprintf(out, "  mov #ram_start+%d, &ram_start\n", (field_count + 1) * 2);
+  fprintf(out, "  mov r11, #0 ; Point to memory holding static vars\n");
+  return 0;
 }
 
 int ARM::insert_field_init_boolean(char *name, int index, int value)
@@ -261,6 +271,7 @@ int ARM::add_integer()
 int ARM::add_integer(int num)
 {
   if (stack != 0) { return -1; }
+  if (!immediate_is_possible(num)) { return -1; }
   fprintf(out, "  add r%d, r%d, #%d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
   return 0;
 }
@@ -273,6 +284,7 @@ int ARM::sub_integer()
 int ARM::sub_integer(int num)
 {
   if (stack != 0) { return -1; }
+  if (!immediate_is_possible(num)) { return -1; }
   fprintf(out, "  sub r%d, r%d, #%d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
   return 0;
 }
@@ -342,6 +354,7 @@ int ARM::and_integer()
 int ARM::and_integer(int num)
 {
   if (stack != 0) { return -1; }
+  if (!immediate_is_possible(num)) { return -1; }
   fprintf(out, "  and r%d, r%d, #%d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
   return 0;
 }
@@ -354,6 +367,7 @@ int ARM::or_integer()
 int ARM::or_integer(int num)
 {
   if (stack != 0) { return -1; }
+  if (!immediate_is_possible(num)) { return -1; }
   fprintf(out, "  orr r%d, r%d, #%d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
   return 0;
 }
@@ -366,6 +380,7 @@ int ARM::xor_integer()
 int ARM::xor_integer(int num)
 {
   if (stack != 0) { return -1; }
+  if (!immediate_is_possible(num)) { return -1; }
   fprintf(out, "  eor r%d, r%d, #%d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
   return 0;
 }
@@ -576,16 +591,17 @@ int ARM::stack_alu(const char *instr)
     else
   if (stack == 1)
   {
-    // FIXME
-    fprintf(out, "  error r15\n");
-    fprintf(out, "  %s.w r15, r%d\n", instr, REG_STACK(reg-1));
+    POP_REG(10);
+    fprintf(out, "  %s r%d, r%d, r10\n", instr, REG_STACK(reg-1), REG_STACK(reg-1));
     stack--;
   }
     else
   {
-    // FIXME
-    fprintf(out, "  error r15\n");
-    fprintf(out, "  %s.w r15, @SP\n", instr);
+    //POP_REG(10);
+    //POP_REG(9);
+    fprintf(out, "  ldmfd !SP, { r9, r10 }\n");
+    fprintf(out, "  %s r9, r9, r10\n", instr);
+    PUSH_REG(9);
   }
 
   return 0;
