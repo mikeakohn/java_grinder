@@ -29,6 +29,9 @@
   fprintf(out, "  pla\n"); \
   fprintf(out, "  pla\n"); \
   fprintf(out, "  sta 0x%04x\n", dst)
+//  fprintf(out, "  sta 0x%04x\n", dst); \
+//  stack--
+
 
 M6502::M6502() :
   stack(0),
@@ -368,7 +371,7 @@ int M6502::add_integer()
   fprintf(out, "  adc result + 1\n");
   fprintf(out, "  sta result + 1\n");
   fprintf(out, "  pha\n");
-
+  
   return 0;
 }
 
@@ -1357,7 +1360,17 @@ int M6502::c64_vic_sprite_enable(/* num */ ) { POKE(0xd015); return 0; }
 int M6502::c64_vic_sprite0_pos(/* x, y */ )
 {
   POKE(0xd001);
-  POKE(0xd000);
+  fprintf(out, "  lda 0xd010\n");
+  fprintf(out, "  and #254\n");
+  fprintf(out, "  sta 0xd010\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  and #1\n");
+  fprintf(out, "  ora 0xd010\n");
+  fprintf(out, "  sta 0xd010\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta 0xd000\n");
+//  stack--;
+  
   return 0;
 }
 
