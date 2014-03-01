@@ -20,5 +20,17 @@ public class VIC
   public static void border(int value)
   {
   }
+
+  public static void background(int value)
+  {
+  }
+
+  public static void sprite_enable(int value)
+  {
+  }
+
+  public static void sprite0_pos(int x, int y)
+  {
+  }
 }
 

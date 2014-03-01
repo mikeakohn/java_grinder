@@ -29,9 +29,27 @@ static int c64_vic_border(JavaClass *java_class, Generator *generator)
   return generator->c64_vic_border();
 }
 
+static int c64_vic_background(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_background();
+}
+
+static int c64_vic_sprite_enable(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_sprite_enable();
+}
+
+static int c64_vic_sprite0_pos(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_sprite0_pos();
+}
+
 int c64_vic(JavaClass *java_class, Generator *generator, char *function)
 {
   CHECK_FUNC(border)
+  CHECK_FUNC(background)
+  CHECK_FUNC(sprite_enable)
+  CHECK_FUNC(sprite0_pos)
 
   return -1;
 }

@@ -90,6 +90,9 @@ public:
 
   // VIC methods
   virtual int c64_vic_border();
+  virtual int c64_vic_background();
+  virtual int c64_vic_sprite_enable();
+  virtual int c64_vic_sprite0_pos();
 
 protected:
   int stack;

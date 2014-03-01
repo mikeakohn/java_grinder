@@ -9,6 +9,8 @@
  *
  */
 
+//FIXME: large blocks of 6502 code should be placed into subroutines
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,17 +25,10 @@
 
 #define LOCALS(a) ((a * 2) + 1)
 
-/*
-static char *cond_string[] =
-{
-  "COND_EQUAL",
-  "COND_NOT_EQUAL",
-  "COND_LESS",
-  "COND_LESS_EQUAL",
-  "COND_GREATER",
-  "COND_GREATER_EQUAL"
-};
-*/
+#define POKE(dst) \
+  fprintf(out, "  pla\n"); \
+  fprintf(out, "  pla\n"); \
+  fprintf(out, "  sta 0x%04x\n", dst)
 
 M6502::M6502() :
   stack(0),
@@ -44,6 +39,7 @@ M6502::M6502() :
 
 M6502::~M6502()
 {
+  // test that prints stack and heap on screen
   fprintf(out, "print:\n");
   fprintf(out, "  ldx #0\n");
   fprintf(out, "print_stack_loop:\n");
@@ -139,7 +135,6 @@ int M6502::init_heap(int field_count)
 int M6502::insert_field_init_boolean(char *name, int index, int value)
 {
   value = (value == 0) ? 0 : 1;
-  //fprintf(out, "  mov #%d, &ram_start+%d ; %s\n", value, (index + 1) * 2, name);
   fprintf(out, "  lda #%d\n", value & 0xff);
   fprintf(out, "  sta %s\n", name + 0);
   fprintf(out, "  lda #%d\n", value >> 8);
@@ -357,7 +352,6 @@ int M6502::swap()
 
 int M6502::add_integer()
 {
-/*
   fprintf(out, "; add_integers\n");
   fprintf(out, "  pla\n");
   fprintf(out, "  sta result + 1\n");
@@ -374,13 +368,12 @@ int M6502::add_integer()
   fprintf(out, "  adc result + 1\n");
   fprintf(out, "  sta result + 1\n");
   fprintf(out, "  pha\n");
-*/
-  return -1;
+
+  return 0;
 }
 
 int M6502::sub_integer()
 {
-/*
   fprintf(out, "; sub_integers\n");
   fprintf(out, "  pla\n");
   fprintf(out, "  sta result + 1\n");
@@ -399,8 +392,6 @@ int M6502::sub_integer()
   fprintf(out, "  pha\n");
 
   return 0;
-*/
-  return -1;
 }
 
 int M6502::mul_integer()
@@ -440,7 +431,6 @@ int M6502::shift_right_uinteger()
 
 int M6502::and_integer()
 {
-/*
   fprintf(out, "; and_integers\n");
   fprintf(out, "  pla\n");
   fprintf(out, "  sta result + 1\n");
@@ -458,13 +448,10 @@ int M6502::and_integer()
   fprintf(out, "  pha\n");
 
   return 0;
-*/
-  return -1;
 }
 
 int M6502::or_integer()
 {
-/*
   fprintf(out, "; and_integers\n");
   fprintf(out, "  pla\n");
   fprintf(out, "  sta result + 1\n");
@@ -482,13 +469,10 @@ int M6502::or_integer()
   fprintf(out, "  pha\n");
 
   return 0;
-*/
-  return -1;
 }
 
 int M6502::xor_integer()
 {
-/*
   fprintf(out, "; and_integers\n");
   fprintf(out, "  pla\n");
   fprintf(out, "  sta result + 1\n");
@@ -506,8 +490,6 @@ int M6502::xor_integer()
   fprintf(out, "  pha\n");
 
   return 0;
-*/
-  return -1;
 }
 
 int M6502::inc_integer(int index, int num)
@@ -554,7 +536,6 @@ int M6502::jump_cond(const char *label, int cond)
       cond = COND_LESS;
     }
 
-    //printf("jump_cond = %s, neg = %d\n", cond_string[cond], reverse == true ? 1 : 0);
     switch(cond)
     {
       case COND_EQUAL:
@@ -653,7 +634,6 @@ int M6502::jump_cond_integer(const char *label, int cond)
       cond = COND_LESS;
     }
 
-    //printf("jump_cond_integer = %s, neg = %d\n", cond_string[cond], reverse == true ? 1 : 0);
     switch(cond)
     {
       case COND_EQUAL:
@@ -824,9 +804,7 @@ int stack_vars = stack;
 
     if (stack_vars > 0)
     {
-      //fprintf(out, "  mov.w %d(SP), %d(SP)\n", stack_vars, local-4);
       fprintf(out, "  tsx\n");
-
       fprintf(out, "  lda 0x102 + %d,x\n", (stack - stack_vars) * 2);
       fprintf(out, "  sta 0x102 %d,x\n", local-4);
       fprintf(out, "  lda 0x101 + %d,x\n", (stack - stack_vars) * 2);
@@ -1372,13 +1350,14 @@ int M6502::get_values_from_stack(int num)
   return 0;
 }
 
-int M6502::c64_vic_border()
+// C64 specific
+int M6502::c64_vic_border(/* color */) { POKE(0xd020); return 0; }
+int M6502::c64_vic_background(/* color */) { POKE(0xd021); return 0; }
+int M6502::c64_vic_sprite_enable(/* num */ ) { POKE(0xd015); return 0; }
+int M6502::c64_vic_sprite0_pos(/* x, y */ )
 {
-  fprintf(out, "  pla\n");
-  fprintf(out, "  pla\n");
-  fprintf(out, "  sta 0xd020\n");
-  stack--;
-
+  POKE(0xd001);
+  POKE(0xd000);
   return 0;
 }
 
