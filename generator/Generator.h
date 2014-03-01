@@ -196,6 +196,7 @@ public:
 
   // Commodore 64 stuff
   virtual int c64_sid_setVolume() { return -1; }
+  virtual int c64_vic_border() { return -1; }
 
   void add_newline();
 
