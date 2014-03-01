@@ -216,7 +216,19 @@ int MC68000::push_short(int16_t s)
 
 int MC68000::pop_integer_local(int index)
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  move.l (sp)+ ,(-%d,a6)\n", LOCALS(index));
+    stack--;
+  }
+    else
+  if (reg > 0)
+  {
+    fprintf(out, "  move.l d%d, (-%d,a6)\n", REG_STACK(reg-1), LOCALS(index));
+    reg--;
+  }
+
+  return 0;
 }
 
 int MC68000::pop_ref_local(int index)

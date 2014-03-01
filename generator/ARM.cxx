@@ -35,7 +35,7 @@
 // r14 Link Register
 // r15 PC
 
-//static const char *cond_str[] = { "eq", "ne", "lt", "le", "gt", "ge" };
+static const char *cond_str[] = { "eq", "ne", "lt", "le", "gt", "ge" };
 
 ARM::ARM() :
   reg(0),
@@ -211,7 +211,21 @@ int ARM::push_short(int16_t s)
 
 int ARM::pop_integer_local(int index)
 {
-  return -1;
+  // FIXME - This is NOT right
+  if (stack > 0)
+  {
+    fprintf(out, "  ldr r10, ![SP,#4]\n");
+    fprintf(out, "  str r10, [r14,#-%d]\n", LOCALS(index));
+    stack--;
+  }
+    else
+  if (reg > 0)
+  {
+    fprintf(out, "  str r%d, [r14,#-%d]\n", REG_STACK(reg-1), LOCALS(index));
+    reg--;
+  }
+
+  return 0;
 }
 
 int ARM::pop_ref_local(int index)
@@ -241,17 +255,31 @@ int ARM::swap()
 
 int ARM::add_integer()
 {
-  return -1;
+  return stack_alu("add");
+}
+
+int ARM::add_integer(int num)
+{
+  if (stack != 0) { return -1; }
+  fprintf(out, "  add r%d, r%d, #%d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
+  return 0;
 }
 
 int ARM::sub_integer()
 {
-  return -1;
+  return stack_alu("sub");
+}
+
+int ARM::sub_integer(int num)
+{
+  if (stack != 0) { return -1; }
+  fprintf(out, "  sub r%d, r%d, #%d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
+  return 0;
 }
 
 int ARM::mul_integer()
 {
-  return -1;
+  return stack_alu("mul");
 }
 
 int ARM::div_integer()
@@ -271,7 +299,15 @@ int ARM::neg_integer()
 
 int ARM::shift_left_integer()
 {
+  // mov r0, r1, lsl r2
   return -1;
+}
+
+int ARM::shift_left_integer(int num)
+{
+  if (stack != 0) { return -1; }
+  fprintf(out, "  mov r%d, r%d, lsl #%d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
+  return 0;
 }
 
 int ARM::shift_right_integer()
@@ -279,24 +315,59 @@ int ARM::shift_right_integer()
   return -1;
 }
 
+int ARM::shift_right_integer(int num)
+{
+  if (stack != 0) { return -1; }
+  fprintf(out, "  mov r%d, r%d, rsl #%d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
+  return 0;
+}
+
 int ARM::shift_right_uinteger()
 {
   return -1;
 }
 
+int ARM::shift_right_uinteger(int num)
+{
+  if (stack != 0) { return -1; }
+  fprintf(out, "  mov r%d, r%d, rsl #%d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
+  return 0;
+}
+
 int ARM::and_integer()
 {
-  return -1;
+  return stack_alu("and");
+}
+
+int ARM::and_integer(int num)
+{
+  if (stack != 0) { return -1; }
+  fprintf(out, "  and r%d, r%d, #%d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
+  return 0;
 }
 
 int ARM::or_integer()
 {
-  return -1;
+  return stack_alu("orr");
+}
+
+int ARM::or_integer(int num)
+{
+  if (stack != 0) { return -1; }
+  fprintf(out, "  orr r%d, r%d, #%d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
+  return 0;
 }
 
 int ARM::xor_integer()
 {
-  return -1;
+  return stack_alu("eor");
+}
+
+int ARM::xor_integer(int num)
+{
+  if (stack != 0) { return -1; }
+  fprintf(out, "  eor r%d, r%d, #%d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
+  return 0;
 }
 
 int ARM::inc_integer(int index, int num)
@@ -306,7 +377,20 @@ int ARM::inc_integer(int index, int num)
 
 int ARM::jump_cond(const char *label, int cond)
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  ldm SP!, {r10}\n");
+    fprintf(out, "  cmp r10, #0\n");
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  cmp r%d, #0\n", REG_STACK(reg-1));
+    reg--;
+  }
+
+  fprintf(out, "  b%s %s\n", cond_str[cond], label);
+  return 0;
 }
 
 int ARM::jump_cond_integer(const char *label, int cond)
@@ -480,6 +564,31 @@ bool ARM::immediate_is_possible(int immediate)
   }
 
   return false;
+}
+
+int ARM::stack_alu(const char *instr)
+{
+  if (stack == 0)
+  {
+    fprintf(out, "  %s r%d, r%d, r%d\n", instr, REG_STACK(reg-2), REG_STACK(reg-2), REG_STACK(reg-1));
+    reg--;
+  }
+    else
+  if (stack == 1)
+  {
+    // FIXME
+    fprintf(out, "  error r15\n");
+    fprintf(out, "  %s.w r15, r%d\n", instr, REG_STACK(reg-1));
+    stack--;
+  }
+    else
+  {
+    // FIXME
+    fprintf(out, "  error r15\n");
+    fprintf(out, "  %s.w r15, @SP\n", instr);
+  }
+
+  return 0;
 }
 
 

@@ -15,26 +15,26 @@
 
 #include "MIPS.h"
 
-#define REG_STACK(a) (reg + 1)
+#define REG_STACK(a) (reg)
 #define LOCALS(i) (i * 4)
 
 // ABI is:
-// r0 Always 0
-// r1 Start of stack
+// r0 $zero Always 0
+// r1 $at Return value
 // r2
 // r3
 // r4
 // r5
 // r6
 // r7
-// r8
-// r9
-// r10
-// r11
-// r12
-// r13
-// r14
-// r15 Top Of Stack
+// r8 $t0  Start of stack
+// r9 $t1
+// r10 $t2
+// r11 $t3
+// r12 $t4
+// r13 $t5
+// r14 $t6
+// r15 $t7 Top Of Stack
 // r16
 // r17
 // r18
@@ -47,14 +47,14 @@
 // r25
 // r26
 // r27
-// r28
-// r29 Stack pointer
-// r30 Frame pointer (link register)
-// r31 Return address
+// r28 $gp Heap pointer
+// r29 $sp Stack pointer
+// r30 $fp Frame pointer (link register)
+// r31 $ra Return address
 
 MIPS::MIPS() :
   reg(0),
-  reg_max(15),
+  reg_max(8),
   stack(0),
   is_main(0)
 {
