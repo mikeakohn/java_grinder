@@ -1374,8 +1374,8 @@ int M6502::get_values_from_stack(int num)
 
 int M6502::c64_vic_border()
 {
-  fprintf(out, "  pha\n");
-  fprintf(out, "  pha\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  pla\n");
   fprintf(out, "  sta 0xd020\n");
   stack--;
 

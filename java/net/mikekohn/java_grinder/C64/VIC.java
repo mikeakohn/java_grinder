@@ -17,7 +17,7 @@ public class VIC
   {
   }
 
-  public static void c64_vic_border(int value)
+  public static void border(int value)
   {
   }
 }
