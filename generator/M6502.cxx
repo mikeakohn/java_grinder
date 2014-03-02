@@ -29,8 +29,6 @@
   fprintf(out, "  pla\n"); \
   fprintf(out, "  pla\n"); \
   fprintf(out, "  sta 0x%04x\n", dst)
-//  stack--
-
 
 M6502::M6502() :
   stack(0),
@@ -71,6 +69,14 @@ M6502::~M6502()
   fprintf(out, "dw 0\n");
   fprintf(out, "value3:\n");
   fprintf(out, "dw 0\n");
+  fprintf(out, "sprite_msb_set:\n");
+  fprintf(out, "db 0\n");
+  fprintf(out, "sprite_msb_clear:\n");
+  fprintf(out, "db 0\n");
+  fprintf(out, "sprite_x:\n");
+  fprintf(out, "dw 0\n");
+  fprintf(out, "sprite_y:\n");
+  fprintf(out, "db 0\n");
   fprintf(out, "locals:\n");
   fprintf(out, "db 0\n");
 }
@@ -1467,32 +1473,35 @@ int M6502::get_values_from_stack(int num)
   return 0;
 }
 
-// C64 specific
-int M6502::c64_vic_border(/* color */) { POKE(0xd020); return 0; }
-
-int M6502::c64_vic_background(/* color */) { POKE(0xd021); return 0; }
-
-int M6502::c64_vic_sprite_enable(/* num */ ) { POKE(0xd015); return 0; }
-
-int M6502::c64_vic_sprite0_pos(/* x, y */ )
+// Memory API
+int M6502::memory_read8()
 {
-  POKE(0xd001);
-  fprintf(out, "  lda 0xd010\n");
-  fprintf(out, "  and #254\n");
-  fprintf(out, "  sta 0xd010\n");
+  fprintf(out, "; memory_read8\n");
   fprintf(out, "  pla\n");
-  fprintf(out, "  and #1\n");
-  fprintf(out, "  ora 0xd010\n");
-  fprintf(out, "  sta 0xd010\n");
+  fprintf(out, "  sta address + 1\n");
   fprintf(out, "  pla\n");
-  fprintf(out, "  sta 0xd000\n");
-//  stack--;
-  
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "  lda (address),y\n");
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  pha\n");
+  // sign-extend
+  fprintf(out, "  bpl #10\n");
+  fprintf(out, "  lda #0xff\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  beq #6\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pha\n");
+
   return 0;
 }
 
-int M6502::c64_vic_poke(/* dest, value */ )
+int M6502::memory_write8()
 {
+  fprintf(out, "; memory_write8\n");
   fprintf(out, "  pla\n");
   fprintf(out, "  pla\n");
   fprintf(out, "  tax\n");
@@ -1503,8 +1512,87 @@ int M6502::c64_vic_poke(/* dest, value */ )
   fprintf(out, "  ldy #0\n");
   fprintf(out, "  txa\n");
   fprintf(out, "  sta (address),y\n");
-//  stack--;
+
+  stack -= 2;
+
+  return 0;
+}
+
+// C64 API
+int M6502::c64_vic_border(/* color */) { POKE(0xd020); return 0; }
+
+int M6502::c64_vic_background(/* color */) { POKE(0xd021); return 0; }
+
+int M6502::c64_vic_sprite_enable(/* num */ ) { POKE(0xd015); return 0; }
+
+// slow but convenient :)
+int M6502::c64_vic_sprite_pos(/* sprite, x, y */ )
+{
+  fprintf(out, "; c64_vic_sprite_pos\n");
+  // y
+  fprintf(out, "  pla\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta sprite_y\n");
+
+  // x
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta sprite_x + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta sprite_x + 0\n");
+
+  // sprite
+  fprintf(out, "  pla\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  tay\n");
+  fprintf(out, "  sta sprite_msb_set\n");
+  fprintf(out, "  tax\n");
+  fprintf(out, "  beq #6\n");
+  fprintf(out, "  asl sprite_msb_set\n");
+  fprintf(out, "  dex\n");
+  fprintf(out, "  bne #-8\n");
+
+  // vic sprite position offset (sprite * 2)
+  fprintf(out, "  tya\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  tay\n");
+
+  // set xy pos
+  fprintf(out, "  lda sprite_msb_set\n");
+  fprintf(out, "  eor #0xff\n");
+  fprintf(out, "  sta sprite_msb_clear\n");
+
+  fprintf(out, "  lda 0xd010\n");
+  fprintf(out, "  and sprite_msb_clear\n");
+  fprintf(out, "  sta 0xd010\n");
+  fprintf(out, "  lda sprite_x + 1\n");
+  fprintf(out, "  and sprite_msb_set\n");
+  fprintf(out, "  ora 0xd010\n");
+  fprintf(out, "  sta 0xd010\n");
+
+  fprintf(out, "  lda sprite_x + 0\n");
+  fprintf(out, "  sta 0xd000,y\n");
+
+  fprintf(out, "  lda sprite_y\n");
+  fprintf(out, "  sta 0xd001,y\n");
   
+  return 0;
+}
+
+int M6502::c64_vic_poke_reg(/* dest, value */ )
+{
+  // value
+  fprintf(out, "  pla\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  tay\n");
+
+  // reg
+  fprintf(out, "  pla\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  tax\n");
+
+  fprintf(out, "  tya\n");
+  fprintf(out, "  sta 0xd000,x\n");
+
   return 0;
 }
 

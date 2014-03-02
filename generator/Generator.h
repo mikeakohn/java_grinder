@@ -199,7 +199,8 @@ public:
   virtual int c64_vic_border() { return -1; }
   virtual int c64_vic_background() { return -1; }
   virtual int c64_vic_sprite_enable() { return -1; }
-  virtual int c64_vic_sprite0_pos() { return -1; }
+  virtual int c64_vic_sprite_pos() { return -1; }
+  virtual int c64_vic_poke_reg() { return -1; }
 
   void add_newline();
 

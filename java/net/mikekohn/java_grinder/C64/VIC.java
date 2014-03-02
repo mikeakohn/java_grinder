@@ -29,11 +29,11 @@ public class VIC
   {
   }
 
-  public static void sprite0_pos(int x, int y)
+  public static void sprite_pos(int sprite, int x, int y)
   {
   }
 
-  public static void poke(int dest, int value)
+  public static void poke_reg(int offset, int value)
   {
   }
 }

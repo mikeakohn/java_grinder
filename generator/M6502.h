@@ -88,12 +88,16 @@ public:
   //virtual void close();
   virtual int get_values_from_stack(int num);
 
-  // VIC methods
+  // Memory API
+  virtual int memory_read8();
+  virtual int memory_write8();
+
+  // VIC API
   virtual int c64_vic_border();
   virtual int c64_vic_background();
   virtual int c64_vic_sprite_enable();
-  virtual int c64_vic_sprite0_pos();
-  virtual int c64_vic_poke();
+  virtual int c64_vic_sprite_pos();
+  virtual int c64_vic_poke_reg();
 
 protected:
   int stack;
