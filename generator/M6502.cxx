@@ -351,7 +351,25 @@ int M6502::dup2()
 
 int M6502::swap()
 {
-  return -1;
+//FIXME untested
+  fprintf(out, "; swap\n");
+  fprintf(out, "  tsx\n");
+  fprintf(out, "  lda 0x101,x\n");
+  fprintf(out, "  sta temp + 0,x\n");
+  fprintf(out, "  lda 0x100,x\n");
+  fprintf(out, "  sta temp + 1,x\n");
+
+  fprintf(out, "  lda 0x103,x\n");
+  fprintf(out, "  sta 0x101,x\n");
+  fprintf(out, "  lda 0x102,x\n");
+  fprintf(out, "  sta 0x100,x\n");
+
+  fprintf(out, "  lda temp + 0\n");
+  fprintf(out, "  sta 0x103,x\n");
+  fprintf(out, "  lda temp + 1\n");
+  fprintf(out, "  sta 0x102,x\n");
+
+  return 0;
 }
 
 int M6502::add_integer()
@@ -415,22 +433,81 @@ int M6502::mod_integer()
 
 int M6502::neg_integer()
 {
-  return -1;
+  return 0;
 }
 
 int M6502::shift_left_integer()
 {
-  return -1;
+  fprintf(out, "; shift_left_integer\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  tax\n");
+
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 0\n");
+
+  fprintf(out, "  asl result + 0\n");
+  fprintf(out, "  rol result + 1\n");
+  fprintf(out, "  dex\n");
+  fprintf(out, "  bne #-9\n");
+  fprintf(out, "  lda result + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  lda result + 1\n");
+  fprintf(out, "  pha\n");
+
+  return 0;
 }
 
 int M6502::shift_right_integer()
 {
-  return -1;
+  fprintf(out, "; shift_right_integer\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  tax\n");
+
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 0\n");
+
+  fprintf(out, "  lda result + 1\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  ror result + 1\n");
+  fprintf(out, "  ror result + 0\n");
+  fprintf(out, "  dex\n");
+  fprintf(out, "  bne #-13\n");
+  fprintf(out, "  lda result + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  lda result + 1\n");
+  fprintf(out, "  pha\n");
+
+  return 0;
 }
 
 int M6502::shift_right_uinteger()
 {
-  return -1;
+  fprintf(out, "; shift_right_uinteger\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  tax\n");
+
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 0\n");
+
+  fprintf(out, "  lsr result + 1\n");
+  fprintf(out, "  ror result + 0\n");
+  fprintf(out, "  dex\n");
+  fprintf(out, "  bne #-9\n");
+  fprintf(out, "  lda result + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  lda result + 1\n");
+  fprintf(out, "  pha\n");
+
+  return 0;
 }
 
 int M6502::and_integer()
