@@ -647,7 +647,7 @@ printf("code_len=%d\n", code_len);
 
       case 53: // saload (0x35)
         if (operand_stack_ptr == 0)
-        { ret = -1; }
+        { ret = generator->array_read_short(); }
           else
         { ret = array_load(java_class, generator, operand_stack[--operand_stack_ptr], ARRAY_TYPE_SHORT); }
 
