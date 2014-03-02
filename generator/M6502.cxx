@@ -433,6 +433,24 @@ int M6502::mod_integer()
 
 int M6502::neg_integer()
 {
+  fprintf(out, "; neg_integer\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 0\n");
+
+  fprintf(out, "  sec\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sbc result + 0\n");
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sbc result + 1\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  lda result + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  lda result + 1\n");
+  fprintf(out, "  pha\n");
+
   return 0;
 }
 
@@ -1165,11 +1183,17 @@ int M6502::array_read_byte()
   fprintf(out, "  lda result + 0\n");
   fprintf(out, "  pha\n");
   // sign-extend
-  fprintf(out, "  bpl #3\n");
+  fprintf(out, "  bpl #10\n");
   fprintf(out, "  lda #0xff\n");
+  fprintf(out, "  sta result + 1\n");
   fprintf(out, "  pha\n");
   fprintf(out, "  lda #0\n");
+  fprintf(out, "  beq #6\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sta result + 1\n");
   fprintf(out, "  pha\n");
+
+  stack++;
 
   return 0;
 }
@@ -1359,6 +1383,7 @@ int M6502::array_write_byte(const char *name, int field_id)
 {
   get_values_from_stack(2);
 
+  fprintf(out, "; array_write_byte2\n");
   fprintf(out, "  clc\n"); 
   fprintf(out, "  lda value2 + 0\n"); 
   fprintf(out, "  adc %s + 0\n", name); 
@@ -1385,6 +1410,7 @@ int M6502::array_write_int(const char *name, int field_id)
 {
   get_values_from_stack(2);
 
+  fprintf(out, "; array_write_int2\n");
   fprintf(out, "  asl value2 + 0\n");
   fprintf(out, "  rol value2 + 1\n");
 
