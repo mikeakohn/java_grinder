@@ -29,7 +29,6 @@
   fprintf(out, "  pla\n"); \
   fprintf(out, "  pla\n"); \
   fprintf(out, "  sta 0x%04x\n", dst)
-//  fprintf(out, "  sta 0x%04x\n", dst); \
 //  stack--
 
 
@@ -275,10 +274,12 @@ int M6502::push_double(double f)
 
 int M6502::push_byte(int8_t b)
 {
+  uint16_t value = (b & 0xffff);
+
   fprintf(out, "; push_byte\n");
-  fprintf(out, "  lda #0x%02x\n", b);
+  fprintf(out, "  lda #0x%02x\n", value & 0xff);
   fprintf(out, "  pha\n");
-  fprintf(out, "  lda #0x00\n");
+  fprintf(out, "  lda #0x%02x\n", value >> 8);
   fprintf(out, "  pha\n");
   stack++;
 
@@ -371,7 +372,7 @@ int M6502::add_integer()
   fprintf(out, "  adc result + 1\n");
   fprintf(out, "  sta result + 1\n");
   fprintf(out, "  pha\n");
-  
+
   return 0;
 }
 
@@ -564,7 +565,7 @@ int M6502::jump_cond(const char *label, int cond)
         {
           fprintf(out, "  lda 0x101 -2,x\n");
           fprintf(out, "  cmp #0\n");
-          fprintf(out, "  bne #10\n");
+          fprintf(out, "  bpl #10\n");
           fprintf(out, "  lda 0x102 -2,x\n");
           fprintf(out, "  cmp #0\n");
           fprintf(out, "  bpl #3\n");
@@ -574,7 +575,7 @@ int M6502::jump_cond(const char *label, int cond)
         {
           fprintf(out, "  lda #0\n");
           fprintf(out, "  cmp 0x101 -2,x\n");
-          fprintf(out, "  bne #10\n");
+          fprintf(out, "  bpl #10\n");
           fprintf(out, "  lda #0\n");
           fprintf(out, "  cmp 0x102 -2,x\n");
           fprintf(out, "  bpl #3\n");
@@ -586,7 +587,7 @@ int M6502::jump_cond(const char *label, int cond)
         {
           fprintf(out, "  lda 0x101 -2,x\n");
           fprintf(out, "  cmp #0\n");
-          fprintf(out, "  bne #10\n");
+          fprintf(out, "  bmi #10\n");
           fprintf(out, "  lda 0x102 -2,x\n");
           fprintf(out, "  cmp #0\n");
           fprintf(out, "  bmi #3\n");
@@ -596,7 +597,7 @@ int M6502::jump_cond(const char *label, int cond)
         {
           fprintf(out, "  lda #0\n");
           fprintf(out, "  cmp 0x101 -2,x\n");
-          fprintf(out, "  bne #10\n");
+          fprintf(out, "  bmi #10\n");
           fprintf(out, "  lda #0\n");
           fprintf(out, "  cmp 0x102 -2,x\n");
           fprintf(out, "  bmi #3\n");
@@ -662,7 +663,7 @@ int M6502::jump_cond_integer(const char *label, int cond)
         {
           fprintf(out, "  lda 0x101 -2,x\n");
           fprintf(out, "  cmp 0x101 -4,x\n");
-          fprintf(out, "  bne #11\n");
+          fprintf(out, "  bpl #11\n");
           fprintf(out, "  lda 0x102 -2,x\n");
           fprintf(out, "  cmp 0x102 -4,x\n");
           fprintf(out, "  bpl #3\n");
@@ -672,7 +673,7 @@ int M6502::jump_cond_integer(const char *label, int cond)
         {
           fprintf(out, "  lda 0x101 -4,x\n");
           fprintf(out, "  cmp 0x101 -2,x\n");
-          fprintf(out, "  bne #11\n");
+          fprintf(out, "  bpl #11\n");
           fprintf(out, "  lda 0x102 -4,x\n");
           fprintf(out, "  cmp 0x102 -2,x\n");
           fprintf(out, "  bpl #3\n");
@@ -684,7 +685,7 @@ int M6502::jump_cond_integer(const char *label, int cond)
         {
           fprintf(out, "  lda 0x101 -2,x\n");
           fprintf(out, "  cmp 0x101 -4,x\n");
-          fprintf(out, "  bne #11\n");
+          fprintf(out, "  bmi #11\n");
           fprintf(out, "  lda 0x102 -2,x\n");
           fprintf(out, "  cmp 0x102 -4,x\n");
           fprintf(out, "  bmi #3\n");
@@ -694,7 +695,7 @@ int M6502::jump_cond_integer(const char *label, int cond)
         {
           fprintf(out, "  lda 0x101 -4,x\n");
           fprintf(out, "  cmp 0x101 -2,x\n");
-          fprintf(out, "  bne #11\n");
+          fprintf(out, "  bmi #11\n");
           fprintf(out, "  lda 0x102 -4,x\n");
           fprintf(out, "  cmp 0x102 -2,x\n");
           fprintf(out, "  bmi #3\n");
