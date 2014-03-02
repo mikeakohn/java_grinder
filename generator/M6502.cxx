@@ -59,6 +59,8 @@ M6502::~M6502()
 
   fprintf(out, "result:\n");
   fprintf(out, "dw 0\n");
+  fprintf(out, "remainder:\n");
+  fprintf(out, "dw 0\n");
   fprintf(out, "length:\n");
   fprintf(out, "dw 0\n");
   fprintf(out, "temp:\n");
@@ -439,9 +441,9 @@ int M6502::mul_integer()
   fprintf(out, "  lda #0\n");
   fprintf(out, "  sta result + 0\n");
   fprintf(out, "  sta result + 1\n");
-
   fprintf(out, "  ldx #16\n");
-  // main loop
+
+  // loop
   fprintf(out, "  asl result + 0\n");
   fprintf(out, "  rol result + 1\n");
   fprintf(out, "  asl value1 + 0\n");
@@ -470,14 +472,74 @@ int M6502::mul_integer()
   return 0;
 }
 
+// unsigned only
 int M6502::div_integer()
 {
-  return -1;
+  fprintf(out, "; div_integers\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta value2 + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta value2 + 0\n");
+
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta value1 + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta value1 + 0\n");
+
+  // clear remainder
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sta remainder + 0\n");
+  fprintf(out, "  sta remainder + 1\n");
+  fprintf(out, "  ldx #16\n");
+
+  // loop
+  fprintf(out, "  asl value1 + 0\n");
+  fprintf(out, "  rol value1 + 1\n");
+  fprintf(out, "  rol remainder + 0\n");
+  fprintf(out, "  rol remainder + 1\n");
+
+  // sub
+  fprintf(out, "  sec\n");
+  fprintf(out, "  lda remainder + 0\n");
+  fprintf(out, "  sbc value2 + 0\n");
+  fprintf(out, "  tay\n");
+  fprintf(out, "  lda remainder + 1\n");
+  fprintf(out, "  sbc value2 + 1\n");
+  fprintf(out, "  bcc #9\n");
+
+  fprintf(out, "  sta remainder + 1\n");
+  fprintf(out, "  sty remainder + 0\n");
+  fprintf(out, "  inc value1 + 0\n");
+
+  // skip
+  fprintf(out, "  dex\n");
+  fprintf(out, "  bne #-40\n");
+
+  // push result
+  fprintf(out, "  lda value1 + 0\n");
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  lda value1 + 1\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pha\n");
+
+  return 0;
 }
 
+// unsigned only
 int M6502::mod_integer()
 {
-  return -1;
+  // div_integer has the remainder built-in
+  div_integer();
+
+  fprintf(out, "  lda remainder + 0\n");
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  lda remainder + 1\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pha\n");
+
+  return 0;
 }
 
 int M6502::neg_integer()
