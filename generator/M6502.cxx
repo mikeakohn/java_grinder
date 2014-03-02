@@ -424,7 +424,50 @@ int M6502::sub_integer()
 
 int M6502::mul_integer()
 {
-  return -1;
+  fprintf(out, "; mul_integers\n");
+  // load values
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta value2 + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta value2 + 0\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta value1 + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta value1 + 0\n");
+
+  // clear result
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  sta result + 1\n");
+
+  fprintf(out, "  ldx #16\n");
+  // main loop
+  fprintf(out, "  asl result + 0\n");
+  fprintf(out, "  rol result + 1\n");
+  fprintf(out, "  asl value1 + 0\n");
+  fprintf(out, "  rol value1 + 1\n");
+  fprintf(out, "  bcc #19\n");
+
+  // add
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda result + 0\n");
+  fprintf(out, "  adc value2 + 0\n");
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  lda result + 1\n");
+  fprintf(out, "  adc value2 + 1\n");
+  fprintf(out, "  sta result + 1\n");
+
+  // next
+  fprintf(out, "  dex\n");
+  fprintf(out, "  bne #-36\n");
+
+  // push result
+  fprintf(out, "  lda result + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  lda result + 1\n");
+  fprintf(out, "  pha\n");
+
+  return 0;
 }
 
 int M6502::div_integer()
