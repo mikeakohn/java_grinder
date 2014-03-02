@@ -93,6 +93,7 @@ public:
   virtual int c64_vic_background();
   virtual int c64_vic_sprite_enable();
   virtual int c64_vic_sprite0_pos();
+  virtual int c64_vic_poke();
 
 protected:
   int stack;

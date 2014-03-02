@@ -52,7 +52,7 @@ M6502::~M6502()
 
   fprintf(out, "  ldx #0\n");
   fprintf(out, "print_heap_loop:\n");
-  fprintf(out, "  lda 49152,x\n");
+  fprintf(out, "  lda heap_ptr,x\n");
   fprintf(out, "  sta 1344,x\n");
   fprintf(out, "  dex\n");
   fprintf(out, "  bne print_heap_loop\n");
@@ -81,7 +81,7 @@ int M6502::open(char *filename)
 
   // assumes c64 for now (basic loader)
   fprintf(out, ".65xx\n");
-  fprintf(out, "ram_start equ 49152\n");
+  fprintf(out, "ram_start equ 0x8000\n");
   fprintf(out, "heap_ptr equ ram_start\n");
   // for indirection
   fprintf(out, "address equ 251\n");
@@ -563,21 +563,23 @@ int M6502::jump_cond(const char *label, int cond)
       case COND_LESS:
         if(reverse == false)
         {
-          fprintf(out, "  lda 0x101 -2,x\n");
-          fprintf(out, "  cmp #0\n");
-          fprintf(out, "  bpl #10\n");
           fprintf(out, "  lda 0x102 -2,x\n");
           fprintf(out, "  cmp #0\n");
+          fprintf(out, "  lda 0x101 -2,x\n");
+          fprintf(out, "  sbc #0\n");
+          fprintf(out, "  bvc #2\n");
+          fprintf(out, "  eor #0x80\n");
           fprintf(out, "  bpl #3\n");
           fprintf(out, "  jmp %s\n", label);
         }
           else
         {
           fprintf(out, "  lda #0\n");
-          fprintf(out, "  cmp 0x101 -2,x\n");
-          fprintf(out, "  bpl #10\n");
-          fprintf(out, "  lda #0\n");
           fprintf(out, "  cmp 0x102 -2,x\n");
+          fprintf(out, "  lda #0\n");
+          fprintf(out, "  sbc 0x101 -2,x\n");
+          fprintf(out, "  bvc #2\n");
+          fprintf(out, "  eor #0x80\n");
           fprintf(out, "  bpl #3\n");
           fprintf(out, "  jmp %s\n", label);
         }
@@ -585,21 +587,23 @@ int M6502::jump_cond(const char *label, int cond)
       case COND_GREATER_EQUAL:
         if(reverse == false)
         {
-          fprintf(out, "  lda 0x101 -2,x\n");
-          fprintf(out, "  cmp #0\n");
-          fprintf(out, "  bmi #10\n");
           fprintf(out, "  lda 0x102 -2,x\n");
           fprintf(out, "  cmp #0\n");
+          fprintf(out, "  lda 0x101 -2,x\n");
+          fprintf(out, "  sbc #0\n");
+          fprintf(out, "  bvc #2\n");
+          fprintf(out, "  eor #0x80\n");
           fprintf(out, "  bmi #3\n");
           fprintf(out, "  jmp %s\n", label);
         }
           else
         {
           fprintf(out, "  lda #0\n");
-          fprintf(out, "  cmp 0x101 -2,x\n");
-          fprintf(out, "  bmi #10\n");
-          fprintf(out, "  lda #0\n");
           fprintf(out, "  cmp 0x102 -2,x\n");
+          fprintf(out, "  lda #0\n");
+          fprintf(out, "  sbc 0x101 -2,x\n");
+          fprintf(out, "  bvc #2\n");
+          fprintf(out, "  eor #0x80\n");
           fprintf(out, "  bmi #3\n");
           fprintf(out, "  jmp %s\n", label);
         }
@@ -661,21 +665,23 @@ int M6502::jump_cond_integer(const char *label, int cond)
       case COND_LESS:
         if(reverse == false)
         {
-          fprintf(out, "  lda 0x101 -2,x\n");
-          fprintf(out, "  cmp 0x101 -4,x\n");
-          fprintf(out, "  bpl #11\n");
           fprintf(out, "  lda 0x102 -2,x\n");
           fprintf(out, "  cmp 0x102 -4,x\n");
+          fprintf(out, "  lda 0x101 -2,x\n");
+          fprintf(out, "  sbc 0x101 -4,x\n");
+          fprintf(out, "  bvc #2\n");
+          fprintf(out, "  eor #0x80\n");
           fprintf(out, "  bpl #3\n");
           fprintf(out, "  jmp %s\n", label);
         }
           else
         {
-          fprintf(out, "  lda 0x101 -4,x\n");
-          fprintf(out, "  cmp 0x101 -2,x\n");
-          fprintf(out, "  bpl #11\n");
           fprintf(out, "  lda 0x102 -4,x\n");
           fprintf(out, "  cmp 0x102 -2,x\n");
+          fprintf(out, "  lda 0x101 -4,x\n");
+          fprintf(out, "  sbc 0x101 -2,x\n");
+          fprintf(out, "  bvc #2\n");
+          fprintf(out, "  eor #0x80\n");
           fprintf(out, "  bpl #3\n");
           fprintf(out, "  jmp %s\n", label);
         }
@@ -683,21 +689,23 @@ int M6502::jump_cond_integer(const char *label, int cond)
       case COND_GREATER_EQUAL:
         if(reverse == false)
         {
-          fprintf(out, "  lda 0x101 -2,x\n");
-          fprintf(out, "  cmp 0x101 -4,x\n");
-          fprintf(out, "  bmi #11\n");
           fprintf(out, "  lda 0x102 -2,x\n");
           fprintf(out, "  cmp 0x102 -4,x\n");
+          fprintf(out, "  lda 0x101 -2,x\n");
+          fprintf(out, "  sbc 0x101 -4,x\n");
+          fprintf(out, "  bvc #2\n");
+          fprintf(out, "  eor #0x80\n");
           fprintf(out, "  bmi #3\n");
           fprintf(out, "  jmp %s\n", label);
         }
           else
         {
-          fprintf(out, "  lda 0x101 -4,x\n");
-          fprintf(out, "  cmp 0x101 -2,x\n");
-          fprintf(out, "  bmi #11\n");
           fprintf(out, "  lda 0x102 -4,x\n");
           fprintf(out, "  cmp 0x102 -2,x\n");
+          fprintf(out, "  lda 0x101 -4,x\n");
+          fprintf(out, "  sbc 0x101 -2,x\n");
+          fprintf(out, "  bvc #2\n");
+          fprintf(out, "  eor #0x80\n");
           fprintf(out, "  bmi #3\n");
           fprintf(out, "  jmp %s\n", label);
         }
@@ -1079,10 +1087,12 @@ int M6502::array_read_byte()
 
   fprintf(out, "  lda result + 0\n");
   fprintf(out, "  pha\n");
+  // sign-extend
+  fprintf(out, "  bpl #3\n");
+  fprintf(out, "  lda #0xff\n");
+  fprintf(out, "  pha\n");
   fprintf(out, "  lda #0\n");
   fprintf(out, "  pha\n");
-
-  stack++;
 
   return 0;
 }
@@ -1131,7 +1141,7 @@ int M6502::array_read_byte(const char *name, int field_id)
 {
   if (stack > 0)
   {
-    fprintf(out, "; array_read_byte\n");
+    fprintf(out, "; array_read_byte2\n");
 
     fprintf(out, "  lda %s & 0xff\n", name);
     fprintf(out, "  sta address + 0\n");
@@ -1179,7 +1189,7 @@ int M6502::array_read_int(const char *name, int field_id)
 {
   if (stack > 0)
   {
-    fprintf(out, "; array_read_int\n");
+    fprintf(out, "; array_read_int2\n");
 
     fprintf(out, "  lda %s & 0xff\n", name);
     fprintf(out, "  sta address + 0\n");
@@ -1356,8 +1366,11 @@ int M6502::get_values_from_stack(int num)
 
 // C64 specific
 int M6502::c64_vic_border(/* color */) { POKE(0xd020); return 0; }
+
 int M6502::c64_vic_background(/* color */) { POKE(0xd021); return 0; }
+
 int M6502::c64_vic_sprite_enable(/* num */ ) { POKE(0xd015); return 0; }
+
 int M6502::c64_vic_sprite0_pos(/* x, y */ )
 {
   POKE(0xd001);
@@ -1370,6 +1383,23 @@ int M6502::c64_vic_sprite0_pos(/* x, y */ )
   fprintf(out, "  sta 0xd010\n");
   fprintf(out, "  pla\n");
   fprintf(out, "  sta 0xd000\n");
+//  stack--;
+  
+  return 0;
+}
+
+int M6502::c64_vic_poke(/* dest, value */ )
+{
+  fprintf(out, "  pla\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  tax\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta address + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "  txa\n");
+  fprintf(out, "  sta (address),y\n");
 //  stack--;
   
   return 0;

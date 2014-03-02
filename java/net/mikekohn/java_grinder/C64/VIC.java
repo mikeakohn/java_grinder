@@ -32,5 +32,9 @@ public class VIC
   public static void sprite0_pos(int x, int y)
   {
   }
+
+  public static void poke(int dest, int value)
+  {
+  }
 }
 
