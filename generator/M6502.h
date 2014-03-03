@@ -99,25 +99,6 @@ public:
   //virtual void close();
   virtual int get_values_from_stack(int num);
 
-  // subroutines
-  virtual void insert_swap();
-  virtual void insert_add_integer();
-  virtual void insert_sub_integer();
-  virtual void insert_mul_integer();
-  virtual void insert_div_integer();
-  virtual void insert_mod_integer();
-  virtual void insert_neg_integer();
-  virtual void insert_shift_left_integer();
-  virtual void insert_shift_right_integer();
-  virtual void insert_shift_right_uinteger();
-  virtual void insert_and_integer();
-  virtual void insert_or_integer();
-  virtual void insert_xor_integer();
-  virtual void insert_push_array_length();
-  virtual void insert_push_array_length2();
-  virtual void insert_array_byte_support();
-  virtual void insert_array_int_support();
-
   // Memory API
   virtual int memory_read8();
   virtual int memory_write8();
@@ -143,6 +124,24 @@ protected:
   bool need_push_array_length2:1;
   bool need_array_byte_support:1;
   bool need_array_int_support:1;
+
+  void insert_swap();
+  void insert_add_integer();
+  void insert_sub_integer();
+  void insert_mul_integer();
+  void insert_div_integer();
+  void insert_mod_integer();
+  void insert_neg_integer();
+  void insert_shift_left_integer();
+  void insert_shift_right_integer();
+  void insert_shift_right_uinteger();
+  void insert_and_integer();
+  void insert_or_integer();
+  void insert_xor_integer();
+  void insert_push_array_length();
+  void insert_push_array_length2();
+  void insert_array_byte_support();
+  void insert_array_int_support();
 };
 
 #endif
