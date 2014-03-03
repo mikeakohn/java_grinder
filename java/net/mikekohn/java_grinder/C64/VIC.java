@@ -33,7 +33,7 @@ public class VIC
   {
   }
 
-  public static void poke_reg(int offset, int value)
+  public static void poke(int loc, int value)
   {
   }
 }

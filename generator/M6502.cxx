@@ -61,6 +61,10 @@ M6502::~M6502()
   fprintf(out, "dw 0\n");
   fprintf(out, "remainder:\n");
   fprintf(out, "dw 0\n");
+  fprintf(out, "sign1:\n");
+  fprintf(out, "db 0\n");
+  fprintf(out, "sign2:\n");
+  fprintf(out, "db 0\n");
   fprintf(out, "length:\n");
   fprintf(out, "dw 0\n");
   fprintf(out, "temp:\n");
@@ -532,6 +536,8 @@ int M6502::mod_integer()
   // div_integer has the remainder built-in
   div_integer();
 
+  fprintf(out, "  pla\n");
+  fprintf(out, "  pla\n");
   fprintf(out, "  lda remainder + 0\n");
   fprintf(out, "  sta result + 0\n");
   fprintf(out, "  pha\n");
@@ -607,6 +613,7 @@ int M6502::shift_right_integer()
   fprintf(out, "  ror result + 0\n");
   fprintf(out, "  dex\n");
   fprintf(out, "  bne #-13\n");
+
   fprintf(out, "  lda result + 0\n");
   fprintf(out, "  pha\n");
   fprintf(out, "  lda result + 1\n");
@@ -647,14 +654,15 @@ int M6502::and_integer()
   fprintf(out, "  pla\n");
   fprintf(out, "  sta result + 0\n");
   fprintf(out, "  pla\n");
-  fprintf(out, "  tax\n");
+  fprintf(out, "  and result + 1\n");
+  fprintf(out, "  sta result + 1\n");
   fprintf(out, "  pla\n");
   fprintf(out, "  and result + 0\n");
   fprintf(out, "  sta result + 0\n");
+
+  fprintf(out, "  lda result + 0\n");
   fprintf(out, "  pha\n");
-  fprintf(out, "  txa\n");
-  fprintf(out, "  and result + 1\n");
-  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  lda result + 1\n");
   fprintf(out, "  pha\n");
 
   return 0;
@@ -1683,20 +1691,24 @@ int M6502::c64_vic_sprite_pos(/* sprite, x, y */ )
   return 0;
 }
 
-int M6502::c64_vic_poke_reg(/* dest, value */ )
+int M6502::c64_vic_poke(/* dest, value */ )
 {
   // value
+  fprintf(out, "; c64_vic_poke\n");
   fprintf(out, "  pla\n");
   fprintf(out, "  pla\n");
   fprintf(out, "  tay\n");
 
   // reg
   fprintf(out, "  pla\n");
+  fprintf(out, "  sta address + 1\n");
   fprintf(out, "  pla\n");
-  fprintf(out, "  tax\n");
+  fprintf(out, "  sta address + 0\n");
 
   fprintf(out, "  tya\n");
-  fprintf(out, "  sta 0xd000,x\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "  sta (address),y\n");
+//  stack -= 2;
 
   return 0;
 }
