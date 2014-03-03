@@ -88,6 +88,25 @@ public:
   //virtual void close();
   virtual int get_values_from_stack(int num);
 
+  // subroutines
+  virtual void insert_swap();
+  virtual void insert_add_integer();
+  virtual void insert_sub_integer();
+  virtual void insert_mul_integer();
+  virtual void insert_div_integer();
+  virtual void insert_mod_integer();
+  virtual void insert_neg_integer();
+  virtual void insert_shift_left_integer();
+  virtual void insert_shift_right_integer();
+  virtual void insert_shift_right_uinteger();
+  virtual void insert_and_integer();
+  virtual void insert_or_integer();
+  virtual void insert_xor_integer();
+  virtual void insert_push_array_length();
+  virtual void insert_push_array_length2();
+  virtual void insert_array_byte_support();
+  virtual void insert_array_int_support();
+
   // Memory API
   virtual int memory_read8();
   virtual int memory_write8();
@@ -102,6 +121,24 @@ public:
 protected:
   int stack;
   bool is_main:1;
+
+  bool need_swap:1;
+  bool need_add_integer:1;
+  bool need_sub_integer:1;
+  bool need_mul_integer:1;
+  bool need_div_integer:1;
+  bool need_mod_integer:1;
+  bool need_neg_integer:1;
+  bool need_shift_left_integer:1;
+  bool need_shift_right_integer:1;
+  bool need_shift_right_uinteger:1;
+  bool need_and_integer:1;
+  bool need_or_integer:1;
+  bool need_xor_integer:1;
+  bool need_push_array_length:1;
+  bool need_push_array_length2:1;
+  bool need_array_byte_support:1;
+  bool need_array_int_support:1;
 };
 
 #endif
