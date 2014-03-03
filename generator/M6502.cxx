@@ -107,6 +107,7 @@ M6502::~M6502()
   fprintf(out, "print_end:\n");
   fprintf(out, "  jmp print_end\n\n");
 
+  // temp variables
   fprintf(out, "result:\n");
   fprintf(out, "dw 0\n");
   fprintf(out, "return:\n");
@@ -504,17 +505,16 @@ int M6502::xor_integer()
 
 int M6502::inc_integer(int index, int num)
 {
-  uint8_t lo = num & 0xff;
-  uint8_t hi = lo > 0x7f ? 0xff : 0x00;
+  uint16_t value = num & 0xffff;
 
   fprintf(out, "; inc_integer num = %d\n", num);
   fprintf(out, "  ldx locals\n");
   fprintf(out, "  clc\n");
   fprintf(out, "  lda 0x101 - %d,x\n", LOCALS(index));
-  fprintf(out, "  adc #0x%02x\n", lo);
+  fprintf(out, "  adc #0x%02x\n", value & 0xff);
   fprintf(out, "  sta 0x101 - %d,x\n", LOCALS(index));
   fprintf(out, "  lda 0x100 - %d,x\n", LOCALS(index));
-  fprintf(out, "  adc #0x%02x\n", hi);
+  fprintf(out, "  adc #0x%02x\n", value >> 8);
   fprintf(out, "  sta 0x100 - %d,x\n", LOCALS(index));
   return 0;
 }
