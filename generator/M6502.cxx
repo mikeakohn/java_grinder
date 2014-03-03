@@ -495,7 +495,9 @@ int M6502::div_integer(int const_val)
 // unsigned only
 int M6502::mod_integer()
 {
+  need_div_integer = 1;
   need_mod_integer = 1;
+  fprintf(out, "  jsr div_integer\n");
   fprintf(out, "  jsr mod_integer\n");
   return 0;
 }
@@ -540,7 +542,6 @@ int M6502::shift_left_integer(int const_val)
   fprintf(out, "  pha\n");
   fprintf(out, "  lda result + 1\n");
   fprintf(out, "  pha\n");
-  return 0;
   return 0;
 }
 
@@ -1457,7 +1458,6 @@ void M6502::insert_mod_integer()
 {
   fprintf(out, "mod_integer:\n");
   BEGIN_SUB;
-  fprintf(out, "  jsr div_integer\n");
   fprintf(out, "  pla\n");
   fprintf(out, "  pla\n");
   fprintf(out, "  lda remainder + 0\n");
