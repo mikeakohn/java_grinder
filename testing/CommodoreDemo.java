@@ -1,6 +1,6 @@
 import net.mikekohn.java_grinder.C64.*;
 
-public class Mandel
+public class CommodoreDemo
 {
   public static void main(String args[])
   {
