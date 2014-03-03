@@ -122,13 +122,6 @@ public:
   virtual int memory_read8();
   virtual int memory_write8();
 
-  // VIC API
-  virtual int c64_vic_border();
-  virtual int c64_vic_background();
-  virtual int c64_vic_sprite_enable();
-  virtual int c64_vic_sprite_pos();
-  virtual int c64_vic_poke();
-
 protected:
   int stack;
   bool is_main:1;
