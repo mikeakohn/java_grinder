@@ -9,8 +9,6 @@
  *
  */
 
-//FIXME: large blocks of 6502 code should be placed into subroutines
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -424,10 +422,46 @@ int M6502::add_integer()
   return 0;
 }
 
+int M6502::add_integer(int const_val)
+{
+  fprintf(out, "; add_integer (optimized)\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  adc #%d\n", const_val & 0xff);
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  lda result + 1\n");
+  fprintf(out, "  adc #%d\n", const_val >> 8);
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pha\n");
+  return 0;
+}
+
 int M6502::sub_integer()
 {
   need_sub_integer = 1;
   fprintf(out, "  jsr sub_integer\n");
+  return 0;
+}
+
+int M6502::sub_integer(int const_val)
+{
+  fprintf(out, "; sub_integer (optimized)\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  sbc #%d\n", const_val & 0xff);
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  lda result + 1\n");
+  fprintf(out, "  sbc #%d\n", const_val >> 8);
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pha\n");
   return 0;
 }
 
@@ -438,6 +472,12 @@ int M6502::mul_integer()
   return 0;
 }
 
+int M6502::mul_integer(int const_val)
+{
+  //fprintf(out, "; mul_integer (optimized)\n");
+  return -1;
+}
+
 // unsigned only
 int M6502::div_integer()
 {
@@ -446,12 +486,24 @@ int M6502::div_integer()
   return 0;
 }
 
+int M6502::div_integer(int const_val)
+{
+  //fprintf(out, "; div_integer (optimized)\n");
+  return -1;
+}
+
 // unsigned only
 int M6502::mod_integer()
 {
   need_mod_integer = 1;
   fprintf(out, "  jsr mod_integer\n");
   return 0;
+}
+
+int M6502::mod_integer(int const_val)
+{
+  //fprintf(out, "; mod_integer (optimized)\n");
+  return -1;
 }
 
 int M6502::neg_integer()
@@ -468,10 +520,59 @@ int M6502::shift_left_integer()
   return 0;
 }
 
+int M6502::shift_left_integer(int const_val)
+{
+  int i;
+
+  fprintf(out, "; shift_left_integer (optimized)\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 0\n");
+
+  for(i = 0; i < const_val; i++)
+  {
+    fprintf(out, "  asl result + 0\n");
+    fprintf(out, "  ror result + 1\n");
+  }
+
+  fprintf(out, "  lda result + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  lda result + 1\n");
+  fprintf(out, "  pha\n");
+  return 0;
+  return 0;
+}
+
 int M6502::shift_right_integer()
 {
   need_shift_right_integer = 1;
   fprintf(out, "  jsr shift_right_integer\n");
+  return 0;
+}
+
+int M6502::shift_right_integer(int const_val)
+{
+  int i;
+
+  fprintf(out, "; shift_right_integer (optimized)\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 0\n");
+
+  for(i = 0; i < const_val; i++)
+  {
+    fprintf(out, "  lda result + 1\n");
+    fprintf(out, "  asl\n");
+    fprintf(out, "  ror result + 1\n");
+    fprintf(out, "  ror result + 0\n");
+  }
+
+  fprintf(out, "  lda result + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  lda result + 1\n");
+  fprintf(out, "  pha\n");
   return 0;
 }
 
@@ -482,10 +583,49 @@ int M6502::shift_right_uinteger()
   return 0;
 }
 
+int M6502::shift_right_uinteger(int const_val)
+{
+  int i;
+
+  fprintf(out, "; shift_right_uinteger (optimized)\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result + 0\n");
+
+  for(i = 0; i < const_val; i++)
+  {
+    fprintf(out, "  lsr result + 1\n");
+    fprintf(out, "  ror result + 0\n");
+  }
+
+  fprintf(out, "  lda result + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  lda result + 1\n");
+  fprintf(out, "  pha\n");
+  return 0;
+}
+
 int M6502::and_integer()
 {
   need_and_integer = 1;
   fprintf(out, "  jsr and_integer\n");
+  return 0;
+}
+
+int M6502::and_integer(int const_val)
+{
+  fprintf(out, "; and_integer (optimized)\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  and #%d\n", const_val >> 8);
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  and #%d\n", const_val & 0xff);
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  lda result + 1\n");
+  fprintf(out, "  pha\n");
+
   return 0;
 }
 
@@ -496,10 +636,42 @@ int M6502::or_integer()
   return 0;
 }
 
+int M6502::or_integer(int const_val)
+{
+  fprintf(out, "; or_integer (optimized)\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  ora #%d\n", const_val >> 8);
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  ora #%d\n", const_val & 0xff);
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  lda result + 1\n");
+  fprintf(out, "  pha\n");
+
+  return 0;
+}
+
 int M6502::xor_integer()
 {
   need_xor_integer = 1;
   fprintf(out, "  jsr xor_integer\n");
+  return 0;
+}
+
+int M6502::xor_integer(int const_val)
+{
+  fprintf(out, "; xor_integer (optimized)\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  eor #%d\n", const_val >> 8);
+  fprintf(out, "  sta result + 1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  eor #%d\n", const_val & 0xff);
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  lda result + 1\n");
+  fprintf(out, "  pha\n");
+
   return 0;
 }
 
@@ -818,7 +990,6 @@ int stack_vars = stack;
     // Copy parameters onto the stack so they are local variables in
     // the called method.  Start with -4 because the return address will
     // be at 0 and r12 will be at 2.
-
     if (stack_vars > 0)
     {
       fprintf(out, "  tsx\n");
@@ -1039,11 +1210,9 @@ int M6502::array_write_byte(const char *name, int field_id)
   fprintf(out, "  clc\n"); 
   fprintf(out, "  lda value2 + 0\n"); 
   fprintf(out, "  adc %s + 0\n", name); 
-  //fprintf(out, "  sta value2 + 0\n"); 
   fprintf(out, "  sta address + 0\n"); 
   fprintf(out, "  lda value2 + 1\n"); 
   fprintf(out, "  adc %s + 1\n", name); 
-  //fprintf(out, "  sta value2 + 1\n"); 
   fprintf(out, "  sta address + 1\n"); 
 
   fprintf(out, "  ldy #0\n"); 
@@ -1067,11 +1236,9 @@ int M6502::array_write_int(const char *name, int field_id)
   fprintf(out, "  clc\n"); 
   fprintf(out, "  lda value2 + 0\n"); 
   fprintf(out, "  adc %s + 0\n", name); 
-  //fprintf(out, "  sta value2 + 0\n"); 
   fprintf(out, "  sta address + 0\n"); 
   fprintf(out, "  lda value2 + 1\n"); 
   fprintf(out, "  adc %s + 1\n", name); 
-  //fprintf(out, "  sta value2 + 1\n"); 
   fprintf(out, "  sta address + 1\n"); 
 
   fprintf(out, "  ldy #0\n"); 
