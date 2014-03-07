@@ -21,13 +21,6 @@
 // X
 // Y
 
-#define LOCALS(a) ((a * 2) + 1)
-
-#define POKE(dst) \
-  fprintf(out, "  pla\n"); \
-  fprintf(out, "  pla\n"); \
-  fprintf(out, "  sta 0x%04x\n", dst)
-
 #define BEGIN_SUB \
   fprintf(out, "  pla\n"); \
   fprintf(out, "  sta return + 1\n"); \
@@ -41,6 +34,33 @@
   fprintf(out, "  pha\n"); \
   fprintf(out, "  rts\n\n")
 
+#define PUSH_LO \
+  fprintf(out, "; PUSH_LO\n"); \
+  fprintf(out, "  ldy SP\n"); \
+  fprintf(out, "  sta stack_lo,y\n"); \
+
+#define PUSH_HI \
+  fprintf(out, "; PUSH_HI\n"); \
+  fprintf(out, "  ldy SP\n"); \
+  fprintf(out, "  sta stack_hi,y\n"); \
+  fprintf(out, "  dec SP\n")
+
+#define POP_HI \
+  fprintf(out, "; POP_HI\n"); \
+  fprintf(out, "  inc SP\n"); \
+  fprintf(out, "  ldy SP\n"); \
+  fprintf(out, "  lda stack_hi,y\n")
+
+#define POP_LO \
+  fprintf(out, "; POP_LO\n"); \
+  fprintf(out, "  ldy SP\n"); \
+  fprintf(out, "  lda stack_lo,y\n")
+
+#define POKE(dst) \
+  POP_HI; \
+  POP_LO; \
+  fprintf(out, "  sta 0x%04x\n", dst)
+
 C64::C64()
 {
 
@@ -48,14 +68,6 @@ C64::C64()
 
 C64::~C64()
 {
-  fprintf(out, "sprite_msb_set:\n");
-  fprintf(out, "db 0\n");
-  fprintf(out, "sprite_msb_clear:\n");
-  fprintf(out, "db 0\n");
-  fprintf(out, "sprite_x:\n");
-  fprintf(out, "dw 0\n");
-  fprintf(out, "sprite_y:\n");
-  fprintf(out, "db 0\n");
 }
 
 int C64::open(char *filename)
@@ -63,11 +75,34 @@ int C64::open(char *filename)
   if (Generator::open(filename) != 0) { return -1; }
 
   fprintf(out, ".65xx\n");
+  // heap
   fprintf(out, "ram_start equ 0x8000\n");
   fprintf(out, "heap_ptr equ ram_start\n");
-  // for indirection
-  fprintf(out, "address equ 251\n");
+  // for indirection (2 bytes)
+  fprintf(out, "address equ 0xfb\n");
+  // java stack
+  fprintf(out, "stack_lo equ 0xc000\n");
+  fprintf(out, "stack_hi equ 0xc100\n");
+  fprintf(out, "SP equ 0xfd\n");
+  // points to locals
+  fprintf(out, "locals equ 0xfe\n");
+  // temp variables
+  fprintf(out, "result equ 0x20\n");
+  fprintf(out, "return equ 0x22\n");
+  fprintf(out, "remainder equ 0x24\n");
+  fprintf(out, "length equ 0x26\n");
+  fprintf(out, "temp equ 0x28\n");
+  fprintf(out, "value1 equ 0x2a\n");
+  fprintf(out, "value2 equ 0x2c\n");
+  fprintf(out, "value3 equ 0x2e\n");
+  fprintf(out, "value4 equ 0x30\n");
+  // sprites
+  fprintf(out, "sprite_msb_set equ 0x10\n");
+  fprintf(out, "sprite_msb_clear equ 0x11\n");
+  fprintf(out, "sprite_x equ 0x12\n");
+  fprintf(out, "sprite_y equ 0x13\n");
 
+  // basic loader
   fprintf(out, ".org 0x07ff\n\n");
 
   fprintf(out, "dw 0x0801\n");
@@ -87,8 +122,8 @@ int C64::open(char *filename)
   fprintf(out, "start:\n");
   fprintf(out, "  sei\n");
   fprintf(out, "  cld\n");
-  fprintf(out, "  ldx #0xff\n");
-  fprintf(out, "  txs\n\n");
+  fprintf(out, "  lda #0xff\n");
+  fprintf(out, "  sta SP\n\n");
 
   return 0;
 }
@@ -105,19 +140,19 @@ int C64::c64_vic_sprite_pos(/* sprite, x, y */ )
 {
   fprintf(out, "; c64_vic_sprite_pos\n");
   // y
-  fprintf(out, "  pla\n");
-  fprintf(out, "  pla\n");
+  POP_HI;
+  POP_LO;
   fprintf(out, "  sta sprite_y\n");
 
   // x
-  fprintf(out, "  pla\n");
+  POP_HI;
   fprintf(out, "  sta sprite_x + 1\n");
-  fprintf(out, "  pla\n");
+  POP_LO;
   fprintf(out, "  sta sprite_x + 0\n");
 
   // sprite
-  fprintf(out, "  pla\n");
-  fprintf(out, "  pla\n");
+  POP_HI;
+  POP_LO;
   fprintf(out, "  tay\n");
   fprintf(out, "  sta sprite_msb_set\n");
   fprintf(out, "  tax\n");
@@ -157,17 +192,17 @@ int C64::c64_vic_poke(/* dest, value */ )
 {
   // value
   fprintf(out, "; c64_vic_poke\n");
-  fprintf(out, "  pla\n");
-  fprintf(out, "  pla\n");
-  fprintf(out, "  tay\n");
+  POP_HI;
+  POP_LO;
+  fprintf(out, "  tax\n");
 
   // reg
-  fprintf(out, "  pla\n");
+  POP_HI;
   fprintf(out, "  sta address + 1\n");
-  fprintf(out, "  pla\n");
+  POP_LO;
   fprintf(out, "  sta address + 0\n");
 
-  fprintf(out, "  tya\n");
+  fprintf(out, "  txa\n");
   fprintf(out, "  ldy #0\n");
   fprintf(out, "  sta (address),y\n");
 

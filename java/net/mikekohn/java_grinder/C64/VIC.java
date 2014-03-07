@@ -25,11 +25,19 @@ public class VIC
   {
   }
 
-  public static void sprite_enable(int value)
+  public static void sprite_enable(int sprite)
+  {
+  }
+
+  public static void sprite_disable(int sprite)
   {
   }
 
   public static void sprite_pos(int sprite, int x, int y)
+  {
+  }
+
+  public static void sprite_expand(int sprite, boolean value)
   {
   }
 
