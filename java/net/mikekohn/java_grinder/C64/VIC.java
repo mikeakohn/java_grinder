@@ -17,31 +17,136 @@ public class VIC
   {
   }
 
-  public static void border(int value)
-  {
-  }
+  // 0xd000
+  // 0xd001
+  public static void sprite0pos(int x, int y) { }
 
-  public static void background(int value)
-  {
-  }
+  // 0xd002
+  // 0xd003
+  public static void sprite1pos(int x, int y) { }
 
-  public static void sprite_enable(int sprite)
-  {
-  }
+  // 0xd004
+  // 0xd005
+  public static void sprite2pos(int x, int y) { }
 
-  public static void sprite_disable(int sprite)
-  {
-  }
+  // 0xd006
+  // 0xd007
+  public static void sprite3pos(int x, int y) { }
 
-  public static void sprite_pos(int sprite, int x, int y)
-  {
-  }
+  // 0xd008
+  // 0xd009
+  public static void sprite4pos(int x, int y) { }
 
-  public static void sprite_expand(int sprite, boolean value)
-  {
-  }
+  // 0xd00a
+  // 0xd00b
+  public static void sprite5pos(int x, int y) { }
 
+  // 0xd00c
+  // 0xd00d
+  public static void sprite6pos(int x, int y) { }
+
+  // 0xd00e
+  // 0xd00f
+  public static void sprite7pos(int x, int y) { }
+
+  // 0xd010
+
+  // 0xd011
+  public static void write_control1(int value) { }
+  public static void read_control1() { }
+
+  // 0xd012
+  public static void write_raster(int value) { }
+  public static void read_raster(int value) { }
+
+  // 0xd013
+  // 0xd014
+
+  // 0xd015
+  public static void sprite_enable() { }
+
+  // 0xd016
+  public static void write_control2(int value) { }
+  public static void read_control2() { }
+
+  // 0xd017
+  public static void sprite_expandy(int value) { }
+
+  // 0xd018
+  public static void write_pointer(int value) { }
+  public static void read_pointer() { }
+
+  // 0xd019
+
+  // 0xd01a
+
+  // 0xd01b
+  public static void sprite_priority(int value) { }
+
+  // 0xd01c
+  public static void sprite_multicolor_enable(int value) { }
+
+  // 0xd01d
+  public static void sprite_expandx(int value) { }
+
+  // 0xd01e
+  public static void sprite_collision() { }
+
+  // 0xd01f
+  public static void data_collision() { }
+
+  // 0xd020
+  public static void border(int value) { }
+
+  // 0xd021
+  public static void background(int value) { }
+
+  // 0xd022
+  public static void background1(int value) { }
+
+  // 0xd023
+  public static void background2(int value) { }
+
+  // 0xd024
+  public static void background3(int value) { }
+
+  // 0xd025
+  public static void sprite_multicolor0(int value) { }
+
+  // 0xd026
+  public static void sprite_multicolor1(int value) { }
+
+  // 0xd027
+  public static void sprite0color(int value) { }
+
+  // 0xd028
+  public static void sprite1color(int value) { }
+
+  // 0xd029
+  public static void sprite2color(int value) { }
+
+  // 0xd02a
+  public static void sprite3color(int value) { }
+
+  // 0xd02b
+  public static void sprite4color(int value) { }
+
+  // 0xd02c
+  public static void sprite5color(int value) { }
+
+  // 0xd02d
+  public static void sprite6color(int value) { }
+
+  // 0xd02e
+  public static void sprite7color(int value) { }
+
+  // poke
   public static void poke(int loc, int value)
+  {
+  }
+
+  // peek
+  public static void peek(int loc, int value)
   {
   }
 }

@@ -196,11 +196,46 @@ public:
 
   // Commodore 64 stuff
   virtual int c64_sid_setVolume() { return -1; }
+  virtual int c64_vic_sprite0pos() { return -1; }
+  virtual int c64_vic_sprite1pos() { return -1; }
+  virtual int c64_vic_sprite2pos() { return -1; }
+  virtual int c64_vic_sprite3pos() { return -1; }
+  virtual int c64_vic_sprite4pos() { return -1; }
+  virtual int c64_vic_sprite5pos() { return -1; }
+  virtual int c64_vic_sprite6pos() { return -1; }
+  virtual int c64_vic_sprite7pos() { return -1; }
+  virtual int c64_vic_write_control1() { return -1; }
+  virtual int c64_vic_read_control1() { return -1; }
+  virtual int c64_vic_write_raster() { return -1; }
+  virtual int c64_vic_read_raster() { return -1; }
+  virtual int c64_vic_sprite_enable() { return -1; }
+  virtual int c64_vic_write_control2() { return -1; }
+  virtual int c64_vic_read_control2() { return -1; }
+  virtual int c64_vic_sprite_expandy() { return -1; }
+  virtual int c64_vic_write_pointer() { return -1; }
+  virtual int c64_vic_read_pointer() { return -1; }
+  virtual int c64_vic_sprite_priority() { return -1; }
+  virtual int c64_vic_sprite_multicolor_enable() { return -1; }
+  virtual int c64_vic_sprite_expandx() { return -1; }
+  virtual int c64_vic_sprite_collision() { return -1; }
+  virtual int c64_vic_data_collision() { return -1; }
   virtual int c64_vic_border() { return -1; }
   virtual int c64_vic_background() { return -1; }
-  virtual int c64_vic_sprite_enable() { return -1; }
-  virtual int c64_vic_sprite_pos() { return -1; }
+  virtual int c64_vic_background1() { return -1; }
+  virtual int c64_vic_background2() { return -1; }
+  virtual int c64_vic_background3() { return -1; }
+  virtual int c64_vic_sprite_multicolor0() { return -1; }
+  virtual int c64_vic_sprite_multicolor1() { return -1; }
+  virtual int c64_vic_sprite0color() { return -1; }
+  virtual int c64_vic_sprite1color() { return -1; }
+  virtual int c64_vic_sprite2color() { return -1; }
+  virtual int c64_vic_sprite3color() { return -1; }
+  virtual int c64_vic_sprite4color() { return -1; }
+  virtual int c64_vic_sprite5color() { return -1; }
+  virtual int c64_vic_sprite6color() { return -1; }
+  virtual int c64_vic_sprite7color() { return -1; }
   virtual int c64_vic_poke() { return -1; }
+  virtual int c64_vic_peek() { return -1; }
 
   void add_newline();
 
