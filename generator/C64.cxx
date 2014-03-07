@@ -173,6 +173,129 @@ int C64::c64_system_peek(/* dest */ )
   return 0;
 }
 
+int C64::c64_sid_voice1_frequency(/* value */)
+{
+  POP_HI;
+  fprintf(out, "  sta 0xd401\n");
+  POP_LO;
+  fprintf(out, "  sta 0xd400\n");
+
+  return 0;
+}
+
+int C64::c64_sid_voice1_pulse_width(/* value */)
+{
+  POP_HI;
+  fprintf(out, "  sta 0xd403\n");
+  POP_LO;
+  fprintf(out, "  sta 0xd402\n");
+
+  return 0;
+}
+
+int C64::c64_sid_voice1_waveform(/* value */) { POKE(0xd404); return 0; }
+
+int C64::c64_sid_voice1_adsr(/* value */)
+{
+  POP_HI;
+  fprintf(out, "  sta 0xd406\n");
+  POP_LO;
+  fprintf(out, "  sta 0xd405\n");
+
+  return 0;
+}
+
+int C64::c64_sid_voice2_frequency(/* value */)
+{
+  POP_HI;
+  fprintf(out, "  sta 0xd408\n");
+  POP_LO;
+  fprintf(out, "  sta 0xd407\n");
+
+  return 0;
+}
+
+int C64::c64_sid_voice2_pulse_width(/* value */)
+{
+  POP_HI;
+  fprintf(out, "  sta 0xd40a\n");
+  POP_LO;
+  fprintf(out, "  sta 0xd409\n");
+
+  return 0;
+}
+
+int C64::c64_sid_voice2_waveform(/* value */) { POKE(0xd40b); return 0; }
+
+int C64::c64_sid_voice2_adsr(/* value */)
+{
+  POP_HI;
+  fprintf(out, "  sta 0xd40d\n");
+  POP_LO;
+  fprintf(out, "  sta 0xd40c\n");
+
+  return 0;
+}
+
+int C64::c64_sid_voice3_frequency(/* value */)
+{
+  POP_HI;
+  fprintf(out, "  sta 0xd40f\n");
+  POP_LO;
+  fprintf(out, "  sta 0xd40e\n");
+
+  return 0;
+}
+
+int C64::c64_sid_voice3_pulse_width(/* value */)
+{
+  POP_HI;
+  fprintf(out, "  sta 0xd411\n");
+  POP_LO;
+  fprintf(out, "  sta 0xd410\n");
+
+  return 0;
+}
+
+int C64::c64_sid_voice3_waveform(/* value */) { POKE(0xd412); return 0; }
+
+int C64::c64_sid_voice3_adsr(/* value */)
+{
+  POP_HI;
+  fprintf(out, "  sta 0xd414\n");
+  POP_LO;
+  fprintf(out, "  sta 0xd413\n");
+
+  return 0;
+}
+
+int C64::c64_sid_filter_cutoff(/* value */)
+{
+  POP_HI;
+  fprintf(out, "  sta 0xd416\n");
+  POP_LO;
+  fprintf(out, "  sta 0xd415\n");
+
+  return 0;
+}
+
+int C64::c64_sid_filter_resonance(/* value */) { POKE(0xd417); return 0; }
+int C64::c64_sid_volume(/* value */) { POKE(0xd418); return 0; }
+int C64::c64_sid_voice3_oscillator(/* value */) { POKE(0xd41b); return 0; }
+int C64::c64_sid_voice3_envelope(/* value */) { POKE(0xd41c); return 0; }
+
+int C64::c64_sid_clear()
+{
+  fprintf(out, "; sid clear\n");
+  fprintf(out, "  ldx #0x1c\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sta 0xd400,x\n");
+  fprintf(out, "  dex\n");
+  fprintf(out, "  bpl #-8\n");
+
+  return 0;
+}
+
 int C64::c64_vic_sprite0pos(/* x, y */)
 {
   fprintf(out, "; sprite0pos\n");

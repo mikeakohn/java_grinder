@@ -197,7 +197,26 @@ public:
   // Commodore 64 stuff
   virtual int c64_system_poke() { return -1; }
   virtual int c64_system_peek() { return -1; }
-  virtual int c64_sid_setVolume() { return -1; }
+
+  virtual int c64_sid_voice1_frequency() { return -1; }
+  virtual int c64_sid_voice1_pulse_width() { return -1; }
+  virtual int c64_sid_voice1_waveform() { return -1; }
+  virtual int c64_sid_voice1_adsr() { return -1; }
+  virtual int c64_sid_voice2_frequency() { return -1; }
+  virtual int c64_sid_voice2_pulse_width() { return -1; }
+  virtual int c64_sid_voice2_waveform() { return -1; }
+  virtual int c64_sid_voice2_adsr() { return -1; }
+  virtual int c64_sid_voice3_frequency() { return -1; }
+  virtual int c64_sid_voice3_pulse_width() { return -1; }
+  virtual int c64_sid_voice3_waveform() { return -1; }
+  virtual int c64_sid_voice3_adsr() { return -1; }
+  virtual int c64_sid_filter_cutoff() { return -1; }
+  virtual int c64_sid_filter_resonance() { return -1; }
+  virtual int c64_sid_volume() { return -1; }
+  virtual int c64_sid_voice3_oscillator() { return -1; }
+  virtual int c64_sid_voice3_envelope() { return -1; }
+  virtual int c64_sid_clear() { return -1; }
+
   virtual int c64_vic_sprite0pos() { return -1; }
   virtual int c64_vic_sprite1pos() { return -1; }
   virtual int c64_vic_sprite2pos() { return -1; }

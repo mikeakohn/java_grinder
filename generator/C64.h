@@ -25,6 +25,26 @@ public:
   // API
   virtual int c64_system_poke();
   virtual int c64_system_peek();
+
+  virtual int c64_sid_voice1_frequency();
+  virtual int c64_sid_voice1_pulse_width();
+  virtual int c64_sid_voice1_waveform();
+  virtual int c64_sid_voice1_adsr();
+  virtual int c64_sid_voice2_frequency();
+  virtual int c64_sid_voice2_pulse_width();
+  virtual int c64_sid_voice2_waveform();
+  virtual int c64_sid_voice2_adsr();
+  virtual int c64_sid_voice3_frequency();
+  virtual int c64_sid_voice3_pulse_width();
+  virtual int c64_sid_voice3_waveform();
+  virtual int c64_sid_voice3_adsr();
+  virtual int c64_sid_filter_cutoff();
+  virtual int c64_sid_filter_resonance();
+  virtual int c64_sid_volume();
+  virtual int c64_sid_voice3_oscillator();
+  virtual int c64_sid_voice3_envelope();
+  virtual int c64_sid_clear();
+
   virtual int c64_vic_sprite0pos();
   virtual int c64_vic_sprite1pos();
   virtual int c64_vic_sprite2pos();
