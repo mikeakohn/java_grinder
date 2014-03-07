@@ -17,6 +17,7 @@ JOBJS=\
   $(PKG_DIR)/UART.class \
   $(PKG_DIR)/UART0.class \
   $(PKG_DIR)/UART1.class \
+  $(PKG_DIR)/C64/SYSTEM.class \
   $(PKG_DIR)/C64/SID.class \
   $(PKG_DIR)/C64/VIC.class
 

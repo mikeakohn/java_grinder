@@ -53,28 +53,28 @@ public class VIC
 
   // 0xd011
   public static void write_control1(int value) { }
-  public static void read_control1() { }
+  public static int read_control1() { return 0; }
 
   // 0xd012
   public static void write_raster(int value) { }
-  public static void read_raster(int value) { }
+  public static int read_raster(int value) { return 0; }
 
   // 0xd013
   // 0xd014
 
   // 0xd015
-  public static void sprite_enable() { }
+  public static void sprite_enable(int value) { }
 
   // 0xd016
   public static void write_control2(int value) { }
-  public static void read_control2() { }
+  public static int read_control2() { return 0; }
 
   // 0xd017
   public static void sprite_expandy(int value) { }
 
   // 0xd018
   public static void write_pointer(int value) { }
-  public static void read_pointer() { }
+  public static int read_pointer() { return 0; }
 
   // 0xd019
 
@@ -90,10 +90,10 @@ public class VIC
   public static void sprite_expandx(int value) { }
 
   // 0xd01e
-  public static void sprite_collision() { }
+  public static int sprite_collision() { return 0; }
 
   // 0xd01f
-  public static void data_collision() { }
+  public static int data_collision() { return 0; }
 
   // 0xd020
   public static void border(int value) { }
@@ -139,15 +139,5 @@ public class VIC
 
   // 0xd02e
   public static void sprite7color(int value) { }
-
-  // poke
-  public static void poke(int loc, int value)
-  {
-  }
-
-  // peek
-  public static void peek(int loc, int value)
-  {
-  }
 }
 

@@ -22,7 +22,9 @@ public:
 
   virtual int open(char *filename);
 
-  // VIC API
+  // API
+  virtual int c64_system_poke();
+  virtual int c64_system_peek();
   virtual int c64_vic_sprite0pos();
   virtual int c64_vic_sprite1pos();
   virtual int c64_vic_sprite2pos();
@@ -61,8 +63,6 @@ public:
   virtual int c64_vic_sprite5color();
   virtual int c64_vic_sprite6color();
   virtual int c64_vic_sprite7color();
-  virtual int c64_vic_poke();
-  virtual int c64_vic_peek();
 
 };
 

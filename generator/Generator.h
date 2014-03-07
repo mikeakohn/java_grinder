@@ -195,6 +195,8 @@ public:
   virtual int dsp_shiftB() { return -1; }
 
   // Commodore 64 stuff
+  virtual int c64_system_poke() { return -1; }
+  virtual int c64_system_peek() { return -1; }
   virtual int c64_sid_setVolume() { return -1; }
   virtual int c64_vic_sprite0pos() { return -1; }
   virtual int c64_vic_sprite1pos() { return -1; }
@@ -234,8 +236,6 @@ public:
   virtual int c64_vic_sprite5color() { return -1; }
   virtual int c64_vic_sprite6color() { return -1; }
   virtual int c64_vic_sprite7color() { return -1; }
-  virtual int c64_vic_poke() { return -1; }
-  virtual int c64_vic_peek() { return -1; }
 
   void add_newline();
 

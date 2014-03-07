@@ -204,16 +204,6 @@ static int c64_vic_sprite7color(JavaClass *java_class, Generator *generator)
   return generator->c64_vic_sprite7color();
 }
 
-static int c64_vic_poke(JavaClass *java_class, Generator *generator)
-{
-  return generator->c64_vic_poke();
-}
-
-static int c64_vic_peek(JavaClass *java_class, Generator *generator)
-{
-  return generator->c64_vic_peek();
-}
-
 int c64_vic(JavaClass *java_class, Generator *generator, char *function)
 {
   CHECK_FUNC(sprite0pos)
@@ -252,8 +242,6 @@ int c64_vic(JavaClass *java_class, Generator *generator, char *function)
   CHECK_FUNC(sprite5color)
   CHECK_FUNC(sprite6color)
   CHECK_FUNC(sprite7color)
-  CHECK_FUNC(poke)
-  CHECK_FUNC(peek)
 
   return -1;
 }

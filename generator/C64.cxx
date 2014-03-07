@@ -135,6 +135,44 @@ int C64::open(char *filename)
 }
 
 // C64 API
+int C64::c64_system_poke(/* dest, value */ )
+{
+  // value
+  fprintf(out, "; vic_poke\n");
+  POP_HI;
+  POP_LO;
+  fprintf(out, "  tax\n");
+
+  // dest
+  POP_HI;
+  fprintf(out, "  sta address + 1\n");
+  POP_LO;
+  fprintf(out, "  sta address + 0\n");
+
+  fprintf(out, "  txa\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "  sta (address),y\n");
+
+  return 0;
+}
+int C64::c64_system_peek(/* dest */ )
+{
+  // dest
+  fprintf(out, "; vic_peek\n");
+  POP_HI;
+  fprintf(out, "  sta address + 1\n");
+  POP_LO;
+  fprintf(out, "  sta address + 0\n");
+
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "  lda (address),y\n");
+  PUSH_LO;
+  fprintf(out, "  lda #0\n");
+  PUSH_HI;
+
+  return 0;
+}
+
 int C64::c64_vic_sprite0pos(/* x, y */)
 {
   fprintf(out, "; sprite0pos\n");
@@ -149,7 +187,7 @@ int C64::c64_vic_sprite0pos(/* x, y */)
   fprintf(out, "  and #255 - 1\n");
   fprintf(out, "  sta 0xd010\n");
   POP_HI;
-  fprintf(out, "  bne #8\n");
+  fprintf(out, "  beq #8\n");
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  ora #(1 << 0)\n");
   fprintf(out, "  sta 0xd010\n");
@@ -173,7 +211,7 @@ int C64::c64_vic_sprite1pos(/* x, y */)
   fprintf(out, "  and #255 - 2\n");
   fprintf(out, "  sta 0xd010\n");
   POP_HI;
-  fprintf(out, "  bne #8\n");
+  fprintf(out, "  beq #8\n");
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  ora #2\n");
   fprintf(out, "  sta 0xd010\n");
@@ -197,7 +235,7 @@ int C64::c64_vic_sprite2pos(/* x, y */)
   fprintf(out, "  and #255 - 4\n");
   fprintf(out, "  sta 0xd010\n");
   POP_HI;
-  fprintf(out, "  bne #8\n");
+  fprintf(out, "  beq #8\n");
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  ora #4\n");
   fprintf(out, "  sta 0xd010\n");
@@ -221,7 +259,7 @@ int C64::c64_vic_sprite3pos(/* x, y */)
   fprintf(out, "  and #255 - 8\n");
   fprintf(out, "  sta 0xd010\n");
   POP_HI;
-  fprintf(out, "  bne #8\n");
+  fprintf(out, "  beq #8\n");
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  ora #8\n");
   fprintf(out, "  sta 0xd010\n");
@@ -245,7 +283,7 @@ int C64::c64_vic_sprite4pos(/* x, y */)
   fprintf(out, "  and #255 - 16\n");
   fprintf(out, "  sta 0xd010\n");
   POP_HI;
-  fprintf(out, "  bne #8\n");
+  fprintf(out, "  beq #8\n");
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  ora #16\n");
   fprintf(out, "  sta 0xd010\n");
@@ -269,7 +307,7 @@ int C64::c64_vic_sprite5pos(/* x, y */)
   fprintf(out, "  and #255 - 32\n");
   fprintf(out, "  sta 0xd010\n");
   POP_HI;
-  fprintf(out, "  bne #8\n");
+  fprintf(out, "  beq #8\n");
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  ora #32\n");
   fprintf(out, "  sta 0xd010\n");
@@ -293,7 +331,7 @@ int C64::c64_vic_sprite6pos(/* x, y */)
   fprintf(out, "  and #255 - 64\n");
   fprintf(out, "  sta 0xd010\n");
   POP_HI;
-  fprintf(out, "  bne #8\n");
+  fprintf(out, "  beq #8\n");
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  ora #64\n");
   fprintf(out, "  sta 0xd010\n");
@@ -317,7 +355,7 @@ int C64::c64_vic_sprite7pos(/* x, y */)
   fprintf(out, "  and #255 - 128\n");
   fprintf(out, "  sta 0xd010\n");
   POP_HI;
-  fprintf(out, "  bne #8\n");
+  fprintf(out, "  beq #8\n");
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  ora #128\n");
   fprintf(out, "  sta 0xd010\n");
@@ -357,44 +395,6 @@ int C64::c64_vic_sprite4color(/* value */) { POKE(0xd02b); return 0; }
 int C64::c64_vic_sprite5color(/* value */) { POKE(0xd02c); return 0; }
 int C64::c64_vic_sprite6color(/* value */) { POKE(0xd02d); return 0; }
 int C64::c64_vic_sprite7color(/* value */) { POKE(0xd02e); return 0; }
-
-int C64::c64_vic_poke(/* dest, value */ )
-{
-  // value
-  fprintf(out, "; vic_poke\n");
-  POP_HI;
-  POP_LO;
-  fprintf(out, "  tax\n");
-
-  // dest
-  POP_HI;
-  fprintf(out, "  sta address + 1\n");
-  POP_LO;
-  fprintf(out, "  sta address + 0\n");
-
-  fprintf(out, "  txa\n");
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  sta (address),y\n");
-
-  return 0;
-}
-int C64::c64_vic_peek(/* dest */ )
-{
-  // dest
-  fprintf(out, "; vic_peek\n");
-  POP_HI;
-  fprintf(out, "  sta address + 1\n");
-  POP_LO;
-  fprintf(out, "  sta address + 0\n");
-
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda (address),y\n");
-  PUSH_LO;
-  fprintf(out, "  lda #0\n");
-  PUSH_HI;
-
-  return 0;
-}
 
 #if 0
 void C64::close()
