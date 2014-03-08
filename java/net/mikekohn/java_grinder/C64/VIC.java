@@ -57,7 +57,7 @@ public class VIC
 
   // 0xd012
   public static void write_raster(int value) { }
-  public static int read_raster(int value) { return 0; }
+  public static int read_raster() { return 0; }
 
   // 0xd013
   // 0xd014
