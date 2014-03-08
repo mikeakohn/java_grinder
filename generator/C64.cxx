@@ -21,19 +21,6 @@
 // X
 // Y
 
-#define BEGIN_SUB \
-  fprintf(out, "  pla\n"); \
-  fprintf(out, "  sta return + 1\n"); \
-  fprintf(out, "  pla\n"); \
-  fprintf(out, "  sta return + 0\n")
-
-#define END_SUB \
-  fprintf(out, "  lda return + 0\n"); \
-  fprintf(out, "  pha\n"); \
-  fprintf(out, "  lda return + 1\n"); \
-  fprintf(out, "  pha\n"); \
-  fprintf(out, "  rts\n\n")
-
 #define PUSH_LO \
   fprintf(out, "; PUSH_LO\n"); \
   fprintf(out, "  ldy SP\n"); \
