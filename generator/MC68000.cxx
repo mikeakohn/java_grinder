@@ -466,6 +466,11 @@ int MC68000::inc_integer(int index, int num)
   return 0;
 }
 
+int MC68000::integer_to_byte()
+{
+  return -1;
+}
+
 int MC68000::jump_cond(const char *label, int cond)
 {
   if (stack > 0)

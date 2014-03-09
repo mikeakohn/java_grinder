@@ -751,6 +751,11 @@ int MSP430::inc_integer(int index, int num)
   return 0;
 }
 
+int MSP430::integer_to_byte()
+{
+  return -1;
+}
+
 int MSP430::jump_cond(const char *label, int cond)
 {
 bool reverse = false;

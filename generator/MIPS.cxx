@@ -325,6 +325,11 @@ int MIPS::inc_integer(int index, int num)
   return -1;
 }
 
+int MIPS::integer_to_byte()
+{
+  return -1;
+}
+
 int MIPS::jump_cond(const char *label, int cond)
 {
   return -1;

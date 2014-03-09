@@ -539,6 +539,11 @@ int DSPIC::inc_integer(int index, int num)
   return 0;
 }
 
+int DSPIC::integer_to_byte()
+{
+  return -1;
+}
+
 int DSPIC::jump_cond(const char *label, int cond)
 {
   if (stack > 0)
