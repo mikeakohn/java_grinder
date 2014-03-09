@@ -222,7 +222,7 @@ char function[256];
   {
     char *cls = method_class + len_c64;
 
-    CHECK(SYSTEM, c64_system);
+    CHECK(System, c64_system);
     CHECK(SID, c64_sid);
     CHECK(VIC, c64_vic);
   }
