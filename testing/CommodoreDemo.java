@@ -1,3 +1,4 @@
+import net.mikekohn.java_grinder.Memory;
 import net.mikekohn.java_grinder.C64.*;
 
 public class CommodoreDemo
@@ -19,10 +20,10 @@ public class CommodoreDemo
     VIC.background(0);
     VIC.border(11);
 
-    for(i = 1024; i < 2024; i++)
-      VIC.poke(i, 160);
     for(i = 55296; i < 56296; i++)
-      VIC.poke(i, 0);
+      Memory.write8(i, (byte)0);
+    for(i = 1024; i < 2024; i++)
+      Memory.write8(i, (byte)160);
 
     for(y = 0; y < 25 * 64; y += 64)
     {
@@ -53,7 +54,7 @@ public class CommodoreDemo
           im2 = (im * im) >> 6;
         }
 
-        VIC.poke(loc++, i & 15);
+        Memory.write8(loc++, (byte)(i & 15));
       }
     }
 
