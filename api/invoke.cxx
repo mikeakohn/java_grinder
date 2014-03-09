@@ -24,7 +24,6 @@
 #include "memory.h"
 #include "spi.h"
 #include "uart.h"
-#include "c64_system.h"
 #include "c64_sid.h"
 #include "c64_vic.h"
 #include "java_lang_system.h"
@@ -222,7 +221,6 @@ char function[256];
   {
     char *cls = method_class + len_c64;
 
-    CHECK(System, c64_system);
     CHECK(SID, c64_sid);
     CHECK(VIC, c64_vic);
   }
