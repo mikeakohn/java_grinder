@@ -983,10 +983,8 @@ int stack_vars = stack;
     local++;
   }
 
-  // Make the call
   fprintf(out, "  jsr %s\n", name);
 
-  // Pop all params off the Java stack
   if ((stack - stack_vars) > 0)
   {
     fprintf(out, "  lda SP\n");
@@ -999,7 +997,6 @@ int stack_vars = stack;
 
   if (!is_void)
   {
-    // REVIEW - This looks wrong
     fprintf(out, "  lda result + 0\n");
     PUSH_LO;
     fprintf(out, "  lda result + 1\n");

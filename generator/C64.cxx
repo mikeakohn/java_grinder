@@ -121,45 +121,6 @@ int C64::open(char *filename)
   return 0;
 }
 
-// C64 API
-int C64::c64_system_poke(/* dest, value */ )
-{
-  // value
-  fprintf(out, "; vic_poke\n");
-  POP_HI;
-  POP_LO;
-  fprintf(out, "  tax\n");
-
-  // dest
-  POP_HI;
-  fprintf(out, "  sta address + 1\n");
-  POP_LO;
-  fprintf(out, "  sta address + 0\n");
-
-  fprintf(out, "  txa\n");
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  sta (address),y\n");
-
-  return 0;
-}
-int C64::c64_system_peek(/* dest */ )
-{
-  // dest
-  fprintf(out, "; vic_peek\n");
-  POP_HI;
-  fprintf(out, "  sta address + 1\n");
-  POP_LO;
-  fprintf(out, "  sta address + 0\n");
-
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda (address),y\n");
-  PUSH_LO;
-  fprintf(out, "  lda #0\n");
-  PUSH_HI;
-
-  return 0;
-}
-
 int C64::c64_sid_voice1_frequency(/* value */)
 {
   POP_HI;

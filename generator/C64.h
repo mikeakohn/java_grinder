@@ -23,9 +23,6 @@ public:
   virtual int open(char *filename);
 
   // API
-  virtual int c64_system_poke();
-  virtual int c64_system_peek();
-
   virtual int c64_sid_voice1_frequency();
   virtual int c64_sid_voice1_pulse_width();
   virtual int c64_sid_voice1_waveform();

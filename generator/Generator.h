@@ -196,9 +196,6 @@ public:
   virtual int dsp_shiftB() { return -1; }
 
   // Commodore 64 stuff
-  virtual int c64_system_poke() { return -1; }
-  virtual int c64_system_peek() { return -1; }
-
   virtual int c64_sid_voice1_frequency() { return -1; }
   virtual int c64_sid_voice1_pulse_width() { return -1; }
   virtual int c64_sid_voice1_waveform() { return -1; }
