@@ -658,6 +658,29 @@ int M6502::inc_integer(int index, int num)
   return 0;
 }
 
+int M6502::integer_to_byte()
+{
+  fprintf(out, "; integer_to_byte\n");
+  POP_HI;
+  POP_LO;
+  fprintf(out, "  sta result + 0\n");
+  PUSH_LO;
+  fprintf(out, "  lda result + 0\n");
+  fprintf(out, "  bpl #14\n");
+
+  fprintf(out, "  lda #0xff\n");
+  fprintf(out, "  sta result + 1\n");
+  PUSH_HI;
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  beq #8\n");
+
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sta result + 1\n");
+  PUSH_HI;
+
+  return 0;
+}
+
 int M6502::jump_cond(const char *label, int cond)
 {
   bool reverse = false;
@@ -1398,7 +1421,7 @@ void M6502::insert_div_integer()
   fprintf(out, "  sty remainder + 0\n");
   fprintf(out, "  inc value1 + 0\n");
 
-  // skip
+  // next
   fprintf(out, "  dex\n");
   fprintf(out, "  bne #-29\n");
 

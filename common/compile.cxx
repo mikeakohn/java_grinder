@@ -1105,7 +1105,7 @@ printf("code_len=%d\n", code_len);
 
       case 145: // i2b (0x91)
         // Pop top integer from stack and push as a byte
-        UNIMPL()
+        ret = generator->integer_to_byte();
         break;
 
       case 146: // i2c (0x92)
