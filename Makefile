@@ -39,5 +39,6 @@ clean:
 	@rm -rf build/net
 	@echo "Clean!"
 
+distclean: clean
 
 

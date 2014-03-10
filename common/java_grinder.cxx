@@ -25,6 +25,7 @@
 #include "MIPS.h"
 #include "MSP430.h"
 #include "MSP430X.h"
+#include "version.h"
 
 #define STACK_LEN 65536
 
@@ -36,9 +37,15 @@ JavaClass *java_class;
 char method_name[32];
 int index;
 
+  printf("\nJava Grinder\n");
+  printf("Authors: Michael Kohn, Joe Davisson\n");
+  printf("    Web: http://www.mikekohn.net/micro/java_grinder.php\n");
+  printf("  Email: mike@mikekohn.net\n\n");
+  printf("Version: "VERSION"\n\n");
+
   if (argc != 4)
   {
-    printf("Usage: %s <class> <outfile> <dspic/msp430g2231/msp430g2553/m6502/arm>\n", argv[0]);
+    printf("Usage: %s <class> <outfile> <dspic/msp430g2231/msp430g2553/m6502/c64/arm/mips>\n", argv[0]);
     exit(0);
   }
 
