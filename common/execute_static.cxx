@@ -216,6 +216,7 @@ int ret = 0;
         stack_ptr -= 2;
         break;
       case 89: // dup (0x59)
+        CHECK_STACK(1)
         temp = stack[stack_ptr-1];
         stack[stack_ptr++] = temp;
         break;
@@ -428,7 +429,8 @@ int ret = 0;
           array = (int32_t *)realloc(array, array_alloc_size * sizeof(int32_t));
           memset(array, 0, array_len * sizeof(int32_t));
         }
-        stack_ptr--;
+        // mkohn 2014-Mar-9 - Why was this here?
+        //stack_ptr--;
         break;
       case 189: // anewarray (0xbd)
       case 190: // arraylength (0xbe)
@@ -517,6 +519,8 @@ int ret = 0;
 
     wide = 0;
   }
+
+  printf("stack_ptr=%d after execute ends\n", stack_ptr);
 
   // printf("EXIT pc=%d ret=%d code_len=%d\n", pc, ret, code_len);
   if (array != NULL) { free(array); }
