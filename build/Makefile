@@ -1,5 +1,5 @@
-CC=gcc
-CXX=g++
+CC?=gcc
+CXX?=g++
 DEBUG=-DDEBUG -g
 #OPTIMIZATIONS=-march=nocona -mtune=nocona
 INCLUDES=-I../common -I../generator -I../api
