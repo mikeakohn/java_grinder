@@ -1078,6 +1078,8 @@ int MSP430::new_array(uint8_t type)
   // ref = heap + 2
   // heap = heap + sizeof(array) + 2 (to hold the length of the array)
 
+  // I can't think of why the stack version should ever get run.. this
+  // probably could be removed.  It's not right probably anyway.
   if (stack > 0)
   {
     // r14 is the length of the array
@@ -1093,23 +1095,23 @@ int MSP430::new_array(uint8_t type)
     {
       // if int or short double the len of array for space (16 bit)
       fprintf(out, "  rla r14\n");
+      // Add 2 to the length of the array to account for array[-1]
+      fprintf(out, "  add.w #2, r14\n");
     }
       else
     {
-      //fprintf(out, "  mov.w r14, r13\n");
-      //fprintf(out, "  and.w #1, r13\n");
-      //fprintf(out, "  add.w r13, r14\n");
+      // Add 2 to the length of the array to account for array[-1]
+      // Add 1 to the len and and with ~1 to word align
+      fprintf(out, "  add.w #3, r14\n");
+      fprintf(out, "  and.w #0xfffe, r14\n");
     }
-
-    // Add 2 to the length of the array to account for array[-1]
-    fprintf(out, "  add.w #2, r14\n");
 
     // Increase where the heap points to by num of bytes allocated
     fprintf(out, "  add.w r14, &heap_ptr\n");
 
     // r15 should point to array[0] instead of array[-1] and is now top of stack
-    fprintf(out, "  add.w #3, r15\n");  // Add 2 for len, add 1 and then
-    fprintf(out, "  and.w #1, r15\n");  // and 1 to word align
+    //fprintf(out, "  add.w #3, r15\n");  // Add 2 for len, add 1 and then
+    //fprintf(out, "  and.w #1, r15\n");  // and 1 to word align
     fprintf(out, "  push r15\n");
 
   }
@@ -1124,23 +1126,24 @@ int MSP430::new_array(uint8_t type)
     {
       // if int or short double the len of array for space (16 bit)
       fprintf(out, "  rla r%d\n", REG_STACK(reg-1));
+
+      // Add 2 to the length of the array to account for array[-1]
+      fprintf(out, "  add.w #2, r%d\n", REG_STACK(reg-1));
+
     }
       else
     {
-      //fprintf(out, "  mov.w r%d, r13\n", REG_STACK(reg-1));
-      //fprintf(out, "  and.w #1, r13\n");
-      //fprintf(out, "  add.w r13, r%d\n", REG_STACK(reg-1));
+      // Add 2 to the length of the array to account for array[-1]
+      // Add 1 to the length of the array and 0xfffe to 16 bit align length
+      fprintf(out, "  add.w #3, r%d\n", REG_STACK(reg-1));
+      fprintf(out, "  and.w #0xfffe, r%d\n", REG_STACK(reg-1));
     }
-
-    // Add 2 to the length of the array to account for array[-1]
-    fprintf(out, "  add.w #2, r%d\n", REG_STACK(reg-1));
 
     // Increase where the heap points to by num of bytes allocated
     fprintf(out, "  add.w r%d, &heap_ptr\n", REG_STACK(reg-1));
 
-    // r15 should point to array[0] instead of array[-1] and is now top of stack
-    fprintf(out, "  add.w #3, r15\n");  // Add 2 for len and add 1
-    fprintf(out, "  and.w #1, r15\n");  // and 1 to align by word
+    // Top of stack now holds pointer to array ref
+    fprintf(out, "  add.w #2, r15\n");
     fprintf(out, "  mov.w r15, r%d\n", REG_STACK(reg-1));
   }
 
