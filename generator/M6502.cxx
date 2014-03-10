@@ -1715,7 +1715,6 @@ void M6502::insert_array_byte_support()
 
   // array_read_byte
   fprintf(out, "array_read_byte:\n");
-  fprintf(out, "  inc 53280\n");
   fprintf(out, "  clc\n");
   fprintf(out, "  lda value2 + 0\n");
   fprintf(out, "  adc value1 + 0\n");
@@ -1741,7 +1740,7 @@ void M6502::insert_array_byte_support()
   fprintf(out, "  sta result + 1\n");
   PUSH_HI;
   fprintf(out, "  lda #0\n");
-  fprintf(out, "  beq #4\n");
+  fprintf(out, "  beq #10\n");
   fprintf(out, "  lda #0\n");
   fprintf(out, "  sta result + 1\n");
   PUSH_HI;
