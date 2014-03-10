@@ -225,8 +225,7 @@ public:
   virtual int c64_vic_sprite7pos() { return -1; }
   virtual int c64_vic_write_control1() { return -1; }
   virtual int c64_vic_read_control1() { return -1; }
-  virtual int c64_vic_write_raster() { return -1; }
-  virtual int c64_vic_read_raster() { return -1; }
+  virtual int c64_vic_wait_raster() { return -1; }
   virtual int c64_vic_sprite_enable() { return -1; }
   virtual int c64_vic_write_control2() { return -1; }
   virtual int c64_vic_read_control2() { return -1; }

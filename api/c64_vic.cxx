@@ -74,6 +74,11 @@ static int c64_vic_read_control1(JavaClass *java_class, Generator *generator)
   return generator->c64_vic_read_control1();
 }
 
+static int c64_vic_wait_raster(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_wait_raster();
+}
+
 static int c64_vic_sprite_enable(JavaClass *java_class, Generator *generator)
 {
   return generator->c64_vic_sprite_enable();
@@ -216,6 +221,7 @@ int c64_vic(JavaClass *java_class, Generator *generator, char *function)
   CHECK_FUNC(sprite7pos)
   CHECK_FUNC(write_control1)
   CHECK_FUNC(read_control1)
+  CHECK_FUNC(wait_raster)
   CHECK_FUNC(sprite_enable)
   CHECK_FUNC(write_control2)
   CHECK_FUNC(read_control2)

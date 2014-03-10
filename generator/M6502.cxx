@@ -672,7 +672,7 @@ int M6502::integer_to_byte()
   fprintf(out, "  sta result + 1\n");
   PUSH_HI;
   fprintf(out, "  lda #0\n");
-  fprintf(out, "  beq #8\n");
+  fprintf(out, "  beq #10\n");
 
   fprintf(out, "  lda #0\n");
   fprintf(out, "  sta result + 1\n");
@@ -1735,6 +1735,7 @@ void M6502::insert_array_byte_support()
   fprintf(out, "  lda result + 0\n");
   PUSH_LO;
   // sign-extend
+  fprintf(out, "  lda result + 0\n");
   fprintf(out, "  bpl #14\n");
   fprintf(out, "  lda #0xff\n");
   fprintf(out, "  sta result + 1\n");
@@ -1951,7 +1952,8 @@ int M6502::memory_read8()
   fprintf(out, "  sta result + 0\n");
   PUSH_LO;
   // sign-extend
-  fprintf(out, "  bpl #8\n");
+  fprintf(out, "  lda result + 0\n");
+  fprintf(out, "  bpl #14\n");
   fprintf(out, "  lda #0xff\n");
   fprintf(out, "  sta result + 1\n");
   PUSH_HI;

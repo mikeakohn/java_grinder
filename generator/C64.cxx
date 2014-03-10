@@ -438,8 +438,16 @@ int C64::c64_vic_sprite7pos(/* x, y */)
 
 int C64::c64_vic_write_control1(/* value */) { POKE(0xd011); return 0; }
 int C64::c64_vic_read_control1() { PEEK(0xd011); return 0; }
-int C64::c64_vic_write_raster(/* value */) { POKE(0xd012); return 0; }
-int C64::c64_vic_read_raster() { PEEK(0xd012); return 0; }
+int C64::c64_vic_wait_raster(/* line */)
+{
+  fprintf(out, "; wait_raster\n");
+  POP_HI;
+  POP_LO;
+  fprintf(out, "cmp 0xd012\n");
+  fprintf(out, "bne #-5\n");
+
+  return 0;
+}
 int C64::c64_vic_sprite_enable(/* value */) { POKE(0xd015); return 0; }
 int C64::c64_vic_write_control2(/* value */) { POKE(0xd016); return 0; }
 int C64::c64_vic_read_control2() { PEEK(0xd016); return 0; }

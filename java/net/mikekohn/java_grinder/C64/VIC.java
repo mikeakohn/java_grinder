@@ -56,8 +56,7 @@ public class VIC
   public static int read_control1() { return 0; }
 
   // 0xd012
-  public static void write_raster(int value) { }
-  public static int read_raster() { return 0; }
+  public static void wait_raster(int value) { }
 
   // 0xd013
   // 0xd014
