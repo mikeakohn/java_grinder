@@ -148,9 +148,9 @@ int M6502::insert_field_init_boolean(char *name, int index, int value)
 {
   value = (value == 0) ? 0 : 1;
   fprintf(out, "  lda #%d\n", value & 0xff);
-  fprintf(out, "  sta %s\n", name + 0);
+  fprintf(out, "  sta %s + 0\n", name);
   fprintf(out, "  lda #%d\n", value >> 8);
-  fprintf(out, "  sta %s\n", name + 1);
+  fprintf(out, "  sta %s + 1\n", name);
 
   return 0;
 }
@@ -160,9 +160,9 @@ int M6502::insert_field_init_byte(char *name, int index, int value)
   if (value < -128 || value > 255) { return -1; }
 
   fprintf(out, "  lda #%d\n", (int8_t)value & 0xff);
-  fprintf(out, "  sta %s\n", name + 0);
+  fprintf(out, "  sta %s + 0\n", name);
   fprintf(out, "  lda #%d\n", (int8_t)value >> 8);
-  fprintf(out, "  sta %s\n", name + 1);
+  fprintf(out, "  sta %s + 1\n", name);
 
   return 0;
 }
@@ -172,9 +172,9 @@ int M6502::insert_field_init_short(char *name, int index, int value)
   if (value < -32768 || value > 65535) { return -1; }
 
   fprintf(out, "  lda #%d\n", value & 0xff);
-  fprintf(out, "  sta %s\n", name + 0);
+  fprintf(out, "  sta %s + 0\n", name);
   fprintf(out, "  lda #%d\n", value >> 8);
-  fprintf(out, "  sta %s\n", name + 1);
+  fprintf(out, "  sta %s + 1\n", name);
 
   return 0;
 }
@@ -187,9 +187,9 @@ int M6502::insert_field_init_int(char *name, int index, int value)
 int M6502::insert_field_init(char *name, int index)
 {
   fprintf(out, "  lda #_%s & 0xff\n", name);
-  fprintf(out, "  sta %s\n", name + 0);
+  fprintf(out, "  sta %s + 0\n", name);
   fprintf(out, "  lda #_%s >> 8\n", name);
-  fprintf(out, "  sta %s\n", name + 1);
+  fprintf(out, "  sta %s + 1\n", name);
 
   return 0;
 }
@@ -1012,11 +1012,11 @@ int M6502::put_static(const char *name, int index)
   if (stack > 0)
   {
     POP_HI;
-    fprintf(out, "  sta result + 1\n");
-    fprintf(out, "  sta %s\n", name + 1);
+    //fprintf(out, "  sta result + 1\n");
+    fprintf(out, "  sta %s + 1\n", name);
     POP_LO;
-    fprintf(out, "  sta result + 0\n");
-    fprintf(out, "  sta %s\n", name + 0);
+    //fprintf(out, "  sta result + 0\n");
+    fprintf(out, "  sta %s + 0\n", name);
     stack--;
   }
 
@@ -1026,9 +1026,9 @@ int M6502::put_static(const char *name, int index)
 int M6502::get_static(const char *name, int index)
 {
   POP_HI;
-  fprintf(out, "  sta %s\n", name + 1);
+  fprintf(out, "  sta %s + 1\n", name);
   POP_LO;
-  fprintf(out, "  sta %s\n", name + 0);
+  fprintf(out, "  sta %s + 0\n", name);
   stack++;
 
   return 0;
@@ -1132,6 +1132,7 @@ int M6502::array_read_int()
 
 int M6502::array_read_byte(const char *name, int field_id)
 {
+  need_array_byte_support = 1;
   if (stack > 0)
   {
     fprintf(out, "  lda %s & 0xff\n", name);
@@ -1152,6 +1153,8 @@ int M6502::array_read_short(const char *name, int field_id)
 
 int M6502::array_read_int(const char *name, int field_id)
 {
+  need_array_int_support = 1;
+
   if (stack > 0)
   {
     fprintf(out, "  lda %s & 0xff\n", name);
