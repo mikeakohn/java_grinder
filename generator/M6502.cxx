@@ -186,6 +186,7 @@ int M6502::insert_field_init_int(char *name, int index, int value)
 
 int M6502::insert_field_init(char *name, int index)
 {
+  fprintf(out, "; insert_field_init\n");
   fprintf(out, "  lda #_%s & 0xff\n", name);
   fprintf(out, "  sta %s + 0\n", name);
   fprintf(out, "  lda #_%s >> 8\n", name);
@@ -1012,10 +1013,10 @@ int M6502::put_static(const char *name, int index)
   if (stack > 0)
   {
     POP_HI;
-    //fprintf(out, "  sta result + 1\n");
+    fprintf(out, "  lda result + 1\n");
     fprintf(out, "  sta %s + 1\n", name);
     POP_LO;
-    //fprintf(out, "  sta result + 0\n");
+    fprintf(out, "  lda result + 0\n");
     fprintf(out, "  sta %s + 0\n", name);
     stack--;
   }
@@ -1025,10 +1026,19 @@ int M6502::put_static(const char *name, int index)
 
 int M6502::get_static(const char *name, int index)
 {
+/*
   POP_HI;
+  fprintf(out, "  lda result + 1\n");
   fprintf(out, "  sta %s + 1\n", name);
   POP_LO;
+  fprintf(out, "  lda result + 0\n");
   fprintf(out, "  sta %s + 0\n", name);
+  stack++;
+*/
+  fprintf(out, "  lda %s + 0\n", name);
+  PUSH_LO;
+  fprintf(out, "  lda %s + 1\n", name);
+  PUSH_HI;
   stack++;
 
   return 0;
@@ -1097,9 +1107,9 @@ int M6502::push_array_length()
 int M6502::push_array_length(const char *name, int field_id)
 {
   need_push_array_length2 = 1;
-  fprintf(out, "  lda %s + 0\n", name);
+  fprintf(out, "  lda #%s + 0\n", name);
   fprintf(out, "  sta temp + 0\n");
-  fprintf(out, "  lda %s + 1\n", name);
+  fprintf(out, "  lda #%s + 1\n", name);
   fprintf(out, "  sta temp + 1\n");
   fprintf(out, "jsr push_array_length2\n");
   stack++;
@@ -1135,9 +1145,9 @@ int M6502::array_read_byte(const char *name, int field_id)
   need_array_byte_support = 1;
   if (stack > 0)
   {
-    fprintf(out, "  lda %s & 0xff\n", name);
+    fprintf(out, "  lda %s + 0\n", name);
     fprintf(out, "  sta address + 0\n");
-    fprintf(out, "  lda %s >> 8\n", name);
+    fprintf(out, "  lda %s + 1\n", name);
     fprintf(out, "  sta address + 1\n");
 
     fprintf(out, "jsr array_read_byte2\n");
@@ -1157,9 +1167,9 @@ int M6502::array_read_int(const char *name, int field_id)
 
   if (stack > 0)
   {
-    fprintf(out, "  lda %s & 0xff\n", name);
+    fprintf(out, "  lda %s + 0\n", name);
     fprintf(out, "  sta address + 0\n");
-    fprintf(out, "  lda %s >> 8\n", name);
+    fprintf(out, "  lda %s + 1\n", name);
     fprintf(out, "  sta address + 1\n");
     fprintf(out, "jsr array_read_int2\n");
   }
@@ -1896,6 +1906,9 @@ void M6502::insert_array_int_support()
   fprintf(out, "  sta result + 1\n");
   POP_LO;
   fprintf(out, "  sta result + 0\n");
+  // index * 2 for int
+  fprintf(out, "  asl result + 0\n");
+  fprintf(out, "  rol result + 1\n");
 
   fprintf(out, "  clc\n");
   fprintf(out, "  lda address + 0\n");
