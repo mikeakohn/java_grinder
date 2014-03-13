@@ -25,6 +25,7 @@
 #include "MIPS.h"
 #include "MSP430.h"
 #include "MSP430X.h"
+#include "STDC.h"
 #include "version.h"
 
 #define STACK_LEN 65536
@@ -104,6 +105,11 @@ int index;
   if (strcasecmp("mips",argv[3]) == 0)
   {
     generator = new MIPS();
+  }
+    else
+  if (strcasecmp("stdc",argv[3]) == 0)
+  {
+    generator = new STDC();
   }
     else
   {
