@@ -218,7 +218,7 @@ int MC68000::pop_integer_local(int index)
 {
   if (stack > 0)
   {
-    fprintf(out, "  move.l (sp)+ ,(-%d,a6)\n", LOCALS(index));
+    fprintf(out, "  move.l (SP)+ ,(-%d,a6)\n", LOCALS(index));
     stack--;
   }
     else
@@ -468,7 +468,16 @@ int MC68000::inc_integer(int index, int num)
 
 int MC68000::integer_to_byte()
 {
-  return -1;
+  if (stack == 0)
+  {
+    fprintf(out, "  extb.l (SP)\n");
+  }
+    else
+  {
+    fprintf(out, "  extb.l d%d\n", REG_STACK(reg-1));
+  }
+
+  return 0;
 }
 
 int MC68000::jump_cond(const char *label, int cond)
@@ -689,19 +698,26 @@ int array_length_reg;
   // heap = heap + sizeof(array) + 4 (to hold the length of the array)
 
   get_values_from_stack(&array_length_reg);
-  fprintf(out, "  move.l d%d, (a5)\n", array_length_reg); // store length @-1
+
+  // store length @ heap
+  fprintf(out, "  move.l d%d, (a5)\n", array_length_reg);
 
   if (type == TYPE_INT)
   {
-    fprintf(out, "  lsl.l #2, d%d\n", array_length_reg);  // int is 4 bytes
+    // int is 4 bytes
+    fprintf(out, "  lsl.l #2, d%d\n", array_length_reg);
   }
     else
   if (type == TYPE_SHORT || type == TYPE_CHAR)
   {
-    fprintf(out, "  lsl.l #1, d%d\n", array_length_reg);  // short is 2 bytes
+    // short is 2 bytes
+    fprintf(out, "  lsl.l #1, d%d\n", array_length_reg);
   }
 
-  fprintf(out, "  addq.l #4, a5\n");   // sizeof(array) + 4 (for array size)
+  // sizeof(array) + 4 (for array size)
+  fprintf(out, "  addq.l #4, a5\n");
+
+  // Top of Java stack should equal where the heap is currently pointing
   if (reg < reg_max)
   {
     fprintf(out, "  move.l a5, d%d\n", REG_STACK(reg));
@@ -712,7 +728,9 @@ int array_length_reg;
     fprintf(out, "  move.l a5, -(SP)\n");
     stack++;
   }
-  fprintf(out, "  add.l d%d, a5\n", array_length_reg);  // adjust heap ptr
+
+  // Add the length of the array to heap pointer
+  fprintf(out, "  add.l d%d, a5\n", array_length_reg);
 
   // Need to align heap
   fprintf(out, "  addq.l #3, a5\n");

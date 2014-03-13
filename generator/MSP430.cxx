@@ -753,7 +753,16 @@ int MSP430::inc_integer(int index, int num)
 
 int MSP430::integer_to_byte()
 {
-  return -1;
+  if (stack == 0)
+  {
+    fprintf(out, "  sxt @SP\n");
+  }
+    else
+  {
+    fprintf(out, "  sxt r%d\n", REG_STACK(reg-1));
+  }
+
+  return 0;
 }
 
 int MSP430::jump_cond(const char *label, int cond)

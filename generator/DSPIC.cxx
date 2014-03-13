@@ -541,7 +541,18 @@ int DSPIC::inc_integer(int index, int num)
 
 int DSPIC::integer_to_byte()
 {
-  return -1;
+  if (stack == 0)
+  {
+    fprintf(out, "  pop w0\n");
+    fprintf(out, "  se w0, w0\n");
+    fprintf(out, "  push w0\n");
+  }
+    else
+  {
+    fprintf(out, "  se w%d, w%d\n", REG_STACK(reg-1), REG_STACK(reg-1));
+  }
+
+  return 0;
 }
 
 int DSPIC::jump_cond(const char *label, int cond)
