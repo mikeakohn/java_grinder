@@ -431,14 +431,14 @@ int STDC::jump_cond_integer(const char *label, int cond)
 
 int STDC::return_local(int index, int local_count)
 {
-  fprintf(out, "  return local_%d\n", index);
+  fprintf(out, "  return local_%d;\n", index);
 
   return 0;
 }
 
 int STDC::return_integer(int local_count)
 {
-  fprintf(out, "\n  return stack_%d\n", stack - 1);
+  fprintf(out, "\n  return stack_%d;\n", stack - 1);
 
   return 0;
 }
@@ -459,14 +459,26 @@ int STDC::jump(const char *name)
 
 int STDC::call(const char *name)
 {
-  fprintf(out, "  stack_%d = %s();\n", stack++, name);
+  //fprintf(out, "  stack_%d = %s();\n", stack++, name);
 
-  return 0;
+  return -1;
 }
 
 int STDC::invoke_static_method(const char *name, int params, int is_void)
 {
-  return -1;
+int n;
+
+  fprintf(out, "  stack_%d = %s(", stack - params, name);
+  for (n = 0; n < params; n++)
+  {
+    if (n != 0) { fprintf(out, ", "); }
+    fprintf(out, "stack_%d", stack - params + n);
+  }
+  fprintf(out, ");\n");
+
+  stack = stack - params + 1;
+
+  return 0;
 }
 
 int STDC::put_static(const char *name, int index)
