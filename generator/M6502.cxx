@@ -995,10 +995,10 @@ int M6502::push_array_length()
 int M6502::push_array_length(const char *name, int field_id)
 {
   need_push_array_length2 = 1;
-  fprintf(out, "  lda #%s + 0\n", name);
-  fprintf(out, "  sta temp + 0\n");
-  fprintf(out, "  lda #%s + 1\n", name);
-  fprintf(out, "  sta temp + 1\n");
+  fprintf(out, "  lda %s + 0\n", name);
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda %s + 1\n", name);
+  fprintf(out, "  sta address + 1\n");
   fprintf(out, "jsr push_array_length2\n");
   stack++;
 
@@ -1542,16 +1542,17 @@ void M6502::insert_push_array_length2()
 {
   fprintf(out, "push_array_length2:\n");
   fprintf(out, "  sec\n");
-  fprintf(out, "  lda temp + 0\n");
+  fprintf(out, "  lda address + 0\n");
   fprintf(out, "  sbc #2\n");
-  fprintf(out, "  sta temp + 0\n");
-  fprintf(out, "  lda temp + 1\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda address + 1\n");
   fprintf(out, "  sbc #0\n");
-  fprintf(out, "  sta temp + 1\n");
-
-  fprintf(out, "  lda temp + 0\n");
+  fprintf(out, "  sta address + 1\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "  lda (address),y\n");
   PUSH_LO;
-  fprintf(out, "  lda temp + 1\n");
+  fprintf(out, "  ldy #1\n");
+  fprintf(out, "  lda (address),y\n");
   PUSH_HI;
   fprintf(out, "  rts\n");
 }
