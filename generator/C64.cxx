@@ -24,7 +24,7 @@
 #define PUSH_LO \
   fprintf(out, "; PUSH_LO\n"); \
   fprintf(out, "  ldy SP\n"); \
-  fprintf(out, "  sta stack_lo,y\n"); \
+  fprintf(out, "  sta stack_lo,y\n")
 
 #define PUSH_HI \
   fprintf(out, "; PUSH_HI\n"); \
@@ -116,7 +116,9 @@ int C64::open(char *filename)
   fprintf(out, "  sei\n");
   fprintf(out, "  cld\n");
   fprintf(out, "  lda #0xff\n");
-  fprintf(out, "  sta SP\n\n");
+  fprintf(out, "  sta SP\n");
+  fprintf(out, "  tax\n");
+  fprintf(out, "  txs\n\n");
 
   return 0;
 }
