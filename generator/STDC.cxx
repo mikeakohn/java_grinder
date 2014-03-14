@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 
 #include "STDC.h"
@@ -50,6 +51,8 @@ int STDC::open(char *filename)
 int STDC::start_init()
 {
   // Add any set up items (stack, registers, etc).
+  fprintf(out, "\nvoid init()\n");
+  fprintf(out, "{\n");
 
   return 0;
 }
@@ -64,12 +67,14 @@ int STDC::insert_static_field_define(const char *name, const char *type, int ind
 
 int STDC::init_heap(int field_count)
 {
+#if 0
 int n;
 
   for (n = 0; n < field_count; n++)
   {
     fprintf(out, "static int32_t global_%d;\n", n);
   }
+#endif
 
   return 0;
 }
@@ -104,7 +109,7 @@ int STDC::insert_field_init_int(char *name, int index, int value)
 
 int STDC::insert_field_init(char *name, int index)
 {
-  fprintf(out, "  %s = ;\n", name);
+  fprintf(out, "  %s = (int)_%s;\n", name, name);
 
   return 0;
 }
@@ -112,6 +117,12 @@ int STDC::insert_field_init(char *name, int index)
 void STDC::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
 int n;
+
+  if (strcmp(name, "main") == 0)
+  {
+    fprintf(out, "}\n\n");
+    is_main = true;
+  }
 
   fprintf(out, "int32_t %s(", name);
   for (n = 0; n < param_count; n++)
@@ -133,6 +144,8 @@ int n;
   }
 
   fprintf(out, "\n");
+
+  if (is_main) { fprintf(out, "  init();\n"); }
 
   stack = 0;
   temp_var = false;
@@ -483,12 +496,14 @@ int n;
 
 int STDC::put_static(const char *name, int index)
 {
-  return -1;
+  fprintf(out, "  %s = stack_%d;\n", name, stack++);
+  return 0;
 }
 
 int STDC::get_static(const char *name, int index)
 {
-  return -1;
+  fprintf(out, "  stack_%d = %s;\n", --stack, name);
+  return 0;
 }
 
 int STDC::brk()
@@ -498,7 +513,32 @@ int STDC::brk()
 
 int STDC::new_array(uint8_t type)
 {
-  return -1;
+  if (!temp_var)
+  {
+    fprintf(out, "  int32_t temp;\n");
+    temp_var = true;
+  }
+
+  fprintf(out, "  temp = stack_%d;\n", stack - 1);
+
+  if (type == TYPE_SHORT || type == TYPE_CHAR)
+  {
+    fprintf(out, "  stack_%d = (int32_t)malloc(temp * 2 + 4);\n", stack - 1);
+  }
+    else
+  if (type == TYPE_INT)
+  {
+    fprintf(out, "  stack_%d = (int32_t)malloc(temp * 4 + 4);\n", stack - 1);
+  }
+    else
+  {
+    fprintf(out, "  stack_%d = (int32_t)malloc(temp + 4);\n", stack - 1);
+  }
+
+  fprintf(out, "  *((int32_t *)stack_%d) = temp;\n", stack - 1);
+  fprintf(out, "  stack_%d += 4;\n", stack - 1);
+
+  return 0;
 }
 
 int STDC::insert_array(const char *name, int32_t *data, int len, uint8_t type)
@@ -513,7 +553,8 @@ int STDC::push_array_length()
 
 int STDC::push_array_length(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  stack_%d = ((int32_t *)%s)[-1];\n", stack - 1, name);
+  return 0;
 }
 
 int STDC::array_read_byte()
@@ -533,17 +574,20 @@ int STDC::array_read_int()
 
 int STDC::array_read_byte(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  stack_%d = ((int8_t *)%s)[stack_%d];\n", stack - 1, name, stack - 1);
+  return 0;
 }
 
 int STDC::array_read_short(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  stack_%d = ((int16_t *)%s)[stack_%d];\n", stack - 1, name, stack - 1);
+  return 0;
 }
 
 int STDC::array_read_int(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  stack_%d = ((int32_t *)%s)[stack_%d];\n", stack - 1, name, stack - 1);
+  return 0;
 }
 
 int STDC::array_write_byte()
@@ -563,16 +607,22 @@ int STDC::array_write_int()
 
 int STDC::array_write_byte(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  ((int8_t *)%s)[stack_%d] = stack_%d;\n", name, stack - 2, stack - 1);
+  stack -= 2;
+  return 0;
 }
 
 int STDC::array_write_short(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  ((int16_t *)%s)[stack_%d] = stack_%d;\n", name, stack - 2, stack - 1);
+  stack -= 2;
+  return 0;
 }
 
 int STDC::array_write_int(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  ((int32_t *)%s)[stack_%d] = stack_%d;\n", name, stack - 2, stack - 1);
+  stack -= 2;
+  return 0;
 }
 

@@ -101,6 +101,7 @@ protected:
   int stack;          // Current variable stack ptr
   bool is_main : 1;
   bool temp_var: 1;
+  bool len_var: 1;
 
   //int stack_alu(const char *instr);
 };
