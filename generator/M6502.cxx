@@ -129,7 +129,8 @@ int M6502::start_init()
 
 int M6502::insert_static_field_define(const char *name, const char *type, int index)
 {
-  fprintf(out, "%s equ ram_start+%d\n", name, index + 1);
+//FIXME test this
+  fprintf(out, "%s equ ram_start + %d\n", name, (index + 1) * 2);
 
   return 0;
 }
@@ -137,9 +138,9 @@ int M6502::insert_static_field_define(const char *name, const char *type, int in
 int M6502::init_heap(int field_count)
 {
   fprintf(out, "  ; Set up heap and static initializers\n");
-  fprintf(out, "  lda #(ram_start+%d) & 0xff\n", (field_count + 1) * 2);
+  fprintf(out, "  lda #ram_start + %d & 0xff\n", (field_count + 1) * 2);
   fprintf(out, "  sta ram_start + 0\n");
-  fprintf(out, "  lda #(ram_start+%d) >> 8\n", (field_count + 1) * 2);
+  fprintf(out, "  lda #ram_start + %d >> 8\n", (field_count + 1) * 2);
   fprintf(out, "  sta ram_start + 1\n");
 
   return 0;
@@ -159,10 +160,13 @@ int M6502::insert_field_init_boolean(char *name, int index, int value)
 int M6502::insert_field_init_byte(char *name, int index, int value)
 {
   if (value < -128 || value > 255) { return -1; }
+  int16_t n = value;
+  uint16_t v = (n & 0xffff);
 
-  fprintf(out, "  lda #%d\n", (int8_t)value & 0xff);
+
+  fprintf(out, "  lda #%d\n", (uint8_t)v & 0xff);
   fprintf(out, "  sta %s + 0\n", name);
-  fprintf(out, "  lda #%d\n", (int8_t)value >> 8);
+  fprintf(out, "  lda #%d\n", (uint8_t)v >> 8);
   fprintf(out, "  sta %s + 1\n", name);
 
   return 0;
@@ -285,7 +289,8 @@ int M6502::push_double(double f)
 
 int M6502::push_byte(int8_t b)
 {
-  uint16_t value = (b & 0xffff);
+  int16_t n = b;
+  uint16_t value = (n & 0xffff);
 
   fprintf(out, "; push_byte\n");
   fprintf(out, "  lda #0x%02x\n", value & 0xff);
@@ -559,13 +564,13 @@ int M6502::integer_to_byte()
   fprintf(out, "  sta result + 0\n");
   PUSH_LO;
   fprintf(out, "  lda result + 0\n");
-  fprintf(out, "  bpl #13\n");
+  fprintf(out, "  bpl #15\n");
 
   fprintf(out, "  lda #0xff\n");
   fprintf(out, "  sta result + 1\n");
   PUSH_HI;
   fprintf(out, "  lda #0\n");
-  fprintf(out, "  beq #9\n");
+  fprintf(out, "  beq #11\n");
 
   fprintf(out, "  lda #0\n");
   fprintf(out, "  sta result + 1\n");
@@ -973,7 +978,7 @@ int M6502::insert_array(const char *name, int32_t *data, int len, uint8_t type)
     return insert_dw(name, data, len, TYPE_SHORT);
   }
 
-  return 0;
+  return -1;
 }
 
 int M6502::push_array_length()
@@ -1034,6 +1039,7 @@ int M6502::array_read_byte(const char *name, int field_id)
     fprintf(out, "  sta address + 1\n");
 
     fprintf(out, "jsr array_read_byte2\n");
+    stack++;
   }
 
   return 0;
@@ -1055,6 +1061,7 @@ int M6502::array_read_int(const char *name, int field_id)
     fprintf(out, "  lda %s + 1\n", name);
     fprintf(out, "  sta address + 1\n");
     fprintf(out, "jsr array_read_int2\n");
+    stack++;
   }
 
   return 0;
@@ -1848,6 +1855,7 @@ int M6502::memory_read8()
   fprintf(out, "  lda (address),y\n");
   fprintf(out, "  sta result + 0\n");
   PUSH_LO;
+/*
   // sign-extend
   fprintf(out, "  lda result + 0\n");
   fprintf(out, "  bpl #15\n");
@@ -1856,6 +1864,7 @@ int M6502::memory_read8()
   PUSH_HI;
   fprintf(out, "  lda #0\n");
   fprintf(out, "  beq #11\n");
+*/
   fprintf(out, "  lda #0\n");
   fprintf(out, "  sta result + 1\n");
   PUSH_HI;
