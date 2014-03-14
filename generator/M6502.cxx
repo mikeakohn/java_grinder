@@ -195,7 +195,7 @@ int M6502::insert_field_init(char *name, int index)
   return 0;
 }
 
-void M6502::method_start(int local_count, const char *name)
+void M6502::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
   stack = 0;
 

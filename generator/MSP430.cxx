@@ -167,7 +167,7 @@ int MSP430::insert_field_init(char *name, int index)
   return 0;
 }
 
-void MSP430::method_start(int local_count, const char *name)
+void MSP430::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
   reg = 0;
   stack = 0;

@@ -295,6 +295,7 @@ int wide = 0;
 int pc_start;
 int max_stack;
 int max_locals;
+int param_count;
 int code_len;
 uint32_t ref;
 struct generic_32bit_t *gen32;
@@ -323,17 +324,23 @@ int skip_bytes;
     return 0;
   }
 
+  param_count = 0;
+
   if (strcmp(method_name, "main") != 0)
   {
     char method_sig[64];
     java_class->get_name_constant(method_sig, sizeof(method_sig), method->descriptor_index);
 
     char *s = method_sig + 1;
-    while(*s != ')' && *s != 0) { s++; }
+    while(*s != ')' && *s != 0) { param_count++; s++; }
     *s = 0;
     method_sig[0] = '_';
     if (method_sig[1] != 0 ) { strcat(method_name, method_sig); }
     printf("Using method name '%s'\n", method_name);
+  }
+    else
+  {
+    param_count = 1;
   }
 
   // bytes points to the method attributes info for the method.
@@ -347,7 +354,7 @@ int skip_bytes;
              ((int)bytes[code_len+9])) + 8;
   pc = pc_start;
 
-  generator->method_start(max_locals, method_name);
+  generator->method_start(max_locals, max_stack, param_count, method_name);
   operand_stack = (uint16_t *)alloca(max_stack * sizeof(uint16_t));
 
   int label_map_len = (code_len / 8) + 1;

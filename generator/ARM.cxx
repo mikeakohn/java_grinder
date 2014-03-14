@@ -138,7 +138,7 @@ int ARM::insert_field_init(char *name, int index)
   return -1;
 }
 
-void ARM::method_start(int local_count, const char *name)
+void ARM::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
 }
 

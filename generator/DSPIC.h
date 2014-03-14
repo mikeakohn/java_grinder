@@ -35,7 +35,7 @@ public:
   virtual int insert_field_init_short(char *name, int index, int value);
   virtual int insert_field_init_int(char *name, int index, int value);
   virtual int insert_field_init(char *name, int index);
-  virtual void method_start(int local_count, const char *name);
+  virtual void method_start(int local_count, int max_stack, int param_count, const char *name);
   virtual void method_end(int local_count);
   virtual int push_integer(int32_t n);
   virtual int push_integer_local(int index);

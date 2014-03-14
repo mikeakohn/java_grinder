@@ -127,7 +127,7 @@ int MIPS::insert_field_init(char *name, int index)
   return -1;
 }
 
-void MIPS::method_start(int local_count, const char *name)
+void MIPS::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
 }
 
