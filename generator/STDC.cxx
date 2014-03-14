@@ -164,6 +164,13 @@ int STDC::push_ref_local(int index)
   return 0;
 }
 
+int STDC::set_integer_local(int index, int value)
+{
+  fprintf(out, "  local_%d = %d;\n", index, value);
+
+  return 0;
+}
+
 int STDC::push_long(int64_t n)
 {
   return -1;
@@ -195,7 +202,7 @@ int STDC::push_short(int16_t s)
 
 int STDC::pop_integer_local(int index)
 {
-  fprintf(out, "  stack_%d = local_%d;\n", stack++, index);
+  fprintf(out, "  local_%d = stack_%d;\n", index, --stack);
 
   return 0;
 }
@@ -431,14 +438,14 @@ int STDC::return_local(int index, int local_count)
 
 int STDC::return_integer(int local_count)
 {
-  fprintf(out, "  return stack_%d\n", stack - 1);
+  fprintf(out, "\n  return stack_%d\n", stack - 1);
 
   return 0;
 }
 
 int STDC::return_void(int local_count)
 {
-  fprintf(out, "  return 0;\n");
+  fprintf(out, "\n  return 0;\n");
 
   return 0;
 }
