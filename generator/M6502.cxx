@@ -1294,6 +1294,7 @@ void M6502::insert_mul_integer()
 void M6502::insert_mul_integer()
 {
   fprintf(out, "mul_integer:\n");
+  // load values
   POP_HI;
   fprintf(out, "  sta value2 + 1\n");
   POP_LO;
@@ -1304,123 +1305,56 @@ void M6502::insert_mul_integer()
   fprintf(out, "  sta value1 + 0\n");
 
   fprintf(out, "  lda value1 + 0\n");
-  fprintf(out, "  sta sm1a + 1\n");
-  fprintf(out, "  sta sm3a + 1\n");
-  fprintf(out, "  sta sm5a + 1\n");
-//  fprintf(out, "  sta sm7a + 1\n");
+  fprintf(out, "  sta mul_1a + 1\n");
+  fprintf(out, "  sta mul_3a + 1\n");
+  fprintf(out, "  sta mul_5a + 1\n");
   fprintf(out, "  eor #0xff\n");
-  fprintf(out, "  sta sm2a + 1\n");
-  fprintf(out, "  sta sm4a + 1\n");
-  fprintf(out, "  sta sm6a + 1\n");
-//  fprintf(out, "  sta sm8a + 1\n");
+  fprintf(out, "  sta mul_2a + 1\n");
+  fprintf(out, "  sta mul_4a + 1\n");
+  fprintf(out, "  sta mul_6a + 1\n");
   fprintf(out, "  lda value1 + 1\n");
-  fprintf(out, "  sta sm1b + 1\n");
-//  fprintf(out, "  sta sm3b + 1\n");
-//  fprintf(out, "  sta sm5b + 1\n");
-//  fprintf(out, "  sta sm7b + 1\n");
+  fprintf(out, "  sta mul_1b + 1\n");
   fprintf(out, "  eor #0xff\n");
-  fprintf(out, "  sta sm2b + 1\n");
-//  fprintf(out, "  sta sm4b + 1\n");
-//  fprintf(out, "  sta sm6b + 1\n");
-//  fprintf(out, "  sta sm8b + 1\n");
+  fprintf(out, "  sta mul_2b + 1\n");
 
   fprintf(out, "  ldx value2 + 0\n");
   fprintf(out, "  sec\n");
-  fprintf(out, "sm1a:\n");
+  fprintf(out, "mul_1a:\n");
   fprintf(out, "  lda square1_lo,x\n");
-  fprintf(out, "sm2a:\n");
+  fprintf(out, "mul_2a:\n");
   fprintf(out, "  sbc square2_lo,x\n");
   fprintf(out, "  sta product + 0\n");
-  fprintf(out, "sm3a:\n");
+  fprintf(out, "mul_3a:\n");
   fprintf(out, "  lda square1_hi,x\n");
-  fprintf(out, "sm4a:\n");
+  fprintf(out, "mul_4a:\n");
   fprintf(out, "  sbc square2_hi,x\n");
-  fprintf(out, "  sta _AA + 1\n");
-
+  fprintf(out, "  sta mul_a + 1\n");
   fprintf(out, "  sec\n");
-  fprintf(out, "sm1b:\n");
+  fprintf(out, "mul_1b:\n");
   fprintf(out, "  lda square1_lo,x\n");
-  fprintf(out, "sm2b:\n");
+  fprintf(out, "mul_2b:\n");
   fprintf(out, "  sbc square2_lo,x\n");
-  fprintf(out, "  sta _cc + 1\n");
-//  fprintf(out, "sm3b:\n");
-//  fprintf(out, "  lda square1_hi,x\n");
-//  fprintf(out, "sm4b:\n");
-//  fprintf(out, "  sbc square2_hi,x\n");
-//  fprintf(out, "  sta _CC + 1\n");
-
+  fprintf(out, "  sta mul_c + 1\n");
   fprintf(out, "  ldx value2 + 1\n");
   fprintf(out, "  sec\n");
-  fprintf(out, "sm5a:\n");
+  fprintf(out, "mul_5a:\n");
   fprintf(out, "  lda square1_lo,x\n");
-  fprintf(out, "sm6a:\n");
+  fprintf(out, "mul_6a:\n");
   fprintf(out, "  sbc square2_lo,x\n");
-  fprintf(out, "  sta _bb + 1\n");
-//  fprintf(out, "sm7a:\n");
-//  fprintf(out, "  lda square1_hi,x\n");
-//  fprintf(out, "sm8a:\n");
-//  fprintf(out, "  sbc square2_hi,x\n");
-//  fprintf(out, "  sta _BB + 1\n");
-//  fprintf(out, "  sec\n");
-//  fprintf(out, "sm5b:\n");
-//  fprintf(out, "  lda square1_lo,x\n");
-//  fprintf(out, "sm6b:\n");
-//  fprintf(out, "  sbc square2_lo,x\n");
-//  fprintf(out, "  sta _dd + 1\n");
-//  fprintf(out, "sm7b:\n");
-//  fprintf(out, "  lda square1_hi,x\n");
-//  fprintf(out, "sm8b:\n");
-//  fprintf(out, "  sbc square2_hi,x\n");
-//  fprintf(out, "  sta product + 3\n");
-
+  fprintf(out, "  sta mul_b + 1\n");
   fprintf(out, "  clc\n");
-  fprintf(out, "_AA:\n");
+  fprintf(out, "mul_a:\n");
   fprintf(out, "  lda #0\n");
-  fprintf(out, "_bb:\n");
+  fprintf(out, "mul_b:\n");
   fprintf(out, "  adc #0\n");
   fprintf(out, "  sta product + 1\n");
-//  fprintf(out, "_BB:\n");
-//  fprintf(out, "  lda #0\n");
-//  fprintf(out, "_CC:\n");
-//  fprintf(out, "  adc #0\n");
-//  fprintf(out, "  sta product + 2\n");
-//  fprintf(out, "  bcc #3\n");
-//  fprintf(out, "  inc product + 3\n");
   fprintf(out, "  clc\n");
-
-  fprintf(out, "_cc:\n");
+  fprintf(out, "mul_c:\n");
   fprintf(out, "  lda #0\n");
   fprintf(out, "  adc product + 1\n");
   fprintf(out, "  sta product + 1\n");
-//  fprintf(out, "_dd:\n");
-//  fprintf(out, "  lda #0\n");
-//  fprintf(out, "  adc product + 2\n");
-//  fprintf(out, "  sta product + 2\n");
-//  fprintf(out, "  bcc #2\n");
-//  fprintf(out, "  inc product + 3\n");
 
-  // fix signs
-/*
-  fprintf(out, "  lda value1 + 1\n");
-  fprintf(out, "  bpl #13\n");
-  fprintf(out, "  sec\n");
-  fprintf(out, "  lda product + 2\n");
-  fprintf(out, "  sbc value2 + 0\n");
-  fprintf(out, "  sta product + 2\n");
-  fprintf(out, "  lda product + 3\n");
-  fprintf(out, "  sbc value2 + 1\n");
-  fprintf(out, "  sta product + 3\n");
-
-  fprintf(out, "  lda value2 + 1\n");
-  fprintf(out, "  bpl #13\n");
-  fprintf(out, "  sec\n");
-  fprintf(out, "  lda product + 2\n");
-  fprintf(out, "  sbc value1 + 0\n");
-  fprintf(out, "  sta product + 2\n");
-  fprintf(out, "  lda product + 3\n");
-  fprintf(out, "  sbc value1 + 1\n");
-  fprintf(out, "  sta product + 3\n");
-*/
+  // push result
   fprintf(out, "  lda product + 0\n");
   PUSH_LO;
   fprintf(out, "  lda product + 1\n");
@@ -1428,7 +1362,7 @@ void M6502::insert_mul_integer()
 
   fprintf(out, "  rts\n");
 
-  // make square tables
+  // square tables
   fprintf(out, "; make_square_tables\n");
   fprintf(out, "make_square_tables:\n");
   fprintf(out, "  ldx #0\n");
