@@ -95,6 +95,13 @@ int C64::open(char *filename)
   fprintf(out, "sprite_x equ 0x12\n");
   fprintf(out, "sprite_y equ 0x13\n");
 
+  // fast multiply related
+  fprintf(out, "product equ 0x40\n");
+  fprintf(out, "square1_lo equ 0xc200\n");
+  fprintf(out, "square1_hi equ 0xc400\n");
+  fprintf(out, "square2_lo equ 0xc600\n");
+  fprintf(out, "square2_hi equ 0xc800\n\n");
+
   // basic loader
   fprintf(out, ".org 0x07ff\n\n");
 
@@ -118,7 +125,8 @@ int C64::open(char *filename)
   fprintf(out, "  lda #0xff\n");
   fprintf(out, "  sta SP\n");
   fprintf(out, "  tax\n");
-  fprintf(out, "  txs\n\n");
+  fprintf(out, "  txs\n");
+  fprintf(out, "  jsr make_square_tables\n\n");
 
   return 0;
 }
