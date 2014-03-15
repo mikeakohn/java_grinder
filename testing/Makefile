@@ -1,16 +1,17 @@
 
 JOBJS=Arrays.class \
-      GasDetector.class \
-      Testing.class \
-      Testing2.class \
+      CommodoreDemo.class \
       DSPTest.class \
+      GasDetector.class \
       LedBlink.class \
       LCD.class \
       LCDDSPIC.class \
       MemoryTest.class \
       MethodCall.class \
       SPITest.class \
-      CommodoreDemo.class
+      StringTest.class \
+      Testing.class \
+      Testing2.class
 
 default: $(JOBJS)
 

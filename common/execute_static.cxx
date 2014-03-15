@@ -44,6 +44,7 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
 {
 struct methods_t *method = java_class->get_method(method_id);
 uint8_t *bytes = method->attributes[0].info;
+generic_32bit_t *gen32;
 int pc;
 int wide = 0;
 int pc_start;
@@ -116,10 +117,37 @@ int ret = 0;
         stack[stack_ptr++] = (int8_t)bytes[pc+1];
         break;
       case 17: // sipush (0x11)
-        stack[stack_ptr++] = (int16_t)((bytes[pc+1]<<8) | bytes[pc+2]);
+        stack[stack_ptr++] = (int16_t)((bytes[pc+1] << 8) | bytes[pc+2]);
         break;
       case 18: // ldc (0x12)
+        index = bytes[pc+1];
       case 19: // ldc_w (0x13)
+        if (bytes[pc] == 0x13) { index = (bytes[pc+1] << 8) | bytes[pc+2]; }
+        printf("  index=%d\n", index);
+
+        gen32 = (generic_32bit_t *)java_class->get_constant(index);
+
+        if (gen32->tag == CONSTANT_INTEGER)
+        {
+          stack[stack_ptr++] = gen32->value;
+        }
+          else
+        if (gen32->tag == CONSTANT_FLOAT)
+        {
+          stack[stack_ptr++] = gen32->value;
+        }
+          else
+        if (gen32->tag == CONSTANT_STRING)
+        {
+          printf("Can't do a string yet.. :(\n");
+          ret = -1;
+        }
+          else
+        {
+          printf("Cannot ldc this type %d=>'%s' pc=%d\n", gen32->tag, JavaClass::tag_as_string(gen32->tag), pc);
+          ret = -1;
+        }
+        break;
       case 20: // ldc2_w (0x14)
       case 21: // iload (0x15)
       case 22: // lload (0x16)

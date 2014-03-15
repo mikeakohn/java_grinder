@@ -310,6 +310,7 @@ uint16_t operand_stack_ptr = 0;
 //int const_stack_ptr = 0;
 int const_val;
 int skip_bytes;
+int index;
 
   if (java_class->get_method_name(method_name, sizeof(method_name), method_id) != 0)
   {
@@ -469,11 +470,15 @@ printf("code_len=%d\n", code_len);
         break;
 
       case 18: // ldc (0x12)
-        gen32 = (generic_32bit_t *)java_class->get_constant(bytes[pc+1]);
+        index = bytes[pc+1];
+      case 19: // ldc_w (0x13)
+        if (bytes[pc] == 0x13) { index = GET_PC_UINT16(1); }
+        printf("  index=%d\n", index);
+
+        gen32 = (generic_32bit_t *)java_class->get_constant(index);
 
         if (gen32->tag == CONSTANT_INTEGER)
         {
-          //PUSH_INTEGER(gen32->value);
           const_val = gen32->value;
           ret = optimize_const(java_class, generator, method_name, bytes, pc + 2, pc_start + code_len, address + 2, const_val);
           if (ret == 0)
@@ -490,7 +495,6 @@ printf("code_len=%d\n", code_len);
         if (gen32->tag == CONSTANT_FLOAT)
         {
           constant_float = (constant_float_t *)gen32;
-          //PUSH_FLOAT(constant_float->value);
           ret = generator->push_float(constant_float->value);
         }
           else
@@ -504,11 +508,6 @@ printf("code_len=%d\n", code_len);
           printf("Cannot ldc this type %d=>'%s' pc=%d\n", gen32->tag, JavaClass::tag_as_string(gen32->tag), pc);
           ret = -1;
         }
-
-        break;
-
-      case 19: // ldc_w (0x13)
-        UNIMPL()
         break;
 
       case 20: // ldc2_w (0x14)
