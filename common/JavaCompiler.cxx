@@ -15,7 +15,7 @@
 #include <stdint.h>
 
 #include "JavaClass.h"
-#include "compile.h"
+#include "JavaCompiler.h"
 #include "invoke.h"
 #include "table_java_instr.h"
 
@@ -25,10 +25,7 @@
 
 //#define CONST_STACK_SIZE 4
 
-// FIXME - put this in a class
-static int optimize = 1;
-
-static uint8_t cond_table[] =
+uint8_t JavaCompiler::cond_table[] =
 {
   COND_EQUAL,         // 159 (0x9f) if_icmpeq
   COND_NOT_EQUAL,     // 160 (0xa0) if_icmpne
@@ -38,7 +35,18 @@ static uint8_t cond_table[] =
   COND_LESS_EQUAL,    // 164 (0xa4) if_icmple
 };
 
-static void fill_label_map(uint8_t *label_map, int label_map_len, uint8_t *bytes, int code_len, int pc_start)
+JavaCompiler::JavaCompiler() :
+  optimize(true)
+{
+  optimize = 1;
+}
+
+JavaCompiler::~JavaCompiler()
+{
+}
+
+
+void JavaCompiler::fill_label_map(uint8_t *label_map, int label_map_len, uint8_t *bytes, int code_len, int pc_start)
 {
 int pc = pc_start;
 int wide = 0;
@@ -105,7 +113,7 @@ int address;
 }
 
 // FIXME - Too many parameters :(.
-static int optimize_const(JavaClass *java_class, Generator *generator, char *method_name, uint8_t *bytes, int pc, int pc_end, int address, int const_val)
+int JavaCompiler::optimize_const(JavaClass *java_class, Generator *generator, char *method_name, uint8_t *bytes, int pc, int pc_end, int address, int const_val)
 {
 int const_vals[2];
 
@@ -210,7 +218,7 @@ int const_vals[2];
   return 0;
 }
 
-static int array_load(JavaClass *java_class, Generator *generator, int constant_id, uint8_t array_type)
+int JavaCompiler::array_load(JavaClass *java_class, Generator *generator, int constant_id, uint8_t array_type)
 {
 generic_32bit_t *gen32;
 char field_name[64];
@@ -248,7 +256,7 @@ char type[64];
   return -1;
 }
 
-static int array_store(JavaClass *java_class, Generator *generator, int constant_id, uint8_t array_type)
+int JavaCompiler::array_store(JavaClass *java_class, Generator *generator, int constant_id, uint8_t array_type)
 {
 generic_32bit_t *gen32;
 char field_name[64];
@@ -286,7 +294,7 @@ char type[64];
   return -1;
 }
 
-int compile_method(JavaClass *java_class, int method_id, Generator *generator)
+int JavaCompiler::compile_method(JavaClass *java_class, int method_id, Generator *generator)
 {
 struct methods_t *method = java_class->get_method(method_id);
 uint8_t *bytes = method->attributes[0].info;

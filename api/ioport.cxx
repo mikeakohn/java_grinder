@@ -15,7 +15,6 @@
 #include <stdint.h>
 
 #include "JavaClass.h"
-#include "compile.h"
 #include "ioport.h"
 
 #define CHECK_FUNC(funct) \

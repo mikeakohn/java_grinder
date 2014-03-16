@@ -15,7 +15,7 @@
 #include <stdint.h>
 
 #include "JavaClass.h"
-#include "compile.h"
+#include "JavaCompiler.h"
 #include "invoke.h"
 #include "adc.h"
 #include "cpu.h"

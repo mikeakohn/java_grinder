@@ -15,7 +15,7 @@
 
 #include "Generator.h"
 #include "JavaClass.h"
-#include "compile.h"
+#include "JavaCompiler.h"
 #include "execute_static.h"
 #include "ARM.h"
 #include "DSPIC.h"
@@ -35,6 +35,7 @@ int main(int argc, char *argv[])
 FILE *in;
 Generator *generator;
 JavaClass *java_class;
+JavaCompiler java_compiler;
 char method_name[32];
 int index;
 
@@ -173,7 +174,7 @@ int index;
       {
         if (strcmp(method_name, "main") == 0)
         {
-          if (compile_method(java_class, index, generator) != 0)
+          if (java_compiler.compile_method(java_class, index, generator) != 0)
           {
             printf("** Error compiling class.\n");
             ret = -1;
@@ -202,7 +203,7 @@ int index;
         }
       }
 
-      if (compile_method(java_class, index, generator) != 0)
+      if (java_compiler.compile_method(java_class, index, generator) != 0)
       {
         printf("** Error compiling class.\n");
         ret = -1;
