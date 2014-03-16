@@ -147,7 +147,14 @@ int MIPS::push_integer_local(int index)
 
 int MIPS::push_ref_local(int index)
 {
-  return push_ref_local(index);
+  return push_integer_local(index);
+}
+
+int MIPS::push_fake()
+{
+  if (stack != 0) { return -1; }
+  reg++;
+  return 0;
 }
 
 int MIPS::push_long(int64_t n)

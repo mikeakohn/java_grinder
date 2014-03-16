@@ -275,6 +275,11 @@ int M6502::push_ref_local(int index)
   return push_integer_local(index);
 }
 
+int M6502::push_fake()
+{
+  return -1;
+}
+
 int M6502::push_long(int64_t n)
 {
   return push_integer((int32_t)n);

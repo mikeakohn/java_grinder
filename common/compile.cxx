@@ -25,6 +25,9 @@
 
 //#define CONST_STACK_SIZE 4
 
+// FIXME - put this in a class
+static int optimize = 1;
+
 static uint8_t cond_table[] =
 {
   COND_EQUAL,         // 159 (0x9f) if_icmpeq
@@ -663,13 +666,12 @@ printf("code_len=%d\n", code_len);
         if (wide == 1)
         {
           ret = generator->pop_integer_local(GET_PC_UINT16(1));
-          //local_vars[GET_PC_UINT16(1)]=POP_INTEGER();
         }
           else
         {
-          //local_vars[bytes[pc+1]]=POP_INTEGER();
           ret = generator->pop_integer_local(bytes[pc+1]);
         }
+
         break;
 
       case 55: // lstore (0x37)
@@ -701,6 +703,15 @@ printf("code_len=%d\n", code_len);
       case 62: // istore_3 (0x3e)
         // Pop integer off stack and store in local variable
         ret = generator->pop_integer_local(bytes[pc]-59);
+
+        if (optimize == 1 && bytes[pc+1] == 26 + (bytes[pc]-59))
+        {
+          if (generator->push_fake() == 0)
+          {
+            pc += table_java_instr[bytes[pc+1]].normal;
+          }
+        }
+
         break;
 
       case 63: // lstore_0 (0x3f)

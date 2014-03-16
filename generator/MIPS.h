@@ -34,6 +34,7 @@ public:
   virtual int push_integer(int32_t n);
   virtual int push_integer_local(int index);
   virtual int push_ref_local(int index);
+  virtual int push_fake();
   virtual int push_long(int64_t n);
   virtual int push_float(float f);
   virtual int push_double(double f);

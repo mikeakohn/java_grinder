@@ -190,6 +190,14 @@ int ARM::push_ref_local(int index)
   return push_integer_local(index);
 }
 
+int ARM::push_fake()
+{
+  if (stack != 0) { return -1; }
+
+  reg++;
+  return 0;
+}
+
 int ARM::push_long(int64_t n)
 {
   return -1;

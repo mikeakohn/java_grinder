@@ -177,6 +177,12 @@ int STDC::push_ref_local(int index)
   return 0;
 }
 
+int STDC::push_fake()
+{
+  stack++;
+  return 0;
+}
+
 int STDC::set_integer_local(int index, int value)
 {
   fprintf(out, "  local_%d = %d;\n", index, value);

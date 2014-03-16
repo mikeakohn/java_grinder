@@ -14,12 +14,13 @@ do
   answer=`echo ${a} | sed 's/^.* r15: //' | sed 's/,.*$//'`
   answer=`printf "%d" ${answer}`
   result=`cat ${file}.result`
-  echo ${file} ": " ${cycles} "cycles", ${answer}
+  echo -n ${file} ": " ${cycles} "cycles", ${answer}
   if [ ${answer} -ne ${result} ]
   then
-    echo "FAIL got ${answer} but expected ${result}"
+    echo " FAIL got ${answer} but expected ${result}"
     exit 1
   fi
+  echo " PASS"
 done
 
 make clean

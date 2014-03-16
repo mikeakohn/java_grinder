@@ -41,6 +41,7 @@ public:
   virtual int push_short(int16_t s);
   virtual int pop_integer_local(int index);
   virtual int pop_ref_local(int index);
+  virtual int push_fake();
   virtual int pop();
   virtual int dup();
   virtual int dup2();

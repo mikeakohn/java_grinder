@@ -236,6 +236,13 @@ int MSP430::push_ref_local(int index)
   return push_integer_local(index);
 }
 
+int MSP430::push_fake()
+{
+  if (stack != 0) { return -1; }
+  reg++;
+  return 0;
+}
+
 int MSP430::push_long(int64_t n)
 {
   printf("long is not supported right now\n");

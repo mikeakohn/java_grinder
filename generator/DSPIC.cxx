@@ -265,6 +265,13 @@ int DSPIC::push_ref_local(int index)
   return push_integer_local(index);
 }
 
+int DSPIC::push_fake()
+{
+  if (stack != 0) { return -1; }
+  reg++;
+  return 0;
+}
+
 int DSPIC::push_long(int64_t n)
 {
   printf("long is not supported right now\n");

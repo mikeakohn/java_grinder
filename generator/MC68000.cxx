@@ -185,6 +185,13 @@ int MC68000::push_ref_local(int index)
   return push_integer_local(index);
 }
 
+int MC68000::push_fake()
+{
+  if (stack != -1) { return -1; }
+  reg++;
+  return 0;
+}
+
 int MC68000::push_long(int64_t n)
 {
   return -1;

@@ -36,6 +36,7 @@ public:
   virtual int push_integer(int32_t n) = 0;
   virtual int push_integer_local(int index) = 0;
   virtual int push_ref_local(int index) = 0;
+  virtual int push_fake() { return -1; } // move stack ptr without push
   virtual int set_integer_local(int index, int value) { return -1; }
   virtual int push_long(int64_t n) = 0;
   virtual int push_float(float f) = 0;
