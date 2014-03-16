@@ -40,7 +40,6 @@ JavaCompiler::JavaCompiler() :
   generator(NULL),
   optimize(true)
 {
-  optimize = 1;
 }
 
 JavaCompiler::~JavaCompiler()

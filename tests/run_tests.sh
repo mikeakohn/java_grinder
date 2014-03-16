@@ -29,6 +29,8 @@ do
   run_msp430_test ${file}
 done
 
+echo " ---- Testing MSP430 (Unoptimized) ----"
+
 for file in *.class
 do
   file=${file%.class}
