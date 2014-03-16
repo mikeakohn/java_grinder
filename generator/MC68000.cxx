@@ -748,6 +748,7 @@ int array_length_reg;
 
 int MC68000::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 {
+  fprintf(out, ".align 32\n");
   if (type == TYPE_BYTE)
   { return insert_db(name, data, len, TYPE_INT); }
     else
@@ -758,6 +759,16 @@ int MC68000::insert_array(const char *name, int32_t *data, int len, uint8_t type
   { return insert_dc32(name, data, len, TYPE_INT); }
 
   return -1;
+}
+
+int MC68000::insert_array(const char *name, char *data)
+{
+  fprintf(out, ".align 32\n");
+  fprintf(out, "  dc32 %d\n", (int)strlen(data));
+  fprintf(out, "_%s:\n", name);
+  fprintf(out, "  ds \"%s\"\n", data);
+
+  return 0;
 }
 
 int MC68000::push_array_length()

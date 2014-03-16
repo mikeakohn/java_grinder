@@ -993,6 +993,11 @@ int M6502::insert_array(const char *name, int32_t *data, int len, uint8_t type)
   return -1;
 }
 
+int M6502::insert_array(const char *name, char *data)
+{
+  return -1;
+}
+
 int M6502::push_array_length()
 {
   if (stack > 0)

@@ -139,8 +139,52 @@ int ret = 0;
           else
         if (gen32->tag == CONSTANT_STRING)
         {
-          printf("Can't do a string yet.. :(\n");
-          ret = -1;
+          constant_string_t *constant_string = (constant_string_t *)gen32;
+
+          if (bytes[pc] == 18 && bytes[pc+2] == 179)
+          {
+            index = (bytes[pc+3] << 8) | bytes[pc+4];
+            pc += 2;
+          }
+            else
+          if (bytes[pc] == 19 && bytes[pc+3] == 179)
+          {
+            index = (bytes[pc+4] << 8) | bytes[pc+5];
+            pc += 3;
+          }
+            else
+          {
+            printf("Error: Why is there no putstatic?\n");
+            ret = -1;
+            break;
+          }
+
+          if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), index) != 0)
+          {
+            printf("Error retrieving field name %d\n", constant_string->string_index);
+            ret = -1;
+            break;
+          }
+          printf("  String %s;\n", field_name);
+          if (do_arrays)
+          {
+            char *array = (char *)java_class->get_constant(constant_string->string_index);
+            if (array == NULL)
+            {
+              printf("Error retrieving constant %s\n", field_name);
+              ret = -1;
+              break;
+            }
+            generator->insert_array(field_name, array);
+          }
+            else
+          {
+            //index = java_class->get_field_index(field_name);
+            generator->insert_field_init(field_name, index);
+          }
+
+          //printf("Can't do a string yet.. :( %d\n", constant_string->string_index);
+          //ret = -1;
         }
           else
         {

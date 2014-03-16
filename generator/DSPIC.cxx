@@ -765,9 +765,10 @@ int DSPIC::new_array(uint8_t type)
 
 int DSPIC::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 {
+  fprintf(out, ".align 16\n");
+
   if (type == TYPE_BYTE)
   {
-    fprintf(out, ".align 16\n");
     return insert_db(name, data, len, TYPE_SHORT);
   }
     else
@@ -778,6 +779,16 @@ int DSPIC::insert_array(const char *name, int32_t *data, int len, uint8_t type)
   { return insert_dw(name, data, len, TYPE_SHORT); }
 
   return -1;
+}
+
+int DSPIC::insert_array(const char *name, char *data)
+{
+  fprintf(out, ".align 16\n");
+  fprintf(out, "  dw %d\n", (int)strlen(data));
+  fprintf(out, "_%s:\n", name);
+  fprintf(out, "  ds \"%s\"\n", data);
+
+  return 0;
 }
 
 int DSPIC::push_array_length()

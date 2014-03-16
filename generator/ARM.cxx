@@ -490,6 +490,11 @@ int ARM::insert_array(const char *name, int32_t *data, int len, uint8_t type)
   return -1;
 }
 
+int ARM::insert_array(const char *name, char *data)
+{
+  return -1;
+}
+
 int ARM::push_array_length()
 {
   return -1;

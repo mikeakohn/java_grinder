@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 
 #include "MIPS.h"
@@ -399,6 +400,7 @@ int MIPS::new_array(uint8_t type)
 
 int MIPS::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 {
+  fprintf(out, ".align 32\n");
   if (type == TYPE_BYTE)
   { return insert_db(name, data, len, TYPE_INT); }
     else
@@ -409,6 +411,16 @@ int MIPS::insert_array(const char *name, int32_t *data, int len, uint8_t type)
   { return insert_dc32(name, data, len, TYPE_INT); } 
 
   return -1;
+}
+
+int MIPS::insert_array(const char *name, char *data)
+{
+  fprintf(out, ".align 32\n");
+  fprintf(out, "  dc32 %d\n", (int)strlen(data));
+  fprintf(out, "_%s:\n", name);
+  fprintf(out, "  ds \"%s\"\n", data);
+
+  return 0;
 }
 
 int MIPS::push_array_length()
