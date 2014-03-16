@@ -2,7 +2,7 @@
 
 make
 
-echo "Testing MSP430"
+echo " ---- Testing MSP430 ----"
 
 for file in *.class
 do
@@ -17,7 +17,7 @@ do
   echo ${file} ": " ${cycles} "cycles", ${answer}
   if [ ${answer} -ne ${result} ]
   then
-    echo "FAIL"
+    echo "FAIL got ${answer} but expected ${result}"
     exit 1
   fi
 done
