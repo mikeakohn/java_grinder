@@ -32,17 +32,24 @@ public:
   JavaCompiler();
   ~JavaCompiler();
 
-  int compile_method(JavaClass *java_class, int method_id);
   void disable_optimizer() { optimize = false; }
   void set_generator(Generator *generator) { this->generator = generator; }
+  int load_class(FILE *in);
+  void insert_static_field_defines();
+  void init_heap();
+  int add_static_initializers();
+  int compile_methods(bool do_main);
+  JavaClass *get_java_class() { return java_class; }
 
 private:
   void fill_label_map(uint8_t *label_map, int label_map_len, uint8_t *bytes, int code_len, int pc_start);
   int optimize_const(JavaClass *java_class, char *method_name, uint8_t *bytes, int pc, int pc_end, int address, int const_val);
   int array_load(JavaClass *java_class, int constant_id, uint8_t array_type);
   int array_store(JavaClass *java_class, int constant_id, uint8_t array_type);
+  int compile_method(JavaClass *java_class, int method_id);
 
   Generator *generator;
+  JavaClass *java_class;
   static uint8_t cond_table[];
   bool optimize;
 };

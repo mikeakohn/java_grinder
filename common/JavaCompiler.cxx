@@ -16,6 +16,7 @@
 
 #include "JavaClass.h"
 #include "JavaCompiler.h"
+#include "execute_static.h"
 #include "invoke.h"
 #include "table_java_instr.h"
 
@@ -44,6 +45,7 @@ JavaCompiler::JavaCompiler() :
 
 JavaCompiler::~JavaCompiler()
 {
+  delete java_class;
 }
 
 
@@ -1572,5 +1574,108 @@ printf("code_len=%d\n", code_len);
   return ret;
 }
 
+int JavaCompiler::load_class(FILE *in)
+{
+  java_class = new JavaClass(in);
+  java_class->print();
 
+  return 0;
+}
+
+void JavaCompiler::insert_static_field_defines()
+{
+int field_count = java_class->get_field_count();
+int index;
+
+  for (index = 0; index < field_count; index++)
+  {
+    char field_name[64];
+    char field_type[64];
+    java_class->get_field_name(field_name, sizeof(field_name), index);
+    java_class->get_field_type(field_type, sizeof(field_type), index);
+    generator->insert_static_field_define(field_name, field_type, index);
+  }
+}
+
+void JavaCompiler::init_heap()
+{
+int field_count = java_class->get_field_count();
+
+  generator->start_init();
+  generator->init_heap(field_count);
+}
+
+int JavaCompiler::add_static_initializers()
+{
+int method_count = java_class->get_method_count();
+char method_name[32];
+int index;
+
+  // Add all the static initializers
+  for (index = 0; index < method_count; index++)
+  {
+    if (java_class->get_method_name(method_name, sizeof(method_name), index) == 0)
+    {
+      if (strcmp("<clinit>", method_name) == 0)
+      {
+        if (execute_static(java_class, index, generator, false) != 0)
+        {
+          printf("** Error setting statics.\n");
+          return -1;
+        }
+        continue;
+      }
+    }
+  }
+
+  generator->add_newline();
+
+  return 0;
+}
+
+int JavaCompiler::compile_methods(bool do_main)
+{
+int method_count = java_class->get_method_count();
+char method_name[32];
+int index;
+
+  for (index = 0; index < method_count; index++)
+  {
+    if (java_class->get_method_name(method_name, sizeof(method_name), index) == 0)
+    {
+      if (strcmp(method_name, "main") == 0)
+      {
+        if (!do_main) { continue ;}
+        if (compile_method(java_class, index) != 0)
+        {
+          printf("** Error compiling class.\n");
+          return -1;
+        }
+
+        break;
+      }
+
+      if (do_main) { continue; }
+
+      // <clinit> method is executed to pull out arrays and statics
+      if (strcmp("<clinit>", method_name) == 0)
+      {
+        if (execute_static(java_class, index, generator, true) != 0)
+        {
+          printf("** Error setting statics.\n");
+          return -1;
+        }
+        continue;
+      }
+
+      if (compile_method(java_class, index) != 0)
+      {
+        printf("** Error compiling class.\n");
+        return -1;
+      }
+    }
+  }
+
+  return 0;
+}
 

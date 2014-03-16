@@ -96,13 +96,10 @@ int main(int argc, char *argv[])
 {
 FILE *in;
 Generator *generator;
-JavaClass *java_class;
 JavaCompiler java_compiler;
-char method_name[32];
 const char *java_file;
 const char *asm_file;
 const char *chip_type;
-int index;
 int option = 0;
 int n;
 
@@ -165,98 +162,23 @@ int n;
   }
 
   java_compiler.set_generator(generator);
+  java_compiler.load_class(in);
 
-  java_class = new JavaClass(in);
-#ifdef DEBUG
-  java_class->print();
-#endif
-
-  int method_count = java_class->get_method_count();
-  int field_count = java_class->get_field_count();
   int ret = 0;
 
-  for (index = 0; index < field_count; index++)
-  {
-    char field_name[64];
-    char field_type[64];
-    java_class->get_field_name(field_name, sizeof(field_name), index);
-    java_class->get_field_type(field_type, sizeof(field_type), index);
-    generator->insert_static_field_define(field_name, field_type, index);
-  }
-
-  generator->start_init();
-  generator->init_heap(field_count);
+  java_compiler.insert_static_field_defines();
+  java_compiler.init_heap();
 
   do
   {
-    // Add all the static initializers
-    for (index = 0; index < method_count; index++)
-    {
-      if (java_class->get_method_name(method_name, sizeof(method_name), index) == 0)
-      {
-        if (strcmp("<clinit>", method_name) == 0)
-        {
-          if (execute_static(java_class, index, generator, false) != 0)
-          {
-            printf("** Error setting statics.\n");
-            ret = -1;
-            break;
-          }
-          continue;
-        }
-      }
-    }
-
-    if (ret != 0) { break; }
-    generator->add_newline();
-
+    if (java_compiler.add_static_initializers() == -1) { ret = -1; break; }
     // Add the main function directly under init to save a jmp.
-    for (index = 0; index < method_count; index++)
-    {
-      if (java_class->get_method_name(method_name, sizeof(method_name), index) == 0)
-      {
-        if (strcmp(method_name, "main") == 0)
-        {
-          if (java_compiler.compile_method(java_class, index) != 0)
-          {
-            printf("** Error compiling class.\n");
-            ret = -1;
-            break;
-          }
-        }
-      }
-    }
-
-    if (ret != 0) { break; }
-
-    for (index = 0; index < method_count; index++)
-    {
-      if (java_class->get_method_name(method_name, sizeof(method_name), index) == 0)
-      {
-        if (strcmp(method_name, "main") == 0) { continue; }
-        if (strcmp("<clinit>", method_name) == 0)
-        {
-          if (execute_static(java_class, index, generator, true) != 0)
-          {
-            printf("** Error setting statics.\n");
-            ret = -1;
-            break;
-          }
-          continue;
-        }
-      }
-
-      if (java_compiler.compile_method(java_class, index) != 0)
-      {
-        printf("** Error compiling class.\n");
-        ret = -1;
-        break;
-      }
-    }
+    if (java_compiler.compile_methods(true) == -1) { ret = -1; break; }
+    // Compile all other methods.
+    if (java_compiler.compile_methods(false) == -1) { ret = -1; break; }
   } while(0);
 
   delete generator;
-  delete java_class;
 
   fclose(in);
 
