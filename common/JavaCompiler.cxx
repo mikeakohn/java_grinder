@@ -36,6 +36,7 @@ uint8_t JavaCompiler::cond_table[] =
 };
 
 JavaCompiler::JavaCompiler() :
+  generator(NULL),
   optimize(true)
 {
   optimize = 1;
@@ -113,7 +114,7 @@ int address;
 }
 
 // FIXME - Too many parameters :(.
-int JavaCompiler::optimize_const(JavaClass *java_class, Generator *generator, char *method_name, uint8_t *bytes, int pc, int pc_end, int address, int const_val)
+int JavaCompiler::optimize_const(JavaClass *java_class, char *method_name, uint8_t *bytes, int pc, int pc_end, int address, int const_val)
 {
 int const_vals[2];
 
@@ -218,7 +219,7 @@ int const_vals[2];
   return 0;
 }
 
-int JavaCompiler::array_load(JavaClass *java_class, Generator *generator, int constant_id, uint8_t array_type)
+int JavaCompiler::array_load(JavaClass *java_class, int constant_id, uint8_t array_type)
 {
 generic_32bit_t *gen32;
 char field_name[64];
@@ -256,7 +257,7 @@ char type[64];
   return -1;
 }
 
-int JavaCompiler::array_store(JavaClass *java_class, Generator *generator, int constant_id, uint8_t array_type)
+int JavaCompiler::array_store(JavaClass *java_class, int constant_id, uint8_t array_type)
 {
 generic_32bit_t *gen32;
 char field_name[64];
@@ -294,7 +295,7 @@ char type[64];
   return -1;
 }
 
-int JavaCompiler::compile_method(JavaClass *java_class, int method_id, Generator *generator)
+int JavaCompiler::compile_method(JavaClass *java_class, int method_id)
 {
 struct methods_t *method = java_class->get_method(method_id);
 uint8_t *bytes = method->attributes[0].info;
@@ -410,7 +411,7 @@ printf("code_len=%d\n", code_len);
       case 7: // iconst_4 (0x07)
       case 8: // iconst_5 (0x08)
         const_val = uint8_t(bytes[pc])-3;
-        ret = optimize_const(java_class, generator, method_name, bytes, pc + 1, pc_start + code_len, address + 1, const_val);
+        ret = optimize_const(java_class, method_name, bytes, pc + 1, pc_start + code_len, address + 1, const_val);
         if (ret == 0)
         {
           ret = generator->push_integer(const_val);
@@ -450,7 +451,7 @@ printf("code_len=%d\n", code_len);
       case 16: // bipush (0x10)
         //PUSH_BYTE((char)bytes[pc+1])
         const_val = (int8_t)bytes[pc+1];
-        ret = optimize_const(java_class, generator, method_name, bytes, pc + 2, pc_start + code_len, address + 2, const_val);
+        ret = optimize_const(java_class, method_name, bytes, pc + 2, pc_start + code_len, address + 2, const_val);
         if (ret == 0)
         {
           // FIXME - I don't think push_byte() is really needed.
@@ -466,7 +467,7 @@ printf("code_len=%d\n", code_len);
 
       case 17: // sipush (0x11)
         const_val = (int16_t)((bytes[pc+1]<<8)|(bytes[pc+2]));
-        ret = optimize_const(java_class, generator, method_name, bytes, pc + 3, pc_start + code_len, address + 3, const_val);
+        ret = optimize_const(java_class, method_name, bytes, pc + 3, pc_start + code_len, address + 3, const_val);
         if (ret == 0)
         {
           // FIXME - I don't think push_short() is really needed.
@@ -491,7 +492,7 @@ printf("code_len=%d\n", code_len);
         if (gen32->tag == CONSTANT_INTEGER)
         {
           const_val = gen32->value;
-          ret = optimize_const(java_class, generator, method_name, bytes, pc + 2, pc_start + code_len, address + 2, const_val);
+          ret = optimize_const(java_class, method_name, bytes, pc + 2, pc_start + code_len, address + 2, const_val);
           if (ret == 0)
           {
             ret = generator->push_integer(const_val);
@@ -630,7 +631,7 @@ printf("code_len=%d\n", code_len);
         //{ ret = -1; }
         { ret = generator->array_read_int(); }
           else
-        { ret = array_load(java_class, generator, operand_stack[--operand_stack_ptr], ARRAY_TYPE_INT); }
+        { ret = array_load(java_class, operand_stack[--operand_stack_ptr], ARRAY_TYPE_INT); }
 
         break;
 
@@ -654,7 +655,7 @@ printf("code_len=%d\n", code_len);
         if (operand_stack_ptr == 0)
         { ret = generator->array_read_byte(); }
           else
-        { ret = array_load(java_class, generator, operand_stack[--operand_stack_ptr], ARRAY_TYPE_BYTE); }
+        { ret = array_load(java_class, operand_stack[--operand_stack_ptr], ARRAY_TYPE_BYTE); }
 
         break;
 
@@ -666,7 +667,7 @@ printf("code_len=%d\n", code_len);
         if (operand_stack_ptr == 0)
         { ret = generator->array_read_short(); }
           else
-        { ret = array_load(java_class, generator, operand_stack[--operand_stack_ptr], ARRAY_TYPE_SHORT); }
+        { ret = array_load(java_class, operand_stack[--operand_stack_ptr], ARRAY_TYPE_SHORT); }
 
         break;
 
@@ -779,7 +780,7 @@ printf("code_len=%d\n", code_len);
         if (operand_stack_ptr == 0)
         { ret = generator->array_write_int(); }
           else
-        { ret = array_store(java_class, generator, operand_stack[--operand_stack_ptr], ARRAY_TYPE_INT); }
+        { ret = array_store(java_class, operand_stack[--operand_stack_ptr], ARRAY_TYPE_INT); }
 
         break;
 
@@ -803,7 +804,7 @@ printf("code_len=%d\n", code_len);
         if (operand_stack_ptr == 0)
         { ret = generator->array_write_byte(); }
           else
-        { ret = array_store(java_class, generator, operand_stack[--operand_stack_ptr], ARRAY_TYPE_BYTE); }
+        { ret = array_store(java_class, operand_stack[--operand_stack_ptr], ARRAY_TYPE_BYTE); }
 
         break;
 
@@ -811,14 +812,14 @@ printf("code_len=%d\n", code_len);
         if (operand_stack_ptr == 0)
         { ret = generator->array_write_short(); }
           else
-        { ret = array_store(java_class, generator, operand_stack[--operand_stack_ptr], ARRAY_TYPE_CHAR); }
+        { ret = array_store(java_class, operand_stack[--operand_stack_ptr], ARRAY_TYPE_CHAR); }
         break;
 
       case 86: // sastore (0x56)
         if (operand_stack_ptr == 0)
         { ret = generator->array_write_short(); }
           else
-        { ret = array_store(java_class, generator, operand_stack[--operand_stack_ptr], ARRAY_TYPE_SHORT); }
+        { ret = array_store(java_class, operand_stack[--operand_stack_ptr], ARRAY_TYPE_SHORT); }
         break;
 
       case 87: // pop (0x57)

@@ -123,6 +123,8 @@ int index;
     exit(1);
   }
 
+  java_compiler.set_generator(generator);
+
   java_class = new JavaClass(in);
 #ifdef DEBUG
   java_class->print();
@@ -174,7 +176,7 @@ int index;
       {
         if (strcmp(method_name, "main") == 0)
         {
-          if (java_compiler.compile_method(java_class, index, generator) != 0)
+          if (java_compiler.compile_method(java_class, index) != 0)
           {
             printf("** Error compiling class.\n");
             ret = -1;
@@ -203,7 +205,7 @@ int index;
         }
       }
 
-      if (java_compiler.compile_method(java_class, index, generator) != 0)
+      if (java_compiler.compile_method(java_class, index) != 0)
       {
         printf("** Error compiling class.\n");
         ret = -1;
