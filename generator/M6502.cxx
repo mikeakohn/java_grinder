@@ -156,6 +156,7 @@ int M6502::init_heap(int field_count)
 int M6502::insert_field_init_boolean(char *name, int index, int value)
 {
   value = (value == 0) ? 0 : 1;
+  fprintf(out, "; insert_field_init_boolean\n");
   fprintf(out, "  lda #%d\n", value & 0xff);
   fprintf(out, "  sta %s + 0\n", name);
   fprintf(out, "  lda #%d\n", value >> 8);
@@ -171,6 +172,7 @@ int M6502::insert_field_init_byte(char *name, int index, int value)
   uint16_t v = (n & 0xffff);
 
 
+  fprintf(out, "; insert_field_init_short\n");
   fprintf(out, "  lda #%d\n", (uint8_t)v & 0xff);
   fprintf(out, "  sta %s + 0\n", name);
   fprintf(out, "  lda #%d\n", (uint8_t)v >> 8);
@@ -183,6 +185,7 @@ int M6502::insert_field_init_short(char *name, int index, int value)
 {
   if (value < -32768 || value > 65535) { return -1; }
 
+  fprintf(out, "; insert_field_init_short\n");
   fprintf(out, "  lda #%d\n", value & 0xff);
   fprintf(out, "  sta %s + 0\n", name);
   fprintf(out, "  lda #%d\n", value >> 8);
