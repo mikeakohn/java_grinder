@@ -1,7 +1,7 @@
 
 #JOBJS=$(shell ls *.java | sed 's/\.java/\.class/')
 
-default:
+default: java
 	@+make -C build
 
 .PHONY: samples
