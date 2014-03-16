@@ -13,6 +13,10 @@ java:
 	@+make -C java
 	@make -C build jar
 
+.PHONY: tests
+tests:
+	@cd tests && sh run_tests.sh
+
 %.class: %.java
 	javac $*.java
 
