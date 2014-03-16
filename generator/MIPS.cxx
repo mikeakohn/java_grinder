@@ -417,10 +417,7 @@ int MIPS::insert_string(const char *name, uint8_t *bytes, int len)
 {
   fprintf(out, ".align 32\n");
   fprintf(out, "  dc32 %d\n", len);
-  fprintf(out, "_%s:\n", name);
-  fprintf(out, "  ds \"%s\"\n", bytes);
-
-  return 0;
+  return insert_utf8(name, bytes, len);
 }
 
 int MIPS::push_array_length()

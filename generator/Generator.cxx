@@ -199,4 +199,19 @@ int n;
   fprintf(out, "\n\n");
 }
 
+int Generator::insert_utf8(const char *name, uint8_t *bytes, int len)
+{
+int n;
+
+  fprintf(out, "_%s:\n", name);
+  fprintf(out, "  db \"");
+  for (n = 0; n < len; n++)
+  {
+    fprintf(out, "%c", bytes[n]);
+  }
+  fprintf(out, "\"\n");
+
+  return 0;
+}
+
 

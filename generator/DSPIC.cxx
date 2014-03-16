@@ -785,10 +785,7 @@ int DSPIC::insert_string(const char *name, uint8_t *bytes, int len)
 {
   fprintf(out, ".align 16\n");
   fprintf(out, "  dw %d\n", len);
-  fprintf(out, "_%s:\n", name);
-  fprintf(out, "  ds \"%s\"\n", bytes);
-
-  return 0;
+  return insert_utf8(name, bytes, len);
 }
 
 int DSPIC::push_array_length()
