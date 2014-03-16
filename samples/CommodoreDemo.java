@@ -5,7 +5,9 @@ public class CommodoreDemo
 {
   static byte mandel_colors[] = { 6, 4, 14, 3, 13, 10, 7, 1, 7, 10, 13, 3 };
   static int text[] = { 10, 1, 22, 1, 100, 7, 18, 9, 14, 4, 5, 18 };
+  static int text2[] = { 1, 22, 1, 32, 3, 15, 13, 16, 9, 12, 5, 18 };
   static int balloon_height[] = { 0, 0, 0, 0, 2, 2, 5, 5, 7, 7, 7, 7, 5, 5, 2, 2 };
+
   static int screen_row[] =
   {
     1024 + 40 * 0,
@@ -98,11 +100,90 @@ public class CommodoreDemo
     0b00000000, 0b11111111, 0b00000000
   };
 
+  public static int pulse = 1024;
+  public static int note[] = { 1403, 1486, 1574, 1668, 1767, 1872, 1984, 2102, 2227, 2359, 2500, 2648, 2806, 2973, 3149, 3337, 3535, 3745, 3968, 4204, 4454, 4719, 5000, 5297 };
+
+  public static int song1pos = 0;
+  public static int song2pos = 0;
+  public static int song3pos = 0;
+
+  public static int song1[] = { 0, 0, 4, 0, -1, 0, 4, 0 };
+
+  public static int song2[] =
+  {
+    0, -1, 0, 3, 0, -1, 0, 7, 0, -1, 0, 5, 0, -1, 0, 0,
+    0, -1, 0, 3, 0, -1, 0, 7, 0, -1, 0, 5, 0, -1, 0, 0,
+    0, -1, 0, 8, 0, -1, 0, 12, 0, -1, 0, 10, 0, -1, 0, 0,
+    0, -1, 0, 3, 0, -1, 0, 7, 0, -1, 0, 5, 0, -1, 0, 0
+  };
+
+  public static int song3[] =
+  {
+    0, 0, 0, 0, 7, 7, 7, 7, 3, 3, 7, 7, 5, 5, 3, 3,
+    0, 0, 0, 0, 7, 7, 7, 7, 3, 3, 7, 7, 5, 5, 3, 3,
+    5, 5, 5, 5, 12, 12, 12, 12, 8, 8, 12, 12, 10, 10, 8, 8,
+    0, 0, 0, 0, 7, 7, 7, 7, 3, 3, 7, 7, 5, 5, 3, 3
+  };
+
   public static void wait(int time)
   {
     int i;
 
     for(i = 0; i < time; i++);
+  }
+
+  public static void musak_init()
+  {
+    //                srad 
+    SID.voice1_adsr(0x0004);
+    SID.voice2_adsr(0x0009);
+    SID.voice3_adsr(0x0060);
+
+    SID.voice1_pulse_width(2048);
+    SID.voice2_pulse_width(2048);
+    SID.voice3_pulse_width(2048);
+  }
+
+  public static void musak_play()
+  {
+    int i;
+
+    i = note[song1[song1pos]];
+    if(i != -1)
+    {
+      SID.voice1_frequency(note[song1[song1pos]]);
+      SID.voice1_waveform(128);
+      SID.voice1_waveform(129);
+    }
+
+    i = note[song2[song2pos]];
+    if(i != -1)
+    {
+      SID.voice2_frequency(note[song2[song2pos]] << 1);
+      SID.voice2_waveform(64);
+      SID.voice2_waveform(65);
+    }
+
+    i = note[song3[song3pos]];
+    if(i != -1)
+    {
+      SID.voice3_frequency(note[song3[song3pos]] << 2);
+      SID.voice3_waveform(32);
+      SID.voice3_waveform(33);
+    }
+
+    song1pos++;
+    if(song1pos >= song1.length)
+      song1pos = 0;
+    song2pos++;
+    if(song2pos >= song2.length)
+      song2pos = 0;
+    song3pos++;
+    if(song3pos >= song3.length)
+      song3pos = 0;
+
+    SID.voice2_pulse_width(pulse);
+    pulse += 16;
   }
 
   public static void wipe()
@@ -118,23 +199,23 @@ public class CommodoreDemo
     {
       for(i = left; i <= right; i++)
       {
-        Memory.write8(55296 + i + 40 * top, (byte)0);
-        Memory.write8(1024 + i + 40 * top, (byte)32);
+        Memory.write8(color_row[top] + i, (byte)0);
+        Memory.write8(screen_row[top] + i, (byte)32);
       }
       for(i = top; i <= bottom; i++)
       {
-        Memory.write8(55296 + right + 40 * i, (byte)0);
-        Memory.write8(1024 + right + 40 * i, (byte)32);
+        Memory.write8(color_row[i] + right, (byte)0);
+        Memory.write8(screen_row[i] + right, (byte)32);
       }
       for(i = right; i >= left; i--)
       {
-        Memory.write8(55296 + i + 40 * bottom, (byte)0);
-        Memory.write8(1024 + i + 40 * bottom, (byte)32);
+        Memory.write8(color_row[bottom] + i, (byte)0);
+        Memory.write8(screen_row[bottom] + i, (byte)32);
       }
       for(i = bottom; i >= top; i--)
       {
-        Memory.write8(55296 + left + 40 * i, (byte)0);
-        Memory.write8(1024 + left + 40 * i, (byte)32);
+        Memory.write8(color_row[i] + left, (byte)0);
+        Memory.write8(screen_row[i] + left, (byte)32);
       }
 
       left++;
@@ -170,9 +251,13 @@ public class CommodoreDemo
 
     for(i = 0; i < text.length; i++)
     {
-      Memory.write8(1024 + 40 * 12 + 19 + i, (byte)text[i]);
       Memory.write8(55296 + 40 * 12 + 19 + i, (byte)1);
+      Memory.write8(1024 + 40 * 12 + 19 + i, (byte)text[i]);
     }
+
+    SID.voice1_adsr(0xF000);
+    SID.voice2_adsr(0xF000);
+    SID.voice3_adsr(0xF000);
 
     int loc1 = 55296;
     int loc2 = 56256;
@@ -222,11 +307,24 @@ public class CommodoreDemo
           Memory.write8(loc2 + xx, c);
         }
 
+        if((xx & 7) == 7)
+        {
+          SID.voice1_frequency(note[re2 & 15]);
+          SID.voice1_waveform(32);
+          SID.voice1_waveform(33);
+          SID.voice2_frequency(note[im2 & 15]);
+          SID.voice2_waveform(32);
+          SID.voice2_waveform(33);
+        }
+
         xx++;
       }
       yy++;
       loc1 += 40;
       loc2 -= 40;
+      SID.voice3_frequency(note[yy & 15]);
+      SID.voice3_waveform(16);
+      SID.voice3_waveform(17);
     }
 
     wait(10000);
@@ -240,8 +338,8 @@ public class CommodoreDemo
     VIC.border(0);
     for(i = 880; i < 1000; i++)
     {
-      Memory.write8(1024 + i, (byte)160);
       Memory.write8(55296 + i, (byte)5);
+      Memory.write8(1024 + i, (byte)160);
     }
 
     int x0 = 0;
@@ -272,12 +370,12 @@ public class CommodoreDemo
     Memory.write8(2046, (byte)13);
     Memory.write8(2047, (byte)13);
 
-    VIC.sprite0color(2);
+    VIC.sprite0color(10);
     VIC.sprite1color(8);
     VIC.sprite2color(7);
     VIC.sprite3color(13);
-    VIC.sprite4color(14);
-    VIC.sprite5color(3);
+    VIC.sprite4color(3);
+    VIC.sprite5color(14);
     VIC.sprite6color(4);
     VIC.sprite7color(1);
 
@@ -289,6 +387,9 @@ public class CommodoreDemo
 
     for(i = 0; i < 512; i++)
     {
+      if((i & 7) == 7)
+        musak_play();
+
       VIC.wait_raster(251);
       VIC.sprite0pos(x0, y0 + balloon_height[(x0 >> 3) & 15]);
       VIC.sprite1pos(x1, y1 + balloon_height[(x1 >> 3) & 15]);
@@ -348,6 +449,7 @@ public class CommodoreDemo
     VIC.sprite_enable(0);
     VIC.background(0);
 
+    int vol = 15;
     for(i = 0; i < 19; i++)
     {
       VIC.wait_raster(251);
@@ -357,15 +459,19 @@ public class CommodoreDemo
       Memory.write8(1983 - i, (byte)32);
       Memory.write8(1984 + i, (byte)32);
       Memory.write8(2023 - i, (byte)32);
+      vol--;
+      if(vol < 0)
+        vol = 0;
+      SID.volume(vol);
     }
 
     for(i = 21; i >= 0; i--)
     {
       VIC.wait_raster(251);
-      Memory.write8(55296 + 19 + 40 * i, (byte)5);
-      Memory.write8(55296 + 20 + 40 * i, (byte)5);
-      Memory.write8(1024 + 19 + 40 * i, (byte)160);
-      Memory.write8(1024 + 20 + 40 * i, (byte)160);
+      Memory.write8(color_row[i] + 19, (byte)5);
+      Memory.write8(color_row[i] + 20, (byte)5);
+      Memory.write8(screen_row[i] + 19, (byte)160);
+      Memory.write8(screen_row[i] + 20, (byte)160);
     }
 
     for(i = 18; i >= 0; i--)
@@ -383,14 +489,33 @@ public class CommodoreDemo
   public static void green()
   {
     int i, j;
+    int pulse1 = 1024;
+    int pulse2 = 2048;
+    int pulse3 = 3072;
 
     wait(5000);
+
+    //                srad 
+    SID.voice1_adsr(0xf000);
+    SID.voice2_adsr(0xf000);
+    SID.voice3_adsr(0xf000);
+    SID.voice1_frequency(1024);
+    SID.voice2_frequency(2048);
+    SID.voice3_frequency(4096);
+    SID.voice1_pulse_width(1024);
+    SID.voice2_pulse_width(1024);
+    SID.voice3_pulse_width(1024);
+    SID.voice1_waveform(64);
+    SID.voice1_waveform(65);
+    SID.voice2_waveform(64);
+    SID.voice2_waveform(65);
+    SID.voice3_waveform(64);
+    SID.voice3_waveform(65);
+    SID.volume(15);
 
     for(i = 0; i < 63; i++)
       Memory.write8(832 + i, (byte)sprite2[i]);
 
-    //VIC.sprite_expandx(0);
-    //VIC.sprite_expandy(0);
     VIC.sprite0pos(32, 58);
 
     VIC.sprite0color(5);
@@ -419,9 +544,53 @@ public class CommodoreDemo
         if(k > 38)
           break;
       }
+
+      pulse1 += 16;
+      pulse2 += 16;
+      pulse3 += 16;
+      SID.voice1_pulse_width(pulse1);
+      SID.voice2_pulse_width(pulse2);
+      SID.voice3_pulse_width(pulse3);
     }
 
     wait(5000);
+
+    for(i = 32; i <= 175; i++)
+    {
+      VIC.sprite0pos(i, i + 26);
+      wait(50);
+      pulse1 -= 16;
+      pulse2 -= 16;
+      pulse3 -= 16;
+      SID.voice1_pulse_width(pulse1);
+      SID.voice2_pulse_width(pulse2);
+      SID.voice3_pulse_width(pulse3);
+    }
+
+    wait(4000);
+    int vol = 15;
+
+    for(i = 0; i < text2.length; i++)
+    {
+      Memory.write8(color_row[21] + i + 25, (byte)12);
+      Memory.write8(screen_row[21] + i + 25, (byte)text2[i]);
+      wait(400);
+      Memory.write8(color_row[21] + i + 25, (byte)13);
+      wait(400);
+      Memory.write8(color_row[21] + i + 25, (byte)15);
+      wait(400);
+      Memory.write8(color_row[21] + i + 25, (byte)7);
+      wait(400);
+      Memory.write8(color_row[21] + i + 25, (byte)1);
+
+      vol--;
+      SID.volume(vol);
+    }
+    SID.volume(0);
+
+    wait(10000);
+
+    VIC.sprite_enable(0);
 
     for(i = 38; i >= 8; i--)
     {
@@ -437,15 +606,19 @@ public class CommodoreDemo
           break;
       }
     }
+
   }
 
   public static void main()
   {
+    musak_init();
+    SID.volume(15);
     mandel();
     wipe();
     sprites();
     green();
-
+    wipe();
+    SID.volume(0);
     while(true);
   }
 }
