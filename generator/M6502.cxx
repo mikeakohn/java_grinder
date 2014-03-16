@@ -91,7 +91,7 @@ M6502::~M6502()
   if(need_array_int_support) { insert_array_int_support(); }
 }
 
-int M6502::open(char *filename)
+int M6502::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 

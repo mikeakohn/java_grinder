@@ -59,7 +59,7 @@ ARM::~ARM()
   write_constants();
 }
 
-int ARM::open(char *filename)
+int ARM::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 

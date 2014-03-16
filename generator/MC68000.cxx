@@ -53,7 +53,7 @@ MC68000::~MC68000()
 
 }
 
-int MC68000::open(char *filename)
+int MC68000::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 

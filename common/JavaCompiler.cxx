@@ -118,6 +118,8 @@ int JavaCompiler::optimize_const(JavaClass *java_class, char *method_name, uint8
 {
 int const_vals[2];
 
+  if (!optimize) { return 0; }
+
   if (pc + table_java_instr[bytes[pc]].normal > pc_end)
   {
     return 0;

@@ -20,7 +20,7 @@ public:
   STDC();
   virtual ~STDC();
 
-  virtual int open(char *filename);
+  virtual int open(const char *filename);
   virtual int start_init();
   virtual int insert_static_field_define(const char *name, const char *type, int index);
   virtual int init_heap(int field_count);

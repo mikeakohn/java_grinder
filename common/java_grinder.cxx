@@ -30,6 +30,68 @@
 
 #define STACK_LEN 65536
 
+static Generator *new_generator(const char *chip_type)
+{
+Generator *generator = NULL;
+
+  if (strcasecmp("arm", chip_type) == 0)
+  {
+    generator = new ARM();
+  }
+    else
+  if (strcasecmp("c64", chip_type) == 0)
+  {
+    generator = new C64();
+  }
+    else
+  if (strcasecmp("dspic30f3012", chip_type) == 0)
+  {
+    generator = new DSPIC(DSPIC30F3012);
+  }
+    else
+  if (strcasecmp("dspic33fj06gs101a", chip_type) == 0)
+  {
+    generator = new DSPIC(DSPIC33FJ06GS101A);
+  }
+    else
+  if (strcasecmp("m6502", chip_type) == 0)
+  {
+    generator = new M6502();
+  }
+    else
+  if (strcasecmp("mc68000", chip_type) == 0)
+  {
+    generator = new MC68000();
+  }
+    else
+  if (strcasecmp("mips", chip_type) == 0)
+  {
+    generator = new MIPS();
+  }
+    else
+  if (strcasecmp("msp430g2231", chip_type) == 0)
+  {
+    generator = new MSP430(MSP430G2231);
+  }
+    else
+  if (strcasecmp("msp430g2553", chip_type) == 0)
+  {
+    generator = new MSP430(MSP430G2553);
+  }
+    else
+  if (strcasecmp("msp430x", chip_type) == 0)
+  {
+    generator = new MSP430X(0);
+  }
+    else
+  if (strcasecmp("stdc", chip_type) == 0)
+  {
+    generator = new STDC();
+  }
+
+  return generator;
+}
+
 int main(int argc, char *argv[])
 {
 FILE *in;
@@ -37,7 +99,12 @@ Generator *generator;
 JavaClass *java_class;
 JavaCompiler java_compiler;
 char method_name[32];
+const char *java_file;
+const char *asm_file;
+const char *chip_type;
 int index;
+int option = 0;
+int n;
 
   printf("\nJava Grinder\n");
   printf("Authors: Michael Kohn, Joe Davisson\n");
@@ -45,80 +112,54 @@ int index;
   printf("  Email: mike@mikekohn.net\n\n");
   printf("Version: "VERSION"\n\n");
 
-  if (argc != 4)
+  if (argc < 4)
   {
-    printf("Usage: %s <class> <outfile> <dspic/msp430g2231/msp430g2553/m6502/c64/arm/mips>\n", argv[0]);
+    printf("Usage: %s <class> <outfile> <dspic/msp430g2231/msp430g2553/m6502/c64/arm/mips/stdc>\n", argv[0]);
     exit(0);
   }
 
-  in = fopen(argv[1],"rb");
+  for (n = 1; n < argc; n++)
+  {
+    if (strcmp(argv[n], "-O0") == 0)
+    {
+      java_compiler.disable_optimizer();
+      continue;
+    }
+      else
+    if (option == 0)
+    {
+      java_file = argv[n];
+    }
+      else
+    if (option == 1)
+    {
+      asm_file = argv[n];
+    }
+      else
+    if (option == 2)
+    {
+      chip_type = argv[n];
+    }
+
+    option++;
+  }
+
+  in = fopen(java_file, "rb");
   if (in == NULL)
   {
     printf("Cannot open classfile %s\n", argv[1]);
     exit(1);
   }
 
-  if (strcasecmp("msp430g2231",argv[3]) == 0)
+  generator = new_generator(chip_type);
+
+  if (generator == NULL)
   {
-    generator = new MSP430(MSP430G2231);
-  }
-    else
-  if (strcasecmp("msp430g2553",argv[3]) == 0)
-  {
-    generator = new MSP430(MSP430G2553);
-  }
-    else
-  if (strcasecmp("msp430x",argv[3]) == 0)
-  {
-    generator = new MSP430X(0);
-  }
-    else
-  if (strcasecmp("dspic30f3012",argv[3]) == 0)
-  {
-    generator = new DSPIC(DSPIC30F3012);
-  }
-    else
-  if (strcasecmp("dspic33fj06gs101a",argv[3]) == 0)
-  {
-    generator = new DSPIC(DSPIC33FJ06GS101A);
-  }
-    else
-  if (strcasecmp("m6502",argv[3]) == 0)
-  {
-    generator = new M6502();
-  }
-    else
-  if (strcasecmp("c64",argv[3]) == 0)
-  {
-    generator = new C64();
-  }
-    else
-  if (strcasecmp("arm",argv[3]) == 0)
-  {
-    generator = new ARM();
-  }
-    else
-  if (strcasecmp("mc68000",argv[3]) == 0)
-  {
-    generator = new MC68000();
-  }
-    else
-  if (strcasecmp("mips",argv[3]) == 0)
-  {
-    generator = new MIPS();
-  }
-    else
-  if (strcasecmp("stdc",argv[3]) == 0)
-  {
-    generator = new STDC();
-  }
-    else
-  {
-    printf("Unknown cpu type: %s\n", argv[3]);
+    printf("Unknown cpu type: %s\n", chip_type);
     exit(1);
   }
 
-  if (generator->open(argv[2]) == -1)
+  if (generator->open(asm_file) == -1)
   {
     exit(1);
   }

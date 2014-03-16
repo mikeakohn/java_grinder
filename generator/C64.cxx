@@ -63,7 +63,7 @@ C64::~C64()
 {
 }
 
-int C64::open(char *filename)
+int C64::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 

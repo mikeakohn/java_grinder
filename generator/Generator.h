@@ -21,7 +21,7 @@ public:
   Generator();
   virtual ~Generator();
 
-  virtual int open(char *filename);
+  virtual int open(const char *filename);
   void label(char *name);
   virtual int start_init() = 0;
   virtual int insert_static_field_define(const char *name, const char *type, int index) = 0;

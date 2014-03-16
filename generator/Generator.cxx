@@ -26,7 +26,7 @@ Generator::~Generator()
   fclose(out);
 }
 
-int Generator::open(char *filename)
+int Generator::open(const char *filename)
 {
   out = fopen(filename, "wb");
 

@@ -66,7 +66,7 @@ MIPS::~MIPS()
 
 }
 
-int MIPS::open(char *filename)
+int MIPS::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 

@@ -60,7 +60,7 @@ DSPIC::~DSPIC()
   fprintf(out, "  dc32 0xffcf\n\n");
 }
 
-int DSPIC::open(char *filename)
+int DSPIC::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 

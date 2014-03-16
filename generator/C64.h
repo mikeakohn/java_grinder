@@ -20,7 +20,7 @@ public:
   C64();
   virtual ~C64();
 
-  virtual int open(char *filename);
+  virtual int open(const char *filename);
 
   // API
   virtual int c64_sid_voice1_frequency();

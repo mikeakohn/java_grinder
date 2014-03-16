@@ -2,12 +2,10 @@
 
 make
 
-echo " ---- Testing MSP430 ----"
-
-for file in *.class
-do
-  file=${file%.class}
-  ../java_grinder ${file}.class ${file}.asm msp430g2231 > /dev/null
+run_msp430_test()
+{
+  file=$1
+  ../java_grinder $2 ${file}.class ${file}.asm msp430g2231 > /dev/null
   naken_asm -l -I/storage/git/naken_asm/include -o ${file}.hex ${file}.asm > /dev/null
   a=`naken_util -run ${file}.hex`
   cycles=`echo ${a} | sed 's/ clock cycles.*$//' | sed 's/^.* //'`
@@ -21,6 +19,20 @@ do
     exit 1
   fi
   echo " PASS"
+}
+
+echo " ---- Testing MSP430 ----"
+
+for file in *.class
+do
+  file=${file%.class}
+  run_msp430_test ${file}
+done
+
+for file in *.class
+do
+  file=${file%.class}
+  run_msp430_test ${file} -O0
 done
 
 make clean

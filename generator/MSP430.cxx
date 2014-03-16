@@ -93,7 +93,7 @@ MSP430::~MSP430()
   fprintf(out, "  dw start\n\n");
 }
 
-int MSP430::open(char *filename)
+int MSP430::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 

@@ -37,7 +37,7 @@ STDC::~STDC()
 
 }
 
-int STDC::open(char *filename)
+int STDC::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 
