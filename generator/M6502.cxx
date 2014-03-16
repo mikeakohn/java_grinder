@@ -1992,6 +1992,7 @@ int M6502::memory_read8()
   fprintf(out, "  sta result + 0\n");
   PUSH_LO;
 /*
+//FIXME not sure if this matters or not
   // sign-extend
   fprintf(out, "  lda result + 0\n");
   fprintf(out, "  bpl #15\n");
