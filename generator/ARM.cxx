@@ -490,7 +490,7 @@ int ARM::insert_array(const char *name, int32_t *data, int len, uint8_t type)
   return -1;
 }
 
-int ARM::insert_array(const char *name, char *data)
+int ARM::insert_string(const char *name, uint8_t *bytes, int len)
 {
   return -1;
 }

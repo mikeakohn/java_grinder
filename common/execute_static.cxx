@@ -168,14 +168,15 @@ int ret = 0;
           printf("  String %s;\n", field_name);
           if (do_arrays)
           {
-            char *array = (char *)java_class->get_constant(constant_string->string_index);
-            if (array == NULL)
+            constant_utf8_t *constant_utf8 = (constant_utf8_t *)java_class->get_constant(constant_string->string_index);
+            if (constant_utf8 == NULL)
             {
               printf("Error retrieving constant %s\n", field_name);
               ret = -1;
               break;
             }
-            generator->insert_array(field_name, array);
+
+            generator->insert_string(field_name, constant_utf8->bytes, constant_utf8->length);
           }
             else
           {

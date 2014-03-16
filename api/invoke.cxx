@@ -26,6 +26,7 @@
 #include "uart.h"
 #include "c64_sid.h"
 #include "c64_vic.h"
+#include "java_lang_string.h"
 #include "java_lang_system.h"
 
 #define CHECK_WITH_PORT(a,b,c) \
@@ -89,14 +90,12 @@ int ptr = 0;
   s = method_sig + 1;
   while(*s != 0)
   {
-    //if (*s == '(') { method_sig = s + 1; }
     if (*s == ')') { break; }
     function[ptr++] = *s;
     s++;
   }
 
   function[ptr] = 0;
-  //sprintf(function, "%s_%s_%s_%s", field_class, field_name, method_name, method_sig);
 }
 
 static void get_signature(char *signature, int *params, int *is_void)
@@ -182,6 +181,14 @@ char function[256];
   if (strcmp(field_class, "java/lang/System") == 0)
   {
     ret = java_lang_system(java_class, generator, function);
+  }
+
+  get_static_function(function, method_name, method_sig);
+  printf("function=%s  %s field_class=%s\n", function, field_name, method_class);
+
+  if (strcmp(method_class, "java/lang/String") == 0)
+  {
+    ret = java_lang_string(java_class, generator, function, field_name, field_id);
   }
 
   if (ret == 0) { return 0; }

@@ -761,12 +761,12 @@ int MC68000::insert_array(const char *name, int32_t *data, int len, uint8_t type
   return -1;
 }
 
-int MC68000::insert_array(const char *name, char *data)
+int MC68000::insert_string(const char *name, uint8_t *bytes, int len)
 {
   fprintf(out, ".align 32\n");
-  fprintf(out, "  dc32 %d\n", (int)strlen(data));
+  fprintf(out, "  dc32 %d\n", len);
   fprintf(out, "_%s:\n", name);
-  fprintf(out, "  ds \"%s\"\n", data);
+  fprintf(out, "  ds \"%s\"\n", bytes);
 
   return 0;
 }

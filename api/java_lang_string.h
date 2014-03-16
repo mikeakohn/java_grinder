@@ -9,13 +9,13 @@
  *
  */
 
-#ifndef _JAVA_LANG_SYSTEM_H
-#define _JAVA_LANG_SYSTEM_H
+#ifndef _JAVA_LANG_STRING_H
+#define _JAVA_LANG_STRING_H
 
 #include "Generator.h"
 #include "JavaClass.h"
 
-int java_lang_system(JavaClass *java_class, Generator *generator, char *function);
+int java_lang_string(JavaClass *java_class, Generator *generator, char *function, char *field_name, int field_id);
 
 #endif
 

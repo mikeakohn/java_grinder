@@ -993,7 +993,7 @@ int M6502::insert_array(const char *name, int32_t *data, int len, uint8_t type)
   return -1;
 }
 
-int M6502::insert_array(const char *name, char *data)
+int M6502::insert_string(const char *name, uint8_t *bytes, int len)
 {
   return -1;
 }

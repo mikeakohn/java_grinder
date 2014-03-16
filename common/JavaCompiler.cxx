@@ -1298,7 +1298,6 @@ printf("code_len=%d\n", code_len);
         ref = GET_PC_UINT16(1);
         gen32 = (generic_32bit_t *)java_class->get_constant(ref);
 
-
         if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), ref) != 0)
         {
           printf("Error retrieving field name %d\n", ref);
@@ -1314,6 +1313,8 @@ printf("code_len=%d\n", code_len);
         {
           int index = java_class->get_field_index(field_name);
           generator->get_static(field_name, index);
+          printf("  static is %s\n", field_name);
+          operand_stack[operand_stack_ptr++] = ref;
         }
 
         break;
