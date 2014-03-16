@@ -1312,8 +1312,15 @@ printf("code_len=%d\n", code_len);
         {
           int index = java_class->get_field_index(field_name);
           generator->get_static(field_name, index);
-          printf("  static is %s\n", field_name);
-          operand_stack[operand_stack_ptr++] = ref;
+          java_class->get_ref_name_type(field_name, type, sizeof(field_name), ref);
+
+          // This fixes Joe's demo (meant to deal with strings) kind of
+          // gross with a strcmp :(  Maybe revisit later.
+          if (strcmp("Ljava/lang/String;", type) == 0)
+          {
+            printf("  static is %s (will invoke)\n", field_name);
+            operand_stack[operand_stack_ptr++] = ref;
+          }
         }
 
         break;
