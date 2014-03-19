@@ -14,7 +14,7 @@
 #include <string.h>
 
 #include "Generator.h"
-#include "JavaClass.h"
+#include "Compiler.h"
 #include "JavaCompiler.h"
 #include "execute_static.h"
 #include "ARM.h"
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
 {
 FILE *in;
 Generator *generator;
-JavaCompiler java_compiler;
+Compiler *compiler;
 const char *java_file;
 const char *asm_file;
 const char *chip_type;
@@ -115,11 +115,14 @@ int n;
     exit(0);
   }
 
+  // Can we do .NET too? :)
+  compiler = new JavaCompiler();
+
   for (n = 1; n < argc; n++)
   {
     if (strcmp(argv[n], "-O0") == 0)
     {
-      java_compiler.disable_optimizer();
+      compiler->disable_optimizer();
       continue;
     }
       else
@@ -161,24 +164,25 @@ int n;
     exit(1);
   }
 
-  java_compiler.set_generator(generator);
-  java_compiler.load_class(in);
+  compiler->set_generator(generator);
+  compiler->load_class(in);
 
   int ret = 0;
 
-  java_compiler.insert_static_field_defines();
-  java_compiler.init_heap();
+  compiler->insert_static_field_defines();
+  compiler->init_heap();
 
   do
   {
-    if (java_compiler.add_static_initializers() == -1) { ret = -1; break; }
+    if (compiler->add_static_initializers() == -1) { ret = -1; break; }
     // Add the main function directly under init to save a jmp.
-    if (java_compiler.compile_methods(true) == -1) { ret = -1; break; }
+    if (compiler->compile_methods(true) == -1) { ret = -1; break; }
     // Compile all other methods.
-    if (java_compiler.compile_methods(false) == -1) { ret = -1; break; }
+    if (compiler->compile_methods(false) == -1) { ret = -1; break; }
   } while(0);
 
   delete generator;
+  delete compiler;
 
   fclose(in);
 

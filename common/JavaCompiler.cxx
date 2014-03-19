@@ -36,9 +36,7 @@ uint8_t JavaCompiler::cond_table[] =
   COND_LESS_EQUAL,    // 164 (0xa4) if_icmple
 };
 
-JavaCompiler::JavaCompiler() :
-  generator(NULL),
-  optimize(true)
+JavaCompiler::JavaCompiler()
 {
 }
 

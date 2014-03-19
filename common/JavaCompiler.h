@@ -9,9 +9,10 @@
  *
  */
 
-#ifndef _COMPILE_H
-#define _COMPILE_H
+#ifndef _JAVA_COMPILER_H
+#define _JAVA_COMPILER_H
 
+#include "Compiler.h"
 #include "Generator.h"
 #include "JavaClass.h"
 
@@ -26,20 +27,17 @@
                          ((uint32_t)bytes[pc+a+2])<<8|\
                           bytes[pc+a+3])
 
-class JavaCompiler
+class JavaCompiler : public Compiler
 {
 public:
   JavaCompiler();
-  ~JavaCompiler();
+  virtual ~JavaCompiler();
 
-  void disable_optimizer() { optimize = false; }
-  void set_generator(Generator *generator) { this->generator = generator; }
-  int load_class(FILE *in);
-  void insert_static_field_defines();
-  void init_heap();
-  int add_static_initializers();
-  int compile_methods(bool do_main);
-  JavaClass *get_java_class() { return java_class; }
+  virtual int load_class(FILE *in);
+  virtual void insert_static_field_defines();
+  virtual void init_heap();
+  virtual int add_static_initializers();
+  virtual int compile_methods(bool do_main);
 
 private:
   void fill_label_map(uint8_t *label_map, int label_map_len, uint8_t *bytes, int code_len, int pc_start);
@@ -48,10 +46,8 @@ private:
   int array_store(JavaClass *java_class, int constant_id, uint8_t array_type);
   int compile_method(JavaClass *java_class, int method_id);
 
-  Generator *generator;
   JavaClass *java_class;
   static uint8_t cond_table[];
-  bool optimize;
 };
 
 #endif
