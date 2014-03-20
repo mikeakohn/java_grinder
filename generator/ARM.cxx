@@ -15,7 +15,7 @@
 
 #include "ARM.h"
 
-#define REG_STACK(a) (reg)
+#define REG_STACK(a) (a)
 #define LOCALS(i) (i * 4)
 // We want to use a full descending stack.
 // SP points to last occupied.

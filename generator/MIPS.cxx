@@ -16,7 +16,7 @@
 
 #include "MIPS.h"
 
-#define REG_STACK(a) (reg)
+#define REG_STACK(a) (a)
 #define LOCALS(i) (i * 4)
 
 // ABI is:
