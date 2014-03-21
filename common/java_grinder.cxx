@@ -21,6 +21,7 @@
 #include "DSPIC.h"
 #include "M6502.h"
 #include "C64.h"
+#include "AVR8.h"
 #include "MC68000.h"
 #include "MIPS.h"
 #include "MSP430.h"
@@ -57,6 +58,11 @@ Generator *generator = NULL;
   if (strcasecmp("m6502", chip_type) == 0)
   {
     generator = new M6502();
+  }
+    else
+  if (strcasecmp("avr8", chip_type) == 0)
+  {
+    generator = new AVR8();
   }
     else
   if (strcasecmp("mc68000", chip_type) == 0)
