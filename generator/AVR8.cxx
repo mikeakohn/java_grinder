@@ -59,16 +59,6 @@ AVR8::AVR8() :
   need_sub_integer(0),
   need_mul_integer(0),
   need_div_integer(0),
-
-AVR8::AVR8() :
-  stack(0),
-  is_main(0),
-
-  need_swap(0),
-  need_add_integer(0),
-  need_sub_integer(0),
-  need_mul_integer(0),
-  need_div_integer(0),
   need_mod_integer(0),
   need_neg_integer(0),
   need_shift_left_integer(0),
@@ -151,7 +141,7 @@ int AVR8::init_heap(int field_count)
 
 int AVR8::insert_field_init_boolean(char *name, int index, int value)
 {
-  value = (value == 0) ? 0 : 1;
+//  value = (value == 0) ? 0 : 1;
   fprintf(out, "; insert_field_init_boolean\n");
 
   return 0;
@@ -159,9 +149,9 @@ int AVR8::insert_field_init_boolean(char *name, int index, int value)
 
 int AVR8::insert_field_init_byte(char *name, int index, int value)
 {
-  if (value < -128 || value > 255) { return -1; }
-  int16_t n = value;
-  uint16_t v = (n & 0xffff);
+//  if (value < -128 || value > 255) { return -1; }
+//  int16_t n = value;
+//  uint16_t v = (n & 0xffff);
 
 
   fprintf(out, "; insert_field_init_short\n");
@@ -171,7 +161,7 @@ int AVR8::insert_field_init_byte(char *name, int index, int value)
 
 int AVR8::insert_field_init_short(char *name, int index, int value)
 {
-  if (value < -32768 || value > 65535) { return -1; }
+//  if (value < -32768 || value > 65535) { return -1; }
 
   fprintf(out, "; insert_field_init_short\n");
 
@@ -218,7 +208,7 @@ int AVR8::push_integer(int32_t n)
     return -1;
   }
 
-  uint16_t value = (n & 0xffff);
+//  uint16_t value = (n & 0xffff);
 
   fprintf(out, "; push_integer\n");
   stack++;
@@ -265,8 +255,8 @@ int AVR8::push_double(double f)
 
 int AVR8::push_byte(int8_t b)
 {
-  int16_t n = b;
-  uint16_t value = (n & 0xffff);
+//  int16_t n = b;
+//  uint16_t value = (n & 0xffff);
 
   fprintf(out, "; push_byte\n");
   stack++;
@@ -276,7 +266,7 @@ int AVR8::push_byte(int8_t b)
 
 int AVR8::push_short(int16_t s)
 {
-  uint16_t value = (s & 0xffff);
+//  uint16_t value = (s & 0xffff);
 
   fprintf(out, "; push_short\n");
   stack++;
@@ -496,7 +486,7 @@ int AVR8::xor_integer(int const_val)
 
 int AVR8::inc_integer(int index, int num)
 {
-  uint16_t value = num & 0xffff;
+ // uint16_t value = num & 0xffff;
 
   fprintf(out, "; inc_integer num = %d\n", num);
   return 0;
