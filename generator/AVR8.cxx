@@ -17,6 +17,48 @@
 #include "AVR8.h"
 
 // ABI is:
+// r0 
+// r1
+// r2 
+// r3
+// r4
+// r5
+// r6
+// r7
+// r8
+// r9
+// r10
+// r11
+// r12
+// r13
+// r14
+// r15
+// r16 reserved for load/store immediate
+// r17 reserved for load/store immediate
+// r18
+// r19
+// r20
+// r21
+// r22
+// r23
+// r24
+// r25
+// r26 XL points to locals
+// r27 XH points to locals
+// r28 YL java stack pointer
+// r29 YH java stack pointer
+// r30 ZL
+// r31 ZH
+
+AVR8::AVR8() :
+  stack(0),
+  is_main(0),
+
+  need_swap(0),
+  need_add_integer(0),
+  need_sub_integer(0),
+  need_mul_integer(0),
+  need_div_integer(0),
 
 AVR8::AVR8() :
   stack(0),
