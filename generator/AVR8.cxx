@@ -17,20 +17,20 @@
 #include "AVR8.h"
 
 // ABI is:
-// r0 
-// r1
-// r2 
-// r3
-// r4
-// r5
-// r6
-// r7
-// r8
-// r9
-// r10
-// r11
-// r12
-// r13
+// r0 return0
+// r1 return1
+// r2 result0
+// r3 result1
+// r4 remainder0
+// r5 remainder1
+// r6 length0
+// r7 length1
+// r8 value10
+// r9 value11
+// r10 value20
+// r11 value21
+// r12 value30
+// r13 value31
 // r14
 // r15
 // r16 reserved for load/store immediate
@@ -44,11 +44,16 @@
 // r24
 // r25
 // r26 XL points to locals
-// r27 XH points to locals
+// r27 XH always 0
 // r28 YL java stack pointer
-// r29 YH java stack pointer
+// r29 YH always 0
 // r30 ZL
 // r31 ZH
+
+// java stack is first 128 bytes of RAM (2 parallel lo/hi byte stacks)
+// processor stack is at RAMEND
+// heap starts at 0x100
+
 
 AVR8::AVR8() :
   stack(0),
@@ -103,18 +108,43 @@ int AVR8::open(const char *filename)
   fprintf(out, ".avr8\n");
 
   // heap
-  // java stack
+  fprintf(out, "ram_start equ 0x8000\n");
+  fprintf(out, "heap_ptr equ ram_start\n");
+
+  // temp vars (held in registers to save ram)
+  fprintf(out, "return0 equ r0\n");
+  fprintf(out, "return1 equ r1\n");
+  fprintf(out, "result0 equ r2\n");
+  fprintf(out, "result1 equ r3\n");
+  fprintf(out, "remainder0 equ r4\n");
+  fprintf(out, "remainder1 equ r5\n");
+  fprintf(out, "length0 equ r6\n");
+  fprintf(out, "length1 equ r7\n");
+  fprintf(out, "value10 equ r8\n");
+  fprintf(out, "value11 equ r9\n");
+  fprintf(out, "value20 equ r10\n");
+  fprintf(out, "value21 equ r11\n");
+  fprintf(out, "value30 equ r12\n");
+  fprintf(out, "value31 equ r13\n");
+
   // points to locals
-  // temp variables
-  fprintf(out, "result equ 0x00\n");
-  fprintf(out, "return equ 0x01\n");
-  fprintf(out, "remainder equ 0x02\n");
-  fprintf(out, "length equ 0x03\n");
-  fprintf(out, "temp equ 0x04\n");
-  fprintf(out, "value1 equ 0x05\n");
-  fprintf(out, "value2 equ 0x06\n");
-  fprintf(out, "value3 equ 0x07\n");
-  fprintf(out, "value4 equ 0x08\n");
+  fprintf(out, "locals equ r26\n");
+
+  // java stack pointer
+  fprintf(out, "SP equ r28\n");
+
+  // RAMEND (alter to chip)
+  fprintf(out, "RAMEND equ 0x1ff\n");
+
+  // startup
+  fprintf(out, ".org 0x0000\n");
+  fprintf(out, "start:\n");
+
+  // processor stack pointer setup
+  fprintf(out, "  ldi r16, RAMEND & 0xff\n");
+  fprintf(out, "  out 0x5d, r16\n");
+  fprintf(out, "  ldi r16, RAMEND >> 8\n");
+  fprintf(out, "  out 0x5e, r16\n");
 
   return 0;
 }
