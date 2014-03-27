@@ -146,6 +146,10 @@ int AVR8::open(const char *filename)
   fprintf(out, "  ldi r16, RAMEND >> 8\n");
   fprintf(out, "  out 0x5e, r16\n");
 
+  // java stack pointer setup
+  fprintf(out, "  ldi r28, 0x3f\n");
+  fprintf(out, "  ldi r29, 0x00\n");
+
   return 0;
 }
 
