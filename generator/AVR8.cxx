@@ -50,10 +50,21 @@
 // r30 ZL
 // r31 ZH
 
-// java stack is first 128 bytes of RAM (2 parallel lo/hi byte stacks)
-// processor stack is at RAMEND
-// heap starts at 0x100
+#define PUSH_LO \
+  fprintf(out, "; PUSH_LO\n"); \
+  fprintf(out, "; st Y, result0\n")
 
+#define PUSH_HI \
+  fprintf(out, "; PUSH_HI\n"); \
+  fprintf(out, "; st Y-, result1\n")
+
+#define POP_HI \
+  fprintf(out, "; POP_HI\n"); \
+  fprintf(out, "; ld result1, +Y\n")
+
+#define POP_LO \
+  fprintf(out, "; POP_LO\n"); \
+  fprintf(out, "; ld result0, Y\n")
 
 AVR8::AVR8() :
   stack(0),
@@ -105,11 +116,7 @@ int AVR8::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 
-  fprintf(out, ".avr8\n");
-
-  // heap
-  fprintf(out, "ram_start equ 0x8000\n");
-  fprintf(out, "heap_ptr equ ram_start\n");
+  fprintf(out, ".avr8\n\n");
 
   // temp vars (held in registers to save ram)
   fprintf(out, "return0 equ r0\n");
@@ -130,27 +137,31 @@ int AVR8::open(const char *filename)
   // points to locals
   fprintf(out, "locals equ r26\n");
 
-  // java stack pointer (64 bytes)
+  // java stack (64 locations)
   fprintf(out, "stack_lo equ 0x00\n");
   fprintf(out, "stack_hi equ 0x40\n");
   fprintf(out, "SP equ r28\n");
 
-  // RAMEND (alter to chip)
+  // RAMEND (change to particular chip)
   fprintf(out, "RAMEND equ 0x1ff\n");
 
+  // heap
+  fprintf(out, "ram_start equ 0x80\n");
+  fprintf(out, "heap_ptr equ ram_start\n\n");
+
   // startup
-  fprintf(out, ".org 0x0000\n");
+  fprintf(out, ".org 0x0000\n\n");
   fprintf(out, "start:\n");
 
   // processor stack pointer setup
   fprintf(out, "  ldi r16, RAMEND & 0xff\n");
-  fprintf(out, "  out 0x5d, r16\n");
+  fprintf(out, "  out 0x3d, r16\n");
   fprintf(out, "  ldi r16, RAMEND >> 8\n");
-  fprintf(out, "  out 0x5e, r16\n");
+  fprintf(out, "  out 0x3e, r16\n");
 
   // java stack pointer setup
   fprintf(out, "  ldi r28, 0x3f\n");
-  fprintf(out, "  ldi r29, 0x00\n");
+  fprintf(out, "  ldi r29, 0x00\n\n");
 
   return 0;
 }
