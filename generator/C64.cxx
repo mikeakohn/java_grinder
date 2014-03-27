@@ -67,27 +67,31 @@ int C64::open(const char *filename)
   if (Generator::open(filename) != 0) { return -1; }
 
   fprintf(out, ".65xx\n");
+
   // heap
   fprintf(out, "ram_start equ 0x8000\n");
   fprintf(out, "heap_ptr equ ram_start\n");
+
   // for indirection (2 bytes)
   fprintf(out, "address equ 0xfb\n");
+
   // java stack
   fprintf(out, "stack_lo equ 0xc000\n");
   fprintf(out, "stack_hi equ 0xc100\n");
   fprintf(out, "SP equ 0xfd\n");
+
   // points to locals
   fprintf(out, "locals equ 0xfe\n");
+
   // temp variables
   fprintf(out, "result equ 0x20\n");
   fprintf(out, "return equ 0x22\n");
   fprintf(out, "remainder equ 0x24\n");
   fprintf(out, "length equ 0x26\n");
-  fprintf(out, "temp equ 0x28\n");
   fprintf(out, "value1 equ 0x2a\n");
   fprintf(out, "value2 equ 0x2c\n");
   fprintf(out, "value3 equ 0x2e\n");
-  fprintf(out, "value4 equ 0x30\n");
+
   // sprites
   fprintf(out, "sprite_msb_set equ 0x10\n");
   fprintf(out, "sprite_msb_clear equ 0x11\n");

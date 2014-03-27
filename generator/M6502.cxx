@@ -100,24 +100,26 @@ int M6502::open(const char *filename)
   // heap
   fprintf(out, "ram_start equ 0x8000\n");
   fprintf(out, "heap_ptr equ ram_start\n");
+
   // for indirection (2 bytes)
   fprintf(out, "address equ 0xfb\n");
+
   // java stack
   fprintf(out, "stack_lo equ 0xc000\n");
   fprintf(out, "stack_hi equ 0xc100\n");
   fprintf(out, "SP equ 0xfd\n");
+
   // points to locals
   fprintf(out, "locals equ 0xfe\n");
+
   // temp variables
   fprintf(out, "result equ 0x20\n");
   fprintf(out, "return equ 0x22\n");
   fprintf(out, "remainder equ 0x24\n");
   fprintf(out, "length equ 0x26\n");
-  fprintf(out, "temp equ 0x28\n");
   fprintf(out, "value1 equ 0x2a\n");
   fprintf(out, "value2 equ 0x2c\n");
   fprintf(out, "value3 equ 0x2e\n");
-  fprintf(out, "value4 equ 0x30\n");
 
   return 0;
 }
@@ -129,7 +131,6 @@ int M6502::start_init()
 
 int M6502::insert_static_field_define(const char *name, const char *type, int index)
 {
-//FIXME test this
   fprintf(out, "%s equ ram_start + %d\n", name, (index + 1) * 2);
 
   return 0;
@@ -918,10 +919,8 @@ int M6502::put_static(const char *name, int index)
   if (stack > 0)
   {
     POP_HI;
-    //printf(out, "  lda result + 1\n");
     fprintf(out, "  sta %s + 1\n", name);
     POP_LO;
-    //fprintf(out, "  lda result + 0\n");
     fprintf(out, "  sta %s + 0\n", name);
     stack--;
   }
@@ -1186,22 +1185,21 @@ int M6502::get_values_from_stack(int num)
 // subroutines
 void M6502::insert_swap()
 {
-//FIXME untested
   fprintf(out, "swap:\n");
   fprintf(out, "  ldx SP\n");
   fprintf(out, "  lda stack_lo,x\n");
-  fprintf(out, "  sta temp + 0,x\n");
+  fprintf(out, "  sta value1 + 0,x\n");
   fprintf(out, "  lda stack_hi,x\n");
-  fprintf(out, "  sta temp + 1,x\n");
+  fprintf(out, "  sta value1 + 1,x\n");
 
   fprintf(out, "  lda stack_lo - 1,x\n");
   fprintf(out, "  sta stack_lo,x\n");
   fprintf(out, "  lda stack_hi - 1,x\n");
   fprintf(out, "  sta stack_hi,x\n");
 
-  fprintf(out, "  lda temp + 0\n");
+  fprintf(out, "  lda value1 + 0\n");
   fprintf(out, "  sta stack_lo - 1,x\n");
-  fprintf(out, "  lda temp + 1\n");
+  fprintf(out, "  lda value1 + 1\n");
   fprintf(out, "  sta stack_hi - 1,x\n");
   fprintf(out, "  rts\n");
 }
