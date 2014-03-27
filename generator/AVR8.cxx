@@ -130,7 +130,9 @@ int AVR8::open(const char *filename)
   // points to locals
   fprintf(out, "locals equ r26\n");
 
-  // java stack pointer
+  // java stack pointer (64 bytes)
+  fprintf(out, "stack_lo equ 0x00\n");
+  fprintf(out, "stack_hi equ 0x40\n");
   fprintf(out, "SP equ r28\n");
 
   // RAMEND (alter to chip)
