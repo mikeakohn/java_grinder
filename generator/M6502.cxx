@@ -43,7 +43,7 @@
   fprintf(out, "  ldy SP\n"); \
   fprintf(out, "  lda stack_lo,y\n")
 
-#define LOCALS(a) (a - 0)
+#define LOCALS(a) (a)
 
 M6502::M6502() :
   stack(0),
@@ -114,7 +114,6 @@ int M6502::open(const char *filename)
 
   // temp variables
   fprintf(out, "result equ 0x20\n");
-  fprintf(out, "return equ 0x22\n");
   fprintf(out, "remainder equ 0x24\n");
   fprintf(out, "length equ 0x26\n");
   fprintf(out, "value1 equ 0x2a\n");
@@ -139,9 +138,9 @@ int M6502::insert_static_field_define(const char *name, const char *type, int in
 int M6502::init_heap(int field_count)
 {
   fprintf(out, "  ; Set up heap and static initializers\n");
-  fprintf(out, "  lda #ram_start + %d & 0xff\n", (field_count + 1) * 2);
+  fprintf(out, "  lda #(ram_start + %d) & 0xff\n", (field_count + 1) * 2);
   fprintf(out, "  sta ram_start + 0\n");
-  fprintf(out, "  lda #ram_start + %d >> 8\n", (field_count + 1) * 2);
+  fprintf(out, "  lda #(ram_start + %d) >> 8\n", (field_count + 1) * 2);
   fprintf(out, "  sta ram_start + 1\n");
 
   return 0;
