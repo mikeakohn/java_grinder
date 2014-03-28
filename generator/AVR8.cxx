@@ -211,31 +211,42 @@ int AVR8::init_heap(int field_count)
 
 int AVR8::insert_field_init_boolean(char *name, int index, int value)
 {
-//  value = (value == 0) ? 0 : 1;
+  value = (value == 0) ? 0 : 1;
   fprintf(out, "; insert_field_init_boolean\n");
+  fprintf(out, "  mov temp, %d\n", value & 0xff);
+  fprintf(out, "  mov name + 0, temp\n");
+  fprintf(out, "  mov temp, %d\n", value >> 8);
+  fprintf(out, "  mov name + 1, temp\n");
 
-  return -1;
+  return 0;
 }
 
 int AVR8::insert_field_init_byte(char *name, int index, int value)
 {
-//  if (value < -128 || value > 255) { return -1; }
-//  int16_t n = value;
-//  uint16_t v = (n & 0xffff);
+  if (value < -128 || value > 255) { return -1; }
+  int16_t n = value;
+  uint16_t v = (n & 0xffff);
 
+  fprintf(out, "; insert_field_init_byte\n");
+  fprintf(out, "  mov temp, %d\n", (uint8_t)v & 0xff);
+  fprintf(out, "  mov name + 0, temp\n");
+  fprintf(out, "  mov temp, %d\n", (uint8_t)v >> 8);
+  fprintf(out, "  mov name + 1, temp\n");
 
-  fprintf(out, "; insert_field_init_short\n");
-
-  return -1;
+  return 0;
 }
 
 int AVR8::insert_field_init_short(char *name, int index, int value)
 {
-//  if (value < -32768 || value > 65535) { return -1; }
+  if (value < -32768 || value > 65535) { return -1; }
 
   fprintf(out, "; insert_field_init_short\n");
+  fprintf(out, "  mov temp, %d\n", value & 0xff);
+  fprintf(out, "  mov name + 0, temp\n");
+  fprintf(out, "  mov temp, %d\n", value >> 8);
+  fprintf(out, "  mov name + 1, temp\n");
 
-  return -1;
+  return 0;
 }
 
 int AVR8::insert_field_init_int(char *name, int index, int value)
@@ -246,6 +257,10 @@ int AVR8::insert_field_init_int(char *name, int index, int value)
 int AVR8::insert_field_init(char *name, int index)
 {
   fprintf(out, "; insert_field_init\n");
+  fprintf(out, "  mov temp, _%s & 0xff\n", name);
+  fprintf(out, "  mov %s + 0\n", name);
+  fprintf(out, "  mov temp, _%s >> 8\n", name);
+  fprintf(out, "  mov %s + 1\n", name);
 
   return 0;
 }
@@ -301,6 +316,14 @@ int AVR8::push_integer(int32_t n)
 int AVR8::push_integer_local(int index)
 {
   fprintf(out, "; push_integer_local\n");
+  fprintf(out, "  ldi YL, stack_hi - %d\n", LOCALS(index));
+  fprintf(out, "  add YL, locals\n");
+  fprintf(out, "  ld temp, Y\n");
+  PUSH_LO;
+  fprintf(out, "  ldi YL, stack_lo - %d\n", LOCALS(index));
+  fprintf(out, "  add YL, locals\n");
+  fprintf(out, "  ld temp, Y\n");
+  PUSH_HI;
   stack++;
 
   return -1;
@@ -337,23 +360,31 @@ int AVR8::push_double(double f)
 
 int AVR8::push_byte(int8_t b)
 {
-//  int16_t n = b;
-//  uint16_t value = (n & 0xffff);
+  int16_t n = b;
+  uint16_t value = (n & 0xffff);
 
   fprintf(out, "; push_byte\n");
+  fprintf(out, "  ldi temp, 0x%02x\n", value & 0xff);
+  PUSH_LO;
+  fprintf(out, "  ldi temp, 0x%02x\n", value >> 8);
+  PUSH_HI;
   stack++;
 
-  return -1;
+  return 0;
 }
 
 int AVR8::push_short(int16_t s)
 {
-//  uint16_t value = (s & 0xffff);
+  uint16_t value = (s & 0xffff);
 
   fprintf(out, "; push_short\n");
+  fprintf(out, "  ldi temp, 0x%02x\n", value & 0xff);
+  PUSH_LO;
+  fprintf(out, "  ldi temp, 0x%02x\n", value >> 8);
+  PUSH_HI;
   stack++;
 
-  return -1;
+  return 0;
 }
 
 int AVR8::pop_integer_local(int index)
@@ -367,8 +398,6 @@ int AVR8::pop_integer_local(int index)
   fprintf(out, "  ldi YL, stack_lo - %d\n", LOCALS(index));
   fprintf(out, "  add YL, locals\n");
   fprintf(out, "  st Y, temp\n");
-
-  fprintf(out, "    \n");
   stack--;
 
   return 0;
