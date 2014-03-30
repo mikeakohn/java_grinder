@@ -537,7 +537,7 @@ int AVR8::shift_left_integer()
   fprintf(out, "  call shift_left_integer\n");
   stack--;
 
-  return -1;
+  return 0;
 }
 
 int AVR8::shift_left_integer(int const_val)
@@ -551,7 +551,7 @@ int AVR8::shift_right_integer()
   fprintf(out, "  call shift_right_integer\n");
   stack--;
 
-  return -1;
+  return 0;
 }
 
 int AVR8::shift_right_integer(int const_val)
@@ -565,7 +565,7 @@ int AVR8::shift_right_uinteger()
   fprintf(out, "  call shift_right_uinteger\n");
   stack--;
 
-  return -1;
+  return 0;
 }
 
 int AVR8::shift_right_uinteger(int const_val)
@@ -617,10 +617,28 @@ int AVR8::xor_integer(int const_val)
 
 int AVR8::inc_integer(int index, int num)
 {
- // uint16_t value = num & 0xffff;
+  uint16_t value = num & 0xffff;
 
   fprintf(out, "; inc_integer num = %d\n", num);
-  return -1;
+  fprintf(out, "  ldi value10, 0x%02x\n", value & 0xff);
+  fprintf(out, "  ldi value11, 0x%02x\n", value >> 8);
+
+  fprintf(out, "  ldi YL, stack_lo - %d\n", LOCALS(index));
+  fprintf(out, "  add YL, locals\n");
+  fprintf(out, "  mov temp, YL\n");
+  fprintf(out, "  ld value20, Y\n");
+
+  fprintf(out, "  ldi YL, stack_hi - %d\n", LOCALS(index));
+  fprintf(out, "  add YL, locals\n");
+  fprintf(out, "  ld value21, Y\n");
+
+  fprintf(out, "  add value20, value10\n");
+  fprintf(out, "  adc value21, value11\n");
+  fprintf(out, "  st Y, value21\n");
+  fprintf(out, "  mov YL, temp\n");
+  fprintf(out, "  st Y, value20\n");
+
+  return 0;
 }
 
 int AVR8::integer_to_byte()
@@ -1160,36 +1178,109 @@ void AVR8::insert_mod_integer()
 void AVR8::insert_neg_integer()
 {
   fprintf(out, "neg_integer:\n");
+  POP_HI("result1");
+  POP_LO("result0");
+  fprintf(out, "  ldi temp, 0\n");
+  fprintf(out, "  sub temp, result0\n");
+  fprintf(out, "  sbc temp, result1\n");
+  PUSH_LO("result0");
+  PUSH_HI("result1");
+  fprintf(out, "  ret\n");
 }
 
 void AVR8::insert_shift_left_integer()
 {
   fprintf(out, "shift_left_integer:\n");
+  POP_HI("temp");
+  POP_LO("temp");
+  POP_HI("result1");
+  POP_LO("result0");
+  fprintf(out, "shift_left_integer_loop:\n");
+  fprintf(out, "  lsl result0\n");
+  fprintf(out, "  rol result1\n");
+  fprintf(out, "  dec temp\n");
+  fprintf(out, "  brne shift_left_integer_loop\n");
+  PUSH_LO("result0");
+  PUSH_HI("result1");
+  fprintf(out, "  ret\n");
 }
 
 void AVR8::insert_shift_right_integer()
 {
   fprintf(out, "shift_right_integer:\n");
+  POP_HI("temp");
+  POP_LO("temp");
+  POP_HI("result1");
+  POP_LO("result0");
+  fprintf(out, "shift_right_integer_loop:\n");
+  fprintf(out, "  lsl result1\n");
+  fprintf(out, "  ror result1\n");
+  fprintf(out, "  ror result0\n");
+  fprintf(out, "  dec temp\n");
+  fprintf(out, "  brne shift_right_integer_loop\n");
+  PUSH_LO("result0");
+  PUSH_HI("result1");
+  fprintf(out, "  ret\n");
 }
 
 void AVR8::insert_shift_right_uinteger()
 {
   fprintf(out, "shift_right_uinteger:\n");
+  POP_HI("temp");
+  POP_LO("temp");
+  POP_HI("result1");
+  POP_LO("result0");
+  fprintf(out, "shift_right_uinteger_loop:\n");
+  fprintf(out, "  lsr result1\n");
+  fprintf(out, "  ror result0\n");
+  fprintf(out, "  dec temp\n");
+  fprintf(out, "  brne shift_right_uinteger_loop\n");
+  PUSH_LO("result0");
+  PUSH_HI("result1");
+  fprintf(out, "  ret\n");
 }
 
 void AVR8::insert_and_integer()
 {
   fprintf(out, "and_integer:\n");
+  POP_HI("value11");
+  POP_LO("value10");
+  POP_HI("result1");
+  POP_LO("result0");
+  fprintf(out, "  and result0, value10\n");
+  fprintf(out, "  and result1, value11\n");
+  PUSH_LO("result0");
+  PUSH_HI("result1");
+  fprintf(out, "  ret\n");
 }
 
 void AVR8::insert_or_integer()
 {
   fprintf(out, "or_integer:\n");
+  POP_HI("value11");
+  POP_LO("value10");
+  POP_HI("result1");
+  POP_LO("result0");
+  fprintf(out, "  or result0, value10\n");
+  fprintf(out, "  or result1, value11\n");
+  PUSH_LO("result0");
+  PUSH_HI("result1");
+  fprintf(out, "  ret\n");
 }
 
 void AVR8::insert_xor_integer()
 {
   fprintf(out, "xor_integer:\n");
+  fprintf(out, "or_integer:\n");
+  POP_HI("value11");
+  POP_LO("value10");
+  POP_HI("result1");
+  POP_LO("result0");
+  fprintf(out, "  eor result0, value10\n");
+  fprintf(out, "  eor result1, value11\n");
+  PUSH_LO("result0");
+  PUSH_HI("result1");
+  fprintf(out, "  ret\n");
 }
 
 void AVR8::insert_push_array_length()
