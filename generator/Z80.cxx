@@ -22,11 +22,21 @@
 // ABI is:
 // Using the real stack for now.  This could be slow.
 //
-// ix = point to heap?
+// ix = temp?
 // iy = point to locals
 
 //static const char *cond_str[] = { "z", "nz", "lt", "le", "gt", "ge" };
-//static const char *stack_regs[] = { "bc", "de", "af", "hl" };
+//static const char *cond_str[] = { "z", "nz", "lt", "le", "gt", "ge" };
+static const char *alu_str[] = { "adc", "sbc", "and", "xor", "or" };
+
+enum
+{
+  ALU_ADD = 0,
+  ALU_SUB,
+  ALU_AND,  // everything past here should be logic, don't change the order
+  ALU_XOR,
+  ALU_OR,
+};
 
 Z80::Z80() :
   reg(0),
@@ -231,22 +241,22 @@ int Z80::swap()
 
 int Z80::add_integer()
 {
-  return stack_alu("add");
+  return stack_alu(ALU_ADD);
 }
 
 int Z80::add_integer(int num)
 {
-  return stack_alu_const("add", num);
+  return stack_alu_const(ALU_ADD, num);
 }
 
 int Z80::sub_integer()
 {
-  return stack_alu("sub");
+  return stack_alu(ALU_SUB);
 }
 
 int Z80::sub_integer(int num)
 {
-  return stack_alu_const("sub", num);
+  return stack_alu_const(ALU_SUB, num);
 }
 
 int Z80::mul_integer()
@@ -377,32 +387,32 @@ int n;
 
 int Z80::and_integer()
 {
-  return stack_alu("and");
+  return stack_alu(ALU_AND);
 }
 
 int Z80::and_integer(int num)
 {
-  return stack_alu_const("and", num);
+  return stack_alu_const(ALU_AND, num);
 }
 
 int Z80::or_integer()
 {
-  return stack_alu("or");
+  return stack_alu(ALU_OR);
 }
 
 int Z80::or_integer(int num)
 {
-  return stack_alu_const("or", num);
+  return stack_alu_const(ALU_OR, num);
 }
 
 int Z80::xor_integer()
 {
-  return stack_alu("xor");
+  return stack_alu(ALU_XOR);
 }
 
 int Z80::xor_integer(int num)
 {
-  return stack_alu_const("xor", num);
+  return stack_alu_const(ALU_XOR, num);
 }
 
 int Z80::inc_integer(int index, int num)
@@ -432,17 +442,23 @@ int Z80::return_local(int index, int local_count)
 
 int Z80::return_integer(int local_count)
 {
-  return -1;
+  fprintf(out, "  pop de\n");
+  while (stack > 0) { fprintf(out, "  pop bc\n"); stack--; }
+  fprintf(out, "  ret\n");
+  return 0;
 }
 
 int Z80::return_void(int local_count)
 {
-  return -1;
+  while (stack > 0) { fprintf(out, "  pop bc\n"); stack--; }
+  fprintf(out, "  ret\n");
+  return 0;
 }
 
 int Z80::jump(const char *name)
 {
-  return -1;
+  fprintf(out, "  jmp %s\n", name);
+  return 0;
 }
 
 int Z80::call(const char *name)
@@ -452,6 +468,21 @@ int Z80::call(const char *name)
 
 int Z80::invoke_static_method(const char *name, int params, int is_void)
 {
+int n;
+
+  printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
+
+  fprintf(out, "  ld ix, %d\n", params * 2);
+  fprintf(out, "  sub sp, ix\n");
+
+  // Make the call
+  fprintf(out, "  call %s\n", name);
+
+  for (n = 0; n < params; n++)
+  {
+    fprintf(out, "  pop bc\n");
+  }
+
   return -1;
 }
 
@@ -567,18 +598,37 @@ int Z80::array_write_int(const char *name, int field_id)
   return -1;
 }
 
-int Z80::stack_alu(const char *instr)
+int Z80::stack_alu(int alu_op)
 {
-  fprintf(out, "  pop ix\n");
-  fprintf(out, "  pop bc\n");
-  fprintf(out, "  %s ix, bc\n", instr);
-  fprintf(out, "  push ix\n");
-  stack--;
+  if (alu_op <= ALU_SUB)
+  {
+    fprintf(out, "  pop bc\n");
+    fprintf(out, "  pop hl\n");
+    //fprintf(out, "  scf\n");   // set carry
+    //fprintf(out, "  ccf\n");   // carry = not carry
+    fprintf(out, "  and a   ; clear carry\n");   
+    fprintf(out, "  %s hl, bc\n", alu_str[alu_op]);
+    fprintf(out, "  push hl\n");
+    stack--;
+  }
+    else
+  {
+    // Logic instruction
+    fprintf(out, "  pop hl\n");
+    fprintf(out, "  pop bc\n");
+    fprintf(out, "  ld a, b\n");
+    fprintf(out, "  %s a, h\n", alu_str[alu_op]);
+    fprintf(out, "  ld h, a\n");
+    fprintf(out, "  ld a, c\n");
+    fprintf(out, "  %s a, l\n", alu_str[alu_op]);
+    fprintf(out, "  ld l, a\n");
+    fprintf(out, "  push hl\n");
+  }
 
   return 0;
 }
 
-int Z80::stack_alu_const(const char *instr, int num)
+int Z80::stack_alu_const(int alu_op, int num)
 {
   if (num > 65535 || num < -32768)
   {
@@ -588,11 +638,43 @@ int Z80::stack_alu_const(const char *instr, int num)
 
   uint16_t value = (((int16_t)num) & 0xffff);
 
-  fprintf(out, "  pop ix\n");
-  fprintf(out, "  ld bc, %04x\n", value);
-  fprintf(out, "  %s ix, %d\n", instr, num);
-  fprintf(out, "  push ix\n");
-  stack--;
+  if (value == 0 && alu_op <= ALU_SUB) { return 0; }
+  if (value == 1 && alu_op == ALU_ADD)
+  {
+    fprintf(out, "  pop de\n");
+    fprintf(out, "  inc de\n");
+    fprintf(out, "  push de\n");
+    return 0;
+  }
+  if (value == 1 && alu_op == ALU_SUB)
+  {
+    fprintf(out, "  pop de\n");
+    fprintf(out, "  dec de\n");
+    fprintf(out, "  push de\n");
+    return 0;
+  }
+
+  if (alu_op <= ALU_SUB)
+  {
+    fprintf(out, "  pop hl\n");
+    fprintf(out, "  ld bc, %04x\n", value);
+    //fprintf(out, "  scf\n");   // set carry
+    //fprintf(out, "  ccf\n");   // carry = not carry
+    fprintf(out, "  and a   ; clear carry\n");   
+    fprintf(out, "  %s hl, bc\n", alu_str[alu_op]);
+    fprintf(out, "  push hl\n");
+    return 0;
+  }
+
+  // Now we know this is a logic instruction
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld a, h\n");
+  fprintf(out, "  %s %02x\n", alu_str[alu_op], value >> 8);
+  fprintf(out, "  ld h, a\n");
+  fprintf(out, "  ld a, l\n");
+  fprintf(out, "  %s %02x\n", alu_str[alu_op], value & 0xff);
+  fprintf(out, "  ld l, a\n");
+  fprintf(out, "  push hl\n");
 
   return 0;
 }

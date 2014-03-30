@@ -99,8 +99,8 @@ public:
   //virtual void close();
 
 protected:
-  int stack_alu(const char *instr);
-  int stack_alu_const(const char *instr, int num);
+  int stack_alu(int alu_op);
+  int stack_alu_const(int alu_op, int num);
 
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 
