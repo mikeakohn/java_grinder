@@ -20,13 +20,13 @@
 #define LOCALS(i) (i * 4)
 
 // ABI is:
-// bc - start of stack
-// de
-// af
-// hl - end of stack
+// Using the real stack for now.  This could be slow.
+//
+// ix = point to heap?
+// iy = point to locals
 
 //static const char *cond_str[] = { "z", "nz", "lt", "le", "gt", "ge" };
-static const char *stack_regs[] = { "bc", "de", "af", "hl" };
+//static const char *stack_regs[] = { "bc", "de", "af", "hl" };
 
 Z80::Z80() :
   reg(0),
@@ -120,17 +120,9 @@ int Z80::push_integer(int32_t n)
 
   uint16_t value = (n & 0xffff);
 
-  if (reg < reg_max)
-  {
-    fprintf(out, "  ld %s, 0x%4x\n", REG_STACK(reg), value);
-    reg++;
-  }
-    else
-  {
-    fprintf(out, "  ld ix, 0x%4x\n", value);
-    fprintf(out, "  push ix\n");
-    stack++;
-  }
+  fprintf(out, "  ld bc, 0x%4x\n", value);
+  fprintf(out, "  push bc\n");
+  stack++;
 
   return 0;
 }
@@ -147,9 +139,7 @@ int Z80::push_ref_local(int index)
 
 int Z80::push_fake()
 {
-  if (stack != 0) { return -1; }
-  reg++;
-  return 0;
+  return -1;
 }
 
 int Z80::push_long(int64_t n)
@@ -171,34 +161,18 @@ int Z80::push_byte(int8_t b)
 {
   uint16_t value = (((int16_t)b) & 0xffff);
 
-  if (reg < reg_max)
-  {
-    fprintf(out, "  ld %s, 0x%4x\n", REG_STACK(reg), value);
-    reg++;
-  }
-    else
-  {
-    fprintf(out, "  ld ix, 0x%4x\n", value);
-    fprintf(out, "  push ix\n");
-    stack++;
-  }
+  fprintf(out, "  ld bc, 0x%4x\n", value);
+  fprintf(out, "  push bc\n");
+  stack++;
 
   return 0;
 }
 
 int Z80::push_short(int16_t s)
 {
-  if (reg < reg_max)
-  {
-    fprintf(out, "  ld %s, 0x%4x\n", REG_STACK(reg), s);
-    reg++;
-  }
-    else
-  {
-    fprintf(out, "  ld ix, 0x%4x\n", s);
-    fprintf(out, "  push ix\n");
-    stack++;
-  }
+  fprintf(out, "  ld bc, 0x%4x\n", s);
+  fprintf(out, "  push bc\n");
+  stack++;
 
   return 0;
 }
@@ -215,72 +189,43 @@ int Z80::pop_ref_local(int index)
 
 int Z80::pop()
 {
-  if (stack > 0)
-  {
-    fprintf(out, "  pop ix\n");
-    stack--;
-  }
-    else
-  {
-    reg--;
-  }
+  fprintf(out, "  pop bc\n");
+  stack--;
 
   return 0;
 }
 
 int Z80::dup()
 {
-  if (stack > 0)
-  {
-    // FIXME - I think this could be done better
-    fprintf(out, "  pop ix\n");
-    fprintf(out, "  push ix\n");
-    fprintf(out, "  push ix\n");
-    stack++;
-  }
-    else
-  if (reg == reg_max)
-  {
-    fprintf(out, "  push hl\n");
-    stack++;
-  }
-    else
-  {
-    fprintf(out, "  ld %s, %s\n", REG_STACK(reg), REG_STACK(reg-1));
-    reg++;
-  }
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  push bc\n");
+  fprintf(out, "  push bc\n");
+  stack++;
+
   return 0;
 }
 
 int Z80::dup2()
 {
-  return -1;
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  pop de\n");
+  fprintf(out, "  push bc\n");
+  fprintf(out, "  push de\n");
+  fprintf(out, "  push bc\n");
+  fprintf(out, "  push de\n");
+  stack += 2;
+
+  return 0;
 }
 
 int Z80::swap()
 {
-  if (stack > 1)
-  {
-    // FIXME - This could be done a little faster
-    fprintf(out, "  pop ix\n");
-    fprintf(out, "  pop iy\n");
-    fprintf(out, "  push iy\n");
-    fprintf(out, "  push ix\n");
-    stack++;
-  }
-    else
-  if (stack > 0)
-  {
-    fprintf(out, "  pop ix\n");
-    fprintf(out, "  pop hl\n");
-    fprintf(out, "  ld hl, ix\n");
-  }
-    else
-  {
-    fprintf(out, "  ld ix, %s\n", REG_STACK(reg-1));
-    fprintf(out, "  ld %s, %s\n", REG_STACK(reg-1), REG_STACK(reg-2));
-    fprintf(out, "  ld %s, ix\n", REG_STACK(reg-2));
-  }
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  pop de\n");
+  fprintf(out, "  push de\n");
+  fprintf(out, "  push bc\n");
+  stack++;
+
   return 0;
 }
 
@@ -321,37 +266,113 @@ int Z80::mod_integer()
 
 int Z80::neg_integer()
 {
-  return -1;
+  // OUCH :(
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  ld a,b\n");
+  fprintf(out, "  xor 0xff\n");
+  fprintf(out, "  ld b,a\n");
+  fprintf(out, "  ld a,c\n");
+  fprintf(out, "  xor 0xff\n");
+  fprintf(out, "  ld c,a\n");
+  fprintf(out, "  push bc\n");
+
+  return 0;
 }
 
 int Z80::shift_left_integer()
 {
-  return -1;
+  fprintf(out, "  pop de\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  ld b,c\n");
+  fprintf(out, "label_%d:\n", label_count);
+  fprintf(out, "  sla e\n");
+  fprintf(out, "  rl d\n");
+  fprintf(out, "  djnz label_%d:\n", label_count);
+  fprintf(out, "  push de\n");
+  stack--;
+  label_count++;
+
+  return 0;
 }
 
 int Z80::shift_left_integer(int num)
 {
-  return -1;
+int n;
+
+  if (num == 0) { return 0; }
+  fprintf(out, "  pop de\n");
+  for (n = 0; n < num; n++)
+  {
+    fprintf(out, "  sla e\n");
+    fprintf(out, "  rl d\n");
+  }
+  fprintf(out, "  push de\n");
+
+  return 0;
 }
 
 int Z80::shift_right_integer()
 {
-  return -1;
+  fprintf(out, "  pop de\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  ld b,c\n");
+  fprintf(out, "label_%d:\n", label_count);
+  fprintf(out, "  sra d\n");
+  fprintf(out, "  rr e\n");
+  fprintf(out, "  djnz label_%d:\n", label_count);
+  fprintf(out, "  push de\n");
+  stack--;
+  label_count++;
+
+  return 0;
 }
 
 int Z80::shift_right_integer(int num)
 {
-  return -1;
+int n;
+
+  if (num == 0) { return 0; }
+  fprintf(out, "  pop de\n");
+  for (n = 0; n < num; n++)
+  {
+    fprintf(out, "  sra d\n");
+    fprintf(out, "  rr e\n");
+  }
+  fprintf(out, "  push de\n");
+
+  return 0;
 }
 
 int Z80::shift_right_uinteger()
 {
-  return -1;
+  fprintf(out, "  pop de\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  ld b,c\n");
+  fprintf(out, "label_%d:\n", label_count);
+  fprintf(out, "  srl d\n");
+  fprintf(out, "  rr e\n");
+  fprintf(out, "  djnz label_%d:\n", label_count);
+  fprintf(out, "  push de\n");
+  stack--;
+  label_count++;
+
+  return 0;
 }
 
 int Z80::shift_right_uinteger(int num)
 {
-  return -1;
+int n;
+
+  if (num == 0) { return 0; }
+  fprintf(out, "  pop de\n");
+  for (n = 0; n < num; n++)
+  {
+    fprintf(out, "  srl d\n");
+    fprintf(out, "  rr e\n");
+  }
+  fprintf(out, "  push de\n");
+
+  return 0;
 }
 
 int Z80::and_integer()
@@ -548,44 +569,30 @@ int Z80::array_write_int(const char *name, int field_id)
 
 int Z80::stack_alu(const char *instr)
 {
-  if (stack == 0)
-  {
-    fprintf(out, "  %s %s, %s\n", instr, REG_STACK(reg-2), REG_STACK(reg-1));
-    reg--;
-  }
-    else
-  if (stack == 1)
-  {
-    fprintf(out, "  pop ix\n");
-    fprintf(out, "  %s %s, ix\n", instr, REG_STACK(reg-1));
-    stack--;
-  }
-    else
-  {
-    fprintf(out, "  pop ix\n");
-    fprintf(out, "  pop iy\n");
-    fprintf(out, "  %s iy, ix\n", instr);
-    fprintf(out, "  push iy\n");
-  }
+  fprintf(out, "  pop ix\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  %s ix, bc\n", instr);
+  fprintf(out, "  push ix\n");
+  stack--;
 
   return 0;
 }
 
 int Z80::stack_alu_const(const char *instr, int num)
 {
-  if (stack == 0)
+  if (num > 65535 || num < -32768)
   {
-    fprintf(out, "  %s %s, %d\n", instr, REG_STACK(reg-1), num);
-    reg--;
+    printf("Error: literal value %d bigger than 16 bit.\n", num);
+    return -1;
   }
-    else
-  if (stack == 1)
-  {
-    fprintf(out, "  pop ix\n");
-    fprintf(out, "  %s ix, %d\n", instr, num);
-    fprintf(out, "  push ix\n");
-    stack--;
-  }
+
+  uint16_t value = (((int16_t)num) & 0xffff);
+
+  fprintf(out, "  pop ix\n");
+  fprintf(out, "  ld bc, %04x\n", value);
+  fprintf(out, "  %s ix, %d\n", instr, num);
+  fprintf(out, "  push ix\n");
+  stack--;
 
   return 0;
 }
