@@ -17,30 +17,30 @@
 #include "AVR8.h"
 
 // ABI is:
-// r0
-// r1
-// r2
-// r3
-// r4
-// r5
-// r6
-// r7
-// r8
-// r9
-// r10
-// r11
+// r0 result0
+// r1 result1
+// r2 remainder0
+// r3 remainder1
+// r4 length0 
+// r5 length1
+// r6 value10
+// r7 value11
+// r8 value20
+// r9 value21
+// r10 value30
+// r11 value31
 // r12
 // r13
 // r14
 // r15
 // r16
 // r17
-// r18
+// r18 
 // r19
 // r20
 // r21
-// r22
-// r23 temp
+// r22 temp
+// r23 temp2
 // r24 locals
 // r25 SP
 // r26 XL
@@ -131,20 +131,21 @@ int AVR8::open(const char *filename)
   fprintf(out, ".avr8\n\n");
 
   // defines
-  fprintf(out, "result0 equ 0x80\n");
-  fprintf(out, "result1 equ 0x81\n");
-  fprintf(out, "remainder0 equ 0x82\n");
-  fprintf(out, "remainder1 equ 0x83\n");
-  fprintf(out, "length0 equ 0x84\n");
-  fprintf(out, "length1 equ 0x85\n");
-  fprintf(out, "value10 equ 0x86\n");
-  fprintf(out, "value11 equ 0x87\n");
-  fprintf(out, "value20 equ 0x88\n");
-  fprintf(out, "value21 equ 0x89\n");
-  fprintf(out, "value30 equ 0x8a\n");
-  fprintf(out, "value31 equ 0x8b\n");
+  fprintf(out, "result0 equ r0\n");
+  fprintf(out, "result1 equ r1\n");
+  fprintf(out, "remainder0 equ r2\n");
+  fprintf(out, "remainder1 equ r3\n");
+  fprintf(out, "length0 equ r4\n");
+  fprintf(out, "length1 equ r5\n");
+  fprintf(out, "value10 equ r6\n");
+  fprintf(out, "value11 equ r7\n");
+  fprintf(out, "value20 equ r8\n");
+  fprintf(out, "value21 equ r9\n");
+  fprintf(out, "value30 equ r10\n");
+  fprintf(out, "value31 equ r11\n");
 
-  fprintf(out, "temp equ r23\n");
+  fprintf(out, "temp equ r22\n");
+  fprintf(out, "temp2 equ r23\n");
   fprintf(out, "locals equ r24\n");
   fprintf(out, "SP equ r25\n");
   fprintf(out, "XL equ r26\n");
@@ -164,7 +165,7 @@ int AVR8::open(const char *filename)
   fprintf(out, "RAMEND equ 0x1ff\n");
 
   // heap
-  fprintf(out, "ram_start equ 0x90\n");
+  fprintf(out, "ram_start equ 0x80\n");
   fprintf(out, "heap_ptr equ ram_start\n\n");
 
   // startup
@@ -316,17 +317,17 @@ int AVR8::push_integer(int32_t n)
 int AVR8::push_integer_local(int index)
 {
   fprintf(out, "; push_integer_local\n");
-  fprintf(out, "  ldi YL, stack_hi - %d\n", LOCALS(index));
+  fprintf(out, "  ldi YL, stack_lo - %d\n", LOCALS(index));
   fprintf(out, "  add YL, locals\n");
   fprintf(out, "  ld temp, Y\n");
   PUSH_LO;
-  fprintf(out, "  ldi YL, stack_lo - %d\n", LOCALS(index));
+  fprintf(out, "  ldi YL, stack_hi - %d\n", LOCALS(index));
   fprintf(out, "  add YL, locals\n");
   fprintf(out, "  ld temp, Y\n");
   PUSH_HI;
   stack++;
 
-  return -1;
+  return 0;
 }
 
 int AVR8::push_ref_local(int index)
@@ -391,11 +392,11 @@ int AVR8::pop_integer_local(int index)
 {
   fprintf(out, "; pop_integer_local\n");
   POP_HI;
-  fprintf(out, "  lds YL, stack_hi - %d\n", LOCALS(index));
+  fprintf(out, "  ldi YL, stack_hi - %d\n", LOCALS(index));
   fprintf(out, "  add YL, locals\n");
   fprintf(out, "  st Y, temp\n");
   POP_LO;
-  fprintf(out, "  lds YL, stack_lo - %d\n", LOCALS(index));
+  fprintf(out, "  ldi YL, stack_lo - %d\n", LOCALS(index));
   fprintf(out, "  add YL, locals\n");
   fprintf(out, "  st Y, temp\n");
   stack--;
@@ -412,9 +413,9 @@ int AVR8::pop()
 {
   fprintf(out, "; pop\n");
   POP_HI;
-  fprintf(out, "  sts result + 1, temp\n");
+  fprintf(out, "  mov result1, temp\n");
   POP_LO;
-  fprintf(out, "  sts result + 0, temp\n");
+  fprintf(out, "  mov result0, temp\n");
   stack--;
 
   return -1;
@@ -457,7 +458,7 @@ int AVR8::add_integer()
   fprintf(out, "  call add_integer\n");
   stack--;
 
-  return -1;
+  return 0;
 }
 
 int AVR8::add_integer(int const_val)
@@ -747,31 +748,50 @@ int AVR8::return_local(int index, int local_count)
 int AVR8::return_integer(int local_count)
 {
   fprintf(out, "; return_integer\n");
+  POP_HI;
+  fprintf(out, "  mov result1, temp\n");
+  POP_LO;
+  fprintf(out, "  mov result0, temp\n");
+  stack--;
+
+  fprintf(out, "  mov SP, locals\n");
 
   if (!is_main)
   {
+    POP_HI;
+    POP_LO;
+    fprintf(out, "  mov locals, temp\n");
   }
 
   fprintf(out, "  ret\n");
 
-  return -1;
+  return 0;
 }
 
 int AVR8::return_void(int local_count)
 {
   fprintf(out, "; return_void\n");
+  fprintf(out, "  mov SP, locals\n");
 
   if (!is_main)
+  {
+    POP_HI;
+    POP_LO;
+    fprintf(out, "  mov locals, temp\n");
     fprintf(out, "  ret\n");
-  else
+  }
+    else
+  {
+    //FIXME stop the simulator when program ends
     fprintf(out, "  break\n");
+  }
 
   return 0;
 }
 
 int AVR8::jump(const char *name)
 {
-  fprintf(out, "  jmp %s\n", name);
+  fprintf(out, "  rjmp %s\n", name);
 
   return -1;
 }
@@ -797,11 +817,18 @@ int stack_vars = stack;
   {
     if (stack_vars > 0)
     {
-      //fprintf(out, "  ldx SP\n");
-      //fprintf(out, "  lda stack_lo + 1 + %d,x\n", (stack - stack_vars));
-      //fprintf(out, "  sta stack_lo + 1 %d,x\n", local-1);
-      //fprintf(out, "  lda stack_hi + 1 + %d,x\n", (stack - stack_vars));
-      //fprintf(out, "  sta stack_hi + 1 %d,x\n", local-1);
+      fprintf(out, "  ldi YL, stack_lo + 1 + %d\n", (stack - stack_vars));
+      fprintf(out, "  add YL, SP\n");
+      fprintf(out, "  ld temp, Y\n");
+      fprintf(out, "  ldi YL, stack_lo + 1 %d\n", local - 1);
+      fprintf(out, "  add YL, SP\n");
+      fprintf(out, "  st Y, temp\n");
+      fprintf(out, "  ldi YL, stack_hi + 1 + %d\n", (stack - stack_vars));
+      fprintf(out, "  add YL, SP\n");
+      fprintf(out, "  ld temp, Y\n");
+      fprintf(out, "  ldi YL, stack_hi + 1 %d\n", local - 1);
+      fprintf(out, "  add YL, SP\n");
+      fprintf(out, "  st Y, temp\n");
       stack_vars--;
     }
 
@@ -812,15 +839,22 @@ int stack_vars = stack;
 
   if ((stack - stack_vars) > 0)
   {
+    fprintf(out, "  ldi temp, %d\n", (stack - stack_vars));
+    fprintf(out, "  add SP, temp\n");
+
     params -= (stack - stack_vars);
   }
 
   if (!is_void)
   {
+    fprintf(out, "  mov temp, result0\n");
+    PUSH_LO;
+    fprintf(out, "  mov temp, result1\n");
+    PUSH_HI;
     stack++;
   }
 
-  return -1;
+  return 0;
 }
 
 int AVR8::put_static(const char *name, int index)
@@ -1040,6 +1074,22 @@ void AVR8::insert_swap()
 void AVR8::insert_add_integer()
 {
   fprintf(out, "add_integer:\n");
+  POP_HI;
+  fprintf(out, "  mov result1, temp\n");
+  POP_LO;
+  fprintf(out, "  mov result0, temp\n");
+  POP_HI;
+  fprintf(out, "  mov value11, temp\n");
+  POP_LO;
+  fprintf(out, "  mov value10, temp\n");
+
+  fprintf(out, "  add result0, value10\n");
+  fprintf(out, "  adc result1, value11\n");
+  fprintf(out, "  mov temp, result0\n");
+  PUSH_LO;
+  fprintf(out, "  mov temp, result1\n");
+  PUSH_HI;
+  fprintf(out, "  ret\n");
 }
 
 void AVR8::insert_sub_integer()
