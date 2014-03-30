@@ -391,11 +391,11 @@ int AVR8::pop_integer_local(int index)
 {
   fprintf(out, "; pop_integer_local\n");
   POP_HI;
-  fprintf(out, "  ldi YL, stack_hi - %d\n", LOCALS(index));
+  fprintf(out, "  lds YL, stack_hi - %d\n", LOCALS(index));
   fprintf(out, "  add YL, locals\n");
   fprintf(out, "  st Y, temp\n");
   POP_LO;
-  fprintf(out, "  ldi YL, stack_lo - %d\n", LOCALS(index));
+  fprintf(out, "  lds YL, stack_lo - %d\n", LOCALS(index));
   fprintf(out, "  add YL, locals\n");
   fprintf(out, "  st Y, temp\n");
   stack--;
@@ -411,6 +411,10 @@ int AVR8::pop_ref_local(int index)
 int AVR8::pop()
 {
   fprintf(out, "; pop\n");
+  POP_HI;
+  fprintf(out, "  sts result + 1, temp\n");
+  POP_LO;
+  fprintf(out, "  sts result + 0, temp\n");
   stack--;
 
   return -1;
@@ -419,6 +423,14 @@ int AVR8::pop()
 int AVR8::dup()
 {
   fprintf(out, "; dup\n");
+  fprintf(out, "  mov YL, stack_lo\n");
+  fprintf(out, "  add YL, SP\n");
+  fprintf(out, "  ld temp, YL\n");
+  PUSH_LO;
+  fprintf(out, "  mov YL, stack_hi\n");
+  fprintf(out, "  add YL, SP\n");
+  fprintf(out, "  ld temp, YL\n");
+  PUSH_HI;
   stack++;
 
   return -1;
