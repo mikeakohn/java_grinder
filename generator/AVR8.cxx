@@ -528,7 +528,7 @@ int AVR8::neg_integer()
   need_neg_integer = 1;
   fprintf(out, "  call neg_integer\n");
 
-  return -1;
+  return 0;
 }
 
 int AVR8::shift_left_integer()
@@ -579,7 +579,7 @@ int AVR8::and_integer()
   fprintf(out, "  call and_integer\n");
   stack--;
 
-  return -1;
+  return 0;
 }
 
 int AVR8::and_integer(int const_val)
@@ -593,7 +593,7 @@ int AVR8::or_integer()
   fprintf(out, "  call or_integer\n");
   stack--;
 
-  return -1;
+  return 0;
 }
 
 int AVR8::or_integer(int const_val)
@@ -607,7 +607,7 @@ int AVR8::xor_integer()
   fprintf(out, "  call xor_integer\n");
   stack--;
 
-  return -1;
+  return 0;
 }
 
 int AVR8::xor_integer(int const_val)
