@@ -27,7 +27,8 @@
 
 //static const char *cond_str[] = { "z", "nz", "lt", "le", "gt", "ge" };
 //static const char *cond_str[] = { "z", "nz", "lt", "le", "gt", "ge" };
-static const char *alu_str[] = { "adc", "sbc", "and", "xor", "or" };
+//static const char *alu_str[] = { "adc", "sbc", "and", "xor", "or" };
+static const char *alu_str[] = { "add", "sub", "and", "xor", "or" };
 
 enum
 {
@@ -472,18 +473,35 @@ int n;
 
   printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
 
-  fprintf(out, "  ld ix, %d\n", params * 2);
-  fprintf(out, "  sub sp, ix\n");
+  // Pop all params off stack
+  fprintf(out, "  ld hl, -%d\n", params * 2);
+  fprintf(out, "  add hl, sp\n");
+  fprintf(out, "  ld sp, hl\n");
+
+  // Copy all params to local area of new method (sp - 4 - (params * 2))
+  // since we will push iy and the return address.
+  fprintf(out, "  ld ix, -%d\n", (params * 2) + 4);
+  fprintf(out, "  add ix, sp\n");
+
+  for (n = 0; n < params; n++)
+  {
+    fprintf(out, "  ld e, (ix+%d)", (params * 2) + (n * 2));
+    fprintf(out, "  ld (ix+%d), e", (n * 2));
+  }
+
+  fprintf(out, "  push iy\n");
 
   // Make the call
   fprintf(out, "  call %s\n", name);
 
-  for (n = 0; n < params; n++)
+  fprintf(out, "  pop iy\n");
+
+  if (!is_void)
   {
-    fprintf(out, "  pop bc\n");
+    fprintf(out, "  push de\n");
   }
 
-  return -1;
+  return 0;
 }
 
 int Z80::put_static(const char *name, int index)
@@ -602,6 +620,7 @@ int Z80::stack_alu(int alu_op)
 {
   if (alu_op <= ALU_SUB)
   {
+#if 0
     fprintf(out, "  pop bc\n");
     fprintf(out, "  pop hl\n");
     //fprintf(out, "  scf\n");   // set carry
@@ -609,6 +628,11 @@ int Z80::stack_alu(int alu_op)
     fprintf(out, "  and a   ; clear carry\n");   
     fprintf(out, "  %s hl, bc\n", alu_str[alu_op]);
     fprintf(out, "  push hl\n");
+#endif
+    fprintf(out, "  pop ix\n");
+    fprintf(out, "  pop bc\n");
+    fprintf(out, "  %s ix, bc\n", alu_str[alu_op]);
+    fprintf(out, "  push ix\n");
     stack--;
   }
     else
@@ -656,6 +680,7 @@ int Z80::stack_alu_const(int alu_op, int num)
 
   if (alu_op <= ALU_SUB)
   {
+#if 0
     fprintf(out, "  pop hl\n");
     fprintf(out, "  ld bc, %04x\n", value);
     //fprintf(out, "  scf\n");   // set carry
@@ -663,6 +688,12 @@ int Z80::stack_alu_const(int alu_op, int num)
     fprintf(out, "  and a   ; clear carry\n");   
     fprintf(out, "  %s hl, bc\n", alu_str[alu_op]);
     fprintf(out, "  push hl\n");
+#endif
+    fprintf(out, "  pop ix\n");
+    fprintf(out, "  ld b, %04x\n", value >> 8);
+    fprintf(out, "  ld c, %04x\n", value & 0xff);
+    fprintf(out, "  %s ix, bc\n", alu_str[alu_op]);
+    fprintf(out, "  push ix\n");
     return 0;
   }
 
