@@ -25,7 +25,7 @@
 // ix = temp?
 // iy = point to locals
 
-//static const char *cond_str[] = { "z", "nz", "lt", "le", "gt", "ge" };
+//                                 Z    NZ    LT    LE    GT    GE
 //static const char *cond_str[] = { "z", "nz", "lt", "le", "gt", "ge" };
 //static const char *alu_str[] = { "adc", "sbc", "and", "xor", "or" };
 static const char *alu_str[] = { "add", "sub", "and", "xor", "or" };
@@ -115,10 +115,22 @@ int Z80::insert_field_init(char *name, int index)
 
 void Z80::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
+  reg = 0;
+  stack = 0;
+
+  is_main = (strcmp(name, "main") == 0) ? 1 : 0;
+
+  fprintf(out, "%s:\n", name);
+  if (!is_main) { fprintf(out, "  push iy\n"); }
+  fprintf(out, "  mov iy, SP\n");
+  fprintf(out, "  ld ix, -%d\n", local_count * 2);
+  fprintf(out, "  add ix, SP\n");
+  fprintf(out, "  ld SP, ix\n");
 }
 
 void Z80::method_end(int local_count)
 {
+  fprintf(out, "\n");
 }
 
 int Z80::push_integer(int32_t n)
@@ -140,7 +152,11 @@ int Z80::push_integer(int32_t n)
 
 int Z80::push_integer_local(int index)
 {
-  return -1;
+  fprintf(out, "  ld e, (iy+%d)\n", (index * 2));
+  fprintf(out, "  ld d, (iy+%d)\n", (index * 2) + 1);
+  fprintf(out, "  push de\n");
+  stack++;
+  return 0;
 }
 
 int Z80::push_ref_local(int index)
@@ -152,6 +168,15 @@ int Z80::push_fake()
 {
   return -1;
 }
+
+int Z80::set_integer_local(int index, int value)
+{
+  fprintf(out, "  ld de, 0x%04x\n", value);
+  fprintf(out, "  ld (iy+%d), e\n", (index * 2));
+  fprintf(out, "  ld (iy+%d), d\n", (index * 2) + 1);
+  return 0;
+}
+
 
 int Z80::push_long(int64_t n)
 {
@@ -280,10 +305,10 @@ int Z80::neg_integer()
   // OUCH :(
   fprintf(out, "  pop bc\n");
   fprintf(out, "  ld a,b\n");
-  fprintf(out, "  xor 0xff\n");
+  fprintf(out, "  cpl\n");
   fprintf(out, "  ld b,a\n");
   fprintf(out, "  ld a,c\n");
-  fprintf(out, "  xor 0xff\n");
+  fprintf(out, "  cpl\n");
   fprintf(out, "  ld c,a\n");
   fprintf(out, "  push bc\n");
 
@@ -428,23 +453,103 @@ int Z80::integer_to_byte()
 
 int Z80::jump_cond(const char *label, int cond)
 {
-  return -1;
+  fprintf(out, "  xor a\n");
+  fprintf(out, "  pop de\n");
+
+  switch(cond)
+  {
+    case COND_EQUAL:
+      fprintf(out, "  cp d\n");
+      fprintf(out, "  jr nz, label_%d\n", label_count);
+      fprintf(out, "  cp e\n");
+      fprintf(out, "  jr z, %s\n", label);
+      fprintf(out, "label_%d:\n", label_count);
+      label_count++;
+      break;
+    case COND_NOT_EQUAL:
+      fprintf(out, "  cp d\n");
+      fprintf(out, "  jr z, label_%d\n", label_count);
+      fprintf(out, "  cp e\n");
+      fprintf(out, "  jr nz, %s\n", label);
+      fprintf(out, "label_%d:\n", label_count);
+      label_count++;
+      break;
+    case COND_LESS:
+      //fprintf(out, "  cp d\n");
+      //fprintf(out, "  jr z %s\n", label);  // if d=0 try lower
+      //fprintf(out, "  ld a, f\n");
+      //fprintf(out, "  jp pe, %s\n", label_count);
+      //fprintf(out, "  xor 0x80\n");
+      //fprintf(out, "label_%d:\n", label_count);
+      //label_count++;
+
+      break;
+    case COND_LESS_EQUAL:
+    case COND_GREATER:
+    case COND_GREATER_EQUAL:
+    default:
+      return -1;
+  }
+
+  stack--;
+  return 0;
 }
 
 int Z80::jump_cond_integer(const char *label, int cond)
 {
-  return -1;
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  pop de\n");
+
+  switch(cond)
+  {
+    case COND_EQUAL:
+      fprintf(out, "  ld a, b\n");
+      fprintf(out, "  cp d\n");
+      fprintf(out, "  jr nz, label_%d\n", label_count);
+      fprintf(out, "  ld a, c\n");
+      fprintf(out, "  cp e\n");
+      fprintf(out, "  jr z, %s\n", label);
+      fprintf(out, "label_%d:\n", label_count);
+      label_count++;
+      break;
+    case COND_NOT_EQUAL:
+      fprintf(out, "  ld a, b\n");
+      fprintf(out, "  cp d\n");
+      fprintf(out, "  jr z, label_%d\n", label_count);
+      fprintf(out, "  ld a, c\n");
+      fprintf(out, "  cp e\n");
+      fprintf(out, "  jr nz, %s\n", label);
+      fprintf(out, "label_%d:\n", label_count);
+      label_count++;
+      break;
+    case COND_LESS:
+    case COND_LESS_EQUAL:
+    case COND_GREATER:
+    case COND_GREATER_EQUAL:
+    default:
+      return -1;
+  }
+
+  stack--;
+  return 0;
 }
 
 int Z80::return_local(int index, int local_count)
 {
-  return -1;
+  fprintf(out, "  ld e, (iy+%d)\n", (index * 2));
+  fprintf(out, "  ld d, (iy+%d)\n", (index * 2) + 1);
+  while (stack > 0) { fprintf(out, "  pop bc\n"); stack--; }
+  if (!is_main) { fprintf(out, "  pop iy\n"); }
+  fprintf(out, "  ret\n");
+  return 0;
 }
 
 int Z80::return_integer(int local_count)
 {
   fprintf(out, "  pop de\n");
+  stack--;
   while (stack > 0) { fprintf(out, "  pop bc\n"); stack--; }
+  if (!is_main) { fprintf(out, "  pop iy\n"); }
   fprintf(out, "  ret\n");
   return 0;
 }
@@ -452,6 +557,7 @@ int Z80::return_integer(int local_count)
 int Z80::return_void(int local_count)
 {
   while (stack > 0) { fprintf(out, "  pop bc\n"); stack--; }
+  if (!is_main) { fprintf(out, "  pop iy\n"); }
   fprintf(out, "  ret\n");
   return 0;
 }
@@ -475,13 +581,13 @@ int n;
 
   // Pop all params off stack
   fprintf(out, "  ld hl, -%d\n", params * 2);
-  fprintf(out, "  add hl, sp\n");
-  fprintf(out, "  ld sp, hl\n");
+  fprintf(out, "  add hl, SP\n");
+  fprintf(out, "  ld SP, hl\n");
 
-  // Copy all params to local area of new method (sp - 4 - (params * 2))
+  // Copy all params to local area of new method (SP - 4 - (params * 2))
   // since we will push iy and the return address.
   fprintf(out, "  ld ix, -%d\n", (params * 2) + 4);
-  fprintf(out, "  add ix, sp\n");
+  fprintf(out, "  add ix, SP\n");
 
   for (n = 0; n < params; n++)
   {
@@ -489,12 +595,8 @@ int n;
     fprintf(out, "  ld (ix+%d), e", (n * 2));
   }
 
-  fprintf(out, "  push iy\n");
-
   // Make the call
   fprintf(out, "  call %s\n", name);
-
-  fprintf(out, "  pop iy\n");
 
   if (!is_void)
   {

@@ -27,6 +27,7 @@
 #include "MSP430.h"
 #include "MSP430X.h"
 #include "STDC.h"
+#include "Z80.h"
 #include "version.h"
 
 #define STACK_LEN 65536
@@ -93,6 +94,11 @@ Generator *generator = NULL;
   if (strcasecmp("stdc", chip_type) == 0)
   {
     generator = new STDC();
+  }
+    else
+  if (strcasecmp("z80", chip_type) == 0)
+  {
+    generator = new Z80();
   }
 
   return generator;
