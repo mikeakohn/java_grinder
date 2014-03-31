@@ -215,7 +215,10 @@ int Z80::push_short(int16_t s)
 
 int Z80::pop_integer_local(int index)
 {
-  return -1;
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld l, (iy+%d)\n", (index * 2));
+  fprintf(out, "  ld h, (iy+%d)\n", (index * 2) + 1);
+  return 0;
 }
 
 int Z80::pop_ref_local(int index)
@@ -443,7 +446,13 @@ int Z80::xor_integer(int num)
 
 int Z80::inc_integer(int index, int num)
 {
-  return -1;
+  fprintf(out, "  ld h, (iy+%d)\n", (index * 2) + 1);
+  fprintf(out, "  ld l, (iy+%d)\n", (index * 2));
+  fprintf(out, "  ld bc, 0x%02x\n", num);
+  fprintf(out, "  add hl, bc\n");
+  fprintf(out, "  ld (iy+%d), h\n", (index * 2) + 1);
+  fprintf(out, "  ld (iy+%d), l\n", (index * 2));
+  return 0;
 }
 
 int Z80::integer_to_byte()
@@ -453,28 +462,55 @@ int Z80::integer_to_byte()
 
 int Z80::jump_cond(const char *label, int cond)
 {
-  fprintf(out, "  xor a\n");
-  fprintf(out, "  pop de\n");
+  if (cond == COND_GREATER)
+  {
+    fprintf(out, "  pop bc\n");
+    fprintf(out, "  ld hl, 0\n");
+    cond = COND_LESS;
+  }
+    else
+  if (cond == COND_LESS_EQUAL)
+  {
+    fprintf(out, "  pop bc\n");
+    fprintf(out, "  ld hl, 0\n");
+    cond = COND_GREATER_EQUAL;
+  }
+    else
+  {
+    fprintf(out, "  ld bc, 0\n");
+    fprintf(out, "  pop hl\n");
+  }
 
   switch(cond)
   {
     case COND_EQUAL:
-      fprintf(out, "  cp d\n");
-      fprintf(out, "  jr nz, label_%d\n", label_count);
-      fprintf(out, "  cp e\n");
+      fprintf(out, "  and a\n");  // clear carry
+      fprintf(out, "  sbc hl, bc\n");
       fprintf(out, "  jr z, %s\n", label);
-      fprintf(out, "label_%d:\n", label_count);
-      label_count++;
+      //fprintf(out, "  cp d\n");
+      //fprintf(out, "  jr nz, label_%d\n", label_count);
+      //fprintf(out, "  cp e\n");
+      //fprintf(out, "  jr z, %s\n", label);
+      //fprintf(out, "label_%d:\n", label_count);
+      //label_count++;
       break;
     case COND_NOT_EQUAL:
-      fprintf(out, "  cp d\n");
-      fprintf(out, "  jr z, label_%d\n", label_count);
-      fprintf(out, "  cp e\n");
+      fprintf(out, "  and a\n");  // clear carry
+      fprintf(out, "  sbc hl, bc\n");
       fprintf(out, "  jr nz, %s\n", label);
-      fprintf(out, "label_%d:\n", label_count);
-      label_count++;
+      //fprintf(out, "  cp d\n");
+      //fprintf(out, "  jr z, label_%d\n", label_count);
+      //fprintf(out, "  cp e\n");
+      //fprintf(out, "  jr nz, %s\n", label);
+      //fprintf(out, "label_%d:\n", label_count);
+      //label_count++;
       break;
     case COND_LESS:
+      fprintf(out, "  and a\n");  // clear carry
+      fprintf(out, "  sbc hl, bc\n");
+      fprintf(out, "  ld a, f\n");
+      fprintf(out, "  and 0x84\n");
+      fprintf(out, "  jp po, %s\n", label);
       //fprintf(out, "  cp d\n");
       //fprintf(out, "  jr z %s\n", label);  // if d=0 try lower
       //fprintf(out, "  ld a, f\n");
@@ -482,11 +518,18 @@ int Z80::jump_cond(const char *label, int cond)
       //fprintf(out, "  xor 0x80\n");
       //fprintf(out, "label_%d:\n", label_count);
       //label_count++;
-
       break;
     case COND_LESS_EQUAL:
+      return -1;
     case COND_GREATER:
+      return -1;
     case COND_GREATER_EQUAL:
+      fprintf(out, "  and a\n");  // clear carry
+      fprintf(out, "  sbc hl, bc\n");
+      fprintf(out, "  ld a, f\n");
+      fprintf(out, "  and 0x84\n");
+      fprintf(out, "  jp pe, %s\n", label);
+      break;
     default:
       return -1;
   }
@@ -497,35 +540,56 @@ int Z80::jump_cond(const char *label, int cond)
 
 int Z80::jump_cond_integer(const char *label, int cond)
 {
-  fprintf(out, "  pop bc\n");
-  fprintf(out, "  pop de\n");
+  if (cond == COND_GREATER)
+  {
+    fprintf(out, "  pop hl\n");
+    fprintf(out, "  pop bc\n");
+    cond = COND_LESS;
+  }
+    else
+  if (cond == COND_LESS_EQUAL)
+  {
+    fprintf(out, "  pop hl\n");
+    fprintf(out, "  pop bc\n");
+    cond = COND_GREATER_EQUAL;
+  }
+    else
+  {
+    fprintf(out, "  pop bc\n");
+    fprintf(out, "  pop hl\n");
+  }
 
   switch(cond)
   {
     case COND_EQUAL:
-      fprintf(out, "  ld a, b\n");
-      fprintf(out, "  cp d\n");
-      fprintf(out, "  jr nz, label_%d\n", label_count);
-      fprintf(out, "  ld a, c\n");
-      fprintf(out, "  cp e\n");
+      fprintf(out, "  and a\n");  // clear carry
+      fprintf(out, "  sbc hl, bc\n");
       fprintf(out, "  jr z, %s\n", label);
-      fprintf(out, "label_%d:\n", label_count);
-      label_count++;
       break;
     case COND_NOT_EQUAL:
-      fprintf(out, "  ld a, b\n");
-      fprintf(out, "  cp d\n");
-      fprintf(out, "  jr z, label_%d\n", label_count);
-      fprintf(out, "  ld a, c\n");
-      fprintf(out, "  cp e\n");
+      fprintf(out, "  and a\n");  // clear carry
+      fprintf(out, "  sbc hl, bc\n");
       fprintf(out, "  jr nz, %s\n", label);
-      fprintf(out, "label_%d:\n", label_count);
       label_count++;
       break;
     case COND_LESS:
+      fprintf(out, "  and a\n");  // clear carry
+      fprintf(out, "  sbc hl, bc\n");
+      fprintf(out, "  ld a, f\n");
+      fprintf(out, "  and 0x84\n");
+      fprintf(out, "  jp po, %s\n", label);
+      break;
     case COND_LESS_EQUAL:
+      return -1;
     case COND_GREATER:
+      return -1;
     case COND_GREATER_EQUAL:
+      fprintf(out, "  and a\n");  // clear carry
+      fprintf(out, "  sbc hl, bc\n");
+      fprintf(out, "  ld a, f\n");
+      fprintf(out, "  and 0x84\n");
+      fprintf(out, "  jp pe, %s\n", label);
+      break;
     default:
       return -1;
   }
