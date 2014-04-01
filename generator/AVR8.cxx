@@ -23,22 +23,22 @@
 // r3 remainder1
 // r4 length0 
 // r5 length1
-// r6 value10
-// r7 value11
-// r8 value20
-// r9 value21
-// r10 value30
-// r11 value31
+// r6
+// r7
+// r8
+// r9
+// r10
+// r11
 // r12
 // r13
 // r14
-// r15
-// r16
-// r17
-// r18 
-// r19
-// r20
-// r21
+// r15 zero
+// r16 value10
+// r17 value11
+// r18 value20
+// r19 value21
+// r20 value30
+// r21 value31
 // r22 temp
 // r23 temp2
 // r24 locals
@@ -137,13 +137,13 @@ int AVR8::open(const char *filename)
   fprintf(out, "remainder1 equ r3\n");
   fprintf(out, "length0 equ r4\n");
   fprintf(out, "length1 equ r5\n");
-  fprintf(out, "value10 equ r6\n");
-  fprintf(out, "value11 equ r7\n");
-  fprintf(out, "value20 equ r8\n");
-  fprintf(out, "value21 equ r9\n");
-  fprintf(out, "value30 equ r10\n");
-  fprintf(out, "value31 equ r11\n");
-
+  fprintf(out, "zero equ r15\n");
+  fprintf(out, "value10 equ r16\n");
+  fprintf(out, "value11 equ r17\n");
+  fprintf(out, "value20 equ r18\n");
+  fprintf(out, "value21 equ r19\n");
+  fprintf(out, "value30 equ r20\n");
+  fprintf(out, "value31 equ r21\n");
   fprintf(out, "temp equ r22\n");
   fprintf(out, "temp2 equ r23\n");
   fprintf(out, "locals equ r24\n");
@@ -171,6 +171,10 @@ int AVR8::open(const char *filename)
   // startup
   fprintf(out, ".org 0x0000\n\n");
   fprintf(out, "start:\n");
+
+  // zero (for compares)
+  fprintf(out, "  ldi temp, 0\n");
+  fprintf(out, "  mov zero, temp\n");
 
   // processor stack setup
   fprintf(out, "  ldi r16, RAMEND & 0xff\n");
@@ -651,9 +655,16 @@ int AVR8::jump_cond(const char *label, int cond)
 {
   bool reverse = false;
 
+  char label_skip[16];
+  char label_next[16];
+
+  sprintf(label_skip, "label_%d", label_count++);
+  sprintf(label_next, "label_%d", label_count++);
+
   if (stack > 0)
   {
     fprintf(out, "; jump_cond\n");
+    fprintf(out, "  inc SP\n");
 
     if(cond == COND_LESS_EQUAL)
     {
@@ -670,6 +681,18 @@ int AVR8::jump_cond(const char *label, int cond)
     switch(cond)
     {
       case COND_EQUAL:
+        fprintf(out, "  ldi YL, stack_lo - 0\n");
+        fprintf(out, "  add YL, SP\n");
+        fprintf(out, "  ld temp, Y\n");
+        fprintf(out, "  cp temp, 0\n");
+        fprintf(out, "  brne %s\n", label_skip);
+        fprintf(out, "  ldi YL, stack_hi - 0\n");
+        fprintf(out, "  add YL, SP\n");
+        fprintf(out, "  ld temp, Y\n");
+        fprintf(out, "  cp temp, 0\n");
+        fprintf(out, "  brne %s\n", label_skip);
+        fprintf(out, "  jmp %s\n", label);
+        fprintf(out, "%s:\n", label_skip);
         break;
       case COND_NOT_EQUAL:
         break;
@@ -694,16 +717,24 @@ int AVR8::jump_cond(const char *label, int cond)
     stack--;
   }
 
-  return -1;
+  return 0;
 }
 
 int AVR8::jump_cond_integer(const char *label, int cond)
 {
   bool reverse = false;
 
+  char label_skip[16];
+  char label_next[16];
+
+  sprintf(label_skip, "label_%d", label_count++);
+  sprintf(label_next, "label_%d", label_count++);
+
   if (stack > 1)
   {
     fprintf(out, "; jump_cond_integer\n");
+    fprintf(out, "  inc SP\n");
+    fprintf(out, "  inc SP\n");
 
     if(cond == COND_LESS_EQUAL)
     {
@@ -720,6 +751,24 @@ int AVR8::jump_cond_integer(const char *label, int cond)
     switch(cond)
     {
       case COND_EQUAL:
+        fprintf(out, "  ldi YL, stack_lo - 0\n");
+        fprintf(out, "  add YL, SP\n");
+        fprintf(out, "  ld temp, Y\n");
+        fprintf(out, "  ldi YL, stack_lo - 1\n");
+        fprintf(out, "  add YL, SP\n");
+        fprintf(out, "  ld temp2, Y\n");
+        fprintf(out, "  cp temp, temp2\n");
+        fprintf(out, "  brne %s\n", label_skip);
+        fprintf(out, "  ldi YL, stack_hi - 0\n");
+        fprintf(out, "  add YL, SP\n");
+        fprintf(out, "  ld temp, Y\n");
+        fprintf(out, "  ldi YL, stack_hi - 1\n");
+        fprintf(out, "  add YL, SP\n");
+        fprintf(out, "  ld temp2, Y\n");
+        fprintf(out, "  cp temp, temp2\n");
+        fprintf(out, "  brne %s\n", label_skip);
+        fprintf(out, "  jmp %s\n", label);
+        fprintf(out, "%s:\n", label_skip);
         break;
       case COND_NOT_EQUAL:
         break;
@@ -744,7 +793,7 @@ int AVR8::jump_cond_integer(const char *label, int cond)
     stack -= 2;
   }
 
-  return -1;
+  return 0;
 }
 
 int AVR8::return_local(int index, int local_count)
@@ -802,16 +851,16 @@ int AVR8::return_void(int local_count)
 
 int AVR8::jump(const char *name)
 {
-  fprintf(out, "  rjmp %s\n", name);
+  fprintf(out, "  jmp %s\n", name);
 
-  return -1;
+  return 0;
 }
 
 int AVR8::call(const char *name)
 {
   fprintf(out, "  call %s\n", name);
 
-  return -1;
+  return 0;
 }
 
 int AVR8::invoke_static_method(const char *name, int params, int is_void)
