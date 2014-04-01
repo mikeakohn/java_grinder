@@ -656,10 +656,10 @@ int AVR8::jump_cond(const char *label, int cond)
   bool reverse = false;
 
   char label_skip[16];
-  char label_next[16];
+  char label_jump[16];
 
   sprintf(label_skip, "label_%d", label_count++);
-  sprintf(label_next, "label_%d", label_count++);
+  sprintf(label_jump, "label_%d", label_count++);
 
   if (stack > 0)
   {
@@ -681,20 +681,33 @@ int AVR8::jump_cond(const char *label, int cond)
     switch(cond)
     {
       case COND_EQUAL:
-        fprintf(out, "  ldi YL, stack_lo - 0\n");
+        fprintf(out, "  ldi YL, stack_lo\n");
         fprintf(out, "  add YL, SP\n");
         fprintf(out, "  ld temp, Y\n");
-        fprintf(out, "  cp temp, 0\n");
+        fprintf(out, "  cp temp, zero\n");
         fprintf(out, "  brne %s\n", label_skip);
-        fprintf(out, "  ldi YL, stack_hi - 0\n");
+        fprintf(out, "  ldi YL, stack_hi\n");
         fprintf(out, "  add YL, SP\n");
         fprintf(out, "  ld temp, Y\n");
-        fprintf(out, "  cp temp, 0\n");
+        fprintf(out, "  cp temp, zero\n");
         fprintf(out, "  brne %s\n", label_skip);
         fprintf(out, "  jmp %s\n", label);
         fprintf(out, "%s:\n", label_skip);
         break;
       case COND_NOT_EQUAL:
+        fprintf(out, "  ldi YL, stack_lo\n");
+        fprintf(out, "  add YL, SP\n");
+        fprintf(out, "  ld temp, Y\n");
+        fprintf(out, "  cp temp, zero\n");
+        fprintf(out, "  brne %s\n", label_jump);
+        fprintf(out, "  ldi YL, stack_hi\n");
+        fprintf(out, "  add YL, SP\n");
+        fprintf(out, "  ld temp, Y\n");
+        fprintf(out, "  cp temp, zero\n");
+        fprintf(out, "  breq %s\n", label_skip);
+        fprintf(out, "%s:\n", label_jump);
+        fprintf(out, "  jmp %s\n", label);
+        fprintf(out, "%s:\n", label_skip);
         break;
       case COND_LESS:
         if(reverse == false)
@@ -725,10 +738,10 @@ int AVR8::jump_cond_integer(const char *label, int cond)
   bool reverse = false;
 
   char label_skip[16];
-  char label_next[16];
+  char label_jump[16];
 
   sprintf(label_skip, "label_%d", label_count++);
-  sprintf(label_next, "label_%d", label_count++);
+  sprintf(label_jump, "label_%d", label_count++);
 
   if (stack > 1)
   {
@@ -751,19 +764,17 @@ int AVR8::jump_cond_integer(const char *label, int cond)
     switch(cond)
     {
       case COND_EQUAL:
-        fprintf(out, "  ldi YL, stack_lo - 0\n");
+        fprintf(out, "  ldi YL, stack_lo\n");
         fprintf(out, "  add YL, SP\n");
         fprintf(out, "  ld temp, Y\n");
-        fprintf(out, "  ldi YL, stack_lo - 1\n");
-        fprintf(out, "  add YL, SP\n");
+        fprintf(out, "  dec YL\n");
         fprintf(out, "  ld temp2, Y\n");
         fprintf(out, "  cp temp, temp2\n");
         fprintf(out, "  brne %s\n", label_skip);
-        fprintf(out, "  ldi YL, stack_hi - 0\n");
+        fprintf(out, "  ldi YL, stack_hi\n");
         fprintf(out, "  add YL, SP\n");
         fprintf(out, "  ld temp, Y\n");
-        fprintf(out, "  ldi YL, stack_hi - 1\n");
-        fprintf(out, "  add YL, SP\n");
+        fprintf(out, "  dec YL\n");
         fprintf(out, "  ld temp2, Y\n");
         fprintf(out, "  cp temp, temp2\n");
         fprintf(out, "  brne %s\n", label_skip);
@@ -771,6 +782,23 @@ int AVR8::jump_cond_integer(const char *label, int cond)
         fprintf(out, "%s:\n", label_skip);
         break;
       case COND_NOT_EQUAL:
+        fprintf(out, "  ldi YL, stack_lo\n");
+        fprintf(out, "  add YL, SP\n");
+        fprintf(out, "  ld temp, Y\n");
+        fprintf(out, "  dec YL\n");
+        fprintf(out, "  ld temp2, Y\n");
+        fprintf(out, "  cp temp, temp2\n");
+        fprintf(out, "  brne %s\n", label_jump);
+        fprintf(out, "  ldi YL, stack_hi\n");
+        fprintf(out, "  add YL, SP\n");
+        fprintf(out, "  ld temp, Y\n");
+        fprintf(out, "  dec YL\n");
+        fprintf(out, "  ld temp2, Y\n");
+        fprintf(out, "  cp temp, temp2\n");
+        fprintf(out, "  breq %s\n", label_skip);
+        fprintf(out, "%s:\n", label_jump);
+        fprintf(out, "  jmp %s\n", label);
+        fprintf(out, "%s:\n", label_skip);
         break;
       case COND_LESS:
         if(reverse == false)
