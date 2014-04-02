@@ -40,8 +40,6 @@ enum
 };
 
 Z80::Z80() :
-  reg(0),
-  reg_max(4),
   stack(0),
   is_main(0)
 {
@@ -115,7 +113,6 @@ int Z80::insert_field_init(char *name, int index)
 
 void Z80::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
-  reg = 0;
   stack = 0;
 
   is_main = (strcmp(name, "main") == 0) ? 1 : 0;
@@ -143,7 +140,7 @@ int Z80::push_integer(int32_t n)
 
   uint16_t value = (n & 0xffff);
 
-  fprintf(out, "  ld bc, 0x%4x\n", value);
+  fprintf(out, "  ld bc, 0x%04x\n", value);
   fprintf(out, "  push bc\n");
   stack++;
 
@@ -197,7 +194,7 @@ int Z80::push_byte(int8_t b)
 {
   uint16_t value = (((int16_t)b) & 0xffff);
 
-  fprintf(out, "  ld bc, 0x%4x\n", value);
+  fprintf(out, "  ld bc, 0x%04x\n", value);
   fprintf(out, "  push bc\n");
   stack++;
 
@@ -206,7 +203,7 @@ int Z80::push_byte(int8_t b)
 
 int Z80::push_short(int16_t s)
 {
-  fprintf(out, "  ld bc, 0x%4x\n", s);
+  fprintf(out, "  ld bc, 0x%04x\n", s);
   fprintf(out, "  push bc\n");
   stack++;
 
