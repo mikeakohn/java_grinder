@@ -26,7 +26,7 @@
 // iy = point to locals
 
 //                                 Z    NZ    LT    LE    GT    GE
-//static const char *cond_str[] = { "z", "nz", "lt", "le", "gt", "ge" };
+static const char *cond_str[] = { "eq", "ne", "lt", "le", "gt", "ge" };
 //static const char *alu_str[] = { "adc", "sbc", "and", "xor", "or" };
 static const char *alu_str[] = { "add", "sub", "and", "xor", "or" };
 
@@ -140,6 +140,7 @@ int Z80::push_integer(int32_t n)
 
   uint16_t value = (n & 0xffff);
 
+  fprintf(out, "  ;; push_integer(%d)\n", n);
   fprintf(out, "  ld bc, 0x%04x\n", value);
   fprintf(out, "  push bc\n");
   stack++;
@@ -149,6 +150,7 @@ int Z80::push_integer(int32_t n)
 
 int Z80::push_integer_local(int index)
 {
+  fprintf(out, "  ;; push_integer_local(%d)\n", index);
   fprintf(out, "  ld e, (iy+%d)\n", (index * 2));
   fprintf(out, "  ld d, (iy+%d)\n", (index * 2) + 1);
   fprintf(out, "  push de\n");
@@ -163,11 +165,13 @@ int Z80::push_ref_local(int index)
 
 int Z80::push_fake()
 {
+  fprintf(out, "  ; push_fake() called...\n");
   return -1;
 }
 
 int Z80::set_integer_local(int index, int value)
 {
+  fprintf(out, "  ;; set_integer_local(%d,%d)\n", index, value);
   fprintf(out, "  ld de, 0x%04x\n", value);
   fprintf(out, "  ld (iy+%d), e\n", (index * 2));
   fprintf(out, "  ld (iy+%d), d\n", (index * 2) + 1);
@@ -194,6 +198,7 @@ int Z80::push_byte(int8_t b)
 {
   uint16_t value = (((int16_t)b) & 0xffff);
 
+  fprintf(out, "  ;; push_byte(%d)\n", b);
   fprintf(out, "  ld bc, 0x%04x\n", value);
   fprintf(out, "  push bc\n");
   stack++;
@@ -203,6 +208,7 @@ int Z80::push_byte(int8_t b)
 
 int Z80::push_short(int16_t s)
 {
+  fprintf(out, "  ;; push_short(%d)\n", s);
   fprintf(out, "  ld bc, 0x%04x\n", s);
   fprintf(out, "  push bc\n");
   stack++;
@@ -212,6 +218,7 @@ int Z80::push_short(int16_t s)
 
 int Z80::pop_integer_local(int index)
 {
+  fprintf(out, "  ;; pop_integer_local(%d)\n", index);
   fprintf(out, "  pop hl\n");
   fprintf(out, "  ld l, (iy+%d)\n", (index * 2));
   fprintf(out, "  ld h, (iy+%d)\n", (index * 2) + 1);
@@ -225,7 +232,7 @@ int Z80::pop_ref_local(int index)
 
 int Z80::pop()
 {
-  fprintf(out, "  pop bc\n");
+  fprintf(out, "  pop bc    ; pop()\n");
   stack--;
 
   return 0;
@@ -233,7 +240,7 @@ int Z80::pop()
 
 int Z80::dup()
 {
-  fprintf(out, "  pop bc\n");
+  fprintf(out, "  pop bc     ; dup()\n");
   fprintf(out, "  push bc\n");
   fprintf(out, "  push bc\n");
   stack++;
@@ -243,7 +250,7 @@ int Z80::dup()
 
 int Z80::dup2()
 {
-  fprintf(out, "  pop bc\n");
+  fprintf(out, "  pop bc    ; dup2()\n");
   fprintf(out, "  pop de\n");
   fprintf(out, "  push bc\n");
   fprintf(out, "  push de\n");
@@ -256,7 +263,7 @@ int Z80::dup2()
 
 int Z80::swap()
 {
-  fprintf(out, "  pop bc\n");
+  fprintf(out, "  pop bc    ; swap()\n");
   fprintf(out, "  pop de\n");
   fprintf(out, "  push de\n");
   fprintf(out, "  push bc\n");
@@ -303,7 +310,7 @@ int Z80::mod_integer()
 int Z80::neg_integer()
 {
   // OUCH :(
-  fprintf(out, "  pop bc\n");
+  fprintf(out, "  pop bc    ; neg()\n");
   fprintf(out, "  ld a,b\n");
   fprintf(out, "  cpl\n");
   fprintf(out, "  ld b,a\n");
@@ -317,7 +324,7 @@ int Z80::neg_integer()
 
 int Z80::shift_left_integer()
 {
-  fprintf(out, "  pop de\n");
+  fprintf(out, "  pop de    ; shift_left_integer()\n");
   fprintf(out, "  pop bc\n");
   fprintf(out, "  ld b,c\n");
   fprintf(out, "label_%d:\n", label_count);
@@ -336,7 +343,7 @@ int Z80::shift_left_integer(int num)
 int n;
 
   if (num == 0) { return 0; }
-  fprintf(out, "  pop de\n");
+  fprintf(out, "  pop de    ; shift_left_integer(int)\n");
   for (n = 0; n < num; n++)
   {
     fprintf(out, "  sla e\n");
@@ -349,7 +356,7 @@ int n;
 
 int Z80::shift_right_integer()
 {
-  fprintf(out, "  pop de\n");
+  fprintf(out, "  pop de    ; shift_right_integer()\n");
   fprintf(out, "  pop bc\n");
   fprintf(out, "  ld b,c\n");
   fprintf(out, "label_%d:\n", label_count);
@@ -368,7 +375,7 @@ int Z80::shift_right_integer(int num)
 int n;
 
   if (num == 0) { return 0; }
-  fprintf(out, "  pop de\n");
+  fprintf(out, "  pop de    ; shift_right_integer(int)\n");
   for (n = 0; n < num; n++)
   {
     fprintf(out, "  sra d\n");
@@ -381,7 +388,7 @@ int n;
 
 int Z80::shift_right_uinteger()
 {
-  fprintf(out, "  pop de\n");
+  fprintf(out, "  pop de    ; shift_right_uinteger()\n");
   fprintf(out, "  pop bc\n");
   fprintf(out, "  ld b,c\n");
   fprintf(out, "label_%d:\n", label_count);
@@ -400,7 +407,7 @@ int Z80::shift_right_uinteger(int num)
 int n;
 
   if (num == 0) { return 0; }
-  fprintf(out, "  pop de\n");
+  fprintf(out, "  pop de    ; shift_right_uinteger(int)\n");
   for (n = 0; n < num; n++)
   {
     fprintf(out, "  srl d\n");
@@ -443,6 +450,7 @@ int Z80::xor_integer(int num)
 
 int Z80::inc_integer(int index, int num)
 {
+  fprintf(out, "  ;; inc_integer(%d,%d)\n", index, num);
   fprintf(out, "  ld h, (iy+%d)\n", (index * 2) + 1);
   fprintf(out, "  ld l, (iy+%d)\n", (index * 2));
   fprintf(out, "  ld bc, 0x%02x\n", num);
@@ -459,6 +467,7 @@ int Z80::integer_to_byte()
 
 int Z80::jump_cond(const char *label, int cond)
 {
+  fprintf(out, "  ;; jump_cond(%s, %s)\n", label, cond_str[cond]);
   if (cond == COND_GREATER)
   {
     fprintf(out, "  pop bc\n");
@@ -537,6 +546,7 @@ int Z80::jump_cond(const char *label, int cond)
 
 int Z80::jump_cond_integer(const char *label, int cond)
 {
+  fprintf(out, "  ;; jump_cond_integer(%s,%s)\n", label, cond_str[cond]);
   if (cond == COND_GREATER)
   {
     fprintf(out, "  pop hl\n");
@@ -597,6 +607,7 @@ int Z80::jump_cond_integer(const char *label, int cond)
 
 int Z80::return_local(int index, int local_count)
 {
+  fprintf(out, "  ;; return_local(%d,%d)\n", index, local_count);
   fprintf(out, "  ld e, (iy+%d)\n", (index * 2));
   fprintf(out, "  ld d, (iy+%d)\n", (index * 2) + 1);
   while (stack > 0) { fprintf(out, "  pop bc\n"); stack--; }
@@ -607,6 +618,7 @@ int Z80::return_local(int index, int local_count)
 
 int Z80::return_integer(int local_count)
 {
+  fprintf(out, "  ;; return_integer(%d)\n", local_count);
   fprintf(out, "  pop de\n");
   stack--;
   while (stack > 0) { fprintf(out, "  pop bc\n"); stack--; }
@@ -617,6 +629,7 @@ int Z80::return_integer(int local_count)
 
 int Z80::return_void(int local_count)
 {
+  fprintf(out, "  ;; return_void(%d)\n", local_count);
   while (stack > 0) { fprintf(out, "  pop bc\n"); stack--; }
   if (!is_main) { fprintf(out, "  pop iy\n"); }
   fprintf(out, "  ret\n");
@@ -639,6 +652,7 @@ int Z80::invoke_static_method(const char *name, int params, int is_void)
 int n;
 
   printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
+  fprintf(out, "  ;; invoke_static_method(%s,%d,%d)\n", name, params, is_void);
 
   // Pop all params off stack
   fprintf(out, "  ld hl, -%d\n", params * 2);
@@ -655,6 +669,9 @@ int n;
     fprintf(out, "  ld e, (ix+%d)", (params * 2) + (n * 2));
     fprintf(out, "  ld (ix+%d), e", (n * 2));
   }
+
+  // Params are removed from the stack 
+  stack -= params;
 
   // Make the call
   fprintf(out, "  call %s\n", name);
@@ -781,6 +798,7 @@ int Z80::array_write_int(const char *name, int field_id)
 
 int Z80::stack_alu(int alu_op)
 {
+  fprintf(out, "  stack_alu(%d)\n", alu_op);
   if (alu_op <= ALU_SUB)
   {
 #if 0

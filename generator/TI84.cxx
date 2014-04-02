@@ -37,6 +37,7 @@ int TI84::start_init()
   // Add any set up items (stack, registers, etc).
   //fprintf(out, ".org ???\n");
   fprintf(out, "start:\n");
+  fprintf(out, "  ld SP, 0x8100\n");
 
   return 0;
 }
