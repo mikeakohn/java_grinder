@@ -10,7 +10,6 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
 
@@ -663,8 +662,19 @@ int AVR8::jump_cond(const char *label, int cond)
 
   if (stack > 0)
   {
-    fprintf(out, "; jump_cond\n");
+//FIXME the register loading will be in a subroutine to save room
+    fprintf(out, "; jump_condr\n");
     fprintf(out, "  inc SP\n");
+
+    // value10
+    fprintf(out, "  ldi YL, stack_lo\n");
+    fprintf(out, "  add YL, SP\n");
+    fprintf(out, "  ld value10, Y\n");
+
+    // value11
+    fprintf(out, "  ldi YL, stack_hi\n");
+    fprintf(out, "  add YL, SP\n");
+    fprintf(out, "  ld value11, Y\n");
 
     if(cond == COND_LESS_EQUAL)
     {
@@ -681,29 +691,17 @@ int AVR8::jump_cond(const char *label, int cond)
     switch(cond)
     {
       case COND_EQUAL:
-        fprintf(out, "  ldi YL, stack_lo\n");
-        fprintf(out, "  add YL, SP\n");
-        fprintf(out, "  ld temp, Y\n");
-        fprintf(out, "  cp temp, zero\n");
+        fprintf(out, "  cp value10, zero\n");
         fprintf(out, "  brne %s\n", label_skip);
-        fprintf(out, "  ldi YL, stack_hi\n");
-        fprintf(out, "  add YL, SP\n");
-        fprintf(out, "  ld temp, Y\n");
-        fprintf(out, "  cp temp, zero\n");
+        fprintf(out, "  cp value11, zero\n");
         fprintf(out, "  brne %s\n", label_skip);
         fprintf(out, "  jmp %s\n", label);
         fprintf(out, "%s:\n", label_skip);
         break;
       case COND_NOT_EQUAL:
-        fprintf(out, "  ldi YL, stack_lo\n");
-        fprintf(out, "  add YL, SP\n");
-        fprintf(out, "  ld temp, Y\n");
-        fprintf(out, "  cp temp, zero\n");
+        fprintf(out, "  cp value10, zero\n");
         fprintf(out, "  brne %s\n", label_jump);
-        fprintf(out, "  ldi YL, stack_hi\n");
-        fprintf(out, "  add YL, SP\n");
-        fprintf(out, "  ld temp, Y\n");
-        fprintf(out, "  cp temp, zero\n");
+        fprintf(out, "  cp value11, zero\n");
         fprintf(out, "  breq %s\n", label_skip);
         fprintf(out, "%s:\n", label_jump);
         fprintf(out, "  jmp %s\n", label);
@@ -745,9 +743,28 @@ int AVR8::jump_cond_integer(const char *label, int cond)
 
   if (stack > 1)
   {
+//FIXME the register loading will be in a subroutine to save room
     fprintf(out, "; jump_cond_integer\n");
     fprintf(out, "  inc SP\n");
     fprintf(out, "  inc SP\n");
+
+    // value10
+    fprintf(out, "  ldi YL, stack_lo\n");
+    fprintf(out, "  add YL, SP\n");
+    fprintf(out, "  ld value10, Y\n");
+
+    // value20
+    fprintf(out, "  dec YL\n");
+    fprintf(out, "  ld value20, Y\n");
+
+    // value11
+    fprintf(out, "  ldi YL, stack_hi\n");
+    fprintf(out, "  add YL, SP\n");
+    fprintf(out, "  ld value11, Y\n");
+
+    // value21
+    fprintf(out, "  dec YL\n");
+    fprintf(out, "  ld value21, Y\n");
 
     if(cond == COND_LESS_EQUAL)
     {
@@ -764,37 +781,17 @@ int AVR8::jump_cond_integer(const char *label, int cond)
     switch(cond)
     {
       case COND_EQUAL:
-        fprintf(out, "  ldi YL, stack_lo\n");
-        fprintf(out, "  add YL, SP\n");
-        fprintf(out, "  ld temp, Y\n");
-        fprintf(out, "  dec YL\n");
-        fprintf(out, "  ld temp2, Y\n");
-        fprintf(out, "  cp temp, temp2\n");
+        fprintf(out, "  cp value10, value20\n");
         fprintf(out, "  brne %s\n", label_skip);
-        fprintf(out, "  ldi YL, stack_hi\n");
-        fprintf(out, "  add YL, SP\n");
-        fprintf(out, "  ld temp, Y\n");
-        fprintf(out, "  dec YL\n");
-        fprintf(out, "  ld temp2, Y\n");
-        fprintf(out, "  cp temp, temp2\n");
+        fprintf(out, "  cp value11, value21\n");
         fprintf(out, "  brne %s\n", label_skip);
         fprintf(out, "  jmp %s\n", label);
         fprintf(out, "%s:\n", label_skip);
         break;
       case COND_NOT_EQUAL:
-        fprintf(out, "  ldi YL, stack_lo\n");
-        fprintf(out, "  add YL, SP\n");
-        fprintf(out, "  ld temp, Y\n");
-        fprintf(out, "  dec YL\n");
-        fprintf(out, "  ld temp2, Y\n");
-        fprintf(out, "  cp temp, temp2\n");
+        fprintf(out, "  cp value10, value20\n");
         fprintf(out, "  brne %s\n", label_jump);
-        fprintf(out, "  ldi YL, stack_hi\n");
-        fprintf(out, "  add YL, SP\n");
-        fprintf(out, "  ld temp, Y\n");
-        fprintf(out, "  dec YL\n");
-        fprintf(out, "  ld temp2, Y\n");
-        fprintf(out, "  cp temp, temp2\n");
+        fprintf(out, "  cp value11, value21\n");
         fprintf(out, "  breq %s\n", label_skip);
         fprintf(out, "%s:\n", label_jump);
         fprintf(out, "  jmp %s\n", label);
