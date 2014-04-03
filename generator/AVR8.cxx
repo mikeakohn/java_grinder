@@ -316,6 +316,7 @@ int AVR8::push_integer(int32_t n)
   return 0;
 }
 
+//FIXME this could possibly be a sub
 int AVR8::push_integer_local(int index)
 {
   fprintf(out, "; push_integer_local\n");
@@ -390,6 +391,7 @@ int AVR8::push_short(int16_t s)
   return 0;
 }
 
+//FIXME this could possibly be a sub
 int AVR8::pop_integer_local(int index)
 {
   fprintf(out, "; pop_integer_local\n");
@@ -618,6 +620,7 @@ int AVR8::xor_integer(int const_val)
   return -1;
 }
 
+//FIXME this is huge, should be a sub
 int AVR8::inc_integer(int index, int num)
 {
   uint16_t value = num & 0xffff;
