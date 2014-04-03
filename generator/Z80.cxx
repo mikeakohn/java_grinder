@@ -27,8 +27,7 @@
 
 //                                 Z    NZ    LT    LE    GT    GE
 static const char *cond_str[] = { "eq", "ne", "lt", "le", "gt", "ge" };
-//static const char *alu_str[] = { "adc", "sbc", "and", "xor", "or" };
-static const char *alu_str[] = { "add", "sub", "and", "xor", "or" };
+static const char *alu_str[] = { "add", "sbc", "and", "xor", "or" };
 
 enum
 {
@@ -118,11 +117,16 @@ void Z80::method_start(int local_count, int max_stack, int param_count, const ch
   is_main = (strcmp(name, "main") == 0) ? 1 : 0;
 
   fprintf(out, "%s:\n", name);
+  fprintf(out, "  ;; Save iy if needed.  iy = alloca(params * 2)\n");
   if (!is_main) { fprintf(out, "  push iy\n"); }
-  fprintf(out, "  mov iy, SP\n");
-  fprintf(out, "  ld ix, -%d\n", local_count * 2);
-  fprintf(out, "  add ix, SP\n");
-  fprintf(out, "  ld SP, ix\n");
+  //fprintf(out, "  ld iy, 0\n");
+  //fprintf(out, "  add iy, SP\n");
+  //fprintf(out, "  ld ix, -%d\n", local_count * 2);
+  //fprintf(out, "  add ix, SP\n");
+  //fprintf(out, "  ld SP, ix\n");
+  fprintf(out, "  ld iy, -%d\n", local_count * 2);
+  fprintf(out, "  add iy, SP\n");
+  fprintf(out, "  ld SP, iy\n");
 }
 
 void Z80::method_end(int local_count)
@@ -514,7 +518,10 @@ int Z80::jump_cond(const char *label, int cond)
     case COND_LESS:
       fprintf(out, "  and a\n");  // clear carry
       fprintf(out, "  sbc hl, bc\n");
-      fprintf(out, "  ld a, f\n");
+      fprintf(out, "  push af\n");
+      fprintf(out, "  push hl\n");
+      fprintf(out, "  ld a, l\n");
+      //fprintf(out, "  ld a, f\n");
       fprintf(out, "  and 0x84\n");
       fprintf(out, "  jp po, %s\n", label);
       //fprintf(out, "  cp d\n");
@@ -532,7 +539,10 @@ int Z80::jump_cond(const char *label, int cond)
     case COND_GREATER_EQUAL:
       fprintf(out, "  and a\n");  // clear carry
       fprintf(out, "  sbc hl, bc\n");
-      fprintf(out, "  ld a, f\n");
+      fprintf(out, "  push af\n");
+      fprintf(out, "  push hl\n");
+      fprintf(out, "  ld a, l\n");
+      //fprintf(out, "  ld a, f\n");
       fprintf(out, "  and 0x84\n");
       fprintf(out, "  jp pe, %s\n", label);
       break;
@@ -582,7 +592,10 @@ int Z80::jump_cond_integer(const char *label, int cond)
     case COND_LESS:
       fprintf(out, "  and a\n");  // clear carry
       fprintf(out, "  sbc hl, bc\n");
-      fprintf(out, "  ld a, f\n");
+      fprintf(out, "  push af\n");
+      fprintf(out, "  push hl\n");
+      fprintf(out, "  ld a, l\n");
+      //fprintf(out, "  ld a, f\n");
       fprintf(out, "  and 0x84\n");
       fprintf(out, "  jp po, %s\n", label);
       break;
@@ -593,7 +606,10 @@ int Z80::jump_cond_integer(const char *label, int cond)
     case COND_GREATER_EQUAL:
       fprintf(out, "  and a\n");  // clear carry
       fprintf(out, "  sbc hl, bc\n");
-      fprintf(out, "  ld a, f\n");
+      fprintf(out, "  push af\n");
+      fprintf(out, "  pop hl\n");
+      fprintf(out, "  ld a, l\n");
+      //fprintf(out, "  ld a, f\n");
       fprintf(out, "  and 0x84\n");
       fprintf(out, "  jp pe, %s\n", label);
       break;
@@ -638,7 +654,7 @@ int Z80::return_void(int local_count)
 
 int Z80::jump(const char *name)
 {
-  fprintf(out, "  jmp %s\n", name);
+  fprintf(out, "  jr %s\n", name);
   return 0;
 }
 
@@ -798,7 +814,7 @@ int Z80::array_write_int(const char *name, int field_id)
 
 int Z80::stack_alu(int alu_op)
 {
-  fprintf(out, "  stack_alu(%d)\n", alu_op);
+  fprintf(out, "  ;; stack_alu(%s)\n", alu_str[alu_op]);
   if (alu_op <= ALU_SUB)
   {
 #if 0
@@ -810,10 +826,15 @@ int Z80::stack_alu(int alu_op)
     fprintf(out, "  %s hl, bc\n", alu_str[alu_op]);
     fprintf(out, "  push hl\n");
 #endif
-    fprintf(out, "  pop ix\n");
+    //fprintf(out, "  pop ix\n");
+    fprintf(out, "  pop hl\n");
     fprintf(out, "  pop bc\n");
-    fprintf(out, "  %s ix, bc\n", alu_str[alu_op]);
-    fprintf(out, "  push ix\n");
+    if (alu_op == ALU_SUB)
+    {
+      fprintf(out, "  and a   ; clear carry\n");   
+    }
+    fprintf(out, "  %s hl, bc\n", alu_str[alu_op]);
+    fprintf(out, "  push hl\n");
     stack--;
   }
     else
@@ -840,6 +861,8 @@ int Z80::stack_alu_const(int alu_op, int num)
     printf("Error: literal value %d bigger than 16 bit.\n", num);
     return -1;
   }
+
+  fprintf(out, "  ;; stack_alu_const(%s, %d)\n", alu_str[alu_op], num);
 
   uint16_t value = (((int16_t)num) & 0xffff);
 
@@ -870,11 +893,16 @@ int Z80::stack_alu_const(int alu_op, int num)
     fprintf(out, "  %s hl, bc\n", alu_str[alu_op]);
     fprintf(out, "  push hl\n");
 #endif
-    fprintf(out, "  pop ix\n");
+    fprintf(out, "  pop hl\n");
     fprintf(out, "  ld b, %04x\n", value >> 8);
     fprintf(out, "  ld c, %04x\n", value & 0xff);
-    fprintf(out, "  %s ix, bc\n", alu_str[alu_op]);
-    fprintf(out, "  push ix\n");
+    if (alu_op == ALU_SUB)
+    {
+      fprintf(out, "  and a   ; clear carry\n");   
+    }
+    //fprintf(out, "  %s ix, bc\n", alu_str[alu_op]);
+    fprintf(out, "  %s hl, bc\n", alu_str[alu_op]);
+    fprintf(out, "  push hl\n");
     return 0;
   }
 
