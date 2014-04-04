@@ -97,6 +97,8 @@ AVR8::AVR8() :
   need_inc_integer(0),
   need_jump_cond(0),
   need_jump_cond_integer(0),
+  need_push_integer_local(0),
+  need_pop_integer_local(0),
   need_push_array_length(0),
   need_push_array_length2(0),
   need_array_byte_support(0),
@@ -123,6 +125,8 @@ AVR8::~AVR8()
   if(need_inc_integer) { insert_inc_integer(); }
   if(need_jump_cond) { insert_jump_cond(); }
   if(need_jump_cond_integer) { insert_jump_cond_integer(); }
+  if(need_push_integer_local) { insert_push_integer_local(); }
+  if(need_pop_integer_local) { insert_pop_integer_local(); }
   if(need_push_array_length) { insert_push_array_length(); }
   if(need_push_array_length2) { insert_push_array_length2(); }
   if(need_array_byte_support) { insert_array_byte_support(); }
@@ -177,9 +181,8 @@ int AVR8::open(const char *filename)
   fprintf(out, ".org 0x0000\n\n");
   fprintf(out, "start:\n");
 
-  // zero (for compares)
-  fprintf(out, "  ldi temp, 0\n");
-  fprintf(out, "  mov zero, temp\n");
+  // zero (for compares etc)
+  fprintf(out, "  clr zero\n");
 
   // processor stack setup
   fprintf(out, "  ldi r16, RAMEND & 0xff\n");
@@ -322,18 +325,12 @@ int AVR8::push_integer(int32_t n)
   return 0;
 }
 
-//FIXME this could possibly be a sub
 int AVR8::push_integer_local(int index)
 {
-  fprintf(out, "; push_integer_local\n");
-  fprintf(out, "  ldi YL, stack_lo - %d\n", LOCALS(index));
-  fprintf(out, "  add YL, locals\n");
-  fprintf(out, "  ld temp, Y\n");
-  PUSH_LO("temp");
-  fprintf(out, "  ldi YL, stack_hi - %d\n", LOCALS(index));
-  fprintf(out, "  add YL, locals\n");
-  fprintf(out, "  ld temp, Y\n");
-  PUSH_HI("temp");
+  need_push_integer_local = 1;
+
+  fprintf(out, "  mov temp, %d\n", LOCALS(index));
+  fprintf(out, "  call push_integer_local\n");
   stack++;
 
   return 0;
@@ -397,18 +394,12 @@ int AVR8::push_short(int16_t s)
   return 0;
 }
 
-//FIXME this could possibly be a sub
 int AVR8::pop_integer_local(int index)
 {
-  fprintf(out, "; pop_integer_local\n");
-  POP_HI("temp");
-  fprintf(out, "  ldi YL, stack_hi - %d\n", LOCALS(index));
-  fprintf(out, "  add YL, locals\n");
-  fprintf(out, "  st Y, temp\n");
-  POP_LO("temp");
-  fprintf(out, "  ldi YL, stack_lo - %d\n", LOCALS(index));
-  fprintf(out, "  add YL, locals\n");
-  fprintf(out, "  st Y, temp\n");
+  need_pop_integer_local = 1;
+
+  fprintf(out, "  mov temp, %d\n", LOCALS(index));
+  fprintf(out, "  call pop_integer_local\n");
   stack--;
 
   return 0;
@@ -1423,6 +1414,38 @@ void AVR8::insert_jump_cond_integer()
   fprintf(out, "  dec YL\n");
   fprintf(out, "  ld value21, Y\n");
 
+  fprintf(out, "  ret\n");
+}
+
+void AVR8::insert_push_integer_local()
+{
+  fprintf(out, "push_integer_local:\n");
+  fprintf(out, "  ldi YL, stack_lo\n");
+  fprintf(out, "  sub YL, temp2\n");
+  fprintf(out, "  add YL, locals\n");
+  fprintf(out, "  ld temp, Y\n");
+  PUSH_LO("temp");
+  fprintf(out, "  ldi YL, stack_hi\n");
+  fprintf(out, "  sub YL, temp2\n");
+  fprintf(out, "  add YL, locals\n");
+  fprintf(out, "  ld temp, Y\n");
+  PUSH_HI("temp");
+  fprintf(out, "  ret\n");
+}
+
+void AVR8::insert_pop_integer_local()
+{
+  fprintf(out, "pop_integer_local:\n");
+  POP_HI("temp");
+  fprintf(out, "  ldi YL, stack_hi\n");
+  fprintf(out, "  sub YL, temp2\n");
+  fprintf(out, "  add YL, locals\n");
+  fprintf(out, "  st Y, temp\n");
+  POP_LO("temp");
+  fprintf(out, "  ldi YL, stack_lo\n");
+  fprintf(out, "  sub YL, temp2\n");
+  fprintf(out, "  add YL, locals\n");
+  fprintf(out, "  st Y, temp\n");
   fprintf(out, "  ret\n");
 }
 

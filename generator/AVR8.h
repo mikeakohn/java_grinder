@@ -126,6 +126,8 @@ protected:
   bool need_inc_integer:1;
   bool need_jump_cond:1;
   bool need_jump_cond_integer:1;
+  bool need_push_integer_local:1;
+  bool need_pop_integer_local:1;
   bool need_push_array_length:1;
   bool need_push_array_length2:1;
   bool need_array_byte_support:1;
@@ -147,6 +149,8 @@ protected:
   void insert_inc_integer();
   void insert_jump_cond();
   void insert_jump_cond_integer();
+  void insert_push_integer_local();
+  void insert_pop_integer_local();
   void insert_push_array_length();
   void insert_push_array_length2();
   void insert_array_byte_support();
