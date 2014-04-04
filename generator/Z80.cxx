@@ -176,9 +176,11 @@ int Z80::push_fake()
 int Z80::set_integer_local(int index, int value)
 {
   fprintf(out, "  ;; set_integer_local(%d,%d)\n", index, value);
-  fprintf(out, "  ld de, 0x%04x\n", value);
-  fprintf(out, "  ld (iy+%d), e\n", (index * 2));
-  fprintf(out, "  ld (iy+%d), d\n", (index * 2) + 1);
+  //fprintf(out, "  ld de, 0x%04x\n", value);
+  //fprintf(out, "  ld (iy+%d), e\n", (index * 2));
+  //fprintf(out, "  ld (iy+%d), d\n", (index * 2) + 1);
+  fprintf(out, "  ld (iy+%d), 0x%02x\n", (index * 2), value & 0xff);
+  fprintf(out, "  ld (iy+%d), 0x%02x\n", (index * 2) + 1, (value >> 8) & 0xff);
   return 0;
 }
 

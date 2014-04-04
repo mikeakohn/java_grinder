@@ -1,19 +1,21 @@
 
-JOBJS=Arrays.class \
-      CommodoreDemo.class \
-      DSPTest.class \
-      GasDetector.class \
-      LedBlink.class \
-      LCD.class \
-      LCDDSPIC.class \
-      MemoryTest.class \
-      MethodCall.class \
-      SPITest.class \
-      StringTest.class \
-      Testing.class \
-      Testing2.class
+JAVA_SRC=\
+  Arrays.java \
+  CommodoreDemo.java \
+  DSPTest.java \
+  GasDetector.java \
+  LedBlink.java \
+  LCD.java \
+  LCDDSPIC.java \
+  MemoryTest.java \
+  MethodCall.java \
+  SPITest.java \
+  StringTest.java \
+  Testing.java \
+  Testing2.java
 
-default: $(JOBJS)
+default:
+	javac -classpath ../build/JavaGrinder.jar:. $(JAVA_SRC)
 
 %.class: %.java
 	javac -classpath ../build/JavaGrinder.jar:. $*.java

@@ -27,7 +27,7 @@
 #include "MSP430.h"
 #include "MSP430X.h"
 #include "STDC.h"
-#include "TI84.h"
+#include "TI84C.h"
 #include "Z80.h"
 #include "version.h"
 
@@ -97,9 +97,9 @@ Generator *generator = NULL;
     generator = new STDC();
   }
     else
-  if (strcasecmp("ti84", chip_type) == 0)
+  if (strcasecmp("ti84c", chip_type) == 0)
   {
-    generator = new TI84();
+    generator = new TI84C();
   }
     else
   if (strcasecmp("z80", chip_type) == 0)

@@ -9,16 +9,16 @@
  *
  */
 
-#ifndef _TI84_H
-#define _TI84_H
+#ifndef _TI84C_H
+#define _TI84C_H
 
 #include "Z80.h"
 
-class TI84 : public Z80
+class TI84C : public Z80
 {
 public:
-  TI84();
-  virtual ~TI84();
+  TI84C();
+  virtual ~TI84C();
 
   virtual int open(const char *filename);
   virtual int start_init();
