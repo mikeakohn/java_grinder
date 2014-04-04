@@ -28,10 +28,10 @@ abstract public class TI84C
   public static void putS(String text) { }
   public static void setPenBGWhite() { }
 
-  public static final int OPERATION_ERASE_PIXEL = 0
-  public static final int OPERATION_DRAW_PIXEL = 1
-  public static final int OPERATION_INVERT_PIXEL = 2
-  public static final int OPERATION_TEST_PIXEL = 3
-  public static final int OPERATION_RESTORE_PIXEL = 4
+  public static final int OPERATION_ERASE_PIXEL = 0;
+  public static final int OPERATION_DRAW_PIXEL = 1;
+  public static final int OPERATION_INVERT_PIXEL = 2;
+  public static final int OPERATION_TEST_PIXEL = 3;
+  public static final int OPERATION_RESTORE_PIXEL = 4;
 }
 
