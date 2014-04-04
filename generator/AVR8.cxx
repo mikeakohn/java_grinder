@@ -99,6 +99,7 @@ AVR8::AVR8() :
   need_jump_cond_integer(0),
   need_push_integer_local(0),
   need_pop_integer_local(0),
+  need_dup(0),
   need_push_array_length(0),
   need_push_array_length2(0),
   need_array_byte_support(0),
@@ -127,6 +128,7 @@ AVR8::~AVR8()
   if(need_jump_cond_integer) { insert_jump_cond_integer(); }
   if(need_push_integer_local) { insert_push_integer_local(); }
   if(need_pop_integer_local) { insert_pop_integer_local(); }
+  if(need_dup) { insert_dup(); }
   if(need_push_array_length) { insert_push_array_length(); }
   if(need_push_array_length2) { insert_push_array_length2(); }
   if(need_array_byte_support) { insert_array_byte_support(); }
@@ -422,18 +424,12 @@ int AVR8::pop()
 
 int AVR8::dup()
 {
-  fprintf(out, "; dup\n");
-  fprintf(out, "  mov YL, stack_lo\n");
-  fprintf(out, "  add YL, SP\n");
-  fprintf(out, "  ld temp, YL\n");
-  PUSH_LO("temp");
-  fprintf(out, "  mov YL, stack_hi\n");
-  fprintf(out, "  add YL, SP\n");
-  fprintf(out, "  ld temp, YL\n");
-  PUSH_HI("temp");
+  need_dup = 1;
+
+  fprintf(out, "  call dup\n");
   stack++;
 
-  return -1;
+  return 0;
 }
 
 int AVR8::dup2()
@@ -443,6 +439,7 @@ int AVR8::dup2()
   return -1;
 }
 
+// FIXME doesn't work yet
 int AVR8::swap()
 {
   need_swap = 1;
@@ -1144,7 +1141,7 @@ int AVR8::get_values_from_stack(int num)
 // subroutines
 void AVR8::insert_swap()
 {
-//FIXME untested
+//FIXME nothing here
   fprintf(out, "swap:\n");
 }
 
@@ -1446,6 +1443,20 @@ void AVR8::insert_pop_integer_local()
   fprintf(out, "  sub YL, temp2\n");
   fprintf(out, "  add YL, locals\n");
   fprintf(out, "  st Y, temp\n");
+  fprintf(out, "  ret\n");
+}
+
+void AVR8::insert_dup()
+{
+  fprintf(out, "dup:\n");
+  fprintf(out, "  mov YL, stack_lo\n");
+  fprintf(out, "  add YL, SP\n");
+  fprintf(out, "  ld temp, YL\n");
+  PUSH_LO("temp");
+  fprintf(out, "  mov YL, stack_hi\n");
+  fprintf(out, "  add YL, SP\n");
+  fprintf(out, "  ld temp, YL\n");
+  PUSH_HI("temp");
   fprintf(out, "  ret\n");
 }
 
