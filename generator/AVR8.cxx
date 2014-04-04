@@ -94,6 +94,9 @@ AVR8::AVR8() :
   need_and_integer(0),
   need_or_integer(0),
   need_xor_integer(0),
+  need_inc_integer(0),
+  need_jump_cond(0),
+  need_jump_cond_integer(0),
   need_push_array_length(0),
   need_push_array_length2(0),
   need_array_byte_support(0),
@@ -117,6 +120,9 @@ AVR8::~AVR8()
   if(need_and_integer) { insert_and_integer(); }
   if(need_or_integer) { insert_or_integer(); }
   if(need_xor_integer) { insert_xor_integer(); }
+  if(need_inc_integer) { insert_inc_integer(); }
+  if(need_jump_cond) { insert_jump_cond(); }
+  if(need_jump_cond_integer) { insert_jump_cond_integer(); }
   if(need_push_array_length) { insert_push_array_length(); }
   if(need_push_array_length2) { insert_push_array_length2(); }
   if(need_array_byte_support) { insert_array_byte_support(); }
@@ -620,29 +626,16 @@ int AVR8::xor_integer(int const_val)
   return -1;
 }
 
-//FIXME this is huge, should be a sub
 int AVR8::inc_integer(int index, int num)
 {
+  need_inc_integer = 1;
   uint16_t value = num & 0xffff;
 
-  fprintf(out, "; inc_integer num = %d\n", num);
   fprintf(out, "  ldi value10, 0x%02x\n", value & 0xff);
   fprintf(out, "  ldi value11, 0x%02x\n", value >> 8);
-
-  fprintf(out, "  ldi YL, stack_lo - %d\n", LOCALS(index));
-  fprintf(out, "  add YL, locals\n");
-  fprintf(out, "  mov temp, YL\n");
-  fprintf(out, "  ld value20, Y\n");
-
-  fprintf(out, "  ldi YL, stack_hi - %d\n", LOCALS(index));
-  fprintf(out, "  add YL, locals\n");
-  fprintf(out, "  ld value21, Y\n");
-
-  fprintf(out, "  add value20, value10\n");
-  fprintf(out, "  adc value21, value11\n");
-  fprintf(out, "  st Y, value21\n");
-  fprintf(out, "  mov YL, temp\n");
-  fprintf(out, "  st Y, value20\n");
+  fprintf(out, "  ldi temp, %d\n", LOCALS(index));
+  fprintf(out, "  ldi temp, %d\n", LOCALS(index));
+  fprintf(out, "  call inc_integer\n");
 
   return 0;
 }
@@ -660,24 +653,12 @@ int AVR8::jump_cond(const char *label, int cond)
   char label_skip[16];
   char label_jump[16];
 
-  sprintf(label_skip, "label_%d", label_count++);
-  sprintf(label_jump, "label_%d", label_count++);
-
   if (stack > 0)
   {
-//FIXME the register loading will be in a subroutine to save room
-    fprintf(out, "; jump_condr\n");
-    fprintf(out, "  inc SP\n");
-
-    // value10
-    fprintf(out, "  ldi YL, stack_lo\n");
-    fprintf(out, "  add YL, SP\n");
-    fprintf(out, "  ld value10, Y\n");
-
-    // value11
-    fprintf(out, "  ldi YL, stack_hi\n");
-    fprintf(out, "  add YL, SP\n");
-    fprintf(out, "  ld value11, Y\n");
+    need_jump_cond = 1;
+    sprintf(label_skip, "label_%d", label_count++);
+    sprintf(label_jump, "label_%d", label_count++);
+    fprintf(out, "  call jump_cond\n");
 
     if(cond == COND_LESS_EQUAL)
     {
@@ -761,33 +742,12 @@ int AVR8::jump_cond_integer(const char *label, int cond)
   char label_skip[16];
   char label_jump[16];
 
-  sprintf(label_skip, "label_%d", label_count++);
-  sprintf(label_jump, "label_%d", label_count++);
-
   if (stack > 1)
   {
-//FIXME the register loading will be in a subroutine to save room
-    fprintf(out, "; jump_cond_integer\n");
-    fprintf(out, "  inc SP\n");
-    fprintf(out, "  inc SP\n");
-
-    // value10
-    fprintf(out, "  ldi YL, stack_lo\n");
-    fprintf(out, "  add YL, SP\n");
-    fprintf(out, "  ld value10, Y\n");
-
-    // value20
-    fprintf(out, "  dec YL\n");
-    fprintf(out, "  ld value20, Y\n");
-
-    // value11
-    fprintf(out, "  ldi YL, stack_hi\n");
-    fprintf(out, "  add YL, SP\n");
-    fprintf(out, "  ld value11, Y\n");
-
-    // value21
-    fprintf(out, "  dec YL\n");
-    fprintf(out, "  ld value21, Y\n");
+    need_jump_cond_integer = 1;
+    sprintf(label_skip, "label_%d", label_count++);
+    sprintf(label_jump, "label_%d", label_count++);
+    fprintf(out, "  call jump_cond_integer\n");
 
     if(cond == COND_LESS_EQUAL)
     {
@@ -1388,7 +1348,6 @@ void AVR8::insert_or_integer()
 void AVR8::insert_xor_integer()
 {
   fprintf(out, "xor_integer:\n");
-  fprintf(out, "or_integer:\n");
   POP_HI("value11");
   POP_LO("value10");
   POP_HI("result1");
@@ -1397,6 +1356,73 @@ void AVR8::insert_xor_integer()
   fprintf(out, "  eor result1, value11\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
+  fprintf(out, "  ret\n");
+}
+
+void AVR8::insert_inc_integer()
+{
+  fprintf(out, "inc_integer:\n");
+  fprintf(out, "  ldi YL, stack_lo\n");
+  fprintf(out, "  sub YL, temp\n");
+  fprintf(out, "  add YL, locals\n");
+  fprintf(out, "  mov temp2, YL\n");
+  fprintf(out, "  ld value20, Y\n");
+
+  fprintf(out, "  ldi YL, stack_hi\n");
+  fprintf(out, "  sub YL, temp\n");
+  fprintf(out, "  add YL, locals\n");
+  fprintf(out, "  ld value21, Y\n");
+
+  fprintf(out, "  add value20, value10\n");
+  fprintf(out, "  adc value21, value11\n");
+  fprintf(out, "  st Y, value21\n");
+  fprintf(out, "  mov YL, temp2\n");
+  fprintf(out, "  st Y, value20\n");
+  fprintf(out, "  ret\n");
+}
+
+void AVR8::insert_jump_cond()
+{
+  fprintf(out, "jump_cond:\n");
+  fprintf(out, "  inc SP\n");
+
+  // value10
+  fprintf(out, "  ldi YL, stack_lo\n");
+  fprintf(out, "  add YL, SP\n");
+  fprintf(out, "  ld value10, Y\n");
+
+  // value11
+  fprintf(out, "  ldi YL, stack_hi\n");
+  fprintf(out, "  add YL, SP\n");
+  fprintf(out, "  ld value11, Y\n");
+
+  fprintf(out, "  ret\n");
+}
+
+void AVR8::insert_jump_cond_integer()
+{
+  fprintf(out, "jump_cond_integer:\n");
+  fprintf(out, "  inc SP\n");
+  fprintf(out, "  inc SP\n");
+
+  // value10
+  fprintf(out, "  ldi YL, stack_lo\n");
+  fprintf(out, "  add YL, SP\n");
+  fprintf(out, "  ld value10, Y\n");
+
+  // value20
+  fprintf(out, "  dec YL\n");
+  fprintf(out, "  ld value20, Y\n");
+
+  // value11
+  fprintf(out, "  ldi YL, stack_hi\n");
+  fprintf(out, "  add YL, SP\n");
+  fprintf(out, "  ld value11, Y\n");
+
+  // value21
+  fprintf(out, "  dec YL\n");
+  fprintf(out, "  ld value21, Y\n");
+
   fprintf(out, "  ret\n");
 }
 

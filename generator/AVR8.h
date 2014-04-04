@@ -123,6 +123,9 @@ protected:
   bool need_and_integer:1;
   bool need_or_integer:1;
   bool need_xor_integer:1;
+  bool need_inc_integer:1;
+  bool need_jump_cond:1;
+  bool need_jump_cond_integer:1;
   bool need_push_array_length:1;
   bool need_push_array_length2:1;
   bool need_array_byte_support:1;
@@ -141,6 +144,9 @@ protected:
   void insert_and_integer();
   void insert_or_integer();
   void insert_xor_integer();
+  void insert_inc_integer();
+  void insert_jump_cond();
+  void insert_jump_cond_integer();
   void insert_push_array_length();
   void insert_push_array_length2();
   void insert_array_byte_support();
