@@ -331,7 +331,7 @@ int AVR8::push_integer_local(int index)
 {
   need_push_integer_local = 1;
 
-  fprintf(out, "  mov temp, %d\n", LOCALS(index));
+  fprintf(out, "  ldi temp, %d\n", LOCALS(index));
   fprintf(out, "  call push_integer_local\n");
   stack++;
 
@@ -400,7 +400,7 @@ int AVR8::pop_integer_local(int index)
 {
   need_pop_integer_local = 1;
 
-  fprintf(out, "  mov temp, %d\n", LOCALS(index));
+  fprintf(out, "  ldi temp, %d\n", LOCALS(index));
   fprintf(out, "  call pop_integer_local\n");
   stack--;
 
@@ -622,7 +622,6 @@ int AVR8::inc_integer(int index, int num)
   fprintf(out, "  ldi value10, 0x%02x\n", value & 0xff);
   fprintf(out, "  ldi value11, 0x%02x\n", value >> 8);
   fprintf(out, "  ldi temp, %d\n", LOCALS(index));
-  fprintf(out, "  ldi temp, %d\n", LOCALS(index));
   fprintf(out, "  call inc_integer\n");
 
   return 0;
@@ -815,14 +814,23 @@ int AVR8::jump_cond_integer(const char *label, int cond)
 int AVR8::return_local(int index, int local_count)
 {
   fprintf(out, "; return_local\n");
+  fprintf(out, "  ldi YL, stack_lo - %d\n", LOCALS(index));
+  fprintf(out, "  add YL, locals\n");
+  fprintf(out, "  ld result0, Y\n");
+  fprintf(out, "  ldi YL, stack_hi - %d\n", LOCALS(index));
+  fprintf(out, "  add YL, locals\n");
+  fprintf(out, "  ld result1, Y\n");
+  fprintf(out, "  mov SP, locals\n");
 
   if (!is_main)
   {
+    POP_HI("locals");
+    POP_LO("locals");
   }
 
   fprintf(out, "  ret\n");
 
-  return -1;
+  return 0;
 }
 
 int AVR8::return_integer(int local_count)
@@ -1141,8 +1149,33 @@ int AVR8::get_values_from_stack(int num)
 // subroutines
 void AVR8::insert_swap()
 {
-//FIXME nothing here
   fprintf(out, "swap:\n");
+  fprintf(out, "  ldi YL, stack_lo\n");
+  fprintf(out, "  add YL, SP\n");
+  fprintf(out, "  ld value30, Y\n");
+  fprintf(out, "  ldi YL, stack_hi\n");
+  fprintf(out, "  add YL, SP\n");
+  fprintf(out, "  ld value31, Y\n");
+
+  fprintf(out, "  ldi YL, stack_lo - 1\n");
+  fprintf(out, "  add YL, SP\n");
+  fprintf(out, "  ld temp, Y\n");
+  fprintf(out, "  dec YL\n");
+  fprintf(out, "  st Y, temp\n");
+
+  fprintf(out, "  ldi YL, stack_hi - 1\n");
+  fprintf(out, "  add YL, SP\n");
+  fprintf(out, "  ld temp, Y\n");
+  fprintf(out, "  dec YL\n");
+  fprintf(out, "  st Y, temp\n");
+
+  fprintf(out, "  ldi YL, stack_lo\n");
+  fprintf(out, "  add YL, SP\n");
+  fprintf(out, "  st Y, value0\n");
+  fprintf(out, "  ldi YL, stack_hi\n");
+  fprintf(out, "  add YL, SP\n");
+  fprintf(out, "  st Y, value1\n");
+  fprintf(out, "  ret\n");
 }
 
 void AVR8::insert_add_integer()
@@ -1353,19 +1386,17 @@ void AVR8::insert_inc_integer()
   fprintf(out, "  ldi YL, stack_lo\n");
   fprintf(out, "  sub YL, temp\n");
   fprintf(out, "  add YL, locals\n");
-  fprintf(out, "  mov temp2, YL\n");
   fprintf(out, "  ld value20, Y\n");
+  fprintf(out, "  add value20, value10\n");
+  fprintf(out, "  st Y, value20\n");
 
   fprintf(out, "  ldi YL, stack_hi\n");
   fprintf(out, "  sub YL, temp\n");
   fprintf(out, "  add YL, locals\n");
   fprintf(out, "  ld value21, Y\n");
-
-  fprintf(out, "  add value20, value10\n");
-  fprintf(out, "  adc value21, value11\n");
+  fprintf(out, "  add value21, value11\n");
   fprintf(out, "  st Y, value21\n");
-  fprintf(out, "  mov YL, temp2\n");
-  fprintf(out, "  st Y, value20\n");
+
   fprintf(out, "  ret\n");
 }
 
@@ -1378,7 +1409,6 @@ void AVR8::insert_jump_cond()
   fprintf(out, "  ldi YL, stack_lo\n");
   fprintf(out, "  add YL, SP\n");
   fprintf(out, "  ld value10, Y\n");
-
   // value11
   fprintf(out, "  ldi YL, stack_hi\n");
   fprintf(out, "  add YL, SP\n");
@@ -1397,16 +1427,13 @@ void AVR8::insert_jump_cond_integer()
   fprintf(out, "  ldi YL, stack_lo\n");
   fprintf(out, "  add YL, SP\n");
   fprintf(out, "  ld value10, Y\n");
-
   // value20
   fprintf(out, "  dec YL\n");
   fprintf(out, "  ld value20, Y\n");
-
   // value11
   fprintf(out, "  ldi YL, stack_hi\n");
   fprintf(out, "  add YL, SP\n");
   fprintf(out, "  ld value11, Y\n");
-
   // value21
   fprintf(out, "  dec YL\n");
   fprintf(out, "  ld value21, Y\n");
