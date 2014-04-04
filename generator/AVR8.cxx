@@ -331,7 +331,7 @@ int AVR8::push_integer_local(int index)
 {
   need_push_integer_local = 1;
 
-  fprintf(out, "  ldi temp, %d\n", LOCALS(index));
+  fprintf(out, "  ldi temp2, %d\n", LOCALS(index));
   fprintf(out, "  call push_integer_local\n");
   stack++;
 
@@ -400,7 +400,7 @@ int AVR8::pop_integer_local(int index)
 {
   need_pop_integer_local = 1;
 
-  fprintf(out, "  ldi temp, %d\n", LOCALS(index));
+  fprintf(out, "  ldi temp2, %d\n", LOCALS(index));
   fprintf(out, "  call pop_integer_local\n");
   stack--;
 
