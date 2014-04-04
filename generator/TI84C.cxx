@@ -68,5 +68,83 @@ int TI84C::start_init()
   return 0;
 }
 
+int TI84C::centerPutS()
+{
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  call CenterPutS\n");
+
+  return 0;
+}
+
+int TI84C::dispHL()
+{
+  fprintf(out, "  call CenterPutS\n");
+
+  return 0;
+}
+
+int TI84C::clearRect()
+{
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  pop de\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  ld b,c\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  call ClearRect\n");
+
+  return 0;
+}
+
+int TI84C::fillRect()
+{
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  pop de\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  ld b,c\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  call FillRect\n");
+
+  return 0;
+}
+
+int TI84C::iLine()
+{
+  fprintf(out, "  pop de\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  pop ix\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld b,l\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "  ld hl,ix\n");
+  fprintf(out, "  call ILine\n");
+
+  return 0;
+}
+
+int TI84C::iPoint()
+{
+  fprintf(out, "  pop de\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "  call IPoint\n");
+
+  return 0;
+}
+
+int TI84C::putS()
+{
+  fprintf(out, "  call PutS\n");
+
+  return 0;
+}
+
+int TI84C::setPenBGWhite()
+{
+  fprintf(out, "  call SetPenBG_White\n");
+
+  return 0;
+}
 
 

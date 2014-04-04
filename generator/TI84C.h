@@ -22,6 +22,14 @@ public:
 
   virtual int open(const char *filename);
   virtual int start_init();
+  virtual int centerPutS();
+  virtual int clearRect();
+  virtual int dispHL();
+  virtual int fillRect();
+  virtual int iLine();
+  virtual int iPoint();
+  virtual int putS();
+  virtual int setPenBGWhite();
 };
 
 #endif
