@@ -713,17 +713,37 @@ int AVR8::jump_cond(const char *label, int cond)
       case COND_LESS:
         if(reverse == false)
         {
+          fprintf(out, "  cp value10, zero\n");
+          fprintf(out, "  cpc value11, zero\n");
+          fprintf(out, "  brge %s\n", label_skip);
+          fprintf(out, "  jmp %s\n", label);
+          fprintf(out, "%s:\n", label_skip);
         }
           else
         {
+          fprintf(out, "  cp zero, value10\n");
+          fprintf(out, "  cpc zero, value11\n");
+          fprintf(out, "  brge %s\n", label_skip);
+          fprintf(out, "  jmp %s\n", label);
+          fprintf(out, "%s:\n", label_skip);
         }
         break;
       case COND_GREATER_EQUAL:
         if(reverse == false)
         {
+          fprintf(out, "  cp value10, zero\n");
+          fprintf(out, "  cpc value11, zero\n");
+          fprintf(out, "  brlt %s\n", label_skip);
+          fprintf(out, "  jmp %s\n", label);
+          fprintf(out, "%s:\n", label_skip);
         }
           else
         {
+          fprintf(out, "  cp zero, value10\n");
+          fprintf(out, "  cpc zero, value11\n");
+          fprintf(out, "  brlt %s\n", label_skip);
+          fprintf(out, "  jmp %s\n", label);
+          fprintf(out, "%s:\n", label_skip);
         }
         break;
     }
@@ -803,17 +823,37 @@ int AVR8::jump_cond_integer(const char *label, int cond)
       case COND_LESS:
         if(reverse == false)
         {
+          fprintf(out, "  cp value10, value20\n");
+          fprintf(out, "  cpc value11, value21\n");
+          fprintf(out, "  brge %s\n", label_skip);
+          fprintf(out, "  jmp %s\n", label);
+          fprintf(out, "%s:\n", label_skip);
         }
           else
         {
+          fprintf(out, "  cp value20, value10\n");
+          fprintf(out, "  cpc value21, value11\n");
+          fprintf(out, "  brge %s\n", label_skip);
+          fprintf(out, "  jmp %s\n", label);
+          fprintf(out, "%s:\n", label_skip);
         }
         break;
       case COND_GREATER_EQUAL:
         if(reverse == false)
         {
+          fprintf(out, "  cp value10, value20\n");
+          fprintf(out, "  cpc value11, value21\n");
+          fprintf(out, "  brlt %s\n", label_skip);
+          fprintf(out, "  jmp %s\n", label);
+          fprintf(out, "%s:\n", label_skip);
         }
           else
         {
+          fprintf(out, "  cp value20, value10\n");
+          fprintf(out, "  cpc value21, value11\n");
+          fprintf(out, "  brlt %s\n", label_skip);
+          fprintf(out, "  jmp %s\n", label);
+          fprintf(out, "%s:\n", label_skip);
         }
         break;
     }
@@ -834,7 +874,7 @@ int AVR8::return_local(int index, int local_count)
 
   fprintf(out, "  ret\n");
 
-  return 0;
+  return -1;
 }
 
 int AVR8::return_integer(int local_count)
