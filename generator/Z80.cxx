@@ -812,69 +812,147 @@ int Z80::push_array_length()
 
 int Z80::push_array_length(const char *name, int field_id)
 {
-  fprintf(out, "  ld hl, (%s-2)\n", name);
+  fprintf(out, "  ld hl,(%s-2)\n", name);
   fprintf(out, "  push hl\n");
   return 0;
 }
 
 int Z80::array_read_byte()
 {
-  return -1;
+  fprintf(out, "  ;; array_read_byte()\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  and a\n");
+  fprintf(out, "  adc hl,bc\n");
+  fprintf(out, "  ld c,(hl)\n");
+  fprintf(out, "  ld b, 0x00\n");
+  fprintf(out, "  bit 7,c\n");
+  fprintf(out, "  jr z, label_%d\n", label_count);
+  fprintf(out, "  ld b, 0xff\n");
+  fprintf(out, "label_%d:\n", label_count);
+  fprintf(out, "  push hl\n");
+  label_count++;
+  return 0;
 }
 
 int Z80::array_read_short()
 {
-  return -1;
+  fprintf(out, "  ;; array_read_short()\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  sla c\n");
+  fprintf(out, "  rlc b\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  and a\n");
+  fprintf(out, "  adc hl,bc\n");
+  fprintf(out, "  ld c,(hl)\n");
+  fprintf(out, "  ld b,(hl+1)\n");
+  fprintf(out, "  push bc\n");
+  return 0;
 }
 
 int Z80::array_read_int()
 {
-  return -1;
+  return array_read_short();
 }
 
 int Z80::array_read_byte(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  ;; array_read_byte(name,field_id);\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  ld hl,(%s)\n", name);
+  fprintf(out, "  and a\n");
+  fprintf(out, "  adc hl,bc\n");
+  fprintf(out, "  ld c,(hl)\n");
+  fprintf(out, "  ld b, 0x00\n");
+  fprintf(out, "  bit 7,c\n");
+  fprintf(out, "  jr z, label_%d\n", label_count);
+  fprintf(out, "  ld b, 0xff\n");
+  fprintf(out, "label_%d:\n", label_count);
+  fprintf(out, "  push hl\n");
+  label_count++;
+  return 0;
 }
 
 int Z80::array_read_short(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  ;; array_read_short()\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  sla c\n");
+  fprintf(out, "  rlc b\n");
+  fprintf(out, "  ld hl,(%s)\n", name);
+  fprintf(out, "  and a\n");
+  fprintf(out, "  adc hl,bc\n");
+  fprintf(out, "  ld c,(hl)\n");
+  fprintf(out, "  ld b,(hl+1)\n");
+  fprintf(out, "  push bc\n");
+  return 0;
 }
 
 int Z80::array_read_int(const char *name, int field_id)
 {
-  return -1;
+  return array_read_short(name, field_id);
 }
 
 int Z80::array_write_byte()
 {
-  return -1;
+  fprintf(out, "  ;; array_write_byte()\n");
+  fprintf(out, "  pop de\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  and a\n");
+  fprintf(out, "  adc hl,bc\n");
+  fprintf(out, "  ld (hl),e\n");
+  return 0;
 }
 
 int Z80::array_write_short()
 {
-  return -1;
+  fprintf(out, "  ;; array_write_short()\n");
+  fprintf(out, "  pop de\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  sla c\n");
+  fprintf(out, "  rlc b\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  and a\n");
+  fprintf(out, "  adc hl,bc\n");
+  fprintf(out, "  ld (hl),e\n");
+  fprintf(out, "  ld (hl+1),d\n");
+  return 0;
 }
 
 int Z80::array_write_int()
 {
-  return -1;
+  return array_write_short();
 }
 
 int Z80::array_write_byte(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  ;; array_write_byte(name,field_id)\n");
+  fprintf(out, "  pop de\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  ld hl,(%s)\n", name);
+  fprintf(out, "  and a\n");
+  fprintf(out, "  adc hl,bc\n");
+  fprintf(out, "  ld (hl),e\n");
+  return 0;
 }
 
 int Z80::array_write_short(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  ;; array_write_byte(name,field_id)\n");
+  fprintf(out, "  pop de\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  ld hl,(%s)\n", name);
+  fprintf(out, "  and a\n");
+  fprintf(out, "  adc hl,bc\n");
+  fprintf(out, "  ld (hl),e\n");
+  fprintf(out, "  ld (hl+1),d\n");
+  return 0;
 }
 
 int Z80::array_write_int(const char *name, int field_id)
 {
-  return -1;
+  return array_write_short(name, field_id);
 }
 
 int Z80::stack_alu(int alu_op)
