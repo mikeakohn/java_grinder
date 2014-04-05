@@ -75,39 +75,54 @@ int Z80::start_init()
 
 int Z80::insert_static_field_define(const char *name, const char *type, int index)
 {
-  //fprintf(out, "%s equ ram_start+%d\n", name, (index + 1) * 4);
+  fprintf(out, "%s equ ram_start+%d\n", name, (index + 1) * 2);
   return 0;
 }
 
 
 int Z80::init_heap(int field_count)
 {
-  return -1;
+  fprintf(out, "  ;; Set up heap and static initializers\n");
+  fprintf(out, "  ld hl, %d\n", (field_count + 1) * 2);
+  fprintf(out, "  ld (ram_start), hl\n");
+  return 0;
 }
 
 int Z80::insert_field_init_boolean(char *name, int index, int value)
 {
-  return -1;
+  value = (value == 0) ? 0 : 1;
+  fprintf(out, "  ld hl, %d\n", value);
+  fprintf(out, "  ld (%s), hl\n", name);
+  return 0;
 }
 
 int Z80::insert_field_init_byte(char *name, int index, int value)
 {
-  return -1;
+  if (value < -128 || value > 255) { return -1; }
+  fprintf(out, "  ld hl, %d\n", (int8_t)value);
+  fprintf(out, "  ld (%s), hl\n", name);
+
+  return 0;
 }
 
 int Z80::insert_field_init_short(char *name, int index, int value)
 {
-  return -1;
+  if (value < -32768 || value > 65535) { return -1; }
+  fprintf(out, "  ld hl, %d\n", value);
+  fprintf(out, "  ld (%s), hl\n", name);
+  return 0;
 }
 
 int Z80::insert_field_init_int(char *name, int index, int value)
 {
-  return -1;
+  return insert_field_init_short(name, index, value);
 }
 
 int Z80::insert_field_init(char *name, int index)
 {
-  return -1;
+  fprintf(out, "  ld hl, _%s\n", name);
+  fprintf(out, "  ld (%s), hl\n", name);
+  return 0;
 }
 
 void Z80::method_start(int local_count, int max_stack, int param_count, const char *name)
@@ -468,7 +483,17 @@ int Z80::inc_integer(int index, int num)
 
 int Z80::integer_to_byte()
 {
-  return -1;
+  fprintf(out, "  ;; integer_to_byte() (sign extend byte)\n");
+  fprintf(out, "  pop hl\n");
+  //fprintf(out, "  ld a, l\n");
+  //fprintf(out, "  and a, 0x80\n");
+  fprintf(out, "  bit 7, l\n");
+  fprintf(out, "  jr z, label_%d\n", label_count);
+  fprintf(out, "  ld h, 0xff\n");
+  fprintf(out, "label_%d:\n", label_count);
+  fprintf(out, "  push hl\n");
+  label_count++;
+  return 0;
 }
 
 int Z80::jump_cond(const char *label, int cond)
@@ -704,12 +729,16 @@ int n;
 
 int Z80::put_static(const char *name, int index)
 {
-  return -1;
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld (%s), hl\n", name);
+  return 0;
 }
 
 int Z80::get_static(const char *name, int index)
 {
-  return -1;
+  fprintf(out, "  ld hl, (%s)\n", name);
+  fprintf(out, "  push hl\n");
+  return 0;
 }
 
 int Z80::brk()
@@ -719,7 +748,33 @@ int Z80::brk()
 
 int Z80::new_array(uint8_t type)
 {
-  return -1;
+  fprintf(out, "  ;; new_array() size=bc\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  ld hl, (heap_ptr)\n");
+  fprintf(out, "  ld (hl), bc\n");
+
+  if (type == TYPE_SHORT || type == TYPE_CHAR || type == TYPE_INT)
+  {
+    // If 2 byte size, then multiply array.length by 2 to compute new heap
+    fprintf(out, "  sla c\n");
+    fprintf(out, "  rlc b\n");
+  }
+    else
+  {
+    // Align heap by 2 bytes
+    fprintf(out, "  bit 0,c\n");
+    fprintf(out, "  jr z label_%d\n", label_count);
+    fprintf(out, "  inc bc\n");
+    fprintf(out, "label_%d\n", label_count);
+    label_count++;
+  }
+
+  // Add length of allocated bytes to hl and store as new heap pointer
+  fprintf(out, "  and a\n");
+  fprintf(out, "  adc hl, bc\n");
+  fprintf(out, "  ld (heap_ptr), hl\n");
+
+  return 0;
 }
 
 int Z80::insert_array(const char *name, int32_t *data, int len, uint8_t type)
@@ -746,12 +801,20 @@ int Z80::insert_string(const char *name, uint8_t *bytes, int len)
 
 int Z80::push_array_length()
 {
-  return -1;
+  fprintf(out, "  pop ix\n");
+  fprintf(out, "  dec ix\n");
+  fprintf(out, "  dec ix\n");
+  fprintf(out, "  ld c, (ix)\n");
+  fprintf(out, "  ld b, (ix+1)\n");
+  fprintf(out, "  push bc\n");
+  return 0;
 }
 
 int Z80::push_array_length(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  ld hl, (%s-2)\n", name);
+  fprintf(out, "  push hl\n");
+  return 0;
 }
 
 int Z80::array_read_byte()

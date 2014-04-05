@@ -31,6 +31,7 @@ abstract public class TI84C
   public static void setDrawBGColor(int color) { }
   public static void setDrawBGWhite() { }
   public static void setDrawColor(int color) { }
+  public static void setFillColor(int color) { }
   public static void setTextBGColor(int color) { }
   public static void setTextColor(int color) { }
 

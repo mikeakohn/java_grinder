@@ -90,6 +90,11 @@ static int ti84c_setDrawColor(JavaClass *java_class, Generator *generator)
   return generator->ti84c_setDrawColor();
 }
 
+static int ti84c_setFillColor(JavaClass *java_class, Generator *generator)
+{
+  return generator->ti84c_setFillColor();
+}
+
 static int ti84c_setTextBGColor(JavaClass *java_class, Generator *generator)
 {
   return generator->ti84c_setTextBGColor();
@@ -114,6 +119,7 @@ int ti84c(JavaClass *java_class, Generator *generator, char *function)
   CHECK_FUNC(setDrawBGColor)
   CHECK_FUNC(setDrawBGWhite)
   CHECK_FUNC(setDrawColor)
+  CHECK_FUNC(setFillColor)
   CHECK_FUNC(setTextBGColor)
   CHECK_FUNC(setTextColor)
 

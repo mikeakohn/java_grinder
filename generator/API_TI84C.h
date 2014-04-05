@@ -28,6 +28,7 @@ public:
   virtual int ti84c_setDrawBGColor() { return -1; }
   virtual int ti84c_setDrawBGWhite() { return -1; }
   virtual int ti84c_setDrawColor() { return -1; }
+  virtual int ti84c_setFillColor() { return -1; }
   virtual int ti84c_setTextBGColor() { return -1; }
   virtual int ti84c_setTextColor() { return -1; }
 };

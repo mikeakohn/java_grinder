@@ -29,8 +29,11 @@ int TI84C::open(const char *filename)
 {
   if (Z80::open(filename) != 0) { return -1; }
 
-  // http://wikiti.brandonw.net/index.php?title=84PCSE:OS:Applications
+  fprintf(out, "  .include \"ti84c.inc\"\n\n");
+  fprintf(out, "ram_start equ appData\n");
+  fprintf(out, "heap_ptr equ ram_start\n");
 
+  // http://wikiti.brandonw.net/index.php?title=84PCSE:OS:Applications
   fprintf(out,
         "  ; Master Field\n"
 	"  .db	0x80, 0x0F, 0x00, 0x00, 0x00, 0x00\n"
@@ -82,7 +85,7 @@ int TI84C::ti84c_clearRect()
 
 int TI84C::ti84c_drawHL()
 {
-  fprintf(out, "  call CenterPutS\n");
+  fprintf(out, "  call DispHL\n");
 
   return 0;
 }
@@ -158,8 +161,8 @@ int TI84C::ti84c_setCursorY()
 
 int TI84C::ti84c_setDrawBGColor()
 {
-  fprintf(out, "  pop af\n");
-  fprintf(out, "  ld (penBGColor), a\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld (penBGColor), hl\n");
 
   return 0;
 }
@@ -174,8 +177,16 @@ int TI84C::ti84c_setDrawBGWhite()
 
 int TI84C::ti84c_setDrawColor()
 {
-  fprintf(out, "  pop af\n");
-  fprintf(out, "  ld (penFGColor), a\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld (penFGColor), hl\n");
+
+  return 0;
+}
+
+int TI84C::ti84c_setFillColor()
+{
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld (fillRectColor), hl\n");
 
   return 0;
 }
