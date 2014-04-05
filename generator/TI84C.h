@@ -22,14 +22,20 @@ public:
 
   virtual int open(const char *filename);
   virtual int start_init();
-  virtual int centerPutS();
   virtual int clearRect();
-  virtual int dispHL();
+  virtual int drawHL();
+  virtual int drawLine();
+  virtual int drawPoint();
+  virtual int drawString();
+  virtual int drawStringCenter();
   virtual int fillRect();
-  virtual int iLine();
-  virtual int iPoint();
-  virtual int putS();
-  virtual int setPenBGWhite();
+  virtual int setCursorX();
+  virtual int setCursorY();
+  virtual int setDrawBGColor();
+  virtual int setDrawBGWhite();
+  virtual int setDrawColor();
+  virtual int setTextBGColor();
+  virtual int setTextColor();
 };
 
 #endif
