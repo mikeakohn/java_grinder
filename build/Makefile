@@ -8,7 +8,7 @@ CFLAGS=-Wall $(DEBUG) $(INCLUDES) $(OPTIMIZATIONS)
 LDFLAGS=
 VPATH=../generator:../common:../api
 
-API=adc.o c64_sid.o c64_vic.o cpu.o dsp.o invoke.o ioport.o java_lang_system.o java_lang_string.o memory.o spi.o ti84c.o uart.o
+API=adc.o c64_sid.o c64_vic.o cpu.o dsp.o invoke.o ioport.o java_lang_system.o java_lang_string.o memory.o spi.o ti84c_.o uart.o
 CPUS=DSPIC.o MC68000.o MIPS.o MSP430.o MSP430X.o ARM.o M6502.o STDC.o Z80.o AVR8.o
 SYSTEMS=C64.o TI84C.o
 OBJS=fileio.o Compiler.o Generator.o JavaClass.o JavaCompiler.o execute_static.o table_java_instr.o $(CPUS) $(SYSTEMS) $(API)

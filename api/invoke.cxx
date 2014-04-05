@@ -25,7 +25,7 @@
 #include "ioport.h"
 #include "memory.h"
 #include "spi.h"
-#include "ti84c.h"
+#include "ti84c_.h"
 #include "uart.h"
 #include "java_lang_string.h"
 #include "java_lang_system.h"
