@@ -18,14 +18,15 @@
 #include "JavaCompiler.h"
 #include "invoke.h"
 #include "adc.h"
+#include "c64_sid.h"
+#include "c64_vic.h"
 #include "cpu.h"
 #include "dsp.h"
 #include "ioport.h"
 #include "memory.h"
 #include "spi.h"
+#include "ti84c.h"
 #include "uart.h"
-#include "c64_sid.h"
-#include "c64_vic.h"
 #include "java_lang_string.h"
 #include "java_lang_system.h"
 
@@ -250,6 +251,7 @@ char function[256];
     CHECK_WITH_PORT(SPI, spi, 1)
     CHECK_WITH_PORT(UART, uart, 0)
     CHECK_WITH_PORT(UART, uart, 1)
+    CHECK(TI84C, ti84c)
       else
     {}
   }

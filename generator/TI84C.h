@@ -22,20 +22,20 @@ public:
 
   virtual int open(const char *filename);
   virtual int start_init();
-  virtual int clearRect();
-  virtual int drawHL();
-  virtual int drawLine();
-  virtual int drawPoint();
-  virtual int drawString();
-  virtual int drawStringCenter();
-  virtual int fillRect();
-  virtual int setCursorX();
-  virtual int setCursorY();
-  virtual int setDrawBGColor();
-  virtual int setDrawBGWhite();
-  virtual int setDrawColor();
-  virtual int setTextBGColor();
-  virtual int setTextColor();
+  virtual int ti84c_clearRect();
+  virtual int ti84c_drawHL();
+  virtual int ti84c_drawLine();
+  virtual int ti84c_drawPoint();
+  virtual int ti84c_drawString();
+  virtual int ti84c_drawStringCenter();
+  virtual int ti84c_fillRect();
+  virtual int ti84c_setCursorX();
+  virtual int ti84c_setCursorY();
+  virtual int ti84c_setDrawBGColor();
+  virtual int ti84c_setDrawBGWhite();
+  virtual int ti84c_setDrawColor();
+  virtual int ti84c_setTextBGColor();
+  virtual int ti84c_setTextColor();
 };
 
 #endif

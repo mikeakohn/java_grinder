@@ -68,7 +68,7 @@ int TI84C::start_init()
   return 0;
 }
 
-int TI84C::clearRect()
+int TI84C::ti84c_clearRect()
 {
   fprintf(out, "  pop hl\n");
   fprintf(out, "  pop de\n");
@@ -80,14 +80,14 @@ int TI84C::clearRect()
   return 0;
 }
 
-int TI84C::drawHL()
+int TI84C::ti84c_drawHL()
 {
   fprintf(out, "  call CenterPutS\n");
 
   return 0;
 }
 
-int TI84C::drawLine()
+int TI84C::ti84c_drawLine()
 {
   fprintf(out, "  pop de\n");
   fprintf(out, "  pop bc\n");
@@ -102,7 +102,7 @@ int TI84C::drawLine()
   return 0;
 }
 
-int TI84C::drawPoint()
+int TI84C::ti84c_drawPoint()
 {
   fprintf(out, "  pop de\n");
   fprintf(out, "  pop bc\n");
@@ -113,14 +113,14 @@ int TI84C::drawPoint()
   return 0;
 }
 
-int TI84C::drawString()
+int TI84C::ti84c_drawString()
 {
   fprintf(out, "  call PutS\n");
 
   return 0;
 }
 
-int TI84C::drawStringCenter()
+int TI84C::ti84c_drawStringCenter()
 {
   fprintf(out, "  pop hl\n");
   fprintf(out, "  call CenterPutS\n");
@@ -128,7 +128,7 @@ int TI84C::drawStringCenter()
   return 0;
 }
 
-int TI84C::fillRect()
+int TI84C::ti84c_fillRect()
 {
   fprintf(out, "  pop hl\n");
   fprintf(out, "  pop de\n");
@@ -140,7 +140,7 @@ int TI84C::fillRect()
   return 0;
 }
 
-int TI84C::setCursorX()
+int TI84C::ti84c_setCursorX()
 {
   fprintf(out, "  pop af\n");
   fprintf(out, "  ld (curCol), a\n");
@@ -148,7 +148,7 @@ int TI84C::setCursorX()
   return 0;
 }
 
-int TI84C::setCursorY()
+int TI84C::ti84c_setCursorY()
 {
   fprintf(out, "  pop af\n");
   fprintf(out, "  ld (curRow), a\n");
@@ -156,7 +156,7 @@ int TI84C::setCursorY()
   return 0;
 }
 
-int TI84C::setDrawBGColor()
+int TI84C::ti84c_setDrawBGColor()
 {
   fprintf(out, "  pop af\n");
   fprintf(out, "  ld (penBGColor), a\n");
@@ -164,7 +164,7 @@ int TI84C::setDrawBGColor()
   return 0;
 }
 
-int TI84C::setDrawBGWhite()
+int TI84C::ti84c_setDrawBGWhite()
 {
   fprintf(out, "  call SetPenBG_White\n");
 
@@ -172,7 +172,7 @@ int TI84C::setDrawBGWhite()
 }
 
 
-int TI84C::setDrawColor()
+int TI84C::ti84c_setDrawColor()
 {
   fprintf(out, "  pop af\n");
   fprintf(out, "  ld (penFGColor), a\n");
@@ -180,7 +180,7 @@ int TI84C::setDrawColor()
   return 0;
 }
 
-int TI84C::setTextBGColor()
+int TI84C::ti84c_setTextBGColor()
 {
   fprintf(out, "  pop hl\n");
   fprintf(out, "  ld (curBGColor), hl\n");
@@ -188,7 +188,7 @@ int TI84C::setTextBGColor()
   return 0;
 }
 
-int TI84C::setTextColor()
+int TI84C::ti84c_setTextColor()
 {
   fprintf(out, "  pop hl\n");
   fprintf(out, "  ld (curFGColor), hl\n");

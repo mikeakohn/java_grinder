@@ -16,20 +16,20 @@ class API_TI84C
 {
 public:
   // TI-84 plus C Color Calculator
-  virtual int clearRect() { return -1; }
-  virtual int drawHL() { return -1; }
-  virtual int drawLine() { return -1; }
-  virtual int drawPoint() { return -1; }
-  virtual int drawString() { return -1; }
-  virtual int drawStringCenter() { return -1; }
-  virtual int fillRect() { return -1; }
-  virtual int setCursorX() { return -1; }
-  virtual int setCursorY() { return -1; }
-  virtual int setDrawBGColor() { return -1; }
-  virtual int setDrawBGWhite() { return -1; }
-  virtual int setDrawColor() { return -1; }
-  virtual int setTextBGColor() { return -1; }
-  virtual int setTextColor() { return -1; }
+  virtual int ti84c_clearRect() { return -1; }
+  virtual int ti84c_drawHL() { return -1; }
+  virtual int ti84c_drawLine() { return -1; }
+  virtual int ti84c_drawPoint() { return -1; }
+  virtual int ti84c_drawString() { return -1; }
+  virtual int ti84c_drawStringCenter() { return -1; }
+  virtual int ti84c_fillRect() { return -1; }
+  virtual int ti84c_setCursorX() { return -1; }
+  virtual int ti84c_setCursorY() { return -1; }
+  virtual int ti84c_setDrawBGColor() { return -1; }
+  virtual int ti84c_setDrawBGWhite() { return -1; }
+  virtual int ti84c_setDrawColor() { return -1; }
+  virtual int ti84c_setTextBGColor() { return -1; }
+  virtual int ti84c_setTextColor() { return -1; }
 };
 
 #endif
