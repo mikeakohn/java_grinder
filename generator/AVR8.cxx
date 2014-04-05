@@ -627,10 +627,15 @@ int AVR8::inc_integer(int index, int num)
   return 0;
 }
 
+//FIXME needs sign extend
 int AVR8::integer_to_byte()
 {
   fprintf(out, "; integer_to_byte\n");
-  return -1;
+  POP_HI("temp");
+  POP_LO("temp");
+  PUSH_LO("temp");
+  PUSH_HI("zero");
+  return 0;
 }
 
 int AVR8::jump_cond(const char *label, int cond)
@@ -1538,7 +1543,15 @@ int AVR8::memory_read8()
 
 int AVR8::memory_write8()
 {
-  return -1;
+  fprintf(out, "; memory_write8\n");
+  POP_HI("temp");
+  POP_LO("temp");
+  POP_HI("YH");
+  POP_LO("YL");
+  fprintf(out, "  st Y, temp\n");
+  fprintf(out, "  inc r10\n");
+
+  return 0;
 }
 
 #if 0
