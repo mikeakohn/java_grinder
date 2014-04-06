@@ -134,14 +134,17 @@ void Z80::method_start(int local_count, int max_stack, int param_count, const ch
   fprintf(out, "%s:\n", name);
   fprintf(out, "  ;; Save iy if needed.  iy = alloca(params * 2)\n");
   if (!is_main) { fprintf(out, "  push iy\n"); }
-  //fprintf(out, "  ld iy, 0\n");
-  //fprintf(out, "  add iy, SP\n");
-  //fprintf(out, "  ld ix, -%d\n", local_count * 2);
-  //fprintf(out, "  add ix, SP\n");
-  //fprintf(out, "  ld SP, ix\n");
+
+#if 0
   fprintf(out, "  ld iy, -%d\n", local_count * 2);
   fprintf(out, "  add iy, SP\n");
   fprintf(out, "  ld SP, iy\n");
+#endif
+  int n;
+  for (n = 0; n < local_count; n++)
+  {
+    fprintf(out, "  push bc\n");
+  }
 }
 
 void Z80::method_end(int local_count)
@@ -160,8 +163,8 @@ int Z80::push_integer(int32_t n)
   uint16_t value = (n & 0xffff);
 
   fprintf(out, "  ;; push_integer(%d)\n", n);
-  fprintf(out, "  ld bc, 0x%04x\n", value);
-  fprintf(out, "  push bc\n");
+  fprintf(out, "  ld hl, 0x%04x\n", value);
+  fprintf(out, "  push hl\n");
   stack++;
 
   return 0;
@@ -220,8 +223,8 @@ int Z80::push_byte(int8_t b)
   uint16_t value = (((int16_t)b) & 0xffff);
 
   fprintf(out, "  ;; push_byte(%d)\n", b);
-  fprintf(out, "  ld bc, 0x%04x\n", value);
-  fprintf(out, "  push bc\n");
+  fprintf(out, "  ld hl, 0x%04x\n", value);
+  fprintf(out, "  push hl\n");
   stack++;
 
   return 0;
@@ -230,8 +233,8 @@ int Z80::push_byte(int8_t b)
 int Z80::push_short(int16_t s)
 {
   fprintf(out, "  ;; push_short(%d)\n", s);
-  fprintf(out, "  ld bc, 0x%04x\n", s);
-  fprintf(out, "  push bc\n");
+  fprintf(out, "  ld hl, 0x%04x\n", s);
+  fprintf(out, "  push hl\n");
   stack++;
 
   return 0;
@@ -261,9 +264,9 @@ int Z80::pop()
 
 int Z80::dup()
 {
-  fprintf(out, "  pop bc     ; dup()\n");
-  fprintf(out, "  push bc\n");
-  fprintf(out, "  push bc\n");
+  fprintf(out, "  pop hl     ; dup()\n");
+  fprintf(out, "  push hl\n");
+  fprintf(out, "  push hl\n");
   stack++;
 
   return 0;
@@ -1067,9 +1070,16 @@ int Z80::stack_alu_const(int alu_op, int num)
 
 void Z80::restore_stack(int count)
 {
+#if 0
   fprintf(out, "  ld iy, %d\n", count * 2);
   fprintf(out, "  add iy, SP\n");
   fprintf(out, "  ld SP, iy\n");
+#endif
+  int n;
+  for (n = 0; n < count; n++)
+  {
+    fprintf(out, "  pop bc\n");
+  }
 }
 
 
