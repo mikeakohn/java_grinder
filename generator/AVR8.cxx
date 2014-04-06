@@ -1386,6 +1386,7 @@ void AVR8::insert_xor_integer()
   fprintf(out, "  ret\n");
 }
 
+//FIXME this probably sucks
 void AVR8::insert_inc_integer()
 {
   fprintf(out, "inc_integer:\n");
@@ -1552,10 +1553,9 @@ int AVR8::memory_write8()
   fprintf(out, "; memory_write8\n");
   POP_HI("temp");
   POP_LO("temp");
-  POP_HI("YH");
-  POP_LO("YL");
-  fprintf(out, "  st Y, temp\n");
-  fprintf(out, "  inc r10\n");
+  POP_HI("XH");
+  POP_LO("XL");
+  fprintf(out, "  st X, temp\n");
 
   return 0;
 }
