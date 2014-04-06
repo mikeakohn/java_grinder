@@ -12,7 +12,8 @@ JAVA_SRC=\
   SPITest.java \
   StringTest.java \
   Testing.java \
-  Testing2.java
+  Testing2.java \
+  TI84CDemo.java
 
 default:
 	javac -classpath ../build/JavaGrinder.jar:. $(JAVA_SRC)

@@ -23,6 +23,7 @@ Generator::Generator() : label_count(0), constants_len(0)
 
 Generator::~Generator()
 {
+  fprintf(out, "\n");
   fclose(out);
 }
 
@@ -210,6 +211,7 @@ int n;
     fprintf(out, "%c", bytes[n]);
   }
   fprintf(out, "\"\n");
+  fprintf(out, "  db 0\n");
 
   return 0;
 }

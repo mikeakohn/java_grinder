@@ -30,14 +30,14 @@ static int ti84c_setClock16(JavaClass *java_class, Generator *generator)
 }
 #endif
 
+static int ti84c_clearScreen(JavaClass *java_class, Generator *generator)
+{
+  return generator->ti84c_clearScreen();
+}
+
 static int ti84c_clearRect(JavaClass *java_class, Generator *generator)
 {
   return generator->ti84c_clearRect();
-}
-
-static int ti84c_drawHL(JavaClass *java_class, Generator *generator)
-{
-  return generator->ti84c_drawHL();
 }
 
 static int ti84c_drawLine(JavaClass *java_class, Generator *generator)
@@ -50,14 +50,24 @@ static int ti84c_drawPoint(JavaClass *java_class, Generator *generator)
   return generator->ti84c_drawPoint();
 }
 
-static int ti84c_drawString(JavaClass *java_class, Generator *generator)
+static int ti84c_print(JavaClass *java_class, Generator *generator)
 {
-  return generator->ti84c_drawString();
+  return generator->ti84c_print();
 }
 
-static int ti84c_drawStringCenter(JavaClass *java_class, Generator *generator)
+static int ti84c_printCenter(JavaClass *java_class, Generator *generator)
 {
-  return generator->ti84c_drawStringCenter();
+  return generator->ti84c_printCenter();
+}
+
+static int ti84c_printHL(JavaClass *java_class, Generator *generator)
+{
+  return generator->ti84c_printHL();
+}
+
+static int ti84c_putc(JavaClass *java_class, Generator *generator)
+{
+  return generator->ti84c_putc();
 }
 
 static int ti84c_fillRect(JavaClass *java_class, Generator *generator)
@@ -107,12 +117,14 @@ static int ti84c_setTextColor(JavaClass *java_class, Generator *generator)
 
 int ti84c(JavaClass *java_class, Generator *generator, char *function)
 {
+  CHECK_FUNC(clearScreen)
   CHECK_FUNC(clearRect)
-  CHECK_FUNC(drawHL)
   CHECK_FUNC(drawLine)
   CHECK_FUNC(drawPoint)
-  CHECK_FUNC(drawString)
-  CHECK_FUNC(drawStringCenter)
+  CHECK_FUNC(print)
+  CHECK_FUNC(printCenter)
+  CHECK_FUNC(printHL)
+  CHECK_FUNC(putc)
   CHECK_FUNC(fillRect)
   CHECK_FUNC(setCursorX)
   CHECK_FUNC(setCursorY)

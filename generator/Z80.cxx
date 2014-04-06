@@ -653,6 +653,7 @@ int Z80::return_local(int index, int local_count)
   fprintf(out, "  ;; return_local(%d,%d)\n", index, local_count);
   fprintf(out, "  ld e, (iy+%d)\n", (index * 2));
   fprintf(out, "  ld d, (iy+%d)\n", (index * 2) + 1);
+  restore_stack(local_count);
   while (stack > 0) { fprintf(out, "  pop bc\n"); stack--; }
   if (!is_main) { fprintf(out, "  pop iy\n"); }
   fprintf(out, "  ret\n");
@@ -664,6 +665,7 @@ int Z80::return_integer(int local_count)
   fprintf(out, "  ;; return_integer(%d)\n", local_count);
   fprintf(out, "  pop de\n");
   stack--;
+  restore_stack(local_count);
   while (stack > 0) { fprintf(out, "  pop bc\n"); stack--; }
   if (!is_main) { fprintf(out, "  pop iy\n"); }
   fprintf(out, "  ret\n");
@@ -673,6 +675,7 @@ int Z80::return_integer(int local_count)
 int Z80::return_void(int local_count)
 {
   fprintf(out, "  ;; return_void(%d)\n", local_count);
+  restore_stack(local_count);
   while (stack > 0) { fprintf(out, "  pop bc\n"); stack--; }
   if (!is_main) { fprintf(out, "  pop iy\n"); }
   fprintf(out, "  ret\n");
@@ -681,7 +684,7 @@ int Z80::return_void(int local_count)
 
 int Z80::jump(const char *name)
 {
-  fprintf(out, "  jr %s\n", name);
+  fprintf(out, "  jp %s\n", name);
   return 0;
 }
 
@@ -1060,6 +1063,13 @@ int Z80::stack_alu_const(int alu_op, int num)
   fprintf(out, "  push hl\n");
 
   return 0;
+}
+
+void Z80::restore_stack(int count)
+{
+  fprintf(out, "  ld iy, %d\n", count * 2);
+  fprintf(out, "  add iy, SP\n");
+  fprintf(out, "  ld SP, iy\n");
 }
 
 

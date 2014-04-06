@@ -17,11 +17,13 @@ class API_TI84C
 public:
   // TI-84 plus C Color Calculator
   virtual int ti84c_clearRect() { return -1; }
-  virtual int ti84c_drawHL() { return -1; }
+  virtual int ti84c_clearScreen() { return -1; }
   virtual int ti84c_drawLine() { return -1; }
   virtual int ti84c_drawPoint() { return -1; }
-  virtual int ti84c_drawString() { return -1; }
-  virtual int ti84c_drawStringCenter() { return -1; }
+  virtual int ti84c_print() { return -1; }
+  virtual int ti84c_printCenter() { return -1; }
+  virtual int ti84c_printHL() { return -1; }
+  virtual int ti84c_putc() { return -1; }
   virtual int ti84c_fillRect() { return -1; }
   virtual int ti84c_setCursorX() { return -1; }
   virtual int ti84c_setCursorY() { return -1; }

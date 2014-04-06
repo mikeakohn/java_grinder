@@ -19,12 +19,14 @@ abstract public class TI84C
   {
   }
 
+  public static void clearScreen() { }
   public static void clearRect(int x0, int x1, int y0, int y1) { }
-  public static void drawHL() { }
   public static void drawLine(int x0, int y0, int x1, int y1, int operation) { }
   public static void drawPoint(int x, int y, int operation) { }
-  public static void drawString(String text) { }
-  public static void drawStringCenter(String text) { }
+  public static void printHL() { }
+  public static void print(String text) { }
+  public static void printCenter(String text) { }
+  public static void putc(char c) { }
   public static void fillRect(int x0, int x1, int y0, int y1) { }
   public static void setCursorX(int x) { }
   public static void setCursorY(int y) { }

@@ -22,12 +22,14 @@ public:
 
   virtual int open(const char *filename);
   virtual int start_init();
+  virtual int ti84c_clearScreen();
   virtual int ti84c_clearRect();
-  virtual int ti84c_drawHL();
   virtual int ti84c_drawLine();
   virtual int ti84c_drawPoint();
-  virtual int ti84c_drawString();
-  virtual int ti84c_drawStringCenter();
+  virtual int ti84c_print();
+  virtual int ti84c_printCenter();
+  virtual int ti84c_printHL();
+  virtual int ti84c_putc();
   virtual int ti84c_fillRect();
   virtual int ti84c_setCursorX();
   virtual int ti84c_setCursorY();
