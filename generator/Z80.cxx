@@ -133,18 +133,17 @@ void Z80::method_start(int local_count, int max_stack, int param_count, const ch
 
   fprintf(out, "%s:\n", name);
   fprintf(out, "  ;; Save iy if needed.  iy = alloca(params * 2)\n");
-  if (!is_main) { fprintf(out, "  push iy\n"); }
+  if (is_main)
+  {
+    fprintf(out, "  ld (save_context),iy\n");
+  }
 
-#if 0
+  // FIXME - this might be extra since there's a save_context
+  fprintf(out, "  push iy\n");
+
   fprintf(out, "  ld iy, -%d\n", local_count * 2);
   fprintf(out, "  add iy, SP\n");
   fprintf(out, "  ld SP, iy\n");
-#endif
-  int n;
-  for (n = 0; n < local_count; n++)
-  {
-    fprintf(out, "  push bc\n");
-  }
 }
 
 void Z80::method_end(int local_count)
@@ -1070,16 +1069,20 @@ int Z80::stack_alu_const(int alu_op, int num)
 
 void Z80::restore_stack(int count)
 {
-#if 0
   fprintf(out, "  ld iy, %d\n", count * 2);
   fprintf(out, "  add iy, SP\n");
   fprintf(out, "  ld SP, iy\n");
-#endif
-  int n;
-  for (n = 0; n < count; n++)
-  {
-    fprintf(out, "  pop bc\n");
-  }
+  fprintf(out, "  pop iy\n");
+}
+
+void Z80::save_registers()
+{
+  fprintf(out, "  push iy\n");
+}
+
+void Z80::restore_registers()
+{
+  fprintf(out, "  pop iy\n");
 }
 
 

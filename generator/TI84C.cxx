@@ -18,9 +18,11 @@
 #include "Z80.h"
 
 #define BCALL(a) \
+  save_registers(); \
+  fprintf(out, "  ld iy,(save_context)\n"); \
   fprintf(out, "  rst 0x28\n"); \
-  fprintf(out, "  .db %s&0xff, %s>>8\n", #a, #a);
-  //fprintf(out, "  .db %s>>8, %s&0xff\n", #a, #a);
+  fprintf(out, "  .db %s&0xff, %s>>8\n", #a, #a); \
+  restore_registers()
 
 TI84C::TI84C()
 {
@@ -37,7 +39,8 @@ int TI84C::open(const char *filename)
   //fprintf(out, ".include \"ti84c.inc\"\n\n");
   fprintf(out, ".include \"ti84plus.inc\"\n\n");
   fprintf(out, "ram_start equ appData\n");
-  fprintf(out, "heap_ptr equ ram_start\n");
+  fprintf(out, "save_context equ ram_start\n");
+  fprintf(out, "heap_ptr equ ram_start+2\n");
 
   return 0;
 }

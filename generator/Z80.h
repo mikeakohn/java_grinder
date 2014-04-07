@@ -102,6 +102,8 @@ public:
 protected:
   int stack_alu(int alu_op);
   int stack_alu_const(int alu_op, int num);
+  void save_registers();
+  void restore_registers();
 
   //int reg;            // count number of registers are are using as stack
   //int reg_max;        // size of register stack 

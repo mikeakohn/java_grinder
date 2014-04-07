@@ -3,7 +3,7 @@ import net.mikekohn.java_grinder.TI84C;
 
 public class TI84CDemo
 {
-  static String hello = "Hello World\0";
+  static String hello = "Hello World";
 
   static public void main(String args[])
   {
