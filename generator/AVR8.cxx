@@ -197,9 +197,9 @@ int AVR8::open(const char *filename)
   fprintf(out, "  ldi YL, 0\n");
   fprintf(out, "  ldi YH, 0\n");
 
-  // temp
-  fprintf(out, "  ldi temp, 255\n");
-  fprintf(out, "  out 0x17, temp\n");
+  // for testing attiny13
+  //fprintf(out, "  ldi temp, 255\n");
+  //fprintf(out, "  out 0x17, temp\n");
 
   return 0;
 }
@@ -1559,8 +1559,9 @@ int AVR8::memory_write8()
   POP_LO("temp");
   POP_HI("XH");
   POP_LO("XL");
-//  fprintf(out, "  st X, temp\n");
-  fprintf(out, "  out 0x18, temp\n");
+  fprintf(out, "  st X, temp\n");
+//  for testing attiny13
+//  fprintf(out, "  out 0x18, temp\n");
 
   return 0;
 }
