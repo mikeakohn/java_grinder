@@ -170,13 +170,13 @@ int AVR8::open(const char *filename)
 
   // java stack base locations
   fprintf(out, "stack_lo equ 0x00\n");
-  fprintf(out, "stack_hi equ 0x40\n");
+  fprintf(out, "stack_hi equ 0x10\n");
 
   // RAMEND (change to particular chip)
   fprintf(out, "RAMEND equ 0x1ff\n");
 
   // heap
-  fprintf(out, "ram_start equ 0x80\n");
+  fprintf(out, "ram_start equ 0x20\n");
   fprintf(out, "heap_ptr equ ram_start\n\n");
 
   // startup
@@ -193,9 +193,13 @@ int AVR8::open(const char *filename)
   fprintf(out, "  out SPH, r16\n");
 
   // java stack setup
-  fprintf(out, "  ldi SP, 0x3f\n");
+  fprintf(out, "  ldi SP, 0xf\n");
   fprintf(out, "  ldi YL, 0\n");
   fprintf(out, "  ldi YH, 0\n");
+
+  // for testing attiny13
+  //fprintf(out, "  ldi temp, 255\n");
+  //fprintf(out, "  out 0x17, temp\n");
 
   return 0;
 }
@@ -1556,6 +1560,8 @@ int AVR8::memory_write8()
   POP_HI("XH");
   POP_LO("XL");
   fprintf(out, "  st X, temp\n");
+//  for testing attiny13
+//  fprintf(out, "  out 0x18, temp\n");
 
   return 0;
 }
