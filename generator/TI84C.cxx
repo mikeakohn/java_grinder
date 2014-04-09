@@ -19,7 +19,7 @@
 
 #define BCALL(a) \
   save_registers(); \
-  fprintf(out, "  ld iy,(save_context)\n"); \
+  fprintf(out, "  ld iy,(save_iy)\n"); \
   fprintf(out, "  rst 0x28\n"); \
   fprintf(out, "  .db %s&0xff, %s>>8\n", #a, #a); \
   restore_registers()
@@ -38,9 +38,10 @@ int TI84C::open(const char *filename)
 
   //fprintf(out, ".include \"ti84c.inc\"\n\n");
   fprintf(out, ".include \"ti84plus.inc\"\n\n");
-  fprintf(out, "ram_start equ appData\n");
-  fprintf(out, "save_context equ ram_start\n");
-  fprintf(out, "heap_ptr equ ram_start+2\n");
+  fprintf(out, "save_iy equ appData\n");
+  fprintf(out, "save_ix equ appData+2\n");
+  fprintf(out, "ram_start equ appData+4\n");
+  fprintf(out, "heap_ptr equ ram_start\n");
 
   return 0;
 }
@@ -110,14 +111,28 @@ int TI84C::ti84c_clearRect()
 
 int TI84C::ti84c_drawLine()
 {
-  fprintf(out, "  pop de\n");
+  // (b,c,d,e,h)
+  fprintf(out, "  ld (save_ix),ix\n");
+  fprintf(out, "  ld ix,(heap_ptr)\n");
   fprintf(out, "  pop bc\n");
-  fprintf(out, "  pop ix\n");
-  fprintf(out, "  pop hl\n");
-  fprintf(out, "  ld b,l\n");
-  fprintf(out, "  pop hl\n");
-  fprintf(out, "  ld a,l\n");
-  fprintf(out, "  ld hl,ix\n");
+  fprintf(out, "  ld h,c\n"); // h=param5
+  fprintf(out, "  pop de\n"); // e=param4
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  ld d,c\n"); // d=param3
+
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  ld (ix),c\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  ld b,c\n"); // d=param1
+  fprintf(out, "  ld c,(ix)\n"); // d=param2
+#if 0
+  fprintf(out, "  ld b,1\n");
+  fprintf(out, "  ld c,2\n");
+  fprintf(out, "  ld d,50\n");
+  fprintf(out, "  ld e,50\n");
+  fprintf(out, "  ld h,1\n");
+#endif
+  fprintf(out, "  ld ix,(save_ix)\n");
   BCALL(_ILine);
   stack -= 5;
 

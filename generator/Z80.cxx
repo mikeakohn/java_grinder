@@ -83,8 +83,8 @@ int Z80::insert_static_field_define(const char *name, const char *type, int inde
 int Z80::init_heap(int field_count)
 {
   fprintf(out, "  ;; Set up heap and static initializers\n");
-  fprintf(out, "  ld hl, %d\n", (field_count + 1) * 2);
-  fprintf(out, "  ld (ram_start), hl\n");
+  fprintf(out, "  ld hl, ram_start+%d\n", (field_count + 1) * 2);
+  fprintf(out, "  ld (heap_ptr), hl\n");
   return 0;
 }
 
@@ -135,10 +135,10 @@ void Z80::method_start(int local_count, int max_stack, int param_count, const ch
   fprintf(out, "  ;; Save iy if needed.  iy = alloca(params * 2)\n");
   if (is_main)
   {
-    fprintf(out, "  ld (save_context),iy\n");
+    fprintf(out, "  ld (save_iy),iy\n");
   }
 
-  // FIXME - this might be extra since there's a save_context
+  // FIXME - this might be extra since there's a save_iy
   fprintf(out, "  push iy\n");
 
   fprintf(out, "  ld iy, -%d\n", local_count * 2);
