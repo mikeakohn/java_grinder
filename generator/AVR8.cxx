@@ -443,13 +443,12 @@ int AVR8::dup2()
   return -1;
 }
 
-// FIXME doesn't work yet
 int AVR8::swap()
 {
   need_swap = 1;
   fprintf(out, "  call swap\n");
 
-  return -1;
+  return 0;
 }
 
 int AVR8::add_integer()
@@ -1161,29 +1160,24 @@ void AVR8::insert_swap()
   fprintf(out, "swap:\n");
   fprintf(out, "  ldi YL, stack_lo\n");
   fprintf(out, "  add YL, SP\n");
-  fprintf(out, "  ld value30, Y\n");
+  fprintf(out, "  ld value10, Y-\n");
+  fprintf(out, "  ld value20, Y-\n");
   fprintf(out, "  ldi YL, stack_hi\n");
   fprintf(out, "  add YL, SP\n");
-  fprintf(out, "  ld value31, Y\n");
-
-  fprintf(out, "  ldi YL, stack_lo - 1\n");
-  fprintf(out, "  add YL, SP\n");
-  fprintf(out, "  ld temp, Y\n");
-  fprintf(out, "  dec YL\n");
-  fprintf(out, "  st Y, temp\n");
-
-  fprintf(out, "  ldi YL, stack_hi - 1\n");
-  fprintf(out, "  add YL, SP\n");
-  fprintf(out, "  ld temp, Y\n");
-  fprintf(out, "  dec YL\n");
-  fprintf(out, "  st Y, temp\n");
-
+  fprintf(out, "  ld value11, Y-\n");
+  fprintf(out, "  ld value21, Y\n");
+  fprintf(out, "  mov value30, value20\n");
+  fprintf(out, "  mov value31, value21\n");
+  fprintf(out, "  mov value20, value10\n");
+  fprintf(out, "  mov value21, value11\n");
+  fprintf(out, "  mov value10, value30\n");
+  fprintf(out, "  mov value11, value31\n");
+  fprintf(out, "  st Y+, value21\n");
+  fprintf(out, "  st Y, value11\n");
   fprintf(out, "  ldi YL, stack_lo\n");
   fprintf(out, "  add YL, SP\n");
-  fprintf(out, "  st Y, value0\n");
-  fprintf(out, "  ldi YL, stack_hi\n");
-  fprintf(out, "  add YL, SP\n");
-  fprintf(out, "  st Y, value1\n");
+  fprintf(out, "  st Y-, value10\n");
+  fprintf(out, "  st Y, value20\n");
   fprintf(out, "  ret\n");
 }
 
