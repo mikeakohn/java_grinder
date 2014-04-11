@@ -194,8 +194,12 @@ int AVR8::open(const char *filename)
 
   // java stack setup
   fprintf(out, "  ldi SP, 0xf\n");
+  fprintf(out, "  ldi XL, 0\n");
+  fprintf(out, "  ldi XH, 0\n");
   fprintf(out, "  ldi YL, 0\n");
   fprintf(out, "  ldi YH, 0\n");
+  fprintf(out, "  ldi ZL, 0\n");
+  fprintf(out, "  ldi ZH, 0\n");
 
   // for testing attiny13
   //fprintf(out, "  ldi temp, 255\n");
@@ -1384,7 +1388,6 @@ void AVR8::insert_xor_integer()
   fprintf(out, "  ret\n");
 }
 
-//FIXME this probably sucks
 void AVR8::insert_inc_integer()
 {
   fprintf(out, "inc_integer:\n");
@@ -1392,21 +1395,16 @@ void AVR8::insert_inc_integer()
   fprintf(out, "  sub YL, temp\n");
   fprintf(out, "  add YL, locals\n");
   fprintf(out, "  ld value20, Y\n");
-  fprintf(out, "  mov value30, YL\n");
-
+  fprintf(out, "  mov temp2, YL\n");
   fprintf(out, "  ldi YL, stack_hi\n");
   fprintf(out, "  sub YL, temp\n");
   fprintf(out, "  add YL, locals\n");
   fprintf(out, "  ld value21, Y\n");
-  fprintf(out, "  mov value31, YL\n");
-
   fprintf(out, "  add value20, value10\n");
-  fprintf(out, "  mov YL, value30\n");
-  fprintf(out, "  st Y, value20\n");
   fprintf(out, "  adc value21, value11\n");
-  fprintf(out, "  mov YL, value31\n");
   fprintf(out, "  st Y, value21\n");
-
+  fprintf(out, "  mov YL, temp2\n");
+  fprintf(out, "  st Y, value20\n");
   fprintf(out, "  ret\n");
 }
 
