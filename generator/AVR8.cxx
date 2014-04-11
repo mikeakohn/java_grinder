@@ -95,6 +95,7 @@ AVR8::AVR8() :
   need_or_integer(0),
   need_xor_integer(0),
   need_inc_integer(0),
+  need_integer_to_byte(0),
   need_jump_cond(0),
   need_jump_cond_integer(0),
   need_push_integer_local(0),
@@ -124,6 +125,7 @@ AVR8::~AVR8()
   if(need_or_integer) { insert_or_integer(); }
   if(need_xor_integer) { insert_xor_integer(); }
   if(need_inc_integer) { insert_inc_integer(); }
+  if(need_integer_to_byte) { insert_integer_to_byte(); }
   if(need_jump_cond) { insert_jump_cond(); }
   if(need_jump_cond_integer) { insert_jump_cond_integer(); }
   if(need_push_integer_local) { insert_push_integer_local(); }
@@ -427,7 +429,7 @@ int AVR8::pop()
   POP_LO("result0");
   stack--;
 
-  return -1;
+  return 0;
 }
 
 int AVR8::dup()
@@ -634,14 +636,10 @@ int AVR8::inc_integer(int index, int num)
   return 0;
 }
 
-//FIXME needs sign extend
 int AVR8::integer_to_byte()
 {
-  fprintf(out, "; integer_to_byte\n");
-  POP_HI("temp");
-  POP_LO("temp");
-  PUSH_LO("temp");
-  PUSH_HI("zero");
+  fprintf(out, "call integer_to_byte\n");
+
   return 0;
 }
 
@@ -1408,6 +1406,23 @@ void AVR8::insert_inc_integer()
   fprintf(out, "  ret\n");
 }
 
+void AVR8::insert_integer_to_byte()
+{
+  fprintf(out, "integer_to_byte:\n");
+  POP_HI("result1");
+  POP_LO("result0");
+  PUSH_LO("result0");
+  fprintf(out, "  cp result0, zero\n");
+  fprintf(out, "  brne integer_to_byte_skip\n");
+  fprintf(out, "  ldi result1, 0xff\n");
+  PUSH_HI("result1");
+  fprintf(out, "  ret\n");
+  fprintf(out, "integer_to_byte_skip:\n");
+  fprintf(out, "  ldi result1, 0\n");
+  PUSH_HI("result1");
+  fprintf(out, "  ret\n");
+}
+
 void AVR8::insert_jump_cond()
 {
   fprintf(out, "jump_cond:\n");
@@ -1540,8 +1555,21 @@ void AVR8::insert_array_int_support()
 int AVR8::memory_read8()
 {
   fprintf(out, "; memory_read8\n");
+  POP_HI("XH");
+  POP_LO("XL");
+  fprintf(out, "  ld result0, X\n");
+  PUSH_LO("result0");
+  fprintf(out, "  cp result0, zero\n");
+  fprintf(out, "  brpl memory_read8_%d\n", label_count);
+  fprintf(out, "  ldi result1, 0xff\n");
+  PUSH_HI("result1");
+  fprintf(out, "  ret\n");
+  fprintf(out, "memory_read8_%d:\n", label_count++);
+  fprintf(out, "  ldi result1, 0\n");
+  PUSH_HI("result1");
+  fprintf(out, "  ret\n");
 
-  return -1;
+  return 0;
 }
 
 int AVR8::memory_write8()
@@ -1554,6 +1582,8 @@ int AVR8::memory_write8()
   fprintf(out, "  st X, temp\n");
 //  for testing attiny13
 //  fprintf(out, "  out 0x18, temp\n");
+
+  stack -=2;
 
   return 0;
 }

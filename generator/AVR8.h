@@ -124,6 +124,7 @@ protected:
   bool need_or_integer:1;
   bool need_xor_integer:1;
   bool need_inc_integer:1;
+  bool need_integer_to_byte:1;
   bool need_jump_cond:1;
   bool need_jump_cond_integer:1;
   bool need_push_integer_local:1;
@@ -148,6 +149,7 @@ protected:
   void insert_or_integer();
   void insert_xor_integer();
   void insert_inc_integer();
+  void insert_integer_to_byte();
   void insert_jump_cond();
   void insert_jump_cond_integer();
   void insert_push_integer_local();
