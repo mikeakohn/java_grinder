@@ -244,6 +244,8 @@ int Z80::pop_integer_local(int index)
   fprintf(out, "  pop hl\n");
   fprintf(out, "  ld l, (iy+%d)\n", (index * 2));
   fprintf(out, "  ld h, (iy+%d)\n", (index * 2) + 1);
+  stack--;
+
   return 0;
 }
 
@@ -289,7 +291,6 @@ int Z80::swap()
   fprintf(out, "  pop de\n");
   fprintf(out, "  push de\n");
   fprintf(out, "  push bc\n");
-  stack++;
 
   return 0;
 }
@@ -547,7 +548,7 @@ int Z80::jump_cond(const char *label, int cond)
       fprintf(out, "  and a\n");  // clear carry
       fprintf(out, "  sbc hl, bc\n");
       fprintf(out, "  push af\n");
-      fprintf(out, "  push hl\n");
+      fprintf(out, "  pop hl\n");
       fprintf(out, "  ld a, l\n");
       //fprintf(out, "  ld a, f\n");
       fprintf(out, "  and 0x84\n");
@@ -568,7 +569,7 @@ int Z80::jump_cond(const char *label, int cond)
       fprintf(out, "  and a\n");  // clear carry
       fprintf(out, "  sbc hl, bc\n");
       fprintf(out, "  push af\n");
-      fprintf(out, "  push hl\n");
+      fprintf(out, "  pop hl\n");
       fprintf(out, "  ld a, l\n");
       //fprintf(out, "  ld a, f\n");
       fprintf(out, "  and 0x84\n");
@@ -621,7 +622,7 @@ int Z80::jump_cond_integer(const char *label, int cond)
       fprintf(out, "  and a\n");  // clear carry
       fprintf(out, "  sbc hl, bc\n");
       fprintf(out, "  push af\n");
-      fprintf(out, "  push hl\n");
+      fprintf(out, "  pop hl\n");
       fprintf(out, "  ld a, l\n");
       //fprintf(out, "  ld a, f\n");
       fprintf(out, "  and 0x84\n");
@@ -645,7 +646,7 @@ int Z80::jump_cond_integer(const char *label, int cond)
       return -1;
   }
 
-  stack--;
+  stack -= 2;
   return 0;
 }
 
