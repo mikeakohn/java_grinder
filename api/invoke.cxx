@@ -25,7 +25,7 @@
 #include "ioport.h"
 #include "memory.h"
 #include "spi.h"
-#include "ti84c_.h"
+#include "ti84_.h"
 #include "uart.h"
 #include "java_lang_string.h"
 #include "java_lang_system.h"
@@ -251,7 +251,7 @@ char function[256];
     CHECK_WITH_PORT(SPI, spi, 1)
     CHECK_WITH_PORT(UART, uart, 0)
     CHECK_WITH_PORT(UART, uart, 1)
-    CHECK(TI84C, ti84c)
+    CHECK(TI84, ti84)
       else
     {}
   }

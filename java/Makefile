@@ -36,7 +36,7 @@ JAVA_SRC=\
   $(SRC_DIR)/SPI.java \
   $(SRC_DIR)/SPI0.java \
   $(SRC_DIR)/SPI1.java \
-  $(SRC_DIR)/TI84C.java \
+  $(SRC_DIR)/TI84.java \
   $(SRC_DIR)/UART.java \
   $(SRC_DIR)/UART0.java \
   $(SRC_DIR)/UART1.java \

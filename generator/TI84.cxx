@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "TI84C.h"
+#include "TI84.h"
 #include "Z80.h"
 
 #define BCALL(a) \
@@ -24,15 +24,15 @@
   fprintf(out, "  .db %s&0xff, %s>>8\n", #a, #a); \
   restore_registers()
 
-TI84C::TI84C()
+TI84::TI84(int model) : model(model)
 {
 }
 
-TI84C::~TI84C()
+TI84::~TI84()
 {
 }
 
-int TI84C::open(const char *filename)
+int TI84::open(const char *filename)
 {
   if (Z80::open(filename) != 0) { return -1; }
 
@@ -46,7 +46,7 @@ int TI84C::open(const char *filename)
   return 0;
 }
 
-int TI84C::start_init()
+int TI84::start_init()
 {
   fprintf(out, ".org 0x4000\n");
 
@@ -89,14 +89,14 @@ int TI84C::start_init()
   return 0;
 }
 
-int TI84C::ti84c_clearScreen()
+int TI84::ti84_clearScreen()
 {
   BCALL(_ClrLCDFull);
 
   return 0;
 }
 
-int TI84C::ti84c_clearRect()
+int TI84::ti84_clearRect()
 {
   fprintf(out, "  pop hl\n");
   fprintf(out, "  pop de\n");
@@ -109,7 +109,7 @@ int TI84C::ti84c_clearRect()
   return 0;
 }
 
-int TI84C::ti84c_drawLine()
+int TI84::ti84_drawLine()
 {
   // (b,c,d,e,h)
   fprintf(out, "  ld (save_ix),ix\n");
@@ -139,7 +139,7 @@ int TI84C::ti84c_drawLine()
   return 0;
 }
 
-int TI84C::ti84c_drawPoint()
+int TI84::ti84_drawPoint()
 {
   fprintf(out, "  pop de\n");
   fprintf(out, "  pop bc\n");
@@ -151,7 +151,7 @@ int TI84C::ti84c_drawPoint()
   return 0;
 }
 
-int TI84C::ti84c_fillRect()
+int TI84::ti84_fillRect()
 {
   fprintf(out, "  pop hl\n");
   fprintf(out, "  pop de\n");
@@ -164,7 +164,7 @@ int TI84C::ti84c_fillRect()
   return 0;
 }
 
-int TI84C::ti84c_print()
+int TI84::ti84_print()
 {
   fprintf(out, "  pop hl\n");
   BCALL(_PutS);
@@ -173,7 +173,7 @@ int TI84C::ti84c_print()
   return 0;
 }
 
-int TI84C::ti84c_printCenter()
+int TI84::ti84_printCenter()
 {
   fprintf(out, "  pop hl\n");
   BCALL(_CenterPutS);
@@ -182,14 +182,14 @@ int TI84C::ti84c_printCenter()
   return 0;
 }
 
-int TI84C::ti84c_printHL()
+int TI84::ti84_printHL()
 {
   BCALL(_DispHL);
 
   return 0;
 }
 
-int TI84C::ti84c_putc()
+int TI84::ti84_putc()
 {
   fprintf(out, "  pop hl\n");
   fprintf(out, "  ld a,l\n");
@@ -199,7 +199,7 @@ int TI84C::ti84c_putc()
   return 0;
 }
 
-int TI84C::ti84c_setCursorX()
+int TI84::ti84_setCursorX()
 {
   fprintf(out, "  pop af\n");
   fprintf(out, "  ld (curCol), a\n");
@@ -208,7 +208,7 @@ int TI84C::ti84c_setCursorX()
   return 0;
 }
 
-int TI84C::ti84c_setCursorY()
+int TI84::ti84_setCursorY()
 {
   fprintf(out, "  pop af\n");
   fprintf(out, "  ld (curRow), a\n");
@@ -217,7 +217,7 @@ int TI84C::ti84c_setCursorY()
   return 0;
 }
 
-int TI84C::ti84c_setDrawBGColor()
+int TI84::ti84_setDrawBGColor()
 {
   fprintf(out, "  pop hl\n");
   fprintf(out, "  ld (penBGColor), hl\n");
@@ -226,7 +226,7 @@ int TI84C::ti84c_setDrawBGColor()
   return 0;
 }
 
-int TI84C::ti84c_setDrawBGWhite()
+int TI84::ti84_setDrawBGWhite()
 {
   BCALL(_SetPenBG_White);
 
@@ -234,7 +234,7 @@ int TI84C::ti84c_setDrawBGWhite()
 }
 
 
-int TI84C::ti84c_setDrawColor()
+int TI84::ti84_setDrawColor()
 {
   fprintf(out, "  pop hl\n");
   fprintf(out, "  ld (penFGColor), hl\n");
@@ -243,7 +243,7 @@ int TI84C::ti84c_setDrawColor()
   return 0;
 }
 
-int TI84C::ti84c_setFillColor()
+int TI84::ti84_setFillColor()
 {
   fprintf(out, "  pop hl\n");
   fprintf(out, "  ld (fillRectColor), hl\n");
@@ -252,7 +252,7 @@ int TI84C::ti84c_setFillColor()
   return 0;
 }
 
-int TI84C::ti84c_setTextBGColor()
+int TI84::ti84_setTextBGColor()
 {
   fprintf(out, "  pop hl\n");
   fprintf(out, "  ld (curBGColor), hl\n");
@@ -261,7 +261,7 @@ int TI84C::ti84c_setTextBGColor()
   return 0;
 }
 
-int TI84C::ti84c_setTextColor()
+int TI84::ti84_setTextColor()
 {
   fprintf(out, "  pop hl\n");
   fprintf(out, "  ld (curFGColor), hl\n");

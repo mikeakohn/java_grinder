@@ -13,9 +13,9 @@ package net.mikekohn.java_grinder;
 
 // http://wikiti.brandonw.net/index.php?title=84PCSE:OS:Applications
 
-abstract public class TI84C
+abstract public class TI84
 {
-  protected TI84C()
+  protected TI84()
   {
   }
 

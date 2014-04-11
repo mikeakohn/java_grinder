@@ -9,13 +9,13 @@
  *
  */
 
-#ifndef _TI84C_H
-#define _TI84C_H
+#ifndef _TI84_H
+#define _TI84_H
 
 #include "Generator.h"
 #include "JavaClass.h"
 
-int ti84c(JavaClass *java_class, Generator *generator, char *method_name);
+int ti84(JavaClass *java_class, Generator *generator, char *method_name);
 
 #endif
 

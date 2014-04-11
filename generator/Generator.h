@@ -18,9 +18,9 @@
 #include "API_C64.h"
 #include "API_DSP.h"
 #include "API_Microcontroller.h"
-#include "API_TI84C.h"
+#include "API_TI84.h"
 
-class Generator : public API_C64, public API_DSP, public API_Microcontroller, public API_TI84C
+class Generator : public API_C64, public API_DSP, public API_Microcontroller, public API_TI84
 {
 public:
   Generator();
