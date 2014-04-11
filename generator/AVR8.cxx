@@ -239,9 +239,9 @@ int AVR8::insert_field_init_boolean(char *name, int index, int value)
   value = (value == 0) ? 0 : 1;
   fprintf(out, "; insert_field_init_boolean\n");
   fprintf(out, "  mov temp, %d\n", value & 0xff);
-  fprintf(out, "  mov name + 0, temp\n");
+  fprintf(out, "  sts name + 0, temp\n");
   fprintf(out, "  mov temp, %d\n", value >> 8);
-  fprintf(out, "  mov name + 1, temp\n");
+  fprintf(out, "  sts name + 1, temp\n");
 
   return 0;
 }
@@ -254,9 +254,9 @@ int AVR8::insert_field_init_byte(char *name, int index, int value)
 
   fprintf(out, "; insert_field_init_byte\n");
   fprintf(out, "  mov temp, %d\n", (uint8_t)v & 0xff);
-  fprintf(out, "  mov name + 0, temp\n");
+  fprintf(out, "  sts name + 0, temp\n");
   fprintf(out, "  mov temp, %d\n", (uint8_t)v >> 8);
-  fprintf(out, "  mov name + 1, temp\n");
+  fprintf(out, "  sts name + 1, temp\n");
 
   return 0;
 }
@@ -267,9 +267,9 @@ int AVR8::insert_field_init_short(char *name, int index, int value)
 
   fprintf(out, "; insert_field_init_short\n");
   fprintf(out, "  mov temp, %d\n", value & 0xff);
-  fprintf(out, "  mov name + 0, temp\n");
+  fprintf(out, "  sts name + 0, temp\n");
   fprintf(out, "  mov temp, %d\n", value >> 8);
-  fprintf(out, "  mov name + 1, temp\n");
+  fprintf(out, "  sts name + 1, temp\n");
 
   return 0;
 }
@@ -283,9 +283,9 @@ int AVR8::insert_field_init(char *name, int index)
 {
   fprintf(out, "; insert_field_init\n");
   fprintf(out, "  mov temp, _%s & 0xff\n", name);
-  fprintf(out, "  mov %s + 0\n", name);
+  fprintf(out, "  sts %s + 0, temp\n", name);
   fprintf(out, "  mov temp, _%s >> 8\n", name);
-  fprintf(out, "  mov %s + 1\n", name);
+  fprintf(out, "  sts %s + 1, temp\n", name);
 
   return 0;
 }
@@ -953,17 +953,25 @@ int AVR8::put_static(const char *name, int index)
 {
   if (stack > 0)
   {
+    POP_HI("temp");
+    fprintf(out, "  sts %s + 1, temp\n", name);
+    POP_LO("temp");
+    fprintf(out, "  sts %s + 0, temp\n", name);
     stack--;
   }
 
-  return -1;
+  return 0;
 }
 
 int AVR8::get_static(const char *name, int index)
 {
+  fprintf(out, "  lds temp, %s + 0\n", name);
+  PUSH_LO("temp");
+  fprintf(out, "  lds temp, %s + 1\n", name);
+  PUSH_HI("temp");
   stack++;
 
-  return -1;
+  return 0;
 }
 
 int AVR8::brk()
