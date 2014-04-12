@@ -239,9 +239,9 @@ int AVR8::insert_field_init_boolean(char *name, int index, int value)
   value = (value == 0) ? 0 : 1;
   fprintf(out, "; insert_field_init_boolean\n");
   fprintf(out, "  mov temp, %d\n", value & 0xff);
-  fprintf(out, "  sts name + 0, temp\n");
+  fprintf(out, "  sts %s + 0, temp\n", name);
   fprintf(out, "  mov temp, %d\n", value >> 8);
-  fprintf(out, "  sts name + 1, temp\n");
+  fprintf(out, "  sts %s + 1, temp\n", name);
 
   return 0;
 }
@@ -254,9 +254,9 @@ int AVR8::insert_field_init_byte(char *name, int index, int value)
 
   fprintf(out, "; insert_field_init_byte\n");
   fprintf(out, "  mov temp, %d\n", (uint8_t)v & 0xff);
-  fprintf(out, "  sts name + 0, temp\n");
+  fprintf(out, "  sts %s + 0, temp\n", name);
   fprintf(out, "  mov temp, %d\n", (uint8_t)v >> 8);
-  fprintf(out, "  sts name + 1, temp\n");
+  fprintf(out, "  sts %s + 1, temp\n", name);
 
   return 0;
 }
@@ -267,9 +267,9 @@ int AVR8::insert_field_init_short(char *name, int index, int value)
 
   fprintf(out, "; insert_field_init_short\n");
   fprintf(out, "  mov temp, %d\n", value & 0xff);
-  fprintf(out, "  sts name + 0, temp\n");
+  fprintf(out, "  sts %s + 0, temp\n", name);
   fprintf(out, "  mov temp, %d\n", value >> 8);
-  fprintf(out, "  sts name + 1, temp\n");
+  fprintf(out, "  sts %s + 1, temp\n", name);
 
   return 0;
 }
@@ -1591,7 +1591,7 @@ int AVR8::memory_write8()
 //  for testing attiny13
 //  fprintf(out, "  out 0x18, temp\n");
 
-  stack -=2;
+  stack -= 2;
 
   return 0;
 }
