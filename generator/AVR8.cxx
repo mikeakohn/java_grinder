@@ -30,8 +30,8 @@
 // r11
 // r12
 // r13
-// r14
-// r15 zero
+// r14 zero
+// r15 two
 // r16 value10
 // r17 value11
 // r18 value20
@@ -150,7 +150,8 @@ int AVR8::open(const char *filename)
   fprintf(out, "remainder1 equ r3\n");
   fprintf(out, "length0 equ r4\n");
   fprintf(out, "length1 equ r5\n");
-  fprintf(out, "zero equ r15\n");
+  fprintf(out, "zero equ r14\n");
+  fprintf(out, "two equ r15\n");
   fprintf(out, "value10 equ r16\n");
   fprintf(out, "value11 equ r17\n");
   fprintf(out, "value20 equ r18\n");
@@ -995,7 +996,7 @@ int AVR8::new_array(uint8_t type)
     }
   }
 
-  return -1;
+  return 0;
 }
 
 int AVR8::insert_array(const char *name, int32_t *data, int len, uint8_t type)
@@ -1020,7 +1021,7 @@ int AVR8::insert_array(const char *name, int32_t *data, int len, uint8_t type)
     return insert_dw(name, data, len, TYPE_SHORT);
   }
 
-  return -1;
+  return 0;
 }
 
 int AVR8::insert_string(const char *name, uint8_t *bytes, int len)
@@ -1036,16 +1037,18 @@ int AVR8::push_array_length()
     fprintf(out, "call push_array_length\n");
   }
 
-  return -1;
+  return 0;
 }
 
 int AVR8::push_array_length(const char *name, int field_id)
 {
   need_push_array_length2 = 1;
+  fprintf(out, "  lds YL, %s + 0\n", name);
+  fprintf(out, "  lds YH, %s + 1\n", name);
   fprintf(out, "call push_array_length2\n");
   stack++;
 
-  return -1;
+  return 0;
 }
 
 int AVR8::array_read_byte()
@@ -1054,7 +1057,7 @@ int AVR8::array_read_byte()
   fprintf(out, "call array_read_byte\n");
   stack++;
 
-  return -1;
+  return 0;
 }
 
 int AVR8::array_read_short()
@@ -1522,11 +1525,27 @@ void AVR8::insert_push_array_length()
 {
   // push_array_length
   fprintf(out, "push_array_length:\n");
+  POP_HI("YH");
+  POP_LO("YL");
+  fprintf(out, "  sub YL, two\n");
+  fprintf(out, "  sbc YH, zero\n");
+  fprintf(out, "  ld result0, Y+\n");
+  fprintf(out, "  ld result1, Y+\n");
+  PUSH_LO("result0");
+  PUSH_HI("result1");
+  fprintf(out, "  ret\n");
 }
 
 void AVR8::insert_push_array_length2()
 {
   fprintf(out, "push_array_length2:\n");
+  fprintf(out, "  sub YL, two\n");
+  fprintf(out, "  sbc YH, zero\n");
+  fprintf(out, "  ld result0, Y+\n");
+  fprintf(out, "  ld result1, Y+\n");
+  PUSH_LO("result0");
+  PUSH_HI("result1");
+  fprintf(out, "  ret\n");
 }
 
 void AVR8::insert_array_byte_support()
