@@ -30,7 +30,7 @@
 // r11 one
 // r12 two
 // r13 three
-// r14 four
+// r14 ff
 // r15
 // r16 value10
 // r17 value11
@@ -154,7 +154,7 @@ int AVR8::open(const char *filename)
   fprintf(out, "one equ r11\n");
   fprintf(out, "two equ r12\n");
   fprintf(out, "three equ r13\n");
-  fprintf(out, "four equ r14\n");
+  fprintf(out, "ff equ r14\n");
   fprintf(out, "value10 equ r16\n");
   fprintf(out, "value11 equ r17\n");
   fprintf(out, "value20 equ r18\n");
@@ -176,13 +176,13 @@ int AVR8::open(const char *filename)
 
   // java stack base locations
   fprintf(out, "stack_lo equ 0x00\n");
-  fprintf(out, "stack_hi equ 0x10\n");
+  fprintf(out, "stack_hi equ 0x40\n");
 
   // RAMEND (change to particular chip)
   fprintf(out, "RAMEND equ 0x1ff\n");
 
   // heap
-  fprintf(out, "ram_start equ 0x20\n");
+  fprintf(out, "ram_start equ 0x80\n");
   fprintf(out, "heap_ptr equ ram_start\n\n");
 
   // startup
@@ -190,11 +190,16 @@ int AVR8::open(const char *filename)
   fprintf(out, "start:\n");
 
   // constants
-  fprintf(out, "  ldi zero, 0\n");
-  fprintf(out, "  ldi one, 1\n");
-  fprintf(out, "  ldi two, 2\n");
-  fprintf(out, "  ldi three, 3\n");
-  fprintf(out, "  ldi four, 4\n");
+  fprintf(out, "  ldi temp, 0\n");
+  fprintf(out, "  mov zero, temp\n");
+  fprintf(out, "  ldi temp, 1\n");
+  fprintf(out, "  mov one, temp\n");
+  fprintf(out, "  ldi temp, 2\n");
+  fprintf(out, "  mov two, temp\n");
+  fprintf(out, "  ldi temp, 3\n");
+  fprintf(out, "  mov three, temp\n");
+  fprintf(out, "  ldi temp, 0xff\n");
+  fprintf(out, "  mov ff, temp\n");
 
   // processor stack setup
   fprintf(out, "  ldi r16, RAMEND & 0xff\n");
@@ -203,7 +208,7 @@ int AVR8::open(const char *filename)
   fprintf(out, "  out SPH, r16\n");
 
   // java stack setup
-  fprintf(out, "  ldi SP, 0xf\n");
+  fprintf(out, "  ldi SP, 0x3f\n");
   fprintf(out, "  ldi XL, 0\n");
   fprintf(out, "  ldi XH, 0\n");
   fprintf(out, "  ldi YL, 0\n");
@@ -246,9 +251,9 @@ int AVR8::insert_field_init_boolean(char *name, int index, int value)
 {
   value = (value == 0) ? 0 : 1;
   fprintf(out, "; insert_field_init_boolean\n");
-  fprintf(out, "  mov temp, %d\n", value & 0xff);
+  fprintf(out, "  ldi temp, %d\n", value & 0xff);
   fprintf(out, "  sts %s + 0, temp\n", name);
-  fprintf(out, "  mov temp, %d\n", value >> 8);
+  fprintf(out, "  ldi temp, %d\n", value >> 8);
   fprintf(out, "  sts %s + 1, temp\n", name);
 
   return 0;
@@ -261,9 +266,9 @@ int AVR8::insert_field_init_byte(char *name, int index, int value)
   uint16_t v = (n & 0xffff);
 
   fprintf(out, "; insert_field_init_byte\n");
-  fprintf(out, "  mov temp, %d\n", (uint8_t)v & 0xff);
+  fprintf(out, "  ldi temp, %d\n", (uint8_t)v & 0xff);
   fprintf(out, "  sts %s + 0, temp\n", name);
-  fprintf(out, "  mov temp, %d\n", (uint8_t)v >> 8);
+  fprintf(out, "  ldi temp, %d\n", (uint8_t)v >> 8);
   fprintf(out, "  sts %s + 1, temp\n", name);
 
   return 0;
@@ -274,9 +279,9 @@ int AVR8::insert_field_init_short(char *name, int index, int value)
   if (value < -32768 || value > 65535) { return -1; }
 
   fprintf(out, "; insert_field_init_short\n");
-  fprintf(out, "  mov temp, %d\n", value & 0xff);
+  fprintf(out, "  ldi temp, %d\n", value & 0xff);
   fprintf(out, "  sts %s + 0, temp\n", name);
-  fprintf(out, "  mov temp, %d\n", value >> 8);
+  fprintf(out, "  ldi temp, %d\n", value >> 8);
   fprintf(out, "  sts %s + 1, temp\n", name);
 
   return 0;
@@ -290,9 +295,9 @@ int AVR8::insert_field_init_int(char *name, int index, int value)
 int AVR8::insert_field_init(char *name, int index)
 {
   fprintf(out, "; insert_field_init\n");
-  fprintf(out, "  mov temp, _%s & 0xff\n", name);
+  fprintf(out, "  ldi temp, _%s & 0xff\n", name);
   fprintf(out, "  sts %s + 0, temp\n", name);
-  fprintf(out, "  mov temp, _%s >> 8\n", name);
+  fprintf(out, "  ldi temp, _%s >> 8\n", name);
   fprintf(out, "  sts %s + 1, temp\n", name);
 
   return 0;
@@ -310,8 +315,7 @@ void AVR8::method_start(int local_count, int max_stack, int param_count, const c
   if (!is_main)
   {
     PUSH_LO("locals");
-    fprintf(out, "  ldi temp, 0\n");
-    PUSH_HI("temp");
+    PUSH_HI("zero");
   }
 
   fprintf(out, "  mov locals, SP\n");
@@ -646,7 +650,8 @@ int AVR8::inc_integer(int index, int num)
 
 int AVR8::integer_to_byte()
 {
-  fprintf(out, "call integer_to_byte\n");
+  need_integer_to_byte = 1;
+  fprintf(out, "  call integer_to_byte\n");
 
   return 0;
 }
@@ -994,12 +999,12 @@ int AVR8::new_array(uint8_t type)
     if (type == TYPE_SHORT || type == TYPE_CHAR || type == TYPE_INT)
     {
       need_array_int_support = 1;
-      fprintf(out, "call new_array_int\n");
+      fprintf(out, "  call new_array_int\n");
     }
       else
     {
       need_array_byte_support = 1;
-      fprintf(out, "call new_array_byte\n");
+      fprintf(out, "  call new_array_byte\n");
     }
   }
 
@@ -1041,7 +1046,7 @@ int AVR8::push_array_length()
   if (stack > 0)
   {
     need_push_array_length = 1;
-    fprintf(out, "call push_array_length\n");
+    fprintf(out, "  call push_array_length\n");
   }
 
   return 0;
@@ -1052,7 +1057,7 @@ int AVR8::push_array_length(const char *name, int field_id)
   need_push_array_length2 = 1;
   fprintf(out, "  lds YL, %s + 0\n", name);
   fprintf(out, "  lds YH, %s + 1\n", name);
-  fprintf(out, "call push_array_length2\n");
+  fprintf(out, "  call push_array_length2\n");
   stack++;
 
   return 0;
@@ -1061,7 +1066,7 @@ int AVR8::push_array_length(const char *name, int field_id)
 int AVR8::array_read_byte()
 {
   get_values_from_stack(2);
-  fprintf(out, "call array_read_byte\n");
+  fprintf(out, "  call array_read_byte\n");
   stack++;
 
   return 0;
@@ -1075,7 +1080,7 @@ int AVR8::array_read_short()
 int AVR8::array_read_int()
 {
   get_values_from_stack(2);
-  fprintf(out, "call array_read_int\n");
+  fprintf(out, "  call array_read_int\n");
   stack++;
 
   return 0;
@@ -1088,7 +1093,7 @@ int AVR8::array_read_byte(const char *name, int field_id)
   {
     fprintf(out, "  lds YL, %s + 0\n", name);
     fprintf(out, "  lds YH, %s + 1\n", name);
-    fprintf(out, "call array_read_byte2\n");
+    fprintf(out, "  call array_read_byte2\n");
     stack++;
   }
 
@@ -1106,7 +1111,7 @@ int AVR8::array_read_int(const char *name, int field_id)
 
   if (stack > 0)
   {
-    fprintf(out, "call array_read_int2\n");
+    fprintf(out, "  call array_read_int2\n");
     stack++;
   }
 
@@ -1116,7 +1121,7 @@ int AVR8::array_read_int(const char *name, int field_id)
 int AVR8::array_write_byte()
 {
   get_values_from_stack(3);
-  fprintf(out, "call array_write_byte\n");
+  fprintf(out, "  call array_write_byte\n");
 
   return 0;
 }
@@ -1129,7 +1134,7 @@ int AVR8::array_write_short()
 int AVR8::array_write_int()
 {
   get_values_from_stack(3);
-  fprintf(out, "call array_write_int\n");
+  fprintf(out, "  call array_write_int\n");
 
   return 0;
 }
@@ -1440,11 +1445,11 @@ void AVR8::insert_integer_to_byte()
   PUSH_LO("result0");
   fprintf(out, "  cp result0, zero\n");
   fprintf(out, "  brpl integer_to_byte_skip\n");
-  fprintf(out, "  ldi result1, 0xff\n");
+  fprintf(out, "  mov result1, ff\n");
   PUSH_HI("result1");
   fprintf(out, "  ret\n");
   fprintf(out, "integer_to_byte_skip:\n");
-  fprintf(out, "  ldi result1, 0\n");
+  fprintf(out, "  mov result1, zero\n");
   PUSH_HI("result1");
   fprintf(out, "  ret\n");
 }
@@ -1573,8 +1578,8 @@ void AVR8::insert_array_byte_support()
   fprintf(out, "  lds YH, heap_ptr + 1\n");
   fprintf(out, "  st Y+, length0\n");
   fprintf(out, "  st Y+, length1\n");
-  fprintf(out, "  add length0, 2\n");
-  fprintf(out, "  adc length1, 0\n");
+  fprintf(out, "  add length0, two\n");
+  fprintf(out, "  adc length1, zero\n");
   fprintf(out, "  lds result0, heap_ptr + 0\n");
   fprintf(out, "  lds result1, heap_ptr + 0\n");
   fprintf(out, "  add result0, length0\n");
@@ -1583,7 +1588,8 @@ void AVR8::insert_array_byte_support()
   fprintf(out, "  sts heap_ptr + 1, result1\n");
   fprintf(out, "  add result0, three\n");
   fprintf(out, "  adc result1, zero\n");
-  fprintf(out, "  andi result0, 254\n");
+  fprintf(out, "  ldi temp, 254\n");
+  fprintf(out, "  and result0, temp\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
   fprintf(out, "  ret\n");
@@ -1598,11 +1604,11 @@ void AVR8::insert_array_byte_support()
   PUSH_LO("result0");
   fprintf(out, "  cp result0, zero\n");
   fprintf(out, "  brpl array_read_byte_skip\n");
-  fprintf(out, "  ldi result1, 0xff\n");
+  fprintf(out, "  mov result1, ff\n");
   PUSH_HI("result1");
   fprintf(out, "  ret\n");
   fprintf(out, "array_read_byte_skip:\n");
-  fprintf(out, "  ldi result1, 0\n");
+  fprintf(out, "  mov result1, zero\n");
   PUSH_HI("result1");
   fprintf(out, "  ret\n");
 
@@ -1616,11 +1622,11 @@ void AVR8::insert_array_byte_support()
   PUSH_LO("result0");
   fprintf(out, "  cp result0, zero\n");
   fprintf(out, "  brpl array_read_byte2_skip\n");
-  fprintf(out, "  ldi result1, 0xff\n");
+  fprintf(out, "  mov result1, ff\n");
   PUSH_HI("result1");
   fprintf(out, "  ret\n");
   fprintf(out, "array_read_byte2_skip:\n");
-  fprintf(out, "  ldi result1, 0\n");
+  fprintf(out, "  mov result1, zero\n");
   PUSH_HI("result1");
   fprintf(out, "  ret\n");
 
@@ -1646,8 +1652,8 @@ void AVR8::insert_array_int_support()
   fprintf(out, "  st Y+, length1\n");
   fprintf(out, "  lsl length0\n");
   fprintf(out, "  rol length1\n");
-  fprintf(out, "  add length0, 2\n");
-  fprintf(out, "  adc length1, 0\n");
+  fprintf(out, "  add length0, two\n");
+  fprintf(out, "  adc length1, zero\n");
   fprintf(out, "  lds result0, heap_ptr + 0\n");
   fprintf(out, "  lds result1, heap_ptr + 0\n");
   fprintf(out, "  add result0, length0\n");
@@ -1656,7 +1662,8 @@ void AVR8::insert_array_int_support()
   fprintf(out, "  sts heap_ptr + 1, result1\n");
   fprintf(out, "  add result0, three\n");
   fprintf(out, "  adc result1, zero\n");
-  fprintf(out, "  andi result0, 254\n");
+  fprintf(out, "  ldi temp, 254\n");
+  fprintf(out, "  and result0, temp\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
   fprintf(out, "  ret\n");
@@ -1712,11 +1719,11 @@ int AVR8::memory_read8()
   PUSH_LO("result0");
   fprintf(out, "  cp result0, zero\n");
   fprintf(out, "  brpl memory_read8_%d\n", label_count);
-  fprintf(out, "  ldi result1, 0xff\n");
+  fprintf(out, "  mov result1, ff\n");
   PUSH_HI("result1");
   fprintf(out, "  ret\n");
   fprintf(out, "memory_read8_%d:\n", label_count++);
-  fprintf(out, "  ldi result1, 0\n");
+  fprintf(out, "  mov result1, zero\n");
   PUSH_HI("result1");
   fprintf(out, "  ret\n");
 
