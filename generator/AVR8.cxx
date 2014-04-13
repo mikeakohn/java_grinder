@@ -26,12 +26,12 @@
 // r7
 // r8
 // r9
-// r10
-// r11
-// r12
-// r13
-// r14 zero
-// r15 two
+// r10 zero
+// r11 one
+// r12 two
+// r13 three
+// r14 four
+// r15
 // r16 value10
 // r17 value11
 // r18 value20
@@ -150,8 +150,11 @@ int AVR8::open(const char *filename)
   fprintf(out, "remainder1 equ r3\n");
   fprintf(out, "length0 equ r4\n");
   fprintf(out, "length1 equ r5\n");
-  fprintf(out, "zero equ r14\n");
-  fprintf(out, "two equ r15\n");
+  fprintf(out, "zero equ r10\n");
+  fprintf(out, "one equ r11\n");
+  fprintf(out, "two equ r12\n");
+  fprintf(out, "three equ r13\n");
+  fprintf(out, "four equ r14\n");
   fprintf(out, "value10 equ r16\n");
   fprintf(out, "value11 equ r17\n");
   fprintf(out, "value20 equ r18\n");
@@ -186,8 +189,12 @@ int AVR8::open(const char *filename)
   fprintf(out, ".org 0x0000\n\n");
   fprintf(out, "start:\n");
 
-  // zero (for compares etc)
-  fprintf(out, "  clr zero\n");
+  // constants
+  fprintf(out, "  ldi zero, 0\n");
+  fprintf(out, "  ldi one, 1\n");
+  fprintf(out, "  ldi two, 2\n");
+  fprintf(out, "  ldi three, 3\n");
+  fprintf(out, "  ldi four, 4\n");
 
   // processor stack setup
   fprintf(out, "  ldi r16, RAMEND & 0xff\n");
@@ -1071,7 +1078,7 @@ int AVR8::array_read_int()
   fprintf(out, "call array_read_int\n");
   stack++;
 
-  return -1;
+  return 0;
 }
 
 int AVR8::array_read_byte(const char *name, int field_id)
@@ -1079,11 +1086,13 @@ int AVR8::array_read_byte(const char *name, int field_id)
   need_array_byte_support = 1;
   if (stack > 0)
   {
+    fprintf(out, "  lds YL, %s + 0\n", name);
+    fprintf(out, "  lds YH, %s + 1\n", name);
     fprintf(out, "call array_read_byte2\n");
     stack++;
   }
 
-  return -1;
+  return 0;
 }
 
 int AVR8::array_read_short(const char *name, int field_id)
@@ -1101,7 +1110,7 @@ int AVR8::array_read_int(const char *name, int field_id)
     stack++;
   }
 
-  return -1;
+  return 0;
 }
 
 int AVR8::array_write_byte()
@@ -1109,7 +1118,7 @@ int AVR8::array_write_byte()
   get_values_from_stack(3);
   fprintf(out, "call array_write_byte\n");
 
-  return -1;
+  return 0;
 }
 
 int AVR8::array_write_short()
@@ -1122,7 +1131,7 @@ int AVR8::array_write_int()
   get_values_from_stack(3);
   fprintf(out, "call array_write_int\n");
 
-  return -1;
+  return 0;
 }
 
 int AVR8::array_write_byte(const char *name, int field_id)
@@ -1130,7 +1139,7 @@ int AVR8::array_write_byte(const char *name, int field_id)
   get_values_from_stack(2);
   fprintf(out, "; array_write_byte2\n");
 
-  return -1;
+  return 0;
 }
 
 int AVR8::array_write_short(const char *name, int field_id)
@@ -1143,7 +1152,7 @@ int AVR8::array_write_int(const char *name, int field_id)
   get_values_from_stack(2);
   fprintf(out, "; array_write_int2\n");
 
-  return -1;
+  return 0;
 }
 
 int AVR8::get_values_from_stack(int num)
@@ -1151,20 +1160,26 @@ int AVR8::get_values_from_stack(int num)
   fprintf(out, "; get_values_from_stack, num = %d\n", num);
   if(num > 0)
   {
+    POP_HI("value11");
+    POP_LO("value10");
     stack--;
   }
 
   if(num > 1)
   {
+    POP_HI("value21");
+    POP_LO("value20");
     stack--;
   }
 
   if(num > 2)
   {
+    POP_HI("value31");
+    POP_LO("value30");
     stack--;
   }
 
-  return -1;
+  return 0;
 }
 
 // subroutines
@@ -1424,7 +1439,7 @@ void AVR8::insert_integer_to_byte()
   POP_LO("result0");
   PUSH_LO("result0");
   fprintf(out, "  cp result0, zero\n");
-  fprintf(out, "  brne integer_to_byte_skip\n");
+  fprintf(out, "  brpl integer_to_byte_skip\n");
   fprintf(out, "  ldi result1, 0xff\n");
   PUSH_HI("result1");
   fprintf(out, "  ret\n");
@@ -1552,30 +1567,139 @@ void AVR8::insert_array_byte_support()
 {
   // new_array byte
   fprintf(out, "new_array_byte:\n");
+  POP_HI("length1");
+  POP_HI("length0");
+  fprintf(out, "  lds YL, heap_ptr + 0\n");
+  fprintf(out, "  lds YH, heap_ptr + 1\n");
+  fprintf(out, "  st Y+, length0\n");
+  fprintf(out, "  st Y+, length1\n");
+  fprintf(out, "  add length0, 2\n");
+  fprintf(out, "  adc length1, 0\n");
+  fprintf(out, "  lds result0, heap_ptr + 0\n");
+  fprintf(out, "  lds result1, heap_ptr + 0\n");
+  fprintf(out, "  add result0, length0\n");
+  fprintf(out, "  adc result1, length1\n");
+  fprintf(out, "  sts heap_ptr + 0, result0\n");
+  fprintf(out, "  sts heap_ptr + 1, result1\n");
+  fprintf(out, "  add result0, three\n");
+  fprintf(out, "  adc result1, zero\n");
+  fprintf(out, "  andi result0, 254\n");
+  PUSH_LO("result0");
+  PUSH_HI("result1");
+  fprintf(out, "  ret\n");
 
   // array_read_byte
   fprintf(out, "array_read_byte:\n");
+  fprintf(out, "  add value20, value10\n");
+  fprintf(out, "  adc value21, value11\n");
+  fprintf(out, "  mov YL, value20\n");
+  fprintf(out, "  mov YH, value21\n");
+  fprintf(out, "  ld result0, Y\n");
+  PUSH_LO("result0");
+  fprintf(out, "  cp result0, zero\n");
+  fprintf(out, "  brpl array_read_byte_skip\n");
+  fprintf(out, "  ldi result1, 0xff\n");
+  PUSH_HI("result1");
+  fprintf(out, "  ret\n");
+  fprintf(out, "array_read_byte_skip:\n");
+  fprintf(out, "  ldi result1, 0\n");
+  PUSH_HI("result1");
+  fprintf(out, "  ret\n");
 
   // array_read_byte2
   fprintf(out, "array_read_byte2:\n");
+  POP_HI("result1");
+  POP_HI("result0");
+  fprintf(out, "  add YL, result0\n");
+  fprintf(out, "  adc YH, result1\n");
+  fprintf(out, "  ld result0, Y\n");
+  PUSH_LO("result0");
+  fprintf(out, "  cp result0, zero\n");
+  fprintf(out, "  brpl array_read_byte2_skip\n");
+  fprintf(out, "  ldi result1, 0xff\n");
+  PUSH_HI("result1");
+  fprintf(out, "  ret\n");
+  fprintf(out, "array_read_byte2_skip:\n");
+  fprintf(out, "  ldi result1, 0\n");
+  PUSH_HI("result1");
+  fprintf(out, "  ret\n");
 
   // array_write_byte
   fprintf(out, "array_write_byte:\n");
+  fprintf(out, "  add value30, value20\n");
+  fprintf(out, "  mov YL, value30\n");
+  fprintf(out, "  adc value31, value21\n");
+  fprintf(out, "  mov YH, value31\n");
+  fprintf(out, "  st Y, value10\n");
+  fprintf(out, "  ret\n");
 }
 
 void AVR8::insert_array_int_support()
 {
   // new_array int
   fprintf(out, "new_array_int:\n");
+  POP_HI("length1");
+  POP_HI("length0");
+  fprintf(out, "  lds YL, heap_ptr + 0\n");
+  fprintf(out, "  lds YH, heap_ptr + 1\n");
+  fprintf(out, "  st Y+, length0\n");
+  fprintf(out, "  st Y+, length1\n");
+  fprintf(out, "  lsl length0\n");
+  fprintf(out, "  rol length1\n");
+  fprintf(out, "  add length0, 2\n");
+  fprintf(out, "  adc length1, 0\n");
+  fprintf(out, "  lds result0, heap_ptr + 0\n");
+  fprintf(out, "  lds result1, heap_ptr + 0\n");
+  fprintf(out, "  add result0, length0\n");
+  fprintf(out, "  adc result1, length1\n");
+  fprintf(out, "  sts heap_ptr + 0, result0\n");
+  fprintf(out, "  sts heap_ptr + 1, result1\n");
+  fprintf(out, "  add result0, three\n");
+  fprintf(out, "  adc result1, zero\n");
+  fprintf(out, "  andi result0, 254\n");
+  PUSH_LO("result0");
+  PUSH_HI("result1");
+  fprintf(out, "  ret\n");
 
   // array_read_int
   fprintf(out, "array_read_int:\n");
+  fprintf(out, "  lsl value0\n");
+  fprintf(out, "  rol value1\n");
+  fprintf(out, "  add value20, value10\n");
+  fprintf(out, "  adc value21, value11\n");
+  fprintf(out, "  mov YL, value20\n");
+  fprintf(out, "  mov YH, value21\n");
+  fprintf(out, "  ld result0, Y+\n");
+  fprintf(out, "  ld result1, Y+\n");
+  PUSH_LO("result0");
+  PUSH_HI("result1");
+  fprintf(out, "  ret\n");
 
   // array_read_int2
   fprintf(out, "array_read_int2:\n");
+  POP_HI("result1");
+  POP_HI("result0");
+  fprintf(out, "  lsl result0\n");
+  fprintf(out, "  rol result1\n");
+  fprintf(out, "  add YL, result0\n");
+  fprintf(out, "  adc YH, result1\n");
+  fprintf(out, "  ld result0, Y+\n");
+  fprintf(out, "  ld result1, Y+\n");
+  PUSH_LO("result0");
+  PUSH_LO("result1");
+  fprintf(out, "  ret\n");
 
   // array_write_int
   fprintf(out, "array_write_int:\n");
+  fprintf(out, "  lsl value20\n");
+  fprintf(out, "  rol value21\n");
+  fprintf(out, "  add value30, value20\n");
+  fprintf(out, "  mov YL, value30\n");
+  fprintf(out, "  adc value31, value21\n");
+  fprintf(out, "  mov YH, value31\n");
+  fprintf(out, "  st Y+, value10\n");
+  fprintf(out, "  st Y+, value11\n");
+  fprintf(out, "  ret\n");
 }
 
 // Memory API
