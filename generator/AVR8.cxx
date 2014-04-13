@@ -1055,8 +1055,8 @@ int AVR8::push_array_length()
 int AVR8::push_array_length(const char *name, int field_id)
 {
   need_push_array_length2 = 1;
-  fprintf(out, "  lds YL, %s + 0\n", name);
-  fprintf(out, "  lds YH, %s + 1\n", name);
+  fprintf(out, "  lds XL, %s + 0\n", name);
+  fprintf(out, "  lds XH, %s + 1\n", name);
   fprintf(out, "  call push_array_length2\n");
   stack++;
 
@@ -1091,8 +1091,8 @@ int AVR8::array_read_byte(const char *name, int field_id)
   need_array_byte_support = 1;
   if (stack > 0)
   {
-    fprintf(out, "  lds YL, %s + 0\n", name);
-    fprintf(out, "  lds YH, %s + 1\n", name);
+    fprintf(out, "  lds XL, %s + 0\n", name);
+    fprintf(out, "  lds XH, %s + 1\n", name);
     fprintf(out, "  call array_read_byte2\n");
     stack++;
   }
@@ -1545,12 +1545,12 @@ void AVR8::insert_push_array_length()
 {
   // push_array_length
   fprintf(out, "push_array_length:\n");
-  POP_HI("YH");
-  POP_LO("YL");
-  fprintf(out, "  sub YL, two\n");
-  fprintf(out, "  sbc YH, zero\n");
-  fprintf(out, "  ld result0, Y+\n");
-  fprintf(out, "  ld result1, Y+\n");
+  POP_HI("XH");
+  POP_LO("XL");
+  fprintf(out, "  sub XL, two\n");
+  fprintf(out, "  sbc XH, zero\n");
+  fprintf(out, "  ld result0, X+\n");
+  fprintf(out, "  ld result1, X+\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
   fprintf(out, "  ret\n");
@@ -1559,10 +1559,10 @@ void AVR8::insert_push_array_length()
 void AVR8::insert_push_array_length2()
 {
   fprintf(out, "push_array_length2:\n");
-  fprintf(out, "  sub YL, two\n");
-  fprintf(out, "  sbc YH, zero\n");
-  fprintf(out, "  ld result0, Y+\n");
-  fprintf(out, "  ld result1, Y+\n");
+  fprintf(out, "  sub XL, two\n");
+  fprintf(out, "  sbc XH, zero\n");
+  fprintf(out, "  ld result0, X+\n");
+  fprintf(out, "  ld result1, X+\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
   fprintf(out, "  ret\n");
@@ -1574,10 +1574,10 @@ void AVR8::insert_array_byte_support()
   fprintf(out, "new_array_byte:\n");
   POP_HI("length1");
   POP_HI("length0");
-  fprintf(out, "  lds YL, heap_ptr + 0\n");
-  fprintf(out, "  lds YH, heap_ptr + 1\n");
-  fprintf(out, "  st Y+, length0\n");
-  fprintf(out, "  st Y+, length1\n");
+  fprintf(out, "  lds XL, heap_ptr + 0\n");
+  fprintf(out, "  lds XH, heap_ptr + 1\n");
+  fprintf(out, "  st X+, length0\n");
+  fprintf(out, "  st X+, length1\n");
   fprintf(out, "  add length0, two\n");
   fprintf(out, "  adc length1, zero\n");
   fprintf(out, "  lds result0, heap_ptr + 0\n");
@@ -1598,9 +1598,9 @@ void AVR8::insert_array_byte_support()
   fprintf(out, "array_read_byte:\n");
   fprintf(out, "  add value20, value10\n");
   fprintf(out, "  adc value21, value11\n");
-  fprintf(out, "  mov YL, value20\n");
-  fprintf(out, "  mov YH, value21\n");
-  fprintf(out, "  ld result0, Y\n");
+  fprintf(out, "  mov XL, value20\n");
+  fprintf(out, "  mov XH, value21\n");
+  fprintf(out, "  ld result0, X\n");
   PUSH_LO("result0");
   fprintf(out, "  cp result0, zero\n");
   fprintf(out, "  brpl array_read_byte_skip\n");
@@ -1616,9 +1616,9 @@ void AVR8::insert_array_byte_support()
   fprintf(out, "array_read_byte2:\n");
   POP_HI("result1");
   POP_HI("result0");
-  fprintf(out, "  add YL, result0\n");
-  fprintf(out, "  adc YH, result1\n");
-  fprintf(out, "  ld result0, Y\n");
+  fprintf(out, "  add XL, result0\n");
+  fprintf(out, "  adc XH, result1\n");
+  fprintf(out, "  ld result0, X\n");
   PUSH_LO("result0");
   fprintf(out, "  cp result0, zero\n");
   fprintf(out, "  brpl array_read_byte2_skip\n");
@@ -1633,10 +1633,10 @@ void AVR8::insert_array_byte_support()
   // array_write_byte
   fprintf(out, "array_write_byte:\n");
   fprintf(out, "  add value30, value20\n");
-  fprintf(out, "  mov YL, value30\n");
   fprintf(out, "  adc value31, value21\n");
-  fprintf(out, "  mov YH, value31\n");
-  fprintf(out, "  st Y, value10\n");
+  fprintf(out, "  mov XL, value30\n");
+  fprintf(out, "  mov XH, value31\n");
+  fprintf(out, "  st X, value10\n");
   fprintf(out, "  ret\n");
 }
 
@@ -1646,10 +1646,10 @@ void AVR8::insert_array_int_support()
   fprintf(out, "new_array_int:\n");
   POP_HI("length1");
   POP_HI("length0");
-  fprintf(out, "  lds YL, heap_ptr + 0\n");
-  fprintf(out, "  lds YH, heap_ptr + 1\n");
-  fprintf(out, "  st Y+, length0\n");
-  fprintf(out, "  st Y+, length1\n");
+  fprintf(out, "  lds XL, heap_ptr + 0\n");
+  fprintf(out, "  lds XH, heap_ptr + 1\n");
+  fprintf(out, "  st X+, length0\n");
+  fprintf(out, "  st X+, length1\n");
   fprintf(out, "  lsl length0\n");
   fprintf(out, "  rol length1\n");
   fprintf(out, "  add length0, two\n");
@@ -1674,10 +1674,10 @@ void AVR8::insert_array_int_support()
   fprintf(out, "  rol value1\n");
   fprintf(out, "  add value20, value10\n");
   fprintf(out, "  adc value21, value11\n");
-  fprintf(out, "  mov YL, value20\n");
-  fprintf(out, "  mov YH, value21\n");
-  fprintf(out, "  ld result0, Y+\n");
-  fprintf(out, "  ld result1, Y+\n");
+  fprintf(out, "  mov XL, value20\n");
+  fprintf(out, "  mov XH, value21\n");
+  fprintf(out, "  ld result0, X+\n");
+  fprintf(out, "  ld result1, X+\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
   fprintf(out, "  ret\n");
@@ -1688,10 +1688,10 @@ void AVR8::insert_array_int_support()
   POP_HI("result0");
   fprintf(out, "  lsl result0\n");
   fprintf(out, "  rol result1\n");
-  fprintf(out, "  add YL, result0\n");
-  fprintf(out, "  adc YH, result1\n");
-  fprintf(out, "  ld result0, Y+\n");
-  fprintf(out, "  ld result1, Y+\n");
+  fprintf(out, "  add XL, result0\n");
+  fprintf(out, "  adc XH, result1\n");
+  fprintf(out, "  ld result0, X+\n");
+  fprintf(out, "  ld result1, X+\n");
   PUSH_LO("result0");
   PUSH_LO("result1");
   fprintf(out, "  ret\n");
@@ -1701,11 +1701,11 @@ void AVR8::insert_array_int_support()
   fprintf(out, "  lsl value20\n");
   fprintf(out, "  rol value21\n");
   fprintf(out, "  add value30, value20\n");
-  fprintf(out, "  mov YL, value30\n");
   fprintf(out, "  adc value31, value21\n");
-  fprintf(out, "  mov YH, value31\n");
-  fprintf(out, "  st Y+, value10\n");
-  fprintf(out, "  st Y+, value11\n");
+  fprintf(out, "  mov XL, value30\n");
+  fprintf(out, "  mov XH, value31\n");
+  fprintf(out, "  st X+, value10\n");
+  fprintf(out, "  st X+, value11\n");
   fprintf(out, "  ret\n");
 }
 
