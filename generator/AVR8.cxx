@@ -1573,19 +1573,21 @@ void AVR8::insert_array_byte_support()
   // new_array byte
   fprintf(out, "new_array_byte:\n");
   POP_HI("length1");
-  POP_HI("length0");
-  fprintf(out, "  lds XL, heap_ptr + 0\n");
-  fprintf(out, "  lds XH, heap_ptr + 1\n");
+  POP_LO("length0");
+  fprintf(out, "  lds result0, heap_ptr + 0\n");
+  fprintf(out, "  lds result1, heap_ptr + 1\n");
+  fprintf(out, "  mov XL, result0\n");
+  fprintf(out, "  mov XH, result1\n");
   fprintf(out, "  st X+, length0\n");
   fprintf(out, "  st X+, length1\n");
   fprintf(out, "  add length0, two\n");
   fprintf(out, "  adc length1, zero\n");
-  fprintf(out, "  lds result0, heap_ptr + 0\n");
-  fprintf(out, "  lds result1, heap_ptr + 0\n");
-  fprintf(out, "  add result0, length0\n");
-  fprintf(out, "  adc result1, length1\n");
-  fprintf(out, "  sts heap_ptr + 0, result0\n");
-  fprintf(out, "  sts heap_ptr + 1, result1\n");
+  fprintf(out, "  lds temp, heap_ptr + 0\n");
+  fprintf(out, "  lds temp2, heap_ptr + 1\n");
+  fprintf(out, "  add temp, length0\n");
+  fprintf(out, "  adc temp2, length1\n");
+  fprintf(out, "  sts heap_ptr + 0, temp\n");
+  fprintf(out, "  sts heap_ptr + 1, temp2\n");
   fprintf(out, "  add result0, three\n");
   fprintf(out, "  adc result1, zero\n");
   fprintf(out, "  ldi temp, 254\n");
@@ -1615,7 +1617,7 @@ void AVR8::insert_array_byte_support()
   // array_read_byte2
   fprintf(out, "array_read_byte2:\n");
   POP_HI("result1");
-  POP_HI("result0");
+  POP_LO("result0");
   fprintf(out, "  add XL, result0\n");
   fprintf(out, "  adc XH, result1\n");
   fprintf(out, "  ld result0, X\n");
@@ -1645,21 +1647,23 @@ void AVR8::insert_array_int_support()
   // new_array int
   fprintf(out, "new_array_int:\n");
   POP_HI("length1");
-  POP_HI("length0");
-  fprintf(out, "  lds XL, heap_ptr + 0\n");
-  fprintf(out, "  lds XH, heap_ptr + 1\n");
+  POP_LO("length0");
+  fprintf(out, "  lds result0, heap_ptr + 0\n");
+  fprintf(out, "  lds result1, heap_ptr + 1\n");
+  fprintf(out, "  mov XL, result0\n");
+  fprintf(out, "  mov XH, result1\n");
   fprintf(out, "  st X+, length0\n");
   fprintf(out, "  st X+, length1\n");
   fprintf(out, "  lsl length0\n");
   fprintf(out, "  rol length1\n");
   fprintf(out, "  add length0, two\n");
   fprintf(out, "  adc length1, zero\n");
-  fprintf(out, "  lds result0, heap_ptr + 0\n");
-  fprintf(out, "  lds result1, heap_ptr + 0\n");
-  fprintf(out, "  add result0, length0\n");
-  fprintf(out, "  adc result1, length1\n");
-  fprintf(out, "  sts heap_ptr + 0, result0\n");
-  fprintf(out, "  sts heap_ptr + 1, result1\n");
+  fprintf(out, "  lds temp, heap_ptr + 0\n");
+  fprintf(out, "  lds temp2, heap_ptr + 1\n");
+  fprintf(out, "  add temp, length0\n");
+  fprintf(out, "  adc temp2, length1\n");
+  fprintf(out, "  sts heap_ptr + 0, temp\n");
+  fprintf(out, "  sts heap_ptr + 1, temp2\n");
   fprintf(out, "  add result0, three\n");
   fprintf(out, "  adc result1, zero\n");
   fprintf(out, "  ldi temp, 254\n");
@@ -1670,8 +1674,8 @@ void AVR8::insert_array_int_support()
 
   // array_read_int
   fprintf(out, "array_read_int:\n");
-  fprintf(out, "  lsl value0\n");
-  fprintf(out, "  rol value1\n");
+  fprintf(out, "  lsl value10\n");
+  fprintf(out, "  rol value11\n");
   fprintf(out, "  add value20, value10\n");
   fprintf(out, "  adc value21, value11\n");
   fprintf(out, "  mov XL, value20\n");
@@ -1685,7 +1689,7 @@ void AVR8::insert_array_int_support()
   // array_read_int2
   fprintf(out, "array_read_int2:\n");
   POP_HI("result1");
-  POP_HI("result0");
+  POP_LO("result0");
   fprintf(out, "  lsl result0\n");
   fprintf(out, "  rol result1\n");
   fprintf(out, "  add XL, result0\n");
@@ -1693,7 +1697,7 @@ void AVR8::insert_array_int_support()
   fprintf(out, "  ld result0, X+\n");
   fprintf(out, "  ld result1, X+\n");
   PUSH_LO("result0");
-  PUSH_LO("result1");
+  PUSH_HI("result1");
   fprintf(out, "  ret\n");
 
   // array_write_int
