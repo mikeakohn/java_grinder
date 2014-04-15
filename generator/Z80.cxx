@@ -807,10 +807,12 @@ int Z80::insert_string(const char *name, uint8_t *bytes, int len)
 int Z80::push_array_length()
 {
   fprintf(out, "  pop ix\n");
-  fprintf(out, "  dec ix\n");
-  fprintf(out, "  dec ix\n");
-  fprintf(out, "  ld c, (ix)\n");
-  fprintf(out, "  ld b, (ix+1)\n");
+  //fprintf(out, "  dec ix\n");
+  //fprintf(out, "  dec ix\n");
+  //fprintf(out, "  ld c, (ix)\n");
+  //fprintf(out, "  ld b, (ix+1)\n");
+  fprintf(out, "  ld c, (ix-2)\n");
+  fprintf(out, "  ld b, (ix-1)\n");
   fprintf(out, "  push bc\n");
   return 0;
 }
