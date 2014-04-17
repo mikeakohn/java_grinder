@@ -216,10 +216,6 @@ int AVR8::open(const char *filename)
   fprintf(out, "  ldi ZL, 0\n");
   fprintf(out, "  ldi ZH, 0\n");
 
-  // for testing attiny13
-  //fprintf(out, "  ldi temp, 255\n");
-  //fprintf(out, "  out 0x17, temp\n");
-
   return 0;
 }
 
@@ -230,7 +226,6 @@ int AVR8::start_init()
 
 int AVR8::insert_static_field_define(const char *name, const char *type, int index)
 {
-//FIXME test this
   fprintf(out, "%s equ ram_start + %d\n", name, (index + 1) * 2);
 
   return 0;
@@ -851,7 +846,7 @@ int AVR8::return_local(int index, int local_count)
     POP_LO("locals");
   }
 
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 
   return 0;
 }
@@ -871,7 +866,7 @@ int AVR8::return_integer(int local_count)
     POP_LO("locals");
   }
 
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 
   return 0;
 }
@@ -885,11 +880,11 @@ int AVR8::return_void(int local_count)
   {
     POP_HI("locals");
     POP_LO("locals");
-    fprintf(out, "  ret\n");
+    fprintf(out, "  ret\n\n");
   }
     else
   {
-    //FIXME stop the simulator when program ends
+    // stop the cpu when program ends
     fprintf(out, "  break\n");
   }
 
@@ -1038,7 +1033,10 @@ int AVR8::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 
 int AVR8::insert_string(const char *name, uint8_t *bytes, int len)
 {
-  return -1;
+  fprintf(out, ".align 16\n");
+  fprintf(out, "dw %d\n", len);
+
+  return insert_utf8(name, bytes, len);
 }
 
 int AVR8::push_array_length()
@@ -1211,7 +1209,7 @@ void AVR8::insert_swap()
   fprintf(out, "  add YL, SP\n");
   fprintf(out, "  st Y-, value10\n");
   fprintf(out, "  st Y, value20\n");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_add_integer()
@@ -1225,7 +1223,7 @@ void AVR8::insert_add_integer()
   fprintf(out, "  adc result1, value11\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_sub_integer()
@@ -1239,7 +1237,7 @@ void AVR8::insert_sub_integer()
   fprintf(out, "  sbc result1, value11\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_mul_integer()
@@ -1265,7 +1263,7 @@ void AVR8::insert_mul_integer()
   fprintf(out, "  brne mul_integer_loop\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_div_integer()
@@ -1295,7 +1293,7 @@ void AVR8::insert_div_integer()
   fprintf(out, "  brne div_integer_loop\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_mod_integer()
@@ -1305,7 +1303,7 @@ void AVR8::insert_mod_integer()
   PUSH_LO("result0");
   fprintf(out, "  mov result1, remainder1\n");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_neg_integer()
@@ -1318,7 +1316,7 @@ void AVR8::insert_neg_integer()
   fprintf(out, "  sbc temp, result1\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_shift_left_integer()
@@ -1335,7 +1333,7 @@ void AVR8::insert_shift_left_integer()
   fprintf(out, "  brne shift_left_integer_loop\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_shift_right_integer()
@@ -1355,7 +1353,7 @@ void AVR8::insert_shift_right_integer()
   fprintf(out, "  brne shift_right_integer_loop\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_shift_right_uinteger()
@@ -1372,7 +1370,7 @@ void AVR8::insert_shift_right_uinteger()
   fprintf(out, "  brne shift_right_uinteger_loop\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_and_integer()
@@ -1386,7 +1384,7 @@ void AVR8::insert_and_integer()
   fprintf(out, "  and result1, value11\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_or_integer()
@@ -1400,7 +1398,7 @@ void AVR8::insert_or_integer()
   fprintf(out, "  or result1, value11\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_xor_integer()
@@ -1414,7 +1412,7 @@ void AVR8::insert_xor_integer()
   fprintf(out, "  eor result1, value11\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_inc_integer()
@@ -1434,7 +1432,7 @@ void AVR8::insert_inc_integer()
   fprintf(out, "  st Y, value21\n");
   fprintf(out, "  mov YL, temp2\n");
   fprintf(out, "  st Y, value20\n");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_integer_to_byte()
@@ -1447,11 +1445,11 @@ void AVR8::insert_integer_to_byte()
   fprintf(out, "  brpl integer_to_byte_skip\n");
   fprintf(out, "  mov result1, ff\n");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
   fprintf(out, "integer_to_byte_skip:\n");
   fprintf(out, "  mov result1, zero\n");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_jump_cond()
@@ -1468,7 +1466,7 @@ void AVR8::insert_jump_cond()
   fprintf(out, "  add YL, SP\n");
   fprintf(out, "  ld value11, Y\n");
 
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_jump_cond_integer()
@@ -1492,7 +1490,7 @@ void AVR8::insert_jump_cond_integer()
   fprintf(out, "  dec YL\n");
   fprintf(out, "  ld value21, Y\n");
 
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_push_integer_local()
@@ -1508,7 +1506,7 @@ void AVR8::insert_push_integer_local()
   fprintf(out, "  add YL, locals\n");
   fprintf(out, "  ld temp, Y\n");
   PUSH_HI("temp");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_pop_integer_local()
@@ -1524,7 +1522,7 @@ void AVR8::insert_pop_integer_local()
   fprintf(out, "  sub YL, temp2\n");
   fprintf(out, "  add YL, locals\n");
   fprintf(out, "  st Y, temp\n");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_dup()
@@ -1538,7 +1536,7 @@ void AVR8::insert_dup()
   fprintf(out, "  add YL, SP\n");
   fprintf(out, "  ld temp, YL\n");
   PUSH_HI("temp");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_push_array_length()
@@ -1553,7 +1551,7 @@ void AVR8::insert_push_array_length()
   fprintf(out, "  ld result1, X+\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_push_array_length2()
@@ -1565,7 +1563,7 @@ void AVR8::insert_push_array_length2()
   fprintf(out, "  ld result1, X+\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_array_byte_support()
@@ -1594,7 +1592,7 @@ void AVR8::insert_array_byte_support()
   fprintf(out, "  and result0, temp\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 
   // array_read_byte
   fprintf(out, "array_read_byte:\n");
@@ -1608,11 +1606,11 @@ void AVR8::insert_array_byte_support()
   fprintf(out, "  brpl array_read_byte_skip\n");
   fprintf(out, "  mov result1, ff\n");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
   fprintf(out, "array_read_byte_skip:\n");
   fprintf(out, "  mov result1, zero\n");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 
   // array_read_byte2
   fprintf(out, "array_read_byte2:\n");
@@ -1626,11 +1624,11 @@ void AVR8::insert_array_byte_support()
   fprintf(out, "  brpl array_read_byte2_skip\n");
   fprintf(out, "  mov result1, ff\n");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
   fprintf(out, "array_read_byte2_skip:\n");
   fprintf(out, "  mov result1, zero\n");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 
   // array_write_byte
   fprintf(out, "array_write_byte:\n");
@@ -1639,7 +1637,7 @@ void AVR8::insert_array_byte_support()
   fprintf(out, "  mov XL, value30\n");
   fprintf(out, "  mov XH, value31\n");
   fprintf(out, "  st X, value10\n");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 void AVR8::insert_array_int_support()
@@ -1670,7 +1668,7 @@ void AVR8::insert_array_int_support()
   fprintf(out, "  and result0, temp\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 
   // array_read_int
   fprintf(out, "array_read_int:\n");
@@ -1684,7 +1682,7 @@ void AVR8::insert_array_int_support()
   fprintf(out, "  ld result1, X+\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 
   // array_read_int2
   fprintf(out, "array_read_int2:\n");
@@ -1698,7 +1696,7 @@ void AVR8::insert_array_int_support()
   fprintf(out, "  ld result1, X+\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 
   // array_write_int
   fprintf(out, "array_write_int:\n");
@@ -1710,7 +1708,7 @@ void AVR8::insert_array_int_support()
   fprintf(out, "  mov XH, value31\n");
   fprintf(out, "  st X+, value10\n");
   fprintf(out, "  st X+, value11\n");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 }
 
 // Memory API
@@ -1725,11 +1723,11 @@ int AVR8::memory_read8()
   fprintf(out, "  brpl memory_read8_%d\n", label_count);
   fprintf(out, "  mov result1, ff\n");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
   fprintf(out, "memory_read8_%d:\n", label_count++);
   fprintf(out, "  mov result1, zero\n");
   PUSH_HI("result1");
-  fprintf(out, "  ret\n");
+  fprintf(out, "  ret\n\n");
 
   return 0;
 }
@@ -1742,8 +1740,6 @@ int AVR8::memory_write8()
   POP_HI("XH");
   POP_LO("XL");
   fprintf(out, "  st X, temp\n");
-//  for testing attiny13
-//  fprintf(out, "  out 0x18, temp\n");
 
   stack -= 2;
 
