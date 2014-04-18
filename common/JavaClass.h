@@ -191,6 +191,7 @@ public:
   int get_field_count() { return fields_count; }
   int get_constant_count() { return constant_pool_count; }
   int get_field_index(const char *field_name);
+  int get_clinit_method();
   static const char *tag_as_string(int tag);
 
   int32_t magic;

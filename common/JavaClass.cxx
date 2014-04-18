@@ -586,6 +586,26 @@ char name[256];
   return -1;
 }
 
+int JavaClass::get_clinit_method()
+{
+int method_count = get_method_count();
+char method_name[128];
+int index;
+
+  for (index = 0; index < method_count; index++)
+  {
+    if (get_method_name(method_name, sizeof(method_name), index) == 0)
+    {
+      if (strcmp("<clinit>", method_name) == 0)
+      {
+        return index;
+      }
+    }
+  }
+
+  return -1;
+}
+
 const char *JavaClass::tag_as_string(int tag)
 {
   const char *tags[] =

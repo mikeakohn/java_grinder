@@ -40,7 +40,7 @@
           break; \
         }
 
-int execute_static(JavaClass *java_class, int method_id, Generator *generator, bool do_arrays)
+int execute_static(JavaClass *java_class, int method_id, Generator *generator, bool do_arrays, char *filter_field_name)
 {
 struct methods_t *method = java_class->get_method(method_id);
 uint8_t *bytes = method->attributes[0].info;

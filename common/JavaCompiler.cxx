@@ -63,7 +63,6 @@ JavaCompiler::~JavaCompiler()
   delete java_class;
 }
 
-
 void JavaCompiler::fill_label_map(uint8_t *label_map, int label_map_len, uint8_t *bytes, int code_len, int pc_start)
 {
 int pc = pc_start;
@@ -1678,25 +1677,26 @@ int field_count = java_class->get_field_count();
 
 int JavaCompiler::add_static_initializers()
 {
-int method_count = java_class->get_method_count();
-char method_name[32];
+//int method_count = java_class->get_method_count();
+//char method_name[32];
 int index;
 
   // Add all the static initializers
-  for (index = 0; index < method_count; index++)
+  index = java_class->get_clinit_method();
+  if (index != -1)
   {
-    if (java_class->get_method_name(method_name, sizeof(method_name), index) == 0)
+    if (execute_static(java_class, index, generator, false) != 0)
     {
-      if (strcmp("<clinit>", method_name) == 0)
-      {
-        if (execute_static(java_class, index, generator, false) != 0)
-        {
-          printf("** Error setting statics.\n");
-          return -1;
-        }
-        continue;
-      }
+      printf("** Error setting statics.\n");
+      return -1;
     }
+  }
+
+  // Add static initializers for all external fields.
+  std::map<std::string,int>::iterator iter;
+  for (iter = external_fields.begin(); iter != external_fields.end(); iter++)
+  {
+    //generator->insert_static_field_define(iter->first.c_str(), field_type_from_int(iter->second), external_index++);
   }
 
   generator->add_newline();
