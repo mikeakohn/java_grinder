@@ -12,6 +12,9 @@
 #ifndef _JAVA_COMPILER_H
 #define _JAVA_COMPILER_H
 
+#include <map>
+#include <string>
+
 #include "Compiler.h"
 #include "Generator.h"
 #include "JavaClass.h"
@@ -45,9 +48,13 @@ private:
   int array_load(JavaClass *java_class, int constant_id, uint8_t array_type);
   int array_store(JavaClass *java_class, int constant_id, uint8_t array_type);
   int compile_method(JavaClass *java_class, int method_id);
+  int field_type_to_int(char *field_type);
+  const char *field_type_from_int(int type);
 
   JavaClass *java_class;
+  std::map<std::string,int> external_fields;
   static uint8_t cond_table[];
+  static const char *type_table[];
 };
 
 #endif

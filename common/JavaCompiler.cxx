@@ -36,6 +36,24 @@ uint8_t JavaCompiler::cond_table[] =
   COND_LESS_EQUAL,    // 164 (0xa4) if_icmple
 };
 
+const char *JavaCompiler::type_table[] =
+{
+  "[",  // 0 invalid
+  //"[",  // 1 invalid
+  //"[",  // 2 invalid
+  //"[",  // 3 invalid
+  "[Z", // 4 boolean
+  "[C", // 5 char
+  "[F", // 6 float
+  "[D", // 7 double
+  "[B", // 8 byte
+  "[S", // 9 short
+  "[I", // 10 int
+  "[J", // 11 long
+  "[Ljava/lang/String;", //
+  NULL
+};
+
 JavaCompiler::JavaCompiler()
 {
 }
@@ -1581,8 +1599,39 @@ printf("code_len=%d\n", code_len);
 
 int JavaCompiler::load_class(FILE *in)
 {
+int index;
+
   java_class = new JavaClass(in);
   java_class->print();
+
+  int constant_count = java_class->get_constant_count();
+
+  // Collect list of external fields
+  for (index = 0; index < constant_count; index++)
+  {
+    constant_fieldref_t *constant_fieldref =
+      (constant_fieldref_t *)java_class->get_constant(index);
+
+    if (constant_fieldref->tag == CONSTANT_FIELDREF &&
+        constant_fieldref->class_index != java_class->this_class)
+    {
+      char field_name[128];
+      char field_type[128];
+
+      java_class->get_ref_name_type(field_name, field_type, sizeof(field_name), index);
+      external_fields[field_name] = field_type_to_int(field_type);
+    }
+  }
+
+  // Just some debug code
+  printf("external_field_count=%ld\n", external_fields.size());
+
+  std::map<std::string,int>::iterator iter;
+
+  for (iter = external_fields.begin(); iter != external_fields.end(); iter++)
+  {
+    printf("EXTERNAL %s %s\n", iter->first.c_str(), field_type_from_int(iter->second));
+  }
 
   return 0;
 }
@@ -1591,7 +1640,6 @@ void JavaCompiler::insert_static_field_defines()
 {
 const fields_t *field;
 int field_count = java_class->get_field_count();
-int constant_count = java_class->get_constant_count();
 int index;
 int external_index;
 
@@ -1611,41 +1659,18 @@ int external_index;
   external_index = field_count;
 
   // Add all fields from any external classes
-  for (index = 0; index < constant_count; index++)
+  std::map<std::string,int>::iterator iter;
+  for (iter = external_fields.begin(); iter != external_fields.end(); iter++)
   {
-    constant_fieldref_t *constant_fieldref =
-      (constant_fieldref_t *)java_class->get_constant(index);
-
-    if (constant_fieldref->tag == CONSTANT_FIELDREF &&
-        constant_fieldref->class_index != java_class->this_class)
-    {
-      char field_name[128];
-      char field_type[128];
-
-      java_class->get_ref_name_type(field_name, field_type, sizeof(field_name), index);
-      generator->insert_static_field_define(field_name, field_type, external_index++);
-    }
+    generator->insert_static_field_define(iter->first.c_str(), field_type_from_int(iter->second), external_index++);
   }
 }
 
 void JavaCompiler::init_heap()
 {
 int field_count = java_class->get_field_count();
-int constant_count = java_class->get_constant_count();
-int index;
 
-  // Count extra fields (this could be done a better way :( )
-  for (index = 0; index < constant_count; index++)
-  {
-    constant_fieldref_t *constant_fieldref =
-      (constant_fieldref_t *)java_class->get_constant(index);
-
-    if (constant_fieldref->tag == CONSTANT_FIELDREF &&
-        constant_fieldref->class_index != java_class->this_class)
-    {
-      field_count++;
-    }
-  }
+  field_count += external_fields.size();
 
   generator->start_init();
   generator->init_heap(field_count);
@@ -1724,4 +1749,34 @@ int index;
 
   return 0;
 }
+
+int JavaCompiler::field_type_to_int(char *field_type)
+{
+int len = sizeof(type_table) / sizeof (char *);
+int n;
+
+  for (n = 0; n < len; n++)
+  {
+    if (strcmp(field_type, type_table[n]) == 0) { return n|0x80; }
+    if (strcmp(field_type, type_table[n]+1) == 0) { return n; }
+  }
+
+  return 0;
+}
+
+const char *JavaCompiler::field_type_from_int(int type)
+{
+int is_array = (type & 0x80) >> 7;
+const char *field_type;
+
+  type = type & 0x7f;
+
+  if (type >= (int)(sizeof(type_table) / sizeof (char *))) { type = 0; }
+
+  field_type = type_table[type];
+  if (is_array == 0) { field_type++; }
+
+  return field_type;
+}
+
 
