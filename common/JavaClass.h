@@ -182,12 +182,14 @@ public:
   int get_method_name(char *name, int len, int index);
   int get_field_name(char *name, int len, int index);
   int get_field_type(char *name, int len, int index);
+  const fields_t *get_field(int index);
   int get_ref_name_type(char *name, char *type, int len, int index);
   int get_class_name(char *name, int len, int index);
   void *get_constant(int index);
   struct methods_t *get_method(int index);
   int get_method_count() { return methods_count; }
   int get_field_count() { return fields_count; }
+  int get_constant_count() { return constant_pool_count; }
   int get_field_index(const char *field_name);
   static const char *tag_as_string(int tag);
 

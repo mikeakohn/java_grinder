@@ -423,6 +423,17 @@ struct fields_t *field;
   return 0;
 }
 
+const fields_t *JavaClass::get_field(int index)
+{
+struct fields_t *field;
+
+  if (index >= fields_count) { return NULL; }
+
+  field = (struct fields_t *)(fields_heap + fields[index]);
+
+  return field;
+}
+
 int JavaClass::get_ref_name_type(char *name, char *type, int len, int index)
 {
 struct constant_fieldref_t *constant_fieldref;
@@ -430,9 +441,11 @@ struct constant_methodref_t *constant_methodref;
 struct constant_nameandtype_t *constant_nameandtype;
 int tag,offset;
 void *heap;
+//char class_name[64];
 
   name[0] = 0;
   type[0] = 0;
+  //class_name[0] = 0;
 
   while(1)
   {
@@ -446,6 +459,17 @@ void *heap;
     {
       constant_fieldref = (constant_fieldref_t *)heap;
       index = constant_fieldref->name_and_type_index;
+
+      //printf("DEBUG: %d %d\n", constant_fieldref->class_index, this_class);
+
+      // If the constant doesn't exist in this class, then add the class
+      // name to the field.
+      if (constant_fieldref->class_index != this_class)
+      {
+        get_class_name(name, 64, constant_fieldref->class_index);
+        printf("  class_name=%s %d\n", name, constant_fieldref->class_index);
+        strcat(name, "_");
+      }
     }
       else
     if (tag == CONSTANT_METHODREF)
@@ -457,7 +481,8 @@ void *heap;
     if (tag == CONSTANT_NAMEANDTYPE)
     {
       constant_nameandtype = (constant_nameandtype_t *)heap;
-      get_name_constant(name, len, constant_nameandtype->name_index);
+      int class_name_len = strlen(name);
+      get_name_constant(name + class_name_len, len - class_name_len, constant_nameandtype->name_index);
       get_name_constant(type, len, constant_nameandtype->descriptor_index);
       return 0;
     }

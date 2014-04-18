@@ -223,15 +223,15 @@ int const_vals[2];
 int JavaCompiler::array_load(JavaClass *java_class, int constant_id, uint8_t array_type)
 {
 generic_32bit_t *gen32;
-char field_name[64];
-char type[64];
+char field_name[128];
+char type[128];
 
   gen32 = (generic_32bit_t *)java_class->get_constant(constant_id);
 
   if (gen32->tag == CONSTANT_FIELDREF)
   {
     constant_fieldref_t *field_ref = (struct constant_fieldref_t *)gen32;
-    printf("class_index=%d name_and_type=%d\n", field_ref->class_index, field_ref->name_and_type_index);
+    printf("FIELD_REF: class_index=%d name_and_type=%d\n", field_ref->class_index, field_ref->name_and_type_index);
 
     if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), constant_id) != 0)
     {
@@ -1589,22 +1589,63 @@ int JavaCompiler::load_class(FILE *in)
 
 void JavaCompiler::insert_static_field_defines()
 {
+const fields_t *field;
 int field_count = java_class->get_field_count();
+int constant_count = java_class->get_constant_count();
 int index;
+int external_index;
 
+  // Add all fields from this class
   for (index = 0; index < field_count; index++)
   {
     char field_name[64];
     char field_type[64];
+    field = java_class->get_field(index);
+    if ((field->access_flags & ACC_STATIC) == 0) { continue; }
+
     java_class->get_field_name(field_name, sizeof(field_name), index);
     java_class->get_field_type(field_type, sizeof(field_type), index);
     generator->insert_static_field_define(field_name, field_type, index);
+  }
+
+  external_index = field_count;
+
+  // Add all fields from any external classes
+  for (index = 0; index < constant_count; index++)
+  {
+    constant_fieldref_t *constant_fieldref =
+      (constant_fieldref_t *)java_class->get_constant(index);
+
+    if (constant_fieldref->tag == CONSTANT_FIELDREF &&
+        constant_fieldref->class_index != java_class->this_class)
+    {
+      char field_name[128];
+      char field_type[128];
+
+      java_class->get_ref_name_type(field_name, field_type, sizeof(field_name), index);
+      generator->insert_static_field_define(field_name, field_type, external_index++);
+    }
   }
 }
 
 void JavaCompiler::init_heap()
 {
 int field_count = java_class->get_field_count();
+int constant_count = java_class->get_constant_count();
+int index;
+
+  // Count extra fields (this could be done a better way :( )
+  for (index = 0; index < constant_count; index++)
+  {
+    constant_fieldref_t *constant_fieldref =
+      (constant_fieldref_t *)java_class->get_constant(index);
+
+    if (constant_fieldref->tag == CONSTANT_FIELDREF &&
+        constant_fieldref->class_index != java_class->this_class)
+    {
+      field_count++;
+    }
+  }
 
   generator->start_init();
   generator->init_heap(field_count);

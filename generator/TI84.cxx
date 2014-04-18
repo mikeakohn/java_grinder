@@ -19,7 +19,7 @@
 
 #define BCALL(a) \
   save_registers(); \
-  fprintf(out, "  ld iy,(save_iy)\n"); \
+  fprintf(out, "  ld iy, (save_iy)\n"); \
   fprintf(out, "  rst 0x28\n"); \
   fprintf(out, "  .db %s&0xff, %s>>8\n", #a, #a); \
   restore_registers()
@@ -54,6 +54,7 @@ int TI84::open(const char *filename)
 
 int TI84::start_init()
 {
+  fprintf(out, "\n");
   fprintf(out, ".org 0x4000\n");
 
   // http://wikiti.brandonw.net/index.php?title=84PCSE:OS:Applications
