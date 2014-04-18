@@ -176,13 +176,13 @@ int AVR8::open(const char *filename)
 
   // java stack base locations
   fprintf(out, "stack_lo equ 0x00\n");
-  fprintf(out, "stack_hi equ 0x40\n");
+  fprintf(out, "stack_hi equ 0x10\n");
 
   // RAMEND (change to particular chip)
-  fprintf(out, "RAMEND equ 0x1ff\n");
+  fprintf(out, "RAMEND equ 0x3f\n");
 
   // heap
-  fprintf(out, "ram_start equ 0x80\n");
+  fprintf(out, "ram_start equ 0x20\n");
   fprintf(out, "heap_ptr equ ram_start\n\n");
 
   // startup
@@ -1743,6 +1743,22 @@ int AVR8::memory_write8()
 
   stack -= 2;
 
+  return 0;
+}
+
+// IOPort API
+int AVR8::ioport_setPinsAsInput(int port)
+{
+  return 0;
+}
+
+int AVR8::ioport_setPinsAsOutput(int port)
+{
+  return 0;
+}
+
+int AVR8::ioport_setPinsValue(int port)
+{
   return 0;
 }
 
