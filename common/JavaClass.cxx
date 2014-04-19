@@ -466,7 +466,7 @@ void *heap;
       // name to the field.
       if (constant_fieldref->class_index != this_class)
       {
-        get_class_name(name, 64, constant_fieldref->class_index);
+        get_class_name(name, sizeof(name), constant_fieldref->class_index);
         printf("  class_name=%s %d\n", name, constant_fieldref->class_index);
         strcat(name, "_");
       }
@@ -682,8 +682,8 @@ int r;
   print_access(access_flags);
   printf("\n");
 
-  get_class_name(class_name, sizeof(class_name), this_class);
-  printf("     ThisClass: %s (%d)\n", class_name, this_class);
+  get_class_name(name, sizeof(name), this_class);
+  printf("     ThisClass: %s (%d)\n", name, this_class);
   get_class_name(name, sizeof(name), super_class);
   printf("    SuperClass: %s (%d)\n", name, super_class);
   printf("InterfaceCount: %d\n", interfaces_count);

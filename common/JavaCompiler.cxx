@@ -54,13 +54,16 @@ const char *JavaCompiler::type_table[] =
   NULL
 };
 
-JavaCompiler::JavaCompiler()
+JavaCompiler::JavaCompiler() :
+  java_class(NULL)
 {
+  classpath[0] = 0;
 }
 
 JavaCompiler::~JavaCompiler()
 {
   delete java_class;
+  fclose(in);
 }
 
 void JavaCompiler::fill_label_map(uint8_t *label_map, int label_map_len, uint8_t *bytes, int code_len, int pc_start)
@@ -1596,9 +1599,31 @@ printf("code_len=%d\n", code_len);
   return ret;
 }
 
-int JavaCompiler::load_class(FILE *in)
+int JavaCompiler::load_class(const char *filename)
 {
 int index;
+int ptr;
+int last_slash = -1;
+
+  ptr = 0;
+  while(filename[ptr] != 0)
+  {
+    if (filename[ptr] == '/') { last_slash = ptr; }
+    if (filename[ptr] == '\\') { last_slash = ptr; }  // DOS :( come on now :(
+    ptr++;
+  }
+
+  if (last_slash != -1 && last_slash < (int)sizeof(classpath) - 1)
+  {
+    last_slash++;
+    strncpy(classpath, filename, last_slash);
+    classpath[last_slash] = 0;
+  }
+
+  printf("CLASSPATH: '%s'\n\n", classpath);
+
+  in = fopen(filename, "rb");
+  if (in == NULL) { return -1; }
 
   java_class = new JavaClass(in);
   java_class->print();
@@ -1614,10 +1639,22 @@ int index;
     if (constant_fieldref->tag == CONSTANT_FIELDREF &&
         constant_fieldref->class_index != java_class->this_class)
     {
+      char class_name[128];
       char field_name[128];
       char field_type[128];
+      int ptr;
 
       java_class->get_ref_name_type(field_name, field_type, sizeof(field_name), index);
+
+      ptr = 0;
+      while(field_name[ptr] != 0 && field_name[ptr] != '_')
+      {
+        class_name[ptr] = field_name[ptr];
+        ptr++;
+      }
+      class_name[ptr] = 0;
+
+      external_classes.insert(class_name);
       external_fields[field_name] = field_type_to_int(field_type);
     }
   }
@@ -1677,8 +1714,6 @@ int field_count = java_class->get_field_count();
 
 int JavaCompiler::add_static_initializers()
 {
-//int method_count = java_class->get_method_count();
-//char method_name[32];
 int index;
 
   // Add all the static initializers
@@ -1692,11 +1727,76 @@ int index;
     }
   }
 
+  //printf("External class count: %ld\n", external_classes.size());
+
   // Add static initializers for all external fields.
-  std::map<std::string,int>::iterator iter;
-  for (iter = external_fields.begin(); iter != external_fields.end(); iter++)
+  std::set<std::string>::iterator iter;
+  for (iter = external_classes.begin(); iter != external_classes.end(); iter++)
   {
+    printf("CLASS %s\n", (*iter).c_str());
+    char filename[1024];
+
+    // This should be safe from earlier restrictions on string sizes.
+    strcpy(filename, classpath);
+    strcat(filename, (*iter).c_str());
+    strcat(filename, ".class");
+
+    printf("EXECUTE %s  method: <clinit>\n", filename);
+
+    FILE *in = fopen(filename, "rb");
+
+    if (in == NULL)
+    {
+      printf("Cannot open '%s'\n", filename);
+      return -1;
+    }
+
+    JavaClass *java_class_external = new JavaClass(in);
+    index = java_class_external->get_clinit_method();
+
+    if (execute_static(java_class_external, index, generator, false, java_class) != 0)
+    {
+      printf("** Error setting statics.\n");
+      return -1;
+    }
+
+    delete java_class_external;
+    fclose(in);
+
+#if 0
+    const char *field_type = field_type_from_int(iter->second);
+    const char *s;
+    int n,i;
+
+    if (field_type[0] == '[')
+    {
+      continue;
+    }
+
+    strcpy(filename, classpath);
+    i = strlen(filename);
+
+    n = 0;
+    s = iter->first.c_str();
+    while (s[n] != '_' && s[n] != 0)
+    {
+      filename[i] = s[n];
+      n++;
+      i++;
+    }
+    filename[i] = 0;
+
+    if (s[n] == 0)
+    {
+      printf("Skipping '%s'\n", iter->first.c_str());
+    }
+      else
+    {
+      strcat(filename, ".class");
+      const char *field_name = s + n + 1;
+    }
     //generator->insert_static_field_define(iter->first.c_str(), field_type_from_int(iter->second), external_index++);
+#endif
   }
 
   generator->add_newline();

@@ -15,7 +15,7 @@
 #include "Generator.h"
 #include "JavaClass.h"
 
-int execute_static(JavaClass *java_class, int method_id, Generator *generator, bool do_arrays, char *filter_field_name=NULL);
+int execute_static(JavaClass *java_class, int method_id, Generator *generator, bool do_arrays, JavaClass *parent_class=NULL);
 
 #endif
 

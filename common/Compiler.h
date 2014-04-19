@@ -23,7 +23,7 @@ public:
   void disable_optimizer() { optimize = false; }
   void set_generator(Generator *generator) { this->generator = generator; }
 
-  virtual int load_class(FILE *in) = 0;
+  virtual int load_class(const char *filename) = 0;
   virtual void insert_static_field_defines() = 0;
   virtual void init_heap() = 0;
   virtual int add_static_initializers() = 0;

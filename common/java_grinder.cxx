@@ -117,7 +117,6 @@ Generator *generator = NULL;
 
 int main(int argc, char *argv[])
 {
-FILE *in;
 Generator *generator;
 Compiler *compiler;
 const char *java_file;
@@ -167,13 +166,6 @@ int n;
     option++;
   }
 
-  in = fopen(java_file, "rb");
-  if (in == NULL)
-  {
-    printf("Cannot open classfile %s\n", argv[1]);
-    exit(1);
-  }
-
   generator = new_generator(chip_type);
 
   if (generator == NULL)
@@ -184,11 +176,18 @@ int n;
 
   if (generator->open(asm_file) == -1)
   {
+    delete generator;
     exit(1);
   }
 
   compiler->set_generator(generator);
-  compiler->load_class(in);
+
+  if (compiler->load_class(java_file) == -1)
+  {
+    printf("Couldn't open class file '%s'\n", java_file);
+    delete generator;
+    exit(1);
+  }
 
   int ret = 0;
 
@@ -206,8 +205,6 @@ int n;
 
   delete generator;
   delete compiler;
-
-  fclose(in);
 
   return ret;
 }

@@ -13,6 +13,8 @@
 #define _JAVA_COMPILER_H
 
 #include <map>
+//#include <unordered_map>
+#include <set>
 #include <string>
 
 #include "Compiler.h"
@@ -36,7 +38,7 @@ public:
   JavaCompiler();
   virtual ~JavaCompiler();
 
-  virtual int load_class(FILE *in);
+  virtual int load_class(const char *filename);
   virtual void insert_static_field_defines();
   virtual void init_heap();
   virtual int add_static_initializers();
@@ -52,7 +54,10 @@ private:
   const char *field_type_from_int(int type);
 
   JavaClass *java_class;
+  char classpath[128];
   std::map<std::string,int> external_fields;
+  std::set<std::string> external_classes;
+  FILE *in;
   static uint8_t cond_table[];
   static const char *type_table[];
 };

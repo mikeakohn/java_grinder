@@ -40,7 +40,7 @@
           break; \
         }
 
-int execute_static(JavaClass *java_class, int method_id, Generator *generator, bool do_arrays, char *filter_field_name)
+int execute_static(JavaClass *java_class, int method_id, Generator *generator, bool do_arrays, JavaClass *parent_class)
 {
 struct methods_t *method = java_class->get_method(method_id);
 uint8_t *bytes = method->attributes[0].info;
@@ -58,12 +58,26 @@ int32_t *array = NULL;
 int array_len;
 int array_type;
 int array_alloc_size = 0;
-char field_name[128];
+char full_field_name[256];
+char *field_name;
 char type[128];
 int index;
 int ret = 0;
 
   printf("--- Executing static code\n");
+
+  if (java_class != parent_class)
+  {
+    java_class->get_class_name(full_field_name, sizeof(full_field_name), java_class->this_class);
+    strcat(full_field_name, "_");
+    field_name = full_field_name + strlen(full_field_name);
+  }
+    else
+  {
+    field_name = full_field_name;
+  }
+
+printf("full_field_name='%s'\n", full_field_name);
 
   // bytes points to the method attributes info for the method.
   max_stack = ((int)bytes[0]<<8) | ((int)bytes[1]);
@@ -159,13 +173,13 @@ int ret = 0;
             break;
           }
 
-          if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), index) != 0)
+          if (java_class->get_ref_name_type(field_name, type, sizeof(type), index) != 0)
           {
             printf("Error retrieving field name %d\n", constant_string->string_index);
             ret = -1;
             break;
           }
-          printf("  String %s;\n", field_name);
+          printf("  String %s; // %s\n", field_name, full_field_name);
           if (do_arrays)
           {
             constant_utf8_t *constant_utf8 = (constant_utf8_t *)java_class->get_constant(constant_string->string_index);
@@ -176,12 +190,12 @@ int ret = 0;
               break;
             }
 
-            generator->insert_string(field_name, constant_utf8->bytes, constant_utf8->length);
+            generator->insert_string(full_field_name, constant_utf8->bytes, constant_utf8->length);
           }
             else
           {
             //index = java_class->get_field_index(field_name);
-            generator->insert_field_init(field_name, index);
+            generator->insert_field_init(full_field_name, index);
           }
 
           //printf("Can't do a string yet.. :( %d\n", constant_string->string_index);
@@ -389,9 +403,9 @@ int ret = 0;
       case 179: // putstatic (0xb3)
         CHECK_STACK(1);
         index = (bytes[pc+1] << 8) | bytes[pc+2];
-        printf("id=%d stack_ptr=%d const=%d\n", stack[stack_ptr-1], stack_ptr, index);
+        printf("id=%d stack_ptr=%d index=%d\n", stack[stack_ptr-1], stack_ptr, index);
         stack_ptr--;  // <-- this is our made up index which here is always 0
-        if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), index) != 0)
+        if (java_class->get_ref_name_type(field_name, type, sizeof(type), index) != 0)
         {
           printf("Error retrieving field name %d\n", stack[stack_ptr]);
           ret = -1;
@@ -415,18 +429,18 @@ int ret = 0;
             if (array_type == ARRAY_TYPE_BOOLEAN ||
                 array_type == ARRAY_TYPE_BYTE)
             {
-              generator->insert_array(field_name, array, array_len, TYPE_BYTE);
+              generator->insert_array(full_field_name, array, array_len, TYPE_BYTE);
             }
               else
             if (array_type == ARRAY_TYPE_CHAR ||
                 array_type == ARRAY_TYPE_SHORT)
             {
-              generator->insert_array(field_name, array, array_len, TYPE_SHORT);
+              generator->insert_array(full_field_name, array, array_len, TYPE_SHORT);
             }
               else
             if (array_type == ARRAY_TYPE_INT)
             {
-              generator->insert_array(field_name, array, array_len, TYPE_INT);
+              generator->insert_array(full_field_name, array, array_len, TYPE_INT);
             }
               else
             {
@@ -437,7 +451,7 @@ int ret = 0;
             else
           {
             index = java_class->get_field_index(field_name);
-            generator->insert_field_init(field_name, index);
+            generator->insert_field_init(full_field_name, index);
           }
         }
           else
@@ -454,27 +468,27 @@ int ret = 0;
 
           if (strcmp(type, "Z") == 0) // boolean
           {
-            ret = generator->insert_field_init_boolean(field_name, index, value);
+            ret = generator->insert_field_init_boolean(full_field_name, index, value);
           }
             else
           if (strcmp(type, "B") == 0)
           {
-            ret = generator->insert_field_init_byte(field_name, index, value);
+            ret = generator->insert_field_init_byte(full_field_name, index, value);
           }
             else
           if (strcmp(type, "S") == 0)
           {
-            ret = generator->insert_field_init_short(field_name, index, value);
+            ret = generator->insert_field_init_short(full_field_name, index, value);
           }
             else
           if (strcmp(type, "C") == 0)
           {
-            ret = generator->insert_field_init_short(field_name, index, value);
+            ret = generator->insert_field_init_short(full_field_name, index, value);
           }
             else
           if (strcmp(type, "I") == 0)
           {
-            ret = generator->insert_field_init_int(field_name, index, value);
+            ret = generator->insert_field_init_int(full_field_name, index, value);
           }
             else
           { ret = -1; }
