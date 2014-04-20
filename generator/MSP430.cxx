@@ -1021,7 +1021,7 @@ int n;
   // Pop all params off the Java stack
   if ((stack - stack_vars) > 0)
   {
-    fprintf(out, "  sub.w #%d, SP\n", (stack - stack_vars) * 2);
+    fprintf(out, "  add.w #%d, SP\n", (stack - stack_vars) * 2);
     params -= (stack - stack_vars);
   }
 
@@ -1769,7 +1769,7 @@ int MSP430::memory_write8()
   {
     fprintf(out, "  mov.w 2(SP), r15\n");
     fprintf(out, "  mov.b @SP, 0(r15)\n");
-    fprintf(out, "  sub.w #4, SP\n");
+    fprintf(out, "  add.w #4, SP\n");
     stack -= 2;
   }
     else
@@ -1809,7 +1809,7 @@ int MSP430::memory_write16()
   {
     fprintf(out, "  mov.w 2(SP), r15\n");
     fprintf(out, "  mov.w @SP, 0(r15)\n");
-    fprintf(out, "  sub.w #4, SP\n");
+    fprintf(out, "  add.w #4, SP\n");
     stack -= 2;
   }
     else
