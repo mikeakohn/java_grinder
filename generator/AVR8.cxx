@@ -179,7 +179,7 @@ int AVR8::open(const char *filename)
   fprintf(out, "stack_hi equ 0x10\n");
 
   // RAMEND (change to particular chip)
-  fprintf(out, "RAMEND equ 0x3f\n");
+//  fprintf(out, "RAMEND equ 0x3f\n");
 
   // heap
   fprintf(out, "ram_start equ 0x20\n");
@@ -202,10 +202,10 @@ int AVR8::open(const char *filename)
   fprintf(out, "  mov ff, temp\n");
 
   // processor stack setup
-  fprintf(out, "  ldi r16, RAMEND & 0xff\n");
-  fprintf(out, "  out SPL, r16\n");
-  fprintf(out, "  ldi r16, RAMEND >> 8\n");
-  fprintf(out, "  out SPH, r16\n");
+//  fprintf(out, "  ldi r16, RAMEND & 0xff\n");
+//  fprintf(out, "  out SPL, r16\n");
+//  fprintf(out, "  ldi r16, RAMEND >> 8\n");
+//  fprintf(out, "  out SPH, r16\n");
 
   // java stack setup
   fprintf(out, "  ldi SP, 0xf\n");
