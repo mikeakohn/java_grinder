@@ -175,18 +175,19 @@ int AVR8::open(const char *filename)
   fprintf(out, "SPH equ 0x3e\n");
 
   // java stack base locations
-  fprintf(out, "stack_lo equ 0x00\n");
-  fprintf(out, "stack_hi equ 0x10\n");
+  fprintf(out, "stack_lo equ 0x60\n");
+  fprintf(out, "stack_hi equ 0x70\n");
 
   // RAMEND (change to particular chip)
-//  fprintf(out, "RAMEND equ 0x3f\n");
+  fprintf(out, "RAMEND equ 0x9f\n");
 
   // heap
-  fprintf(out, "ram_start equ 0x20\n");
+  fprintf(out, "ram_start equ 0x80\n");
   fprintf(out, "heap_ptr equ ram_start\n\n");
 
   // startup
-  fprintf(out, ".org 0x0000\n\n");
+  fprintf(out, ".org 0x0000\n");
+  fprintf(out, "  rjmp start\n");
   fprintf(out, "start:\n");
 
   // constants
@@ -1028,7 +1029,7 @@ int AVR8::insert_array(const char *name, int32_t *data, int len, uint8_t type)
     return insert_dw(name, data, len, TYPE_SHORT);
   }
 
-  return 0;
+  return -1;
 }
 
 int AVR8::insert_string(const char *name, uint8_t *bytes, int len)
@@ -1089,8 +1090,8 @@ int AVR8::array_read_byte(const char *name, int field_id)
   need_array_byte_support = 1;
   if (stack > 0)
   {
-    fprintf(out, "  lds XL, %s + 0\n", name);
-    fprintf(out, "  lds XH, %s + 1\n", name);
+    fprintf(out, "  lds ZL, %s + 0\n", name);
+    fprintf(out, "  lds ZH, %s + 1\n", name);
     fprintf(out, "  rcall array_read_byte2\n");
     stack++;
   }
@@ -1109,6 +1110,8 @@ int AVR8::array_read_int(const char *name, int field_id)
 
   if (stack > 0)
   {
+    fprintf(out, "  lds ZL, %s + 0\n", name);
+    fprintf(out, "  lds ZH, %s + 1\n", name);
     fprintf(out, "  rcall array_read_int2\n");
     stack++;
   }
@@ -1616,9 +1619,9 @@ void AVR8::insert_array_byte_support()
   fprintf(out, "array_read_byte2:\n");
   POP_HI("result1");
   POP_LO("result0");
-  fprintf(out, "  add XL, result0\n");
-  fprintf(out, "  adc XH, result1\n");
-  fprintf(out, "  ld result0, X\n");
+  fprintf(out, "  add ZL, result0\n");
+  fprintf(out, "  adc ZH, result1\n");
+  fprintf(out, "  lpm result0, Z\n");
   PUSH_LO("result0");
   fprintf(out, "  cp result0, zero\n");
   fprintf(out, "  brpl array_read_byte2_skip\n");
@@ -1690,10 +1693,10 @@ void AVR8::insert_array_int_support()
   POP_LO("result0");
   fprintf(out, "  lsl result0\n");
   fprintf(out, "  rol result1\n");
-  fprintf(out, "  add XL, result0\n");
-  fprintf(out, "  adc XH, result1\n");
-  fprintf(out, "  ld result0, X+\n");
-  fprintf(out, "  ld result1, X+\n");
+  fprintf(out, "  add ZL, result0\n");
+  fprintf(out, "  adc ZH, result1\n");
+  fprintf(out, "  lpm result0, Z+\n");
+  fprintf(out, "  lpm result1, Z+\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
   fprintf(out, "  ret\n\n");
