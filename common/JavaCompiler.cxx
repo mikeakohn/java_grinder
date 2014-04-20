@@ -62,6 +62,14 @@ JavaCompiler::JavaCompiler() :
 
 JavaCompiler::~JavaCompiler()
 {
+  // Delete external classes
+  std::map<std::string,JavaClass *>::iterator iter;
+  for (iter = external_classes.begin(); iter != external_classes.end(); iter++)
+  {
+    JavaClass *java_class_external = iter->second;
+    delete java_class_external;
+  }
+
   delete java_class;
   fclose(in);
 }
@@ -1654,12 +1662,38 @@ int last_slash = -1;
       }
       class_name[ptr] = 0;
 
-      external_classes.insert(class_name);
+      //external_classes.insert(class_name);
+      std::map<std::string,JavaClass *>::iterator iter;
+
+      iter = external_classes.find(class_name);
+      if (iter == external_classes.end())
+      {
+        char filename[1024];
+
+        // This should be safe from earlier restrictions on string sizes.
+        strcpy(filename, classpath);
+        strcat(filename, class_name);
+        strcat(filename, ".class");
+
+        FILE *in = fopen(filename, "rb");
+
+        if (in == NULL)
+        {
+          printf("Cannot open '%s'\n", filename);
+          return -1;
+        }
+
+        JavaClass *java_class_external = new JavaClass(in);
+        external_classes[class_name] = java_class_external;
+
+        fclose(in);
+      }
       external_fields[field_name] = field_type_to_int(field_type);
     }
   }
 
   // Just some debug code
+  printf("external_class_count=%ld\n", external_classes.size());
   printf("external_field_count=%ld\n", external_fields.size());
 
   std::map<std::string,int>::iterator iter;
@@ -1727,31 +1761,12 @@ int index;
     }
   }
 
-  //printf("External class count: %ld\n", external_classes.size());
-
   // Add static initializers for all external fields.
-  std::set<std::string>::iterator iter;
+  std::map<std::string,JavaClass *>::iterator iter;
   for (iter = external_classes.begin(); iter != external_classes.end(); iter++)
   {
-    printf("CLASS %s\n", (*iter).c_str());
-    char filename[1024];
-
-    // This should be safe from earlier restrictions on string sizes.
-    strcpy(filename, classpath);
-    strcat(filename, (*iter).c_str());
-    strcat(filename, ".class");
-
-    printf("EXECUTE %s  method: <clinit>\n", filename);
-
-    FILE *in = fopen(filename, "rb");
-
-    if (in == NULL)
-    {
-      printf("Cannot open '%s'\n", filename);
-      return -1;
-    }
-
-    JavaClass *java_class_external = new JavaClass(in);
+    printf("CLASS %s\n", iter->first.c_str());
+    JavaClass *java_class_external = iter->second;
     index = java_class_external->get_clinit_method();
 
     if (execute_static(java_class_external, index, generator, false, java_class) != 0)
@@ -1759,44 +1774,6 @@ int index;
       printf("** Error setting statics.\n");
       return -1;
     }
-
-    delete java_class_external;
-    fclose(in);
-
-#if 0
-    const char *field_type = field_type_from_int(iter->second);
-    const char *s;
-    int n,i;
-
-    if (field_type[0] == '[')
-    {
-      continue;
-    }
-
-    strcpy(filename, classpath);
-    i = strlen(filename);
-
-    n = 0;
-    s = iter->first.c_str();
-    while (s[n] != '_' && s[n] != 0)
-    {
-      filename[i] = s[n];
-      n++;
-      i++;
-    }
-    filename[i] = 0;
-
-    if (s[n] == 0)
-    {
-      printf("Skipping '%s'\n", iter->first.c_str());
-    }
-      else
-    {
-      strcat(filename, ".class");
-      const char *field_name = s + n + 1;
-    }
-    //generator->insert_static_field_define(iter->first.c_str(), field_type_from_int(iter->second), external_index++);
-#endif
   }
 
   generator->add_newline();
@@ -1828,14 +1805,32 @@ int index;
 
       if (do_main) { continue; }
 
-      // <clinit> method is executed to pull out arrays and statics
       if (strcmp("<clinit>", method_name) == 0)
       {
+        // <clinit> method is executed for adding array static data
         if (execute_static(java_class, index, generator, true) != 0)
         {
           printf("** Error setting statics.\n");
           return -1;
         }
+
+        // Add arrays from external classes
+        std::map<std::string,JavaClass *>::iterator iter;
+        for (iter = external_classes.begin(); iter != external_classes.end();
+             iter++)
+        {
+          printf("CLASS %s\n", iter->first.c_str());
+          JavaClass *java_class_external = iter->second;
+          int index = java_class_external->get_clinit_method();
+
+          if (execute_static(java_class_external, index, generator, true,
+                             java_class) != 0)
+          {
+            printf("** Error setting statics.\n");
+            return -1;
+          }
+        }
+
         continue;
       }
 

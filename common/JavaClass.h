@@ -201,6 +201,8 @@ public:
   int16_t this_class;
   int16_t super_class;
 
+  char class_name[128];
+
 private:
   void read_attributes(FILE *in);
   void read_fields(FILE *in);

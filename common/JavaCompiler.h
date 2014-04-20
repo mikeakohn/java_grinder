@@ -14,7 +14,6 @@
 
 #include <map>
 //#include <unordered_map>
-#include <set>
 #include <string>
 
 #include "Compiler.h"
@@ -56,7 +55,7 @@ private:
   JavaClass *java_class;
   char classpath[128];
   std::map<std::string,int> external_fields;
-  std::set<std::string> external_classes;
+  std::map<std::string,JavaClass *> external_classes;
   FILE *in;
   static uint8_t cond_table[];
   static const char *type_table[];

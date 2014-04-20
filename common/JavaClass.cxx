@@ -84,6 +84,8 @@ int t;
     memset(attributes, 0, attributes_count * sizeof(int));
     read_attributes(in);
   }
+
+  get_class_name(class_name, sizeof(class_name), this_class);
 }
 
 JavaClass::~JavaClass()
@@ -682,8 +684,8 @@ int r;
   print_access(access_flags);
   printf("\n");
 
-  get_class_name(name, sizeof(name), this_class);
-  printf("     ThisClass: %s (%d)\n", name, this_class);
+  //get_class_name(name, sizeof(name), this_class);
+  printf("     ThisClass: %s (%d)\n", class_name, this_class);
   get_class_name(name, sizeof(name), super_class);
   printf("    SuperClass: %s (%d)\n", name, super_class);
   printf("InterfaceCount: %d\n", interfaces_count);

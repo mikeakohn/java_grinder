@@ -66,18 +66,18 @@ int ret = 0;
 
   printf("--- Executing static code\n");
 
-  if (java_class != parent_class)
+  // If this isn't the parent class then well prepend the class name
+  // infront of the symbol.
+  if (parent_class == NULL)
+  {
+    field_name = full_field_name;
+  }
+    else
   {
     java_class->get_class_name(full_field_name, sizeof(full_field_name), java_class->this_class);
     strcat(full_field_name, "_");
     field_name = full_field_name + strlen(full_field_name);
   }
-    else
-  {
-    field_name = full_field_name;
-  }
-
-printf("full_field_name='%s'\n", full_field_name);
 
   // bytes points to the method attributes info for the method.
   max_stack = ((int)bytes[0]<<8) | ((int)bytes[1]);
