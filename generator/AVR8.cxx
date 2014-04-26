@@ -1169,19 +1169,19 @@ int AVR8::get_values_from_stack(int num)
 
   if(num > 0)
   {
-    fprintf(out, "call get_values_from_stack_1\n");
+    fprintf(out, "  call get_values_from_stack_1\n");
     stack--;
   }
 
   if(num > 1)
   {
-    fprintf(out, "call get_values_from_stack_2\n");
+    fprintf(out, "  call get_values_from_stack_2\n");
     stack--;
   }
 
   if(num > 2)
   {
-    fprintf(out, "call get_values_from_stack_3\n");
+    fprintf(out, "  call get_values_from_stack_3\n");
     stack--;
   }
 
