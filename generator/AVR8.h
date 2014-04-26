@@ -153,6 +153,7 @@ protected:
   bool need_push_array_length2:1;
   bool need_array_byte_support:1;
   bool need_array_int_support:1;
+  bool need_get_values_from_stack:1;
 
   void insert_swap();
   void insert_add_integer();
@@ -178,6 +179,7 @@ protected:
   void insert_push_array_length2();
   void insert_array_byte_support();
   void insert_array_int_support();
+  void insert_get_values_from_stack();
 };
 
 #endif

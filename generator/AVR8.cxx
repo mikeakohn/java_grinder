@@ -104,7 +104,8 @@ AVR8::AVR8() :
   need_push_array_length(0),
   need_push_array_length2(0),
   need_array_byte_support(0),
-  need_array_int_support(0)
+  need_array_int_support(0),
+  need_get_values_from_stack(0)
 {
 
 }
@@ -135,6 +136,7 @@ AVR8::~AVR8()
   if(need_push_array_length2) { insert_push_array_length2(); }
   if(need_array_byte_support) { insert_array_byte_support(); }
   if(need_array_int_support) { insert_array_int_support(); }
+  if(need_get_values_from_stack) { insert_get_values_from_stack(); }
 }
 
 int AVR8::open(const char *filename)
@@ -1163,25 +1165,23 @@ int AVR8::array_write_int(const char *name, int field_id)
 
 int AVR8::get_values_from_stack(int num)
 {
-  fprintf(out, "; get_values_from_stack, num = %d\n", num);
+  need_get_values_from_stack = 1;
+
   if(num > 0)
   {
-    POP_HI("value11");
-    POP_LO("value10");
+    fprintf(out, "call get_values_from_stack_1\n");
     stack--;
   }
 
   if(num > 1)
   {
-    POP_HI("value21");
-    POP_LO("value20");
+    fprintf(out, "call get_values_from_stack_2\n");
     stack--;
   }
 
   if(num > 2)
   {
-    POP_HI("value31");
-    POP_LO("value30");
+    fprintf(out, "call get_values_from_stack_3\n");
     stack--;
   }
 
@@ -1711,6 +1711,22 @@ void AVR8::insert_array_int_support()
   fprintf(out, "  mov XH, value31\n");
   fprintf(out, "  st X+, value10\n");
   fprintf(out, "  st X+, value11\n");
+  fprintf(out, "  ret\n\n");
+}
+
+void AVR8::insert_get_values_from_stack()
+{
+  fprintf(out, "get_values_from_stack_1:\n");
+  POP_HI("value11");
+  POP_LO("value10");
+  fprintf(out, "  ret\n\n");
+  fprintf(out, "get_values_from_stack_2:\n");
+  POP_HI("value21");
+  POP_LO("value20");
+  fprintf(out, "  ret\n\n");
+  fprintf(out, "get_values_from_stack_3:\n");
+  POP_HI("value31");
+  POP_LO("value30");
   fprintf(out, "  ret\n\n");
 }
 
