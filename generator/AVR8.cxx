@@ -1034,6 +1034,7 @@ int stack_vars = stack;
       fprintf(out, "  ldi YL, stack_hi + 1 %d\n", local - 1);
       fprintf(out, "  add YL, SP\n");
       fprintf(out, "  st Y, temp\n");
+
       stack_vars--;
     }
 
@@ -1292,26 +1293,21 @@ int AVR8::get_values_from_stack(int num)
 void AVR8::insert_swap()
 {
   fprintf(out, "swap:\n");
-  fprintf(out, "  ldi YL, stack_lo\n");
-  fprintf(out, "  add YL, SP\n");
-  fprintf(out, "  ld value10, Y-\n");
-  fprintf(out, "  ld value20, Y-\n");
+  fprintf(out, "  ldi XL, stack_lo\n");
+  fprintf(out, "  add XL, SP\n");
+  fprintf(out, "  ld value10, X-\n");
+  fprintf(out, "  ld value20, X\n");
   fprintf(out, "  ldi YL, stack_hi\n");
   fprintf(out, "  add YL, SP\n");
   fprintf(out, "  ld value11, Y-\n");
   fprintf(out, "  ld value21, Y\n");
-  fprintf(out, "  mov value30, value20\n");
-  fprintf(out, "  mov value31, value21\n");
-  fprintf(out, "  mov value20, value10\n");
-  fprintf(out, "  mov value21, value11\n");
-  fprintf(out, "  mov value10, value30\n");
-  fprintf(out, "  mov value11, value31\n");
+  fprintf(out, "  movw value30, value20\n");
+  fprintf(out, "  movw value20, value10\n");
+  fprintf(out, "  movw value10, value30\n");
   fprintf(out, "  st Y+, value21\n");
   fprintf(out, "  st Y, value11\n");
-  fprintf(out, "  ldi YL, stack_lo\n");
-  fprintf(out, "  add YL, SP\n");
-  fprintf(out, "  st Y-, value10\n");
-  fprintf(out, "  st Y, value20\n");
+  fprintf(out, "  st X+, value10\n");
+  fprintf(out, "  st X, value20\n");
   fprintf(out, "  ret\n\n");
 }
 
