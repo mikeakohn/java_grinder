@@ -705,13 +705,43 @@ int AVR8::xor_integer(int const_val)
 
 int AVR8::inc_integer(int index, int num)
 {
-  need_inc_integer = 1;
   uint16_t value = num & 0xffff;
 
-  fprintf(out, "  ldi value10, 0x%02x\n", value & 0xff);
-  fprintf(out, "  ldi value11, 0x%02x\n", value >> 8);
-  fprintf(out, "  ldi temp, %d\n", LOCALS(index));
-  fprintf(out, "  rcall inc_integer\n");
+  if(num > 0 && num < 64)
+  {
+    fprintf(out, "; inc_integer (optimized, add)\n");
+    fprintf(out, "  ldi XL, stack_lo - %d\n", LOCALS(index));
+    fprintf(out, "  add XL, locals\n");
+    fprintf(out, "  ld ZL, X\n");
+    fprintf(out, "  ldi YL, stack_hi - %d\n", LOCALS(index));
+    fprintf(out, "  add YL, locals\n");
+    fprintf(out, "  ld ZH, Y\n");
+    fprintf(out, "  adiw ZL, 0x%02x\n", num);
+    fprintf(out, "  st X, ZL\n");
+    fprintf(out, "  st Y, ZH\n");
+  }
+    else
+  if(num > -64 && num < 0)
+  {
+    fprintf(out, "; inc_integer (optimized, sub)\n");
+    fprintf(out, "  ldi XL, stack_lo - %d\n", LOCALS(index));
+    fprintf(out, "  add XL, locals\n");
+    fprintf(out, "  ld ZL, X\n");
+    fprintf(out, "  ldi YL, stack_hi - %d\n", LOCALS(index));
+    fprintf(out, "  add YL, locals\n");
+    fprintf(out, "  ld ZH, Y\n");
+    fprintf(out, "  sbiw ZL, 0x%02x\n", -num);
+    fprintf(out, "  st X, ZL\n");
+    fprintf(out, "  st Y, ZH\n");
+  }
+    else
+  {
+    need_inc_integer = 1;
+    fprintf(out, "  ldi value10, 0x%02x\n", value & 0xff);
+    fprintf(out, "  ldi value11, 0x%02x\n", value >> 8);
+    fprintf(out, "  ldi temp, %d\n", LOCALS(index));
+    fprintf(out, "  rcall inc_integer\n");
+  }
 
   return 0;
 }
@@ -1491,20 +1521,18 @@ void AVR8::insert_xor_integer()
 void AVR8::insert_inc_integer()
 {
   fprintf(out, "inc_integer:\n");
-  fprintf(out, "  ldi YL, stack_lo\n");
-  fprintf(out, "  sub YL, temp\n");
-  fprintf(out, "  add YL, locals\n");
-  fprintf(out, "  ld value20, Y\n");
-  fprintf(out, "  mov temp2, YL\n");
+  fprintf(out, "  ldi XL, stack_lo\n");
+  fprintf(out, "  sub XL, temp\n");
+  fprintf(out, "  add XL, locals\n");
+  fprintf(out, "  ld value20, X\n");
   fprintf(out, "  ldi YL, stack_hi\n");
   fprintf(out, "  sub YL, temp\n");
   fprintf(out, "  add YL, locals\n");
   fprintf(out, "  ld value21, Y\n");
   fprintf(out, "  add value20, value10\n");
   fprintf(out, "  adc value21, value11\n");
+  fprintf(out, "  st X, value20\n");
   fprintf(out, "  st Y, value21\n");
-  fprintf(out, "  mov YL, temp2\n");
-  fprintf(out, "  st Y, value20\n");
   fprintf(out, "  ret\n\n");
 }
 
