@@ -584,7 +584,22 @@ int AVR8::shift_left_integer()
 
 int AVR8::shift_left_integer(int const_val)
 {
-  return -1;
+  int i;
+
+  fprintf(out, "; shift_left_integer (optimized)\n");
+  POP_HI("result1");
+  POP_LO("result0");
+
+  for(i = 0; i < const_val; i++)
+  {
+    fprintf(out, "  lsl result0\n");
+    fprintf(out, "  rol result1\n");
+  }
+
+  PUSH_LO("result0");
+  PUSH_HI("result1");
+
+  return 0;
 }
 
 int AVR8::shift_right_integer()
@@ -612,7 +627,22 @@ int AVR8::shift_right_uinteger()
 
 int AVR8::shift_right_uinteger(int const_val)
 {
-  return -1;
+  int i;
+
+  fprintf(out, "; shift_right_uinteger (optimized)\n");
+  POP_HI("result1");
+  POP_LO("result0");
+
+  for(i = 0; i < const_val; i++)
+  {
+    fprintf(out, "  lsr result1\n");
+    fprintf(out, "  ror result0\n");
+  }
+
+  PUSH_LO("result0");
+  PUSH_HI("result1");
+
+  return 0;
 }
 
 int AVR8::and_integer()
@@ -626,7 +656,15 @@ int AVR8::and_integer()
 
 int AVR8::and_integer(int const_val)
 {
-  return -1;
+  fprintf(out, "; and_integer (optimized)\n");
+  POP_HI("result1");
+  POP_LO("result0");
+  fprintf(out, "  andi result0, 0x%02x\n", const_val & 0xff);
+  fprintf(out, "  andi result1, 0x%02x\n", const_val >> 8);
+  PUSH_LO("result0");
+  PUSH_HI("result1");
+
+  return 0;
 }
 
 int AVR8::or_integer()
@@ -640,7 +678,15 @@ int AVR8::or_integer()
 
 int AVR8::or_integer(int const_val)
 {
-  return -1;
+  fprintf(out, "; or_integer (optimized)\n");
+  POP_HI("result1");
+  POP_LO("result0");
+  fprintf(out, "  ori result0, 0x%02x\n", const_val & 0xff);
+  fprintf(out, "  ori result1, 0x%02x\n", const_val >> 8);
+  PUSH_LO("result0");
+  PUSH_HI("result1");
+
+  return 0;
 }
 
 int AVR8::xor_integer()
