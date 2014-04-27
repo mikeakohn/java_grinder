@@ -28,6 +28,7 @@
 #include "MSP430X.h"
 #include "STDC.h"
 #include "TI84.h"
+#include "TMS9900.h"
 #include "Z80.h"
 #include "version.h"
 
@@ -107,6 +108,11 @@ Generator *generator = NULL;
     generator = new TI84(TI84_PLUS_C);
   }
     else
+  if (strcasecmp("tms9900", chip_type) == 0)
+  {
+    generator = new TMS9900();
+  }
+    else
   if (strcasecmp("z80", chip_type) == 0)
   {
     generator = new Z80();
@@ -133,7 +139,7 @@ int n;
 
   if (argc < 4)
   {
-    printf("Usage: %s <class> <outfile> <dspic/msp430g2231/msp430g2553/m6502/c64/arm/mips/stdc>\n", argv[0]);
+    printf("Usage: %s <class> <outfile> <dspic/msp430g2231/msp430g2553/m6502/c64/arm/mips/ti84plus>\n", argv[0]);
     exit(0);
   }
 
