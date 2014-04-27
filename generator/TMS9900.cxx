@@ -35,7 +35,6 @@
 TMS9900::TMS9900() :
   reg(0),
   reg_max(9),
-  stack(0),
   is_main(0)
 {
 
@@ -126,7 +125,7 @@ int TMS9900::push_integer(int32_t n)
 
   CHECK_STACK();
 
-  fprintf(out, "  mov #%d, r%d\n", value, REG_STACK(reg));
+  fprintf(out, "  li r%d, %d\n", REG_STACK(reg), value);
   reg++;
   return -1;
 }
@@ -169,7 +168,7 @@ int TMS9900::push_byte(int8_t b)
 
   CHECK_STACK();
 
-  fprintf(out, "  mov #0x%02x, r%d\n", value, REG_STACK(reg));
+  fprintf(out, "  li r%d, 0x%02x\n", REG_STACK(reg), value);
   reg++;
 
   return 0;
@@ -181,7 +180,7 @@ int TMS9900::push_short(int16_t s)
 
   CHECK_STACK();
 
-  fprintf(out, "  mov #0x%02x, r%d\n", value, REG_STACK(reg));
+  fprintf(out, "  li r%d, 0x%02x\n", REG_STACK(reg), value);
   reg++;
 
   return 0;
@@ -240,28 +239,28 @@ int TMS9900::swap()
 
 int TMS9900::add_integer()
 {
-  return stack_alu("a"); 
+  fprintf(out, "  a r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+  reg--;
+
+  return 0;
 }
 
 int TMS9900::add_integer(int num)
 {
-  if (num < -32768 || num > 0xffff) { return -1; }
-
-  fprintf(out, "  a #%d, %d\n", num, REG_STACK(reg-1));
-  return 0;
+  return -1;
 }
 
 int TMS9900::sub_integer()
 {
-  return stack_alu("s"); 
+  fprintf(out, "  s r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+  reg--;
+
+  return 0;
 }
 
 int TMS9900::sub_integer(int num)
 {
-  if (num < -32768 || num > 0xffff) { return -1; }
-
-  fprintf(out, "  s #%d, %d\n", num, REG_STACK(reg-1));
-  return 0;
+  return -1;
 }
 
 int TMS9900::mul_integer()
@@ -323,7 +322,7 @@ int TMS9900::and_integer()
 int TMS9900::and_integer(int num)
 {
   if (num < -32768 || num > 0xffff) { return -1; }
-  fprintf(out, "  andi #%d, %d\n", num, REG_STACK(reg-1));
+  fprintf(out, "  andi r%d, %d\n", REG_STACK(reg-1), num);
   return 0;
 }
 
@@ -336,21 +335,21 @@ int TMS9900::or_integer()
 int TMS9900::or_integer(int num)
 {
   if (num < -32768 || num > 0xffff) { return -1; }
-  fprintf(out, "  ori #%d, %d\n", num, REG_STACK(reg-1));
+  fprintf(out, "  ori r%d, %d\n", REG_STACK(reg-1), num);
   return 0;
 }
 
 int TMS9900::xor_integer()
 {
-  return stack_alu("xor"); 
+  fprintf(out, "  xor r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+  reg--;
+
+  return 0;
 }
 
 int TMS9900::xor_integer(int num)
 {
-  if (stack != 0) { return -1; }
-  if (num < 0 || num > 0xffff) { return -1; }
-  fprintf(out, "  xori $t%d, $t%d, %d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
-  return 0;
+  return -1;
 }
 
 int TMS9900::inc_integer(int index, int num)
@@ -360,7 +359,13 @@ int TMS9900::inc_integer(int index, int num)
 
 int TMS9900::integer_to_byte()
 {
-  return -1;
+  fprintf(out, "  li r0, 0x80\n");
+  fprintf(out, "  coc r%d, r0\n", REG_STACK(reg-1));
+  fprintf(out, "  jne label_%d\n", label_count);
+  fprintf(out, "  ori r%d, #0xff00\n", REG_STACK(reg-1));
+  fprintf(out, "label_%d\n", label_count);
+  label_count++;
+  return 0;
 }
 
 int TMS9900::jump_cond(const char *label, int cond)
@@ -514,30 +519,4 @@ int TMS9900::array_write_int(const char *name, int field_id)
 {
   return -1;
 }
-
-int TMS9900::stack_alu(const char *instr)
-{
-  if (stack == 0)
-  {
-    fprintf(out, "  %s $t%d, $t%d, $t%d\n", instr, REG_STACK(reg-2), REG_STACK(reg-2), REG_STACK(reg-1));
-    reg--;
-  }
-    else
-  if (stack == 1)
-  {
-    // FIXME
-    fprintf(out, "  error r15\n");
-    fprintf(out, "  %s.w r15, r%d\n", instr, REG_STACK(reg-1));
-    stack--;
-  }
-    else
-  {
-    // FIXME
-    fprintf(out, "  error r15\n");
-    fprintf(out, "  %s.w r15, @SP\n", instr);
-  }
-
-  return 0;
-}
-
 

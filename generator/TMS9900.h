@@ -96,29 +96,12 @@ public:
   virtual int array_write_byte(const char *name, int field_id);
   virtual int array_write_short(const char *name, int field_id);
   virtual int array_write_int(const char *name, int field_id);
-  //virtual void close();
-
-  // GPIO functions
-  virtual int ioport_setPinsAsInput(int port);
-  virtual int ioport_setPinsAsOutput(int port);
-  virtual int ioport_setPinsValue(int port);
-  virtual int ioport_setPinsHigh(int port);
-  virtual int ioport_setPinsLow(int port);
-  virtual int ioport_setPinAsOutput(int port);
-  virtual int ioport_setPinAsInput(int port);
-  virtual int ioport_setPinHigh(int port);
-  virtual int ioport_setPinLow(int port);
-  virtual int ioport_isPinInputHigh(int port);
-  virtual int ioport_getPortInputValue(int port);
-  //virtual int ioport_setPortOutputValue(int port);
 
 protected:
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 
-  int stack;          // count how many things we put on the stack
   bool is_main : 1;
 
-  int stack_alu(const char *instr);
 };
 
 #endif
