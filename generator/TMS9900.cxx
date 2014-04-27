@@ -50,7 +50,7 @@ int TMS9900::open(const char *filename)
   if (Generator::open(filename) != 0) { return -1; }
 
   // For now we only support a specific chip
-  fprintf(out, ".mips\n");
+  fprintf(out, ".tms9900\n");
 
   // Set where RAM starts / ends
   // FIXME - Not sure what to set this to right now
@@ -247,6 +247,30 @@ int TMS9900::add_integer()
 
 int TMS9900::add_integer(int num)
 {
+  if (num == 1)
+  {
+    fprintf(out, "  inc r%d\n", REG_STACK(reg-1));
+    return 0;
+  }
+
+  if (num == 2)
+  {
+    fprintf(out, "  inct r%d\n", REG_STACK(reg-1));
+    return 0;
+  }
+
+  if (num == -1)
+  {
+    fprintf(out, "  dec r%d\n", REG_STACK(reg-1));
+    return 0;
+  }
+
+  if (num == -2)
+  {
+    fprintf(out, "  dect r%d\n", REG_STACK(reg-1));
+    return 0;
+  }
+
   return -1;
 }
 
@@ -260,57 +284,107 @@ int TMS9900::sub_integer()
 
 int TMS9900::sub_integer(int num)
 {
+  if (num == 1)
+  {
+    fprintf(out, "  dec r%d\n", REG_STACK(reg-1));
+    return 0;
+  }
+
+  if (num == 2)
+  {
+    fprintf(out, "  dect r%d\n", REG_STACK(reg-1));
+    return 0;
+  }
+
+  if (num == -1)
+  {
+    fprintf(out, "  inc r%d\n", REG_STACK(reg-1));
+    return 0;
+  }
+
+  if (num == -2)
+  {
+    fprintf(out, "  inct r%d\n", REG_STACK(reg-1));
+    return 0;
+  }
   return -1;
 }
 
 int TMS9900::mul_integer()
 {
-  return -1;
+  fprintf(out, "  mpy r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+  fprintf(out, "  mov r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+  reg--;
+  return 0;
 }
 
 int TMS9900::div_integer()
 {
-  return -1;
+  fprintf(out, "  div r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+  reg--;
+  return 0;
 }
 
 int TMS9900::mod_integer()
 {
-  return -1;
+  fprintf(out, "  div r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+  fprintf(out, "  mov r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+  reg--;
+  return 0;
 }
 
 int TMS9900::neg_integer()
 {
-  return -1;
+  fprintf(out, "  neg r%d\n", REG_STACK(reg-1));
+  return 0;
 }
 
 int TMS9900::shift_left_integer()
 {
-  return -1;
+  fprintf(out, "  mov r%d, r0\n", REG_STACK(reg-1));
+  fprintf(out, "  sla r%d, r0\n", REG_STACK(reg-2));
+  reg--;
+  return 0;
 }
 
 int TMS9900::shift_left_integer(int num)
 {
-  return -1;
+  if (num == 0) { return 0; }
+  fprintf(out, "  sla r%d, %d\n", REG_STACK(reg-1), num);
+  reg--;
+  return 0;
 }
 
 int TMS9900::shift_right_integer()
 {
-  return -1;
+  fprintf(out, "  mov r%d, r0\n", REG_STACK(reg-1));
+  fprintf(out, "  sra r%d, r0\n", REG_STACK(reg-2));
+  reg--;
+  return 0;
 }
 
 int TMS9900::shift_right_integer(int num)
 {
-  return -1;
+  if (num == 0) { return 0; }
+  fprintf(out, "  sra r%d, %d\n", REG_STACK(reg-1), num);
+  reg--;
+  return 0;
 }
 
 int TMS9900::shift_right_uinteger()
 {
-  return -1;
+  fprintf(out, "  mov r%d, r0\n", REG_STACK(reg-1));
+  fprintf(out, "  srl r%d, r0\n", REG_STACK(reg-2));
+  reg--;
+  return 0;
 }
 
 int TMS9900::shift_right_uinteger(int num)
 {
-  return -1;
+  if (num == 0) { return 0; }
+  fprintf(out, "  srl r%d, %d\n", REG_STACK(reg-1), num);
+  reg--;
+  return 0;
 }
 
 int TMS9900::and_integer()
