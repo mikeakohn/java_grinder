@@ -50,7 +50,6 @@
 #define REG_STACK(a) (a + 4)
 #define LOCALS(a) ((a * 2) + 2)
 
-// FIXME - This isn't quite right
 //                                EQ    NE     LESS  LESS EQ GR   GR E
 static const char *cond_str[] = { "jz", "jnz", "jl", "jle", "jg", "jge" };
 //                                                    rev    rev
