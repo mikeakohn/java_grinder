@@ -174,21 +174,10 @@ int AVR8::open(const char *filename)
   fprintf(out, "ZL equ r30\n");
   fprintf(out, "ZH equ r31\n");
   fprintf(out, "SPL equ 0x3d\n");
-  fprintf(out, "SPH equ 0x3e\n");
-
-  // java stack base locations
-  fprintf(out, "stack_lo equ 0x60\n");
-  fprintf(out, "stack_hi equ 0x70\n");
-
-  // RAMEND (change to particular chip)
-  fprintf(out, "RAMEND equ 0x9f\n");
-
-  // heap
-  fprintf(out, "ram_start equ 0x80\n");
-  fprintf(out, "heap_ptr equ ram_start\n\n");
+  fprintf(out, "SPH equ 0x3e\n\n");
 
   // startup
-  fprintf(out, ".org 0x0000\n");
+  fprintf(out, ".org 0x0000\n\n");
   fprintf(out, "  rjmp start\n");
   fprintf(out, "start:\n");
 
@@ -202,28 +191,43 @@ int AVR8::open(const char *filename)
   fprintf(out, "  ldi temp, 3\n");
   fprintf(out, "  mov three, temp\n");
   fprintf(out, "  ldi temp, 0xff\n");
-  fprintf(out, "  mov ff, temp\n");
-
-  // processor stack setup
-//  fprintf(out, "  ldi r16, RAMEND & 0xff\n");
-//  fprintf(out, "  out SPL, r16\n");
-//  fprintf(out, "  ldi r16, RAMEND >> 8\n");
-//  fprintf(out, "  out SPH, r16\n");
+  fprintf(out, "  mov ff, temp\n\n");
 
   // java stack setup
-  fprintf(out, "  ldi SP, 0xf\n");
   fprintf(out, "  ldi XL, 0\n");
   fprintf(out, "  ldi XH, 0\n");
   fprintf(out, "  ldi YL, 0\n");
   fprintf(out, "  ldi YH, 0\n");
   fprintf(out, "  ldi ZL, 0\n");
-  fprintf(out, "  ldi ZH, 0\n");
+  fprintf(out, "  ldi ZH, 0\n\n");
 
   return 0;
 }
 
 int AVR8::start_init()
 {
+  // these defaults are for ATTINY13
+
+  // java stack pointer
+  fprintf(out, "  ldi SP, 0xf\n");
+
+  // java stack base locations
+  fprintf(out, "stack_lo equ 0x60\n");
+  fprintf(out, "stack_hi equ 0x70\n");
+
+  // RAMEND (change to particular chip)
+  fprintf(out, "RAMEND equ 0x9f\n");
+
+  // heap
+  fprintf(out, "ram_start equ 0x80\n");
+  fprintf(out, "heap_ptr equ ram_start\n\n");
+
+  // processor stack setup
+  // fprintf(out, "  ldi r16, RAMEND & 0xff\n");
+  // fprintf(out, "  out SPL, r16\n");
+  // fprintf(out, "  ldi r16, RAMEND >> 8\n");
+  // fprintf(out, "  out SPH, r16\n");
+
   return 0;
 }
 
@@ -478,7 +482,17 @@ int AVR8::add_integer()
 
 int AVR8::add_integer(int const_val)
 {
-  return -1;
+  if(const_val < 0 || const_val > 63)
+    return -1;
+
+  fprintf(out, "; add_integer (optimized)\n");
+  POP_HI("ZH");
+  POP_LO("ZL");
+  fprintf(out, "  adiw ZL, 0x%02x\n", const_val);
+  PUSH_LO("ZL");
+  PUSH_HI("ZH");
+
+  return 0;
 }
 
 int AVR8::sub_integer()
@@ -492,7 +506,17 @@ int AVR8::sub_integer()
 
 int AVR8::sub_integer(int const_val)
 {
-  return -1;
+  if(const_val < 0 || const_val > 63)
+    return -1;
+
+  fprintf(out, "; sub_integer (optimized)\n");
+  POP_HI("ZH");
+  POP_LO("ZL");
+  fprintf(out, "  sbiw ZL, 0x%02x\n", const_val);
+  PUSH_LO("ZL");
+  PUSH_HI("ZH");
+
+  return 0;
 }
 
 int AVR8::mul_integer()
@@ -658,14 +682,14 @@ int AVR8::jump_cond(const char *label, int cond)
 {
   bool reverse = false;
 
-  char label_skip[16];
-  char label_jump[16];
+  char label_skip[32];
+  char label_jump[32];
 
   if (stack > 0)
   {
     need_jump_cond = 1;
-    sprintf(label_skip, "label_%d", label_count++);
-    sprintf(label_jump, "label_%d", label_count++);
+    sprintf(label_skip, "jump_cond_skip_%d", label_count++);
+    sprintf(label_jump, "jump_cond_jump_%d", label_count++);
     fprintf(out, "  rcall jump_cond\n");
 
     if(cond == COND_LESS_EQUAL)
@@ -747,14 +771,14 @@ int AVR8::jump_cond_integer(const char *label, int cond)
 {
   bool reverse = false;
 
-  char label_skip[16];
-  char label_jump[16];
+  char label_skip[32];
+  char label_jump[32];
 
   if (stack > 1)
   {
     need_jump_cond_integer = 1;
-    sprintf(label_skip, "label_%d", label_count++);
-    sprintf(label_jump, "label_%d", label_count++);
+    sprintf(label_skip, "jump_cond_integer_skip_%d", label_count++);
+    sprintf(label_jump, "jump_cond_integer_jump_%d", label_count++);
     fprintf(out, "  rcall jump_cond_integer\n");
 
     if(cond == COND_LESS_EQUAL)
