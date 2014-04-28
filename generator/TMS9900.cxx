@@ -32,6 +32,10 @@
 // r14 Saved PC register
 // r15 Saved ST register
 
+//                                  EQ     NE      <     <=      >     >= 
+static const char *cond_str[] = { "jeq", "jne", "jlt", "???", "jgt", "???" };
+//                                                      rev           rev
+
 TMS9900::TMS9900() :
   reg(0),
   reg_max(9),
@@ -389,8 +393,11 @@ int TMS9900::shift_right_uinteger(int num)
 
 int TMS9900::and_integer()
 {
-  // :(
-  return -1;
+  fprintf(out, "  seto r0\n");
+  fprintf(out, "  xor r%d, r0\n", REG_STACK(reg-1));
+  fprintf(out, "  szc r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+  reg--;
+  return 0;
 }
 
 int TMS9900::and_integer(int num)
@@ -402,8 +409,9 @@ int TMS9900::and_integer(int num)
 
 int TMS9900::or_integer()
 {
-  // :(
-  return -1;
+  fprintf(out, "  soc r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+  reg--;
+  return 0;
 }
 
 int TMS9900::or_integer(int num)
@@ -444,12 +452,50 @@ int TMS9900::integer_to_byte()
 
 int TMS9900::jump_cond(const char *label, int cond)
 {
-  return -1;
+  fprintf(out, "  ci r%d, 0\n", REG_STACK(reg-1));
+  reg--;
+
+  if (cond == COND_LESS_EQUAL)
+  {
+    fprintf(out, "  jlt %s\n", label);
+    fprintf(out, "  jeq %s\n", label);
+  }
+    else
+  if (cond == COND_GREATER_EQUAL)
+  {
+    fprintf(out, "  jlt %s\n", label);
+    fprintf(out, "  jeq %s\n", label);
+  }
+    else
+  {
+    fprintf(out, "  %s %s\n", cond_str[cond], label);
+  }
+
+  return 0;
 }
 
 int TMS9900::jump_cond_integer(const char *label, int cond)
 {
-  return -1;
+  fprintf(out, "  c r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+  reg -= 2;
+
+  if (cond == COND_LESS_EQUAL)
+  {
+    fprintf(out, "  jlt %s\n", label);
+    fprintf(out, "  jeq %s\n", label);
+  }
+    else
+  if (cond == COND_GREATER_EQUAL)
+  {
+    fprintf(out, "  jlt %s\n", label);
+    fprintf(out, "  jeq %s\n", label);
+  }
+    else
+  {
+    fprintf(out, "  %s %s\n", cond_str[cond], label);
+  }
+
+  return 0;
 }
 
 int TMS9900::return_local(int index, int local_count)
