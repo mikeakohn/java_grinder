@@ -550,7 +550,7 @@ int TMS9900::new_array(uint8_t type)
 
 int TMS9900::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 {
-  fprintf(out, ".align 32\n");
+  fprintf(out, ".align 16\n");
   if (type == TYPE_BYTE)
   { return insert_db(name, data, len, TYPE_INT); }
     else
@@ -558,26 +558,30 @@ int TMS9900::insert_array(const char *name, int32_t *data, int len, uint8_t type
   { return insert_dw(name, data, len, TYPE_INT); } 
     else
   if (type == TYPE_INT)
-  { return insert_dc32(name, data, len, TYPE_INT); } 
+  { return insert_dw(name, data, len, TYPE_INT); } 
 
   return -1;
 }
 
 int TMS9900::insert_string(const char *name, uint8_t *bytes, int len)
 {
-  fprintf(out, ".align 32\n");
-  fprintf(out, "  dc32 %d\n", len);
+  fprintf(out, ".align 16\n");
+  fprintf(out, "  dc16 %d\n", len);
   return insert_utf8(name, bytes, len);
 }
 
 int TMS9900::push_array_length()
 {
-  return -1;
+  fprintf(out, "  mov @-2(r%d), r%d\n", REG_STACK(reg-1), REG_STACK(reg-1));
+
+  return 0;
 }
 
 int TMS9900::push_array_length(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  mov &%s, r0\n", name);
+  fprintf(out, "  mov @-2(r0), r%d\n", REG_STACK(reg));
+  return 0;
 }
 
 int TMS9900::array_read_byte()
