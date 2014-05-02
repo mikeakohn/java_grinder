@@ -98,6 +98,8 @@ public:
   virtual int array_write_int(const char *name, int field_id);
 
 protected:
+  void sign_extend();
+
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 
   bool is_main : 1;

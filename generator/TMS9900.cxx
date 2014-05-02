@@ -441,12 +441,7 @@ int TMS9900::inc_integer(int index, int num)
 
 int TMS9900::integer_to_byte()
 {
-  fprintf(out, "  li r0, 0x80\n");
-  fprintf(out, "  coc r%d, r0\n", REG_STACK(reg-1));
-  fprintf(out, "  jne label_%d\n", label_count);
-  fprintf(out, "  ori r%d, #0xff00\n", REG_STACK(reg-1));
-  fprintf(out, "label_%d\n", label_count);
-  label_count++;
+  sign_extend();
   return 0;
 }
 
@@ -586,61 +581,100 @@ int TMS9900::push_array_length(const char *name, int field_id)
 
 int TMS9900::array_read_byte()
 {
-  return -1;
+  fprintf(out, "  a r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+  fprintf(out, "  movb *r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-2));
+  reg--;
+  sign_extend();
+  return 0;
 }
 
 int TMS9900::array_read_short()
 {
-  return -1;
+  fprintf(out, "  sla r%d, 1\n", REG_STACK(reg-1));
+  fprintf(out, "  a r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+  fprintf(out, "  mov *r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-2));
+  reg--;
+  return 0;
 }
 
 int TMS9900::array_read_int()
 {
-  return -1;
+  return array_read_short();
 }
 
 int TMS9900::array_read_byte(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  mov @%s, r13\n", name);
+  fprintf(out, "  a r%d, r13\n", REG_STACK(reg-1));
+  fprintf(out, "  movb *r13, r%d\n", REG_STACK(reg-1));
+  sign_extend();
+
+  return 0;
 }
 
 int TMS9900::array_read_short(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  mov @%s, r13\n", name);
+  fprintf(out, "  sla r%d\n", REG_STACK(reg-1));
+  fprintf(out, "  a r%d, r13\n", REG_STACK(reg-1));
+  fprintf(out, "  mov @r13, r%d\n", REG_STACK(reg-1));
+  return 0;
 }
 
 int TMS9900::array_read_int(const char *name, int field_id)
 {
-  return -1;
+  return array_read_short(name, field_id);
 }
 
 int TMS9900::array_write_byte()
 {
-  return -1;
+  fprintf(out, "  a r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-3));
+  fprintf(out, "  movb r%d, *r%d\n", REG_STACK(reg-1), REG_STACK(reg-3));
+  reg -= 3;
+  return 0;
 }
 
 int TMS9900::array_write_short()
 {
-  return -1;
+  fprintf(out, "  sla r%d, 1\n", REG_STACK(reg-2));
+  fprintf(out, "  a r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-3));
+  fprintf(out, "  mov r%d, *r%d\n", REG_STACK(reg-1), REG_STACK(reg-3));
+  reg -= 3;
+  return 0;
 }
 
 int TMS9900::array_write_int()
 {
-  return -1;
+  return array_write_short();
 }
 
 int TMS9900::array_write_byte(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  a @%s, r%d\n", name, REG_STACK(reg-2));
+  fprintf(out, "  movb r%d, *r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+  return 0;
 }
 
 int TMS9900::array_write_short(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  sla r%d, 1\n", REG_STACK(reg-2));
+  fprintf(out, "  a @%s, r%d\n", name, REG_STACK(reg-2));
+  fprintf(out, "  mov r%d, *r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+  return 0;
 }
 
 int TMS9900::array_write_int(const char *name, int field_id)
 {
-  return -1;
+  return array_write_short(name, field_id);
+}
+
+void TMS9900::sign_extend()
+{
+  fprintf(out, "  li r0, 0x80\n");
+  fprintf(out, "  coc r%d, r0\n", REG_STACK(reg-1));
+  fprintf(out, "  jne label_%d\n", label_count);
+  fprintf(out, "  ori r%d, #0xff00\n", REG_STACK(reg-1));
+  fprintf(out, "label_%d\n", label_count);
+  label_count++;
 }
 
