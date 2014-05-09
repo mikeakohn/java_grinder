@@ -128,7 +128,7 @@ public:
 protected:
   int stack;
   bool is_main:1;
-
+  bool need_farjump:1;
   bool need_swap:1;
   bool need_add_integer:1;
   bool need_sub_integer:1;

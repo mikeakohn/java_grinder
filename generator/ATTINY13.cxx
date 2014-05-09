@@ -47,6 +47,8 @@ int ATTINY13::start_init()
   // fprintf(out, "  ldi r16, RAMEND >> 8\n");
   // fprintf(out, "  out SPH, r16\n");
 
+  need_farjump = 0;
+
   return 0;
 }
 
