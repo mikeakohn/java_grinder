@@ -1876,19 +1876,34 @@ int AVR8::memory_write8()
 // IOPort API
 int AVR8::ioport_setPinsAsInput(int port)
 {
-/*
   if(port == 0)
   {
     fprintf(out, "; ioport_setPinsAsInput\n");
     POP_HI("temp");
     POP_LO("temp");
+    fprintf(out, "  eor temp, ff\n");
     fprintf(out, "  in temp2, 0x16\n");
-    fprintf(out, "  and temp2, ~temp\n");
+    fprintf(out, "  and temp2, temp\n");
     fprintf(out, "  out 0x17, temp2\n");
 
     stack--;
   }
-*/
+
+  return 0;
+}
+
+int AVR8::ioport_setPinsAsInput(int port, int const_val)
+{
+  if(port == 0)
+  {
+    fprintf(out, "; ioport_setPinsAsInput (optimized)\n");
+    fprintf(out, "  ldi temp, 0x%02x\n", const_val);
+    fprintf(out, "  eor temp, ff\n");
+    fprintf(out, "  in temp2, 0x16\n");
+    fprintf(out, "  and temp2, temp\n");
+    fprintf(out, "  out 0x17, temp2\n");
+  }
+
   return 0;
 }
 
@@ -1899,12 +1914,25 @@ int AVR8::ioport_setPinsAsOutput(int port)
     fprintf(out, "; ioport_setPinsAsOutput\n");
     POP_HI("temp");
     POP_LO("temp");
-//    fprintf(out, "  in temp2, 0x16\n");
-//    fprintf(out, "  or temp2, temp\n");
-//    fprintf(out, "  out 0x17, temp2\n");
-    fprintf(out, "  out 0x17, temp\n");
+    fprintf(out, "  in temp2, 0x16\n");
+    fprintf(out, "  or temp2, temp\n");
+    fprintf(out, "  out 0x17, temp2\n");
 
     stack--;
+  }
+
+  return 0;
+}
+
+int AVR8::ioport_setPinsAsOutput(int port, int const_val)
+{
+  if(port == 0)
+  {
+    fprintf(out, "; ioport_setPinsAsOutput (optimized)\n");
+    fprintf(out, "  ldi temp, 0x%02x\n", const_val);
+    fprintf(out, "  in temp2, 0x16\n");
+    fprintf(out, "  or temp2, temp\n");
+    fprintf(out, "  out 0x17, temp2\n");
   }
 
   return 0;
@@ -1923,6 +1951,113 @@ int AVR8::ioport_setPinsValue(int port)
   }
 
   return 0;
+}
+
+int AVR8::ioport_setPinsValue(int port, int const_val)
+{
+  if(port == 0)
+  {
+    fprintf(out, "; ioport_setPinsValue (optimized)\n");
+    fprintf(out, "  out 0x18, 0x%02x\n", const_val);
+  }
+
+  return 0;
+}
+
+int AVR8::ioport_setPinsHigh(int port)
+{
+  if(port == 0)
+  {
+    fprintf(out, "; ioport_setPinsHigh\n");
+    POP_HI("temp");
+    POP_LO("temp");
+    fprintf(out, "  in temp2, 0x16\n");
+    fprintf(out, "  or temp2, temp\n");
+    fprintf(out, "  out 0x18, temp2\n");
+
+    stack--;
+  }
+
+  return 0;
+}
+
+int AVR8::ioport_setPinsLow(int port)
+{
+  if(port == 0)
+  {
+    fprintf(out, "; ioport_setPinsLow\n");
+    POP_HI("temp");
+    POP_LO("temp");
+    fprintf(out, "  eor temp, ff\n");
+    fprintf(out, "  in temp2, 0x16\n");
+    fprintf(out, "  and temp2, temp\n");
+    fprintf(out, "  out 0x18, temp2\n");
+
+    stack--;
+  }
+
+  return 0;
+}
+
+int AVR8::ioport_setPinAsOutput(int port)
+{
+  return -1;
+}
+
+int AVR8::ioport_setPinAsInput(int port)
+{
+  return -1;
+}
+
+int AVR8::ioport_setPinHigh(int port)
+{
+  return -1;
+}
+
+int AVR8::ioport_setPinHigh(int port, int const_val)
+{
+  if(const_val < 0 || const_val > 7) { return -1; }
+
+  if(port == 0)
+  {
+    fprintf(out, "; ioport_setPinHigh (optimized)\n");
+    fprintf(out, "  in temp, 0x16\n");
+    fprintf(out, "  or temp, 0x%02x\n", (1 << const_val));
+    fprintf(out, "  out 0x18, temp\n");
+  }
+
+  return 0;
+}
+
+int AVR8::ioport_setPinLow(int port)
+{
+  return -1;
+}
+
+int AVR8::ioport_setPinLow(int port, int const_val)
+{
+  if(const_val < 0 || const_val > 7) { return -1; }
+
+  if(port == 0)
+  {
+    fprintf(out, "; ioport_setPinLow (optimized)\n");
+    fprintf(out, "  in temp, 0x16\n");
+    fprintf(out, "  ldi temp2, 0x%02x\n", (1 << const_val));
+    fprintf(out, "  eor temp2, ff\n");
+    fprintf(out, "  and temp, temp2\n");
+    fprintf(out, "  out 0x18, temp\n");
+  }
+
+  return 0;
+}
+int AVR8::ioport_isPinInputHigh(int port)
+{
+  return -1;
+}
+
+int AVR8::ioport_getPortInputValue(int port)
+{
+  return -1;
 }
 
 #if 0
