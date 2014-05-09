@@ -240,6 +240,7 @@ int AVR8::start_init()
   // fprintf(out, "  ldi r16, RAMEND >> 8\n");
   // fprintf(out, "  out SPH, r16\n");
 
+  // chips with smaller ram only need rjmp/rcall
   need_farjump = 0;
 
   return 0;
@@ -371,7 +372,6 @@ int AVR8::push_integer_local(int index)
 
   fprintf(out, "  ldi temp2, %d\n", LOCALS(index));
   CALL("push_integer_local");
-  //fprintf(out, "  call push_integer_local\n");
   stack++;
 
   return 0;
@@ -441,7 +441,6 @@ int AVR8::pop_integer_local(int index)
 
   fprintf(out, "  ldi temp2, %d\n", LOCALS(index));
   CALL("pop_integer_local");
-  //fprintf(out, "  call pop_integer_local\n");
   stack--;
 
   return 0;
@@ -467,7 +466,6 @@ int AVR8::dup()
   need_dup = 1;
 
   CALL("dup");
-  //fprintf(out, "  call dup\n");
   stack++;
 
   return 0;
@@ -484,7 +482,6 @@ int AVR8::swap()
 {
   need_swap = 1;
   CALL("swap");
-  //fprintf(out, "  call swap\n");
 
   return 0;
 }
@@ -493,7 +490,6 @@ int AVR8::add_integer()
 {
   need_add_integer = 1;
   CALL("add_integer");
-  //fprintf(out, "  call add_integer\n");
   stack--;
 
   return 0;
@@ -518,7 +514,6 @@ int AVR8::sub_integer()
 {
   need_sub_integer = 1;
   CALL("sub_integer");
-  //fprintf(out, "  call sub_integer\n");
   stack--;
 
   return 0;
@@ -543,7 +538,6 @@ int AVR8::mul_integer()
 {
   need_mul_integer = 1;
   CALL("mul_integer");
-  //fprintf(out, "  call mul_integer\n");
   stack--;
 
   return 0;
@@ -559,7 +553,6 @@ int AVR8::div_integer()
 {
   need_div_integer = 1;
   CALL("div_integer");
-  //fprintf(out, "  call div_integer\n");
   stack--;
 
   return 0;
@@ -577,8 +570,6 @@ int AVR8::mod_integer()
   need_mod_integer = 1;
   CALL("div_integer");
   CALL("mod_integer");
-  //fprintf(out, "  call div_integer\n");
-  //fprintf(out, "  call mod_integer\n");
   stack--;
 
   return 0;
@@ -593,7 +584,6 @@ int AVR8::neg_integer()
 {
   need_neg_integer = 1;
   CALL("neg_integer");
-  //fprintf(out, "  call neg_integer\n");
 
   return 0;
 }
@@ -602,7 +592,6 @@ int AVR8::shift_left_integer()
 {
   need_shift_left_integer = 1;
   CALL("shift_left_integer");
-  //fprintf(out, "  call shift_left_integer\n");
   stack--;
 
   return 0;
@@ -632,7 +621,6 @@ int AVR8::shift_right_integer()
 {
   need_shift_right_integer = 1;
   CALL("shift_right_integer");
-  //fprintf(out, "  call shift_right_integer\n");
   stack--;
 
   return 0;
@@ -647,7 +635,6 @@ int AVR8::shift_right_uinteger()
 {
   need_shift_right_uinteger = 1;
   CALL("shift_right_uinteger");
-  //fprintf(out, "  call shift_right_uinteger\n");
   stack--;
 
   return 0;
@@ -677,7 +664,6 @@ int AVR8::and_integer()
 {
   need_and_integer = 1;
   CALL("and_integer");
-  //fprintf(out, "  call and_integer\n");
   stack--;
 
   return 0;
@@ -700,7 +686,6 @@ int AVR8::or_integer()
 {
   need_or_integer = 1;
   CALL("or_integer");
-  //fprintf(out, "  call or_integer\n");
   stack--;
 
   return 0;
@@ -723,7 +708,6 @@ int AVR8::xor_integer()
 {
   need_xor_integer = 1;
   CALL("xor_integer");
-  //fprintf(out, "  call xor_integer\n");
   stack--;
 
   return 0;
@@ -772,7 +756,6 @@ int AVR8::inc_integer(int index, int num)
     fprintf(out, "  ldi value11, 0x%02x\n", value >> 8);
     fprintf(out, "  ldi temp, %d\n", LOCALS(index));
     CALL("inc_integer");
-    //fprintf(out, "  call inc_integer\n");
   }
 
   return 0;
@@ -782,7 +765,6 @@ int AVR8::integer_to_byte()
 {
   need_integer_to_byte = 1;
   CALL("integer_to_byte");
-  //fprintf(out, "  call integer_to_byte\n");
 
   return 0;
 }
@@ -800,7 +782,6 @@ int AVR8::jump_cond(const char *label, int cond)
     sprintf(label_skip, "jump_cond_skip_%d", label_count++);
     sprintf(label_jump, "jump_cond_jump_%d", label_count++);
     CALL("jump_cond");
-    //fprintf(out, "  call jump_cond\n");
 
     if(cond == COND_LESS_EQUAL)
     {
@@ -822,7 +803,6 @@ int AVR8::jump_cond(const char *label, int cond)
         fprintf(out, "  cp value11, zero\n");
         fprintf(out, "  brne %s\n", label_skip);
         JUMP(label);
-        //fprintf(out, "  jmp %s\n", label);
         fprintf(out, "%s:\n", label_skip);
         break;
       case COND_NOT_EQUAL:
@@ -832,7 +812,6 @@ int AVR8::jump_cond(const char *label, int cond)
         fprintf(out, "  breq %s\n", label_skip);
         fprintf(out, "%s:\n", label_jump);
         JUMP(label);
-        //fprintf(out, "  jmp %s\n", label);
         fprintf(out, "%s:\n", label_skip);
         break;
       case COND_LESS:
@@ -842,7 +821,6 @@ int AVR8::jump_cond(const char *label, int cond)
           fprintf(out, "  cpc value11, zero\n");
           fprintf(out, "  brge %s\n", label_skip);
           JUMP(label);
-          //fprintf(out, "  jmp %s\n", label);
           fprintf(out, "%s:\n", label_skip);
         }
           else
@@ -851,7 +829,6 @@ int AVR8::jump_cond(const char *label, int cond)
           fprintf(out, "  cpc zero, value11\n");
           fprintf(out, "  brge %s\n", label_skip);
           JUMP(label);
-          //fprintf(out, "  jmp %s\n", label);
           fprintf(out, "%s:\n", label_skip);
         }
         break;
@@ -862,7 +839,6 @@ int AVR8::jump_cond(const char *label, int cond)
           fprintf(out, "  cpc value11, zero\n");
           fprintf(out, "  brlt %s\n", label_skip);
           JUMP(label);
-          //fprintf(out, "  jmp %s\n", label);
           fprintf(out, "%s:\n", label_skip);
         }
           else
@@ -871,7 +847,6 @@ int AVR8::jump_cond(const char *label, int cond)
           fprintf(out, "  cpc zero, value11\n");
           fprintf(out, "  brlt %s\n", label_skip);
           JUMP(label);
-          //fprintf(out, "  jmp %s\n", label);
           fprintf(out, "%s:\n", label_skip);
         }
         break;
@@ -896,7 +871,6 @@ int AVR8::jump_cond_integer(const char *label, int cond)
     sprintf(label_skip, "jump_cond_integer_skip_%d", label_count++);
     sprintf(label_jump, "jump_cond_integer_jump_%d", label_count++);
     CALL("jump_cond_integer");
-    //fprintf(out, "  call jump_cond_integer\n");
 
     if(cond == COND_LESS_EQUAL)
     {
@@ -918,7 +892,6 @@ int AVR8::jump_cond_integer(const char *label, int cond)
         fprintf(out, "  cp value11, value21\n");
         fprintf(out, "  brne %s\n", label_skip);
         JUMP(label);
-        //fprintf(out, "  jmp %s\n", label);
         fprintf(out, "%s:\n", label_skip);
         break;
       case COND_NOT_EQUAL:
@@ -928,7 +901,6 @@ int AVR8::jump_cond_integer(const char *label, int cond)
         fprintf(out, "  breq %s\n", label_skip);
         fprintf(out, "%s:\n", label_jump);
         JUMP(label);
-        //fprintf(out, "  jmp %s\n", label);
         fprintf(out, "%s:\n", label_skip);
         break;
       case COND_LESS:
@@ -938,7 +910,6 @@ int AVR8::jump_cond_integer(const char *label, int cond)
           fprintf(out, "  cpc value11, value21\n");
           fprintf(out, "  brge %s\n", label_skip);
           JUMP(label);
-          //fprintf(out, "  jmp %s\n", label);
           fprintf(out, "%s:\n", label_skip);
         }
           else
@@ -947,7 +918,6 @@ int AVR8::jump_cond_integer(const char *label, int cond)
           fprintf(out, "  cpc value21, value11\n");
           fprintf(out, "  brge %s\n", label_skip);
           JUMP(label);
-          //fprintf(out, "  jmp %s\n", label);
           fprintf(out, "%s:\n", label_skip);
         }
         break;
@@ -958,7 +928,6 @@ int AVR8::jump_cond_integer(const char *label, int cond)
           fprintf(out, "  cpc value11, value21\n");
           fprintf(out, "  brlt %s\n", label_skip);
           JUMP(label);
-          //fprintf(out, "  jmp %s\n", label);
           fprintf(out, "%s:\n", label_skip);
         }
           else
@@ -967,7 +936,6 @@ int AVR8::jump_cond_integer(const char *label, int cond)
           fprintf(out, "  cpc value21, value11\n");
           fprintf(out, "  brlt %s\n", label_skip);
           JUMP(label);
-          //fprintf(out, "  jmp %s\n", label);
           fprintf(out, "%s:\n", label_skip);
         }
         break;
@@ -1044,7 +1012,6 @@ int AVR8::return_void(int local_count)
 int AVR8::jump(const char *name)
 {
   JUMP(name);
-  //fprintf(out, "  jmp %s\n", name);
 
   return 0;
 }
@@ -1052,7 +1019,6 @@ int AVR8::jump(const char *name)
 int AVR8::call(const char *name)
 {
   CALL(name);
-  //fprintf(out, "  call %s\n", name);
 
   return 0;
 }
@@ -1091,7 +1057,6 @@ int stack_vars = stack;
   }
 
   CALL(name);
-  //fprintf(out, "  call %s\n", name);
 
   if ((stack - stack_vars) > 0)
   {
@@ -1149,13 +1114,11 @@ int AVR8::new_array(uint8_t type)
     {
       need_array_int_support = 1;
       CALL("new_array_int");
-      //fprintf(out, "  call new_array_int\n");
     }
       else
     {
       need_array_byte_support = 1;
       CALL("new_array_byte");
-      //fprintf(out, "  call new_array_byte\n");
     }
   }
 
@@ -1201,7 +1164,6 @@ int AVR8::push_array_length()
   {
     need_push_array_length = 1;
     CALL("push_array_length");
-    //fprintf(out, "  call push_array_length\n");
   }
 
   return 0;
@@ -1213,7 +1175,6 @@ int AVR8::push_array_length(const char *name, int field_id)
   fprintf(out, "  lds XL, %s + 0\n", name);
   fprintf(out, "  lds XH, %s + 1\n", name);
   CALL("push_array_length2");
-  //fprintf(out, "  call push_array_length2\n");
   stack++;
 
   return 0;
@@ -1223,7 +1184,6 @@ int AVR8::array_read_byte()
 {
   get_values_from_stack(2);
   CALL("array_read_byte");
-  //fprintf(out, "  call array_read_byte\n");
   stack++;
 
   return 0;
@@ -1238,7 +1198,6 @@ int AVR8::array_read_int()
 {
   get_values_from_stack(2);
   CALL("array_read_int");
-  //fprintf(out, "  call array_read_int\n");
   stack++;
 
   return 0;
@@ -1252,7 +1211,6 @@ int AVR8::array_read_byte(const char *name, int field_id)
     fprintf(out, "  lds ZL, %s + 0\n", name);
     fprintf(out, "  lds ZH, %s + 1\n", name);
     CALL("array_read_byte2");
-    //fprintf(out, "  call array_read_byte2\n");
     stack++;
   }
 
@@ -1273,7 +1231,6 @@ int AVR8::array_read_int(const char *name, int field_id)
     fprintf(out, "  lds ZL, %s + 0\n", name);
     fprintf(out, "  lds ZH, %s + 1\n", name);
     CALL("array_read_int2");
-    //fprintf(out, "  call array_read_int2\n");
     stack++;
   }
 
@@ -1284,7 +1241,6 @@ int AVR8::array_write_byte()
 {
   get_values_from_stack(3);
   CALL("array_write_byte");
-  //fprintf(out, "  call array_write_byte\n");
 
   return 0;
 }
@@ -1298,7 +1254,6 @@ int AVR8::array_write_int()
 {
   get_values_from_stack(3);
   CALL("array_write_int");
-  //fprintf(out, "  call array_write_int\n");
 
   return 0;
 }
@@ -1307,7 +1262,6 @@ int AVR8::array_write_byte(const char *name, int field_id)
 {
   get_values_from_stack(2);
   CALL("array_write_byte2");
-  //fprintf(out, "; array_write_byte2\n");
 
   return 0;
 }
@@ -1332,21 +1286,18 @@ int AVR8::get_values_from_stack(int num)
   if(num > 0)
   {
     CALL("get_values_from_stack_1");
-    //fprintf(out, "  call get_values_from_stack_1\n");
     stack--;
   }
 
   if(num > 1)
   {
     CALL("get_values_from_stack_2");
-    //fprintf(out, "  call get_values_from_stack_2\n");
     stack--;
   }
 
   if(num > 2)
   {
     CALL("get_values_from_stack_3");
-    //fprintf(out, "  call get_values_from_stack_3\n");
     stack--;
   }
 
