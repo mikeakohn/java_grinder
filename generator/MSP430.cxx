@@ -942,7 +942,7 @@ int MSP430::return_integer(int local_count)
 
 int MSP430::return_void(int local_count)
 {
-  fprintf(out, "  mov r12, SP\n");
+  fprintf(out, "  mov.w r12, SP\n");
   if (!is_main) { fprintf(out, "  pop r12\n"); }
   fprintf(out, "  ret\n");
 
@@ -1054,13 +1054,13 @@ int MSP430::put_static(const char *name, int index)
   {
     fprintf(out, "  pop r15\n");
     //fprintf(out, "  mov r15, &ram_start+%d\n", (index + 1) * 2);
-    fprintf(out, "  mov r15, &%s\n", name);
+    fprintf(out, "  mov.w r15, &%s\n", name);
     stack--;
   }
     else
   {
     //fprintf(out, "  mov r%d, &ram_start+%d\n", REG_STACK(reg-1), (index + 1) * 2);
-    fprintf(out, "  mov r%d, &%s\n", REG_STACK(reg-1), name);
+    fprintf(out, "  mov.w r%d, &%s\n", REG_STACK(reg-1), name);
     reg--;
   }
 
@@ -1071,7 +1071,7 @@ int MSP430::get_static(const char *name, int index)
 {
   if (reg < reg_max)
   {
-    fprintf(out, "  mov &%s, r%d\n", name, REG_STACK(reg));
+    fprintf(out, "  mov.w &%s, r%d\n", name, REG_STACK(reg));
     reg++;
   }
     else
@@ -1241,13 +1241,13 @@ int ref_reg;
 
   if (reg < reg_max)
   {
-    fprintf(out, "  mov.w @r%d, r%d\n", ref_reg, REG_STACK(reg));
+    fprintf(out, "  mov.b @r%d, r%d\n", ref_reg, REG_STACK(reg));
     fprintf(out, "  sxt r%d\n", REG_STACK(reg)); 
     reg++;
   }
     else
   {
-    fprintf(out, "  mov.w @r%d, r15\n", ref_reg);
+    fprintf(out, "  mov.b @r%d, r15\n", ref_reg);
     fprintf(out, "  sxt r15\n");
     fprintf(out, "  push r15\n");
     stack++;

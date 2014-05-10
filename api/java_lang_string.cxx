@@ -26,13 +26,15 @@
 
 static int string_length(JavaClass *java_class, Generator *generator, char *field_name, int field_id)
 {
-  generator->push_array_length(field_name, field_id);
+  //generator->push_array_length(field_name, field_id);
+  generator->push_array_length();
   return 0;
 }
 
 static int string_charAt_I(JavaClass *java_class, Generator *generator, char *field_name, int field_id)
 {
-  generator->array_read_byte(field_name, field_id);
+  //generator->array_read_byte(field_name, field_id);
+  generator->array_read_byte();
   return 0;
 }
 
