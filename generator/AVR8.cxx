@@ -155,9 +155,20 @@ int AVR8::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 
-  fprintf(out, ".avr8\n\n");
+  return 0;
+}
 
-  // defines
+int AVR8::start_init()
+{
+  // java stack base locations
+  fprintf(out, "stack_lo equ SRAM_START\n");
+  fprintf(out, "stack_hi equ SRAM_START + ((RAMEND - SRAM_START) & 255) / 4 + 1\n");
+
+  // heap
+  fprintf(out, "ram_start equ stack_hi + ((RAMEND - SRAM_START) & 255) / 4 + 1\n");
+  fprintf(out, "heap_ptr equ ram_start\n\n");
+
+  // registers
   fprintf(out, "result0 equ r0\n");
   fprintf(out, "result1 equ r1\n");
   fprintf(out, "remainder0 equ r2\n");
@@ -178,15 +189,7 @@ int AVR8::open(const char *filename)
   fprintf(out, "temp equ r22\n");
   fprintf(out, "temp2 equ r23\n");
   fprintf(out, "locals equ r24\n");
-  fprintf(out, "SP equ r25\n");
-  fprintf(out, "XL equ r26\n");
-  fprintf(out, "XH equ r27\n");
-  fprintf(out, "YL equ r28\n");
-  fprintf(out, "YH equ r29\n");
-  fprintf(out, "ZL equ r30\n");
-  fprintf(out, "ZH equ r31\n");
-  fprintf(out, "SPL equ 0x3d\n");
-  fprintf(out, "SPH equ 0x3e\n\n");
+  fprintf(out, "SP equ r25\n\n");
 
   // startup
   fprintf(out, ".org 0x0000\n\n");
@@ -205,43 +208,8 @@ int AVR8::open(const char *filename)
   fprintf(out, "  ldi temp, 0xff\n");
   fprintf(out, "  mov ff, temp\n\n");
 
-  // java stack setup
-  fprintf(out, "  ldi XL, 0\n");
-  fprintf(out, "  ldi XH, 0\n");
-  fprintf(out, "  ldi YL, 0\n");
-  fprintf(out, "  ldi YH, 0\n");
-  fprintf(out, "  ldi ZL, 0\n");
-  fprintf(out, "  ldi ZH, 0\n\n");
-
-  return 0;
-}
-
-int AVR8::start_init()
-{
-  // these defaults are for ATTINY13
-
   // java stack pointer
-  fprintf(out, "  ldi SP, 0xf\n");
-
-  // java stack base locations
-  fprintf(out, "stack_lo equ 0x60\n");
-  fprintf(out, "stack_hi equ 0x70\n");
-
-  // RAMEND (change to particular chip)
-  fprintf(out, "RAMEND equ 0x9f\n");
-
-  // heap
-  fprintf(out, "ram_start equ 0x80\n");
-  fprintf(out, "heap_ptr equ ram_start\n\n");
-
-  // processor stack setup
-  // fprintf(out, "  ldi r16, RAMEND & 0xff\n");
-  // fprintf(out, "  out SPL, r16\n");
-  // fprintf(out, "  ldi r16, RAMEND >> 8\n");
-  // fprintf(out, "  out SPH, r16\n");
-
-  // chips with smaller ram only need rjmp/rcall
-  need_farjump = 0;
+  fprintf(out, "  ldi SP, ((RAMEND - SRAM_START) & 255) / 4\n\n");
 
   return 0;
 }
@@ -1882,9 +1850,9 @@ int AVR8::ioport_setPinsAsInput(int port)
     POP_HI("temp");
     POP_LO("temp");
     fprintf(out, "  eor temp, ff\n");
-    fprintf(out, "  in temp2, 0x16\n");
+    fprintf(out, "  in temp2, PINB\n");
     fprintf(out, "  and temp2, temp\n");
-    fprintf(out, "  out 0x17, temp2\n");
+    fprintf(out, "  out DDRB, temp2\n");
 
     stack--;
   }
@@ -1899,9 +1867,9 @@ int AVR8::ioport_setPinsAsInput(int port, int const_val)
     fprintf(out, "; ioport_setPinsAsInput (optimized)\n");
     fprintf(out, "  ldi temp, 0x%02x\n", const_val);
     fprintf(out, "  eor temp, ff\n");
-    fprintf(out, "  in temp2, 0x16\n");
+    fprintf(out, "  in temp2, PINB\n");
     fprintf(out, "  and temp2, temp\n");
-    fprintf(out, "  out 0x17, temp2\n");
+    fprintf(out, "  out DDRB, temp2\n");
   }
 
   return 0;
@@ -1914,9 +1882,9 @@ int AVR8::ioport_setPinsAsOutput(int port)
     fprintf(out, "; ioport_setPinsAsOutput\n");
     POP_HI("temp");
     POP_LO("temp");
-    fprintf(out, "  in temp2, 0x16\n");
+    fprintf(out, "  in temp2, PINB\n");
     fprintf(out, "  or temp2, temp\n");
-    fprintf(out, "  out 0x17, temp2\n");
+    fprintf(out, "  out DDRB, temp2\n");
 
     stack--;
   }
@@ -1930,9 +1898,9 @@ int AVR8::ioport_setPinsAsOutput(int port, int const_val)
   {
     fprintf(out, "; ioport_setPinsAsOutput (optimized)\n");
     fprintf(out, "  ldi temp, 0x%02x\n", const_val);
-    fprintf(out, "  in temp2, 0x16\n");
+    fprintf(out, "  in temp2, PINB\n");
     fprintf(out, "  or temp2, temp\n");
-    fprintf(out, "  out 0x17, temp2\n");
+    fprintf(out, "  out DDRB, temp2\n");
   }
 
   return 0;
@@ -1945,7 +1913,7 @@ int AVR8::ioport_setPinsValue(int port)
     fprintf(out, "; ioport_setPinsValue\n");
     POP_HI("temp");
     POP_LO("temp");
-    fprintf(out, "  out 0x18, temp\n");
+    fprintf(out, "  out PORTB, temp\n");
 
     stack--;
   }
@@ -1959,7 +1927,7 @@ int AVR8::ioport_setPinsValue(int port, int const_val)
   {
     fprintf(out, "; ioport_setPinsValue (optimized)\n");
     fprintf(out, "  ldi temp, 0x%02x\n", const_val);
-    fprintf(out, "  out 0x18, temp\n");
+    fprintf(out, "  out PORTB, temp\n");
   }
 
   return 0;
@@ -1972,9 +1940,9 @@ int AVR8::ioport_setPinsHigh(int port)
     fprintf(out, "; ioport_setPinsHigh\n");
     POP_HI("temp");
     POP_LO("temp");
-    fprintf(out, "  in temp2, 0x16\n");
+    fprintf(out, "  in temp2, PINB\n");
     fprintf(out, "  or temp2, temp\n");
-    fprintf(out, "  out 0x18, temp2\n");
+    fprintf(out, "  out PORTB, temp2\n");
 
     stack--;
   }
@@ -1990,9 +1958,9 @@ int AVR8::ioport_setPinsLow(int port)
     POP_HI("temp");
     POP_LO("temp");
     fprintf(out, "  eor temp, ff\n");
-    fprintf(out, "  in temp2, 0x16\n");
+    fprintf(out, "  in temp2, PINB\n");
     fprintf(out, "  and temp2, temp\n");
-    fprintf(out, "  out 0x18, temp2\n");
+    fprintf(out, "  out PORTB, temp2\n");
 
     stack--;
   }
@@ -2022,9 +1990,9 @@ int AVR8::ioport_setPinHigh(int port, int const_val)
   if(port == 0)
   {
     fprintf(out, "; ioport_setPinHigh (optimized)\n");
-    fprintf(out, "  in temp, 0x16\n");
+    fprintf(out, "  in temp, PINB\n");
     fprintf(out, "  ori temp, 0x%02x\n", (1 << const_val));
-    fprintf(out, "  out 0x18, temp\n");
+    fprintf(out, "  out PORTB, temp\n");
   }
 
   return 0;
@@ -2042,11 +2010,11 @@ int AVR8::ioport_setPinLow(int port, int const_val)
   if(port == 0)
   {
     fprintf(out, "; ioport_setPinLow (optimized)\n");
-    fprintf(out, "  in temp, 0x16\n");
+    fprintf(out, "  in temp, PINB\n");
     fprintf(out, "  ldi temp2, 0x%02x\n", (1 << const_val));
     fprintf(out, "  eor temp2, ff\n");
     fprintf(out, "  and temp, temp2\n");
-    fprintf(out, "  out 0x18, temp\n");
+    fprintf(out, "  out PORTB, temp\n");
   }
 
   return 0;
