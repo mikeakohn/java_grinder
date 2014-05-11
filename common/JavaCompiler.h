@@ -51,6 +51,7 @@ private:
   int compile_method(JavaClass *java_class, int method_id);
   int field_type_to_int(char *field_type);
   const char *field_type_from_int(int type);
+  int execute_statics(int index);
 
   JavaClass *java_class;
   char classpath[128];

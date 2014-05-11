@@ -1783,11 +1783,40 @@ int index;
   return 0;
 }
 
+int JavaCompiler::execute_statics(int index)
+{
+  // <clinit> method is executed for adding array static data
+  if (index != -1 && execute_static(java_class, index, generator, true) != 0)
+  {
+    printf("** Error setting statics.\n");
+    return -1;
+  }
+
+  // Add arrays from external classes
+  std::map<std::string,JavaClass *>::iterator iter;
+  for (iter = external_classes.begin(); iter != external_classes.end(); iter++)
+  {
+    printf("CLASS %s\n", iter->first.c_str());
+    JavaClass *java_class_external = iter->second;
+    int index = java_class_external->get_clinit_method();
+
+    if (execute_static(java_class_external, index, generator, true,
+                       java_class) != 0)
+    {
+      printf("** Error setting statics.\n");
+      return -1;
+    }
+  }
+
+  return 0;
+}
+
 int JavaCompiler::compile_methods(bool do_main)
 {
 int method_count = java_class->get_method_count();
 char method_name[32];
 int index;
+bool did_execute_statics = false;
 
   for (index = 0; index < method_count; index++)
   {
@@ -1809,30 +1838,8 @@ int index;
 
       if (strcmp("<clinit>", method_name) == 0)
       {
-        // <clinit> method is executed for adding array static data
-        if (execute_static(java_class, index, generator, true) != 0)
-        {
-          printf("** Error setting statics.\n");
-          return -1;
-        }
-
-        // Add arrays from external classes
-        std::map<std::string,JavaClass *>::iterator iter;
-        for (iter = external_classes.begin(); iter != external_classes.end();
-             iter++)
-        {
-          printf("CLASS %s\n", iter->first.c_str());
-          JavaClass *java_class_external = iter->second;
-          int index = java_class_external->get_clinit_method();
-
-          if (execute_static(java_class_external, index, generator, true,
-                             java_class) != 0)
-          {
-            printf("** Error setting statics.\n");
-            return -1;
-          }
-        }
-
+        if (execute_statics(index) != 0) { return -1; }
+        did_execute_statics = true;
         continue;
       }
 
@@ -1842,6 +1849,11 @@ int index;
         return -1;
       }
     }
+  }
+
+  if (did_execute_statics == false && external_classes.size() != 0)
+  {
+    execute_statics(-1);
   }
 
   return 0;
