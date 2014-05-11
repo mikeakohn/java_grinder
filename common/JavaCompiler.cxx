@@ -1851,7 +1851,7 @@ bool did_execute_statics = false;
     }
   }
 
-  if (did_execute_statics == false && external_classes.size() != 0)
+  if (!did_execute_statics && !do_main && external_classes.size() != 0)
   {
     execute_statics(-1);
   }
