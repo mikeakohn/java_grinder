@@ -1958,7 +1958,8 @@ int AVR8::ioport_setPinsValue(int port, int const_val)
   if(port == 0)
   {
     fprintf(out, "; ioport_setPinsValue (optimized)\n");
-    fprintf(out, "  out 0x18, 0x%02x\n", const_val);
+    fprintf(out, "  ldi temp, 0x%02x\n", const_val);
+    fprintf(out, "  out 0x18, temp\n");
   }
 
   return 0;
@@ -2022,7 +2023,7 @@ int AVR8::ioport_setPinHigh(int port, int const_val)
   {
     fprintf(out, "; ioport_setPinHigh (optimized)\n");
     fprintf(out, "  in temp, 0x16\n");
-    fprintf(out, "  or temp, 0x%02x\n", (1 << const_val));
+    fprintf(out, "  ori temp, 0x%02x\n", (1 << const_val));
     fprintf(out, "  out 0x18, temp\n");
   }
 
