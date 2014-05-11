@@ -4,13 +4,14 @@ import net.mikekohn.java_grinder.CPU;
 import net.mikekohn.java_grinder.IOPort0;
 import net.mikekohn.java_grinder.SPI0;
 
-public class GasDetector
+public class Nokia5110
 {
   // The masks for the IO pins used to communicate with the LCD.
   static final int LCD_RESET = 0;
   static final int LCD_DC = 1;
   static final int SPI_CS = 2;
 
+/*
   static byte[] data = {
    0, 0, 0, 0, 0, 0, 0, 0, -128, -32, -16, -8, -8, -8, -4, -4,
    -4, -100, -100, -98, -98, -98, -2, -2, -2, -2, -2, -98, -98, -98, -100, -100,
@@ -26,6 +27,7 @@ public class GasDetector
    1, 7, 15, 31, 31, 31, 63, 63, 63, 63, 59, 115, 119, 119, 119, 119,
    119, 119, 119, 119, 119, 119, 51, 59, 63, 63, 63, 31, 31, 31, 15, 7
   };
+*/
 
   static public void main(String args[])
   {
@@ -74,44 +76,12 @@ public class GasDetector
     clearDisplay();
 
     moveCursor(0, 0);
-    for (n = 0; n < data.length; n++)
+    for (n = 0; n < LittleBird.logo.length; n++)
     {
-      lcdData(data[n]);
+      lcdData(LittleBird.logo[n]);
     }
 
-    //drawMeter(100);
-
-    while(true)
-    {
-      drawMeter(ADC.read());
-      long_delay();
-    }
-  }
-
-  public static void drawMeter(int value)
-  {
-    int n,y,data;
-
-    value = value >> 5;
-
-    //for (y = 0; y <= 4; y++)
-    for (y = 4; y >= 0; y--)
-    {
-      moveCursor(70, y << 3);
-
-      data = 0;
-      for (n = 0; n < 8; n++)
-      {
-        data = data << 1;
-        if (value != 0) { data |= 1; value--; }
-      }
-
-      lcdData(data);
-      lcdData(data);
-      lcdData(data);
-
-      //if (value == 0) { break; }
-    }
+    while(true);
   }
 
   /** Set the address RAM pointer.  y must be a multiple of 8. */
@@ -176,15 +146,6 @@ public class GasDetector
   {
     int n,a;
     for (a = 0; a < 3; a++)
-    {
-      for (n = 0; n < 65535; n++) { }
-    }
-  }
-
-  public static void long_delay()
-  {
-    int n,a;
-    for (a = 0; a < 20; a++)
     {
       for (n = 0; n < 65535; n++) { }
     }
