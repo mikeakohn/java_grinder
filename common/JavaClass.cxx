@@ -468,8 +468,8 @@ void *heap;
       // name to the field.
       if (constant_fieldref->class_index != this_class)
       {
-        get_class_name(name, sizeof(name), constant_fieldref->class_index);
-        printf("  class_name=%s %d\n", name, constant_fieldref->class_index);
+        get_class_name(name, len, constant_fieldref->class_index);
+        printf("  class_name='%s' %d\n", name, constant_fieldref->class_index);
         strcat(name, "_");
       }
     }

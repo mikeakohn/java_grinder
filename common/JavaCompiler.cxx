@@ -1613,6 +1613,8 @@ int index;
 int ptr;
 int last_slash = -1;
 
+  printf("load_class(%s)\n", filename);
+
   ptr = 0;
   while(filename[ptr] != 0)
   {
