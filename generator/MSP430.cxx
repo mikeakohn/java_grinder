@@ -1770,7 +1770,7 @@ int value_reg;
 
 int MSP430::adc_setChannel_I(int channel)
 {
-  fprintf(out, "  mov.w #INCH_%d|ADC10SSEL_2|ADC10DIV_7, &ADC10CTL1", channel);
+  fprintf(out, "  mov.w #INCH_%d|ADC10SSEL_2|ADC10DIV_7, &ADC10CTL1\n", channel);
   return 0;
 }
 
