@@ -62,6 +62,15 @@ public:
   virtual int adc_setChannel_I(int channel) { return -1; }
   virtual int adc_read() { return -1; }
 
+  // Timer functions
+  virtual int timer_setInterval() { return -1; }
+  virtual int timer_setInterval(int cycles, int divider) { return -1; }
+  virtual int timer_setListener() { return -1; }
+  virtual int timer_setListener(int const_value) { return -1; }
+  virtual int timer_getValue() { return -1; }
+  virtual int timer_setValue() { return -1; }
+  virtual int timer_setValue(int const_value) { return -1; }
+
   // CPU functions
   virtual int cpu_setClock16() { return -1; }
   virtual int cpu_nop() { return -1; }
