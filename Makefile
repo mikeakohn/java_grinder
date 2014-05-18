@@ -51,7 +51,7 @@ ti84: samples
 	naken_asm -l -I include -o ti84_demo.hex ti84_demo.asm
 	rabbitsign -p -g -k include/0104.key -t 8xk -f -vv ti84_demo.hex
 
-lean:
+clean:
 	@rm -f *.o java_grinder build/*.o *.asm *.lst *.hex *.prg
 	@rm -f java/*.class samples/*.class build/*.jar
 	@rm -rf build/net

@@ -74,6 +74,10 @@ MSP430::MSP430(uint8_t chip_type) :
       flash_start = 0xf800;
       stack_start = 0x0280;
       break;
+    case MSP430G2452:
+      flash_start = 0xe000;
+      stack_start = 0x0300;
+      break;
     case MSP430G2553:
       flash_start = 0xc000;
       stack_start = 0x0400;
