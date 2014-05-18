@@ -149,6 +149,15 @@ public:
   virtual int adc_setChannel_I(int channel);
   virtual int adc_read();
 
+  // Timer functions
+  virtual int timer_setInterval();
+  virtual int timer_setInterval(int cycles, int divider);
+  virtual int timer_setListener();
+  virtual int timer_setListener(int const_value);
+  virtual int timer_getValue();
+  virtual int timer_setValue();
+  virtual int timer_setValue(int const_value);
+
   // CPU functions
   virtual int cpu_setClock16();
   virtual int cpu_nop();
@@ -177,10 +186,13 @@ protected:
   bool need_read_spi:1;
   bool need_mul_integers:1;
   bool need_div_integers:1;
+  bool need_timer_interrupt:1;
   bool is_main:1;
+  bool is_interrupt:1;
   uint32_t ram_start;
   uint32_t stack_start;
   uint32_t flash_start;
+  int max_stack;
 };
 
 #endif

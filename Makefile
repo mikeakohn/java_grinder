@@ -38,6 +38,10 @@ array:
 	./java_grinder samples/Arrays.class arrays.asm msp430g2231
 	naken_asm -I /storage/git/naken_asm/include/msp430 -l -o arrays.hex arrays.asm
 
+timer:
+	./java_grinder samples/TimerTest.class timer_test.asm msp430g2231
+	naken_asm -I /storage/git/naken_asm/include/msp430 -l -o timer_test.hex timer_test.asm
+
 c64: samples
 	./java_grinder samples/CommodoreDemo.class demo.asm c64
 	naken_asm -l -b -o demo.prg demo.asm
@@ -47,7 +51,7 @@ ti84: samples
 	naken_asm -l -I include -o ti84_demo.hex ti84_demo.asm
 	rabbitsign -p -g -k include/0104.key -t 8xk -f -vv ti84_demo.hex
 
-clean:
+lean:
 	@rm -f *.o java_grinder build/*.o *.asm *.lst *.hex *.prg
 	@rm -f java/*.class samples/*.class build/*.jar
 	@rm -rf build/net

@@ -62,7 +62,9 @@ MSP430::MSP430(uint8_t chip_type) :
   need_read_spi(0),
   need_mul_integers(0),
   need_div_integers(0),
-  is_main(0)
+  need_timer_interrupt(0),
+  is_main(0),
+  is_interrupt(0)
 {
   ram_start = 0x0200;
 
@@ -87,6 +89,12 @@ MSP430::~MSP430()
   if (need_read_spi) { insert_read_spi(); }
   if (need_mul_integers) { insert_mul_integers(); }
   if (need_div_integers) { insert_div_integers(); }
+
+  if (need_timer_interrupt)
+  {
+    fprintf(out, ".org 0xfff2\n");
+    fprintf(out, "  dw timerInterrupt\n");
+  }
 
   fprintf(out, ".org 0xfffe\n");
   fprintf(out, "  dw start\n\n");
@@ -171,13 +179,38 @@ void MSP430::method_start(int local_count, int max_stack, int param_count, const
   reg = 0;
   stack = 0;
 
+  this->max_stack = max_stack;
+  printf("max_stack=%d\n", max_stack);
+
   is_main = (strcmp(name, "main") == 0) ? 1 : 0;
+  is_interrupt = (strcmp(name, "timerInterrupt") == 0) ? 1 : 0;
 
   // main() function goes here
   fprintf(out, "%s:\n", name);
-  if (!is_main) { fprintf(out, "  push r12\n"); }
-  fprintf(out, "  mov.w SP, r12\n");
-  fprintf(out, "  sub.w #0x%x, SP\n", local_count * 2);
+
+  if (is_interrupt)
+  {
+    // If this is an interrupt, we have to push all possible registers that
+    // could be in use.  Right now we'll push all temporary registers and
+    // and max_stack registers.  This is bad because if the user calls a
+    // another method in the interrupt that has a bigger max_stack, it
+    // could cause odd results.  Fix later maybe.
+    for (int n = 0; n < max_stack; n++)
+    {
+      fprintf(out, "  push r%d\n", REG_STACK(n));
+    }
+
+    fprintf(out, "  push r12\n");
+    fprintf(out, "  push r13\n");
+    fprintf(out, "  push r14\n");
+    fprintf(out, "  push r15\n");
+  }
+    else
+  {
+    if (!is_main) { fprintf(out, "  push r12\n"); }
+    fprintf(out, "  mov.w SP, r12\n");
+    fprintf(out, "  sub.w #0x%x, SP\n", local_count * 2);
+  }
 }
 
 void MSP430::method_end(int local_count)
@@ -942,9 +975,28 @@ int MSP430::return_integer(int local_count)
 
 int MSP430::return_void(int local_count)
 {
-  fprintf(out, "  mov.w r12, SP\n");
-  if (!is_main) { fprintf(out, "  pop r12\n"); }
-  fprintf(out, "  ret\n");
+  if (is_interrupt)
+  {
+    // This should be the only place we return from an interrupt since
+    // interrupts should be void.
+    fprintf(out, "  pop r15\n");
+    fprintf(out, "  pop r14\n");
+    fprintf(out, "  pop r13\n");
+    fprintf(out, "  pop r12\n");
+
+    for (int n = max_stack - 1; n >= 0; n--)
+    {
+      fprintf(out, "  pop r%d\n", REG_STACK(n));
+    }
+
+    fprintf(out, "  reti\n");
+  }
+    else
+  {
+    fprintf(out, "  mov.w r12, SP\n");
+    if (!is_main) { fprintf(out, "  pop r12\n"); }
+    fprintf(out, "  ret\n");
+  }
 
   return 0;
 }
@@ -1736,7 +1788,6 @@ int MSP430::adc_read()
     reg++;
   }
     else
-  if (reg < reg_max)
   {
     fprintf(out, "  mov.w &ADC10MEM, r15\n");
     fprintf(out, "  push r15\n");
@@ -1746,6 +1797,93 @@ int MSP430::adc_read()
   return 0;
 }
 
+  // Timer functions
+int MSP430::timer_setInterval()
+{
+  return -1;
+}
+
+int MSP430::timer_setInterval(int cycles, int divider)
+{
+  if (cycles > 0xffff)
+  {
+    printf("** Error cycles is more than 16 bit\n"); 
+    return -1;
+  }
+
+  if (divider == 1) { divider = 0; }
+  else if (divider == 2) { divider = 1; }
+  else if (divider == 4) { divider = 2; }
+  else if (divider == 8) { divider = 3; }
+  else { printf("** divider must be 1,2,4,8\n"); return -1; }
+
+  fprintf(out, "  mov.w #%d, &TACCR0\n", cycles);
+  fprintf(out, "  mov.w #(TASSEL_2|MC_1|%d), &TACTL ; SMCLK, DIV1, COUNT to TACCR0\n", divider << 6);
+  fprintf(out, "  mov.w #0, &TACCTL1\n");
+
+  return 0;
+}
+
+int MSP430::timer_setListener()
+{
+  need_timer_interrupt = true;
+  return -1;
+}
+
+int MSP430::timer_setListener(int const_value)
+{
+  if (const_value != 0)
+  {
+    need_timer_interrupt = true;
+    fprintf(out, "  bis.w #CCIE, &TACCTL0\n");
+    fprintf(out, "  eint\n");
+  }
+    else
+  {
+    fprintf(out, "  bic.w #CCIE, &TACCTL0\n");
+  }
+  return 0;
+}
+
+int MSP430::timer_getValue()
+{
+  if (reg < reg_max)
+  {
+    fprintf(out, "  mov.w &TAR, r%d\n", REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  mov.w &TAR, r15\n");
+    fprintf(out, "  push r15\n");
+    stack++;
+  }
+
+  return 0;
+}
+
+int MSP430::timer_setValue()
+{
+  if (stack != 0)
+  {
+    fprintf(out, "  pop r15\n");
+    fprintf(out, "  mov.w r15, &TAR\n");
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  mov.w r%d, &TAR\n", REG_STACK(reg-1));
+    reg--;
+  }
+
+  return 0;
+}
+
+int MSP430::timer_setValue(int const_value)
+{
+  fprintf(out, "  mov.w #%d, &TAR\n", const_value);
+  return 0;
+}
 
 // Memory
 int MSP430::memory_read8()
