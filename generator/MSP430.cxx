@@ -200,17 +200,14 @@ void MSP430::method_start(int local_count, int max_stack, int param_count, const
       fprintf(out, "  push r%d\n", REG_STACK(n));
     }
 
-    fprintf(out, "  push r12\n");
     fprintf(out, "  push r13\n");
     fprintf(out, "  push r14\n");
     fprintf(out, "  push r15\n");
   }
-    else
-  {
-    if (!is_main) { fprintf(out, "  push r12\n"); }
-    fprintf(out, "  mov.w SP, r12\n");
-    fprintf(out, "  sub.w #0x%x, SP\n", local_count * 2);
-  }
+
+  if (!is_main) { fprintf(out, "  push r12\n"); }
+  fprintf(out, "  mov.w SP, r12\n");
+  fprintf(out, "  sub.w #0x%x, SP\n", local_count * 2);
 }
 
 void MSP430::method_end(int local_count)
@@ -621,7 +618,7 @@ int n;
 
   if (count >= 8)
   {
-    fprintf(out, "  swapb r%d\n", REG_STACK(reg-1));
+    fprintf(out, "  swpb r%d\n", REG_STACK(reg-1));
     fprintf(out, "  and.w #0xff00, r%d\n", REG_STACK(reg-1));
     count = count - 8;
   }
@@ -678,7 +675,7 @@ int n;
 #if 0
   if (count >= 8)
   {
-    fprintf(out, "  swapb r%d\n", REG_STACK(reg));
+    fprintf(out, "  swpb r%d\n", REG_STACK(reg));
     fprintf(out, "  and.w #0xff00, r%d\n", REG_STACK(reg));
     count = count - 8;
   }
@@ -734,12 +731,12 @@ int n;
 
   if (count >= 8)
   {
-    fprintf(out, "  swapb r%d\n", REG_STACK(reg-1));
+    fprintf(out, "  swpb r%d\n", REG_STACK(reg-1));
     fprintf(out, "  and.w #0x00ff, r%d\n", REG_STACK(reg-1));
     count = count - 8;
   }
 
-  fprintf(out, "  clrc\n");
+  if (count != 0) { fprintf(out, "  clrc\n"); }
   for (n = 0; n < count; n ++)
   {
     fprintf(out, "  rrc.w r%d\n", REG_STACK(reg-1));
@@ -975,14 +972,16 @@ int MSP430::return_integer(int local_count)
 
 int MSP430::return_void(int local_count)
 {
+  fprintf(out, "  mov.w r12, SP\n");
+
   if (is_interrupt)
   {
     // This should be the only place we return from an interrupt since
     // interrupts should be void.
+    fprintf(out, "  pop r12\n");
     fprintf(out, "  pop r15\n");
     fprintf(out, "  pop r14\n");
     fprintf(out, "  pop r13\n");
-    fprintf(out, "  pop r12\n");
 
     for (int n = max_stack - 1; n >= 0; n--)
     {
@@ -993,7 +992,6 @@ int MSP430::return_void(int local_count)
   }
     else
   {
-    fprintf(out, "  mov.w r12, SP\n");
     if (!is_main) { fprintf(out, "  pop r12\n"); }
     fprintf(out, "  ret\n");
   }
@@ -1757,7 +1755,7 @@ int value_reg;
 
   get_values_from_stack(&value_reg);
 
-  fprintf(out, "  swapb r%d\n", value_reg);
+  fprintf(out, "  swpb r%d\n", value_reg);
   fprintf(out, "  rla.w r%d\n", value_reg);
   fprintf(out, "  rla.w r%d\n", value_reg);
   fprintf(out, "  rla.w r%d\n", value_reg);
