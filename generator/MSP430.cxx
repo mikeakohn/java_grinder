@@ -1523,9 +1523,23 @@ int MSP430::ioport_setPinAsOutput(int port)
   return -1;
 }
 
+int MSP430::ioport_setPinAsOutput(int port, int const_val)
+{
+  if (const_val < 0 || const_val > 7) { return -1; }
+  fprintf(out, "  bis.b #0x%02x, &P%dDIR\n", (1<<const_val), port+1);
+  return 0;
+}
+
 int MSP430::ioport_setPinAsInput(int port)
 {
   return -1;
+}
+
+int MSP430::ioport_setPinAsInput(int port, int const_val)
+{
+  if (const_val < 0 || const_val > 7) { return -1; }
+  fprintf(out, "  bic.b #0x%02x, &P%dDIR\n", (1<<const_val), port+1);
+  return 0;
 }
 
 int MSP430::ioport_setPinHigh(int port)
@@ -1559,7 +1573,19 @@ int MSP430::ioport_isPinInputHigh(int port)
 
 int MSP430::ioport_getPortInputValue(int port)
 {
-  return -1;
+  if (reg < reg_max)
+  {
+    fprintf(out, "  mov.b &P%dIN, r%d\n", port + 1, REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  mov.b &P%dIN, r15\n", port + 1);
+    fprintf(out, "  push r15\n");
+    stack++;
+  }
+
+  return 0;
 }
 
 #if 0

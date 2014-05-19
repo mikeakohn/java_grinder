@@ -37,7 +37,7 @@ abstract public class IOPort
   {
   }
 
-  public static void setPinAsOuput(int pin)
+  public static void setPinAsOutput(int pin)
   {
   }
 
