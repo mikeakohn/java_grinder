@@ -1695,8 +1695,8 @@ int last_slash = -1;
   }
 
   // Just some debug code
-  printf("external_class_count=%ld\n", external_classes.size());
-  printf("external_field_count=%ld\n", external_fields.size());
+  printf("external_class_count=%zu\n", external_classes.size());
+  printf("external_field_count=%zu\n", external_fields.size());
 
   std::map<std::string,int>::iterator iter;
 
