@@ -67,6 +67,7 @@ MSP430::MSP430(uint8_t chip_type) :
   is_interrupt(0)
 {
   ram_start = 0x0200;
+  include_file = "msp430x2xx.inc";
 
   switch(chip_type)
   {
@@ -110,7 +111,7 @@ int MSP430::open(const char *filename)
 
   // For now we only support a specific chip
   fprintf(out, ".msp430\n");
-  fprintf(out, ".include \"msp430x2xx.inc\"\n\n");
+  fprintf(out, ".include \"%s\"\n\n", include_file);
 
   // Set where RAM starts
   fprintf(out, "ram_start equ 0x%04x\n", ram_start);
@@ -1825,7 +1826,7 @@ int MSP430::adc_read()
   return 0;
 }
 
-  // Timer functions
+// Timer functions
 int MSP430::timer_setInterval()
 {
   return -1;

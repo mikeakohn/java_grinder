@@ -105,9 +105,9 @@ Generator *generator = NULL;
     generator = new MSP430(MSP430G2553);
   }
     else
-  if (strcasecmp("msp430x", chip_type) == 0)
+  if (strcasecmp("msp430f5529", chip_type) == 0)
   {
-    generator = new MSP430X(0);
+    generator = new MSP430X(MSP430F5529);
   }
     else
   if (strcasecmp("stdc", chip_type) == 0)

@@ -404,11 +404,13 @@ int index;
   fill_label_map(label_map, label_map_len, bytes, code_len, pc_start);
 
 #ifdef DEBUG
-printf("pc=%d\n", pc);
-printf("max_stack=%d\n", max_stack);
-printf("max_locals=%d\n", max_locals);
-printf("code_len=%d\n", code_len);
+  printf("pc=%d\n", pc);
+  printf("max_stack=%d\n", max_stack);
+  printf("max_locals=%d\n", max_locals);
+  printf("code_len=%d\n", code_len);
 #endif
+
+  generator->instruction_count_clear();
 
   while(pc - pc_start < code_len)
   {
@@ -422,6 +424,11 @@ printf("code_len=%d\n", code_len);
       sprintf(label, "%s_%d", method_name, address);
       generator->label(label);
     }
+
+    // Instruction count can be used for optimization.  For example if
+    // next instruction is an array access to the same array, maybe it's
+    // possible to unpop the array pointer from the stack.
+    generator->instruction_count_inc();
 
     switch(bytes[pc])
     {

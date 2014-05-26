@@ -20,13 +20,12 @@ public class CPU
   }
 
   /** Set clock speed to 16MHz (internal crystal? DCO?) */
-  public static void setClock16()
-  {
-  }
+  public static void setClock16() { }
+
+  /** Set clock speed to 25MHz (internal crystal? DCO?) */
+  public static void setClock25() { }
 
   /** Insert a CPU level NOP */
-  public static void nop()
-  {
-  }
+  public static void nop() { }
 }
 

@@ -19,6 +19,7 @@ enum
   MSP430G2231,
   MSP430G2452,
   MSP430G2553,
+  MSP430F5529,
 };
 
 class MSP430 : public Generator
@@ -196,6 +197,7 @@ protected:
   uint32_t stack_start;
   uint32_t flash_start;
   int max_stack;
+  const char *include_file;
 };
 
 #endif

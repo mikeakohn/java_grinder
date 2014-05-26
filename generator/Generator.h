@@ -114,6 +114,8 @@ public:
   virtual int memory_write16() { return -1; }
 
   void add_newline();
+  void instruction_count_clear() { instruction_count = 0; }
+  void instruction_count_inc() { instruction_count++; }
 
 protected:
   int insert_db(const char *name, int32_t *data, int len, uint8_t len_type);
@@ -125,8 +127,9 @@ protected:
 
   FILE *out;
   int label_count;
+  int instruction_count;
   int constants_len;
-  uint32_t constants[16384];
+  uint32_t constants[16384];   // For ARM and maybe MIPS
 };
 
 enum

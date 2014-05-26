@@ -22,8 +22,21 @@ public:
   virtual ~MSP430X();
 
   virtual int shift_left_integer();
+  virtual int shift_left_integer(int count);
   virtual int shift_right_integer();
+  virtual int shift_right_integer(int count);
   virtual int shift_right_uinteger();
+  virtual int shift_right_uinteger(int count);
+
+  // Timer functions
+  virtual int timer_setInterval(int cycles, int divider);
+  virtual int timer_setListener(int const_value);
+  virtual int timer_getValue();
+  virtual int timer_setValue();
+  virtual int timer_setValue(int const_value);
+
+  // CPU functions
+  virtual int cpu_setClock25();
 };
 
 #endif
