@@ -35,6 +35,7 @@ MSP430X::MSP430X(uint8_t chip_type) : MSP430(chip_type)
   // Looks like most of the MSP430F55xx line are using this value, but
   // if other chips are added this can move to the switch/case.
   ram_start = 0x2400;
+  vector_timer = 0xffea;
 
   switch(chip_type)
   {

@@ -67,6 +67,7 @@ MSP430::MSP430(uint8_t chip_type) :
   is_interrupt(0)
 {
   ram_start = 0x0200;
+  vector_timer = 0xfff2;
   include_file = "msp430x2xx.inc";
 
   switch(chip_type)
@@ -97,7 +98,7 @@ MSP430::~MSP430()
 
   if (need_timer_interrupt)
   {
-    fprintf(out, ".org 0xfff2\n");
+    fprintf(out, ".org 0x%04x\n", vector_timer);
     fprintf(out, "  dw timerInterrupt\n");
   }
 

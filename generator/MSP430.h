@@ -183,6 +183,7 @@ protected:
   int get_values_from_stack(int *value1, int *value2, int *value3);
   int get_values_from_stack(int *value1, int *value2);
   int get_values_from_stack(int *value1);
+
   int reg;
   int reg_max;
   int stack;
@@ -198,6 +199,7 @@ protected:
   uint32_t flash_start;
   int max_stack;
   const char *include_file;
+  uint16_t vector_timer;
 };
 
 #endif
