@@ -18,13 +18,13 @@
 #include "ioport.h"
 
 #define CHECK_FUNC(funct,sig) \
-  if (strncmp(#funct#sig, method_name, sizeof(#funct)-1) == 0) \
+  if (strcmp(#funct#sig, method_name) == 0) \
   { \
     return generator->ioport_##funct(port); \
   }
 
 #define CHECK_FUNC_CONST(funct,sig) \
-  if (strncmp(#funct#sig, method_name, sizeof(#funct)-1) == 0) \
+  if (strcmp(#funct#sig, method_name) == 0) \
   { \
     return generator->ioport_##funct(port, const_val); \
   }

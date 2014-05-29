@@ -16,19 +16,22 @@
 
 #include "JavaClass.h"
 #include "adc.h"
+  //if (strncmp(#funct#sig, function, sizeof(#funct#sig)-1) == 0)
+  //if (strncmp(#funct#sig, function, sizeof(#funct#sig)-1) == 0)
 
-#define CHECK_FUNC(funct) \
-  if (strncmp(#funct, function, sizeof(#funct)-1) == 0) \
+#define CHECK_FUNC(funct,sig) \
+  if (strcmp(#funct#sig, function) == 0) \
   { \
-    return adc_##funct(java_class, generator); \
+    return generator->adc_##funct##sig(); \
   }
 
-#define CHECK_FUNC_CONST_1(funct) \
-  if (strncmp(#funct, function, sizeof(#funct)-1) == 0) \
+#define CHECK_FUNC_CONST_1(funct,sig) \
+  if (strcmp(#funct#sig, function) == 0) \
   { \
-    return adc_##funct(java_class, generator, const_val); \
+    return generator->adc_##funct##sig(const_val); \
   }
 
+#if 0
 static int adc_enable(JavaClass *java_class, Generator *generator)
 {
   return generator->adc_enable();
@@ -53,20 +56,21 @@ static int adc_read(JavaClass *java_class, Generator *generator)
 {
   return generator->adc_read();
 }
+#endif
 
 int adc(JavaClass *java_class, Generator *generator, char *function)
 {
-  CHECK_FUNC(enable)
-  CHECK_FUNC(disable)
-  CHECK_FUNC(setChannel_I)
-  CHECK_FUNC(read)
+  CHECK_FUNC(enable,)
+  CHECK_FUNC(disable,)
+  CHECK_FUNC(setChannel,_I)
+  CHECK_FUNC(read,)
 
   return -1;
 }
 
 int adc(JavaClass *java_class, Generator *generator, char *function, int const_val)
 {
-  CHECK_FUNC_CONST_1(setChannel_I)
+  CHECK_FUNC_CONST_1(setChannel,_I)
   return -1;
 }
 
