@@ -136,6 +136,16 @@ static int ioport_setPortOutputValue_I(JavaClass *java_class, Generator *generat
 }
 #endif
 
+static int ioport_setPinsResistorEnable_I(JavaClass *java_class, Generator *generator, int port)
+{
+  return generator->ioport_setPinsResistorEnable(port);
+}
+
+static int ioport_setPinsResistorEnable_I(JavaClass *java_class, Generator *generator, int port, int const_val)
+{
+  return generator->ioport_setPinsResistorEnable(port, const_val);
+}
+
 int ioport(JavaClass *java_class, Generator *generator, char *method_name, int port)
 {
   CHECK_FUNC(setPinsAsInput_I)
@@ -150,6 +160,7 @@ int ioport(JavaClass *java_class, Generator *generator, char *method_name, int p
   CHECK_FUNC(isPinInputHigh_I)
   CHECK_FUNC(getPortInputValue)
   //CHECK_FUNC(setPortOutputValue_I)
+  CHECK_FUNC(setPinsResistorEnable_I)
 
   return -1;
 }
@@ -165,6 +176,7 @@ int ioport(JavaClass *java_class, Generator *generator, char *method_name, int p
   CHECK_FUNC_CONST(setPinAsInput_I)
   CHECK_FUNC_CONST(setPinHigh_I)
   CHECK_FUNC_CONST(setPinLow_I)
+  CHECK_FUNC_CONST(setPinsResistorEnable_I)
   return -1;
 }
 

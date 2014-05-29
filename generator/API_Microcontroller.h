@@ -37,6 +37,8 @@ public:
   virtual int ioport_isPinInputHigh(int port) { return -1; }
   virtual int ioport_getPortInputValue(int port) { return -1; }
   //virtual int ioport_setPortOutputValue(int port) { return -1; }
+  virtual int ioport_setPinsResistorEnable(int port) { return -1; }
+  virtual int ioport_setPinsResistorEnable(int port, int const_val) { return -1; }
 
   // UART functions
   virtual int uart_init(int port) { return -1; }

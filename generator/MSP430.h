@@ -128,6 +128,8 @@ public:
   virtual int ioport_isPinInputHigh(int port);
   virtual int ioport_getPortInputValue(int port);
   //virtual int ioport_setPortOutputValue(int port);
+  virtual int ioport_setPinsResistorEnable(int port);
+  virtual int ioport_setPinsResistorEnable(int port, int const_val);
 
   // UART functions
   virtual int uart_init(int port);

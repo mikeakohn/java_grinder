@@ -1609,6 +1609,21 @@ int MSP430::ioport_setPortOutputValue(int port)
 }
 #endif
 
+int MSP430::ioport_setPinsResistorEnable(int port)
+{
+  char periph[32];
+  sprintf(periph, "P%dREN", port+1);
+  return set_periph("mov", periph);
+}
+
+int MSP430::ioport_setPinsResistorEnable(int port, int const_val)
+{
+  char periph[32];
+  sprintf(periph, "P%dREN", port+1);
+  fprintf(out, "  mov.b #%d, &%s\n", const_val, periph);
+  return 0;
+}
+
 // UART functions
 int MSP430::uart_init(int port)
 {
