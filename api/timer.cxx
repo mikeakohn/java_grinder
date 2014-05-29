@@ -17,79 +17,44 @@
 #include "JavaClass.h"
 #include "timer.h"
 
-#define CHECK_FUNC(funct) \
-  if (strncmp(#funct, function, sizeof(#funct)-1) == 0) \
+#define CHECK_FUNC(funct,sig) \
+  if (strcmp(#funct#sig, function) == 0) \
   { \
-    return timer_##funct(java_class, generator); \
+    return generator->timer_##funct(); \
   }
 
-#define CHECK_FUNC_CONST_1(funct) \
-  if (strncmp(#funct, function, sizeof(#funct)-1) == 0) \
+#define CHECK_FUNC_CONST_1(funct,sig) \
+  if (strcmp(#funct#sig, function) == 0) \
   { \
-    return timer_##funct(java_class, generator, const_val); \
+    return generator->timer_##funct(const_val); \
   }
 
-#define CHECK_FUNC_CONST_2(funct) \
-  if (strncmp(#funct, function, sizeof(#funct)-1) == 0) \
+#define CHECK_FUNC_CONST_2(funct,sig) \
+  if (strcmp(#funct#sig, function) == 0) \
   { \
-    return timer_##funct(java_class, generator, const_val1, const_val2); \
+    return generator->timer_##funct(const_val1, const_val2); \
   }
-
-static int timer_setInterval_II(JavaClass *java_class, Generator *generator)
-{
-  return generator->timer_setInterval();
-}
-
-static int timer_setInterval_II(JavaClass *java_class, Generator *generator, int const_val1, int const_val2)
-{
-  return generator->timer_setInterval(const_val1, const_val2);
-}
-
-static int timer_setListener_Z(JavaClass *java_class, Generator *generator)
-{
-  return generator->timer_setListener();
-}
-
-static int timer_setListener_Z(JavaClass *java_class, Generator *generator, int const_val)
-{
-  return generator->timer_setListener(const_val);
-}
-
-static int timer_getValue(JavaClass *java_class, Generator *generator)
-{
-  return generator->timer_getValue();
-}
-
-static int timer_setValue_I(JavaClass *java_class, Generator *generator)
-{
-  return generator->timer_setValue();
-}
-
-static int timer_setValue_I(JavaClass *java_class, Generator *generator, int const_val)
-{
-  return generator->timer_setValue(const_val);
-}
 
 int timer(JavaClass *java_class, Generator *generator, char *function)
 {
-  CHECK_FUNC(setInterval_II)
-  CHECK_FUNC(setListener_Z)
-  CHECK_FUNC(getValue)
-  CHECK_FUNC(setValue_I)
+  CHECK_FUNC(setInterval,II)
+  CHECK_FUNC(setListener,Z)
+  CHECK_FUNC(getValue,)
+  CHECK_FUNC(setValue,I)
 
   return -1;
 }
 
 int timer(JavaClass *java_class, Generator *generator, char *function, int const_val)
 {
-  CHECK_FUNC_CONST_1(setListener_Z)
-  CHECK_FUNC_CONST_1(setValue_I)
+  CHECK_FUNC_CONST_1(setListener,Z)
+  CHECK_FUNC_CONST_1(setValue,I)
   return -1;
 }
 
 int timer(JavaClass *java_class, Generator *generator, char *function, int const_val1, int const_val2)
 {
-  CHECK_FUNC_CONST_2(setInterval_II)
+  CHECK_FUNC_CONST_2(setInterval,II)
   return -1;
 }
 
