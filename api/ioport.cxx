@@ -17,166 +17,49 @@
 #include "JavaClass.h"
 #include "ioport.h"
 
-#define CHECK_FUNC(funct) \
-  if (strncmp(#funct, method_name, sizeof(#funct)-1) == 0) \
+#define CHECK_FUNC(funct,sig) \
+  if (strncmp(#funct#sig, method_name, sizeof(#funct)-1) == 0) \
   { \
-    return ioport_##funct(java_class, generator, port); \
+    return generator->ioport_##funct(port); \
   }
 
-#define CHECK_FUNC_CONST(funct) \
-  if (strncmp(#funct, method_name, sizeof(#funct)-1) == 0) \
+#define CHECK_FUNC_CONST(funct,sig) \
+  if (strncmp(#funct#sig, method_name, sizeof(#funct)-1) == 0) \
   { \
-    return ioport_##funct(java_class, generator, port, const_val); \
+    return generator->ioport_##funct(port, const_val); \
   }
-
-static int ioport_setPinsAsInput_I(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->ioport_setPinsAsInput(port);
-}
-
-static int ioport_setPinsAsInput_I(JavaClass *java_class, Generator *generator, int port, int const_val)
-{
-  return generator->ioport_setPinsAsInput(port, const_val);
-}
-
-static int ioport_setPinsAsOutput_I(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->ioport_setPinsAsOutput(port);
-}
-
-static int ioport_setPinsAsOutput_I(JavaClass *java_class, Generator *generator, int port, int const_val)
-{
-  return generator->ioport_setPinsAsOutput(port, const_val);
-}
-
-static int ioport_setPinsValue_I(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->ioport_setPinsValue(port);
-}
-
-static int ioport_setPinsValue_I(JavaClass *java_class, Generator *generator, int port, int const_val)
-{
-  return generator->ioport_setPinsValue(port, const_val);
-}
-
-static int ioport_setPinsHigh_I(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->ioport_setPinsHigh(port);
-}
-
-static int ioport_setPinsHigh_I(JavaClass *java_class, Generator *generator, int port, int const_val)
-{
-  return generator->ioport_setPinsHigh(port, const_val);
-}
-
-static int ioport_setPinsLow_I(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->ioport_setPinsLow(port);
-}
-
-static int ioport_setPinsLow_I(JavaClass *java_class, Generator *generator, int port, int const_val)
-{
-  return generator->ioport_setPinsLow(port, const_val);
-}
-
-static int ioport_setPinAsOutput_I(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->ioport_setPinAsOutput(port);
-}
-
-static int ioport_setPinAsOutput_I(JavaClass *java_class, Generator *generator, int port, int const_val)
-{
-  return generator->ioport_setPinAsOutput(port, const_val);
-}
-
-static int ioport_setPinAsInput_I(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->ioport_setPinAsInput(port);
-}
-
-static int ioport_setPinAsInput_I(JavaClass *java_class, Generator *generator, int port, int const_val)
-{
-  return generator->ioport_setPinAsInput(port, const_val);
-}
-
-static int ioport_setPinHigh_I(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->ioport_setPinHigh(port);
-}
-
-static int ioport_setPinHigh_I(JavaClass *java_class, Generator *generator, int port, int const_val)
-{
-  return generator->ioport_setPinHigh(port, const_val);
-}
-
-static int ioport_setPinLow_I(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->ioport_setPinLow(port);
-}
-
-static int ioport_setPinLow_I(JavaClass *java_class, Generator *generator, int port, int const_val)
-{
-  return generator->ioport_setPinLow(port, const_val);
-}
-
-static int ioport_isPinInputHigh_I(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->ioport_isPinInputHigh(port);
-}
-
-static int ioport_getPortInputValue(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->ioport_getPortInputValue(port);
-}
-
-#if 0
-static int ioport_setPortOutputValue_I(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->ioport_setPortOutputValue(port);
-}
-#endif
-
-static int ioport_setPinsResistorEnable_I(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->ioport_setPinsResistorEnable(port);
-}
-
-static int ioport_setPinsResistorEnable_I(JavaClass *java_class, Generator *generator, int port, int const_val)
-{
-  return generator->ioport_setPinsResistorEnable(port, const_val);
-}
 
 int ioport(JavaClass *java_class, Generator *generator, char *method_name, int port)
 {
-  CHECK_FUNC(setPinsAsInput_I)
-  CHECK_FUNC(setPinsAsOutput_I)
-  CHECK_FUNC(setPinsValue_I)
-  CHECK_FUNC(setPinsHigh_I)
-  CHECK_FUNC(setPinsLow_I)
-  CHECK_FUNC(setPinAsOutput_I)
-  CHECK_FUNC(setPinAsInput_I)
-  CHECK_FUNC(setPinHigh_I)
-  CHECK_FUNC(setPinLow_I)
-  CHECK_FUNC(isPinInputHigh_I)
-  CHECK_FUNC(getPortInputValue)
-  //CHECK_FUNC(setPortOutputValue_I)
-  CHECK_FUNC(setPinsResistorEnable_I)
+  CHECK_FUNC(setPinsAsInput,_I)
+  CHECK_FUNC(setPinsAsOutput,_I)
+  CHECK_FUNC(setPinsValue,_I)
+  CHECK_FUNC(setPinsHigh,_I)
+  CHECK_FUNC(setPinsLow,_I)
+  CHECK_FUNC(setPinAsOutput,_I)
+  CHECK_FUNC(setPinAsInput,_I)
+  CHECK_FUNC(setPinHigh,_I)
+  CHECK_FUNC(setPinLow,_I)
+  CHECK_FUNC(isPinInputHigh,_I)
+  CHECK_FUNC(getPortInputValue,)
+  //CHECK_FUNC(setPortOutputValue,I)
+  CHECK_FUNC(setPinsResistorEnable,_I)
 
   return -1;
 }
 
 int ioport(JavaClass *java_class, Generator *generator, char *method_name, int port, int const_val)
 {
-  CHECK_FUNC_CONST(setPinsAsInput_I)
-  CHECK_FUNC_CONST(setPinsAsOutput_I)
-  CHECK_FUNC_CONST(setPinsValue_I)
-  CHECK_FUNC_CONST(setPinsHigh_I)
-  CHECK_FUNC_CONST(setPinsLow_I)
-  CHECK_FUNC_CONST(setPinAsOutput_I)
-  CHECK_FUNC_CONST(setPinAsInput_I)
-  CHECK_FUNC_CONST(setPinHigh_I)
-  CHECK_FUNC_CONST(setPinLow_I)
-  CHECK_FUNC_CONST(setPinsResistorEnable_I)
+  CHECK_FUNC_CONST(setPinsAsInput,_I)
+  CHECK_FUNC_CONST(setPinsAsOutput,_I)
+  CHECK_FUNC_CONST(setPinsValue,_I)
+  CHECK_FUNC_CONST(setPinsHigh,_I)
+  CHECK_FUNC_CONST(setPinsLow,_I)
+  CHECK_FUNC_CONST(setPinAsOutput,_I)
+  CHECK_FUNC_CONST(setPinAsInput,_I)
+  CHECK_FUNC_CONST(setPinHigh,_I)
+  CHECK_FUNC_CONST(setPinLow,_I)
+  CHECK_FUNC_CONST(setPinsResistorEnable,_I)
   return -1;
 }
 
