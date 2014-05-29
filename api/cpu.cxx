@@ -17,32 +17,17 @@
 #include "JavaClass.h"
 #include "cpu.h"
 
-#define CHECK_FUNC(funct) \
-  if (strncmp(#funct, function, sizeof(#funct)-1) == 0) \
+#define CHECK_FUNC(funct,sig) \
+  if (strcmp(#funct#sig, function) == 0) \
   { \
-    return cpu_##funct(java_class, generator); \
+    return generator->cpu_##funct(); \
   }
-
-static int cpu_setClock16(JavaClass *java_class, Generator *generator)
-{
-  return generator->cpu_setClock16();
-}
-
-static int cpu_setClock25(JavaClass *java_class, Generator *generator)
-{
-  return generator->cpu_setClock25();
-}
-
-static int cpu_nop(JavaClass *java_class, Generator *generator)
-{
-  return generator->cpu_nop();
-}
 
 int cpu(JavaClass *java_class, Generator *generator, char *function)
 {
-  CHECK_FUNC(setClock16)
-  CHECK_FUNC(setClock25)
-  CHECK_FUNC(nop)
+  CHECK_FUNC(setClock16,)
+  CHECK_FUNC(setClock25,)
+  CHECK_FUNC(nop,)
 
   return -1;
 }
