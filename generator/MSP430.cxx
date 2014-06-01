@@ -15,6 +15,7 @@
 #include <stdint.h>
 
 #include "MSP430.h"
+#include "MSP430X.h"
 
 // ABI is:
 // r4 top of stack
@@ -110,8 +111,10 @@ int MSP430::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 
+  MSP430X *msp430x = dynamic_cast<MSP430X *>(this);
+
   // For now we only support a specific chip
-  fprintf(out, ".msp430\n");
+  fprintf(out, ".%s\n", msp430x == NULL ? "msp430" : "msp430x");
   fprintf(out, ".include \"%s\"\n\n", include_file);
 
   // Set where RAM starts
@@ -206,7 +209,8 @@ void MSP430::method_start(int local_count, int max_stack, int param_count, const
       fprintf(out, "  push r%d\n", REG_STACK(n));
     }
 
-    fprintf(out, "  push r13\n");
+    // Why push r13?  it's pretty much a temp
+    //fprintf(out, "  push r13\n");
     fprintf(out, "  push r14\n");
     fprintf(out, "  push r15\n");
   }
@@ -987,7 +991,8 @@ int MSP430::return_void(int local_count)
     fprintf(out, "  pop r12\n");
     fprintf(out, "  pop r15\n");
     fprintf(out, "  pop r14\n");
-    fprintf(out, "  pop r13\n");
+    // Again, r13 is pretty much a temp, why push it
+    //fprintf(out, "  pop r13\n");
 
     for (int n = max_stack - 1; n >= 0; n--)
     {

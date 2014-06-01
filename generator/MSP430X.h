@@ -37,6 +37,11 @@ public:
 
   // CPU functions
   virtual int cpu_setClock25();
+
+private:
+  void insert_set_vcore_up();
+
+  bool need_set_vcore_up:1;
 };
 
 #endif

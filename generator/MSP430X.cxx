@@ -30,7 +30,9 @@
 #define REG_STACK(a) (a + 4)
 #define LOCALS(a) ((a * 2) + 2)
 
-MSP430X::MSP430X(uint8_t chip_type) : MSP430(chip_type)
+MSP430X::MSP430X(uint8_t chip_type) :
+  MSP430(chip_type),
+  need_set_vcore_up(false)
 {
   // Looks like most of the MSP430F55xx line are using this value, but
   // if other chips are added this can move to the switch/case.
@@ -53,7 +55,7 @@ MSP430X::MSP430X(uint8_t chip_type) : MSP430(chip_type)
 
 MSP430X::~MSP430X()
 {
-
+  if (need_set_vcore_up) { insert_set_vcore_up(); }
 }
 
 int MSP430X::shift_left_integer()
@@ -197,6 +199,15 @@ int MSP430X::shift_right_uinteger(int count)
 // CPU functions
 int MSP430X::cpu_setClock25()
 {
+  need_set_vcore_up = true;
+
+  fprintf(out, "  ;; Increase CPU voltage for faster MCLK\n");
+  fprintf(out, "  mov.w #1, r15\n");
+  fprintf(out, "  call #set_vcore_up\n");
+  fprintf(out, "  mov.w #2, r15\n");
+  fprintf(out, "  call #set_vcore_up\n");
+  fprintf(out, "  mov.w #3, r15\n");
+  fprintf(out, "  call #set_vcore_up\n\n");
   fprintf(out, "  ;; Set up DCO to 25MHz\n");
   fprintf(out, "  bis.w #SCG0, SR\n");
   fprintf(out, "  mov.w #SELREF__REFOCLK, &UCSCTL3\n");
@@ -292,5 +303,62 @@ int MSP430X::timer_setValue(int const_value)
 {
   fprintf(out, "  mov.w #%d, &TA0R\n", const_value);
   return 0;
+}
+
+void MSP430X::insert_set_vcore_up()
+{
+  // Translated from C to Assmembly from TI's msp430x5xx family PDF
+  // slau208m - June 2008 - Revised February 2013, page 108
+
+  fprintf(out, "set_vcore_up:\n");
+
+  // Open PMM registers for write access
+  fprintf(out, "  mov.b #0xa5, &PMMCTL0_H\n");
+  // Make sure no flags are set for iterative sequences
+/* The manual says to do this.. I see someone else not doing this.. and
+   this hands if it's done.. :(
+  fprintf(out, "set_vcore_up_svsmhdlyifg_1:\n");
+  fprintf(out, "  bit.w #SVSMHDLYIFG, &PMMIFG\n");
+  fprintf(out, "  jz set_vcore_up_svsmhdlyifg_1\n");
+  fprintf(out, "set_vcore_up_svsmldlyifg_1:\n");
+  fprintf(out, "  bit.w #SVSMLDLYIFG, &PMMIFG\n");
+  fprintf(out, "  jz set_vcore_up_svsmldlyifg_1\n");
+*/
+  // Set SVS/SVM high side new level
+  //SVSMHCTL = SVSHE + (SVSHRVL0 * level) + SVMHE + (SVSMHRRL0 * level);
+  fprintf(out, "  mov.w r15, r14\n");
+  fprintf(out, "  rlam.w #4, r14\n");
+  fprintf(out, "  rlam.w #4, r14\n");
+  fprintf(out, "  mov.w r14, r13\n");
+  fprintf(out, "  bis.w #SVSHE|SVMHE, r13\n");
+  fprintf(out, "  mov.w r13, &SVSMHCTL\n");
+  // Set SVM low side to new level
+  //SVSMLCTL = SVSLE + SVMLE + (SVSMLRRL0 * level);
+  fprintf(out, "  mov.w r15, r13\n");
+  fprintf(out, "  bis.w #SVSLE|SVMLE, r13\n");
+  fprintf(out, "  mov.w r13, &SVSMLCTL\n");
+  // Wait till SVM is settled
+  fprintf(out, "set_vcore_up_svsmldlyifg_2:\n");
+  fprintf(out, "  bit.w #SVSMLDLYIFG, &PMMIFG\n");
+  fprintf(out, "  jz set_vcore_up_svsmldlyifg_2\n");
+  // Clear already set flags
+  fprintf(out, "  bic.w #SVMLVLRIFG|SVMLIFG, &PMMIFG\n");
+  // Set VCore to new level
+  //PMMCTL0_L = PMMCOREV0 * level;
+  fprintf(out, "  mov.b r15, &PMMCTL0_L\n");
+  // Wait till new level reached
+  fprintf(out, "  bit.w #SVMLIFG, &PMMIFG\n");
+  fprintf(out, "  jz set_vcore_up_skip_level_check\n");
+  fprintf(out, "set_vcore_up_level_check:\n");
+  fprintf(out, "  bit.w #SVMLVLRIFG, &PMMIFG\n");
+  fprintf(out, "  jz set_vcore_up_level_check\n");
+  fprintf(out, "set_vcore_up_skip_level_check:\n");
+  // Set SVS/SVM low side to new level
+  //SVSMLCTL = SVSLE + (SVSLRVL0 * level) + SVMLE + (SVSMLRRL0 * level);
+  fprintf(out, "  bis.w #SVSLE|SVMLE, r14\n");
+  fprintf(out, "  mov.w r14, &SVSMLCTL\n");
+  // Lock PMM registers for write access
+  fprintf(out, "  mov.b #0x00, &PMMCTL0_H\n");
+  fprintf(out, "  ret\n\n");
 }
 
