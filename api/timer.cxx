@@ -37,24 +37,24 @@
 
 int timer(JavaClass *java_class, Generator *generator, char *function)
 {
-  CHECK_FUNC(setInterval,II)
-  CHECK_FUNC(setListener,Z)
+  CHECK_FUNC(setInterval,_II)
+  CHECK_FUNC(setListener,_Z)
   CHECK_FUNC(getValue,)
-  CHECK_FUNC(setValue,I)
+  CHECK_FUNC(setValue,_I)
 
   return -1;
 }
 
 int timer(JavaClass *java_class, Generator *generator, char *function, int const_val)
 {
-  CHECK_FUNC_CONST_1(setListener,Z)
-  CHECK_FUNC_CONST_1(setValue,I)
+  CHECK_FUNC_CONST_1(setListener,_Z)
+  CHECK_FUNC_CONST_1(setValue,_I)
   return -1;
 }
 
 int timer(JavaClass *java_class, Generator *generator, char *function, int const_val1, int const_val2)
 {
-  CHECK_FUNC_CONST_2(setInterval,II)
+  CHECK_FUNC_CONST_2(setInterval,_II)
   return -1;
 }
 
