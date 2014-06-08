@@ -851,6 +851,23 @@ bool reverse = false;
   return 0;
 }
 
+int MSP430::jump_cond_zero(const char *label, int cond)
+{
+  if (cond == COND_EQUAL)
+  {
+    fprintf(out, "  jeq %s\n", label);
+    return 0;
+  }
+    else
+  if (cond == COND_NOT_EQUAL)
+  {
+    fprintf(out, "  jne %s\n", label);
+    return 0;
+  }
+
+  return -1;
+}
+
 int MSP430::jump_cond_integer(const char *label, int cond)
 {
 bool reverse = false;

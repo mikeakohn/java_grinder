@@ -248,6 +248,79 @@ int const_vals[2];
   return 0;
 }
 
+int JavaCompiler::optimize_compare(JavaClass *java_class, char *method_name, uint8_t *bytes, int pc, int pc_end, int address, int index)
+{
+int local_index = -1;
+bool check_for_compare = false;
+int skip_bytes = 0;
+int wide = 0;
+
+  // If we did some kind of ALU instruction, it's maybe possible we don't
+  // have to do a cmp #0, reg which would require pushing on the stack
+  // and then doing a compare and then doing a jmp.  Might as well just jmp.
+
+  if (!optimize) { return 0; }
+
+  if (pc + table_java_instr[bytes[pc]].normal > pc_end)
+  {
+    return 0;
+  }
+
+  if (bytes[pc] == 0xc4) { skip_bytes++; pc++; wide = 1; }
+
+  switch (bytes[pc])
+  {
+    case 21: // iload (0x15)
+      if (wide == 1)
+      {
+        local_index = GET_PC_UINT16(1);
+        skip_bytes += 3;
+      }
+        else
+      {
+        local_index = bytes[pc+1];
+        skip_bytes += 2;
+      }
+      if (local_index == index) { check_for_compare = true; }
+      break;
+    case 26: // iload_0 (0x1a)
+    case 27: // iload_1 (0x1b)
+    case 28: // iload_2 (0x1c)
+    case 29: // iload_3 (0x1d)
+      // Push a local integer variable on the stack
+      local_index = bytes[pc] - 26;
+      if (local_index == index)
+      {
+        check_for_compare = true;
+        skip_bytes = 1;
+      }
+      break;
+    default:
+      break;
+  }
+
+  if (check_for_compare)
+  {
+    // ifeq (0x99)
+    // ifne (0x9a)
+    if (bytes[pc+skip_bytes] == 153 || bytes[pc+skip_bytes] == 154)
+    {
+      int cond = bytes[pc+skip_bytes] - 153;
+      pc += skip_bytes;
+      char label[128];
+      address += skip_bytes;
+      sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
+
+      if (generator->jump_cond_zero(label, cond) != -1)
+      {
+        return skip_bytes + 3;
+      }
+    }
+  }
+
+  return 0;
+}
+
 int JavaCompiler::array_load(JavaClass *java_class, int constant_id, uint8_t array_type)
 {
 generic_32bit_t *gen32;
@@ -352,6 +425,7 @@ uint16_t operand_stack_ptr = 0;
 int const_val;
 int skip_bytes;
 int index;
+int instruction_length;
 
   if (java_class->get_method_name(method_name, sizeof(method_name), method_id) != 0)
   {
@@ -522,18 +596,23 @@ int index;
 
       case 18: // ldc (0x12)
         index = bytes[pc+1];
+        instruction_length = 2;
       case 19: // ldc_w (0x13)
-        if (bytes[pc] == 0x13) { index = GET_PC_UINT16(1); }
+        if (bytes[pc] == 0x13)
+        {
+          index = GET_PC_UINT16(1);
+          instruction_length = 3;
+        }
         printf("  index=%d\n", index);
 
         gen32 = (generic_32bit_t *)java_class->get_constant(index);
 
         if (gen32->tag == CONSTANT_INTEGER)
         {
-          int len = bytes[pc] == 0x13 ? 3 : 2;
           const_val = gen32->value;
-          ret = optimize_const(java_class, method_name, bytes, pc + len,
-                               pc_start + code_len, address + len, const_val);
+          ret = optimize_const(java_class, method_name, bytes,
+                               pc + instruction_length, pc_start + code_len,
+                               address + instruction_length, const_val);
           if (ret == 0)
           {
             ret = generator->push_integer(const_val);
@@ -555,10 +634,10 @@ int index;
         {
           constant_string_t *constant_string = (constant_string_t *)gen32;
 
-          int len = bytes[pc] == 0x13 ? 3 : 2;
           const_val = constant_string->string_index;
-          ret = optimize_const(java_class, method_name, bytes, pc + len,
-                               pc_start + code_len, address + len, const_val);
+          ret = optimize_const(java_class, method_name, bytes,
+                               pc + instruction_length, pc_start + code_len,
+                               address + instruction_length, const_val);
           if (ret == 0)
           {
             ret = generator->push_integer(const_val);
@@ -1114,14 +1193,21 @@ int index;
       case 132: // iinc (0x84)
         if (wide == 1)
         {
-          //local_vars[GET_PC_UINT16(1)] += GET_PC_INT16(3);
-          ret = generator->inc_integer(GET_PC_UINT16(1), (int16_t)(GET_PC_INT16(3)));
+          index = GET_PC_UINT16(1);
+          ret = generator->inc_integer(index, (int16_t)(GET_PC_INT16(3)));
+          instruction_length = table_java_instr[bytes[pc]].wide;
         }
           else
         {
-          //local_vars[bytes[pc+1]] += ((char)bytes[pc+2]);
-          ret = generator->inc_integer(bytes[pc+1], (int8_t)bytes[pc+2]);
+          index = bytes[pc+1];
+          ret = generator->inc_integer(index, (int8_t)bytes[pc+2]);
+          instruction_length = table_java_instr[bytes[pc]].normal;
         }
+
+        skip_bytes = optimize_compare(java_class, method_name, bytes,
+                                      pc + instruction_length,
+                                      pc_start + code_len,
+                                      address + instruction_length, index);
         break;
 
       case 133: // i2l (0x85)

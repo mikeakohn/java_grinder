@@ -78,6 +78,7 @@ public:
   virtual int inc_integer(int index, int num);
   virtual int integer_to_byte();
   virtual int jump_cond(const char *label, int cond);
+  virtual int jump_cond_zero(const char *label, int cond);
   virtual int jump_cond_integer(const char *label, int cond);
   virtual int jump_cond_integer(const char *label, int cond, int const_val);
   virtual int return_local(int index, int local_count);
