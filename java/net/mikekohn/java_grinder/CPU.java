@@ -27,5 +27,8 @@ public class CPU
 
   /** Insert a CPU level NOP */
   public static void nop() { }
+
+  /** Insert inline assembly */
+  public static void asm(String code) { }
 }
 

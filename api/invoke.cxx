@@ -317,6 +317,7 @@ char function[256];
     CHECK_CONST(Memory, memory)
     CHECK_CONST(ADC, adc)
     CHECK_CONST(Timer, timer)
+    CHECK_CONST(CPU, cpu)
     CHECK_WITH_PORT_CONST(SPI, spi, 0)
     CHECK_WITH_PORT_CONST(SPI, spi, 1)
       else

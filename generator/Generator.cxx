@@ -216,4 +216,15 @@ int n;
   return 0;
 }
 
+int Generator::cpu_asm(const char *code, int len)
+{
+int n;
+
+  for (n = 0; n < len; n++)
+  {
+    putc(code[n], out);
+  }
+  return 0;
+}
+
 

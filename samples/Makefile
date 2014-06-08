@@ -4,6 +4,7 @@ JAVA_SRC=\
   CommodoreDemo.java \
   DSPTest.java \
   GasDetector.java \
+  InlineTest.java \
   LedBlink.java \
   LCD.java \
   LCDDSPIC.java \

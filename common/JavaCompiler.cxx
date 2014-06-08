@@ -447,7 +447,8 @@ int index;
       case 7: // iconst_4 (0x07)
       case 8: // iconst_5 (0x08)
         const_val = uint8_t(bytes[pc])-3;
-        ret = optimize_const(java_class, method_name, bytes, pc + 1, pc_start + code_len, address + 1, const_val);
+        ret = optimize_const(java_class, method_name, bytes, pc + 1,
+                             pc_start + code_len, address + 1, const_val);
         if (ret == 0)
         {
           ret = generator->push_integer(const_val);
@@ -487,7 +488,8 @@ int index;
       case 16: // bipush (0x10)
         //PUSH_BYTE((char)bytes[pc+1])
         const_val = (int8_t)bytes[pc+1];
-        ret = optimize_const(java_class, method_name, bytes, pc + 2, pc_start + code_len, address + 2, const_val);
+        ret = optimize_const(java_class, method_name, bytes, pc + 2,
+                             pc_start + code_len, address + 2, const_val);
         if (ret == 0)
         {
           // FIXME - I don't think push_byte() is really needed.
@@ -503,7 +505,8 @@ int index;
 
       case 17: // sipush (0x11)
         const_val = (int16_t)((bytes[pc+1]<<8)|(bytes[pc+2]));
-        ret = optimize_const(java_class, method_name, bytes, pc + 3, pc_start + code_len, address + 3, const_val);
+        ret = optimize_const(java_class, method_name, bytes, pc + 3,
+                             pc_start + code_len, address + 3, const_val);
         if (ret == 0)
         {
           // FIXME - I don't think push_short() is really needed.
@@ -527,8 +530,10 @@ int index;
 
         if (gen32->tag == CONSTANT_INTEGER)
         {
+          int len = bytes[pc] == 0x13 ? 3 : 2;
           const_val = gen32->value;
-          ret = optimize_const(java_class, method_name, bytes, pc + 2, pc_start + code_len, address + 2, const_val);
+          ret = optimize_const(java_class, method_name, bytes, pc + len,
+                               pc_start + code_len, address + len, const_val);
           if (ret == 0)
           {
             ret = generator->push_integer(const_val);
@@ -548,12 +553,26 @@ int index;
           else
         if (gen32->tag == CONSTANT_STRING)
         {
-          printf("Can't do a string yet.. :(\n");
-          ret = -1;
+          constant_string_t *constant_string = (constant_string_t *)gen32;
+
+          int len = bytes[pc] == 0x13 ? 3 : 2;
+          const_val = constant_string->string_index;
+          ret = optimize_const(java_class, method_name, bytes, pc + len,
+                               pc_start + code_len, address + len, const_val);
+          if (ret == 0)
+          {
+            ret = generator->push_integer(const_val);
+          }
+            else
+          {
+            skip_bytes = ret;
+            ret = 0;
+          }
         }
           else
         {
-          printf("Cannot ldc this type %d=>'%s' pc=%d\n", gen32->tag, JavaClass::tag_as_string(gen32->tag), pc);
+          printf("Cannot ldc this type %d=>'%s' pc=%d\n",
+             gen32->tag, JavaClass::tag_as_string(gen32->tag), pc);
           ret = -1;
         }
         break;

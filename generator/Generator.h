@@ -113,6 +113,9 @@ public:
   virtual int memory_read16() { return -1; }
   virtual int memory_write16() { return -1; }
 
+  // CPU
+  virtual int cpu_asm(const char *code, int len);
+
   void add_newline();
   void instruction_count_clear() { instruction_count = 0; }
   void instruction_count_inc() { instruction_count++; }
