@@ -219,8 +219,8 @@ int MSP430X::cpu_setClock25()
   fprintf(out, "  bic.w #SCG0, SR\n");
   fprintf(out, "wait_clock_%d:\n", label_count);
   fprintf(out, "  bic.w #XT2OFFG|XT1LFOFFG|XT1HFOFFG|DCOFFG, &UCSCTL7\n");
-  fprintf(out, "  bic.w #SFRIFG1, &OFIFG\n");
-  fprintf(out, "  bit.w #SFRIFG1, &OFIFG\n");
+  fprintf(out, "  bic.w #OFIFG, &SFRIFG1\n");
+  fprintf(out, "  bit.w #OFIFG, &SFRIFG1\n");
   fprintf(out, "  jnz wait_clock_%d\n", label_count);
 
   label_count++;
