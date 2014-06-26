@@ -1900,6 +1900,47 @@ int M6502::memory_write8()
   return 0;
 }
 
+int M6502::memory_read16()
+{
+  fprintf(out, "; memory_read16\n");
+  POP_HI;
+  fprintf(out, "  sta address + 1\n");
+  POP_LO;
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "  lda (address),y\n");
+  fprintf(out, "  sta result + 0\n");
+  PUSH_LO;
+  fprintf(out, "  iny\n");
+  fprintf(out, "  lda (address),y\n");
+  fprintf(out, "  sta result + 1\n");
+  PUSH_HI;
+
+  return 0;
+}
+
+int M6502::memory_write16()
+{
+  fprintf(out, "; memory_write16\n");
+  POP_HI;
+  fprintf(out, "  sta result + 1\n");
+  POP_LO;
+  fprintf(out, "  sta result + 0\n");
+  POP_HI;
+  fprintf(out, "  sta address + 1\n");
+  POP_LO;
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "  lda result + 0\n");
+  fprintf(out, "  sta (address),y\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  lda result + 1\n");
+  fprintf(out, "  sta (address),y\n");
+
+  stack -= 2;
+
+  return 0;
+}
 #if 0
 void M6502::close()
 {
