@@ -1841,6 +1841,33 @@ int AVR8::memory_write8()
   return 0;
 }
 
+int AVR8::memory_read16()
+{
+  fprintf(out, "; memory_read16\n");
+  POP_HI("XH");
+  POP_LO("XL");
+  fprintf(out, "  ld result0, X+\n");
+  PUSH_LO("result0");
+  fprintf(out, "  ld result1, X+\n");
+  PUSH_HI("result1");
+
+  return 0;
+}
+
+int AVR8::memory_write16()
+{
+  fprintf(out, "; memory_write16\n");
+  POP_HI("value10");
+  POP_LO("value11");
+  POP_HI("XH");
+  POP_LO("XL");
+  fprintf(out, "  st X+, value10\n");
+  fprintf(out, "  st X+, value11\n");
+
+  stack -= 2;
+
+  return 0;
+}
 // IOPort API
 int AVR8::ioport_setPinsAsInput(int port)
 {

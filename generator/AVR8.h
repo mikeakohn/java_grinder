@@ -105,6 +105,8 @@ public:
   // Memory API
   virtual int memory_read8();
   virtual int memory_write8();
+  virtual int memory_read16();
+  virtual int memory_write16();
 
   // GPIO functions
   virtual int ioport_setPinsAsInput(int port);
