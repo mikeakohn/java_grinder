@@ -23,6 +23,7 @@
 #include "C64.h"
 #include "AVR8.h"
 #include "ATTINY13.h"
+#include "ATTINY84.h"
 #include "ATTINY85.h"
 #include "MC68000.h"
 #include "MIPS.h"
@@ -73,6 +74,11 @@ Generator *generator = NULL;
   if (strcasecmp("attiny13", chip_type) == 0)
   {
     generator = new ATTINY13();
+  }
+    else
+  if (strcasecmp("attiny84", chip_type) == 0)
+  {
+    generator = new ATTINY84();
   }
     else
   if (strcasecmp("attiny85", chip_type) == 0)
