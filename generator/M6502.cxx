@@ -445,7 +445,6 @@ int M6502::mod_integer()
   need_mod_integer = 1;
   fprintf(out, "  jsr div_integer\n");
   fprintf(out, "  jsr mod_integer\n");
-  stack--;
 
   return 0;
 }
