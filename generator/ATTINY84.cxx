@@ -27,7 +27,7 @@ ATTINY84::~ATTINY84()
 
 int ATTINY84::start_init()
 {
-  need_farjump = 0;
+  need_farjump = 1;
 
   fprintf(out, ".avr8\n");
   fprintf(out, ".include \"tn84def.inc\"\n");

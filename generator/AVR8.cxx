@@ -166,10 +166,10 @@ int AVR8::start_init()
 {
   // java stack base locations
   fprintf(out, "stack_lo equ SRAM_START\n");
-  fprintf(out, "stack_hi equ SRAM_START + ((RAMEND - SRAM_START) & 255) / 4 + 1\n");
+  fprintf(out, "stack_hi equ SRAM_START + 64\n");
 
   // heap
-  fprintf(out, "ram_start equ stack_hi + ((RAMEND - SRAM_START) & 255) / 4 + 1\n");
+  fprintf(out, "ram_start equ stack_hi + 64\n");
   fprintf(out, "heap_ptr equ ram_start\n\n");
 
   // registers
@@ -213,7 +213,13 @@ int AVR8::start_init()
   fprintf(out, "  mov ff, temp\n\n");
 
   // java stack pointer
-  fprintf(out, "  ldi SP, ((RAMEND - SRAM_START) & 255) / 4\n\n");
+  fprintf(out, "  ldi SP, 63\n\n");
+
+  // processor stack pointer
+  fprintf(out, "  ldi temp, RAMEND & 255\n");
+  fprintf(out, "  out SPL, temp\n");
+  fprintf(out, "  ldi temp, RAMEND >> 8\n");
+  fprintf(out, "  out SPH, temp\n");
 
   return 0;
 }
@@ -542,7 +548,6 @@ int AVR8::mod_integer()
   need_mod_integer = 1;
   CALL("div_integer");
   CALL("mod_integer");
-  stack--;
 
   return 0;
 }
@@ -946,7 +951,6 @@ int AVR8::return_integer(int local_count)
   fprintf(out, "; return_integer\n");
   POP_HI("result1");
   POP_LO("result0");
-  stack--;
 
   fprintf(out, "  mov SP, locals\n");
 
@@ -954,6 +958,7 @@ int AVR8::return_integer(int local_count)
   {
     POP_HI("locals");
     POP_LO("locals");
+    stack--;
   }
 
   fprintf(out, "  ret\n\n");
@@ -1872,6 +1877,7 @@ int AVR8::memory_write16()
 
   return 0;
 }
+
 // IOPort API
 int AVR8::ioport_setPinsAsInput(int port)
 {
@@ -2050,6 +2056,7 @@ int AVR8::ioport_setPinLow(int port, int const_val)
 
   return 0;
 }
+
 int AVR8::ioport_isPinInputHigh(int port)
 {
   return -1;
@@ -2059,6 +2066,72 @@ int AVR8::ioport_getPortInputValue(int port)
 {
   return -1;
 }
+
+// ADC API
+int AVR8::adc_enable()
+{
+  fprintf(out, "; adc_enable\n");
+  fprintf(out, "  ldi temp, (1 << REFS0)\n");
+  fprintf(out, "  out ADMUX, temp\n");
+  fprintf(out, "  ldi temp, (1 << ADEN) | (1 << ADPS0) | (1 << ADPS1) | (1 << ADPS2)\n");
+  fprintf(out, "  out ADCSRA, temp\n");
+
+  return 0;
+} 
+
+int AVR8::adc_disable()
+{
+  fprintf(out, "; adc_disable\n");
+  fprintf(out, "  out ADCSRA, zero\n");
+
+  return 0;
+} 
+
+int AVR8::adc_setChannel_I()
+{
+  get_values_from_stack(1);
+
+  fprintf(out, "; adc_setChannel\n");
+  fprintf(out, "  in temp, ADMUX\n");
+  fprintf(out, "  andi temp, 0xf8\n");
+  fprintf(out, "  or temp, value10\n");
+  fprintf(out, "  out ADMUX, temp\n");
+
+  return 0;
+} 
+
+int AVR8::adc_setChannel_I(int channel)
+{
+  if(channel < 0 || channel > 7)
+    return -1;
+
+  fprintf(out, "; adc_setChannel2\n");
+  fprintf(out, "  in temp, ADMUX\n");
+  fprintf(out, "  andi temp, 0xf8\n");
+  fprintf(out, "  ori temp, %d\n", channel);
+  fprintf(out, "  out ADMUX, temp\n");
+
+  return 0;
+} 
+
+int AVR8::adc_read()
+{
+  fprintf(out, "  in temp, ADCSRA\n");
+  fprintf(out, "  ori temp, (1 << ADSC)\n");
+  fprintf(out, "  out ADCSRA, temp\n");
+  fprintf(out, "adc_wait_%d:\n", label_count);
+  fprintf(out, "  in temp, ADCSRA\n");
+  fprintf(out, "  andi temp, (1 << ADSC)\n");
+  fprintf(out, "  brne adc_wait_%d\n", label_count++);
+  fprintf(out, "  in temp, ADCL\n");
+  PUSH_LO("temp");
+  fprintf(out, "  in temp, ADCH\n");
+  PUSH_HI("temp");
+
+  stack++;
+
+  return 0;
+} 
 
 #if 0
 void AVR8::close()

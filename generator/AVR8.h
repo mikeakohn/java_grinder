@@ -127,6 +127,13 @@ public:
   virtual int ioport_getPortInputValue(int port);
   //virtual int ioport_setPortOutputValue(int port);
 
+  // ADC Functions
+  virtual int adc_enable();
+  virtual int adc_disable();
+  virtual int adc_setChannel_I();
+  virtual int adc_setChannel_I(int channel);
+  virtual int adc_read();
+
 protected:
   int stack;
   bool is_main:1;
