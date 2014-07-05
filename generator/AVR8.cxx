@@ -137,6 +137,10 @@ AVR8::AVR8(uint8_t chip_type) :
       include_file = "tn84def.inc";
       need_farjump = 1;
       break;
+    case ATTINY2313:
+      include_file = "tn2313def.inc";
+      need_farjump = 0;
+      break;
   }
 }
 
@@ -181,13 +185,13 @@ int AVR8::start_init()
   // include file
   fprintf(out, ".avr8\n");
   fprintf(out, ".include \"%s\"\n\n", include_file);
-  // java stack base locations
 
+  // java stack base locations
   fprintf(out, ".if SRAM_SIZE > 0x100\n");
   fprintf(out, "  .define JAVA_STACK_SIZE 64\n");
   fprintf(out, ".else\n");
   fprintf(out, "  .define JAVA_STACK_SIZE (SRAM_SIZE / 4)\n");
-  fprintf(out, ".endif\n");
+  fprintf(out, ".endif\n\n");
 
   fprintf(out, "stack_lo equ SRAM_START\n");
   fprintf(out, "stack_hi equ SRAM_START + JAVA_STACK_SIZE\n");
@@ -243,7 +247,7 @@ int AVR8::start_init()
   fprintf(out, "  ldi temp, RAMEND & 255\n");
   fprintf(out, "  out SPL, temp\n");
   fprintf(out, "  ldi temp, RAMEND >> 8\n");
-  fprintf(out, "  out SPH, temp\n");
+  fprintf(out, "  out SPH, temp\n\n");
 
   return 0;
 }
@@ -257,7 +261,7 @@ int AVR8::insert_static_field_define(const char *name, const char *type, int ind
 
 int AVR8::init_heap(int field_count)
 {
-  fprintf(out, "  ; Set up heap and static initializers\n");
+  fprintf(out, "; Set up heap and static initializers\n");
   fprintf(out, "  ldi temp, (ram_start + %d) & 0xff\n", (field_count + 1) * 2);
   fprintf(out, "  sts ram_start + 0, temp\n");
   fprintf(out, "  ldi temp, (ram_start + %d) >> 8\n", (field_count + 1) * 2);
@@ -269,6 +273,7 @@ int AVR8::init_heap(int field_count)
 int AVR8::insert_field_init_boolean(char *name, int index, int value)
 {
   value = (value == 0) ? 0 : 1;
+
   fprintf(out, "; insert_field_init_boolean\n");
   fprintf(out, "  ldi temp, %d\n", value & 0xff);
   fprintf(out, "  sts %s + 0, temp\n", name);
@@ -281,6 +286,7 @@ int AVR8::insert_field_init_boolean(char *name, int index, int value)
 int AVR8::insert_field_init_byte(char *name, int index, int value)
 {
   if (value < -128 || value > 255) { return -1; }
+
   int16_t n = value;
   uint16_t v = (n & 0xffff);
 
@@ -504,8 +510,7 @@ int AVR8::add_integer()
 
 int AVR8::add_integer(int const_val)
 {
-  if(const_val < 0 || const_val > 63)
-    return -1;
+  if(const_val < 0 || const_val > 63) { return -1; }
 
   fprintf(out, "; add_integer (optimized)\n");
   POP_HI("ZH");
@@ -528,8 +533,7 @@ int AVR8::sub_integer()
 
 int AVR8::sub_integer(int const_val)
 {
-  if(const_val < 0 || const_val > 63)
-    return -1;
+  if(const_val < 0 || const_val > 63) { return -1; }
 
   fprintf(out, "; sub_integer (optimized)\n");
   POP_HI("ZH");
@@ -1086,6 +1090,7 @@ int AVR8::put_static(const char *name, int index)
 {
   if (stack > 0)
   {
+    fprintf(out, "; put_static\n");
     POP_HI("temp");
     fprintf(out, "  sts %s + 1, temp\n", name);
     POP_LO("temp");
@@ -1098,6 +1103,7 @@ int AVR8::put_static(const char *name, int index)
 
 int AVR8::get_static(const char *name, int index)
 {
+    fprintf(out, "; get_static\n");
   fprintf(out, "  lds temp, %s + 0\n", name);
   PUSH_LO("temp");
   fprintf(out, "  lds temp, %s + 1\n", name);
