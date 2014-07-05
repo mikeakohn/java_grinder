@@ -63,9 +63,19 @@ Generator *generator = NULL;
     generator = new M6502();
   }
     else
-  if (strcasecmp("avr8", chip_type) == 0)
+  if (strcasecmp("attiny13", chip_type) == 0)
   {
-    generator = new AVR8();
+    generator = new AVR8(ATTINY13);
+  }
+    else
+  if (strcasecmp("attiny85", chip_type) == 0)
+  {
+    generator = new AVR8(ATTINY85);
+  }
+    else
+  if (strcasecmp("attiny84", chip_type) == 0)
+  {
+    generator = new AVR8(ATTINY84);
   }
     else
   if (strcasecmp("mc68000", chip_type) == 0)

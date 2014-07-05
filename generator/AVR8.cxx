@@ -93,7 +93,7 @@ static const char *pin_string[2] = { "PINA", "PINB" };
 static const char *ddr_string[2] = { "DDRA", "DDRB" };
 static const char *port_string[2] = { "PORTA", "PORTB" };
 
-AVR8::AVR8() :
+AVR8::AVR8(uint8_t chip_type) :
   stack(0),
   is_main(0),
   need_farjump(0),
@@ -123,7 +123,21 @@ AVR8::AVR8() :
   need_array_int_support(0),
   need_get_values_from_stack(0)
 {
-
+  switch(chip_type)
+  {
+    case ATTINY13:
+      include_file = "tn13def.inc";
+      need_farjump = 0;
+      break;
+    case ATTINY85:
+      include_file = "tn85def.inc";
+      need_farjump = 0;
+      break;
+    case ATTINY84:
+      include_file = "tn84def.inc";
+      need_farjump = 1;
+      break;
+  }
 }
 
 AVR8::~AVR8()
@@ -164,12 +178,22 @@ int AVR8::open(const char *filename)
 
 int AVR8::start_init()
 {
+  // include file
+  fprintf(out, ".avr8\n");
+  fprintf(out, ".include \"%s\"\n\n", include_file);
   // java stack base locations
+
+  fprintf(out, ".if SRAM_SIZE > 0x100\n");
+  fprintf(out, "  .define JAVA_STACK_SIZE 64\n");
+  fprintf(out, ".else\n");
+  fprintf(out, "  .define JAVA_STACK_SIZE (SRAM_SIZE / 4)\n");
+  fprintf(out, ".endif\n");
+
   fprintf(out, "stack_lo equ SRAM_START\n");
-  fprintf(out, "stack_hi equ SRAM_START + 64\n");
+  fprintf(out, "stack_hi equ SRAM_START + JAVA_STACK_SIZE\n");
 
   // heap
-  fprintf(out, "ram_start equ stack_hi + 64\n");
+  fprintf(out, "ram_start equ stack_hi + JAVA_STACK_SIZE\n");
   fprintf(out, "heap_ptr equ ram_start\n\n");
 
   // registers
@@ -213,7 +237,7 @@ int AVR8::start_init()
   fprintf(out, "  mov ff, temp\n\n");
 
   // java stack pointer
-  fprintf(out, "  ldi SP, 63\n\n");
+  fprintf(out, "  ldi SP, JAVA_STACK_SIZE - 1\n\n");
 
   // processor stack pointer
   fprintf(out, "  ldi temp, RAMEND & 255\n");
@@ -2070,67 +2094,27 @@ int AVR8::ioport_getPortInputValue(int port)
 // ADC API
 int AVR8::adc_enable()
 {
-  fprintf(out, "; adc_enable\n");
-  fprintf(out, "  ldi temp, (1 << REFS0)\n");
-  fprintf(out, "  out ADMUX, temp\n");
-  fprintf(out, "  ldi temp, (1 << ADEN) | (1 << ADPS0) | (1 << ADPS1) | (1 << ADPS2)\n");
-  fprintf(out, "  out ADCSRA, temp\n");
-
-  return 0;
+  return -1;
 } 
 
 int AVR8::adc_disable()
 {
-  fprintf(out, "; adc_disable\n");
-  fprintf(out, "  out ADCSRA, zero\n");
-
-  return 0;
+  return -1;
 } 
 
 int AVR8::adc_setChannel_I()
 {
-  get_values_from_stack(1);
-
-  fprintf(out, "; adc_setChannel\n");
-  fprintf(out, "  in temp, ADMUX\n");
-  fprintf(out, "  andi temp, 0xf8\n");
-  fprintf(out, "  or temp, value10\n");
-  fprintf(out, "  out ADMUX, temp\n");
-
-  return 0;
+  return -1;
 } 
 
 int AVR8::adc_setChannel_I(int channel)
 {
-  if(channel < 0 || channel > 7)
-    return -1;
-
-  fprintf(out, "; adc_setChannel2\n");
-  fprintf(out, "  in temp, ADMUX\n");
-  fprintf(out, "  andi temp, 0xf8\n");
-  fprintf(out, "  ori temp, %d\n", channel);
-  fprintf(out, "  out ADMUX, temp\n");
-
-  return 0;
+  return -1;
 } 
 
 int AVR8::adc_read()
 {
-  fprintf(out, "  in temp, ADCSRA\n");
-  fprintf(out, "  ori temp, (1 << ADSC)\n");
-  fprintf(out, "  out ADCSRA, temp\n");
-  fprintf(out, "adc_wait_%d:\n", label_count);
-  fprintf(out, "  in temp, ADCSRA\n");
-  fprintf(out, "  andi temp, (1 << ADSC)\n");
-  fprintf(out, "  brne adc_wait_%d\n", label_count++);
-  fprintf(out, "  in temp, ADCL\n");
-  PUSH_LO("temp");
-  fprintf(out, "  in temp, ADCH\n");
-  PUSH_HI("temp");
-
-  stack++;
-
-  return 0;
+  return -1;
 } 
 
 #if 0

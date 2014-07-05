@@ -14,10 +14,17 @@
 
 #include "Generator.h"
 
+enum
+{
+  ATTINY13,
+  ATTINY85,
+  ATTINY84,
+};
+
 class AVR8 : public Generator
 {
 public:
-  AVR8();
+  AVR8(uint8_t chip_type);
   virtual ~AVR8();
 
   virtual int open(const char *filename);
@@ -137,6 +144,7 @@ public:
 protected:
   int stack;
   bool is_main:1;
+  const char *include_file;
   bool need_farjump:1;
   bool need_swap:1;
   bool need_add_integer:1;
