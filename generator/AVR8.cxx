@@ -137,6 +137,10 @@ AVR8::AVR8(uint8_t chip_type) :
       include_file = "tn84def.inc";
       need_farjump = 1;
       break;
+    case ATTINY2313:
+      include_file = "tn2313def.inc";
+      need_farjump = 0;
+      break;
   }
 }
 
@@ -187,7 +191,7 @@ int AVR8::start_init()
   fprintf(out, "  .define JAVA_STACK_SIZE 64\n");
   fprintf(out, ".else\n");
   fprintf(out, "  .define JAVA_STACK_SIZE (SRAM_SIZE / 4)\n");
-  fprintf(out, ".endif\n");
+  fprintf(out, ".endif\n\n");
 
   fprintf(out, "stack_lo equ SRAM_START\n");
   fprintf(out, "stack_hi equ SRAM_START + JAVA_STACK_SIZE\n");
@@ -243,7 +247,7 @@ int AVR8::start_init()
   fprintf(out, "  ldi temp, RAMEND & 255\n");
   fprintf(out, "  out SPL, temp\n");
   fprintf(out, "  ldi temp, RAMEND >> 8\n");
-  fprintf(out, "  out SPH, temp\n");
+  fprintf(out, "  out SPH, temp\n\n");
 
   return 0;
 }
