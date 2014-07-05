@@ -221,7 +221,7 @@ int STDC::push_short(int16_t s)
 
 int STDC::push_ref(char *name)
 {
-  fprintf(out, "  stack_%d = (uint32_t)%s;\n", stack++, name);
+  fprintf(out, "  stack_%d = *%s;\n", stack++, name);
 
   return 0;
 }

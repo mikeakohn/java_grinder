@@ -195,7 +195,7 @@ int TMS9900::push_ref(char *name)
 {
   CHECK_STACK();
 
-  fprintf(out, "  li r%d, %s\n", REG_STACK(reg), name);
+  fprintf(out, "  mov @%s, r%d\n", name, REG_STACK(reg));
   reg++;
 
   return 0;

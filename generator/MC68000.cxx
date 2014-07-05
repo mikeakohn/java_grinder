@@ -223,14 +223,16 @@ int MC68000::push_short(int16_t s)
 
 int MC68000::push_ref(char *name)
 {
+  fprintf(out, "  move.l #%s, a0\n", name);
+
   if (reg < reg_max)
   {
-    fprintf(out, "  move.l #%s, d%d\n", name, REG_STACK(reg));
+    fprintf(out, "  move.l (a0), d%d\n", REG_STACK(reg));
     reg++;
   }
     else
   {
-    fprintf(out, "  move.l #%s, -(SP)\n", name);
+    fprintf(out, "  move.l (a0), -(SP)\n");
     stack++;
   }
 

@@ -397,6 +397,32 @@ char type[64];
   return -1;
 }
 
+int JavaCompiler::push_ref(int index, uint16_t *operand_stack, uint16_t &operand_stack_ptr)
+{
+  int ref = operand_stack[--operand_stack_ptr];
+  char field_name[64];
+  char type[64];
+  int ret;
+
+  if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), ref) != 0)
+  {
+    printf("Error retrieving field name %d\n", ref);
+    return -1;
+  }
+
+  // Try to set local variable directly to the address of the static
+  if (optimize) { ret = generator->set_ref_local(index, field_name); }
+  else { ret = -1; }
+
+  if (ret == -1)
+  {
+    ret = generator->push_ref(field_name);
+    ret |= generator->pop_ref_local(index);
+  }
+
+  return ret;
+}
+
 int JavaCompiler::compile_method(JavaClass *java_class, int method_id)
 {
 struct methods_t *method = java_class->get_method(method_id);
@@ -830,7 +856,6 @@ int instruction_length;
         break;
 
       case 58: // astore (0x3a)
-#warning "FIXME"
         if (wide == 1)
         {
           index = GET_PC_UINT16(1);
@@ -840,7 +865,10 @@ int instruction_length;
           index = bytes[pc+1];
         }
 
-        ret = generator->pop_ref_local(index);
+        if (operand_stack_ptr == 0)
+        { ret = generator->pop_ref_local(index); }
+          else
+        { ret = push_ref(index, operand_stack, operand_stack_ptr); }
         break;
 
       case 59: // istore_0 (0x3b)
@@ -914,25 +942,7 @@ int instruction_length;
         if (operand_stack_ptr == 0)
         { ret = generator->pop_ref_local(index); }
           else
-        {
-          int ref = operand_stack[--operand_stack_ptr];
-          char field_name[64];
-          char type[64];
-
-          if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), ref) != 0)
-          {
-            printf("Error retrieving field name %d\n", ref);
-            ret = -1;
-            break;
-          }
-
-          ret = generator->set_ref_local(index, field_name);
-          if (ret == -1)
-          {
-            ret = generator->push_ref(field_name);
-            ret |= generator->pop_ref_local(index);
-          }
-        }
+        { ret = push_ref(index, operand_stack, operand_stack_ptr); }
         break;
 
       case 79: // iastore (0x4f)

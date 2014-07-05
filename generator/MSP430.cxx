@@ -341,12 +341,12 @@ int MSP430::push_ref(char *name)
 {
   if (reg < reg_max)
   {
-    fprintf(out, "  mov.w #%s, r%d\n", name, REG_STACK(reg));
+    fprintf(out, "  mov.w &%s, r%d\n", name, REG_STACK(reg));
     reg++;
   }
     else
   {
-    fprintf(out, "  push #%s\n", name);
+    fprintf(out, "  push &%s\n", name);
     stack++;
   }
 
@@ -385,6 +385,13 @@ int MSP430::set_integer_local(int index, int value)
   // Optimization to remove Java stack operations
   if (value < -32768 || value > 0xffff) { return -1; }
   fprintf(out, "  mov.w #%d, -%d(r12) ; local_%d = %d\n", value, LOCALS(index), index, value);
+
+  return 0;
+}
+
+int MSP430::set_ref_local(int index, char *name)
+{
+  fprintf(out, "  mov.w &%s, -%d(r12) ; local_%d = %s\n", name, LOCALS(index), index, name);
 
   return 0;
 }

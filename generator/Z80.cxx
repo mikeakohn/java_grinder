@@ -241,7 +241,7 @@ int Z80::push_short(int16_t s)
 int Z80::push_ref(char *name)
 {
   fprintf(out, "  ;; push_short(%s)\n", name);
-  fprintf(out, "  ld hl, %s\n", name);
+  fprintf(out, "  ld hl, (%s)\n", name);
   fprintf(out, "  push hl\n");
   stack++;
 

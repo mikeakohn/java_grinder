@@ -49,12 +49,13 @@ private:
   int optimize_compare(JavaClass *java_class, char *method_name, uint8_t *bytes, int pc, int pc_end, int address, int index);
   int array_load(JavaClass *java_class, int constant_id, uint8_t array_type);
   int array_store(JavaClass *java_class, int constant_id, uint8_t array_type);
+  int push_ref(int index, uint16_t *operand_stack, uint16_t &operand_stack_ptr);
   int compile_method(JavaClass *java_class, int method_id);
   int field_type_to_int(char *field_type);
   const char *field_type_from_int(int type);
   int execute_statics(int index);
 
-  JavaClass *java_class;
+  JavaClass *java_class;  // FIXME - Why is this here?
   char classpath[128];
   std::map<std::string,int> external_fields;
   std::map<std::string,JavaClass *> external_classes;
