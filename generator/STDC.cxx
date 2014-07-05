@@ -219,6 +219,11 @@ int STDC::push_short(int16_t s)
   return 0;
 }
 
+int STDC::push_ref(int32_t ref)
+{
+  return push_integer(ref);
+}
+
 int STDC::pop_integer_local(int index)
 {
   fprintf(out, "  local_%d = stack_%d;\n", index, --stack);

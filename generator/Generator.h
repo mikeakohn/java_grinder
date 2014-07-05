@@ -43,11 +43,13 @@ public:
   virtual int push_ref_local(int index) = 0;
   virtual int push_fake() { return -1; } // move stack ptr without push
   virtual int set_integer_local(int index, int value) { return -1; }
+  virtual int set_ref_local(int index, uint32_t ref) { return -1; }
   virtual int push_long(int64_t n) = 0;
   virtual int push_float(float f) = 0;
   virtual int push_double(double f) = 0;
   virtual int push_byte(int8_t b) = 0;
   virtual int push_short(int16_t s) = 0;
+  virtual int push_ref(int32_t ref) = 0;
   virtual int pop_integer_local(int index) = 0;
   virtual int pop_ref_local(int index) = 0;
   virtual int pop() = 0;

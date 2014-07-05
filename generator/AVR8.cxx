@@ -437,6 +437,11 @@ int AVR8::push_short(int16_t s)
   return 0;
 }
 
+int AVR8::push_ref(int32_t ref)
+{
+  return push_integer(ref);
+}
+
 int AVR8::pop_integer_local(int index)
 {
   need_pop_integer_local = 1;

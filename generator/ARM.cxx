@@ -227,6 +227,11 @@ int ARM::push_short(int16_t s)
   return push_integer(value);
 }
 
+int ARM::push_ref(int32_t ref)
+{
+  return push_integer(ref);
+}
+
 int ARM::pop_integer_local(int index)
 {
   // FIXME - This is NOT right

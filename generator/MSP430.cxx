@@ -257,13 +257,13 @@ int MSP430::push_integer_local(int index)
   if (reg < reg_max)
   {
     //fprintf(out, "  mov.w @r15, r%d\n", REG_STACK(reg));
-    fprintf(out, "  mov.w -%d(r12), r%d\n", LOCALS(index), REG_STACK(reg));
+    fprintf(out, "  mov.w -%d(r12), r%d  ; push local_%d\n", LOCALS(index), REG_STACK(reg), index);
     reg++;
   }
     else
   {
     //fprintf(out, "  push @r15\n");
-    fprintf(out, "  push -%d(r12)\n", LOCALS(index));
+    fprintf(out, "  push -%d(r12)  ; push local_%d\n", LOCALS(index), index);
     stack++;
   }
 
@@ -337,18 +337,28 @@ int MSP430::push_short(int16_t s)
   return 0;
 }
 
+int MSP430::push_ref(int32_t ref)
+{
+  return push_integer(ref);
+}
+
 int MSP430::pop_integer_local(int index)
 {
   if (stack > 0)
   {
-    fprintf(out, "  pop -%d(r12)\n", LOCALS(index));
+    fprintf(out, "  pop -%d(r12)  ; pop local_%d\n", LOCALS(index), index);
     stack--;
   }
     else
   if (reg > 0)
   {
-    fprintf(out, "  mov.w r%d, -%d(r12)\n", REG_STACK(reg-1), LOCALS(index));
+    fprintf(out, "  mov.w r%d, -%d(r12) ; pop local_%d\n", REG_STACK(reg-1), LOCALS(index), index);
     reg--;
+  }
+    else
+  {
+    printf("Internal Error: Nothing on the stack?\n");
+    return -1;
   }
 
   return 0;
@@ -363,7 +373,7 @@ int MSP430::set_integer_local(int index, int value)
 {
   // Optimization to remove Java stack operations
   if (value < -32768 || value > 0xffff) { return -1; }
-  fprintf(out, "  mov.w #%d, -%d(r12)\n", value, LOCALS(index));
+  fprintf(out, "  mov.w #%d, -%d(r12) ; local_%d = %d\n", value, LOCALS(index), index, value);
 
   return 0;
 }
@@ -1291,7 +1301,7 @@ int MSP430::push_array_length()
 int MSP430::push_array_length(const char *name, int field_id)
 {
   //fprintf(out, "  mov.w #%s-2, r13\n", name);
-  fprintf(out, "  mov.w &%s, r13\n", name);
+  fprintf(out, "  mov.w &%s, r13  ; push %s.length\n", name, name);
 
   if (reg < reg_max)
   {

@@ -830,14 +830,17 @@ int instruction_length;
         break;
 
       case 58: // astore (0x3a)
+#warning "FIXME"
         if (wide == 1)
         {
-          ret = generator->pop_ref_local(GET_PC_UINT16(1));
+          index = GET_PC_UINT16(1);
         }
           else
         {
-          ret = generator->pop_ref_local(bytes[pc+1]);
+          index = bytes[pc+1];
         }
+
+        ret = generator->pop_ref_local(index);
         break;
 
       case 59: // istore_0 (0x3b)
@@ -907,7 +910,13 @@ int instruction_length;
       case 77: // astore_2 (0x4d)
       case 78: // astore_3 (0x4e)
         // Pop ref off stack and store in local variable
-        ret = generator->pop_ref_local(bytes[pc]-75);
+        index = bytes[pc] - 75;
+        if (operand_stack_ptr == 0)
+        { ret = generator->pop_ref_local(index); }
+          else
+        {
+#warning "FIX THIS"
+        }
         break;
 
       case 79: // iastore (0x4f)

@@ -190,6 +190,11 @@ int TMS9900::push_short(int16_t s)
   return 0;
 }
 
+int TMS9900::push_ref(int32_t ref)
+{
+  return push_integer(ref);
+}
+
 int TMS9900::pop_integer_local(int index)
 {
   return -1;

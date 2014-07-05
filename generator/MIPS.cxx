@@ -183,6 +183,11 @@ int MIPS::push_short(int16_t s)
   return -1;
 }
 
+int MIPS::push_ref(int32_t ref)
+{
+  return push_integer(ref);
+}
+
 int MIPS::pop_integer_local(int index)
 {
   return -1;
