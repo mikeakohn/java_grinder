@@ -183,9 +183,9 @@ int MIPS::push_short(int16_t s)
   return -1;
 }
 
-int MIPS::push_ref(int32_t ref)
+int MIPS::push_ref(char *name)
 {
-  return push_integer(ref);
+  return -1;
 }
 
 int MIPS::pop_integer_local(int index)

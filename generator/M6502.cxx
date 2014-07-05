@@ -324,9 +324,10 @@ int M6502::push_short(int16_t s)
   return 0;
 }
 
-int M6502::push_ref(int32_t ref)
+int M6502::push_ref(char *name)
 {
-  return push_integer(ref);
+  // FIXME - Implement me: Need to push address of name on the stack
+  return -1;
 }
 
 int M6502::pop_integer_local(int index)

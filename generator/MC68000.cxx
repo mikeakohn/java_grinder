@@ -221,9 +221,20 @@ int MC68000::push_short(int16_t s)
   return push_integer(value);
 }
 
-int MC68000::push_ref(int32_t ref)
+int MC68000::push_ref(char *name)
 {
-  return push_integer(ref);
+  if (reg < reg_max)
+  {
+    fprintf(out, "  move.l #%s, d%d\n", name, REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  move.l #%s, -(SP)\n", name);
+    stack++;
+  }
+
+  return 0;
 }
 
 int MC68000::pop_integer_local(int index)

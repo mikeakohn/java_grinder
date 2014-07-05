@@ -227,9 +227,10 @@ int ARM::push_short(int16_t s)
   return push_integer(value);
 }
 
-int ARM::push_ref(int32_t ref)
+int ARM::push_ref(char *name)
 {
-  return push_integer(ref);
+  // Need to move the address of name to the top of stack
+  return -1;
 }
 
 int ARM::pop_integer_local(int index)

@@ -46,7 +46,7 @@ public:
   virtual int push_double(double f);
   virtual int push_byte(int8_t b);
   virtual int push_short(int16_t s);
-  virtual int push_ref(int32_t ref);
+  virtual int push_ref(char *name);
   virtual int pop_integer_local(int index);
   virtual int pop_ref_local(int index);
   virtual int pop();

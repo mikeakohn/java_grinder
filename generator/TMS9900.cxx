@@ -131,7 +131,8 @@ int TMS9900::push_integer(int32_t n)
 
   fprintf(out, "  li r%d, %d\n", REG_STACK(reg), value);
   reg++;
-  return -1;
+
+  return 0;
 }
 
 int TMS9900::push_integer_local(int index)
@@ -190,9 +191,14 @@ int TMS9900::push_short(int16_t s)
   return 0;
 }
 
-int TMS9900::push_ref(int32_t ref)
+int TMS9900::push_ref(char *name)
 {
-  return push_integer(ref);
+  CHECK_STACK();
+
+  fprintf(out, "  li r%d, %s\n", REG_STACK(reg), name);
+  reg++;
+
+  return 0;
 }
 
 int TMS9900::pop_integer_local(int index)

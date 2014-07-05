@@ -337,9 +337,20 @@ int MSP430::push_short(int16_t s)
   return 0;
 }
 
-int MSP430::push_ref(int32_t ref)
+int MSP430::push_ref(char *name)
 {
-  return push_integer(ref);
+  if (reg < reg_max)
+  {
+    fprintf(out, "  mov.w #%s, r%d\n", name, REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  push #%s\n", name);
+    stack++;
+  }
+
+  return 0;
 }
 
 int MSP430::pop_integer_local(int index)

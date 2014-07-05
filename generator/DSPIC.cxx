@@ -326,9 +326,20 @@ int DSPIC::push_short(int16_t s)
   return 0;
 }
 
-int DSPIC::push_ref(int32_t ref)
+int DSPIC::push_ref(char *name)
 {
-  return push_integer(ref);
+  if (reg < reg_max)
+  {
+    fprintf(out, "  mov #%s, w%d\n", name, REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  mov #%s, w0\n", name);
+    fprintf(out, "  push w0\n");
+    stack++;
+  }
+  return 0;
 }
 
 int DSPIC::pop_integer_local(int index)

@@ -238,9 +238,14 @@ int Z80::push_short(int16_t s)
   return 0;
 }
 
-int Z80::push_ref(int32_t ref)
+int Z80::push_ref(char *name)
 {
-  return push_integer(ref);
+  fprintf(out, "  ;; push_short(%s)\n", name);
+  fprintf(out, "  ld hl, %s\n", name);
+  fprintf(out, "  push hl\n");
+  stack++;
+
+  return 0;
 }
 
 int Z80::pop_integer_local(int index)

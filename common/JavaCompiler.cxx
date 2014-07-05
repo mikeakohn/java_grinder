@@ -915,7 +915,23 @@ int instruction_length;
         { ret = generator->pop_ref_local(index); }
           else
         {
-#warning "FIX THIS"
+          int ref = operand_stack[--operand_stack_ptr];
+          char field_name[64];
+          char type[64];
+
+          if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), ref) != 0)
+          {
+            printf("Error retrieving field name %d\n", ref);
+            ret = -1;
+            break;
+          }
+
+          ret = generator->set_ref_local(index, field_name);
+          if (ret == -1)
+          {
+            ret = generator->push_ref(field_name);
+            ret |= generator->pop_ref_local(index);
+          }
         }
         break;
 

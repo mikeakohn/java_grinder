@@ -443,9 +443,10 @@ int AVR8::push_short(int16_t s)
   return 0;
 }
 
-int AVR8::push_ref(int32_t ref)
+int AVR8::push_ref(char *name)
 {
-  return push_integer(ref);
+  // FIXME - Implement.  Need to move address of name to stop of stack.
+  return -1;
 }
 
 int AVR8::pop_integer_local(int index)
