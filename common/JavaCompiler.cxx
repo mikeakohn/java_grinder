@@ -1512,8 +1512,24 @@ int instruction_length;
           break;
         }
 
-        int index = java_class->get_field_index(field_name);
-        generator->put_static(field_name, index);
+        if (operand_stack_ptr != 0)
+        {
+          char field_name[64];
+          char type[64];
+
+          if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), operand_stack[--operand_stack_ptr]) != 0)
+          {
+            printf("Error retrieving field name %d\n", ref);
+            ret = -1;
+            break;
+          }
+
+          ret = generator->push_ref(field_name);
+        }
+
+        index = java_class->get_field_index(field_name);
+        ret = generator->put_static(field_name, index);
+
         break;
       }
       case 180: // getfield (0xb4)
