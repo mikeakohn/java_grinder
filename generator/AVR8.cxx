@@ -187,7 +187,7 @@ int AVR8::start_init()
   fprintf(out, ".include \"%s\"\n\n", include_file);
 
   // java stack base locations
-  fprintf(out, ".if SRAM_SIZE > 0x100\n");
+  fprintf(out, ".if SRAM_SIZE > 256\n");
   fprintf(out, "  .define JAVA_STACK_SIZE 64\n");
   fprintf(out, ".else\n");
   fprintf(out, "  .define JAVA_STACK_SIZE (SRAM_SIZE / 4)\n");
@@ -445,8 +445,13 @@ int AVR8::push_short(int16_t s)
 
 int AVR8::push_ref(char *name)
 {
-  // FIXME - Implement.  Need to move address of name to stop of stack.
-  return -1;
+  fprintf(out, "; push_ref\n");
+  fprintf(out, "  lds temp, %s + 0\n", name);
+  PUSH_LO("temp");
+  fprintf(out, "  lds temp, %s + 1\n", name);
+  PUSH_HI("temp");
+
+  return 0;
 }
 
 int AVR8::pop_integer_local(int index)
@@ -1185,6 +1190,7 @@ int AVR8::push_array_length()
 int AVR8::push_array_length(const char *name, int field_id)
 {
   need_push_array_length2 = 1;
+
   fprintf(out, "  lds XL, %s + 0\n", name);
   fprintf(out, "  lds XH, %s + 1\n", name);
   CALL("push_array_length2");
@@ -1195,6 +1201,8 @@ int AVR8::push_array_length(const char *name, int field_id)
 
 int AVR8::array_read_byte()
 {
+  need_array_byte_support = 1;
+
   get_values_from_stack(2);
   CALL("array_read_byte");
   stack++;
@@ -1209,6 +1217,8 @@ int AVR8::array_read_short()
 
 int AVR8::array_read_int()
 {
+  need_array_int_support = 1;
+
   get_values_from_stack(2);
   CALL("array_read_int");
   stack++;
@@ -1219,6 +1229,7 @@ int AVR8::array_read_int()
 int AVR8::array_read_byte(const char *name, int field_id)
 {
   need_array_byte_support = 1;
+
   if (stack > 0)
   {
     fprintf(out, "  lds ZL, %s + 0\n", name);
@@ -1252,6 +1263,8 @@ int AVR8::array_read_int(const char *name, int field_id)
 
 int AVR8::array_write_byte()
 {
+  need_array_byte_support = 1;
+
   get_values_from_stack(3);
   CALL("array_write_byte");
 
@@ -1265,6 +1278,8 @@ int AVR8::array_write_short()
 
 int AVR8::array_write_int()
 {
+  need_array_int_support = 1;
+
   get_values_from_stack(3);
   CALL("array_write_int");
 
@@ -1273,10 +1288,11 @@ int AVR8::array_write_int()
 
 int AVR8::array_write_byte(const char *name, int field_id)
 {
-  get_values_from_stack(2);
-  CALL("array_write_byte2");
+//  get_values_from_stack(2);
+//  fprintf(out, "; array_write_byte2:\n");
+  printf("writing to static byte array unimplemented\n");
 
-  return 0;
+  return -1;
 }
 
 int AVR8::array_write_short(const char *name, int field_id)
@@ -1286,10 +1302,11 @@ int AVR8::array_write_short(const char *name, int field_id)
 
 int AVR8::array_write_int(const char *name, int field_id)
 {
-  get_values_from_stack(2);
-  fprintf(out, "; array_write_int2\n");
+//  get_values_from_stack(2);
+//  fprintf(out, "; array_write_int2:\n");
+  printf("writing to static int array unimplemented\n");
 
-  return 0;
+  return -1;
 }
 
 int AVR8::get_values_from_stack(int num)
