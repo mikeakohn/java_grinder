@@ -568,6 +568,9 @@ int AVR8::mul_integer(int const_val)
 // unsigned only for now
 int AVR8::div_integer()
 {
+//FIXME divide broken on real chip
+return -1;
+
   need_div_integer = 1;
   CALL("div_integer");
   stack--;
@@ -583,10 +586,15 @@ int AVR8::div_integer(int const_val)
 // unsigned only for now
 int AVR8::mod_integer()
 {
+//FIXME divide broken on real chip
+return -1;
+
   need_div_integer = 1;
   need_mod_integer = 1;
   CALL("div_integer");
+  stack--;
   CALL("mod_integer");
+  stack++;
 
   return 0;
 }
@@ -687,6 +695,9 @@ int AVR8::and_integer()
 
 int AVR8::and_integer(int const_val)
 {
+//FIXME can only use registers 16-31
+return -1;
+
   fprintf(out, "; and_integer (optimized)\n");
   POP_HI("result1");
   POP_LO("result0");
@@ -709,6 +720,9 @@ int AVR8::or_integer()
 
 int AVR8::or_integer(int const_val)
 {
+//FIXME can only use registers 16-31
+return -1;
+
   fprintf(out, "; or_integer (optimized)\n");
   POP_HI("result1");
   POP_LO("result0");
