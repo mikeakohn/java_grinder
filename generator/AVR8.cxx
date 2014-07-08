@@ -568,9 +568,6 @@ int AVR8::mul_integer(int const_val)
 // unsigned only for now
 int AVR8::div_integer()
 {
-//FIXME divide broken on real chip
-return -1;
-
   need_div_integer = 1;
   CALL("div_integer");
   stack--;
@@ -586,9 +583,6 @@ int AVR8::div_integer(int const_val)
 // unsigned only for now
 int AVR8::mod_integer()
 {
-//FIXME divide broken on real chip
-return -1;
-
   need_div_integer = 1;
   need_mod_integer = 1;
   CALL("div_integer");
