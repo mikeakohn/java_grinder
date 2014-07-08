@@ -695,14 +695,11 @@ int AVR8::and_integer()
 
 int AVR8::and_integer(int const_val)
 {
-//FIXME can only use registers 16-31
-return -1;
-
   fprintf(out, "; and_integer (optimized)\n");
-  POP_HI("result1");
-  POP_LO("result0");
-  fprintf(out, "  andi result0, 0x%02x\n", const_val & 0xff);
-  fprintf(out, "  andi result1, 0x%02x\n", const_val >> 8);
+  POP_HI("value11");
+  POP_LO("value10");
+  fprintf(out, "  andi value10, 0x%02x\n", const_val & 0xff);
+  fprintf(out, "  andi value11, 0x%02x\n", const_val >> 8);
   PUSH_LO("result0");
   PUSH_HI("result1");
 
@@ -720,14 +717,11 @@ int AVR8::or_integer()
 
 int AVR8::or_integer(int const_val)
 {
-//FIXME can only use registers 16-31
-return -1;
-
   fprintf(out, "; or_integer (optimized)\n");
-  POP_HI("result1");
-  POP_LO("result0");
-  fprintf(out, "  ori result0, 0x%02x\n", const_val & 0xff);
-  fprintf(out, "  ori result1, 0x%02x\n", const_val >> 8);
+  POP_HI("value11");
+  POP_LO("value10");
+  fprintf(out, "  ori value10, 0x%02x\n", const_val & 0xff);
+  fprintf(out, "  ori value11, 0x%02x\n", const_val >> 8);
   PUSH_LO("result0");
   PUSH_HI("result1");
 
