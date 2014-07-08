@@ -77,13 +77,13 @@
 
 #define JUMP(a) \
   if(need_farjump) \
-    fprintf(out, "  rjmp %s\n", a); \
+    fprintf(out, "  jmp %s\n", a); \
   else \
     fprintf(out, "  rjmp %s\n", a)
 
 #define CALL(a) \
   if(need_farjump) \
-    fprintf(out, "  rcall %s\n", a); \
+    fprintf(out, "  call %s\n", a); \
   else \
     fprintf(out, "  rcall %s\n", a)
 
