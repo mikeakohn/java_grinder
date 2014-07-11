@@ -740,7 +740,6 @@ int AVR8::inc_integer(int index, int num)
 {
   uint16_t value = num & 0xffff;
 
-/*
   if(num > 0 && num < 64)
   {
     fprintf(out, "; inc_integer (optimized, add)\n");
@@ -769,7 +768,6 @@ int AVR8::inc_integer(int index, int num)
     fprintf(out, "  st Y, ZH\n");
   }
     else
-*/
   {
     need_inc_integer = 1;
     fprintf(out, "  ldi value10, 0x%02x\n", value & 0xff);
