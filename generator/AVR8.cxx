@@ -740,6 +740,7 @@ int AVR8::inc_integer(int index, int num)
 {
   uint16_t value = num & 0xffff;
 
+/*
   if(num > 0 && num < 64)
   {
     fprintf(out, "; inc_integer (optimized, add)\n");
@@ -768,6 +769,7 @@ int AVR8::inc_integer(int index, int num)
     fprintf(out, "  st Y, ZH\n");
   }
     else
+*/
   {
     need_inc_integer = 1;
     fprintf(out, "  ldi value10, 0x%02x\n", value & 0xff);
@@ -2124,12 +2126,19 @@ int AVR8::ioport_getPortInputValue(int port)
 // ADC API
 int AVR8::adc_enable()
 {
-  return -1;
+  fprintf(out, "; adc_enable\n");
+  fprintf(out, "  ldi temp, (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0)\n");
+  fprintf(out, "  out ADCSRA, temp\n");
+
+  return 0;
 } 
 
 int AVR8::adc_disable()
 {
-  return -1;
+  fprintf(out, "; adc_disable\n");
+  fprintf(out, "  out ADCSRA, zero\n");
+
+  return 0;
 } 
 
 int AVR8::adc_setChannel_I()
@@ -2139,12 +2148,34 @@ int AVR8::adc_setChannel_I()
 
 int AVR8::adc_setChannel_I(int channel)
 {
-  return -1;
+  fprintf(out, "; adc_setChannel_I\n");
+  fprintf(out, "  ldi temp, %d\n", channel);
+  fprintf(out, "  out ADMUX, temp\n");
+  PUSH_LO("zero");
+  PUSH_HI("zero");
+  stack++;
+
+  return 0;
 } 
 
 int AVR8::adc_read()
 {
-  return -1;
+  fprintf(out, "; adc_read\n");
+  fprintf(out, "  in temp, ADCSRA\n");
+  fprintf(out, "  ori temp, (1 << ADSC)\n");
+  fprintf(out, "  out ADCSRA, temp\n");
+
+  fprintf(out, "adc_read_%d:\n", label_count);
+  fprintf(out, "  sbic ADCSRA, ADSC\n");
+  fprintf(out, "  rjmp adc_read_%d\n", label_count++);
+
+  fprintf(out, "  in result0, ADCL\n");
+  PUSH_LO("result0");
+  fprintf(out, "  in result1, ADCH\n");
+  PUSH_HI("result1");
+  stack++;
+  
+  return 0;
 } 
 
 #if 0
