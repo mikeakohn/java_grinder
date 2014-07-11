@@ -587,9 +587,8 @@ int AVR8::mod_integer()
   need_div_integer = 1;
   need_mod_integer = 1;
   CALL("div_integer");
-  stack--;
   CALL("mod_integer");
-  stack++;
+  stack--;
 
   return 0;
 }
@@ -695,8 +694,8 @@ int AVR8::and_integer(int const_val)
   POP_LO("value10");
   fprintf(out, "  andi value10, 0x%02x\n", const_val & 0xff);
   fprintf(out, "  andi value11, 0x%02x\n", const_val >> 8);
-  PUSH_LO("result0");
-  PUSH_HI("result1");
+  PUSH_LO("value10");
+  PUSH_HI("value11");
 
   return 0;
 }
@@ -717,8 +716,8 @@ int AVR8::or_integer(int const_val)
   POP_LO("value10");
   fprintf(out, "  ori value10, 0x%02x\n", const_val & 0xff);
   fprintf(out, "  ori value11, 0x%02x\n", const_val >> 8);
-  PUSH_LO("result0");
-  PUSH_HI("result1");
+  PUSH_LO("value10");
+  PUSH_HI("value11");
 
   return 0;
 }
@@ -1414,24 +1413,23 @@ void AVR8::insert_mul_integer()
 void AVR8::insert_div_integer()
 {
   fprintf(out, "div_integer:\n");
-  POP_HI("value11");
-  POP_LO("value10");
+  POP_HI("value21");
+  POP_LO("value20");
   POP_HI("result1");
   POP_LO("result0");
-  fprintf(out, "  ldi temp, 0\n");
-  fprintf(out, "  mov remainder0, temp\n");
-  fprintf(out, "  mov remainder1, temp\n");
+  fprintf(out, "  mov remainder0, zero\n");
+  fprintf(out, "  mov remainder1, zero\n");
   fprintf(out, "  ldi temp, 16\n");
   fprintf(out, "div_integer_loop:\n");
   fprintf(out, "  lsl result0\n");
   fprintf(out, "  rol result1\n");
   fprintf(out, "  rol remainder0\n");
   fprintf(out, "  rol remainder1\n");
-  fprintf(out, "  cp remainder0, value10\n");
-  fprintf(out, "  cpc remainder1, value11\n");
+  fprintf(out, "  cp remainder0, value20\n");
+  fprintf(out, "  cpc remainder1, value21\n");
   fprintf(out, "  brcs div_integer_next\n");
-  fprintf(out, "  sub remainder0, value10\n");
-  fprintf(out, "  sbc remainder1, value11\n");
+  fprintf(out, "  sub remainder0, value20\n");
+  fprintf(out, "  sbc remainder1, value21\n");
   fprintf(out, "  inc result0\n");
   fprintf(out, "div_integer_next:\n");
   fprintf(out, "  dec temp\n");
@@ -1444,6 +1442,8 @@ void AVR8::insert_div_integer()
 void AVR8::insert_mod_integer()
 {
   fprintf(out, "mod_integer:\n");
+  POP_HI("temp");
+  POP_LO("temp");
   fprintf(out, "  mov result0, remainder0\n");
   PUSH_LO("result0");
   fprintf(out, "  mov result1, remainder1\n");
