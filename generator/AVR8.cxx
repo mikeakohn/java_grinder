@@ -753,8 +753,7 @@ int AVR8::inc_integer(int index, int num)
     fprintf(out, "  st X, ZL\n");
     fprintf(out, "  st Y, ZH\n");
   }
-    else
-  if(num > -64 && num < 0)
+    else if(num > -64 && num < 0)
   {
     fprintf(out, "; inc_integer (optimized, sub)\n");
     fprintf(out, "  ldi XL, stack_lo - %d\n", LOCALS(index));
@@ -1691,7 +1690,7 @@ void AVR8::insert_push_array_length()
   fprintf(out, "  sub XL, two\n");
   fprintf(out, "  sbc XH, zero\n");
   fprintf(out, "  ld result0, X+\n");
-  fprintf(out, "  ld result1, X+\n");
+  fprintf(out, "  ld result1, X\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
   fprintf(out, "  ret\n\n");
@@ -1703,7 +1702,7 @@ void AVR8::insert_push_array_length2()
   fprintf(out, "  sub XL, two\n");
   fprintf(out, "  sbc XH, zero\n");
   fprintf(out, "  ld result0, X+\n");
-  fprintf(out, "  ld result1, X+\n");
+  fprintf(out, "  ld result1, X\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
   fprintf(out, "  ret\n\n");
@@ -1720,7 +1719,7 @@ void AVR8::insert_array_byte_support()
   fprintf(out, "  mov XL, result0\n");
   fprintf(out, "  mov XH, result1\n");
   fprintf(out, "  st X+, length0\n");
-  fprintf(out, "  st X+, length1\n");
+  fprintf(out, "  st X, length1\n");
   fprintf(out, "  add length0, two\n");
   fprintf(out, "  adc length1, zero\n");
   fprintf(out, "  lds temp, heap_ptr + 0\n");
@@ -1794,7 +1793,7 @@ void AVR8::insert_array_int_support()
   fprintf(out, "  mov XL, result0\n");
   fprintf(out, "  mov XH, result1\n");
   fprintf(out, "  st X+, length0\n");
-  fprintf(out, "  st X+, length1\n");
+  fprintf(out, "  st X, length1\n");
   fprintf(out, "  lsl length0\n");
   fprintf(out, "  rol length1\n");
   fprintf(out, "  add length0, two\n");
@@ -1822,7 +1821,7 @@ void AVR8::insert_array_int_support()
   fprintf(out, "  mov XL, value20\n");
   fprintf(out, "  mov XH, value21\n");
   fprintf(out, "  ld result0, X+\n");
-  fprintf(out, "  ld result1, X+\n");
+  fprintf(out, "  ld result1, X\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
   fprintf(out, "  ret\n\n");
@@ -1836,7 +1835,7 @@ void AVR8::insert_array_int_support()
   fprintf(out, "  add ZL, result0\n");
   fprintf(out, "  adc ZH, result1\n");
   fprintf(out, "  lpm result0, Z+\n");
-  fprintf(out, "  lpm result1, Z+\n");
+  fprintf(out, "  lpm result1, Z\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
   fprintf(out, "  ret\n\n");
@@ -1850,7 +1849,7 @@ void AVR8::insert_array_int_support()
   fprintf(out, "  mov XL, value30\n");
   fprintf(out, "  mov XH, value31\n");
   fprintf(out, "  st X+, value10\n");
-  fprintf(out, "  st X+, value11\n");
+  fprintf(out, "  st X, value11\n");
   fprintf(out, "  ret\n\n");
 }
 
@@ -1911,7 +1910,7 @@ int AVR8::memory_read16()
   POP_LO("XL");
   fprintf(out, "  ld result0, X+\n");
   PUSH_LO("result0");
-  fprintf(out, "  ld result1, X+\n");
+  fprintf(out, "  ld result1, X\n");
   PUSH_HI("result1");
 
   return 0;
@@ -1925,7 +1924,7 @@ int AVR8::memory_write16()
   POP_HI("XH");
   POP_LO("XL");
   fprintf(out, "  st X+, value10\n");
-  fprintf(out, "  st X+, value11\n");
+  fprintf(out, "  st X, value11\n");
 
   stack -= 2;
 
@@ -1945,7 +1944,6 @@ int AVR8::ioport_setPinsAsInput(int port)
   fprintf(out, "  in temp2, %s\n", pin_string[port]);
   fprintf(out, "  and temp2, temp\n");
   fprintf(out, "  out %s, temp2\n", ddr_string[port]);
-
   stack--;
 
   return 0;
@@ -1977,7 +1975,6 @@ int AVR8::ioport_setPinsAsOutput(int port)
   fprintf(out, "  in temp2, %s\n", pin_string[port]);
   fprintf(out, "  or temp2, temp\n");
   fprintf(out, "  out %s, temp2\n", ddr_string[port]);
-
   stack--;
 
   return 0;
@@ -2006,7 +2003,6 @@ int AVR8::ioport_setPinsValue(int port)
   POP_HI("temp");
   POP_LO("temp");
   fprintf(out, "  out %s, temp\n", port_string[port]);
-
   stack--;
 
   return 0;
@@ -2035,7 +2031,6 @@ int AVR8::ioport_setPinsHigh(int port)
   fprintf(out, "  in temp2, %s\n", pin_string[port]);
   fprintf(out, "  or temp2, temp\n");
   fprintf(out, "  out %s, temp2\n", port_string[port]);
-
   stack--;
 
   return 0;
@@ -2053,7 +2048,6 @@ int AVR8::ioport_setPinsLow(int port)
   fprintf(out, "  in temp2, %s\n", pin_string[port]);
   fprintf(out, "  and temp2, temp\n");
   fprintf(out, "  out %s, temp2\n", port_string[port]);
-
   stack--;
 
   return 0;
