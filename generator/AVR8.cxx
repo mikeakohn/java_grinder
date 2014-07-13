@@ -646,6 +646,7 @@ int AVR8::shift_right_integer()
 
 int AVR8::shift_right_integer(int const_val)
 {
+  // pointless
   return -1;
 }
 
@@ -690,12 +691,12 @@ int AVR8::and_integer()
 int AVR8::and_integer(int const_val)
 {
   fprintf(out, "; and_integer (optimized)\n");
-  POP_HI("value11");
-  POP_LO("value10");
-  fprintf(out, "  andi value10, 0x%02x\n", const_val & 0xff);
-  fprintf(out, "  andi value11, 0x%02x\n", const_val >> 8);
-  PUSH_LO("value10");
-  PUSH_HI("value11");
+  POP_HI("result1");
+  POP_LO("result0");
+  fprintf(out, "  andi result0, 0x%02x\n", const_val & 0xff);
+  fprintf(out, "  andi result1, 0x%02x\n", const_val >> 8);
+  PUSH_LO("result0");
+  PUSH_HI("result1");
 
   return 0;
 }
@@ -712,12 +713,12 @@ int AVR8::or_integer()
 int AVR8::or_integer(int const_val)
 {
   fprintf(out, "; or_integer (optimized)\n");
-  POP_HI("value11");
-  POP_LO("value10");
-  fprintf(out, "  ori value10, 0x%02x\n", const_val & 0xff);
-  fprintf(out, "  ori value11, 0x%02x\n", const_val >> 8);
-  PUSH_LO("value10");
-  PUSH_HI("value11");
+  POP_HI("result1");
+  POP_LO("result0");
+  fprintf(out, "  ori result0, 0x%02x\n", const_val & 0xff);
+  fprintf(out, "  ori result1, 0x%02x\n", const_val >> 8);
+  PUSH_LO("result0");
+  PUSH_HI("result1");
 
   return 0;
 }
@@ -733,7 +734,18 @@ int AVR8::xor_integer()
 
 int AVR8::xor_integer(int const_val)
 {
-  return -1;
+  fprintf(out, "xor_integer (optimized):\n");
+  POP_HI("result1");
+  POP_LO("result0");
+  fprintf(out, "  ldi temp, %d\n", const_val & 0xff);
+  fprintf(out, "  eor result0, temp\n");
+  fprintf(out, "  ldi temp, %d\n", const_val >> 8);
+  fprintf(out, "  eor result1, temp\n");
+  PUSH_LO("result0");
+  PUSH_HI("result1");
+  fprintf(out, "  ret\n\n");
+
+  return 0;
 }
 
 int AVR8::inc_integer(int index, int num)
