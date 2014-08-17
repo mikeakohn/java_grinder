@@ -126,10 +126,18 @@ protected:
   bool need_and_integer:1;
   bool need_or_integer:1;
   bool need_xor_integer:1;
+  bool need_integer_to_byte:1;
+  bool need_dup:1;
   bool need_push_array_length:1;
   bool need_push_array_length2:1;
   bool need_array_byte_support:1;
   bool need_array_int_support:1;
+  bool need_get_values_from_stack:1;
+
+  bool need_memory_read8:1;
+  bool need_memory_write8:1;
+  bool need_memory_read16:1;
+  bool need_memory_write16:1;
 
   void insert_swap();
   void insert_add_integer();
@@ -144,10 +152,18 @@ protected:
   void insert_and_integer();
   void insert_or_integer();
   void insert_xor_integer();
+  void insert_integer_to_byte();
+  void insert_dup();
   void insert_push_array_length();
   void insert_push_array_length2();
   void insert_array_byte_support();
   void insert_array_int_support();
+  void insert_get_values_from_stack();
+
+  void insert_memory_read8();
+  void insert_memory_write8();
+  void insert_memory_read16();
+  void insert_memory_write16();
 };
 
 #endif
