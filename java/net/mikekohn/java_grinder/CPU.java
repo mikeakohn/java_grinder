@@ -25,6 +25,9 @@ public class CPU
   /** Set clock speed to 25MHz (internal crystal? DCO?) */
   public static void setClock25() { }
 
+  /** Set clock speed to XT2 (external crystal) */
+  public static void setClockExternal2() { }
+
   /** Insert a CPU level NOP */
   public static void nop() { }
 

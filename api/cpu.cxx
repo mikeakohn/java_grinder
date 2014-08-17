@@ -40,6 +40,7 @@ int cpu(JavaClass *java_class, Generator *generator, char *function)
 {
   CHECK_FUNC(setClock16,)
   CHECK_FUNC(setClock25,)
+  CHECK_FUNC(setClockExternal2,)
   CHECK_FUNC(nop,)
 
   return -1;

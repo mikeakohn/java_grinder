@@ -228,6 +228,39 @@ int MSP430X::cpu_setClock25()
   return 0;
 }
 
+int MSP430X::cpu_setClockExternal2()
+{
+  need_set_vcore_up = true;
+
+  fprintf(out, "  ;; Increase CPU voltage for faster MCLK\n");
+  fprintf(out, "  mov.w #1, r15\n");
+  fprintf(out, "  call #set_vcore_up\n");
+  fprintf(out, "  mov.w #2, r15\n");
+  fprintf(out, "  call #set_vcore_up\n");
+  fprintf(out, "  mov.w #3, r15\n");
+  fprintf(out, "  call #set_vcore_up\n\n");
+  fprintf(out, "  ;; Turn on XT2 crystal\n");
+  fprintf(out, "  bis.b #0x0c, &P5SEL\n");
+  fprintf(out, "  mov.w #SELS_5|SELM_5|SELA_2, &UCSCTL4\n");
+  fprintf(out, "  bic.w #SELREF_7, &UCSCTL3\n");
+  fprintf(out, "  bis.w #SELREF_2, &UCSCTL3\n");
+  fprintf(out, "  mov.w #0, &UCSCTL0\n");
+  fprintf(out, "  bic.w #XT2OFF, &UCSCTL6\n");
+  fprintf(out, "wait_clock:\n");
+  fprintf(out, "  bic.w #XT2OFFG|XT1LFOFFG|XT1HFOFFG|DCOFFG, &UCSCTL7\n");
+  fprintf(out, "  bic.w #OFIFG, &SFRIFG1\n");
+  fprintf(out, "  mov.w #5000, r15\n");
+  fprintf(out, "dec_again:\n");
+  fprintf(out, "  dec r15\n");
+  fprintf(out, "  jnz dec_again\n");
+  fprintf(out, "  bit.w #OFIFG, &SFRIFG1\n");
+  fprintf(out, "  jnz wait_clock\n");
+  fprintf(out, "  mov.w #0, &UCSCTL5\n\n");
+  fprintf(out, "  mov.w #SELS_5|SELM_5|SELA_2, &UCSCTL4\n");
+
+  return 0;
+}
+
 // Timer functions
 int MSP430X::timer_setInterval(int cycles, int divider)
 {
@@ -316,7 +349,7 @@ void MSP430X::insert_set_vcore_up()
   fprintf(out, "  mov.b #0xa5, &PMMCTL0_H\n");
   // Make sure no flags are set for iterative sequences
 /* The manual says to do this.. I see someone else not doing this.. and
-   this hands if it's done.. :(
+   this hangs if it's done.. :(
   fprintf(out, "set_vcore_up_svsmhdlyifg_1:\n");
   fprintf(out, "  bit.w #SVSMHDLYIFG, &PMMIFG\n");
   fprintf(out, "  jz set_vcore_up_svsmhdlyifg_1\n");

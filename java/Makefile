@@ -12,6 +12,7 @@ JAVA_SRC=\
   $(SRC_DIR)/IOPort3.java \
   $(SRC_DIR)/IOPort4.java \
   $(SRC_DIR)/IOPort5.java \
+  $(SRC_DIR)/IOPort6.java \
   $(SRC_DIR)/Memory.java \
   $(SRC_DIR)/SPI.java \
   $(SRC_DIR)/SPI0.java \

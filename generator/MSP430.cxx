@@ -131,6 +131,7 @@ int MSP430::start_init()
   fprintf(out, ".org 0x%04x\n", flash_start);
   fprintf(out, "start:\n");
   fprintf(out, "  mov.w #(WDTPW|WDTHOLD), &WDTCTL\n");
+  fprintf(out, "  dint\n");  // Do we need this?
   fprintf(out, "  mov.w #0x%04x, SP\n\n", stack_start);
   //fprintf(out, "  jmp main\n\n");
 

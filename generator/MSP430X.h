@@ -37,6 +37,7 @@ public:
 
   // CPU functions
   virtual int cpu_setClock25();
+  virtual int cpu_setClockExternal2();
 
 private:
   void insert_set_vcore_up();
