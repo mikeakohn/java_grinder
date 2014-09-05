@@ -69,7 +69,6 @@ M6502::M6502() :
   need_array_byte_support(0),
   need_array_int_support(0),
   need_get_values_from_stack(0),
-
   need_memory_read8(0),
   need_memory_write8(0),
   need_memory_read16(0),
@@ -100,7 +99,6 @@ M6502::~M6502()
   if(need_array_byte_support) { insert_array_byte_support(); }
   if(need_array_int_support) { insert_array_int_support(); }
   if(need_get_values_from_stack) { insert_get_values_from_stack(); }
-
   if(need_memory_read8) { insert_memory_read8(); }
   if(need_memory_write8) { insert_memory_write8(); }
   if(need_memory_read16) { insert_memory_read16(); }
@@ -1154,6 +1152,8 @@ int M6502::array_write_int(const char *name, int field_id)
 
 int M6502::get_values_from_stack(int num)
 {
+  need_get_values_from_stack = 1;
+
   fprintf(out, "; get_values_from_stack, num = %d\n", num);
 
   if(num > 0)
