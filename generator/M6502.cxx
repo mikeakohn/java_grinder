@@ -134,6 +134,7 @@ int M6502::open(const char *filename)
   fprintf(out, "value2 equ 0x2c\n");
   fprintf(out, "value3 equ 0x2e\n");
 
+  // start at 0x0400 when using simulator
   fprintf(out, ".org 0x0400\n");
   fprintf(out, "  sei\n");
   fprintf(out, "  cld\n");
@@ -350,9 +351,9 @@ int M6502::push_ref(char *name)
 {
   
   fprintf(out, "; push_ref\n");
-  fprintf(out, "  lda #%s & 0xff\n", name);
+  fprintf(out, "  lda %s + 0\n", name);
   PUSH_LO;
-  fprintf(out, "  lda #%s >> 8\n", name);
+  fprintf(out, "  lda %s + 1\n", name);
   PUSH_HI;
   stack++;
 
