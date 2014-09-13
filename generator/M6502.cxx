@@ -134,6 +134,14 @@ int M6502::open(const char *filename)
   fprintf(out, "value2 equ 0x2c\n");
   fprintf(out, "value3 equ 0x2e\n");
 
+  fprintf(out, ".org 0x0400\n");
+  fprintf(out, "  sei\n");
+  fprintf(out, "  cld\n");
+  fprintf(out, "  lda #0xff\n");
+  fprintf(out, "  sta SP\n");
+  fprintf(out, "  tax\n");
+  fprintf(out, "  txs\n");
+
   return 0;
 }
 
@@ -340,8 +348,15 @@ int M6502::push_short(int16_t s)
 
 int M6502::push_ref(char *name)
 {
-  // FIXME - Implement me: Need to push address of name on the stack
-  return -1;
+  
+  fprintf(out, "; push_ref\n");
+  fprintf(out, "  lda #%s & 0xff\n", name);
+  PUSH_LO;
+  fprintf(out, "  lda #%s >> 8\n", name);
+  PUSH_HI;
+  stack++;
+
+  return 0;
 }
 
 int M6502::pop_integer_local(int index)
@@ -1020,6 +1035,7 @@ int M6502::push_array_length(const char *name, int field_id)
 
 int M6502::array_read_byte()
 {
+  need_array_byte_support = 1;
   get_values_from_stack(2);
   fprintf(out, "jsr array_read_byte\n");
   stack++;
@@ -1034,6 +1050,7 @@ int M6502::array_read_short()
 
 int M6502::array_read_int()
 {
+  need_array_int_support = 1;
   get_values_from_stack(2);
   fprintf(out, "jsr array_read_int\n");
   stack++;
