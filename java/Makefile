@@ -18,6 +18,7 @@ JAVA_SRC=\
   $(SRC_DIR)/SPI0.java \
   $(SRC_DIR)/SPI1.java \
   $(SRC_DIR)/TI84.java \
+  $(SRC_DIR)/TI99.java \
   $(SRC_DIR)/Timer.java \
   $(SRC_DIR)/TimerListener.java \
   $(SRC_DIR)/UART.java \

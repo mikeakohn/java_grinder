@@ -26,6 +26,7 @@
 #include "memory.h"
 #include "spi.h"
 #include "ti84_.h"
+#include "ti99.h"
 #include "timer.h"
 #include "uart.h"
 #include "java_lang_string.h"
@@ -255,6 +256,7 @@ char function[256];
     CHECK_WITH_PORT(UART, uart, 0)
     CHECK_WITH_PORT(UART, uart, 1)
     CHECK(TI84, ti84)
+    CHECK(TI99, ti99)
       else
     {}
   }
@@ -322,6 +324,7 @@ char function[256];
     CHECK_CONST(CPU, cpu)
     CHECK_WITH_PORT_CONST(SPI, spi, 0)
     CHECK_WITH_PORT_CONST(SPI, spi, 1)
+    CHECK_CONST(TI99, ti99)
       else
     {}
   }
@@ -331,6 +334,7 @@ char function[256];
     CHECK_WITH_PORT_CONST_2(SPI, spi, 0)
     CHECK_WITH_PORT_CONST_2(SPI, spi, 1)
     CHECK_CONST_2(Timer, timer)
+    CHECK_CONST_2(TI99, ti99)
       else
     {}
   }
