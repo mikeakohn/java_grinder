@@ -26,7 +26,7 @@
 #include "memory.h"
 #include "spi.h"
 #include "ti84_.h"
-#include "ti99.h"
+#include "ti99_.h"
 #include "timer.h"
 #include "uart.h"
 #include "java_lang_string.h"
