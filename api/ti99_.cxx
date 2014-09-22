@@ -37,7 +37,7 @@
 
 int ti99(JavaClass *java_class, Generator *generator, char *method_name)
 {
-  CHECK_FUNC(printChar,_B)
+  CHECK_FUNC(printChar,_C)
   CHECK_FUNC(setCursor,_II)
 
   return -1;
@@ -45,7 +45,7 @@ int ti99(JavaClass *java_class, Generator *generator, char *method_name)
 
 int ti99(JavaClass *java_class, Generator *generator, char *method_name, int const_val)
 {
-  CHECK_FUNC_CONST(printChar,_B)
+  CHECK_FUNC_CONST(printChar,_C)
 
   return -1;
 }

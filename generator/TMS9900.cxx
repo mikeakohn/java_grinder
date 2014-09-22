@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <typeinfo>
 
 #include "TMS9900.h"
 
@@ -57,8 +58,13 @@ int TMS9900::open(const char *filename)
   fprintf(out, ".tms9900\n");
 
   // Set where RAM starts / ends
-  // FIXME - Not sure what to set this to right now
-  fprintf(out, "ram_start equ 0\n");
+  //Generator *generator = this;
+  //if (dynamic_cast<TMS9900 *>(this) == NULL)
+  if (typeid(this) == typeid(TMS9900 *))
+  {
+    // FIXME
+    //fprintf(out, "ram_start equ 0\n");
+  }
 
   return 0;
 }
@@ -111,10 +117,13 @@ int TMS9900::insert_field_init(char *name, int index)
 
 void TMS9900::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
+  is_main = (strcmp(name, "main") == 0) ? 1 : 0;
+  fprintf(out, "%s:\n", name);
 }
 
 void TMS9900::method_end(int local_count)
 {
+  fprintf(out, "\n");
 }
 
 int TMS9900::push_integer(int32_t n)
@@ -521,7 +530,8 @@ int TMS9900::return_void(int local_count)
 
 int TMS9900::jump(const char *name)
 {
-  return -1;
+  fprintf(out, "  jmp %s\n", name);
+  return 0;
 }
 
 int TMS9900::call(const char *name)

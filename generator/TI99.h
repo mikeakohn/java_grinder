@@ -27,6 +27,12 @@ public:
   virtual int ti99_printChar(int c);
   virtual int ti99_setCursor();
   virtual int ti99_setCursor(int x, int y);
+
+private:
+  void insert_write_string();
+  void insert_vdp_command();
+
+  bool need_vdp_command;
 };
 
 #endif
