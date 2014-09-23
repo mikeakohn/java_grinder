@@ -54,7 +54,6 @@ int TMS9900::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 
-  // For now we only support a specific chip
   fprintf(out, ".tms9900\n");
 
   // Set where RAM starts / ends
@@ -87,32 +86,51 @@ int TMS9900::insert_static_field_define(const char *name, const char *type, int 
 
 int TMS9900::init_heap(int field_count)
 {
-  return -1;
+  fprintf(out, "  ;; Set up heap and static initializers\n");
+  fprintf(out, "  li r0, ram_start+%d\n", (field_count + 1) * 2);
+  fprintf(out, "  mov r0, @ram_start\n");
+
+  return 0;
 }
 
 int TMS9900::insert_field_init_boolean(char *name, int index, int value)
 {
-  return -1;
+  value = (value == 0) ? 0 : 1;
+
+  fprintf(out, "  li r0, %d\n", value);
+  fprintf(out, "  mov r0, @%s\n", name);
+
+  return 0;
 }
 
 int TMS9900::insert_field_init_byte(char *name, int index, int value)
 {
-  return -1;
+  if (value < -128 || value > 255) { return -1; }
+  fprintf(out, "  li r0, %d\n", (int8_t)value);
+  fprintf(out, "  mov r0, @%s\n", name);
+
+  return 0;
 }
 
 int TMS9900::insert_field_init_short(char *name, int index, int value)
 {
-  return -1;
+  if (value < -32768 || value > 65535) { return -1; }
+  fprintf(out, "  li r0, %d\n", (int8_t)value);
+  fprintf(out, "  mov r0, @%s\n", name);
+
+  return 0;
 }
 
 int TMS9900::insert_field_init_int(char *name, int index, int value)
 {
-  return -1;
+  return insert_field_init_short(name, index, value);
 }
 
 int TMS9900::insert_field_init(char *name, int index)
 {
-  return -1;
+  fprintf(out, "  li r0, _%s\n", name);
+  fprintf(out, "  mov r0, @%s\n", name);
+  return 0;
 }
 
 void TMS9900::method_start(int local_count, int max_stack, int param_count, const char *name)
@@ -146,7 +164,21 @@ int TMS9900::push_integer(int32_t n)
 
 int TMS9900::push_integer_local(int index)
 {
-  return -1;
+  if (reg < reg_max)
+  {
+    fprintf(out, "  mov @-%d(r12), r%d  ; push local_%d\n", LOCALS(index), REG_STACK(reg), index);
+    reg++;
+  }
+    else
+  {
+    //fprintf(out, "  push -%d(r12)  ; push local_%d\n", LOCALS(index), index);
+    //stack++;
+    // FIXME
+    printf("ERROR: Need to add stack support\n");
+    return -1;
+  }
+
+  return 0;
 }
 
 int TMS9900::push_ref_local(int index)
@@ -162,16 +194,19 @@ int TMS9900::push_fake()
 
 int TMS9900::push_long(int64_t n)
 {
+  printf("long is not supported right now\n");
   return -1;
 }
 
 int TMS9900::push_float(float f)
 {
+  printf("float is not supported right now\n");
   return -1;
 }
 
 int TMS9900::push_double(double f)
 {
+  printf("double is not supported right now\n");
   return -1;
 }
 
@@ -212,7 +247,26 @@ int TMS9900::push_ref(char *name)
 
 int TMS9900::pop_integer_local(int index)
 {
-  return -1;
+#if 0
+  if (stack > 0)
+  {
+    fprintf(out, "  pop -%d(r12)  ; pop local_%d\n", LOCALS(index), index);
+    stack--;
+  }
+    else
+#endif
+  if (reg > 0)
+  {
+    fprintf(out, "  mov r%d, @-%d(r12) ; pop local_%d\n", REG_STACK(reg-1), LOCALS(index), index);
+    reg--;
+  }
+    else
+  {
+    printf("Internal Error: Nothing on the stack?\n");
+    return -1;
+  }
+
+  return 0;
 }
 
 int TMS9900::pop_ref_local(int index)
@@ -451,12 +505,17 @@ int TMS9900::xor_integer()
 
 int TMS9900::xor_integer(int num)
 {
-  return -1;
+  fprintf(out, "  li r0, %d\n", num);
+  fprintf(out, "  xor r0, r%d\n", REG_STACK(reg-1));
+
+  return 0;
 }
 
 int TMS9900::inc_integer(int index, int num)
 {
-  return -1;
+  fprintf(out, "  li r0, #%d\n", num);
+  fprintf(out, "  a r0, @-%d(r12)\n", LOCALS(index));
+  return 0;
 }
 
 int TMS9900::integer_to_byte()
