@@ -26,6 +26,17 @@
 
 //#define CONST_STACK_SIZE 4
 
+static inline bool needs_label(uint8_t *label_map, int pc, int pc_start)
+{
+  int address = pc - pc_start;
+  if ((label_map[address / 8] & (1 << (address % 8))) != 0)
+  {
+    return true;
+  }
+
+  return false;
+}
+
 uint8_t JavaCompiler::cond_table[] =
 {
   COND_EQUAL,         // 159 (0x9f) if_icmpeq
@@ -519,7 +530,8 @@ int instruction_length;
 #ifdef DEBUG
     printf("pc=%d %s opcode=%d (0x%02x)\n", address, table_java_instr[bytes[pc]].name, bytes[pc], bytes[pc]);
 #endif
-    if ((label_map[address / 8] & (1 << (address % 8))) != 0)
+    //if ((label_map[address / 8] & (1 << (address % 8))) != 0)
+    if (needs_label(label_map, pc, pc_start))
     {
       sprintf(label, "%s_%d", method_name, address);
       generator->label(label);
@@ -878,7 +890,8 @@ int instruction_length;
         // Pop integer off stack and store in local variable
         ret = generator->pop_integer_local(bytes[pc]-59);
 
-        if (optimize == 1 && bytes[pc+1] == 26 + (bytes[pc]-59))
+        if (optimize == 1 && !needs_label(label_map, pc+1, pc_start) &&
+            bytes[pc+1] == 26 + (bytes[pc]-59))
         {
           if (generator->push_fake() == 0)
           {
