@@ -409,6 +409,11 @@ int ARM::integer_to_byte()
   return -1;
 }
 
+int ARM::integer_to_short()
+{
+  return -1;
+}
+
 int ARM::jump_cond(const char *label, int cond)
 {
   if (stack > 0)

@@ -79,6 +79,7 @@ public:
   virtual int xor_integer(int num) { return -1; }
   virtual int inc_integer(int index, int num) = 0;
   virtual int integer_to_byte() = 0;
+  virtual int integer_to_short() = 0;
   virtual int jump_cond(const char *label, int cond) = 0;
   virtual int jump_cond_zero(const char *label, int cond) { return -1; }
   virtual int jump_cond_integer(const char *label, int cond) = 0;

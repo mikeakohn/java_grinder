@@ -80,6 +80,7 @@ public:
   virtual int xor_integer(int const_val);
   virtual int inc_integer(int index, int num);
   virtual int integer_to_byte();
+  virtual int integer_to_short();
   virtual int jump_cond(const char *label, int cond);
   virtual int jump_cond_integer(const char *label, int cond);
   virtual int return_local(int index, int local_count);

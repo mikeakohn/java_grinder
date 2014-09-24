@@ -579,6 +579,12 @@ int DSPIC::integer_to_byte()
   return 0;
 }
 
+int DSPIC::integer_to_short()
+{
+  // I think we do nothing here.  On dsPIC, integers are already 16 bit.
+  return 0;
+}
+
 int DSPIC::jump_cond(const char *label, int cond)
 {
   if (stack > 0)

@@ -798,6 +798,12 @@ int AVR8::integer_to_byte()
   return 0;
 }
 
+int AVR8::integer_to_short()
+{
+  // FIXME - Joe, fill this in :).
+  return -1;
+}
+
 int AVR8::jump_cond(const char *label, int cond)
 {
   bool reverse = false;

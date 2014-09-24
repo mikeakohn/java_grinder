@@ -605,6 +605,12 @@ int M6502::integer_to_byte()
   return 0;
 }
 
+int M6502::integer_to_short()
+{
+  // FIXME - Joe fill this in please :).
+  return 0;
+}
+
 int M6502::jump_cond(const char *label, int cond)
 {
   bool reverse = false;

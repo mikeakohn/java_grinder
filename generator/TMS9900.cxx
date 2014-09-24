@@ -17,8 +17,7 @@
 
 #include "TMS9900.h"
 
-#define REG_STACK(a) (a+2)
-#define LOCALS(i) (i * 4)
+#define LOCALS(i) ((i + 1) * 2)
 #define CHECK_STACK() \
   if (reg >= reg_max) { printf("Internal error: Stack blown.\n"); return -1; }
 
@@ -533,6 +532,12 @@ int TMS9900::integer_to_byte()
   return 0;
 }
 
+int TMS9900::integer_to_short()
+{
+  // I think we do nothing here.  On TMS9900, integers are already 16 bit.
+  return 0;
+}
+
 int TMS9900::jump_cond(const char *label, int cond)
 {
   fprintf(out, "  ci r%d, 0\n", REG_STACK(reg-1));
@@ -546,7 +551,7 @@ int TMS9900::jump_cond(const char *label, int cond)
     else
   if (cond == COND_GREATER_EQUAL)
   {
-    fprintf(out, "  jlt %s\n", label);
+    fprintf(out, "  jgt %s\n", label);
     fprintf(out, "  jeq %s\n", label);
   }
     else
@@ -559,14 +564,7 @@ int TMS9900::jump_cond(const char *label, int cond)
 
 int TMS9900::jump_cond_integer(const char *label, int cond)
 {
-  if (cond == COND_GREATER_EQUAL)
-  {
-    fprintf(out, "  c r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
-  }
-    else
-  {
-    fprintf(out, "  c r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
-  }
+  fprintf(out, "  c r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
   reg -= 2;
 
   if (cond == COND_LESS_EQUAL)
@@ -577,7 +575,7 @@ int TMS9900::jump_cond_integer(const char *label, int cond)
     else
   if (cond == COND_GREATER_EQUAL)
   {
-    fprintf(out, "  jlt %s\n", label);
+    fprintf(out, "  jgt %s\n", label);
     fprintf(out, "  jeq %s\n", label);
   }
     else

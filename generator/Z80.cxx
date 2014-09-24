@@ -508,6 +508,12 @@ int Z80::integer_to_byte()
   return 0;
 }
 
+int Z80::integer_to_short()
+{
+  // I think we do nothing here.  On Z80, integers are already 16 bit.
+  return 0;
+}
+
 int Z80::jump_cond(const char *label, int cond)
 {
   fprintf(out, "  ;; jump_cond(%s, %s)\n", label, cond_str[cond]);

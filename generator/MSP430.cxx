@@ -840,6 +840,12 @@ int MSP430::integer_to_byte()
   return 0;
 }
 
+int MSP430::integer_to_short()
+{
+  // I think we do nothing here.  On MSP430, integers are already 16 bit.
+  return 0;
+}
+
 int MSP430::jump_cond(const char *label, int cond)
 {
 bool reverse = false;

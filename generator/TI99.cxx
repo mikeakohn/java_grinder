@@ -82,7 +82,11 @@ int TI99::ti99_print()
 
 int TI99::ti99_printChar()
 {
-  return -1;
+  fprintf(out, "  sla r%d, 8\n", REG_STACK(reg-1));
+  fprintf(out, "  mov r%d, @VDP_WRITE\n", REG_STACK(reg-1));
+  reg--;
+
+  return 0;
 }
 
 int TI99::ti99_printChar(int c)
@@ -102,9 +106,10 @@ int TI99::ti99_setCursor()
 int TI99::ti99_setCursor(int x, int y)
 {
   need_vdp_command = true;
-  int address = (y * 40) + x + 0x4000;
+  int offset = (y * 40) + x;
+  int address = offset + 0x4000;
 
-  fprintf(out, "  li r0, 0x%04x   ; set write byte to 0\n", address);
+  fprintf(out, "  li r0, 0x%04x   ; set write byte to %d\n", address, offset);
   fprintf(out, "  bl @_vdp_command\n");
 
   return 0;

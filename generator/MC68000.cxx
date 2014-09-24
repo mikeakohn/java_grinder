@@ -505,6 +505,20 @@ int MC68000::integer_to_byte()
   return 0;
 }
 
+int MC68000::integer_to_short()
+{
+  if (stack == 0)
+  {
+    fprintf(out, "  extw.l (SP)\n");
+  }
+    else
+  {
+    fprintf(out, "  extw.l d%d\n", REG_STACK(reg-1));
+  }
+
+  return 0;
+}
+
 int MC68000::jump_cond(const char *label, int cond)
 {
   if (stack > 0)

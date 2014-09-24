@@ -14,6 +14,8 @@
 
 #include "Generator.h"
 
+#define REG_STACK(a) (a+2)
+
 class TMS9900 : public Generator
 {
 public:
@@ -69,6 +71,7 @@ public:
   virtual int xor_integer(int num);
   virtual int inc_integer(int index, int num);
   virtual int integer_to_byte();
+  virtual int integer_to_short();
   virtual int jump_cond(const char *label, int cond);
   virtual int jump_cond_integer(const char *label, int cond);
   virtual int return_local(int index, int local_count);

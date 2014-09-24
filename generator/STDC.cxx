@@ -440,6 +440,13 @@ int STDC::integer_to_byte()
   return 0;
 }
 
+int STDC::integer_to_short()
+{
+  fprintf(out, "  stack_%d = (int32_t)((int16_t)stack_%d);\n", stack - 1, stack - 1);
+
+  return 0;
+}
+
 int STDC::jump_cond(const char *label, int cond)
 {
   fprintf(out, "  if (stack_%d %s 0) { goto %s; }\n", stack--, cond_str[cond], label);

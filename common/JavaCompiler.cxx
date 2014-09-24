@@ -1325,12 +1325,12 @@ int instruction_length;
 
       case 146: // i2c (0x92)
         // Pop top integer from stack and push as a char
-        UNIMPL()
+        ret = generator->integer_to_short();
         break;
 
       case 147: // i2s (0x93)
         // Pop top integer from stack and push as a short
-        UNIMPL()
+        ret = generator->integer_to_short();
         break;
 
       case 148: // lcmp (0x94)
