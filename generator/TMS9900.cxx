@@ -88,7 +88,7 @@ int TMS9900::insert_static_field_define(const char *name, const char *type, int 
 
 int TMS9900::init_heap(int field_count)
 {
-  fprintf(out, "free_ram equ ram_start+32\n");
+  fprintf(out, "free_ram equ ram_start+0\n");
 
   // TI99 - We aren't going to use a heap here since the scratch pad is
   // only 256 bytes long.  Instread the heap will be in the VDP.
