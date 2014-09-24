@@ -23,10 +23,13 @@
   if (reg >= reg_max) { printf("Internal error: Stack blown.\n"); return -1; }
 
 // ABI is:
+// r0 temp
+// r1 temp
 // r2 start of stack
 // ..
 // ..
-// r10 end of stack
+// r9 end of stack
+// r10 Pointer to locals (or should say, pointer to top of local heap?)
 // r11 return address
 // r12 CRU base address
 // r13 Saved WP register
@@ -62,7 +65,7 @@ int TMS9900::open(const char *filename)
   if (typeid(this) == typeid(TMS9900 *))
   {
     // FIXME
-    //fprintf(out, "ram_start equ 0\n");
+    //fprintf(out, "free_ram equ 0\n");
   }
 
   return 0;
@@ -79,16 +82,21 @@ int TMS9900::start_init()
 
 int TMS9900::insert_static_field_define(const char *name, const char *type, int index)
 {
-  fprintf(out, "%s equ ram_start+%d\n", name, (index + 1) * 4);
+  fprintf(out, "%s equ free_ram+%d\n", name, index * 2);
   return 0;
 }
 
 
 int TMS9900::init_heap(int field_count)
 {
+  fprintf(out, "free_ram equ ram_start+32\n");
+
+  // TI99 - We aren't going to use a heap here since the scratch pad is
+  // only 256 bytes long.  Instread the heap will be in the VDP.
   fprintf(out, "  ;; Set up heap and static initializers\n");
-  fprintf(out, "  li r0, ram_start+%d\n", (field_count + 1) * 2);
-  fprintf(out, "  mov r0, @ram_start\n");
+  //fprintf(out, "  li r0, free_ram+%d\n", (field_count + 1) * 2);
+  //fprintf(out, "  mov r0, @free_ram\n");
+  fprintf(out, "  li r10, free_ram+%d\n", field_count * 2);
 
   return 0;
 }
@@ -137,6 +145,7 @@ void TMS9900::method_start(int local_count, int max_stack, int param_count, cons
 {
   is_main = (strcmp(name, "main") == 0) ? 1 : 0;
   fprintf(out, "%s:\n", name);
+  fprintf(out, "  ai r10, %d\n", local_count * 2);
 }
 
 void TMS9900::method_end(int local_count)
@@ -166,12 +175,12 @@ int TMS9900::push_integer_local(int index)
 {
   if (reg < reg_max)
   {
-    fprintf(out, "  mov @-%d(r12), r%d  ; push local_%d\n", LOCALS(index), REG_STACK(reg), index);
+    fprintf(out, "  mov @-%d(r10), r%d  ; push local_%d\n", LOCALS(index), REG_STACK(reg), index);
     reg++;
   }
     else
   {
-    //fprintf(out, "  push -%d(r12)  ; push local_%d\n", LOCALS(index), index);
+    //fprintf(out, "  push -%d(r10)  ; push local_%d\n", LOCALS(index), index);
     //stack++;
     // FIXME
     printf("ERROR: Need to add stack support\n");
@@ -250,14 +259,14 @@ int TMS9900::pop_integer_local(int index)
 #if 0
   if (stack > 0)
   {
-    fprintf(out, "  pop -%d(r12)  ; pop local_%d\n", LOCALS(index), index);
+    fprintf(out, "  pop -%d(r10)  ; pop local_%d\n", LOCALS(index), index);
     stack--;
   }
     else
 #endif
   if (reg > 0)
   {
-    fprintf(out, "  mov r%d, @-%d(r12) ; pop local_%d\n", REG_STACK(reg-1), LOCALS(index), index);
+    fprintf(out, "  mov r%d, @-%d(r10) ; pop local_%d\n", REG_STACK(reg-1), LOCALS(index), index);
     reg--;
   }
     else
@@ -514,7 +523,7 @@ int TMS9900::xor_integer(int num)
 int TMS9900::inc_integer(int index, int num)
 {
   fprintf(out, "  li r0, %d\n", num);
-  fprintf(out, "  a r0, @-%d(r12)\n", LOCALS(index));
+  fprintf(out, "  a r0, @-%d(r10)\n", LOCALS(index));
   return 0;
 }
 

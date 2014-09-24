@@ -33,6 +33,7 @@ private:
   void insert_vdp_command();
 
   bool need_vdp_command;
+  char app_name[16];
 };
 
 #endif

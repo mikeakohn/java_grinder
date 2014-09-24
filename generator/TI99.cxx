@@ -36,6 +36,17 @@ int TI99::open(const char *filename)
   fprintf(out, "ram_start equ RAM\n");
   fprintf(out, "heap_ptr equ ram_start\n");
 
+  strncpy(app_name, filename, 16);
+  app_name[15] = 0;
+
+  int n;
+  for (n = 0; n < 16; n++)
+  {
+    if (app_name[n] == '_') { app_name[n] = ' '; }
+    else if (app_name[n] >= 'a' && app_name[n] <= 'z') { app_name[n] &= 0xdf; }
+    else if (app_name[n] == 0) { break; }
+  }
+
   return 0;
 }
 
@@ -54,7 +65,7 @@ int TI99::start_init()
   fprintf(out, "_prog:\n");
   fprintf(out, "  .dw 0x0000\n");
   fprintf(out, "  .dw main\n");
-  fprintf(out, "  .db 4, \"TEST\"\n");
+  fprintf(out, "  .db %d, \"%s\"\n", strlen(app_name), app_name);
 
   fprintf(out, ".align 16\n\n");
 
