@@ -513,7 +513,7 @@ int TMS9900::xor_integer(int num)
 
 int TMS9900::inc_integer(int index, int num)
 {
-  fprintf(out, "  li r0, #%d\n", num);
+  fprintf(out, "  li r0, %d\n", num);
   fprintf(out, "  a r0, @-%d(r12)\n", LOCALS(index));
   return 0;
 }
