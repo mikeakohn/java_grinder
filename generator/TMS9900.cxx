@@ -559,7 +559,14 @@ int TMS9900::jump_cond(const char *label, int cond)
 
 int TMS9900::jump_cond_integer(const char *label, int cond)
 {
-  fprintf(out, "  c r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+  if (cond == COND_GREATER_EQUAL)
+  {
+    fprintf(out, "  c r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+  }
+    else
+  {
+    fprintf(out, "  c r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+  }
   reg -= 2;
 
   if (cond == COND_LESS_EQUAL)
