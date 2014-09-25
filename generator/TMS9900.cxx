@@ -408,14 +408,21 @@ int TMS9900::mul_integer()
 
 int TMS9900::div_integer()
 {
-  fprintf(out, "  div r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+  fprintf(out, "  mov r%d, r0\n", REG_STACK(reg-1));
+  fprintf(out, "  mov r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+  fprintf(out, "  li r%d, 0\n", REG_STACK(reg-2));
+  fprintf(out, "  div r0, r%d\n", REG_STACK(reg-2));
+  //fprintf(out, "  mov r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
   reg--;
   return 0;
 }
 
 int TMS9900::mod_integer()
 {
-  fprintf(out, "  div r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+  fprintf(out, "  mov r%d, r0\n", REG_STACK(reg-1));
+  fprintf(out, "  mov r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+  fprintf(out, "  li r%d, 0\n", REG_STACK(reg-2));
+  fprintf(out, "  div r0, r%d\n", REG_STACK(reg-2));
   fprintf(out, "  mov r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
   reg--;
   return 0;
