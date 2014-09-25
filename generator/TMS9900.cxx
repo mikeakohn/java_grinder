@@ -398,8 +398,10 @@ int TMS9900::sub_integer(int num)
 
 int TMS9900::mul_integer()
 {
-  fprintf(out, "  mpy r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+  //fprintf(out, "  mpy r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+  fprintf(out, "  mpy r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
   fprintf(out, "  mov r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+  //fprintf(out, "  mpy r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
   reg--;
   return 0;
 }
@@ -437,7 +439,6 @@ int TMS9900::shift_left_integer(int num)
 {
   if (num == 0) { return 0; }
   fprintf(out, "  sla r%d, %d\n", REG_STACK(reg-1), num);
-  reg--;
   return 0;
 }
 
@@ -453,7 +454,6 @@ int TMS9900::shift_right_integer(int num)
 {
   if (num == 0) { return 0; }
   fprintf(out, "  sra r%d, %d\n", REG_STACK(reg-1), num);
-  reg--;
   return 0;
 }
 
@@ -469,7 +469,6 @@ int TMS9900::shift_right_uinteger(int num)
 {
   if (num == 0) { return 0; }
   fprintf(out, "  srl r%d, %d\n", REG_STACK(reg-1), num);
-  reg--;
   return 0;
 }
 
