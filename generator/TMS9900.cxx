@@ -544,7 +544,7 @@ int TMS9900::integer_to_short()
   return 0;
 }
 
-int TMS9900::jump_cond(const char *label, int cond)
+int TMS9900::jump_cond(const char *label, int cond, int distance)
 {
   fprintf(out, "  ci r%d, 0\n", REG_STACK(reg-1));
   reg--;
@@ -568,7 +568,7 @@ int TMS9900::jump_cond(const char *label, int cond)
   return 0;
 }
 
-int TMS9900::jump_cond_integer(const char *label, int cond)
+int TMS9900::jump_cond_integer(const char *label, int cond, int distance)
 {
   fprintf(out, "  c r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
   reg -= 2;
@@ -607,7 +607,7 @@ int TMS9900::return_void(int local_count)
   return -1;
 }
 
-int TMS9900::jump(const char *name)
+int TMS9900::jump(const char *name, int distance)
 {
   //fprintf(out, "  jmp %s\n", name);
   fprintf(out, "  b @%s\n", name);

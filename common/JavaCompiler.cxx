@@ -208,8 +208,9 @@ int const_vals[2];
     case 164: // if_icmple (0xa4)
     {
       char label[128];
-      sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
-      if (generator->jump_cond_integer(label, cond_table[bytes[pc]-159], const_val) == -1)
+      int jump_to = address + GET_PC_INT16(1);
+      sprintf(label, "%s_%d", method_name, jump_to);
+      if (generator->jump_cond_integer(label, cond_table[bytes[pc]-159], const_val, jump_to - pc) == -1)
       { return 0; }
       return 3;
     }
@@ -320,9 +321,10 @@ int wide = 0;
       pc += skip_bytes;
       char label[128];
       address += skip_bytes;
-      sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
+      int jump_to = address + GET_PC_INT16(1);
+      sprintf(label, "%s_%d", method_name, jump_to);
 
-      if (generator->jump_cond_zero(label, cond) != -1)
+      if (generator->jump_cond_zero(label, cond, jump_to - pc) != -1)
       {
         return skip_bytes + 3;
       }
@@ -1359,32 +1361,25 @@ int instruction_length;
       case 156: // ifge (0x9c)
       case 157: // ifgt (0x9d)
       case 158: // ifle (0x9e)
-        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
-        ret = generator->jump_cond(label, cond_table[bytes[pc]-153]);
-        //value1 = POP_INTEGER();
-        //if (value1 == 0)
-        //{ pc += GET_PC_INT16(1); }
-        //  else
-        //{ pc += 3; }
+      {
+        int jump_to = address + GET_PC_INT16(1);
+        sprintf(label, "%s_%d", method_name, jump_to);
+        ret = generator->jump_cond(label, cond_table[bytes[pc]-153], jump_to - pc);
         break;
-
+      }
       case 159: // if_icmpeq (0x9f)
       case 160: // if_icmpne (0xa0)
       case 161: // if_icmplt (0xa1)
       case 162: // if_icmpge (0xa2)
       case 163: // if_icmpgt (0xa3)
       case 164: // if_icmple (0xa4)
-        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
-        ret = generator->jump_cond_integer(label, cond_table[bytes[pc]-159]);
+      {
+        int jump_to = address + GET_PC_INT16(1);
+        sprintf(label, "%s_%d", method_name, jump_to);
+        ret = generator->jump_cond_integer(label, cond_table[bytes[pc]-159], jump_to - pc);
 
-        //value1 = POP_INTEGER();
-        //value2 = POP_INTEGER();
-        //if (value2 <= value1)
-        //{ pc += GET_PC_INT16(1); }
-        //  else
-        //{ pc += 3; }
         break;
-
+      }
       case 165: // if_acmpeq (0xa5)
         UNIMPL()
         break;
@@ -1394,16 +1389,15 @@ int instruction_length;
         break;
 
       case 167: // goto (0xa7)
-        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
-        ret = generator->jump(label);
-        //pc += GET_PC_INT16(1);
+      {
+        int jump_to = address + GET_PC_INT16(1);
+        sprintf(label, "%s_%d", method_name, jump_to);
+        ret = generator->jump(label, jump_to - pc);
         break;
-
+      }
       case 168: // jsr (0xa8)
         sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
         ret = generator->call(label);
-        //PUSH_INTEGER(pc+3);
-        //pc += GET_PC_INT16(1);
         break;
 
       case 169: // ret (0xa9)
@@ -1668,14 +1662,12 @@ int instruction_length;
         break;
 
       case 200: // goto_w (0xc8)
-        //pc += (short)((((unsigned int)bytes[pc+1])<<24) |
-        //              (((unsigned int)bytes[pc+2])<<16) |
-        //              (((unsigned int)bytes[pc+3])<<8) |
-        //              bytes[pc+4]);
-        sprintf(label, "%s_%d", method_name, address + GET_PC_INT32(1));
-        ret = generator->jump(label);
+      {
+        int jump_to = address + GET_PC_INT32(1);
+        sprintf(label, "%s_%d", method_name, jump_to);
+        ret = generator->jump(label, jump_to - pc);
         break;
-
+      }
       case 201: // jsr_w (0xc9)
         //PUSH_INTEGER(pc+5);
         //pc += GET_PC_INT32(1);

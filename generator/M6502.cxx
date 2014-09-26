@@ -611,7 +611,7 @@ int M6502::integer_to_short()
   return 0;
 }
 
-int M6502::jump_cond(const char *label, int cond)
+int M6502::jump_cond(const char *label, int cond, int distance)
 {
   bool reverse = false;
 
@@ -709,7 +709,7 @@ int M6502::jump_cond(const char *label, int cond)
   return 0;
 }
 
-int M6502::jump_cond_integer(const char *label, int cond)
+int M6502::jump_cond_integer(const char *label, int cond, int distance)
 {
   bool reverse = false;
 
@@ -874,7 +874,7 @@ int M6502::return_void(int local_count)
   return 0;
 }
 
-int M6502::jump(const char *name)
+int M6502::jump(const char *name, int distance)
 {
   fprintf(out, "  jmp %s\n", name);
 

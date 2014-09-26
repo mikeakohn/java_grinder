@@ -348,12 +348,12 @@ int MIPS::integer_to_short()
   return -1;
 }
 
-int MIPS::jump_cond(const char *label, int cond)
+int MIPS::jump_cond(const char *label, int cond, int distance)
 {
   return -1;
 }
 
-int MIPS::jump_cond_integer(const char *label, int cond)
+int MIPS::jump_cond_integer(const char *label, int cond, int distance)
 {
   return -1;
 }
@@ -373,7 +373,7 @@ int MIPS::return_void(int local_count)
   return -1;
 }
 
-int MIPS::jump(const char *name)
+int MIPS::jump(const char *name, int distance)
 {
   return -1;
 }

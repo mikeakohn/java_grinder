@@ -514,7 +514,7 @@ int Z80::integer_to_short()
   return 0;
 }
 
-int Z80::jump_cond(const char *label, int cond)
+int Z80::jump_cond(const char *label, int cond, int distance)
 {
   fprintf(out, "  ;; jump_cond(%s, %s)\n", label, cond_str[cond]);
   if (cond == COND_GREATER)
@@ -599,7 +599,7 @@ int Z80::jump_cond(const char *label, int cond)
   return 0;
 }
 
-int Z80::jump_cond_integer(const char *label, int cond)
+int Z80::jump_cond_integer(const char *label, int cond, int distance)
 {
   fprintf(out, "  ;; jump_cond_integer(%s,%s)\n", label, cond_str[cond]);
   if (cond == COND_GREATER)
@@ -700,7 +700,7 @@ int Z80::return_void(int local_count)
   return 0;
 }
 
-int Z80::jump(const char *name)
+int Z80::jump(const char *name, int distance)
 {
   fprintf(out, "  jp %s\n", name);
   return 0;

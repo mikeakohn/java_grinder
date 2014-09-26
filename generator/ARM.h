@@ -70,12 +70,12 @@ public:
   virtual int inc_integer(int index, int num);
   virtual int integer_to_byte();
   virtual int integer_to_short();
-  virtual int jump_cond(const char *label, int cond);
-  virtual int jump_cond_integer(const char *label, int cond);
+  virtual int jump_cond(const char *label, int cond, int distance);
+  virtual int jump_cond_integer(const char *label, int cond, int distance);
   virtual int return_local(int index, int local_count);
   virtual int return_integer(int local_count);
   virtual int return_void(int local_count);
-  virtual int jump(const char *name);
+  virtual int jump(const char *name, int distance);
   virtual int call(const char *name);
   virtual int invoke_static_method(const char *name, int params, int is_void);
   virtual int put_static(const char *name, int index);

@@ -519,7 +519,7 @@ int MC68000::integer_to_short()
   return 0;
 }
 
-int MC68000::jump_cond(const char *label, int cond)
+int MC68000::jump_cond(const char *label, int cond, int distance)
 {
   if (stack > 0)
   {
@@ -536,7 +536,7 @@ int MC68000::jump_cond(const char *label, int cond)
   return 0;
 }
 
-int MC68000::jump_cond_integer(const char *label, int cond)
+int MC68000::jump_cond_integer(const char *label, int cond, int distance)
 {
   if (stack > 1)
   {
@@ -594,7 +594,7 @@ int MC68000::return_void(int local_count)
   return 0;
 }
 
-int MC68000::jump(const char *name)
+int MC68000::jump(const char *name, int distance)
 {
   fprintf(out, "  bra %s\n", name);
   return 0;

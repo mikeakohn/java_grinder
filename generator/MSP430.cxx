@@ -846,7 +846,7 @@ int MSP430::integer_to_short()
   return 0;
 }
 
-int MSP430::jump_cond(const char *label, int cond)
+int MSP430::jump_cond(const char *label, int cond, int distance)
 {
 bool reverse = false;
 
@@ -886,7 +886,7 @@ bool reverse = false;
   return 0;
 }
 
-int MSP430::jump_cond_zero(const char *label, int cond)
+int MSP430::jump_cond_zero(const char *label, int cond, int distance)
 {
   if (cond == COND_EQUAL)
   {
@@ -903,7 +903,7 @@ int MSP430::jump_cond_zero(const char *label, int cond)
   return -1;
 }
 
-int MSP430::jump_cond_integer(const char *label, int cond)
+int MSP430::jump_cond_integer(const char *label, int cond, int distance)
 {
 bool reverse = false;
 
@@ -960,7 +960,7 @@ bool reverse = false;
   return 0;
 }
 
-int MSP430::jump_cond_integer(const char *label, int cond, int const_val)
+int MSP430::jump_cond_integer(const char *label, int cond, int const_val, int distance)
 {
 bool reverse = false;
 
@@ -1062,7 +1062,7 @@ int MSP430::return_void(int local_count)
   return 0;
 }
 
-int MSP430::jump(const char *name)
+int MSP430::jump(const char *name, int distance)
 {
   fprintf(out, "  jmp %s\n", name);
   return 0;

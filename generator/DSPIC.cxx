@@ -585,7 +585,7 @@ int DSPIC::integer_to_short()
   return 0;
 }
 
-int DSPIC::jump_cond(const char *label, int cond)
+int DSPIC::jump_cond(const char *label, int cond, int distance)
 {
   if (stack > 0)
   {
@@ -604,7 +604,7 @@ int DSPIC::jump_cond(const char *label, int cond)
   return 0;
 }
 
-int DSPIC::jump_cond_integer(const char *label, int cond)
+int DSPIC::jump_cond_integer(const char *label, int cond, int distance)
 {
   if (stack > 1)
   {
@@ -675,7 +675,7 @@ int DSPIC::return_void(int local_count)
   return 0;
 }
 
-int DSPIC::jump(const char *name)
+int DSPIC::jump(const char *name, int distance)
 {
   fprintf(out, "  bra %s\n", name);
   return 0;

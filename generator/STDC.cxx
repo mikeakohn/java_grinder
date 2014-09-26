@@ -447,14 +447,14 @@ int STDC::integer_to_short()
   return 0;
 }
 
-int STDC::jump_cond(const char *label, int cond)
+int STDC::jump_cond(const char *label, int cond, int distance)
 {
   fprintf(out, "  if (stack_%d %s 0) { goto %s; }\n", stack--, cond_str[cond], label);
 
   return 0;
 }
 
-int STDC::jump_cond_integer(const char *label, int cond)
+int STDC::jump_cond_integer(const char *label, int cond, int distance)
 {
   fprintf(out, "  if (stack_%d %s stack_%d) { goto %s; }\n", stack - 2, cond_str[cond], stack - 1, label);
   stack -= 2;
@@ -483,7 +483,7 @@ int STDC::return_void(int local_count)
   return 0;
 }
 
-int STDC::jump(const char *name)
+int STDC::jump(const char *name, int distance)
 {
   fprintf(out, "  goto %s;\n", name);
 

@@ -804,7 +804,7 @@ int AVR8::integer_to_short()
   return -1;
 }
 
-int AVR8::jump_cond(const char *label, int cond)
+int AVR8::jump_cond(const char *label, int cond, int distance)
 {
   bool reverse = false;
 
@@ -893,7 +893,7 @@ int AVR8::jump_cond(const char *label, int cond)
   return 0;
 }
 
-int AVR8::jump_cond_integer(const char *label, int cond)
+int AVR8::jump_cond_integer(const char *label, int cond, int distance)
 {
   bool reverse = false;
 
@@ -1044,7 +1044,7 @@ int AVR8::return_void(int local_count)
   return 0;
 }
 
-int AVR8::jump(const char *name)
+int AVR8::jump(const char *name, int distance)
 {
   JUMP(name);
 
