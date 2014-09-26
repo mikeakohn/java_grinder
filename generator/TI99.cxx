@@ -99,14 +99,30 @@ int TI99::ti99_printChar(int c)
 
 int TI99::ti99_setCursor()
 {
+  //mov @-24(r10), r3  ; push local_11
+  //mov @-24(r10), r4  ; push local_11
+  //mpy r4, r3
+  //mov r4, r3
 
-  return -1;
+  // (REG-1 * 32) + REG-2
+
+  // FIXME - Is this better as a function?
+  fprintf(out, "  li r0, 32\n");
+  fprintf(out, "  mpy r%d, r0\n", REG_STACK(reg-1));
+  fprintf(out, "  a r%d, r1\n", REG_STACK(reg-2));
+  fprintf(out, "  mov r1, r0\n");
+  fprintf(out, "  ai r0, 0x4000\n");
+  fprintf(out, "  bl @_vdp_command\n");
+
+  reg -= 2;
+
+  return 0;
 }
 
 int TI99::ti99_setCursor(int x, int y)
 {
   need_vdp_command = true;
-  int offset = (y * 40) + x;
+  int offset = (y * 32) + x;
   int address = offset + 0x4000;
 
   fprintf(out, "  li r0, 0x%04x   ; set write byte to %d\n", address, offset);

@@ -609,7 +609,8 @@ int TMS9900::return_void(int local_count)
 
 int TMS9900::jump(const char *name)
 {
-  fprintf(out, "  jmp %s\n", name);
+  //fprintf(out, "  jmp %s\n", name);
+  fprintf(out, "  b @%s\n", name);
   return 0;
 }
 
