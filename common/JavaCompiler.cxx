@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <assert.h>
 
 #include "JavaClass.h"
 #include "JavaCompiler.h"
@@ -35,6 +36,37 @@ static inline bool needs_label(uint8_t *label_map, int pc, int pc_start)
   }
 
   return false;
+}
+
+static int calc_distance(uint8_t *bytes, int pc, int pc_jump_to)
+{
+  int count = 0;
+
+  if (pc > pc_jump_to)
+  {
+    int temp = pc_jump_to;
+    pc_jump_to = pc;
+    pc = temp;
+  }
+
+  while(pc < pc_jump_to)
+  {
+    if (bytes[pc] == 0xc4)
+    {
+      pc++;
+      pc += table_java_instr[bytes[pc]].wide;
+    }
+      else
+    {
+      pc += table_java_instr[bytes[pc]].normal;
+    }
+
+    count++;
+  }
+
+  assert(pc == pc_jump_to);
+
+  return count;
 }
 
 uint8_t JavaCompiler::cond_table[] =
@@ -208,9 +240,10 @@ int const_vals[2];
     case 164: // if_icmple (0xa4)
     {
       char label[128];
-      int jump_to = address + GET_PC_INT16(1);
+      int byte_count = GET_PC_INT16(1);
+      int jump_to = address + byte_count;
       sprintf(label, "%s_%d", method_name, jump_to);
-      if (generator->jump_cond_integer(label, cond_table[bytes[pc]-159], const_val, jump_to - pc) == -1)
+      if (generator->jump_cond_integer(label, cond_table[bytes[pc]-159], const_val, calc_distance(bytes, pc, pc + byte_count)) == -1)
       { return 0; }
       return 3;
     }
@@ -321,10 +354,11 @@ int wide = 0;
       pc += skip_bytes;
       char label[128];
       address += skip_bytes;
-      int jump_to = address + GET_PC_INT16(1);
+      int byte_count = GET_PC_INT16(1);
+      int jump_to = address + byte_count;
       sprintf(label, "%s_%d", method_name, jump_to);
 
-      if (generator->jump_cond_zero(label, cond, jump_to - pc) != -1)
+      if (generator->jump_cond_zero(label, cond, calc_distance(bytes, pc, pc + byte_count)) != -1)
       {
         return skip_bytes + 3;
       }
@@ -600,7 +634,6 @@ int instruction_length;
         break;
 
       case 16: // bipush (0x10)
-        //PUSH_BYTE((char)bytes[pc+1])
         const_val = (int8_t)bytes[pc+1];
         ret = optimize_const(java_class, method_name, bytes, pc + 2,
                              pc_start + code_len, address + 2, const_val);
@@ -1362,9 +1395,10 @@ int instruction_length;
       case 157: // ifgt (0x9d)
       case 158: // ifle (0x9e)
       {
-        int jump_to = address + GET_PC_INT16(1);
+        int byte_count = GET_PC_INT16(1);
+        int jump_to = address + byte_count;
         sprintf(label, "%s_%d", method_name, jump_to);
-        ret = generator->jump_cond(label, cond_table[bytes[pc]-153], jump_to - pc);
+        ret = generator->jump_cond(label, cond_table[bytes[pc]-153], calc_distance(bytes, pc, pc + byte_count));
         break;
       }
       case 159: // if_icmpeq (0x9f)
@@ -1374,9 +1408,10 @@ int instruction_length;
       case 163: // if_icmpgt (0xa3)
       case 164: // if_icmple (0xa4)
       {
-        int jump_to = address + GET_PC_INT16(1);
+        int byte_count = GET_PC_INT16(1);
+        int jump_to = address + byte_count;
         sprintf(label, "%s_%d", method_name, jump_to);
-        ret = generator->jump_cond_integer(label, cond_table[bytes[pc]-159], jump_to - pc);
+        ret = generator->jump_cond_integer(label, cond_table[bytes[pc]-159], calc_distance(bytes, pc, pc + byte_count));
 
         break;
       }
@@ -1390,9 +1425,10 @@ int instruction_length;
 
       case 167: // goto (0xa7)
       {
-        int jump_to = address + GET_PC_INT16(1);
+        int byte_count = GET_PC_INT16(1);
+        int jump_to = address + byte_count;
         sprintf(label, "%s_%d", method_name, jump_to);
-        ret = generator->jump(label, jump_to - pc);
+        ret = generator->jump(label, calc_distance(bytes, pc, pc + byte_count));
         break;
       }
       case 168: // jsr (0xa8)
@@ -1663,9 +1699,10 @@ int instruction_length;
 
       case 200: // goto_w (0xc8)
       {
-        int jump_to = address + GET_PC_INT32(1);
+        int byte_count = GET_PC_INT32(1);
+        int jump_to = address + byte_count;
         sprintf(label, "%s_%d", method_name, jump_to);
-        ret = generator->jump(label, jump_to - pc);
+        ret = generator->jump(label, calc_distance(bytes, pc, pc + byte_count));
         break;
       }
       case 201: // jsr_w (0xc9)

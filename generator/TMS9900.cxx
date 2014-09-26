@@ -551,17 +551,38 @@ int TMS9900::jump_cond(const char *label, int cond, int distance)
 
   if (cond == COND_LESS_EQUAL)
   {
-    fprintf(out, "  jlt %s\n", label);
-    fprintf(out, "  jeq %s\n", label);
+    if (distance < 60)
+    {
+      fprintf(out, "  jlt %s\n", label);
+      fprintf(out, "  jeq %s\n", label);
+    }
+      else
+    {
+      fprintf(out, "  jgt _label_%d\n", label_count);
+      fprintf(out, "  b @%s\n", label);
+      fprintf(out, "_label_%d:\n", label_count);
+      label_count++;
+    }
   }
     else
   if (cond == COND_GREATER_EQUAL)
   {
-    fprintf(out, "  jgt %s\n", label);
-    fprintf(out, "  jeq %s\n", label);
+    if (distance < 60)
+    {
+      fprintf(out, "  jgt %s\n", label);
+      fprintf(out, "  jeq %s\n", label);
+    }
+      else
+    {
+      fprintf(out, "  jlt _label_%d\n", label_count);
+      fprintf(out, "  b @%s\n", label);
+      fprintf(out, "_label_%d:\n", label_count);
+      label_count++;
+    }
   }
     else
   {
+    // FIXME - Add distance reversal here too
     fprintf(out, "  %s %s\n", cond_str[cond], label);
   }
 
@@ -575,17 +596,38 @@ int TMS9900::jump_cond_integer(const char *label, int cond, int distance)
 
   if (cond == COND_LESS_EQUAL)
   {
-    fprintf(out, "  jlt %s\n", label);
-    fprintf(out, "  jeq %s\n", label);
+    if (distance < 60)
+    {
+      fprintf(out, "  jlt %s\n", label);
+      fprintf(out, "  jeq %s\n", label);
+    }
+      else
+    {
+      fprintf(out, "  jgt _label_%d\n", label_count);
+      fprintf(out, "  b @%s\n", label);
+      fprintf(out, "_label_%d:\n", label_count);
+      label_count++;
+    }
   }
     else
   if (cond == COND_GREATER_EQUAL)
   {
-    fprintf(out, "  jgt %s\n", label);
-    fprintf(out, "  jeq %s\n", label);
+    if (distance < 60)
+    {
+      fprintf(out, "  jgt %s\n", label);
+      fprintf(out, "  jeq %s\n", label);
+    }
+      else
+    {
+      fprintf(out, "  jlt _label_%d\n", label_count);
+      fprintf(out, "  b @%s\n", label);
+      fprintf(out, "_label_%d:\n", label_count);
+      label_count++;
+    }
   }
     else
   {
+    // FIXME - Add distance reversal here too
     fprintf(out, "  %s %s\n", cond_str[cond], label);
   }
 
@@ -609,8 +651,15 @@ int TMS9900::return_void(int local_count)
 
 int TMS9900::jump(const char *name, int distance)
 {
-  //fprintf(out, "  jmp %s\n", name);
-  fprintf(out, "  b @%s\n", name);
+  if (distance < 60)
+  {
+    fprintf(out, "  jmp %s\n", name);
+  }
+    else
+  {
+    fprintf(out, "  b @%s\n", name);
+  }
+
   return 0;
 }
 
