@@ -103,6 +103,7 @@ public:
 
 protected:
   void sign_extend();
+  int insert_conditional(const char *label, int cond, int distance);
 
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 

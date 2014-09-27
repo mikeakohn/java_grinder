@@ -549,6 +549,7 @@ int TMS9900::jump_cond(const char *label, int cond, int distance)
   fprintf(out, "  ci r%d, 0\n", REG_STACK(reg-1));
   reg--;
 
+#if 0
   if (cond == COND_LESS_EQUAL)
   {
     if (distance < 60)
@@ -585,8 +586,9 @@ int TMS9900::jump_cond(const char *label, int cond, int distance)
     // FIXME - Add distance reversal here too
     fprintf(out, "  %s %s\n", cond_str[cond], label);
   }
+#endif
 
-  return 0;
+  return insert_conditional(label, cond, distance);
 }
 
 int TMS9900::jump_cond_integer(const char *label, int cond, int distance)
@@ -594,6 +596,7 @@ int TMS9900::jump_cond_integer(const char *label, int cond, int distance)
   fprintf(out, "  c r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
   reg -= 2;
 
+#if 0
   if (cond == COND_LESS_EQUAL)
   {
     if (distance < 60)
@@ -630,8 +633,9 @@ int TMS9900::jump_cond_integer(const char *label, int cond, int distance)
     // FIXME - Add distance reversal here too
     fprintf(out, "  %s %s\n", cond_str[cond], label);
   }
+#endif
 
-  return 0;
+  return insert_conditional(label, cond, distance);
 }
 
 int TMS9900::return_local(int index, int local_count)
@@ -826,5 +830,75 @@ void TMS9900::sign_extend()
   fprintf(out, "  ori r%d, #0xff00\n", REG_STACK(reg-1));
   fprintf(out, "label_%d\n", label_count);
   label_count++;
+}
+
+int TMS9900::insert_conditional(const char *label, int cond, int distance)
+{
+  bool reverse_cond = false;
+
+  if (distance > 60)
+  {
+    reverse_cond = true;
+
+    switch(cond)
+    {
+      case COND_EQUAL: cond = COND_NOT_EQUAL; break;
+      case COND_NOT_EQUAL: cond = COND_EQUAL; break;
+      case COND_LESS: cond = COND_GREATER_EQUAL; break;
+      case COND_LESS_EQUAL: cond = COND_GREATER; break;
+      case COND_GREATER: cond = COND_LESS_EQUAL; break;
+      case COND_GREATER_EQUAL: cond = COND_LESS; break;
+    }
+  }
+
+  if (cond == COND_LESS_EQUAL)
+  {
+    if (!reverse_cond)
+    {
+      fprintf(out, "  jlt %s\n", label);
+      fprintf(out, "  jeq %s\n", label);
+    }
+      else
+    {
+      fprintf(out, "  jlt _label_%d\n", label_count);
+      fprintf(out, "  jeq _label_%d\n", label_count);
+      fprintf(out, "  b @%s\n", label);
+      fprintf(out, "_label_%d:\n", label_count);
+      label_count++;
+    }
+  }
+    else
+  if (cond == COND_GREATER_EQUAL)
+  {
+    if (!reverse_cond)
+    {
+      fprintf(out, "  jgt %s\n", label);
+      fprintf(out, "  jeq %s\n", label);
+    }
+      else
+    {
+      fprintf(out, "  jgt _label_%d\n", label_count);
+      fprintf(out, "  jeq _label_%d\n", label_count);
+      fprintf(out, "  b @%s\n", label);
+      fprintf(out, "_label_%d:\n", label_count);
+      label_count++;
+    }
+  }
+    else
+  {
+    if (!reverse_cond)
+    {
+      fprintf(out, "  %s %s\n", cond_str[cond], label);
+    }
+      else
+    {
+      fprintf(out, "  %s _label_%d\n", cond_str[cond], label_count);
+      fprintf(out, "  b @%s\n", label);
+      fprintf(out, "_label_%d:\n", label_count);
+      label_count++;
+    }
+  }
+
+  return 0;
 }
 
