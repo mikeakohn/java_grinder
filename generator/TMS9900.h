@@ -14,7 +14,8 @@
 
 #include "Generator.h"
 
-#define REG_STACK(a) (a+2)
+#define REG_START 2
+#define REG_STACK(a) (a+REG_START)
 
 class TMS9900 : public Generator
 {

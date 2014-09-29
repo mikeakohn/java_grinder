@@ -143,8 +143,18 @@ int TMS9900::insert_field_init(char *name, int index)
 void TMS9900::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
   is_main = (strcmp(name, "main") == 0) ? 1 : 0;
+
   fprintf(out, "%s:\n", name);
-  fprintf(out, "  ai r10, %d\n", local_count * 2);
+
+  if (is_main)
+  {
+    fprintf(out, "  ai r10, %d\n", local_count * 2);
+  }
+    else
+  {
+    fprintf(out, "  mov r11, *r10+\n");
+    fprintf(out, "  ai r10, %d\n", (local_count * 2));
+  }
 }
 
 void TMS9900::method_end(int local_count)
@@ -645,12 +655,22 @@ int TMS9900::return_local(int index, int local_count)
 
 int TMS9900::return_integer(int local_count)
 {
-  return -1;
+  // Top of stack goes to r0
+  fprintf(out, "  mov r%d, r0\n", REG_STACK(reg - 1));
+  fprintf(out, "  ai r10, -%d\n", (local_count * 2) + 2);
+  fprintf(out, "  mov @2(r10), r11\n");
+  fprintf(out, "  b *r11\n"); 
+
+  return 0;
 }
 
 int TMS9900::return_void(int local_count)
 {
-  return -1;
+  fprintf(out, "  ai r10, -%d\n", (local_count * 2) + 2);
+  fprintf(out, "  mov @2(r10), r11\n");
+  fprintf(out, "  b *r11\n"); 
+
+  return 0;
 }
 
 int TMS9900::jump(const char *name, int distance)
@@ -674,7 +694,43 @@ int TMS9900::call(const char *name)
 
 int TMS9900::invoke_static_method(const char *name, int params, int is_void)
 {
-  return -1;
+  int n;
+
+  // Push all registers from Java stack
+  for (n = REG_START; n < reg - params; n++)
+  {
+    fprintf(out, "  mov r%d, *r10+\n", n);
+  }
+
+  // Leave a spot for the return address
+  fprintf(out, "  inct r10\n");
+
+  // Push args onto stack
+  for (n = reg - params; n < reg; n++)
+  {
+    fprintf(out, "  mov r%d, *r10+\n", n);
+  }
+
+  // Call function (return value in r0)
+  fprintf(out, "  bl @%s\n", name);
+
+  // Remove return address (I think method can do this easier)
+  //fprintf(out, "  dect r10\n");
+
+  // Pop all registers from Java stack
+  for (n = reg - params - 1; n >= REG_START; n--)
+  {
+    fprintf(out, "  mov *r10-, r%d\n", n);
+  }
+
+  if (!is_void)
+  {
+    // Put r0 on the top of the stack
+    fprintf(out, "  mov r0, r%d\n", REG_STACK(reg));
+    reg++;
+  }
+
+  return 0;
 }
 
 int TMS9900::put_static(const char *name, int index)
