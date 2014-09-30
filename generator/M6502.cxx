@@ -607,7 +607,7 @@ int M6502::integer_to_byte()
 
 int M6502::integer_to_short()
 {
-  // FIXME - Joe fill this in please :).
+  // integers are already shorts to do nothing
   return 0;
 }
 
