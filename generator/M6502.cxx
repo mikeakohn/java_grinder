@@ -607,7 +607,7 @@ int M6502::integer_to_byte()
 
 int M6502::integer_to_short()
 {
-  // integers are already shorts to do nothing
+  // integers are already shorts so do nothing
   return 0;
 }
 
