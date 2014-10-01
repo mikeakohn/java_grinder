@@ -65,7 +65,7 @@ int TI99::start_init()
   fprintf(out, "_prog:\n");
   fprintf(out, "  .dw 0x0000\n");
   fprintf(out, "  .dw start\n");
-  fprintf(out, "  .db %d, \"%s\"\n", strlen(app_name), app_name);
+  fprintf(out, "  .db %d, \"%s\"\n", (int)strlen(app_name), app_name);
 
   fprintf(out, ".align 16\n\n");
 
