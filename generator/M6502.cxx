@@ -119,8 +119,8 @@ int M6502::open(const char *filename)
   fprintf(out, "address equ 0xfb\n");
 
   // java stack
-  fprintf(out, "stack_lo equ 0xc000\n");
-  fprintf(out, "stack_hi equ 0xc100\n");
+  fprintf(out, "stack_lo equ 0x9000\n");
+  fprintf(out, "stack_hi equ 0x9100\n");
   fprintf(out, "SP equ 0xfd\n");
 
   // points to locals
