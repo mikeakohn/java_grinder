@@ -152,8 +152,8 @@ void TMS9900::method_start(int local_count, int max_stack, int param_count, cons
   }
     else
   {
-    fprintf(out, "  mov r11, *r10+\n");
-    fprintf(out, "  ai r10, %d\n", (local_count * 2));
+    fprintf(out, "  mov *r11, *r10\n");
+    fprintf(out, "  ai r10, %d\n", ((local_count + 1) * 2));
   }
 }
 
@@ -658,8 +658,9 @@ int TMS9900::return_integer(int local_count)
   // Top of stack goes to r0
   fprintf(out, "  mov r%d, r0\n", REG_STACK(reg - 1));
   fprintf(out, "  ai r10, -%d\n", (local_count * 2) + 2);
-  fprintf(out, "  mov @2(r10), r11\n");
+  fprintf(out, "  mov *r10, *r11\n");
   fprintf(out, "  b *r11\n"); 
+  //fprintf(out, "  b *r10\n"); 
 
   return 0;
 }
@@ -667,8 +668,9 @@ int TMS9900::return_integer(int local_count)
 int TMS9900::return_void(int local_count)
 {
   fprintf(out, "  ai r10, -%d\n", (local_count * 2) + 2);
-  fprintf(out, "  mov @2(r10), r11\n");
+  fprintf(out, "  mov *r10, *r11\n");
   fprintf(out, "  b *r11\n"); 
+  //fprintf(out, "  b *r10\n"); 
 
   return 0;
 }
@@ -699,16 +701,18 @@ int TMS9900::invoke_static_method(const char *name, int params, int is_void)
   // Push all registers from Java stack
   for (n = REG_START; n < reg - params; n++)
   {
-    fprintf(out, "  mov r%d, *r10+\n", n);
+    fprintf(out, "  mov r%d, *r10+\n", REG_STACK(n));
   }
 
   // Leave a spot for the return address
-  fprintf(out, "  inct r10\n");
+  //fprintf(out, "  inct r10\n");
 
   // Push args onto stack
+  int local_var = 0;
   for (n = reg - params; n < reg; n++)
   {
-    fprintf(out, "  mov r%d, *r10+\n", n);
+    fprintf(out, "  mov r%d, @%d(r10)\n", REG_STACK(n), ((local_var + 1) * 2));
+    local_var++;
   }
 
   // Call function (return value in r0)
@@ -720,8 +724,11 @@ int TMS9900::invoke_static_method(const char *name, int params, int is_void)
   // Pop all registers from Java stack
   for (n = reg - params - 1; n >= REG_START; n--)
   {
-    fprintf(out, "  mov *r10-, r%d\n", n);
+    fprintf(out, "  ai r10, -1\n");
+    fprintf(out, "  mov *r10, r%d\n", REG_STACK(n));
   }
+
+  reg -= params;
 
   if (!is_void)
   {
