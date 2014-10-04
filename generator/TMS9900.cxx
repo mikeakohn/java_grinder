@@ -17,7 +17,7 @@
 
 #include "TMS9900.h"
 
-#define LOCALS(i) ((i + 1) * 2)
+#define LOCALS(i) (i * 2)
 #define CHECK_STACK() \
   if (reg >= reg_max) { printf("Internal error: Stack blown.\n"); return -1; }
 
@@ -28,9 +28,9 @@
 // ..
 // ..
 // r9 end of stack
-// r10 Pointer to locals (or should say, pointer to top of local heap?)
+// r10 Pointer to next chunk of free RAM
 // r11 return address
-// r12 CRU base address
+// r12 CRU base address / point to locals
 // r13 Saved WP register
 // r14 Saved PC register
 // r15 Saved ST register
@@ -148,12 +148,15 @@ void TMS9900::method_start(int local_count, int max_stack, int param_count, cons
 
   if (is_main)
   {
+    fprintf(out, "  mov r10, r12\n");
     fprintf(out, "  ai r10, %d\n", local_count * 2);
   }
     else
   {
-    fprintf(out, "  mov *r11, *r10\n");
-    fprintf(out, "  ai r10, %d\n", ((local_count + 1) * 2));
+    fprintf(out, "  mov *r11, *r10+\n");
+    fprintf(out, "  mov r12, *r10+\n");
+    fprintf(out, "  mov r10, r12\n");
+    fprintf(out, "  ai r10, %d\n", (local_count * 2));
   }
 }
 
@@ -184,12 +187,19 @@ int TMS9900::push_integer_local(int index)
 {
   if (reg < reg_max)
   {
-    fprintf(out, "  mov @-%d(r10), r%d  ; push local_%d\n", LOCALS(index), REG_STACK(reg), index);
+    if (index == 0)
+    {
+      fprintf(out, "  mov *r12, r%d  ; push local_%d\n", REG_STACK(reg), index);
+    }
+      else
+    {
+      fprintf(out, "  mov @%d(r12), r%d  ; push local_%d\n", LOCALS(index), REG_STACK(reg), index);
+    }
     reg++;
   }
     else
   {
-    //fprintf(out, "  push -%d(r10)  ; push local_%d\n", LOCALS(index), index);
+    //fprintf(out, "  push %d(r12)  ; push local_%d\n", LOCALS(index), index);
     //stack++;
     // FIXME
     printf("ERROR: Need to add stack support\n");
@@ -268,14 +278,21 @@ int TMS9900::pop_integer_local(int index)
 #if 0
   if (stack > 0)
   {
-    fprintf(out, "  pop -%d(r10)  ; pop local_%d\n", LOCALS(index), index);
+    fprintf(out, "  pop %d(r12)  ; pop local_%d\n", LOCALS(index), index);
     stack--;
   }
     else
 #endif
   if (reg > 0)
   {
-    fprintf(out, "  mov r%d, @-%d(r10) ; pop local_%d\n", REG_STACK(reg-1), LOCALS(index), index);
+    if (index == 0)
+    {
+      fprintf(out, "  mov r%d, *r12 ; pop local_%d\n", REG_STACK(reg-1), index);
+    }
+      else
+    {
+      fprintf(out, "  mov r%d, @%d(r12) ; pop local_%d\n", REG_STACK(reg-1), LOCALS(index), index);
+    }
     reg--;
   }
     else
@@ -538,7 +555,14 @@ int TMS9900::xor_integer(int num)
 int TMS9900::inc_integer(int index, int num)
 {
   fprintf(out, "  li r0, %d\n", num);
-  fprintf(out, "  a r0, @-%d(r10)\n", LOCALS(index));
+  if (index == 0)
+  {
+    fprintf(out, "  a r0, *r12 ; inc local_%d by %d\n", index, num);
+  }
+    else
+  {
+    fprintf(out, "  a r0, @%d(r12) ; inc local_%d by %d\n", LOCALS(index), index, num);
+  }
   return 0;
 }
 
@@ -657,20 +681,20 @@ int TMS9900::return_integer(int local_count)
 {
   // Top of stack goes to r0
   fprintf(out, "  mov r%d, r0\n", REG_STACK(reg - 1));
-  fprintf(out, "  ai r10, -%d\n", (local_count * 2) + 2);
+  fprintf(out, "  ai r10, -%d\n", (local_count * 2) + 4);
   fprintf(out, "  mov *r10, *r11\n");
+  fprintf(out, "  mov @2(r10), r12\n");
   fprintf(out, "  b *r11\n"); 
-  //fprintf(out, "  b *r10\n"); 
 
   return 0;
 }
 
 int TMS9900::return_void(int local_count)
 {
-  fprintf(out, "  ai r10, -%d\n", (local_count * 2) + 2);
+  fprintf(out, "  ai r10, -%d\n", (local_count * 2) + 4);
   fprintf(out, "  mov *r10, *r11\n");
+  fprintf(out, "  mov @2(r10), r12\n");
   fprintf(out, "  b *r11\n"); 
-  //fprintf(out, "  b *r10\n"); 
 
   return 0;
 }
@@ -707,11 +731,12 @@ int TMS9900::invoke_static_method(const char *name, int params, int is_void)
   // Leave a spot for the return address
   //fprintf(out, "  inct r10\n");
 
-  // Push args onto stack
+  // Put args into locals address space
   int local_var = 0;
   for (n = reg - params; n < reg; n++)
   {
-    fprintf(out, "  mov r%d, @%d(r10)\n", REG_STACK(n), ((local_var + 1) * 2));
+    int offset = (local_var * 2) + 4;
+    fprintf(out, "  mov r%d, @%d(r10)  ; local_%d\n", REG_STACK(n), offset, local_var);
     local_var++;
   }
 
