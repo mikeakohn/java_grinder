@@ -10,7 +10,7 @@ public class TI84Demo
   {
     int n,x,y,ptr,pixels;
 
-    blah = Logo.logo_count;
+    //blah = Logo.logo_count;
 
     TI84.clearScreen();
     TI84.putc('H');
@@ -33,7 +33,8 @@ public class TI84Demo
     {
       for (x = 0; x < 96 / 8; x++)
       {
-        pixels = Logo.logo[ptr++];
+        //pixels = Logo.logo[ptr++];
+        pixels = 0;
 
         for (n = 0; n < 8; n++)
         {
