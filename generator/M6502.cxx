@@ -36,7 +36,7 @@
   fprintf(out, "; POP_HI\n"); \
   fprintf(out, "  inc SP\n"); \
   fprintf(out, "  ldy SP\n"); \
-  fprintf(out, "  lda stack_hi,y\n"); \
+  fprintf(out, "  lda stack_hi,y\n")
 
 #define POP_LO \
   fprintf(out, "; POP_LO\n"); \
