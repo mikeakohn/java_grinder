@@ -118,11 +118,32 @@ static void get_signature(char *signature, int *params, int *is_void)
       break;
     }
       else
+    if (*signature == 'L')
+    {
+      while(*signature != ';' && *signature != 0)
+      {
+        signature++; 
+      }
+      if (*signature == 0) { signature--; }
+
+      (*params)++;
+    }
+      else
     {
       (*params)++;
     }
 
+
     signature++;
+  }
+}
+
+static void remove_illegal_chars(char *function)
+{
+  while(*function != 0)
+  {
+    if (*function == '/' || *function == ';') { *function = '_'; }
+    function++;
   }
 }
 
@@ -266,6 +287,7 @@ char function[256];
     {
       int params,is_void;
       get_signature(method_sig, &params, &is_void);
+      remove_illegal_chars(function);
       ret = generator->invoke_static_method(function, params, is_void);
     }
   }

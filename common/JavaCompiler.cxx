@@ -521,11 +521,26 @@ int instruction_length;
     java_class->get_name_constant(method_sig, sizeof(method_sig), method->descriptor_index);
 
     char *s = method_sig + 1;
-    while(*s != ')' && *s != 0) { param_count++; s++; }
+    while(*s != ')' && *s != 0)
+    {
+      if (*s == 'L')
+      {
+        while(*s != ';' && *s != 0)
+        {
+          if (*s == '/') { *s = '_'; }
+          s++;
+        }
+        if (*s == ';') { *s = '_'; }
+        else if (*s == 0) { s--; }
+      }
+
+      param_count++;
+      s++;
+    }
     *s = 0;
     method_sig[0] = '_';
     if (method_sig[1] != 0 ) { strcat(method_name, method_sig); }
-    printf("Using method name '%s'\n", method_name);
+    printf("Using method name '%s' param_count=%d\n", method_name, param_count);
   }
     else
   {
@@ -1535,6 +1550,7 @@ int instruction_length;
           if (strcmp("Ljava/lang/String;", type) == 0)
           {
             printf("  static is %s (will invoke)\n", field_name);
+            //generator->push_ref(field_name);
             operand_stack[operand_stack_ptr++] = ref;
           }
         }
