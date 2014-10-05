@@ -22,10 +22,8 @@ TI99::TI99() : need_vdp_command(false)
 
 TI99::~TI99()
 {
-  if (need_vdp_command)
-  {
-    insert_vdp_command();
-  }
+  if (need_vdp_command) { insert_vdp_command(); }
+  if (need_write_string) { insert_write_string(); }
 }
 
 int TI99::open(const char *filename)
@@ -77,7 +75,13 @@ int TI99::start_init()
 
 int TI99::ti99_print()
 {
-  return -1;
+  need_write_string = true;
+
+  fprintf(out, "  mov r%d, r1\n", REG_STACK(reg-1));
+  fprintf(out, "  bl @_write_string\n");
+  reg--;
+
+  return 0;
 }
 
 int TI99::ti99_printChar()
@@ -134,10 +138,10 @@ int TI99::ti99_setCursor(int x, int y)
 void TI99::insert_write_string()
 {
   fprintf(out, "_write_string:\n");
-  fprintf(out, "  movb *r2+, r0\n");
+  fprintf(out, "  movb *r1+, r0\n");
   fprintf(out, "  jeq _write_string_exit\n");
   fprintf(out, "  mov r0, @VDP_WRITE\n");
-  fprintf(out, "  jmp write_string\n");
+  fprintf(out, "  jmp _write_string\n");
   fprintf(out, "_write_string_exit:\n");
   fprintf(out, "  b *r11\n\n");
 }

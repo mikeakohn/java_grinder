@@ -32,7 +32,8 @@ private:
   void insert_write_string();
   void insert_vdp_command();
 
-  bool need_vdp_command;
+  bool need_vdp_command:1;
+  bool need_write_string:1;
   char app_name[16];
 };
 
