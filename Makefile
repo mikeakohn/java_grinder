@@ -54,6 +54,7 @@ ti84: samples
 clean:
 	@rm -f *.o java_grinder build/*.o *.asm *.lst *.hex *.prg
 	@rm -f java/*.class samples/*.class build/*.jar
+	@cd samples && make clean
 	@rm -rf build/net
 	@echo "Clean!"
 

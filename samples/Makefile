@@ -1,5 +1,5 @@
 
-JAVA_SRC=\
+#JAVA_SRC=\
   Arrays.java \
   CommodoreDemo.java \
   DSPTest.java \
@@ -19,8 +19,22 @@ JAVA_SRC=\
   TimerTest.java
 
 default:
-	javac -classpath ../build/JavaGrinder.jar:. $(JAVA_SRC)
+	@make -C c64
+	@make -C dspic
+	@make -C misc
+	@make -C msp430
+	@make -C ti84
+	@make -C ti99
 
 %.class: %.java
 	javac -classpath ../build/JavaGrinder.jar:. $*.java
+
+clean:
+	@cd c64 && make clean
+	@cd dspic && make clean
+	@cd misc && make clean
+	@cd msp430 && make clean
+	@cd ti84 && make clean
+	@cd ti99 && make clean
+
 

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<romset version="1.0">
+   <resources>
+      <rom id="C" file="grinder_demo_ti99.bin"/>
+   </resources>
+   <configuration>
+      <pcb type="paged">
+         <socket id="rom_socket" uses="C"/>
+      </pcb>
+   </configuration>
+</romset>

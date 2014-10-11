@@ -8,7 +8,7 @@ import net.mikekohn.java_grinder.DSP;
 // Unfortunately this has to be different than the MSP430 since
 // different pins are being used to do this.
 
-public class LCDDSPIC
+public class Mandelbrot
 {
   // For Philips base Nokia 6100 LCD, we use these commands
   static final int NOP = 0x00;      // nop
