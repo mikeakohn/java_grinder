@@ -21,6 +21,9 @@ public:
   virtual int ti99_printChar(int c) { return -1; }
   virtual int ti99_setCursor() { return -1; }
   virtual int ti99_setCursor(int x, int y) { return -1; }
+  //virtual int ti99_setTextColor() { return -1; }
+  virtual int ti99_setGraphicsMode() { return -1; }
+  virtual int ti99_setGraphicsMode(int mode) { return -1; }
 };
 
 #endif

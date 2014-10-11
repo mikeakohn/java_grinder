@@ -27,6 +27,9 @@ public:
   virtual int ti99_printChar(int c);
   virtual int ti99_setCursor();
   virtual int ti99_setCursor(int x, int y);
+  //virtual int ti99_setTextColor();
+  virtual int ti99_setGraphicsMode();
+  virtual int ti99_setGraphicsMode(int mode);
 
 private:
   void insert_write_string();

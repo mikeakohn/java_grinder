@@ -40,6 +40,8 @@ int ti99(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(print,_Ljava/lang/String;)
   CHECK_FUNC(printChar,_C)
   CHECK_FUNC(setCursor,_II)
+  //CHECK_FUNC(setTextColor,_III)
+  CHECK_FUNC(setGraphicsMode,_I)
 
   return -1;
 }
@@ -47,6 +49,7 @@ int ti99(JavaClass *java_class, Generator *generator, char *method_name)
 int ti99(JavaClass *java_class, Generator *generator, char *method_name, int const_val)
 {
   CHECK_FUNC_CONST(printChar,_C)
+  CHECK_FUNC_CONST(setGraphicsMode,_I)
 
   return -1;
 }
