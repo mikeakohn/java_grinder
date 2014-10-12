@@ -549,6 +549,13 @@ int C64::c64_vic_hires_plot(/* x, y, value */)
   return 0;
 }
 
+int C64::c64_vic_make_hires_tables()
+{
+  need_c64_vic_make_hires_tables = 1;
+  fprintf(out, "  jsr make_hires_tables\n");
+  return 0;
+}
+
 int C64::c64_vic_text_enable()
 {
   need_c64_vic_text_enable = 1;
@@ -642,7 +649,7 @@ void C64::insert_c64_vic_hires_plot()
   POP_HI;
   POP_LO;
   fprintf(out, "  tay\n");
-  // row lo/hi
+  // address lo/hi
   fprintf(out, "  lda 0x0400,y\n");
   fprintf(out, "  sta address + 0\n");
   fprintf(out, "  lda 0x0500,y\n");
@@ -654,7 +661,7 @@ void C64::insert_c64_vic_hires_plot()
   fprintf(out, "  sta result + 0\n");
   // x & 7
   fprintf(out, "  and #7\n");
-  fprintf(out, "  sta value + 0\n");
+  fprintf(out, "  sta value1 + 0\n");
   // x / 8
   fprintf(out, "  lsr result + 1\n");
   fprintf(out, "  ror result + 0\n");
@@ -669,13 +676,13 @@ void C64::insert_c64_vic_hires_plot()
   fprintf(out, "  lda 0x0600,y\n");
   fprintf(out, "  adc address + 0\n");
   fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda #0\n");
+  fprintf(out, "  lda 0x0640,y\n");
   fprintf(out, "  adc address + 1\n");
   fprintf(out, "  sta address + 1\n");
   // read byte
   fprintf(out, "  ldy #0\n");
   fprintf(out, "  lda (address),y\n");
-  fprintf(out, "  ldy value + 0\n");
+  fprintf(out, "  ldy value1 + 0\n");
   fprintf(out, "  ora 0x0700,y\n");
   fprintf(out, "  ldy #0\n");
   fprintf(out, "  sta (address),y\n");
@@ -685,6 +692,102 @@ void C64::insert_c64_vic_hires_plot()
 
 void C64::insert_c64_vic_make_hires_tables()
 {
+  fprintf(out, "make_hires_tables:\n");
+  // row tables
+  fprintf(out, "  lda #0x00\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda #0xe0\n");
+  fprintf(out, "  sta address + 1\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "make_hires_tables_loop1:\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda address + 0\n");
+  fprintf(out, "  sta 0x0400,y\n");
+  fprintf(out, "  adc #1\n");
+  fprintf(out, "  sta 0x0401,y\n");
+  fprintf(out, "  adc #1\n");
+  fprintf(out, "  sta 0x0402,y\n");
+  fprintf(out, "  adc #1\n");
+  fprintf(out, "  sta 0x0403,y\n");
+  fprintf(out, "  adc #1\n");
+  fprintf(out, "  sta 0x0404,y\n");
+  fprintf(out, "  adc #1\n");
+  fprintf(out, "  sta 0x0405,y\n");
+  fprintf(out, "  adc #1\n");
+  fprintf(out, "  sta 0x0406,y\n");
+  fprintf(out, "  adc #1\n");
+  fprintf(out, "  sta 0x0407,y\n");
+  fprintf(out, "  lda address + 1\n");
+  fprintf(out, "  sta 0x0500,y\n");
+  fprintf(out, "  sta 0x0501,y\n");
+  fprintf(out, "  sta 0x0502,y\n");
+  fprintf(out, "  sta 0x0503,y\n");
+  fprintf(out, "  sta 0x0504,y\n");
+  fprintf(out, "  sta 0x0505,y\n");
+  fprintf(out, "  sta 0x0506,y\n");
+  fprintf(out, "  sta 0x0507,y\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda #0x40\n");
+  fprintf(out, "  adc address + 0\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda #0x01\n");
+  fprintf(out, "  adc address + 1\n");
+  fprintf(out, "  sta address + 1\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  bne make_hires_tables_loop1\n");
+
+  // col table
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "make_hires_tables_loop3:\n");
+  fprintf(out, "  sta 0x0600,y\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  adc #8\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  bne make_hires_tables_loop3\n");
+
+  fprintf(out, "  ldy #40\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "make_hires_tables_loop4:\n");
+  fprintf(out, "  sta 0x0640,y\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bne make_hires_tables_loop4\n");
+
+  fprintf(out, "  lda #1\n");
+  fprintf(out, "  sta 0x0660\n");
+  fprintf(out, "  sta 0x0661\n");
+  fprintf(out, "  sta 0x0662\n");
+  fprintf(out, "  sta 0x0663\n");
+  fprintf(out, "  sta 0x0664\n");
+  fprintf(out, "  sta 0x0665\n");
+  fprintf(out, "  sta 0x0666\n");
+  fprintf(out, "  sta 0x0667\n");
+
+  // bit table
+  fprintf(out, "  lda #128\n");
+  fprintf(out, "  sta 0x0700\n");
+  fprintf(out, "  lda #64\n");
+  fprintf(out, "  sta 0x0701\n");
+  fprintf(out, "  lda #32\n");
+  fprintf(out, "  sta 0x0702\n");
+  fprintf(out, "  lda #16\n");
+  fprintf(out, "  sta 0x0703\n");
+  fprintf(out, "  lda #8\n");
+  fprintf(out, "  sta 0x0704\n");
+  fprintf(out, "  lda #4\n");
+  fprintf(out, "  sta 0x0705\n");
+  fprintf(out, "  lda #2\n");
+  fprintf(out, "  sta 0x0706\n");
+  fprintf(out, "  lda #1\n");
+  fprintf(out, "  sta 0x0707\n");
+  fprintf(out, "  rts\n");
 }
 
 void C64::insert_c64_vic_text_enable()

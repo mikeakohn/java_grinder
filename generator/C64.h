@@ -83,6 +83,7 @@ public:
   virtual int c64_vic_hires_enable();
   virtual int c64_vic_hires_clear();
   virtual int c64_vic_hires_plot();
+  virtual int c64_vic_make_hires_tables();
   virtual int c64_vic_text_enable();
   virtual int c64_vic_text_clear();
   virtual int c64_vic_text_plot();

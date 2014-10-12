@@ -904,21 +904,10 @@ public class CommodoreDemo
     VIC.text_enable();
   }
 
-  public static void plot(int x, int y)
-  {
-    int address = hires_ram + (40 * (y & 248)) + (x & 504) + (y & 7);
-
-    int temp = Memory.read8(address) & 255;
-    temp |= pixel_table[x & 7];
-    Memory.write8(address, (byte)temp);
-  }
-
   public static void yin_yang()
   {
     VIC.background(5);
     VIC.border(0);
-
-    int i;
 
     VIC.text_clear(16);
     VIC.color_ram_clear(0);
@@ -945,8 +934,8 @@ public class CommodoreDemo
           // this makes a checkerboard background
           if(((k & 1) ^ (j & 1)) == 1)
           {
-            plot(95 + (129 - k), 60 + (82 - j));
-            plot(95 + k, 60 + j);
+            VIC.hires_plot(95 + (129 - k), 60 + (82 - j), 1);
+            VIC.hires_plot(95 + k, 60 + j, 1);
           }
           continue;
         }
@@ -956,12 +945,12 @@ public class CommodoreDemo
         temp2 += temp1;
         if(temp2 < 30 )
         {
-          plot(95 + k, 60 + j);
+          VIC.hires_plot(95 + k, 60 + j, 1);
           continue;
         }
         if(temp2 < 342 )
         {
-          plot(95 + (129 - k), 60 + (82 - j));
+          VIC.hires_plot(95 + (129 - k), 60 + (82 - j), 1);
           continue;
         }
 
@@ -970,22 +959,23 @@ public class CommodoreDemo
         temp2 += temp1;
         if(temp2 < 30 )
         {
-          plot(95 + (129 - k), 60 + (82 - j));
+          VIC.hires_plot(95 + (129 - k), 60 + (82 - j), 1);
           continue;
         }
         if(temp2 < 342 )
         {
-          plot(95 + k, 60 + j);
+          VIC.hires_plot(95 + k, 60 + j, 1);
           continue;
         }
 
-        plot(95 + k, 60 + j);
+        VIC.hires_plot(95 + k, 60 + j, 1);
       }
     }
   }
 
   public static void main()
   {
+    VIC.make_hires_tables();
     java_screen();
     wipe();
     musak_init();
