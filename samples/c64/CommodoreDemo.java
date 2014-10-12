@@ -955,7 +955,8 @@ public class CommodoreDemo
     {
       for(k = 65; k <= 129; k++)
       {
-        temp1 = (13 * (k - 65)) / 21;
+        //temp1 = (13 * (k - 65)) / 21;
+        temp1 = (13 * (k - 65)) >> 4;
         temp1 *= temp1;
 
         temp2 = (41 - j);
