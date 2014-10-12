@@ -23,24 +23,21 @@
 
 #define PUSH_LO \
   fprintf(out, "; PUSH_LO\n"); \
-  fprintf(out, "  ldy SP\n"); \
-  fprintf(out, "  sta stack_lo,y\n")
+  fprintf(out, "  sta stack_lo,x\n")
 
 #define PUSH_HI \
   fprintf(out, "; PUSH_HI\n"); \
-  fprintf(out, "  ldy SP\n"); \
-  fprintf(out, "  sta stack_hi,y\n"); \
-  fprintf(out, "  dec SP\n")
+  fprintf(out, "  sta stack_hi,x\n"); \
+  fprintf(out, "  dex\n")
 
 #define POP_HI \
   fprintf(out, "; POP_HI\n"); \
-  fprintf(out, "  inc SP\n"); \
-  fprintf(out, "  ldy SP\n"); \
-  fprintf(out, "  lda stack_hi,y\n")
+  fprintf(out, "  inx\n"); \
+  fprintf(out, "  lda stack_hi,x\n")
 
 #define POP_LO \
   fprintf(out, "; POP_LO\n"); \
-  fprintf(out, "  lda stack_lo,y\n")
+  fprintf(out, "  lda stack_lo,x\n")
 
 #define POKE(dst) \
   POP_HI; \
@@ -78,7 +75,6 @@ int C64::open(const char *filename)
   // java stack
   fprintf(out, "stack_lo equ 0x200\n");
   fprintf(out, "stack_hi equ 0x300\n");
-  fprintf(out, "SP equ 0xfd\n");
 
   // points to locals
   fprintf(out, "locals equ 0xfe\n");
@@ -119,7 +115,6 @@ int C64::open(const char *filename)
   fprintf(out, "  sei\n");
   fprintf(out, "  cld\n");
   fprintf(out, "  lda #0xff\n");
-  fprintf(out, "  sta SP\n");
   fprintf(out, "  tax\n");
   fprintf(out, "  txs\n");
 
@@ -134,25 +129,25 @@ int C64::open(const char *filename)
   // copy charset from ROM
   fprintf(out, "  lda #50\n");
   fprintf(out, "  sta 0x0001\n");
-  fprintf(out, "  ldx #0\n");
+  fprintf(out, "  ldy #0\n");
   fprintf(out, "copy_charset_loop:\n");
-  fprintf(out, "  lda 0xd000,x\n");
-  fprintf(out, "  sta 0xc800,x\n");
-  fprintf(out, "  lda 0xd100,x\n");
-  fprintf(out, "  sta 0xc900,x\n");
-  fprintf(out, "  lda 0xd200,x\n");
-  fprintf(out, "  sta 0xca00,x\n");
-  fprintf(out, "  lda 0xd300,x\n");
-  fprintf(out, "  sta 0xcb00,x\n");
-  fprintf(out, "  lda 0xd400,x\n");
-  fprintf(out, "  sta 0xcc00,x\n");
-  fprintf(out, "  lda 0xd500,x\n");
-  fprintf(out, "  sta 0xcd00,x\n");
-  fprintf(out, "  lda 0xd600,x\n");
-  fprintf(out, "  sta 0xce00,x\n");
-  fprintf(out, "  lda 0xd700,x\n");
-  fprintf(out, "  sta 0xcf00,x\n");
-  fprintf(out, "  dex\n");
+  fprintf(out, "  lda 0xd000,y\n");
+  fprintf(out, "  sta 0xc800,y\n");
+  fprintf(out, "  lda 0xd100,y\n");
+  fprintf(out, "  sta 0xc900,y\n");
+  fprintf(out, "  lda 0xd200,y\n");
+  fprintf(out, "  sta 0xca00,y\n");
+  fprintf(out, "  lda 0xd300,y\n");
+  fprintf(out, "  sta 0xcb00,y\n");
+  fprintf(out, "  lda 0xd400,y\n");
+  fprintf(out, "  sta 0xcc00,y\n");
+  fprintf(out, "  lda 0xd500,y\n");
+  fprintf(out, "  sta 0xcd00,y\n");
+  fprintf(out, "  lda 0xd600,y\n");
+  fprintf(out, "  sta 0xce00,y\n");
+  fprintf(out, "  lda 0xd700,y\n");
+  fprintf(out, "  sta 0xcf00,y\n");
+  fprintf(out, "  dey\n");
   fprintf(out, "  bne copy_charset_loop\n");
 
   // turn off ROM chips
@@ -277,10 +272,10 @@ int C64::c64_sid_voice3_envelope(/* value */) { POKE(0xd41c); return 0; }
 int C64::c64_sid_clear()
 {
   fprintf(out, "; sid clear\n");
-  fprintf(out, "  ldx #0x1c\n");
+  fprintf(out, "  ldy #0x1c\n");
   fprintf(out, "  lda #0\n");
-  fprintf(out, "  sta 0xd400,x\n");
-  fprintf(out, "  dex\n");
+  fprintf(out, "  sta 0xd400,y\n");
+  fprintf(out, "  dey\n");
   fprintf(out, "  bpl #-8\n");
 
   return 0;
