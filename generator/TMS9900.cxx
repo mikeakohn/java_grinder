@@ -153,7 +153,7 @@ void TMS9900::method_start(int local_count, int max_stack, int param_count, cons
   }
     else
   {
-    fprintf(out, "  mov *r11, *r10+\n");
+    fprintf(out, "  mov r11, *r10+\n");
     fprintf(out, "  mov r12, *r10+\n");
     fprintf(out, "  mov r10, r12\n");
     fprintf(out, "  ai r10, %d\n", (local_count * 2));
@@ -682,7 +682,7 @@ int TMS9900::return_integer(int local_count)
   // Top of stack goes to r0
   fprintf(out, "  mov r%d, r0\n", REG_STACK(reg - 1));
   fprintf(out, "  ai r10, -%d\n", (local_count * 2) + 4);
-  fprintf(out, "  mov *r10, *r11\n");
+  fprintf(out, "  mov *r10, r11\n");
   fprintf(out, "  mov @2(r10), r12\n");
   fprintf(out, "  b *r11\n"); 
 
@@ -692,7 +692,7 @@ int TMS9900::return_integer(int local_count)
 int TMS9900::return_void(int local_count)
 {
   fprintf(out, "  ai r10, -%d\n", (local_count * 2) + 4);
-  fprintf(out, "  mov *r10, *r11\n");
+  fprintf(out, "  mov *r10, r11\n");
   fprintf(out, "  mov @2(r10), r12\n");
   fprintf(out, "  b *r11\n"); 
 
