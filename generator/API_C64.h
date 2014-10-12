@@ -76,6 +76,7 @@ public:
   virtual int c64_vic_hires_enable() { return -1; }
   virtual int c64_vic_hires_clear() { return -1; }
   virtual int c64_vic_hires_plot() { return -1; }
+  virtual int c64_vic_make_hires_tables() { return -1; }
   virtual int c64_vic_text_enable() { return -1; }
   virtual int c64_vic_text_clear() { return -1; }
   virtual int c64_vic_text_plot() { return -1; }

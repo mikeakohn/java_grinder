@@ -142,6 +142,7 @@ public class VIC
   public static void hires_enable() { }
   public static void hires_clear(int value) { }
   public static void hires_plot(int x, int y, int value) { }
+  public static void make_hires_tables() { }
   public static void text_enable() { }
   public static void text_clear(int value) { }
   public static void text_plot(int x, int y, int value) { }

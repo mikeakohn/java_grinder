@@ -223,6 +223,11 @@ static int c64_vic_hires_plot(JavaClass *java_class, Generator *generator)
   return generator->c64_vic_hires_plot();
 }
 
+static int c64_vic_make_hires_tables(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_make_hires_tables();
+}
+
 static int c64_vic_text_enable(JavaClass *java_class, Generator *generator)
 {
   return generator->c64_vic_text_enable();
@@ -286,6 +291,7 @@ int c64_vic(JavaClass *java_class, Generator *generator, char *function)
   CHECK_FUNC(hires_enable)
   CHECK_FUNC(hires_clear)
   CHECK_FUNC(hires_plot)
+  CHECK_FUNC(make_hires_tables)
   CHECK_FUNC(text_enable)
   CHECK_FUNC(text_clear)
   CHECK_FUNC(text_plot)

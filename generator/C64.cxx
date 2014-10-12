@@ -54,6 +54,7 @@ C64::C64() :
   need_c64_vic_hires_enable(0),
   need_c64_vic_hires_clear(0),
   need_c64_vic_hires_plot(0),
+  need_c64_vic_make_hires_tables(0),
   need_c64_vic_text_enable(0),
   need_c64_vic_text_clear(0),
   need_c64_vic_text_plot(0),
@@ -67,6 +68,7 @@ C64::~C64()
   if(need_c64_vic_hires_enable) { insert_c64_vic_hires_enable(); }
   if(need_c64_vic_hires_clear) { insert_c64_vic_hires_clear(); }
   if(need_c64_vic_hires_plot) { insert_c64_vic_hires_plot(); }
+  if(need_c64_vic_make_hires_tables) { insert_c64_vic_make_hires_tables(); }
   if(need_c64_vic_text_enable) { insert_c64_vic_text_enable(); }
   if(need_c64_vic_text_clear) { insert_c64_vic_text_clear(); }
   if(need_c64_vic_text_plot) { insert_c64_vic_text_plot(); }
@@ -633,7 +635,56 @@ void C64::insert_c64_vic_hires_clear()
 void C64::insert_c64_vic_hires_plot()
 {
   fprintf(out, "hires_plot:\n");
+  // value
+  POP_HI;
+  POP_LO;
+  // y
+  POP_HI;
+  POP_LO;
+  fprintf(out, "  tay\n");
+  // row lo/hi
+  fprintf(out, "  lda 0x0400,y\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda 0x0500,y\n");
+  fprintf(out, "  sta address + 1\n");
+  // x
+  POP_HI;
+  fprintf(out, "  sta result + 1\n");
+  POP_LO;
+  fprintf(out, "  sta result + 0\n");
+  // x & 7
+  fprintf(out, "  and #7\n");
+  fprintf(out, "  sta value + 0\n");
+  // x / 8
+  fprintf(out, "  lsr result + 1\n");
+  fprintf(out, "  ror result + 0\n");
+  fprintf(out, "  lsr result + 1\n");
+  fprintf(out, "  ror result + 0\n");
+  fprintf(out, "  lsr result + 1\n");
+  fprintf(out, "  ror result + 0\n");
+  fprintf(out, "  lda result + 0\n");
+  fprintf(out, "  tay\n");
+  // col
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda 0x0600,y\n");
+  fprintf(out, "  adc address + 0\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  adc address + 1\n");
+  fprintf(out, "  sta address + 1\n");
+  // read byte
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "  lda (address),y\n");
+  fprintf(out, "  ldy value + 0\n");
+  fprintf(out, "  ora 0x0700,y\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "  sta (address),y\n");
+
   fprintf(out, "  rts\n");
+}
+
+void C64::insert_c64_vic_make_hires_tables()
+{
 }
 
 void C64::insert_c64_vic_text_enable()

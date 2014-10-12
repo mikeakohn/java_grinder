@@ -92,6 +92,7 @@ protected:
   bool need_c64_vic_hires_enable:1;
   bool need_c64_vic_hires_clear:1;
   bool need_c64_vic_hires_plot:1;
+  bool need_c64_vic_make_hires_tables:1;
   bool need_c64_vic_text_enable:1;
   bool need_c64_vic_text_clear:1;
   bool need_c64_vic_text_plot:1;
@@ -100,6 +101,7 @@ protected:
   void insert_c64_vic_hires_enable();
   void insert_c64_vic_hires_clear();
   void insert_c64_vic_hires_plot();
+  void insert_c64_vic_make_hires_tables();
   void insert_c64_vic_text_enable();
   void insert_c64_vic_text_clear();
   void insert_c64_vic_text_plot();
