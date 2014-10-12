@@ -208,6 +208,41 @@ static int c64_vic_sprite7color(JavaClass *java_class, Generator *generator)
   return generator->c64_vic_sprite7color();
 }
 
+static int c64_vic_hires_enable(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_hires_enable();
+}
+
+static int c64_vic_hires_clear(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_hires_clear();
+}
+
+static int c64_vic_hires_plot(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_hires_plot();
+}
+
+static int c64_vic_text_enable(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_text_enable();
+}
+
+static int c64_vic_text_clear(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_text_clear();
+}
+
+static int c64_vic_text_plot(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_text_plot();
+}
+
+static int c64_vic_color_ram_clear(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_color_ram_clear();
+}
+
 int c64_vic(JavaClass *java_class, Generator *generator, char *function)
 {
   CHECK_FUNC(sprite0pos)
@@ -247,6 +282,14 @@ int c64_vic(JavaClass *java_class, Generator *generator, char *function)
   CHECK_FUNC(sprite5color)
   CHECK_FUNC(sprite6color)
   CHECK_FUNC(sprite7color)
+
+  CHECK_FUNC(hires_enable)
+  CHECK_FUNC(hires_clear)
+  CHECK_FUNC(hires_plot)
+  CHECK_FUNC(text_enable)
+  CHECK_FUNC(text_clear)
+  CHECK_FUNC(text_plot)
+  CHECK_FUNC(color_ram_clear)
 
   return -1;
 }

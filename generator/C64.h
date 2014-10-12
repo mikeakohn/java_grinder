@@ -80,6 +80,13 @@ public:
   virtual int c64_vic_sprite6color();
   virtual int c64_vic_sprite7color();
 
+  virtual int c64_vic_hires_enable();
+  virtual int c64_vic_hires_clear();
+  virtual int c64_vic_hires_plot();
+  virtual int c64_vic_text_enable();
+  virtual int c64_vic_text_clear();
+  virtual int c64_vic_text_plot();
+  virtual int c64_vic_color_ram_clear();
 };
 
 #endif

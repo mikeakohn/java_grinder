@@ -138,5 +138,13 @@ public class VIC
 
   // 0xd02e
   public static void sprite7color(int value) { }
+
+  public static void hires_enable() { }
+  public static void hires_clear(int value) { }
+  public static void hires_plot(int x, int y, int value) { }
+  public static void text_enable() { }
+  public static void text_clear(int value) { }
+  public static void text_plot(int x, int y, int value) { }
+  public static void color_ram_clear(int value) { }
 }
 

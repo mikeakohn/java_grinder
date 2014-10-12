@@ -480,8 +480,8 @@ int C64::c64_vic_wait_raster(/* line */)
   fprintf(out, "; wait_raster\n");
   POP_HI;
   POP_LO;
-  fprintf(out, "cmp 0xd012\n");
-  fprintf(out, "bne #-5\n");
+  fprintf(out, "  cmp 0xd012\n");
+  fprintf(out, "  bne #-5\n");
 
   return 0;
 }
@@ -511,6 +511,53 @@ int C64::c64_vic_sprite4color(/* value */) { POKE(0xd02b); return 0; }
 int C64::c64_vic_sprite5color(/* value */) { POKE(0xd02c); return 0; }
 int C64::c64_vic_sprite6color(/* value */) { POKE(0xd02d); return 0; }
 int C64::c64_vic_sprite7color(/* value */) { POKE(0xd02e); return 0; }
+
+int C64::c64_vic_hires_enable()
+{
+  fprintf(out, "; hires_enable\n");
+  fprintf(out, "  lda #8\n");
+  fprintf(out, "  sta 0xd018\n");
+  fprintf(out, "  lda 0xd011\n");
+  fprintf(out, "  ora #32\n");
+  fprintf(out, "  sta 0xd011\n");
+  return 0;
+}
+
+int C64::c64_vic_hires_clear()
+{
+  return 0;
+}
+
+int C64::c64_vic_hires_plot()
+{
+  return 0;
+}
+
+int C64::c64_vic_text_enable()
+{
+  fprintf(out, "; text_enable\n");
+  fprintf(out, "  lda #2\n");
+  fprintf(out, "  sta 0xd018\n");
+  fprintf(out, "  lda 0xd011\n");
+  fprintf(out, "  and #223\n");
+  fprintf(out, "  sta 0xd011\n");
+  return 0;
+}
+
+int C64::c64_vic_text_clear()
+{
+  return 0;
+}
+
+int C64::c64_vic_text_plot()
+{
+  return 0;
+}
+
+int C64::c64_vic_color_ram_clear()
+{
+  return 0;
+}
 
 #if 0
 void C64::close()
