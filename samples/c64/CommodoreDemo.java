@@ -467,18 +467,6 @@ public class CommodoreDemo
     }
   }
 
-  public static void set_text_mode()
-  {
-    Memory.write8(53272, (byte)2);
-    Memory.write8(53265, (byte)(Memory.read8(53265) & 223));
-  }
- 
-  public static void set_hires_mode()
-  {
-    Memory.write8(53272, (byte)8);
-    Memory.write8(53265, (byte)(Memory.read8(53265) | 32));
-  }
- 
   public static void mandel()
   {
     int x, y, i;
@@ -490,10 +478,8 @@ public class CommodoreDemo
     VIC.background(0);
     VIC.border(0);
 
-    for(i = color_ram; i < color_ram + 1000; i++)
-      Memory.write8(i, (byte)0);
-    for(i = screen_ram; i < screen_ram + 1000; i++)
-      Memory.write8(i, (byte)160);
+    VIC.text_clear(160);
+    VIC.color_ram_clear(0);
 
     for(i = 0; i < text.length; i++)
     {
@@ -872,11 +858,7 @@ public class CommodoreDemo
     for(i = screen_ram + 960; i < screen_ram + 1000; i++)
       Memory.write8(i, (byte)34);
 
-    for(i = hires_ram; i < hires_ram + 1280; i++)
-      Memory.write8(i, (byte)0);
-
-    for(i = hires_ram + 6720; i < hires_ram + 8000; i++)
-      Memory.write8(i, (byte)0);
+    VIC.hires_clear(0);
 
     for(i = 0; i < java_logo.length; i++)
       Memory.write8(hires_ram + 320 + i, (byte)java_logo[i]);
@@ -908,19 +890,18 @@ public class CommodoreDemo
     VIC.sprite2pos(136, 112 + 42);
     VIC.sprite3pos(136 + 48, 112 + 42);
 
-    set_hires_mode();
+    VIC.hires_enable();
 
     wait(20000);
 
     VIC.background(0);
 
-    for(i = color_ram; i < color_ram + 1000; i++)
-      Memory.write8(i, (byte)1);
-    for(i = screen_ram; i < screen_ram + 1000; i++)
-      Memory.write8(i, (byte)160);
+    VIC.text_clear(160);
+    VIC.color_ram_clear(1);
+
     VIC.sprite_enable(0);
 
-    set_text_mode();
+    VIC.text_enable();
   }
 
   public static void plot(int x, int y)
@@ -939,13 +920,11 @@ public class CommodoreDemo
 
     int i;
 
-    for(i = screen_ram; i < screen_ram + 1000; i++)
-      Memory.write8(i, (byte)16);
+    VIC.text_clear(16);
+    VIC.color_ram_clear(0);
 
-    for(i = hires_ram; i < hires_ram + 8000; i++)
-      Memory.write8(i, (byte)0);
-
-    set_hires_mode();
+    VIC.hires_enable();
+    VIC.hires_clear(0);
 
     int j, k;
     int temp1 = 0;

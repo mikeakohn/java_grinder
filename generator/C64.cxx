@@ -50,13 +50,27 @@
   fprintf(out, "  lda #0\n"); \
   PUSH_HI
 
-C64::C64()
+C64::C64() :
+  need_c64_vic_hires_enable(0),
+  need_c64_vic_hires_clear(0),
+  need_c64_vic_hires_plot(0),
+  need_c64_vic_text_enable(0),
+  need_c64_vic_text_clear(0),
+  need_c64_vic_text_plot(0),
+  need_c64_vic_color_ram_clear(0)
 {
 
 }
 
 C64::~C64()
 {
+  if(need_c64_vic_hires_enable) { insert_c64_vic_hires_enable(); }
+  if(need_c64_vic_hires_clear) { insert_c64_vic_hires_clear(); }
+  if(need_c64_vic_hires_plot) { insert_c64_vic_hires_plot(); }
+  if(need_c64_vic_text_enable) { insert_c64_vic_text_enable(); }
+  if(need_c64_vic_text_clear) { insert_c64_vic_text_clear(); }
+  if(need_c64_vic_text_plot) { insert_c64_vic_text_plot(); }
+  if(need_c64_vic_color_ram_clear) { insert_c64_vic_color_ram_clear(); }
 }
 
 int C64::open(const char *filename)
@@ -514,49 +528,161 @@ int C64::c64_vic_sprite7color(/* value */) { POKE(0xd02e); return 0; }
 
 int C64::c64_vic_hires_enable()
 {
-  fprintf(out, "; hires_enable\n");
-  fprintf(out, "  lda #8\n");
-  fprintf(out, "  sta 0xd018\n");
-  fprintf(out, "  lda 0xd011\n");
-  fprintf(out, "  ora #32\n");
-  fprintf(out, "  sta 0xd011\n");
+  need_c64_vic_hires_enable = 1;
+  fprintf(out, "  jsr hires_enable\n");
   return 0;
 }
 
-int C64::c64_vic_hires_clear()
+int C64::c64_vic_hires_clear(/* value */)
 {
+  need_c64_vic_hires_clear = 1;
+  fprintf(out, "  jsr hires_clear\n");
   return 0;
 }
 
-int C64::c64_vic_hires_plot()
+int C64::c64_vic_hires_plot(/* x, y, value */)
 {
+  need_c64_vic_hires_plot = 1;
+  fprintf(out, "  jsr hires_plot\n");
   return 0;
 }
 
 int C64::c64_vic_text_enable()
 {
-  fprintf(out, "; text_enable\n");
+  need_c64_vic_text_enable = 1;
+  fprintf(out, "  jsr text_enable\n");
+  return 0;
+}
+
+int C64::c64_vic_text_clear(/* value */)
+{
+  need_c64_vic_text_clear = 1;
+  fprintf(out, "  jsr text_clear\n");
+  return 0;
+}
+
+int C64::c64_vic_text_plot(/* x, y, value */)
+{
+  need_c64_vic_text_plot = 1;
+  fprintf(out, "  jsr text_plot\n");
+  return 0;
+}
+
+int C64::c64_vic_color_ram_clear(/* value */)
+{
+  need_c64_vic_color_ram_clear = 1;
+  fprintf(out, "  jsr color_ram_clear\n");
+  return 0;
+}
+
+void C64::insert_c64_vic_hires_enable()
+{
+  fprintf(out, "hires_enable:\n");
+  fprintf(out, "  lda #8\n");
+  fprintf(out, "  sta 0xd018\n");
+  fprintf(out, "  lda 0xd011\n");
+  fprintf(out, "  ora #32\n");
+  fprintf(out, "  sta 0xd011\n");
+  fprintf(out, "  rts\n");
+}
+
+void C64::insert_c64_vic_hires_clear()
+{
+  fprintf(out, "hires_clear:\n");
+  POP_HI;
+  POP_LO;
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "hires_clear_loop:\n");
+  fprintf(out, "  sta 0xe000,y\n");
+  fprintf(out, "  sta 0xe100,y\n");
+  fprintf(out, "  sta 0xe200,y\n");
+  fprintf(out, "  sta 0xe300,y\n");
+  fprintf(out, "  sta 0xe400,y\n");
+  fprintf(out, "  sta 0xe500,y\n");
+  fprintf(out, "  sta 0xe600,y\n");
+  fprintf(out, "  sta 0xe700,y\n");
+  fprintf(out, "  sta 0xe800,y\n");
+  fprintf(out, "  sta 0xe900,y\n");
+  fprintf(out, "  sta 0xea00,y\n");
+  fprintf(out, "  sta 0xeb00,y\n");
+  fprintf(out, "  sta 0xec00,y\n");
+  fprintf(out, "  sta 0xed00,y\n");
+  fprintf(out, "  sta 0xee00,y\n");
+  fprintf(out, "  sta 0xef00,y\n");
+  fprintf(out, "  sta 0xf000,y\n");
+  fprintf(out, "  sta 0xf100,y\n");
+  fprintf(out, "  sta 0xf200,y\n");
+  fprintf(out, "  sta 0xf300,y\n");
+  fprintf(out, "  sta 0xf400,y\n");
+  fprintf(out, "  sta 0xf500,y\n");
+  fprintf(out, "  sta 0xf600,y\n");
+  fprintf(out, "  sta 0xf700,y\n");
+  fprintf(out, "  sta 0xf800,y\n");
+  fprintf(out, "  sta 0xf900,y\n");
+  fprintf(out, "  sta 0xfa00,y\n");
+  fprintf(out, "  sta 0xfb00,y\n");
+  fprintf(out, "  sta 0xfc00,y\n");
+  fprintf(out, "  sta 0xfd00,y\n");
+  fprintf(out, "  sta 0xfe00,y\n");
+  fprintf(out, "  sta 0xff00,y\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bne hires_clear_loop\n");
+  fprintf(out, "  rts\n");
+}
+
+void C64::insert_c64_vic_hires_plot()
+{
+  fprintf(out, "hires_plot:\n");
+  fprintf(out, "  rts\n");
+}
+
+void C64::insert_c64_vic_text_enable()
+{
+  fprintf(out, "text_enable:\n");
   fprintf(out, "  lda #2\n");
   fprintf(out, "  sta 0xd018\n");
   fprintf(out, "  lda 0xd011\n");
   fprintf(out, "  and #223\n");
   fprintf(out, "  sta 0xd011\n");
-  return 0;
+  fprintf(out, "  rts\n");
 }
 
-int C64::c64_vic_text_clear()
+void C64::insert_c64_vic_text_clear()
 {
-  return 0;
+  fprintf(out, "text_clear:\n");
+  POP_HI;
+  POP_LO;
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "text_clear_loop:\n");
+  fprintf(out, "  sta 0xc000,y\n");
+  fprintf(out, "  sta 0xc100,y\n");
+  fprintf(out, "  sta 0xc200,y\n");
+  fprintf(out, "  sta 0xc300,y\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bne text_clear_loop\n");
+  fprintf(out, "  rts\n");
 }
 
-int C64::c64_vic_text_plot()
+void C64::insert_c64_vic_text_plot()
 {
-  return 0;
+  fprintf(out, "text_plot:\n");
+  fprintf(out, "  rts\n");
 }
 
-int C64::c64_vic_color_ram_clear()
+void C64::insert_c64_vic_color_ram_clear()
 {
-  return 0;
+  fprintf(out, "color_ram_clear:\n");
+  POP_HI;
+  POP_LO;
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "color_ram_clear_loop:\n");
+  fprintf(out, "  sta 0xd800,y\n");
+  fprintf(out, "  sta 0xd900,y\n");
+  fprintf(out, "  sta 0xda00,y\n");
+  fprintf(out, "  sta 0xdb00,y\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bne color_ram_clear_loop\n");
+  fprintf(out, "  rts\n");
 }
 
 #if 0
