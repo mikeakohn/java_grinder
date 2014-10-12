@@ -1328,6 +1328,7 @@ void M6502::insert_div_integer()
   fprintf(out, "  ldy #16\n");
 
   // loop
+  fprintf(out, "div_integer_loop:\n");
   fprintf(out, "  asl value1 + 0\n");
   fprintf(out, "  rol value1 + 1\n");
   fprintf(out, "  rol remainder + 0\n");
@@ -1337,19 +1338,20 @@ void M6502::insert_div_integer()
   fprintf(out, "  sec\n");
   fprintf(out, "  lda remainder + 0\n");
   fprintf(out, "  sbc value2 + 0\n");
-  fprintf(out, "  pha\n");
+  fprintf(out, "  sta value3\n");
   fprintf(out, "  lda remainder + 1\n");
   fprintf(out, "  sbc value2 + 1\n");
-  fprintf(out, "  bcc #7\n");
+  fprintf(out, "  bcc div_integer_next\n");
 
   fprintf(out, "  sta remainder + 1\n");
-  fprintf(out, "  pla\n");
+  fprintf(out, "  lda value3\n");
   fprintf(out, "  sta remainder + 0\n");
   fprintf(out, "  inc value1 + 0\n");
 
   // next
+  fprintf(out, "div_integer_next:\n");
   fprintf(out, "  dey\n");
-  fprintf(out, "  bne #-30\n");
+  fprintf(out, "  bne div_integer_loop\n");
 
   // push result
   fprintf(out, "  lda value1 + 0\n");
