@@ -69,15 +69,15 @@ int C64::open(const char *filename)
   fprintf(out, ".65xx\n");
 
   // heap
-  fprintf(out, "ram_start equ 0x8000\n");
+  fprintf(out, "ram_start equ 0xa000\n");
   fprintf(out, "heap_ptr equ ram_start\n");
 
   // for indirection (2 bytes)
   fprintf(out, "address equ 0xfb\n");
 
   // java stack
-  fprintf(out, "stack_lo equ 0x9000\n");
-  fprintf(out, "stack_hi equ 0x9100\n");
+  fprintf(out, "stack_lo equ 0x200\n");
+  fprintf(out, "stack_hi equ 0x300\n");
   fprintf(out, "SP equ 0xfd\n");
 
   // points to locals
@@ -122,6 +122,43 @@ int C64::open(const char *filename)
   fprintf(out, "  sta SP\n");
   fprintf(out, "  tax\n");
   fprintf(out, "  txs\n");
+
+  // switch VIC-II to bank 0
+  fprintf(out, "  lda #4\n");
+  fprintf(out, "  sta 0xdd00\n");
+
+  // put text screen at 0xc000 and charset at 0xc800
+  fprintf(out, "  lda #2\n");
+  fprintf(out, "  sta 0xd018\n");
+
+  // copy charset from ROM
+  fprintf(out, "  lda #50\n");
+  fprintf(out, "  sta 0x0001\n");
+  fprintf(out, "  ldx #0\n");
+  fprintf(out, "copy_charset_loop:\n");
+  fprintf(out, "  lda 0xd000,x\n");
+  fprintf(out, "  sta 0xc800,x\n");
+  fprintf(out, "  lda 0xd100,x\n");
+  fprintf(out, "  sta 0xc900,x\n");
+  fprintf(out, "  lda 0xd200,x\n");
+  fprintf(out, "  sta 0xca00,x\n");
+  fprintf(out, "  lda 0xd300,x\n");
+  fprintf(out, "  sta 0xcb00,x\n");
+  fprintf(out, "  lda 0xd400,x\n");
+  fprintf(out, "  sta 0xcc00,x\n");
+  fprintf(out, "  lda 0xd500,x\n");
+  fprintf(out, "  sta 0xcd00,x\n");
+  fprintf(out, "  lda 0xd600,x\n");
+  fprintf(out, "  sta 0xce00,x\n");
+  fprintf(out, "  lda 0xd700,x\n");
+  fprintf(out, "  sta 0xcf00,x\n");
+  fprintf(out, "  dex\n");
+  fprintf(out, "  bne copy_charset_loop\n");
+
+  // turn off ROM chips
+  fprintf(out, "  lda #53\n");
+  fprintf(out, "  sta 0x0001\n");
+  fprintf(out, "\n");
 
   return 0;
 }

@@ -3,8 +3,13 @@ import net.mikekohn.java_grinder.C64.*;
 
 public class CommodoreDemo
 {
+  static final int screen_ram = 0xc000;
+  static final int color_ram = 0xd800;
+  static final int hires_ram = 0xe000;
+  static final int sprite_ram = screen_ram + 1024;
+  static final int sprite_pointer = screen_ram + 1016;
+
   static int pixel_table[] = { 128, 64, 32, 16, 8, 4, 2, 1 };
-  
   static byte mandel_colors[] = { 6, 4, 14, 3, 13, 10, 7, 1, 7, 10, 13, 3 };
   static int text[] = { 10, 1, 22, 1, 100, 7, 18, 9, 14, 4, 5, 18 };
   static int text2[] = { 1, 22, 1, 32, 3, 15, 13, 16, 9, 12, 5, 18 };
@@ -12,60 +17,60 @@ public class CommodoreDemo
 
   static int screen_row[] =
   {
-    1024 + 40 * 0,
-    1024 + 40 * 1,
-    1024 + 40 * 2,
-    1024 + 40 * 3,
-    1024 + 40 * 4,
-    1024 + 40 * 5,
-    1024 + 40 * 6,
-    1024 + 40 * 7,
-    1024 + 40 * 8,
-    1024 + 40 * 9,
-    1024 + 40 * 10,
-    1024 + 40 * 11,
-    1024 + 40 * 12,
-    1024 + 40 * 13,
-    1024 + 40 * 14,
-    1024 + 40 * 15,
-    1024 + 40 * 16,
-    1024 + 40 * 17,
-    1024 + 40 * 18,
-    1024 + 40 * 19,
-    1024 + 40 * 20,
-    1024 + 40 * 21,
-    1024 + 40 * 22,
-    1024 + 40 * 23,
-    1024 + 40 * 24
+    screen_ram + 40 * 0,
+    screen_ram + 40 * 1,
+    screen_ram + 40 * 2,
+    screen_ram + 40 * 3,
+    screen_ram + 40 * 4,
+    screen_ram + 40 * 5,
+    screen_ram + 40 * 6,
+    screen_ram + 40 * 7,
+    screen_ram + 40 * 8,
+    screen_ram + 40 * 9,
+    screen_ram + 40 * 10,
+    screen_ram + 40 * 11,
+    screen_ram + 40 * 12,
+    screen_ram + 40 * 13,
+    screen_ram + 40 * 14,
+    screen_ram + 40 * 15,
+    screen_ram + 40 * 16,
+    screen_ram + 40 * 17,
+    screen_ram + 40 * 18,
+    screen_ram + 40 * 19,
+    screen_ram + 40 * 20,
+    screen_ram + 40 * 21,
+    screen_ram + 40 * 22,
+    screen_ram + 40 * 23,
+    screen_ram + 40 * 24
   };
 
   static int color_row[] = 
   {
-    55296 + 40 * 0,
-    55296 + 40 * 1,
-    55296 + 40 * 2,
-    55296 + 40 * 3,
-    55296 + 40 * 4,
-    55296 + 40 * 5,
-    55296 + 40 * 6,
-    55296 + 40 * 7,
-    55296 + 40 * 8,
-    55296 + 40 * 9,
-    55296 + 40 * 10,
-    55296 + 40 * 11,
-    55296 + 40 * 12,
-    55296 + 40 * 13,
-    55296 + 40 * 14,
-    55296 + 40 * 15,
-    55296 + 40 * 16,
-    55296 + 40 * 17,
-    55296 + 40 * 18,
-    55296 + 40 * 19,
-    55296 + 40 * 20,
-    55296 + 40 * 21,
-    55296 + 40 * 22,
-    55296 + 40 * 23,
-    55296 + 40 * 24
+    color_ram + 40 * 0,
+    color_ram + 40 * 1,
+    color_ram + 40 * 2,
+    color_ram + 40 * 3,
+    color_ram + 40 * 4,
+    color_ram + 40 * 5,
+    color_ram + 40 * 6,
+    color_ram + 40 * 7,
+    color_ram + 40 * 8,
+    color_ram + 40 * 9,
+    color_ram + 40 * 10,
+    color_ram + 40 * 11,
+    color_ram + 40 * 12,
+    color_ram + 40 * 13,
+    color_ram + 40 * 14,
+    color_ram + 40 * 15,
+    color_ram + 40 * 16,
+    color_ram + 40 * 17,
+    color_ram + 40 * 18,
+    color_ram + 40 * 19,
+    color_ram + 40 * 20,
+    color_ram + 40 * 21,
+    color_ram + 40 * 22,
+    color_ram + 40 * 23,
+    color_ram + 40 * 24
   };
 
   static int java_logo[] =
@@ -461,6 +466,18 @@ public class CommodoreDemo
         bottom = 0;
     }
   }
+
+  public static void set_text_mode()
+  {
+    Memory.write8(53272, (byte)2);
+    Memory.write8(53265, (byte)(Memory.read8(53265) & 223));
+  }
+ 
+  public static void set_hires_mode()
+  {
+    Memory.write8(53272, (byte)8);
+    Memory.write8(53265, (byte)(Memory.read8(53265) | 32));
+  }
  
   public static void mandel()
   {
@@ -473,23 +490,23 @@ public class CommodoreDemo
     VIC.background(0);
     VIC.border(0);
 
-    for(i = 55296; i < 56296; i++)
+    for(i = color_ram; i < color_ram + 1000; i++)
       Memory.write8(i, (byte)0);
-    for(i = 1024; i < 2024; i++)
+    for(i = screen_ram; i < screen_ram + 1000; i++)
       Memory.write8(i, (byte)160);
 
     for(i = 0; i < text.length; i++)
     {
-      Memory.write8(55296 + 40 * 12 + 19 + i, (byte)1);
-      Memory.write8(1024 + 40 * 12 + 19 + i, (byte)text[i]);
+      Memory.write8(color_ram + 40 * 12 + 19 + i, (byte)1);
+      Memory.write8(screen_ram + 40 * 12 + 19 + i, (byte)text[i]);
     }
 
     SID.voice1_adsr(0xF000);
     SID.voice2_adsr(0xF000);
     SID.voice3_adsr(0xF000);
 
-    int loc1 = 55296;
-    int loc2 = 56256;
+    int loc1 = color_ram;
+    int loc2 = color_ram + 960;
     int yy = 0;
     for(y = 0; y < 13 * 16; y += 16)
     {
@@ -520,9 +537,6 @@ public class CommodoreDemo
             break;
 
           im = (re * im) >> 3;
-//          im <<= 1;
-//          im = (re * im) >> 4;
-//          im <<= 1;
           im += imc;
 
           re = (re2 - im2) + rec;
@@ -569,8 +583,8 @@ public class CommodoreDemo
     VIC.border(0);
     for(i = 880; i < 1000; i++)
     {
-      Memory.write8(55296 + i, (byte)5);
-      Memory.write8(1024 + i, (byte)160);
+      Memory.write8(color_ram + i, (byte)5);
+      Memory.write8(screen_ram + i, (byte)160);
     }
 
     int x0 = 0;
@@ -592,14 +606,14 @@ public class CommodoreDemo
     int y7 = 125;
 
     VIC.sprite_enable(255);
-    Memory.write8(2040, (byte)13);
-    Memory.write8(2041, (byte)13);
-    Memory.write8(2042, (byte)13);
-    Memory.write8(2043, (byte)13);
-    Memory.write8(2044, (byte)13);
-    Memory.write8(2045, (byte)13);
-    Memory.write8(2046, (byte)13);
-    Memory.write8(2047, (byte)13);
+    Memory.write8(sprite_pointer + 0, (byte)16);
+    Memory.write8(sprite_pointer + 1, (byte)16);
+    Memory.write8(sprite_pointer + 2, (byte)16);
+    Memory.write8(sprite_pointer + 3, (byte)16);
+    Memory.write8(sprite_pointer + 4, (byte)16);
+    Memory.write8(sprite_pointer + 5, (byte)16);
+    Memory.write8(sprite_pointer + 6, (byte)16);
+    Memory.write8(sprite_pointer + 7, (byte)16);
 
     VIC.sprite0color(10);
     VIC.sprite1color(8);
@@ -611,7 +625,7 @@ public class CommodoreDemo
     VIC.sprite7color(1);
 
     for(i = 0; i < 63; i++)
-      Memory.write8(832 + i, (byte)sprite1[i]);
+      Memory.write8(sprite_ram + i, (byte)sprite1[i]);
 
     VIC.sprite_expandx(255);
     VIC.sprite_expandy(255);
@@ -709,10 +723,10 @@ public class CommodoreDemo
     {
       for(j = 0; j < 1000; j += 40)
       {
-        Memory.write8(55296 + j + i, (byte)5);
-        Memory.write8(55335 + j - i, (byte)5);
-        Memory.write8(1024 + j + i, (byte)160);
-        Memory.write8(1063 + j - i, (byte)160);
+        Memory.write8(color_ram + j + i, (byte)5);
+        Memory.write8(color_ram + 39 + j - i, (byte)5);
+        Memory.write8(screen_ram + j + i, (byte)160);
+        Memory.write8(screen_ram + 39 + j - i, (byte)160);
       }
     }
   }
@@ -745,7 +759,7 @@ public class CommodoreDemo
     SID.volume(15);
 
     for(i = 0; i < 63; i++)
-      Memory.write8(832 + i, (byte)sprite2[i]);
+      Memory.write8(sprite_ram + i, (byte)sprite2[i]);
 
     VIC.sprite0pos(32, 58);
 
@@ -846,36 +860,32 @@ public class CommodoreDemo
 
     int i;
 
-    for(i = 49152 + 1024; i < 49152 + 1184; i++)
+    for(i = screen_ram; i < screen_ram + 160; i++)
       Memory.write8(i, (byte)1);
 
-    for(i = 49152 + 1184; i < 49152 + 1864; i++)
+    for(i = screen_ram + 160; i < screen_ram + 840; i++)
       Memory.write8(i, (byte)17);
 
-    for(i = 49152 + 1864; i < 49152 + 1984; i++)
+    for(i = screen_ram + 840; i < screen_ram + 960; i++)
       Memory.write8(i, (byte)18);
 
-    for(i = 49152 + 1984; i < 49152 + 2024; i++)
+    for(i = screen_ram + 960; i < screen_ram + 1000; i++)
       Memory.write8(i, (byte)34);
 
-    for(i = 57344; i < 57344 + 1280; i++)
+    for(i = hires_ram; i < hires_ram + 1280; i++)
       Memory.write8(i, (byte)0);
 
-    for(i = 57344 + 6720; i < 57344 + 8000; i++)
+    for(i = hires_ram + 6720; i < hires_ram + 8000; i++)
       Memory.write8(i, (byte)0);
 
     for(i = 0; i < java_logo.length; i++)
-      Memory.write8(57344 + 320 + i, (byte)java_logo[i]);
+      Memory.write8(hires_ram + 320 + i, (byte)java_logo[i]);
 
     for(i = 0; i < 240; i++)
     {
-      Memory.write8(57344 + 7080 + i, (byte)java_redlogo[i]);
-      Memory.write8(57344 + 7080 + 320 + i, (byte)java_redlogo[i + 240]);
+      Memory.write8(hires_ram + 7080 + i, (byte)java_redlogo[i]);
+      Memory.write8(hires_ram + 7080 + 320 + i, (byte)java_redlogo[i + 240]);
     }
-
-    Memory.write8(56576, (byte)4);
-    Memory.write8(53272, (byte)(Memory.read8(53272) | 8));
-    Memory.write8(53265, (byte)(Memory.read8(53265) | 32));
 
     VIC.sprite_enable(15);
     VIC.sprite_expandx(15);
@@ -886,35 +896,36 @@ public class CommodoreDemo
     VIC.sprite3color(14);
 
     for(i = 0; i < java_sprite.length; i++)
-      Memory.write8(65280 + i, (byte)java_sprite[i]);
+      Memory.write8(sprite_ram + i, (byte)java_sprite[i]);
 
-    Memory.write8(51192, (byte)252);
-    Memory.write8(51193, (byte)253);
-    Memory.write8(51194, (byte)254);
-    Memory.write8(51195, (byte)255);
+    Memory.write8(sprite_pointer + 0, (byte)16);
+    Memory.write8(sprite_pointer + 1, (byte)17);
+    Memory.write8(sprite_pointer + 2, (byte)18);
+    Memory.write8(sprite_pointer + 3, (byte)19);
 
     VIC.sprite0pos(136, 112);
     VIC.sprite1pos(136 + 48, 112);
     VIC.sprite2pos(136, 112 + 42);
     VIC.sprite3pos(136 + 48, 112 + 42);
 
+    set_hires_mode();
+
     wait(20000);
 
     VIC.background(0);
 
-    for(i = 55296; i < 56296; i++)
+    for(i = color_ram; i < color_ram + 1000; i++)
       Memory.write8(i, (byte)1);
-    for(i = 1024; i < 2024; i++)
+    for(i = screen_ram; i < screen_ram + 1000; i++)
       Memory.write8(i, (byte)160);
     VIC.sprite_enable(0);
-    Memory.write8(56576, (byte)7);
-    Memory.write8(53272, (byte)(Memory.read8(53272) & 247));
-    Memory.write8(53265, (byte)(Memory.read8(53265) & 223));
+
+    set_text_mode();
   }
 
   public static void plot(int x, int y)
   {
-    int address = 57344 + (40 * (y & 248)) + (x & 504) + (y & 7);
+    int address = hires_ram + (40 * (y & 248)) + (x & 504) + (y & 7);
 
     int temp = Memory.read8(address) & 255;
     temp |= pixel_table[x & 7];
@@ -928,15 +939,13 @@ public class CommodoreDemo
 
     int i;
 
-    for(i = 49152 + 1024; i < 49152 + 2024; i++)
+    for(i = screen_ram; i < screen_ram + 1000; i++)
       Memory.write8(i, (byte)16);
 
-    for(i = 57344; i < 57344 + 8000; i++)
+    for(i = hires_ram; i < hires_ram + 8000; i++)
       Memory.write8(i, (byte)0);
 
-    Memory.write8(56576, (byte)4);
-    Memory.write8(53272, (byte)(Memory.read8(53272) | 8));
-    Memory.write8(53265, (byte)(Memory.read8(53265) | 32));
+    set_hires_mode();
 
     int j, k;
     int temp1 = 0;
@@ -997,9 +1006,6 @@ public class CommodoreDemo
 
   public static void main()
   {
-    // turn off basic and kernal
-    Memory.write8(1, (byte)53);
-
     java_screen();
     wipe();
     musak_init();

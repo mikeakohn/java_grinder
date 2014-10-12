@@ -112,15 +112,15 @@ int M6502::open(const char *filename)
   fprintf(out, ".65xx\n");
 
   // heap
-  fprintf(out, "ram_start equ 0x8000\n");
+  fprintf(out, "ram_start equ 0xa000\n");
   fprintf(out, "heap_ptr equ ram_start\n");
 
   // for indirection (2 bytes)
   fprintf(out, "address equ 0xfb\n");
 
   // java stack
-  fprintf(out, "stack_lo equ 0x9000\n");
-  fprintf(out, "stack_hi equ 0x9100\n");
+  fprintf(out, "stack_lo equ 0x200\n");
+  fprintf(out, "stack_hi equ 0x300\n");
   fprintf(out, "SP equ 0xfd\n");
 
   // points to locals
