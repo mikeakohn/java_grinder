@@ -24,6 +24,8 @@ public:
   //virtual int ti99_setTextColor() { return -1; }
   virtual int ti99_setGraphicsMode() { return -1; }
   virtual int ti99_setGraphicsMode(int mode) { return -1; }
+  virtual int ti99_clearScreen() { return -1; }
+  virtual int ti99_plot() { return -1; }
 };
 
 #endif

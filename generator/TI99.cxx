@@ -16,7 +16,10 @@
 
 #include "TI99.h"
 
-TI99::TI99() : need_vdp_command(false)
+TI99::TI99() :
+  need_vdp_command(false),
+  need_write_string(false),
+  need_clear_screen(false)
 {
 }
 
@@ -24,6 +27,7 @@ TI99::~TI99()
 {
   if (need_vdp_command) { insert_vdp_command(); }
   if (need_write_string) { insert_write_string(); }
+  if (need_clear_screen) { insert_clear_screen(); }
 }
 
 int TI99::open(const char *filename)
@@ -173,7 +177,7 @@ int TI99::ti99_setGraphicsMode(int mode)
     case 0:
       fprintf(out, "  li r0, 0x8000\n");
       fprintf(out, "  bl @_vdp_command\n");
-      fprintf(out, "  li r0, 0x8100\n");
+      fprintf(out, "  li r0, 0x8100|0x040\n");
       fprintf(out, "  bl @_vdp_command\n");
       break;
     case 1:
@@ -185,19 +189,47 @@ int TI99::ti99_setGraphicsMode(int mode)
     case 2:
       fprintf(out, "  li r0, 0x8000\n");
       fprintf(out, "  bl @_vdp_command\n");
-      fprintf(out, "  li r0, 0x8108\n");
+      fprintf(out, "  li r0, 0x8108|0x040\n");
       fprintf(out, "  bl @_vdp_command\n");
       break;
     case 3:
       fprintf(out, "  li r0, 0x8002\n");
       fprintf(out, "  bl @_vdp_command\n");
-      fprintf(out, "  li r0, 0x8100\n");
+      fprintf(out, "  li r0, 0x8100|0x040\n");
       fprintf(out, "  bl @_vdp_command\n");
       break;
     default:
       printf("Illegal graphics mode %d\n", mode);
       return -1;
   }
+
+  return 0;
+}
+
+int TI99::ti99_clearScreen()
+{
+  need_clear_screen = true;
+  fprintf(out, "  bl @_clear_screen\n");
+
+  return 0;
+}
+
+int TI99::ti99_plot()
+{
+  // FIXME - Is this better as a function?
+  fprintf(out, "  li r0, 32\n");
+  fprintf(out, "  mpy r%d, r0\n", REG_STACK(reg-2));
+  fprintf(out, "  a r%d, r1\n", REG_STACK(reg-3));
+  fprintf(out, "  mov r1, r0\n");
+  fprintf(out, "  ai r0, 0x4300\n");
+  fprintf(out, "  bl @_vdp_command\n");
+  //fprintf(out, "  mov r%d, r0\n", REG_STACK(reg-1));
+  fprintf(out, "  swpb r%d\n", REG_STACK(reg-1));
+  fprintf(out, "  movb r%d, @VDP_WRITE\n", REG_STACK(reg-1));
+  //fprintf(out, "  swpb r0\n");
+  //fprintf(out, "  movb r0, @VDP_WRITE\n");
+
+  reg -= 3;
 
   return 0;
 }
@@ -221,7 +253,24 @@ void TI99::insert_vdp_command()
   fprintf(out, "  movb r0, @VDP_COMMAND\n");
   fprintf(out, "  swpb r0\n");
   fprintf(out, "  movb r0, @VDP_COMMAND\n");
-  //fprintf(out, "  limi 0xf\n");
+  //fprintf(out, "  limi 2\n");
   fprintf(out, "  b *r11\n\n");
 }
+
+void TI99::insert_clear_screen()
+{
+  fprintf(out, "_clear_screen:\n");
+  fprintf(out, "  li r0, 0x0040\n");
+  fprintf(out, "  movb r0, @VDP_COMMAND\n");
+  fprintf(out, "  swpb r0\n");
+  fprintf(out, "  movb r0, @VDP_COMMAND\n");
+  fprintf(out, "  s r0, r0\n");
+  fprintf(out, "  li r1, 0x300\n");
+  fprintf(out, "_clear_screen_loop:\n");
+  fprintf(out, "  mov r0, @VDP_WRITE\n");
+  fprintf(out, "  dec r1\n");
+  fprintf(out, "  jne _clear_screen_loop\n");
+  fprintf(out, "  b *r11\n\n");
+}
+
 

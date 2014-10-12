@@ -42,6 +42,8 @@ int ti99(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(setCursor,_II)
   //CHECK_FUNC(setTextColor,_III)
   CHECK_FUNC(setGraphicsMode,_I)
+  CHECK_FUNC(clearScreen,)
+  CHECK_FUNC(plot,_III)
 
   return -1;
 }
