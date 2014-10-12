@@ -19,7 +19,8 @@
 TI99::TI99() :
   need_vdp_command(false),
   need_write_string(false),
-  need_clear_screen(false)
+  need_clear_screen(false),
+  need_plot(false)
 {
 }
 
@@ -28,6 +29,7 @@ TI99::~TI99()
   if (need_vdp_command) { insert_vdp_command(); }
   if (need_write_string) { insert_write_string(); }
   if (need_clear_screen) { insert_clear_screen(); }
+  if (need_plot) { insert_plot(); }
 }
 
 int TI99::open(const char *filename)
@@ -216,7 +218,9 @@ int TI99::ti99_clearScreen()
 
 int TI99::ti99_plot()
 {
-  // FIXME - Is this better as a function?
+  //need_plot = true;
+  //fprintf(out, "  bl @_plot\n");
+
   fprintf(out, "  li r0, 32\n");
   fprintf(out, "  mpy r%d, r0\n", REG_STACK(reg-2));
   fprintf(out, "  a r%d, r1\n", REG_STACK(reg-3));
@@ -270,6 +274,23 @@ void TI99::insert_clear_screen()
   fprintf(out, "  mov r0, @VDP_WRITE\n");
   fprintf(out, "  dec r1\n");
   fprintf(out, "  jne _clear_screen_loop\n");
+  fprintf(out, "  b *r11\n\n");
+}
+
+void TI99::insert_plot()
+{
+  fprintf(out, "_plot:\n");
+  fprintf(out, "  li r0, 32\n");
+  fprintf(out, "  mpy r%d, r0\n", REG_STACK(reg-2));
+  fprintf(out, "  a r%d, r1\n", REG_STACK(reg-3));
+  fprintf(out, "  mov r1, r0\n");
+  fprintf(out, "  ai r0, 0x4300\n");
+  fprintf(out, "  bl @_vdp_command\n");
+  //fprintf(out, "  mov r%d, r0\n", REG_STACK(reg-1));
+  fprintf(out, "  swpb r%d\n", REG_STACK(reg-1));
+  fprintf(out, "  movb r%d, @VDP_WRITE\n", REG_STACK(reg-1));
+  //fprintf(out, "  swpb r0\n");
+  //fprintf(out, "  movb r0, @VDP_WRITE\n");
   fprintf(out, "  b *r11\n\n");
 }
 

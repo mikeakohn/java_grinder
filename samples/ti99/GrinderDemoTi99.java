@@ -122,12 +122,13 @@ public class GrinderDemoTi99
     TI99.setGraphicsMode(TI99.MODE_2);
     TI99.clearScreen();
 
-    //TI99.setCursor(0, 0);
-    //TI99.printChar('0');
+    TI99.setCursor(0, 0);
+    TI99.printChar('0');
+    TI99.printChar('1');
 
-    TI99.plot(0,0,5);
-    TI99.plot(4,0,3);
-    TI99.plot(7,0,7);
+    //TI99.plot(0,0,5);
+    //TI99.plot(4,0,3);
+    //TI99.plot(7,0,7);
 
     //TI99.setCursor(0, 0);
     //a = testMethod(1,5);

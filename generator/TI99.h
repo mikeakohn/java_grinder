@@ -37,10 +37,12 @@ private:
   void insert_write_string();
   void insert_vdp_command();
   void insert_clear_screen();
+  void insert_plot();
 
   bool need_vdp_command:1;
   bool need_write_string:1;
   bool need_clear_screen:1;
+  bool need_plot:1;
   char app_name[16];
 };
 
