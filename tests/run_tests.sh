@@ -6,7 +6,12 @@ run_msp430_test()
 {
   file=$1
   ../java_grinder $2 ${file}.class ${file}.asm msp430g2231 > /dev/null
-  naken_asm -l -I/storage/git/naken_asm/include -o ${file}.hex ${file}.asm > /dev/null
+  if [ $? -ne 0 ]
+  then
+    echo "${file} : FAILED ***"
+    exit 1
+  fi
+  ../naken_asm/naken_asm -l -I../naken_asm/include -o ${file}.hex ${file}.asm > /dev/null
   a=`naken_util -run ${file}.hex`
   cycles=`echo ${a} | sed 's/ clock cycles.*$//' | sed 's/^.* //'`
   answer=`echo ${a} | sed 's/^.* r15: //' | sed 's/,.*$//'`
@@ -25,7 +30,7 @@ run_6502_test()
 {
   file=$1
   ../java_grinder $2 ${file}.class ${file}.asm c64 > /dev/null
-  naken_asm -l -I/storage/git/naken_asm/include -o ${file}.hex ${file}.asm > /dev/null
+  ../naken_asm/naken_asm -l -I../naken_asm/include -o ${file}.hex ${file}.asm > /dev/null
   a=`naken_util -65xx -run ${file}.hex`
   cycles=`echo ${a} | sed 's/ clock cycles.*$//' | sed 's/^.* //'`
   answer=`echo ${a} | sed 's/^.* r15: //' | sed 's/,.*$//'`
