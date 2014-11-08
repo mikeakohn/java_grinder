@@ -15,7 +15,7 @@ java:
 
 .PHONY: tests
 tests:
-	@cd tests && sh run_tests.sh
+	@cd tests && bash run_tests.sh
 
 %.class: %.java
 	javac $*.java
