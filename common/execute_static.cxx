@@ -16,6 +16,7 @@
 
 #include "Generator.h"
 #include "JavaClass.h"
+#include "stack.h"
 #include "table_java_instr.h"
 
 // Static fields are done awfuly strange in Java.  Well, mostly it's the
@@ -26,7 +27,7 @@
 
 #define UNIMPL() { printf("Unimplemented\n"); ret = -1; break; }
 #define CHECK_STACK(n) \
-        if (stack_ptr < n) \
+        if (stack->length() < n) \
         { \
           printf("Error: stack < %d\n", n); \
           ret = -1; \
@@ -51,9 +52,11 @@ int pc_start;
 int max_stack;
 int max_locals;
 int code_len;
-int32_t *stack;
+//int32_t *stack;
 int32_t temp;
-int stack_ptr;
+int32_t value;
+//int stack_ptr;
+_stack *stack;
 int32_t *array = NULL;
 int array_len;
 int array_type;
@@ -93,8 +96,8 @@ int ret = 0;
   printf("max_stack=%d max_locals=%d code_len=%d\n", max_stack, max_locals, code_len);
 
   //generator->method_start(max_locals, method_name);
-  stack = (int32_t *)alloca(max_stack * sizeof(int32_t));
-  stack_ptr = 0;
+  stack = (_stack *)alloca(max_stack * sizeof(int32_t) + sizeof(int32_t));
+  stack->reset();
 
   while(pc - pc_start < code_len)
   {
@@ -115,11 +118,11 @@ int ret = 0;
       case 6: // iconst_3 (0x06)
       case 7: // iconst_4 (0x07)
       case 8: // iconst_5 (0x08)
-        stack[stack_ptr++] = bytes[pc] - 0x03;
+        stack->push(bytes[pc] - 0x03);
         break;
       case 9:  // lconst_0 (0x09)
       case 10: // lconst_1 (0x0a)
-        stack[stack_ptr++] = bytes[pc] - 0x09;
+        stack->push(bytes[pc] - 0x09);
         break;
       case 11: // fconst_0 (0x0b)
       case 12: // fconst_1 (0x0c)
@@ -128,10 +131,10 @@ int ret = 0;
       case 15: // dconst_1 (0x0f)
         UNIMPL();
       case 16: // bipush (0x10)
-        stack[stack_ptr++] = (int8_t)bytes[pc+1];
+        stack->push((int8_t)bytes[pc+1]);
         break;
       case 17: // sipush (0x11)
-        stack[stack_ptr++] = (int16_t)((bytes[pc+1] << 8) | bytes[pc+2]);
+        stack->push((int16_t)((bytes[pc+1] << 8) | bytes[pc+2]));
         break;
       case 18: // ldc (0x12)
         index = bytes[pc+1];
@@ -143,12 +146,12 @@ int ret = 0;
 
         if (gen32->tag == CONSTANT_INTEGER)
         {
-          stack[stack_ptr++] = gen32->value;
+          stack->push(gen32->value);
         }
           else
         if (gen32->tag == CONSTANT_FLOAT)
         {
-          stack[stack_ptr++] = gen32->value;
+          stack->push(gen32->value);
         }
           else
         if (gen32->tag == CONSTANT_STRING)
@@ -268,11 +271,13 @@ int ret = 0;
       case 78: // astore_3 (0x4e)
         UNIMPL();
       case 79: // iastore (0x4f)
-        CHECK_STACK(2);
-        index = stack[stack_ptr-2];
+        CHECK_STACK(3);
+        value = stack->pop();
+        index = stack->pop();
         CHECK_BOUNDS();
-        array[index] = stack[stack_ptr-1];
-        stack_ptr -= 3;
+        array[index] = value;
+        //stack_ptr -= 3;
+        stack->pop();
         break;
       case 80: // lastore (0x50)
       case 81: // fastore (0x51)
@@ -280,32 +285,38 @@ int ret = 0;
       case 83: // aastore (0x53)
         UNIMPL();
       case 84: // bastore (0x54)
-        CHECK_STACK(2);
-        index = stack[stack_ptr-2];
+        CHECK_STACK(3);
+        value = stack->pop();
+        index = stack->pop();
         CHECK_BOUNDS();
-        array[index] = stack[stack_ptr-1];
-        stack_ptr -= 3;
+        array[index] = value;
+        //stack_ptr -= 3;
+        stack->pop();
         break;
       case 85: // castore (0x55)
         UNIMPL();
       case 86: // sastore (0x56)
-        CHECK_STACK(2);
-        index = stack[stack_ptr-2];
+        CHECK_STACK(3);
+        value = stack->pop();
+        index = stack->pop();
         //printf("index=%d value=%d\n", index, stack_ptr-1);
         CHECK_BOUNDS();
-        array[index] = stack[stack_ptr-1];
-        stack_ptr -= 3;
+        array[index] = value;
+        //stack_ptr -= 3;
+        stack->pop();
         break;
       case 87: // pop (0x57)
-        stack_ptr--;
+        stack->pop();
         break;
       case 88: // pop2 (0x58)
-        stack_ptr -= 2;
+        stack->pop();
+        stack->pop();
         break;
       case 89: // dup (0x59)
         CHECK_STACK(1)
-        temp = stack[stack_ptr-1];
-        stack[stack_ptr++] = temp;
+        temp = stack->pop();
+        stack->push(temp);
+        stack->push(temp);
         break;
       case 90: // dup_x1 (0x5a)
       case 91: // dup_x2 (0x5b)
@@ -403,11 +414,12 @@ int ret = 0;
       case 179: // putstatic (0xb3)
         CHECK_STACK(1);
         index = (bytes[pc+1] << 8) | bytes[pc+2];
-        printf("id=%d stack_ptr=%d index=%d\n", stack[stack_ptr-1], stack_ptr, index);
-        stack_ptr--;  // <-- this is our made up index which here is always 0
+        temp = stack->pop();
+        printf("id=%d index=%d\n", temp, index);
+        //stack_ptr--;  // <-- this is our made up index which here is always 0
         if (java_class->get_ref_name_type(field_name, type, sizeof(type), index) != 0)
         {
-          printf("Error retrieving field name %d\n", stack[stack_ptr]);
+          printf("Error retrieving field name %d\n", temp);
           ret = -1;
           break;
         }
@@ -457,7 +469,7 @@ int ret = 0;
           else
         if (!do_arrays)
         {
-          int value = stack[stack_ptr];
+          int value = temp;
           index = java_class->get_field_index(field_name);
           if (index == -1)
           {
@@ -506,8 +518,9 @@ int ret = 0;
         UNIMPL()
       case 188: // newarray (0xbc)
         CHECK_STACK(1);
-        array_len = stack[stack_ptr-1];
-        stack[stack_ptr-1] = 0; // FIXME - put the new array on the stack
+        temp = stack->pop();
+        array_len = temp;
+        stack->push(0); // FIXME - put the new array on the stack
         array_type = bytes[pc+1];
         printf("array_len=%d type=%d\n", array_len, array_type);
         if (array_len > array_alloc_size)
@@ -594,9 +607,9 @@ int ret = 0;
     }
 
     if (ret != 0) { break; }
-    if (stack_ptr < 0 || stack_ptr > max_stack)
+    if (stack->length() < 0 || stack->length() > max_stack)
     {
-      printf("Stack error: stack_ptr=%d max_stack=%d\n", stack_ptr, max_stack);
+      printf("Stack error: stack_ptr=%d max_stack=%d\n", stack->length(), max_stack);
       ret = -1;
       break;
     }
@@ -607,7 +620,7 @@ int ret = 0;
     wide = 0;
   }
 
-  printf("stack_ptr=%d after execute ends\n", stack_ptr);
+  printf("stack->length()=%d after execute ends\n", stack->length());
 
   // printf("EXIT pc=%d ret=%d code_len=%d\n", pc, ret, code_len);
   if (array != NULL) { free(array); }

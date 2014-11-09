@@ -444,9 +444,9 @@ char type[64];
   return -1;
 }
 
-int JavaCompiler::push_ref(int index, uint16_t *operand_stack, uint16_t &operand_stack_ptr)
+int JavaCompiler::push_ref(int index, _stack *stack)
 {
-  int ref = operand_stack[--operand_stack_ptr];
+  int ref = stack->pop();
   char field_name[64];
   char type[64];
   int ret;
@@ -491,8 +491,7 @@ uint8_t *label_map;
 int ret = 0;
 char label[128];
 char method_name[64];
-uint16_t *operand_stack;
-uint16_t operand_stack_ptr = 0;
+_stack *stack;
 //uint32_t const_stack[CONST_STACK_SIZE];
 //int const_stack_ptr = 0;
 int const_val;
@@ -559,7 +558,8 @@ int instruction_length;
   pc = pc_start;
 
   generator->method_start(max_locals, max_stack, param_count, method_name);
-  operand_stack = (uint16_t *)alloca(max_stack * sizeof(uint16_t));
+  stack = (_stack *)alloca(max_stack * sizeof(uint32_t) + sizeof(uint32_t));
+  stack->reset();
 
   int label_map_len = (code_len / 8) + 1;
   label_map = (uint8_t *)alloca(label_map_len);
@@ -849,11 +849,10 @@ int instruction_length;
         break;
 
       case 46: // iaload (0x2e)
-        if (operand_stack_ptr == 0)
-        //{ ret = -1; }
+        if (stack->length() == 0)
         { ret = generator->array_read_int(); }
           else
-        { ret = array_load(java_class, operand_stack[--operand_stack_ptr], ARRAY_TYPE_INT); }
+        { ret = array_load(java_class, stack->pop(), ARRAY_TYPE_INT); }
 
         break;
 
@@ -874,10 +873,10 @@ int instruction_length;
         break;
 
       case 51: // baload (0x33)
-        if (operand_stack_ptr == 0)
+        if (stack->length() == 0)
         { ret = generator->array_read_byte(); }
           else
-        { ret = array_load(java_class, operand_stack[--operand_stack_ptr], ARRAY_TYPE_BYTE); }
+        { ret = array_load(java_class, stack->pop(), ARRAY_TYPE_BYTE); }
 
         break;
 
@@ -886,10 +885,10 @@ int instruction_length;
         break;
 
       case 53: // saload (0x35)
-        if (operand_stack_ptr == 0)
+        if (stack->length() == 0)
         { ret = generator->array_read_short(); }
           else
-        { ret = array_load(java_class, operand_stack[--operand_stack_ptr], ARRAY_TYPE_SHORT); }
+        { ret = array_load(java_class, stack->pop(), ARRAY_TYPE_SHORT); }
 
         break;
 
@@ -927,10 +926,10 @@ int instruction_length;
           index = bytes[pc+1];
         }
 
-        if (operand_stack_ptr == 0)
+        if (stack->length() == 0)
         { ret = generator->pop_ref_local(index); }
           else
-        { ret = push_ref(index, operand_stack, operand_stack_ptr); }
+        { ret = push_ref(index, stack); }
         break;
 
       case 59: // istore_0 (0x3b)
@@ -1002,17 +1001,17 @@ int instruction_length;
       case 78: // astore_3 (0x4e)
         // Pop ref off stack and store in local variable
         index = bytes[pc] - 75;
-        if (operand_stack_ptr == 0)
+        if (stack->length() == 0)
         { ret = generator->pop_ref_local(index); }
           else
-        { ret = push_ref(index, operand_stack, operand_stack_ptr); }
+        { ret = push_ref(index, stack); }
         break;
 
       case 79: // iastore (0x4f)
-        if (operand_stack_ptr == 0)
+        if (stack->length() == 0)
         { ret = generator->array_write_int(); }
           else
-        { ret = array_store(java_class, operand_stack[--operand_stack_ptr], ARRAY_TYPE_INT); }
+        { ret = array_store(java_class, stack->pop(), ARRAY_TYPE_INT); }
 
         break;
 
@@ -1033,25 +1032,25 @@ int instruction_length;
         break;
 
       case 84: // bastore (0x54)
-        if (operand_stack_ptr == 0)
+        if (stack->length() == 0)
         { ret = generator->array_write_byte(); }
           else
-        { ret = array_store(java_class, operand_stack[--operand_stack_ptr], ARRAY_TYPE_BYTE); }
+        { ret = array_store(java_class, stack->pop(), ARRAY_TYPE_BYTE); }
 
         break;
 
       case 85: // castore (0x55)
-        if (operand_stack_ptr == 0)
+        if (stack->length() == 0)
         { ret = generator->array_write_short(); }
           else
-        { ret = array_store(java_class, operand_stack[--operand_stack_ptr], ARRAY_TYPE_CHAR); }
+        { ret = array_store(java_class, stack->pop(), ARRAY_TYPE_CHAR); }
         break;
 
       case 86: // sastore (0x56)
-        if (operand_stack_ptr == 0)
+        if (stack->length() == 0)
         { ret = generator->array_write_short(); }
           else
-        { ret = array_store(java_class, operand_stack[--operand_stack_ptr], ARRAY_TYPE_SHORT); }
+        { ret = array_store(java_class, stack->pop(), ARRAY_TYPE_SHORT); }
         break;
 
       case 87: // pop (0x57)
@@ -1537,7 +1536,7 @@ int instruction_length;
 
         if (gen32->tag == CONSTANT_METHODREF || type[0] == '[')
         {
-          operand_stack[operand_stack_ptr++] = ref;
+          stack->push(ref);
         }
           else
         {
@@ -1551,7 +1550,7 @@ int instruction_length;
           {
             printf("  static is %s (will invoke)\n", field_name);
             //generator->push_ref(field_name);
-            operand_stack[operand_stack_ptr++] = ref;
+            stack->push(ref);
           }
         }
 
@@ -1571,12 +1570,12 @@ int instruction_length;
           break;
         }
 
-        if (operand_stack_ptr != 0)
+        if (stack->length() != 0)
         {
           char field_name[64];
           char type[64];
 
-          if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), operand_stack[--operand_stack_ptr]) != 0)
+          if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), stack->pop()) != 0)
           {
             printf("Error retrieving field name %d\n", ref);
             ret = -1;
@@ -1601,14 +1600,14 @@ int instruction_length;
 
       case 182: // invokevirtual (0xb6)
         ref = GET_PC_UINT16(1);
-        if (operand_stack_ptr == 0)
+        if (stack->length() == 0)
         {
-          printf("Error: empty operand_stack\n");
+          printf("Error: empty stack\n");
           ret = -1;
           break;
         }
         
-        ret = invoke_virtual(java_class, ref, operand_stack[--operand_stack_ptr], generator);
+        ret = invoke_virtual(java_class, ref, stack->pop(), generator);
         break;
 
       case 183: // invokespecial (0xb7)
@@ -1641,21 +1640,22 @@ int instruction_length;
         break;
 
       case 190: // arraylength (0xbe)
-        printf("operand_stack_ptr=%d %d\n", operand_stack_ptr, operand_stack[operand_stack_ptr-1]);
+        printf("stack->length()=%d\n", stack->length());
 
         // FIXME - This is may not be correct
-        if (operand_stack_ptr > 0)
+        if (stack->length() > 0)
         {
-          gen32 = (generic_32bit_t *)java_class->get_constant(operand_stack[--operand_stack_ptr]);
+          uint32_t value = stack->pop();
+          gen32 = (generic_32bit_t *)java_class->get_constant(value);
           if (gen32->tag == CONSTANT_FIELDREF)
           {
             char field_name[64];
             char type[64];
             constant_fieldref_t *field_ref = (struct constant_fieldref_t *)gen32;
             printf("class_index=%d name_and_type=%d\n", field_ref->class_index, field_ref->name_and_type_index);
-            if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), operand_stack[operand_stack_ptr]) != 0)
+            if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), value) != 0)
             {
-              printf("Error retrieving field name const_index=%d\n", operand_stack[operand_stack_ptr]);
+              printf("Error retrieving field name const_index=%d\n", value);
               ret = -1;
               break;
             }
