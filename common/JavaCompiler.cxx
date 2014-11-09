@@ -18,7 +18,8 @@
 #include "JavaClass.h"
 #include "JavaCompiler.h"
 #include "execute_static.h"
-#include "invoke.h"
+#include "invoke_static.h"
+#include "invoke_virtual.h"
 #include "table_java_instr.h"
 
 // http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html

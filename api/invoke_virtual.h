@@ -9,14 +9,13 @@
  *
  */
 
-#ifndef _INVOKE_H
-#define _INVOKE_H
+#ifndef _INVOKE_VIRTUAL_H
+#define _INVOKE_VIRTUAL_H
 
 #include "Generator.h"
 #include "JavaClass.h"
 
-void get_signature(char *signature, int *params, int *is_void);
-void get_static_function(char *function, char *method_name, char *method_sig);
+int invoke_virtual(JavaClass *java_class, int method_id, int field_id, Generator *generator);
 
 #endif
 
