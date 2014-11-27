@@ -47,7 +47,7 @@ c64: samples
 	naken_asm -l -b -o demo.prg demo.asm
 
 ti84: samples
-	./java_grinder samples/TI84Demo.class ti84_demo.asm ti84plus
+	./java_grinder samples/ti84/TI84Demo.class ti84_demo.asm ti84plus
 	naken_asm -l -I include -o ti84_demo.hex ti84_demo.asm
 	rabbitsign -p -g -k include/0104.key -t 8xk -f -vv ti84_demo.hex
 
