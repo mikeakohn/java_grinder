@@ -22,6 +22,7 @@
 #include "M6502.h"
 #include "C64.h"
 #include "AVR8.h"
+#include "Epiphany.h"
 #include "MC68000.h"
 #include "MIPS.h"
 #include "MSP430.h"
@@ -82,6 +83,11 @@ Generator *generator = NULL;
   if (strcasecmp("attiny2313", chip_type) == 0)
   {
     generator = new AVR8(ATTINY2313);
+  }
+    else
+  if (strcasecmp("epiphany", chip_type) == 0)
+  {
+    generator = new Epiphany();
   }
     else
   if (strcasecmp("mc68000", chip_type) == 0)
