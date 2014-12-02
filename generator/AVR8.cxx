@@ -141,6 +141,14 @@ AVR8::AVR8(uint8_t chip_type) :
       include_file = "tn2313def.inc";
       need_farjump = 0;
       break;
+    case ATMEGA328:
+      include_file = "m328def.inc";
+      need_farjump = 1;
+      break;
+    case ATMEGA328P:
+      include_file = "m328pdef.inc";
+      need_farjump = 1;
+      break;
   }
 }
 

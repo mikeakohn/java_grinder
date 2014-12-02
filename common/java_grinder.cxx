@@ -85,6 +85,16 @@ Generator *generator = NULL;
     generator = new AVR8(ATTINY2313);
   }
     else
+  if (strcasecmp("atmega328", chip_type) == 0)
+  {
+    generator = new AVR8(ATMEGA328);
+  }
+    else
+  if (strcasecmp("atmega328p", chip_type) == 0)
+  {
+    generator = new AVR8(ATMEGA328P);
+  }
+    else
   if (strcasecmp("epiphany", chip_type) == 0)
   {
     generator = new Epiphany();

@@ -20,6 +20,8 @@ enum
   ATTINY85,
   ATTINY84,
   ATTINY2313,
+  ATMEGA328,
+  ATMEGA328P,
 };
 
 class AVR8 : public Generator
