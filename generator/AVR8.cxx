@@ -2001,7 +2001,7 @@ int AVR8::ioport_setPinsAsInput(int port, int const_val)
     return -1;
 
   fprintf(out, "; ioport_setPinsAsInput (optimized)\n");
-  fprintf(out, "  ldi temp, 0x%02x\n", const_val);
+  fprintf(out, "  ldi temp, 0x%02x\n", const_val & 0xff);
   fprintf(out, "  eor temp, ff\n");
   fprintf(out, "  in temp2, %s\n", pin_string[port]);
   fprintf(out, "  and temp2, temp\n");
