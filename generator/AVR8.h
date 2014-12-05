@@ -151,6 +151,7 @@ protected:
   bool is_main:1;
   const char *include_file;
   bool need_farjump:1;
+  bool need_memory_mapped_adc:1;
   bool need_swap:1;
   bool need_add_integer:1;
   bool need_sub_integer:1;

@@ -89,14 +89,18 @@
 
 #define LOCALS(a) (a)
 
-static const char *pin_string[2] = { "PINA", "PINB" };
-static const char *ddr_string[2] = { "DDRA", "DDRB" };
-static const char *port_string[2] = { "PORTA", "PORTB" };
+static const char *pin_string[4] = { "PINA", "PINB", "PINC", "PIND" };
+static const char *ddr_string[4] = { "DDRA", "DDRB", "DDRC", "DDRD" };
+static const char *port_string[4] = { "PORTA", "PORTB", "PORTC", "PORTD" };
+
+static char *adc_in_string;
+static char *adc_out_string;
 
 AVR8::AVR8(uint8_t chip_type) :
   stack(0),
   is_main(0),
   need_farjump(0),
+  need_memory_mapped_adc(0),
   need_swap(0),
   need_add_integer(0),
   need_sub_integer(0),
@@ -144,11 +148,24 @@ AVR8::AVR8(uint8_t chip_type) :
     case ATMEGA328:
       include_file = "m328def.inc";
       need_farjump = 1;
+      need_memory_mapped_adc = 1;
       break;
     case ATMEGA328P:
       include_file = "m328pdef.inc";
       need_farjump = 1;
+      need_memory_mapped_adc = 1;
       break;
+  }
+
+  if(need_memory_mapped_adc)
+  {
+    adc_in_string = (char *)"lds";
+    adc_out_string = (char *)"sts";
+  }
+  else
+  {
+    adc_in_string = (char *)"in";
+    adc_out_string = (char *)"out";
   }
 }
 
@@ -201,11 +218,11 @@ int AVR8::start_init()
   fprintf(out, "  .define JAVA_STACK_SIZE (SRAM_SIZE / 4)\n");
   fprintf(out, ".endif\n\n");
 
-  fprintf(out, "stack_lo equ SRAM_START\n");
-  fprintf(out, "stack_hi equ SRAM_START + JAVA_STACK_SIZE\n");
+  fprintf(out, "stack_lo equ (SRAM_START & 0xff)\n");
+  fprintf(out, "stack_hi equ (SRAM_START & 0xff) + JAVA_STACK_SIZE\n");
 
   // heap
-  fprintf(out, "ram_start equ stack_hi + JAVA_STACK_SIZE\n");
+  fprintf(out, "ram_start equ SRAM_START + JAVA_STACK_SIZE * 2\n");
   fprintf(out, "heap_ptr equ ram_start\n\n");
 
   // registers
@@ -250,6 +267,9 @@ int AVR8::start_init()
 
   // java stack pointer
   fprintf(out, "  ldi SP, JAVA_STACK_SIZE - 1\n\n");
+
+  // set YH register to java stack page
+  fprintf(out, "  ldi YH, SRAM_START / 256\n\n");
 
   // processor stack pointer
   fprintf(out, "  ldi temp, RAMEND & 255\n");
@@ -699,12 +719,12 @@ int AVR8::and_integer()
 int AVR8::and_integer(int const_val)
 {
   fprintf(out, "; and_integer (optimized)\n");
-  POP_HI("result1");
-  POP_LO("result0");
-  fprintf(out, "  andi result0, 0x%02x\n", const_val & 0xff);
-  fprintf(out, "  andi result1, 0x%02x\n", const_val >> 8);
-  PUSH_LO("result0");
-  PUSH_HI("result1");
+  POP_HI("value11");
+  POP_LO("value10");
+  fprintf(out, "  andi value10, 0x%02x\n", const_val & 0xff);
+  fprintf(out, "  andi value11, 0x%02x\n", const_val >> 8);
+  PUSH_LO("value10");
+  PUSH_HI("value11");
 
   return 0;
 }
@@ -721,12 +741,12 @@ int AVR8::or_integer()
 int AVR8::or_integer(int const_val)
 {
   fprintf(out, "; or_integer (optimized)\n");
-  POP_HI("result1");
-  POP_LO("result0");
-  fprintf(out, "  ori result0, 0x%02x\n", const_val & 0xff);
-  fprintf(out, "  ori result1, 0x%02x\n", const_val >> 8);
-  PUSH_LO("result0");
-  PUSH_HI("result1");
+  POP_HI("value11");
+  POP_LO("value10");
+  fprintf(out, "  ori value10, 0x%02x\n", const_val & 0xff);
+  fprintf(out, "  ori value11, 0x%02x\n", const_val >> 8);
+  PUSH_LO("value10");
+  PUSH_HI("value11");
 
   return 0;
 }
@@ -1960,7 +1980,7 @@ int AVR8::memory_write16()
 // IOPort API
 int AVR8::ioport_setPinsAsInput(int port)
 {
-  if(port < 0 || port > 1)
+  if(port < 0 || port > 3)
     return -1;
 
   fprintf(out, "; ioport_setpinsasinput\n");
@@ -1977,7 +1997,7 @@ int AVR8::ioport_setPinsAsInput(int port)
 
 int AVR8::ioport_setPinsAsInput(int port, int const_val)
 {
-  if(port < 0 || port > 1)
+  if(port < 0 || port > 3)
     return -1;
 
   fprintf(out, "; ioport_setPinsAsInput (optimized)\n");
@@ -1992,7 +2012,7 @@ int AVR8::ioport_setPinsAsInput(int port, int const_val)
 
 int AVR8::ioport_setPinsAsOutput(int port)
 {
-  if(port < 0 || port > 1)
+  if(port < 0 || port > 3)
     return -1;
 
   fprintf(out, "; ioport_setPinsAsOutput\n");
@@ -2008,11 +2028,11 @@ int AVR8::ioport_setPinsAsOutput(int port)
 
 int AVR8::ioport_setPinsAsOutput(int port, int const_val)
 {
-  if(port < 0 || port > 1)
+  if(port < 0 || port > 3)
     return -1;
 
   fprintf(out, "; ioport_setPinsAsOutput (optimized)\n");
-  fprintf(out, "  ldi temp, 0x%02x\n", const_val);
+  fprintf(out, "  ldi temp, 0x%02x\n", const_val & 0xff);
   fprintf(out, "  in temp2, %s\n", pin_string[port]);
   fprintf(out, "  or temp2, temp\n");
   fprintf(out, "  out %s, temp2\n", ddr_string[port]);
@@ -2022,7 +2042,7 @@ int AVR8::ioport_setPinsAsOutput(int port, int const_val)
 
 int AVR8::ioport_setPinsValue(int port)
 {
-  if(port < 0 || port > 1)
+  if(port < 0 || port > 3)
     return -1;
 
   fprintf(out, "; ioport_setPinsValue\n");
@@ -2036,11 +2056,11 @@ int AVR8::ioport_setPinsValue(int port)
 
 int AVR8::ioport_setPinsValue(int port, int const_val)
 {
-  if(port < 0 || port > 1)
+  if(port < 0 || port > 3)
     return -1;
 
   fprintf(out, "; ioport_setPinsValue (optimized)\n");
-  fprintf(out, "  ldi temp, 0x%02x\n", const_val);
+  fprintf(out, "  ldi temp, 0x%02x\n", const_val & 0xff);
   fprintf(out, "  out %s, temp\n", port_string[port]);
 
   return 0;
@@ -2048,7 +2068,7 @@ int AVR8::ioport_setPinsValue(int port, int const_val)
 
 int AVR8::ioport_setPinsHigh(int port)
 {
-  if(port < 0 || port > 1)
+  if(port < 0 || port > 3)
     return -1;
 
   fprintf(out, "; ioport_setPinsHigh\n");
@@ -2064,7 +2084,7 @@ int AVR8::ioport_setPinsHigh(int port)
 
 int AVR8::ioport_setPinsLow(int port)
 {
-  if(port < 0 || port > 1)
+  if(port < 0 || port > 3)
     return -1;
 
   fprintf(out, "; ioport_setPinsLow\n");
@@ -2096,7 +2116,7 @@ int AVR8::ioport_setPinHigh(int port)
 
 int AVR8::ioport_setPinHigh(int port, int const_val)
 {
-  if(port < 0 || port > 1)
+  if(port < 0 || port > 3)
     return -1;
 
   if(const_val < 0 || const_val > 7) { return -1; }
@@ -2116,7 +2136,7 @@ int AVR8::ioport_setPinLow(int port)
 
 int AVR8::ioport_setPinLow(int port, int const_val)
 {
-  if(port < 0 || port > 1)
+  if(port < 0 || port > 3)
     return -1;
 
   if(const_val < 0 || const_val > 7) { return -1; }
@@ -2146,7 +2166,7 @@ int AVR8::adc_enable()
 {
   fprintf(out, "; adc_enable\n");
   fprintf(out, "  ldi temp, (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0)\n");
-  fprintf(out, "  out ADCSRA, temp\n");
+  fprintf(out, "  %s ADCSRA, temp\n", adc_out_string);
 
   return 0;
 } 
@@ -2154,7 +2174,7 @@ int AVR8::adc_enable()
 int AVR8::adc_disable()
 {
   fprintf(out, "; adc_disable\n");
-  fprintf(out, "  out ADCSRA, zero\n");
+  fprintf(out, "  %s ADCSRA, zero\n", adc_out_string);
 
   return 0;
 } 
@@ -2168,7 +2188,7 @@ int AVR8::adc_setChannel_I(int channel)
 {
   fprintf(out, "; adc_setChannel_I\n");
   fprintf(out, "  ldi temp, %d\n", channel);
-  fprintf(out, "  out ADMUX, temp\n");
+  fprintf(out, "  %s ADMUX, temp\n", adc_out_string);
   PUSH_LO("zero");
   PUSH_HI("zero");
   stack++;
@@ -2179,17 +2199,27 @@ int AVR8::adc_setChannel_I(int channel)
 int AVR8::adc_read()
 {
   fprintf(out, "; adc_read\n");
-  fprintf(out, "  in temp, ADCSRA\n");
+  fprintf(out, "  %s temp, ADCSRA\n", adc_in_string);
   fprintf(out, "  ori temp, (1 << ADSC)\n");
-  fprintf(out, "  out ADCSRA, temp\n");
+  fprintf(out, "  %s ADCSRA, temp\n", adc_out_string);
 
   fprintf(out, "adc_read_%d:\n", label_count);
-  fprintf(out, "  sbic ADCSRA, ADSC\n");
+
+  if(need_memory_mapped_adc)
+  {
+    fprintf(out, "  lds temp, ADCSRA\n");
+    fprintf(out, "  sbrc temp, ADSC\n");
+  }
+  else
+  {
+    fprintf(out, "  sbic ADCSRA, ADSC\n");
+  }
+
   fprintf(out, "  rjmp adc_read_%d\n", label_count++);
 
-  fprintf(out, "  in result0, ADCL\n");
+  fprintf(out, "  %s result0, ADCL\n", adc_in_string);
   PUSH_LO("result0");
-  fprintf(out, "  in result1, ADCH\n");
+  fprintf(out, "  %s result1, ADCH\n", adc_in_string);
   PUSH_HI("result1");
   stack++;
   
