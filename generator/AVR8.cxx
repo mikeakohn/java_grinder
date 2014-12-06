@@ -2165,7 +2165,15 @@ int AVR8::ioport_getPortInputValue(int port)
 int AVR8::adc_enable()
 {
   fprintf(out, "; adc_enable\n");
-  fprintf(out, "  ldi temp, (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0)\n");
+  fprintf(out, "  ldi temp, (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0)\n");
+  fprintf(out, "  %s ADCSRA, temp\n", adc_out_string);
+
+  fprintf(out, "  %s temp, ADMUX\n", adc_in_string);
+  fprintf(out, "  ori temp, (1 << REFS0)\n");
+  fprintf(out, "  %s ADMUX, temp\n", adc_out_string);
+
+  fprintf(out, "  %s temp, ADCSRA\n", adc_in_string);
+  fprintf(out, "  ori temp, (1 << ADEN) | (1 << ADSC)\n");
   fprintf(out, "  %s ADCSRA, temp\n", adc_out_string);
 
   return 0;
@@ -2199,6 +2207,7 @@ int AVR8::adc_setChannel_I(int channel)
 int AVR8::adc_read()
 {
   fprintf(out, "; adc_read\n");
+
   fprintf(out, "  %s temp, ADCSRA\n", adc_in_string);
   fprintf(out, "  ori temp, (1 << ADSC)\n");
   fprintf(out, "  %s ADCSRA, temp\n", adc_out_string);
