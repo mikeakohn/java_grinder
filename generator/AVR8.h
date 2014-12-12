@@ -146,6 +146,14 @@ public:
   virtual int adc_setChannel_I(int channel);
   virtual int adc_read();
 
+  // UART functions
+  virtual int uart_init(int port);
+  virtual int uart_init(int port, int baud_rate);
+  virtual int uart_send(int port);
+  virtual int uart_read(int port);
+  virtual int uart_isDataAvailable(int port);
+  virtual int uart_isSendReady(int port);
+
 protected:
   int stack;
   bool is_main:1;

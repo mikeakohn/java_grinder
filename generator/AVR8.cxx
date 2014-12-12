@@ -2238,11 +2238,88 @@ int AVR8::adc_read()
   stack++;
   
   return 0;
-} 
-
-#if 0
-void AVR8::close()
-{
 }
-#endif
+
+// UART functions
+int AVR8::uart_init(int port)
+{
+  return -1;
+}
+
+int AVR8::uart_init(int port, int baud_rate)
+{
+  // UBRR = (fosc / (16 * BAUD) - 1)
+  int rate_table[] = { 832,   415,  103,    51,    25 };
+  int baud_table[] = { 1200, 2400, 9600, 19200, 38400 };
+
+  if (baud_rate < 0 || baud_rate > (int)(sizeof(rate_table) / sizeof(int)))
+  {
+    printf("Error: Illegal baud constant\n");
+    return -1;
+  }
+
+  fprintf(out, "  ;; Set up UART baud rate\n");
+  fprintf(out, "  ldi temp, %d\n", rate_table[baud_rate] >> 8);
+  fprintf(out, "  sts UBRR0H, r16\n");
+  fprintf(out, "  ldi temp, %d\n", rate_table[baud_rate] & 0xff);
+  fprintf(out, "  sts UBRR0L, r16           ; %d @ 16MHz = %d baud\n\n",
+     rate_table[baud_rate], baud_table[baud_rate]);
+
+  fprintf(out, "  ;; Set up UART options\n");
+  fprintf(out, "  ldi temp, (1<<UCSZ00)|(1<<UCSZ01)    ; sets up data as 8N1\n");
+  fprintf(out, "  sts UCSR0C, temp\n");
+  fprintf(out, "  ldi temp, (1<<TXEN0)|(1<<RXEN0)      ; enables send/receive\n");
+  fprintf(out, "  sts UCSR0B, temp\n");
+  //fprintf(out, "  ldi temp, (1<<U2X0)\n");
+  //fprintf(out, "  sts UCSR0A, temp\n");
+
+  return 0;
+}
+
+int AVR8::uart_send(int port)
+{
+  POP_HI("temp");
+  POP_LO("temp");
+  fprintf(out, "  sts UDR0, temp ; output a char over UART\n");
+
+  return 0;
+}
+
+int AVR8::uart_read(int port)
+{
+  //fprintf(out, "  lds r17, UDR0 ; read char from uart\n");
+
+  fprintf(out, "  lds result0, UDR0 ; read char from UART\n");
+  PUSH_LO("result0");
+  PUSH_HI("r10");
+  stack++;
+
+  return 0;
+}
+
+int AVR8::uart_isDataAvailable(int port)
+{
+  fprintf(out, "  mov result0, zero\n");
+  fprintf(out, "  lds temp, UCSR0A  ; poll uart to see if there is a data waiting\n");
+  fprintf(out, "  sbrc temp, RXC0\n");
+  fprintf(out, "  mov result0, one\n");
+  PUSH_LO("result0");
+  PUSH_HI("r10");
+  stack++;
+
+  return 0;
+}
+
+int AVR8::uart_isSendReady(int port)
+{
+  fprintf(out, "  mov result0, zero\n");
+  fprintf(out, "  lds temp, UCSR0A     ; check to see if it's okay to send a char\n");
+  fprintf(out, "  sbrs temp, UDRE0\n");
+  fprintf(out, "  mov result0, one\n");
+  PUSH_LO("result0");
+  PUSH_HI("r10");
+  stack++;
+
+  return 0;
+}
 

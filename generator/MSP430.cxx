@@ -1687,6 +1687,11 @@ int MSP430::uart_init(int port)
   return -1;
 }
 
+int MSP430::uart_init(int port, int baud_rate)
+{
+  return -1;
+}
+
 int MSP430::uart_send(int port)
 {
   return -1;

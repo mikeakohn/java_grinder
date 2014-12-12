@@ -16,6 +16,7 @@
 #include "JavaClass.h"
 
 int uart(JavaClass *java_class, Generator *generator, char *method_name, int port);
+int uart(JavaClass *java_class, Generator *generator, char *method_name, int port, int const_val);
 
 #endif
 

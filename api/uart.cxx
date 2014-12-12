@@ -17,44 +17,32 @@
 #include "JavaClass.h"
 #include "uart.h"
 
-#define CHECK_FUNC(funct) \
-  if (strncmp(#funct, function, sizeof(#funct)-1) == 0) \
+#define CHECK_FUNC(funct,sig) \
+  if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return uart_##funct(java_class, generator, port); \
+    return generator->uart_##funct(port); \
   }
 
-static int uart_init_III(JavaClass *java_class, Generator *generator, int port)
+#define CHECK_FUNC_CONST(funct,sig) \
+  if (strcmp(#funct#sig, method_name) == 0) \
+  { \
+    return generator->uart_##funct(port, const_val); \
+  }
+
+int uart(JavaClass *java_class, Generator *generator, char *method_name, int port)
 {
-  return generator->uart_init(port);
+  CHECK_FUNC(init,_I)
+  CHECK_FUNC(send,_I)
+  CHECK_FUNC(read,)
+  CHECK_FUNC(isDataAvailable,)
+  CHECK_FUNC(isSendReady,)
+
+  return -1;
 }
 
-static int uart_send_B(JavaClass *java_class, Generator *generator, int port)
+int uart(JavaClass *java_class, Generator *generator, char *method_name, int port, int const_val)
 {
-  return generator->uart_send(port);
-}
-
-static int uart_read(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->uart_read(port);
-}
-
-static int uart_isDataAvailable(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->uart_isDataAvailable(port);
-}
-
-static int uart_isSendReady(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->uart_isSendReady(port);
-}
-
-int uart(JavaClass *java_class, Generator *generator, char *function, int port)
-{
-  CHECK_FUNC(init_III)
-  CHECK_FUNC(send_B)
-  CHECK_FUNC(read)
-  CHECK_FUNC(isDataAvailable)
-  CHECK_FUNC(isSendReady)
+  CHECK_FUNC_CONST(init,_I)
 
   return -1;
 }

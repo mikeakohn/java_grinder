@@ -42,6 +42,7 @@ public:
 
   // UART functions
   virtual int uart_init(int port) { return -1; }
+  virtual int uart_init(int port, int baud_rate) { return -1; }
   virtual int uart_send(int port) { return -1; }
   virtual int uart_read(int port) { return -1; }
   virtual int uart_isDataAvailable(int port) { return -1; }

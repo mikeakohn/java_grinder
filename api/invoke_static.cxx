@@ -160,7 +160,7 @@ char method_sig[128];
 char method_class[128];
 char function[256];
 
-  printf("const invoke_static()\n");
+  printf("const invoke_static() const_count=%d\n", const_count);
 
   if (java_class->get_class_name(method_class, sizeof(method_class), method_id) != 0 ||
       java_class->get_ref_name_type(method_name, method_sig, sizeof(method_name), method_id) != 0)
@@ -200,7 +200,9 @@ char function[256];
     CHECK_CONST(CPU, cpu)
     CHECK_WITH_PORT_CONST(SPI, spi, 0)
     CHECK_WITH_PORT_CONST(SPI, spi, 1)
-    CHECK_CONST(TI99, ti99)
+    CHECK_WITH_PORT_CONST(TI99, ti99, 0)
+    CHECK_WITH_PORT_CONST(UART, uart, 0)
+    CHECK_WITH_PORT_CONST(UART, uart, 1)
       else
     {}
   }

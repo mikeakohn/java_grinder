@@ -8,7 +8,8 @@ JAVA_SRC=\
   SPITest.class \
   StringTest.class \
   Testing2.class \
-  Testing.class
+  Testing.class \
+  UARTTest.class
 
 default: $(JAVA_SRC)
 

@@ -137,6 +137,7 @@ public:
 
   // UART functions
   virtual int uart_init(int port);
+  virtual int uart_init(int port, int baud_rate);
   virtual int uart_send(int port);
   virtual int uart_read(int port);
   virtual int uart_isDataAvailable(int port);

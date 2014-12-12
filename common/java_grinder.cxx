@@ -181,7 +181,7 @@ int n;
 
   if (argc < 4)
   {
-    printf("Usage: %s <class> <outfile> <dspic/msp430g2231/msp430g2553/m6502/c64/arm/mips/ti84plus>\n", argv[0]);
+    printf("Usage: %s <class> <outfile> <attiny2313,atmega328,atmega328p,attiny85,attiny84,attiny13,dspic/msp430g2231/msp430g2553/m6502/c64/arm/mips/ti84plus>\n", argv[0]);
     exit(0);
   }
 
