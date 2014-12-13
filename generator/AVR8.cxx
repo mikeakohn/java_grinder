@@ -2260,9 +2260,9 @@ int AVR8::uart_init(int port, int baud_rate)
 
   fprintf(out, "  ;; Set up UART baud rate\n");
   fprintf(out, "  ldi temp, %d\n", rate_table[baud_rate] >> 8);
-  fprintf(out, "  sts UBRR0H, r16\n");
+  fprintf(out, "  sts UBRR0H, temp\n");
   fprintf(out, "  ldi temp, %d\n", rate_table[baud_rate] & 0xff);
-  fprintf(out, "  sts UBRR0L, r16           ; %d @ 16MHz = %d baud\n\n",
+  fprintf(out, "  sts UBRR0L, temp  ; %d @ 16MHz = %d baud\n\n",
      rate_table[baud_rate], baud_table[baud_rate]);
 
   fprintf(out, "  ;; Set up UART options\n");
@@ -2270,6 +2270,8 @@ int AVR8::uart_init(int port, int baud_rate)
   fprintf(out, "  sts UCSR0C, temp\n");
   fprintf(out, "  ldi temp, (1<<TXEN0)|(1<<RXEN0)      ; enables send/receive\n");
   fprintf(out, "  sts UCSR0B, temp\n");
+  fprintf(out, "  eor temp, temp\n");
+  fprintf(out, "  sts UCSR0A, temp\n");
   //fprintf(out, "  ldi temp, (1<<U2X0)\n");
   //fprintf(out, "  sts UCSR0A, temp\n");
 
@@ -2291,7 +2293,7 @@ int AVR8::uart_read(int port)
 
   fprintf(out, "  lds result0, UDR0 ; read char from UART\n");
   PUSH_LO("result0");
-  PUSH_HI("r10");
+  PUSH_HI("zero");
   stack++;
 
   return 0;
@@ -2304,7 +2306,7 @@ int AVR8::uart_isDataAvailable(int port)
   fprintf(out, "  sbrc temp, RXC0\n");
   fprintf(out, "  mov result0, one\n");
   PUSH_LO("result0");
-  PUSH_HI("r10");
+  PUSH_HI("zero");
   stack++;
 
   return 0;
@@ -2314,10 +2316,10 @@ int AVR8::uart_isSendReady(int port)
 {
   fprintf(out, "  mov result0, zero\n");
   fprintf(out, "  lds temp, UCSR0A     ; check to see if it's okay to send a char\n");
-  fprintf(out, "  sbrs temp, UDRE0\n");
+  fprintf(out, "  sbrc temp, UDRE0\n");
   fprintf(out, "  mov result0, one\n");
   PUSH_LO("result0");
-  PUSH_HI("r10");
+  PUSH_HI("zero");
   stack++;
 
   return 0;
