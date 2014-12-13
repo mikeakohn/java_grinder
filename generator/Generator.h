@@ -28,6 +28,7 @@ public:
   virtual ~Generator();
 
   virtual int open(const char *filename);
+  virtual int get_cpu_byte_alignment() { return 2; }
   void label(char *name);
   virtual int start_init() = 0;
   virtual int insert_static_field_define(const char *name, const char *type, int index) = 0;

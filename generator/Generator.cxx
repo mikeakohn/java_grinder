@@ -40,12 +40,6 @@ int Generator::open(const char *filename)
   return 0;
 }
 
-#if 0
-void Generator::close()
-{
-}
-#endif
-
 void Generator::label(char *name)
 {
   fprintf(out, "%s:\n", name);
@@ -58,7 +52,7 @@ void Generator::add_newline()
 
 int Generator::insert_db(const char *name, int32_t *data, int len, uint8_t len_type)
 {
-int n;
+  int n;
 
   if (len_type == TYPE_SHORT)
   {
@@ -93,7 +87,7 @@ int n;
 
 int Generator::insert_dw(const char *name, int32_t *data, int len, uint8_t len_type)
 {
-int n;
+  int n;
 
   if (len_type == TYPE_SHORT)
   {
@@ -129,7 +123,7 @@ int n;
 
 int Generator::insert_dc32(const char *name, int32_t *data, int len, uint8_t len_type)
 {
-int n;
+  int n;
 
   // FIXME: For dc32, the len_type should be dc32 always.
   if (len_type == TYPE_SHORT)
@@ -161,7 +155,7 @@ int n;
 
 int Generator::get_constant(uint32_t constant)
 {
-int n;
+  int n;
 
   for (n = 0; n < constants_len; n++)
   {
@@ -181,7 +175,7 @@ int n;
 
 void Generator::write_constants()
 {
-int n;
+  int n;
 
   if (constants_len == 0) { return; }
 
@@ -202,23 +196,36 @@ int n;
 
 int Generator::insert_utf8(const char *name, uint8_t *bytes, int len)
 {
-int n;
+  int n;
 
   fprintf(out, "_%s:\n", name);
   fprintf(out, "  db \"");
   for (n = 0; n < len; n++)
   {
-    fprintf(out, "%c", bytes[n]);
+    if (bytes[n] == '\n')
+    {
+      fprintf(out, "\\n");
+    }
+      else
+    if (bytes[n] == '\"')
+    {
+      fprintf(out, "\\\"");
+    }
+      else
+    {
+      fprintf(out, "%c", bytes[n]);
+    }
   }
   fprintf(out, "\"\n");
-  fprintf(out, "  db 0\n");
+
+  fprintf(out, ".align %d\n", get_cpu_byte_alignment() * 8);
 
   return 0;
 }
 
 int Generator::cpu_asm(const char *code, int len)
 {
-int n;
+  int n;
 
   for (n = 0; n < len; n++)
   {
