@@ -89,7 +89,7 @@
 
 #define LOCALS(a) (a)
 
-static const char *pin_string[4] = { "PINA", "PINB", "PINC", "PIND" };
+//static const char *pin_string[4] = { "PINA", "PINB", "PINC", "PIND" };
 static const char *ddr_string[4] = { "DDRA", "DDRB", "DDRC", "DDRD" };
 static const char *port_string[4] = { "PORTA", "PORTB", "PORTC", "PORTD" };
 
@@ -1987,7 +1987,7 @@ int AVR8::ioport_setPinsAsInput(int port)
   POP_HI("temp");
   POP_LO("temp");
   fprintf(out, "  eor temp, ff\n");
-  fprintf(out, "  in temp2, %s\n", pin_string[port]);
+  fprintf(out, "  in temp2, %s\n", ddr_string[port]);
   fprintf(out, "  and temp2, temp\n");
   fprintf(out, "  out %s, temp2\n", ddr_string[port]);
   stack--;
@@ -2003,7 +2003,7 @@ int AVR8::ioport_setPinsAsInput(int port, int const_val)
   fprintf(out, "; ioport_setPinsAsInput (optimized)\n");
   fprintf(out, "  ldi temp, 0x%02x\n", const_val & 0xff);
   fprintf(out, "  eor temp, ff\n");
-  fprintf(out, "  in temp2, %s\n", pin_string[port]);
+  fprintf(out, "  in temp2, %s\n", ddr_string[port]);
   fprintf(out, "  and temp2, temp\n");
   fprintf(out, "  out %s, temp2\n", ddr_string[port]);
 
@@ -2018,7 +2018,7 @@ int AVR8::ioport_setPinsAsOutput(int port)
   fprintf(out, "; ioport_setPinsAsOutput\n");
   POP_HI("temp");
   POP_LO("temp");
-  fprintf(out, "  in temp2, %s\n", pin_string[port]);
+  fprintf(out, "  in temp2, %s\n", ddr_string[port]);
   fprintf(out, "  or temp2, temp\n");
   fprintf(out, "  out %s, temp2\n", ddr_string[port]);
   stack--;
@@ -2033,7 +2033,7 @@ int AVR8::ioport_setPinsAsOutput(int port, int const_val)
 
   fprintf(out, "; ioport_setPinsAsOutput (optimized)\n");
   fprintf(out, "  ldi temp, 0x%02x\n", const_val & 0xff);
-  fprintf(out, "  in temp2, %s\n", pin_string[port]);
+  fprintf(out, "  in temp2, %s\n", ddr_string[port]);
   fprintf(out, "  or temp2, temp\n");
   fprintf(out, "  out %s, temp2\n", ddr_string[port]);
 
@@ -2074,7 +2074,7 @@ int AVR8::ioport_setPinsHigh(int port)
   fprintf(out, "; ioport_setPinsHigh\n");
   POP_HI("temp");
   POP_LO("temp");
-  fprintf(out, "  in temp2, %s\n", pin_string[port]);
+  fprintf(out, "  in temp2, %s\n", port_string[port]);
   fprintf(out, "  or temp2, temp\n");
   fprintf(out, "  out %s, temp2\n", port_string[port]);
   stack--;
@@ -2091,7 +2091,7 @@ int AVR8::ioport_setPinsLow(int port)
   POP_HI("temp");
   POP_LO("temp");
   fprintf(out, "  eor temp, ff\n");
-  fprintf(out, "  in temp2, %s\n", pin_string[port]);
+  fprintf(out, "  in temp2, %s\n", port_string[port]);
   fprintf(out, "  and temp2, temp\n");
   fprintf(out, "  out %s, temp2\n", port_string[port]);
   stack--;
@@ -2122,9 +2122,12 @@ int AVR8::ioport_setPinHigh(int port, int const_val)
   if(const_val < 0 || const_val > 7) { return -1; }
 
   fprintf(out, "; ioport_setPinHigh (optimized)\n");
-  fprintf(out, "  in temp, %s\n", pin_string[port]);
+#if 0
+  fprintf(out, "  in temp, %s\n", port_string[port]);
   fprintf(out, "  ori temp, 0x%02x\n", (1 << const_val));
   fprintf(out, "  out %s, temp\n", port_string[port]);
+#endif
+  fprintf(out, "  sbi %s, %d\n", port_string[port], const_val);
 
   return 0;
 }
@@ -2142,17 +2145,21 @@ int AVR8::ioport_setPinLow(int port, int const_val)
   if(const_val < 0 || const_val > 7) { return -1; }
 
   fprintf(out, "; ioport_setPinLow (optimized)\n");
-  fprintf(out, "  in temp, %s\n", pin_string[port]);
+#if 0
+  fprintf(out, "  in temp, %s\n", port_string[port]);
   fprintf(out, "  ldi temp2, 0x%02x\n", (1 << const_val));
   fprintf(out, "  eor temp2, ff\n");
   fprintf(out, "  and temp, temp2\n");
   fprintf(out, "  out %s, temp\n", port_string[port]);
+#endif
+  fprintf(out, "  cbi %s, %d\n", port_string[port], const_val);
 
   return 0;
 }
 
 int AVR8::ioport_isPinInputHigh(int port)
 {
+  // Uncomment pin_string at the top of the file for this function.
   return -1;
 }
 
