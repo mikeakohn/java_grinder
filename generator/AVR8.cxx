@@ -1533,12 +1533,9 @@ void AVR8::insert_shift_right_integer()
   POP_LO("temp");
   POP_HI("result1");
   POP_LO("result0");
-  fprintf(out, "  mov temp2, result1\n");
   fprintf(out, "shift_right_integer_loop:\n");
-  fprintf(out, "  lsl temp2\n");
-  fprintf(out, "  ror result1\n");
+  fprintf(out, "  asr result1\n");
   fprintf(out, "  ror result0\n");
-  fprintf(out, "  mov temp2, result0\n");
   fprintf(out, "  dec temp\n");
   fprintf(out, "  brne shift_right_integer_loop\n");
   PUSH_LO("result0");
