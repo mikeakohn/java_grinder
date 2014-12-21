@@ -21,6 +21,7 @@ abstract public class UART
   public static final int BAUD_9600 = 2;
   public static final int BAUD_19200 = 3;
   public static final int BAUD_38400 = 4;
+  public static final int BAUD_57600 = 5;
 
   protected UART()
   {

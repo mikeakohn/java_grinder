@@ -2253,8 +2253,8 @@ int AVR8::uart_init(int port)
 int AVR8::uart_init(int port, int baud_rate)
 {
   // UBRR = (fosc / (16 * BAUD) - 1)
-  int rate_table[] = { 832,   415,  103,    51,    25 };
-  int baud_table[] = { 1200, 2400, 9600, 19200, 38400 };
+  int rate_table[] = { 832,   415,  103,    51,    25,    16 };
+  int baud_table[] = { 1200, 2400, 9600, 19200, 38400, 57600 };
 
   if (baud_rate < 0 || baud_rate > (int)(sizeof(rate_table) / sizeof(int)))
   {
