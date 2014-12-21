@@ -202,11 +202,6 @@ int AVR8::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 
-  return 0;
-}
-
-int AVR8::start_init()
-{
   // include file
   fprintf(out, ".avr8\n");
   fprintf(out, ".include \"%s\"\n\n", include_file);
@@ -222,9 +217,14 @@ int AVR8::start_init()
   fprintf(out, "stack_hi equ (SRAM_START & 0xff) + JAVA_STACK_SIZE\n");
 
   // heap
-  fprintf(out, "ram_start equ SRAM_START + JAVA_STACK_SIZE * 2\n");
+  fprintf(out, "ram_start equ SRAM_START + JAVA_STACK_SIZE + JAVA_STACK_SIZE\n");
   fprintf(out, "heap_ptr equ ram_start\n\n");
 
+  return 0;
+}
+
+int AVR8::start_init()
+{
   // registers
   fprintf(out, "result0 equ r0\n");
   fprintf(out, "result1 equ r1\n");
@@ -1156,7 +1156,7 @@ int AVR8::put_static(const char *name, int index)
 
 int AVR8::get_static(const char *name, int index)
 {
-    fprintf(out, "; get_static\n");
+  fprintf(out, "; get_static\n");
   fprintf(out, "  lds temp, %s + 0\n", name);
   PUSH_LO("temp");
   fprintf(out, "  lds temp, %s + 1\n", name);
