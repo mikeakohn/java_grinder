@@ -217,7 +217,7 @@ int AVR8::open(const char *filename)
   fprintf(out, "stack_hi equ (SRAM_START & 0xff) + JAVA_STACK_SIZE\n");
 
   // heap
-  fprintf(out, "ram_start equ SRAM_START + JAVA_STACK_SIZE + JAVA_STACK_SIZE\n");
+  fprintf(out, "ram_start equ SRAM_START + (JAVA_STACK_SIZE * 2)\n");
   fprintf(out, "heap_ptr equ ram_start\n\n");
 
   return 0;
@@ -1237,9 +1237,8 @@ int AVR8::push_array_length()
 int AVR8::push_array_length(const char *name, int field_id)
 {
   need_push_array_length2 = 1;
-
-  fprintf(out, "  lds XL, %s + 0\n", name);
-  fprintf(out, "  lds XH, %s + 1\n", name);
+  fprintf(out, "  lds ZL, %s + 0\n", name);
+  fprintf(out, "  lds ZH, %s + 1\n", name);
   CALL("push_array_length2");
   stack++;
 
@@ -1742,10 +1741,10 @@ void AVR8::insert_push_array_length()
 void AVR8::insert_push_array_length2()
 {
   fprintf(out, "push_array_length2:\n");
-  fprintf(out, "  sub XL, two\n");
-  fprintf(out, "  sbc XH, zero\n");
-  fprintf(out, "  ld result0, X+\n");
-  fprintf(out, "  ld result1, X\n");
+  fprintf(out, "  sub ZL, two\n");
+  fprintf(out, "  sbc ZH, zero\n");
+  fprintf(out, "  lpm result0, Z+\n");
+  fprintf(out, "  lpm result1, Z\n");
   PUSH_LO("result0");
   PUSH_HI("result1");
   fprintf(out, "  ret\n\n");
