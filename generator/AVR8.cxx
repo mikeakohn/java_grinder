@@ -828,7 +828,7 @@ int AVR8::integer_to_byte()
 
 int AVR8::integer_to_short()
 {
-  // FIXME - Joe, fill this in :).
+  // integers are already 16-bit, do nothing
   return 0;
 }
 
