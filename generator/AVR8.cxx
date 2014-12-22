@@ -829,7 +829,7 @@ int AVR8::integer_to_byte()
 int AVR8::integer_to_short()
 {
   // FIXME - Joe, fill this in :).
-  return -1;
+  return 0;
 }
 
 int AVR8::jump_cond(const char *label, int cond, int distance)
@@ -1961,8 +1961,8 @@ int AVR8::memory_read16()
 int AVR8::memory_write16()
 {
   fprintf(out, "; memory_write16\n");
-  POP_HI("value10");
-  POP_LO("value11");
+  POP_HI("value11");
+  POP_LO("value10");
   POP_HI("XH");
   POP_LO("XL");
   fprintf(out, "  st X+, value10\n");
