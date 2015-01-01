@@ -376,7 +376,7 @@ int X86::neg_integer()
 
 int X86::shift_left_integer()
 {
-  return -1;
+  return stack_shift("sal");
 }
 
 int X86::shift_left_integer(int num)
@@ -386,7 +386,7 @@ int X86::shift_left_integer(int num)
 
 int X86::shift_right_integer()
 {
-  return -1;
+  return stack_shift("sar");
 }
 
 int X86::shift_right_integer(int num)
@@ -396,7 +396,7 @@ int X86::shift_right_integer(int num)
 
 int X86::shift_right_uinteger()
 {
-  return -1;
+  return stack_shift("shr");
 }
 
 int X86::shift_right_uinteger(int num)
@@ -648,11 +648,10 @@ int X86::stack_alu(const char *instr)
     stack--;
   }
     else
-  if (stack > 0)
+  if (stack > 1)
   {
-    // This is wrong.
     fprintf(out, "  pop ebx\n");
-    fprintf(out, "  add [esp], ebx\n");
+    fprintf(out, "  %s [esp], ebx\n", instr);
     stack--;
   }
     else
@@ -675,6 +674,49 @@ int X86::stack_alu(const char *instr, int num)
     else
   {
     fprintf(out, "  %s %s, %d\n", instr, REG_STACK(reg - 1), num);
+  }
+
+  return 0;
+}
+
+int X86::stack_shift(const char *instr)
+{
+  if (stack == 1)
+  {
+    fprintf(out, "  mov ebx, ecx\n");
+    fprintf(out, "  pop ecx\n");
+    fprintf(out, "  %s %s, cl\n", instr, REG_STACK(reg - 1));
+    fprintf(out, "  mov ecx, ebx\n");
+    stack--;
+  }
+    else
+  if (stack > 1)
+  {
+    fprintf(out, "  mov ebx, ecx\n");
+    fprintf(out, "  pop ecx\n");
+    fprintf(out, "  %s dword [esp], cl\n", instr);
+    fprintf(out, "  mov ecx, ebx\n");
+    stack--;
+  }
+    else
+  if (reg == 2)
+  {
+    fprintf(out, "  %s %s, cl\n", instr, REG_STACK(reg - 2));
+    reg--;
+  }
+    else
+  if (reg == 3)
+  {
+    fprintf(out, "  mov ebx, ecx\n");
+    fprintf(out, "  mov ecx, edx\n");
+    fprintf(out, "  %s ebx, cl\n", instr);
+    fprintf(out, "  mov ecx, ebx\n");
+    reg--;
+  }
+    else
+  {
+    printf("Internal Error: Wrong registers on stack\n");
+    return -1;
   }
 
   return 0;
