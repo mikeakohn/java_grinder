@@ -17,7 +17,7 @@
 #include "X86.h"
 
 #define REG_STACK(a) (registers[a])
-#define LOCALS(i) (i * 4)
+#define LOCALS(i) ((i * 4) + 4)
 
 // ABI is:
 
@@ -41,12 +41,8 @@ int X86::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 
-  fprintf(out, ".bits 32\n");
-
-  // Set where RAM starts / ends
-  // FIXME - Not sure what to set this to right now
-  fprintf(out, "ram_start equ 0\n");
-  fprintf(out, "ram_end equ 0x8000\n");
+  fprintf(out, "BITS 32\n");
+  fprintf(out, "\n");
 
   return 0;
 }
@@ -112,8 +108,28 @@ int X86::insert_field_init(char *name, int index)
 
 void X86::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
+  int i;
+
   fprintf(out, "  push ebp\n");
   fprintf(out, "  mov ebp, esp\n");
+
+  if (local_count != 0)
+  {
+    fprintf(out, "  ; Allocate space for %d local variables\n", local_count);
+    fprintf(out, "  sub esp, %d\n", local_count * 4);
+  }
+
+  // This looks awkward but was done this way to preserve C compatibility.
+  if (param_count != 0)
+  {
+    fprintf(out, "  ; Copy %d parameters to local variables\n", param_count);
+
+    for (i = 0; i < param_count; i++)
+    {
+      fprintf(out, "  mov eax, [ebp+%d]\n", (i * 4) + 8);
+      fprintf(out, "  mov [ebp-%d], eax\n", LOCALS(i));
+    }
+  }
 }
 
 void X86::method_end(int local_count)
@@ -137,7 +153,18 @@ int X86::push_integer(int32_t n)
 
 int X86::push_integer_local(int index)
 {
-  return -1;
+  if (reg < REG_MAX)
+  {
+    fprintf(out, "  mov %s, [ebp-%d]\n", REG_STACK(reg++), LOCALS(index));
+  }
+    else
+  {
+    fprintf(out, "  mov ebx, [ebp-%d]\n", LOCALS(index));
+    fprintf(out, "  push ebx\n");
+    stack++;
+  }
+
+  return 0;
 }
 
 int X86::push_ref_local(int index)
@@ -416,14 +443,27 @@ int X86::return_local(int index, int local_count)
 
 int X86::return_integer(int local_count)
 {
-  printf("  pop ebp\n");
+  if (local_count != 0)
+  {
+    fprintf(out, "  sub esp, %d\n", local_count);
+  }
+
+  fprintf(out, "  pop ebp\n");
   if (reg != 1)
   {
     fprintf(out, "  mov eax, %s\n", REG_STACK(reg - 1));
+    reg--;
   }
     else
+  if (reg == 1)
   {
-    printf("Error: register stack not empty?\n");
+    // Return value is top of stack (eax)
+    reg--;
+  }
+
+  if (reg != 0 || stack != 0)
+  {
+    printf("Error: register stack not empty? (%d,%d)\n", reg, stack);
     return -1;
   }
 
@@ -434,6 +474,10 @@ int X86::return_integer(int local_count)
 
 int X86::return_void(int local_count)
 {
+  if (local_count != 0)
+  {
+    fprintf(out, "  sub esp, %d\n", local_count);
+  }
   fprintf(out, "  pop ebp\n");
   fprintf(out, "  ret\n");
 
