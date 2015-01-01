@@ -513,6 +513,12 @@ int instruction_length;
     return 0;
   }
 
+  if ((method->access_flags & ACC_STATIC) == 0)
+  {
+    printf("Error: Method %s is not static.\n", method_name);
+    return -1;
+  }
+
   param_count = 0;
 
   if (strcmp(method_name, "main") != 0)
