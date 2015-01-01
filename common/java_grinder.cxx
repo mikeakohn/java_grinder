@@ -31,6 +31,8 @@
 #include "TI84.h"
 #include "TI99.h"
 #include "TMS9900.h"
+#include "X86.h"
+#include "X86_64.h"
 #include "Z80.h"
 #include "version.h"
 
@@ -43,26 +45,6 @@ Generator *generator = NULL;
   if (strcasecmp("arm", chip_type) == 0)
   {
     generator = new ARM();
-  }
-    else
-  if (strcasecmp("c64", chip_type) == 0)
-  {
-    generator = new C64();
-  }
-    else
-  if (strcasecmp("dspic30f3012", chip_type) == 0)
-  {
-    generator = new DSPIC(DSPIC30F3012);
-  }
-    else
-  if (strcasecmp("dspic33fj06gs101a", chip_type) == 0)
-  {
-    generator = new DSPIC(DSPIC33FJ06GS101A);
-  }
-    else
-  if (strcasecmp("m6502", chip_type) == 0)
-  {
-    generator = new M6502();
   }
     else
   if (strcasecmp("attiny13", chip_type) == 0)
@@ -95,9 +77,29 @@ Generator *generator = NULL;
     generator = new AVR8(ATMEGA328P);
   }
     else
+  if (strcasecmp("c64", chip_type) == 0)
+  {
+    generator = new C64();
+  }
+    else
+  if (strcasecmp("dspic30f3012", chip_type) == 0)
+  {
+    generator = new DSPIC(DSPIC30F3012);
+  }
+    else
+  if (strcasecmp("dspic33fj06gs101a", chip_type) == 0)
+  {
+    generator = new DSPIC(DSPIC33FJ06GS101A);
+  }
+    else
   if (strcasecmp("epiphany", chip_type) == 0)
   {
     generator = new Epiphany();
+  }
+    else
+  if (strcasecmp("m6502", chip_type) == 0)
+  {
+    generator = new M6502();
   }
     else
   if (strcasecmp("mc68000", chip_type) == 0)
@@ -153,6 +155,16 @@ Generator *generator = NULL;
   if (strcasecmp("tms9900", chip_type) == 0)
   {
     generator = new TMS9900();
+  }
+    else
+  if (strcasecmp("x86", chip_type) == 0)
+  {
+    generator = new X86();
+  }
+    else
+  if (strcasecmp("x86_64", chip_type) == 0)
+  {
+    generator = new X86();
   }
     else
   if (strcasecmp("z80", chip_type) == 0)
