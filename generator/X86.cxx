@@ -16,14 +16,16 @@
 
 #include "X86.h"
 
-#define REG_STACK(a) (a)
+#define REG_STACK(a) (registers[a])
 #define LOCALS(i) (i * 4)
 
 // ABI is:
 
+#define REG_MAX 3
+static const char *registers[] = { "eax", "ecx", "edx" };
+
 X86::X86() :
   reg(0),
-  reg_max(8),
   stack(0),
   is_main(0)
 {
@@ -52,51 +54,66 @@ int X86::open(const char *filename)
 int X86::start_init()
 {
   // Add any set up items (stack, registers, etc).
-  //fprintf(out, ".org ???\n");
-  fprintf(out, "start:\n");
+  fprintf(out, "global start\n");
+  fprintf(out, "init:\n");
 
   return 0;
 }
 
 int X86::insert_static_field_define(const char *name, const char *type, int index)
 {
-  fprintf(out, "%s equ ram_start+%d\n", name, (index + 1) * 4);
+  fprintf(out, "  %s: resb 32\n", name);
   return 0;
 }
 
 
 int X86::init_heap(int field_count)
 {
-  return -1;
+  // Don't think we need a heap?
+  return 0;
 }
 
 int X86::insert_field_init_boolean(char *name, int index, int value)
 {
-  return -1;
+  fprintf(out, "  mov ebx, %d\n", value);
+  fprintf(out, "  mov %s, ebx\n", name);
+  return 0;
 }
 
 int X86::insert_field_init_byte(char *name, int index, int value)
 {
-  return -1;
+  //fprintf(out, "  mov ebx, %d\n", ((uint32_t)((uint8_t)value)));
+  fprintf(out, "  mov ebx, %d\n", value);
+  fprintf(out, "  mov %s, ebx\n", name);
+  return 0;
 }
 
 int X86::insert_field_init_short(char *name, int index, int value)
 {
-  return -1;
+  //fprintf(out, "  mov ebx, %d\n", ((uint32_t)((uint16_t)value)));
+  fprintf(out, "  mov ebx, %d\n", value);
+  fprintf(out, "  mov %s, ebx\n", name);
+  return 0;
 }
 
 int X86::insert_field_init_int(char *name, int index, int value)
 {
-  return -1;
+  fprintf(out, "  mov ebx, %d\n", value);
+  fprintf(out, "  mov %s, ebx\n", name);
+  return 0;
 }
 
 int X86::insert_field_init(char *name, int index)
 {
-  return -1;
+  fprintf(out, "  mov ebx, _%s\n", name);
+  fprintf(out, "  mov %s, ebx\n", name);
+  return 0;
 }
 
 void X86::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
+  fprintf(out, "  push ebp\n");
+  fprintf(out, "  mov ebp, esp\n");
 }
 
 void X86::method_end(int local_count)
@@ -105,7 +122,17 @@ void X86::method_end(int local_count)
 
 int X86::push_integer(int32_t n)
 {
-  return -1;
+  if (reg < REG_MAX)
+  {
+    fprintf(out, "  mov %s, %d\n", REG_STACK(reg++), n);
+  }
+    else
+  {
+    fprintf(out, "  push %d\n", n);
+    stack++;
+  }
+
+  return 0;
 }
 
 int X86::push_integer_local(int index)
@@ -120,7 +147,17 @@ int X86::push_ref_local(int index)
 
 int X86::push_fake()
 {
-  return -1;
+  if (reg < REG_MAX)
+  {
+    reg++;  
+  }
+    else
+  {
+    fprintf(out, "  push eax\n");
+    stack++;
+  }
+
+  return 0;
 }
 
 int X86::push_long(int64_t n)
@@ -140,17 +177,27 @@ int X86::push_double(double f)
 
 int X86::push_byte(int8_t b)
 {
-  return -1;
+  return push_integer((int32_t)b);
 }
 
 int X86::push_short(int16_t s)
 {
-  return -1;
+  return push_integer((int32_t)s);
 }
 
 int X86::push_ref(char *name)
 {
-  return -1;
+  if (reg < REG_MAX)
+  {
+    fprintf(out, "  mov %s, %s\n", REG_STACK(reg++), name);
+  }
+    else
+  {
+    fprintf(out, "  push %s\n", name);
+    stack++;
+  }
+
+  return 0;
 }
 
 int X86::pop_integer_local(int index)
@@ -165,11 +212,38 @@ int X86::pop_ref_local(int index)
 
 int X86::pop()
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  push ebx\n");
+    stack--;
+  }
+    else
+  {
+    reg--;
+  }
+
+  return 0;
 }
 
 int X86::dup()
 {
+  if (reg < REG_MAX)
+  {
+    fprintf(out, "  mov %s, %s\n", REG_STACK(reg), REG_STACK(reg - 1));
+    reg++;
+  }
+    else
+  if (reg == REG_MAX)
+  {
+    fprintf(out, "  push %s\n", REG_STACK(reg - 1));
+  }
+    else
+  {
+    fprintf(out, "  mov ebx, [esp]\n");
+    fprintf(out, "  push ebx\n");
+    stack++;
+  }
+
   return -1;
 }
 
@@ -180,27 +254,54 @@ int X86::dup2()
 
 int X86::swap()
 {
-  return -1;
+  if (reg < 2)
+  {
+    printf("Error: swap() requires 2 registers on the stack\n");
+    return -1;
+  }
+
+  if (stack == 0)
+  {
+    fprintf(out, "  mov ebx, %s\n", REG_STACK(reg - 1));
+    fprintf(out, "  mov %s, %s\n", REG_STACK(reg - 1), REG_STACK(reg - 2));
+    fprintf(out, "  mov %s, ebx\n", REG_STACK(reg - 2));
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  mov ebx, [esp]\n");
+    fprintf(out, "  mov [esp], ebx\n");
+    fprintf(out, "  mov %s, ebx\n", REG_STACK(reg - 1));
+  }
+    else
+  {
+    fprintf(out, "  mov ebx, [esp]\n");
+    fprintf(out, "  mov edi, [esp+4]\n");
+    fprintf(out, "  mov [esp], edi\n");
+    fprintf(out, "  mov [esp+4], ebx\n");
+  }
+
+  return 0;
 }
 
 int X86::add_integer()
 {
-  return -1;
+  return stack_alu("add");
 }
 
 int X86::add_integer(int num)
 {
-  return -1;
+  return stack_alu("add", num);
 }
 
 int X86::sub_integer()
 {
-  return -1;
+  return stack_alu("sub");
 }
 
 int X86::sub_integer(int num)
 {
-  return -1;
+  return stack_alu("sub", num);
 }
 
 int X86::mul_integer()
@@ -230,7 +331,7 @@ int X86::shift_left_integer()
 
 int X86::shift_left_integer(int num)
 {
-  return -1;
+  return stack_alu("sal", num);
 }
 
 int X86::shift_right_integer()
@@ -240,7 +341,7 @@ int X86::shift_right_integer()
 
 int X86::shift_right_integer(int num)
 {
-  return -1;
+  return stack_alu("sar", num);
 }
 
 int X86::shift_right_uinteger()
@@ -250,37 +351,37 @@ int X86::shift_right_uinteger()
 
 int X86::shift_right_uinteger(int num)
 {
-  return -1;
+  return stack_alu("shr", num);
 }
 
 int X86::and_integer()
 {
-  return -1;
+  return stack_alu("and");
 }
 
 int X86::and_integer(int num)
 {
-  return -1;
+  return stack_alu("and", num);
 }
 
 int X86::or_integer()
 {
-  return -1;
+  return stack_alu("or");
 }
 
 int X86::or_integer(int num)
 {
-  return -1;
+  return stack_alu("or", num);
 }
 
 int X86::xor_integer()
 {
-  return -1;
+  return stack_alu("xor");
 }
 
 int X86::xor_integer(int num)
 {
-  return -1;
+  return stack_alu("xor", num);
 }
 
 int X86::inc_integer(int index, int num)
@@ -315,17 +416,35 @@ int X86::return_local(int index, int local_count)
 
 int X86::return_integer(int local_count)
 {
-  return -1;
+  printf("  pop ebp\n");
+  if (reg != 1)
+  {
+    fprintf(out, "  mov eax, %s\n", REG_STACK(reg - 1));
+  }
+    else
+  {
+    printf("Error: register stack not empty?\n");
+    return -1;
+  }
+
+  fprintf(out, "  ret\n");
+
+  return 0;
 }
 
 int X86::return_void(int local_count)
 {
-  return -1;
+  fprintf(out, "  pop ebp\n");
+  fprintf(out, "  ret\n");
+
+  return 0;
 }
 
 int X86::jump(const char *name, int distance)
 {
-  return -1;
+  fprintf(out, "  jmp %s\n", name);
+
+  return 0;
 }
 
 int X86::call(const char *name)
@@ -449,4 +568,46 @@ int X86::array_write_int(const char *name, int field_id)
 {
   return -1;
 }
+
+int X86::stack_alu(const char *instr)
+{
+  if (stack == 1)
+  {
+    fprintf(out, "  pop ebx\n");
+    fprintf(out, "  %s %s, ebx\n", instr, REG_STACK(reg - 1));
+    stack--;
+  }
+    else
+  if (stack > 0)
+  {
+    // This is wrong.
+    fprintf(out, "  pop ebx\n");
+    fprintf(out, "  add [esp], ebx\n");
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  %s %s, %s\n", instr, REG_STACK(reg - 2), REG_STACK(reg - 1));
+    reg--;
+  }
+
+  return 0;
+}
+
+int X86::stack_alu(const char *instr, int num)
+{
+  if (stack > 0)
+  {
+    fprintf(out, "  mov ebx, [esp]\n");
+    fprintf(out, "  %s ebx, %d\n", instr, num);
+    fprintf(out, "  mov [esp], ebx\n");
+  }
+    else
+  {
+    fprintf(out, "  %s %s, %d\n", instr, REG_STACK(reg - 1), num);
+  }
+
+  return 0;
+}
+
 

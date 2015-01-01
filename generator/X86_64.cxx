@@ -52,22 +52,23 @@ int X86_64::open(const char *filename)
 int X86_64::start_init()
 {
   // Add any set up items (stack, registers, etc).
-  //fprintf(out, ".org ???\n");
-  fprintf(out, "start:\n");
+  fprintf(out, "global start\n");
+  fprintf(out, "init:\n");
 
   return 0;
 }
 
 int X86_64::insert_static_field_define(const char *name, const char *type, int index)
 {
-  fprintf(out, "%s equ ram_start+%d\n", name, (index + 1) * 4);
+  fprintf(out, "  %s: resb 32\n", name);
   return 0;
 }
 
 
 int X86_64::init_heap(int field_count)
 {
-  return -1;
+  // Don't think we need a heap?
+  return 0;
 }
 
 int X86_64::insert_field_init_boolean(char *name, int index, int value)
