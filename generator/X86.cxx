@@ -17,7 +17,7 @@
 #include "X86.h"
 
 #define REG_STACK(a) (registers[a])
-#define LOCALS(i) ((i * 4) + 4)
+#define LOCALS(i) (((i) * 4) + 4)
 
 // ABI is:
 
@@ -50,7 +50,7 @@ int X86::open(const char *filename)
 int X86::start_init()
 {
   // Add any set up items (stack, registers, etc).
-  fprintf(out, "global start\n");
+  fprintf(out, "global init\n");
   fprintf(out, "init:\n");
 
   return 0;
@@ -110,6 +110,17 @@ void X86::method_start(int local_count, int max_stack, int param_count, const ch
 {
   int i;
 
+  fprintf(out, "; int %s(", name);
+  for (i = 0; i < param_count; i++)
+  {
+    if (i != 0) { fprintf(out, ", "); }
+    if (i < 26) { fprintf(out, "int %c", 'a' + i); }
+  }
+  fprintf(out, ");\n");
+
+  fprintf(out, "global %s\n", name);
+  fprintf(out, "%s:\n", name);
+
   fprintf(out, "  push ebp\n");
   fprintf(out, "  mov ebp, esp\n");
 
@@ -127,13 +138,14 @@ void X86::method_start(int local_count, int max_stack, int param_count, const ch
     for (i = 0; i < param_count; i++)
     {
       fprintf(out, "  mov eax, [ebp+%d]\n", (i * 4) + 8);
-      fprintf(out, "  mov [ebp-%d], eax\n", LOCALS(i));
+      fprintf(out, "  mov [ebp-%d], eax\n", LOCALS(i + 1));
     }
   }
 }
 
 void X86::method_end(int local_count)
 {
+  fprintf(out, "\n");
 }
 
 int X86::push_integer(int32_t n)
@@ -229,7 +241,18 @@ int X86::push_ref(char *name)
 
 int X86::pop_integer_local(int index)
 {
-  return -1;
+  if (reg < REG_MAX)
+  {
+    fprintf(out, "  mov [ebp-%d], %s\n", LOCALS(index), REG_STACK(--reg));
+  }
+    else
+  {
+    fprintf(out, "  pop ebx\n");
+    fprintf(out, "  mov [ebp-%d], ebx\n", LOCALS(index));
+    stack--;
+  }
+
+  return 0;
 }
 
 int X86::pop_ref_local(int index)
@@ -445,7 +468,8 @@ int X86::return_integer(int local_count)
 {
   if (local_count != 0)
   {
-    fprintf(out, "  sub esp, %d\n", local_count);
+    fprintf(out, "  ; Free stack space for %d local variables\n", local_count);
+    fprintf(out, "  add esp, %d\n", local_count * 4);
   }
 
   fprintf(out, "  pop ebp\n");
@@ -476,8 +500,10 @@ int X86::return_void(int local_count)
 {
   if (local_count != 0)
   {
-    fprintf(out, "  sub esp, %d\n", local_count);
+    fprintf(out, "  ; Free stack space for %d local variables\n", local_count);
+    fprintf(out, "  add esp, %d\n", local_count * 4);
   }
+
   fprintf(out, "  pop ebp\n");
   fprintf(out, "  ret\n");
 
