@@ -17,12 +17,19 @@
 #include "X86.h"
 
 #define REG_STACK(a) (registers[a])
+#define REG_STACK8(a) (registers8[a])
+#define REG_STACK16(a) (registers16[a])
 #define LOCALS(i) (((i) * 4) + 4)
 
 // ABI is:
 
 #define REG_MAX 3
-static const char *registers[] = { "eax", "ecx", "edx" };
+static const char *registers[] =   { "eax", "ecx", "edx" };
+static const char *registers8[] =  {  "al",  "cl",  "dl" };
+static const char *registers16[] = {  "ax",  "cx",  "dx" };
+
+//                                 EQ    NE     LESS  LESS-EQ GR   GR-E
+static const char *cond_str[] = { "je", "jne", "jl", "jle", "jg", "jge" };
 
 X86::X86() :
   reg(0),
@@ -299,7 +306,33 @@ int X86::dup()
 
 int X86::dup2()
 {
-  return -1;
+  if (reg == 2)
+  {
+    fprintf(out, "  mov %s, %s\n",  REG_STACK(reg), REG_STACK(reg-2));
+    fprintf(out, "  push %s\n", REG_STACK(reg-1));
+    reg++;
+    stack++;
+  }
+    else
+  if (reg == 3)
+  {
+    fprintf(out, "  mov ebx, %s\n",  REG_STACK(reg-1));
+    fprintf(out, "  mov edi, [esp]\n");
+    fprintf(out, "  push ebx\n");
+    fprintf(out, "  push edi\n");
+
+    stack += 2;
+  }
+    else
+  {
+    fprintf(out, "  mov ebx, [esp+4]\n");
+    fprintf(out, "  mov edi, [esp]\n");
+    fprintf(out, "  push ebx\n");
+    fprintf(out, "  push edi\n");
+
+    stack += 2;
+  }
+  return 0;
 }
 
 int X86::swap()
@@ -478,27 +511,85 @@ int X86::xor_integer(int num)
 
 int X86::inc_integer(int index, int num)
 {
-  return -1;
+  fprintf(out, "  add dword [ebp-%d], %d\n", LOCALS(index), num);
+  return 0;
 }
 
 int X86::integer_to_byte()
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  mov ebx, [esp]\n");
+    fprintf(out, "  movsx ebx, bl\n");
+    fprintf(out, "  mov [esp], ebx\n");
+  }
+    else
+  {
+    fprintf(out, "  movsx %s, %s\n", REG_STACK(reg-1), REG_STACK8(reg-1));
+  }
+
+  return 0;
 }
 
 int X86::integer_to_short()
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  mov ebx, [esp]\n");
+    fprintf(out, "  movsx ebx, bx\n");
+    fprintf(out, "  mov [esp], ebx\n");
+  }
+    else
+  {
+    fprintf(out, "  movsx %s, %s\n", REG_STACK(reg-1), REG_STACK16(reg-1));
+  }
+
+  return 0;
 }
 
 int X86::jump_cond(const char *label, int cond, int distance)
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  pop ebx\n");
+    fprintf(out, "  cmp ebx, 0\n");
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  cmp %s, 0\n", REG_STACK(--reg));
+  }
+
+  fprintf(out, "  %s %s\n", cond_str[cond], label);
+
+  return 0;
 }
 
 int X86::jump_cond_integer(const char *label, int cond, int distance)
 {
-  return -1;
+  if (stack == 1)
+  {
+    fprintf(out, "  pop ebx\n");
+    fprintf(out, "  cmp %s, ebx\n", REG_STACK(--reg));
+    stack--;
+  }
+    else
+  if (stack > 1)
+  {
+    fprintf(out, "  pop ebx\n");
+    fprintf(out, "  pop edi\n");
+    fprintf(out, "  cmp edi, ebx\n");
+    stack -= 2;
+  }
+    else
+  {
+    fprintf(out, "  cmp %s, %s\n", REG_STACK(reg - 2), REG_STACK(reg - 1));
+    reg -= 2;
+  }
+
+  fprintf(out, "  %s %s\n", cond_str[cond], label);
+
+  return 0;
 }
 
 int X86::return_local(int index, int local_count)
