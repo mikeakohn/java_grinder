@@ -5,7 +5,7 @@
  *     Web: http://www.naken.cc/
  * License: GPL
  *
- * Copyright 2014 by Michael Kohn
+ * Copyright 2014-2015 by Michael Kohn
  *
  */
 

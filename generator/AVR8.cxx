@@ -5,7 +5,9 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014 by Michael Kohn
+ * Copyright 2014-2015 by Michael Kohn
+ *
+ * AVR8 written by Joe Davisson
  *
  */
 
