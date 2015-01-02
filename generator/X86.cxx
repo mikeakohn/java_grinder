@@ -49,6 +49,7 @@ int X86::open(const char *filename)
   if (Generator::open(filename) != 0) { return -1; }
 
   fprintf(out, "BITS 32\n");
+  fprintf(out, "SECTION .bss\n");
   fprintf(out, "\n");
 
   return 0;
@@ -57,6 +58,7 @@ int X86::open(const char *filename)
 int X86::start_init()
 {
   // Add any set up items (stack, registers, etc).
+  fprintf(out, "SECTION .text\n");
   fprintf(out, "global init\n");
   fprintf(out, "init:\n");
 
@@ -65,7 +67,7 @@ int X86::start_init()
 
 int X86::insert_static_field_define(const char *name, const char *type, int index)
 {
-  fprintf(out, "  %s: resb 32\n", name);
+  fprintf(out, "%s: resb 32\n", name);
   return 0;
 }
 
@@ -79,7 +81,7 @@ int X86::init_heap(int field_count)
 int X86::insert_field_init_boolean(char *name, int index, int value)
 {
   fprintf(out, "  mov ebx, %d\n", value);
-  fprintf(out, "  mov %s, ebx\n", name);
+  fprintf(out, "  mov [%s], ebx\n", name);
   return 0;
 }
 
@@ -87,7 +89,7 @@ int X86::insert_field_init_byte(char *name, int index, int value)
 {
   //fprintf(out, "  mov ebx, %d\n", ((uint32_t)((uint8_t)value)));
   fprintf(out, "  mov ebx, %d\n", value);
-  fprintf(out, "  mov %s, ebx\n", name);
+  fprintf(out, "  mov [%s], ebx\n", name);
   return 0;
 }
 
@@ -95,14 +97,14 @@ int X86::insert_field_init_short(char *name, int index, int value)
 {
   //fprintf(out, "  mov ebx, %d\n", ((uint32_t)((uint16_t)value)));
   fprintf(out, "  mov ebx, %d\n", value);
-  fprintf(out, "  mov %s, ebx\n", name);
+  fprintf(out, "  mov [%s], ebx\n", name);
   return 0;
 }
 
 int X86::insert_field_init_int(char *name, int index, int value)
 {
   fprintf(out, "  mov ebx, %d\n", value);
-  fprintf(out, "  mov %s, ebx\n", name);
+  fprintf(out, "  mov [%s], ebx\n", name);
   return 0;
 }
 
@@ -662,12 +664,34 @@ int X86::invoke_static_method(const char *name, int params, int is_void)
 
 int X86::put_static(const char *name, int index)
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  pop ebx\n");
+    fprintf(out, "  mov [%s], ebx\n", name);
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  mov [%s], %s\n", name, REG_STACK(reg - 1));
+    reg--;
+  }
+
+  return 0;
 }
 
 int X86::get_static(const char *name, int index)
 {
-  return -1;
+  if (reg < REG_MAX)
+  {
+    fprintf(out, "  mov %s, [%s]\n", REG_STACK(reg++), name);
+  }
+    else
+  {
+    fprintf(out, "  push [%s]\n", name);
+    stack++;
+  }
+
+  return 0;
 }
 
 int X86::brk()
