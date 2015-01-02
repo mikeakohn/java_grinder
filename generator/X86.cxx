@@ -356,22 +356,64 @@ int X86::sub_integer(int num)
 
 int X86::mul_integer()
 {
-  return -1;
+  if (stack == 1)
+  {
+    fprintf(out, "  pop ebx\n");
+    fprintf(out, "  imul edx, ebx\n");
+    stack--;
+  }
+    else
+  if (stack > 1)
+  {
+    fprintf(out, "  pop edi\n");
+    fprintf(out, "  pop ebx\n");
+    fprintf(out, "  imul ebx, edi\n");
+    fprintf(out, "  push ebx\n");
+    stack--;
+  }
+    else
+  if (reg == 2)
+  {
+    fprintf(out, "  imul ecx\n");
+    reg--;
+  }
+    else
+  if (reg == 3)
+  {
+    fprintf(out, "  imul ecx, edx\n");
+    reg--;
+  }
+    else
+  {
+    printf("Internal Error: %s:%d\n", __FILE__, __LINE__);
+    return -1;
+  }
+
+  return 0;
 }
 
 int X86::div_integer()
 {
-  return -1;
+  return stack_div(true);
 }
 
 int X86::mod_integer()
 {
-  return -1;
+  return stack_div(false);
 }
 
 int X86::neg_integer()
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  neg dword [esp]\n");
+  }
+    else
+  {
+    fprintf(out, "  neg %s\n", REG_STACK(reg - 1));
+  }
+
+  return 0;
 }
 
 int X86::shift_left_integer()
@@ -716,6 +758,90 @@ int X86::stack_shift(const char *instr)
     else
   {
     printf("Internal Error: Wrong registers on stack\n");
+    return -1;
+  }
+
+  return 0;
+}
+
+int X86::stack_div(bool is_quotient)
+{
+  fprintf(out, "  ; div reg=%d stack=%d is_quotient=%d\n", reg, stack, is_quotient);
+
+  if (stack == 1)
+  {
+    fprintf(out, "  pop ebx\n");
+    fprintf(out, "  push eax\n");
+    fprintf(out, "  mov eax, edx\n");
+    fprintf(out, "  xor edx, edx\n");
+    fprintf(out, "  idiv ebx\n");
+    if (is_quotient)
+    {
+      fprintf(out, "  mov edx, eax\n");
+    }
+      else
+    {
+      //fprintf(out, "  mov edx, edx\n");
+    }
+    fprintf(out, "  pop eax\n");
+    stack--;
+  }
+    else
+  if (stack > 1)
+  {
+    fprintf(out, "  pop edi\n");
+    fprintf(out, "  pop ebx\n");
+    fprintf(out, "  push eax\n");
+    fprintf(out, "  push edx\n");
+    fprintf(out, "  mov eax, ebx\n");
+    fprintf(out, "  xor edx, edx\n");
+    fprintf(out, "  idiv edi\n");
+    if (is_quotient)
+    {
+      fprintf(out, "  mov ebx, eax\n");
+    }
+      else
+    {
+      fprintf(out, "  mov ebx, edx\n");
+    }
+    fprintf(out, "  pop edx\n");
+    fprintf(out, "  pop eax\n");
+    fprintf(out, "  push ebx\n");
+    stack--;
+  }
+    else
+  if (reg == 2)
+  {
+    fprintf(out, "  xor edx, edx\n");
+    fprintf(out, "  idiv ecx\n");
+    if (is_quotient == false)
+    {
+      fprintf(out, "  mov eax, edx\n");
+    }
+    reg--;
+  }
+    else
+  if (reg == 3)
+  {
+    fprintf(out, "  push eax\n");
+    fprintf(out, "  mov eax, ecx\n");
+    fprintf(out, "  mov ebx, edx\n");
+    fprintf(out, "  xor edx, edx\n");
+    fprintf(out, "  idiv ebx\n");
+    if (is_quotient)
+    {
+      fprintf(out, "  mov ecx, eax\n");
+    }
+      else
+    {
+      fprintf(out, "  mov ecx, edx\n");
+    }
+    fprintf(out, "  pop eax\n");
+    reg--;
+  }
+    else
+  {
+    printf("Internal Error: %s:%d\n", __FILE__, __LINE__);
     return -1;
   }
 

@@ -108,6 +108,7 @@ protected:
   int stack_alu(const char *instr);
   int stack_alu(const char *instr, int num);
   int stack_shift(const char *instr);
+  int stack_div(bool is_quotient);
 };
 
 #endif
