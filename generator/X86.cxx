@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014 by Michael Kohn
+ * Copyright 2014-2015 by Michael Kohn
  *
  */
 
@@ -659,7 +659,85 @@ int X86::call(const char *name)
 
 int X86::invoke_static_method(const char *name, int params, int is_void)
 {
-  return -1;
+  bool push_ebx = false;
+  int saved_register_count;
+  int n;
+
+  fprintf(out, "  ; invoke_static_method() name=%s params=%d is_void=%d reg=%d stack=%d\n", name, params, is_void, reg, stack);
+
+
+  // Save all registers except parameters
+  //saved_register_count = reg - (params - stack) < 0 ? 0 : reg - params;
+  saved_register_count = reg - (params - stack);
+  if (saved_register_count != 0)
+  {
+    fprintf(out, "  ; save %d registers\n", saved_register_count);
+    for (n = 0; n < saved_register_count; n++)
+    {
+      fprintf(out, "  push %s\n", REG_STACK(n));
+    }
+  }
+
+  if (params != 0)
+  {
+    fprintf(out, "  ; push %d params on the stack\n", params);
+    int stack_params = params - (reg - saved_register_count);
+    int distance = (params * 4) - 4;
+
+    for (n = 0; n < stack_params; n++)
+    {
+      fprintf(out, "  mov ebx, [esp+%d]\n", distance);
+      fprintf(out, "  push ebx\n");
+    }
+
+    for (n = reg; n > saved_register_count; n--)
+    {
+      fprintf(out, "  push %s\n", REG_STACK(n - 1));
+    }
+  }
+
+  fprintf(out, "  call %s\n", name);
+
+  if (params != 0)
+  {
+    fprintf(out, "  ; pop %d params off the stack\n", params);
+    fprintf(out, "  add esp, %d\n", params * 4);
+  }
+
+  // FIXME - is this right?
+  reg = saved_register_count;
+
+  if (is_void == false)
+  {
+    if (reg == 0)
+    {
+      fprintf(out, "  ; mov eax, eax\n");
+      reg++;
+    }
+      else
+    if (reg < REG_MAX)
+    {
+      fprintf(out, "  mov %s, eax\n", REG_STACK(reg++));
+    }
+      else
+    {
+      fprintf(out, "  mov ebx, eax\n");
+    }
+  }
+
+  // Restore all registers
+  for (n = saved_register_count - 1; n >= 0; n--)
+  {
+    fprintf(out, "  pop %s\n", REG_STACK(n));
+  }
+
+  if (push_ebx)
+  {
+    fprintf(out, "  push ebx\n");
+    stack++;
+  }
+
+  return 0;
 }
 
 int X86::put_static(const char *name, int index)

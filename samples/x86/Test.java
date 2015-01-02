@@ -75,5 +75,10 @@ public class Test
   {
     return glo;
   }
+
+  public static int method_call_test(int a, int b)
+  {
+    return add_nums(a, b) + sub_nums(a, b);
+  }
 }
 

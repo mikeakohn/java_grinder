@@ -11,6 +11,7 @@ int shift_nums_II(int a, int b);
 int loop_test_II(int a, int b);
 void put_static_I(int a);
 int get_static();
+int method_call_test_II(int a, int b);
 
 int main(int argc, char *argv[])
 {
@@ -38,6 +39,7 @@ int main(int argc, char *argv[])
   printf("put_static(%d)\n", a);
   put_static_I(a);
   printf("get_static()=%d\n", get_static());
+  printf("method_call_test_II(%d,%d)=%d\n", a, b, method_call_test_II(a,b));
   return 0;
 }
 
