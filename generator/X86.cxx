@@ -661,10 +661,10 @@ int X86::invoke_static_method(const char *name, int params, int is_void)
 {
   bool push_ebx = false;
   int saved_register_count;
+  int stack_params = 0;
   int n;
 
   fprintf(out, "  ; invoke_static_method() name=%s params=%d is_void=%d reg=%d stack=%d\n", name, params, is_void, reg, stack);
-
 
   // Save all registers except parameters
   //saved_register_count = reg - (params - stack) < 0 ? 0 : reg - params;
@@ -681,15 +681,17 @@ int X86::invoke_static_method(const char *name, int params, int is_void)
   if (params != 0)
   {
     fprintf(out, "  ; push %d params on the stack\n", params);
-    int stack_params = params - (reg - saved_register_count);
-    int distance = (params * 4) - 4;
+    stack_params = params - (reg - saved_register_count);
+    int distance = (stack_params * 4) - 4;
 
+    fprintf(out, "  ; %d params are already on the stack\n", stack_params);
     for (n = 0; n < stack_params; n++)
     {
       fprintf(out, "  mov ebx, [esp+%d]\n", distance);
       fprintf(out, "  push ebx\n");
     }
 
+    fprintf(out, "  ; %d params are in registers\n", reg - saved_register_count);
     for (n = reg; n > saved_register_count; n--)
     {
       fprintf(out, "  push %s\n", REG_STACK(n - 1));
@@ -701,7 +703,9 @@ int X86::invoke_static_method(const char *name, int params, int is_void)
   if (params != 0)
   {
     fprintf(out, "  ; pop %d params off the stack\n", params);
-    fprintf(out, "  add esp, %d\n", params * 4);
+    fprintf(out, "  add esp, %d\n", (params * 4) + (stack_params * 4));
+
+    stack -= stack_params;
   }
 
   // FIXME - is this right?

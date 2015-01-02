@@ -12,6 +12,7 @@ int loop_test_II(int a, int b);
 void put_static_I(int a);
 int get_static();
 int method_call_test_II(int a, int b);
+int method_call_long_test_I(int a);
 
 int main(int argc, char *argv[])
 {
@@ -40,6 +41,7 @@ int main(int argc, char *argv[])
   put_static_I(a);
   printf("get_static()=%d\n", get_static());
   printf("method_call_test_II(%d,%d)=%d\n", a, b, method_call_test_II(a,b));
+  printf("method_call_long_test_I(%d)=%d\n", a, method_call_long_test_I(a));
   return 0;
 }
 

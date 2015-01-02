@@ -80,5 +80,15 @@ public class Test
   {
     return add_nums(a, b) + sub_nums(a, b);
   }
+
+  public static int long_method(int a, int b, int c, int d, int e, int f)
+  {
+    return a + b + c + d + e + f;
+  }
+
+  public static int method_call_long_test(int a)
+  {
+    return long_method(a, 1, 2, 3, 4, 5);
+  }
 }
 
