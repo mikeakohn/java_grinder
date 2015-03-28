@@ -276,11 +276,11 @@ int TI99::ti99_setColors()
 void TI99::insert_print_string()
 {
   fprintf(out, "_print_string:\n");
-  fprintf(out, "  movb *r1+, r0\n");
-  fprintf(out, "  jeq _print_string_exit\n");
-  fprintf(out, "  movb r0, @VDP_WRITE\n");
-  fprintf(out, "  jmp _print_string\n");
-  fprintf(out, "_print_string_exit:\n");
+  fprintf(out, "  mov @-2(r1), r0\n");
+  fprintf(out, "_print_string_loop:\n");
+  fprintf(out, "  movb *r1+, @VDP_WRITE\n");
+  fprintf(out, "  dec r0\n");
+  fprintf(out, "  jne _print_string_loop\n");
   fprintf(out, "  b *r11\n\n");
 }
 
