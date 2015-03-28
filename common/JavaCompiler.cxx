@@ -735,7 +735,9 @@ int instruction_length;
                                address + instruction_length, const_val);
           if (ret == 0)
           {
-            ret = generator->push_integer(const_val);
+            //ret = generator->push_integer(const_val);
+            ret = generator->push_string_const(const_val);
+            java_class->needed_constants[const_val] = 1;
           }
             else
           {
@@ -2082,6 +2084,25 @@ bool did_execute_statics = false;
   if (!did_execute_statics && !do_main && external_classes.size() != 0)
   {
     execute_statics(-1);
+  }
+
+  return 0;
+}
+
+int JavaCompiler::add_constants()
+{
+  std::map<int,int>::iterator iter;
+
+  for (iter = java_class->needed_constants.begin();
+       iter != java_class->needed_constants.end();
+       iter++)
+  {
+    constant_utf8_t *constant_utf8 =
+      (constant_utf8_t *)java_class->get_constant(iter->first);
+    char name[128];
+
+    sprintf(name, "string_%d", iter->first);
+    generator->insert_string(name, constant_utf8->bytes, constant_utf8->length);
   }
 
   return 0;

@@ -178,6 +178,16 @@ int Z80::push_integer_local(int index)
   return 0;
 }
 
+int Z80::push_string_const(int32_t n)
+{
+  fprintf(out, "  ;; push_string_const(%d)\n", n);
+  fprintf(out, "  ld hl, _string_%d\n", n);
+  fprintf(out, "  push hl\n");
+  stack++;
+
+  return 0;
+}
+
 int Z80::push_ref_local(int index)
 {
   return push_integer_local(index);

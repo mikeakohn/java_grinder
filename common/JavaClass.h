@@ -13,6 +13,7 @@
 #define _JAVA_CLASS_H
 
 #include <stdint.h>
+#include <map>
 
 // http://java.sun.com/docs/books/jvms/second_edition/html/ClassFile.doc.html
 // http://www.brics.dk/~mis/dOvs/jvmspec/ref-Java.html
@@ -202,6 +203,9 @@ public:
   int16_t super_class;
 
   char class_name[128];
+
+  // Keep track of constants that need to be defined.
+  std::map<int,int> needed_constants;
 
 private:
   void read_attributes(FILE *in);

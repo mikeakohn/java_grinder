@@ -189,6 +189,21 @@ int X86::push_integer_local(int index)
   return 0;
 }
 
+int X86::push_string_const(int32_t n)
+{
+  if (reg < REG_MAX)
+  {
+    fprintf(out, "  mov %s, _string_%d\n", REG_STACK(reg++), n);
+  }
+    else
+  {
+    fprintf(out, "  push _string_%d\n", n);
+    stack++;
+  }
+
+  return 0;
+}
+
 int X86::push_ref_local(int index)
 {
   return push_integer_local(index);

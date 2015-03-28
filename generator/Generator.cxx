@@ -218,7 +218,7 @@ int Generator::insert_utf8(const char *name, uint8_t *bytes, int len)
   }
   fprintf(out, "\"\n");
 
-  fprintf(out, ".align %d\n", get_cpu_byte_alignment() * 8);
+  fprintf(out, ".align %d\n\n", get_cpu_byte_alignment() * 8);
 
   return 0;
 }

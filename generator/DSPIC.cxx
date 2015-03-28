@@ -260,6 +260,11 @@ int DSPIC::push_integer_local(int index)
   return 0;
 }
 
+int DSPIC::push_string_const(int32_t n)
+{
+  return -1;
+}
+
 int DSPIC::push_ref_local(int index)
 {
   return push_integer_local(index);

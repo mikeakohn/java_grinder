@@ -209,6 +209,16 @@ int TMS9900::push_integer_local(int index)
   return 0;
 }
 
+int TMS9900::push_string_const(int32_t n)
+{
+  CHECK_STACK();
+
+  fprintf(out, "  li r%d, _string_%d\n", REG_STACK(reg), n);
+  reg++;
+
+  return 0;
+}
+
 int TMS9900::push_ref_local(int index)
 {
   return push_integer_local(index);

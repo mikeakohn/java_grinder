@@ -180,6 +180,23 @@ int MC68000::push_integer_local(int index)
   return 0;
 }
 
+int MC68000::push_string_const(int32_t n)
+{
+  if (reg < reg_max)
+  {
+    fprintf(out, "  move.l #_string_%d, d%d\n", n, REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  move.l #_string_%d, -(SP)\n", n);
+    stack++;
+  }
+
+  return 0;
+  return 0;
+}
+
 int MC68000::push_ref_local(int index)
 {
   return push_integer_local(index);

@@ -190,6 +190,11 @@ int ARM::push_ref_local(int index)
   return push_integer_local(index);
 }
 
+int ARM::push_string_const(int32_t n)
+{
+  return -1;
+}
+
 int ARM::push_fake()
 {
   if (stack != 0) { return -1; }

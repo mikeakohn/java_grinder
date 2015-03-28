@@ -13,7 +13,6 @@
 #define _JAVA_COMPILER_H
 
 #include <map>
-//#include <unordered_map>
 #include <string>
 
 #include "Compiler.h"
@@ -43,6 +42,7 @@ public:
   virtual void init_heap();
   virtual int add_static_initializers();
   virtual int compile_methods(bool do_main);
+  virtual int add_constants();
 
 private:
   void fill_label_map(uint8_t *label_map, int label_map_len, uint8_t *bytes, int code_len, int pc_start);

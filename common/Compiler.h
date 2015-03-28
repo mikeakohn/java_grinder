@@ -28,6 +28,7 @@ public:
   virtual void init_heap() = 0;
   virtual int add_static_initializers() = 0;
   virtual int compile_methods(bool do_main) = 0;
+  virtual int add_constants() = 0;
 
   static int get_class_type(const char *filename);
 

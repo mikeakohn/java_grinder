@@ -20,7 +20,7 @@
 
 TI99::TI99() :
   need_vdp_command(false),
-  need_write_string(false),
+  need_print_string(false),
   need_clear_screen(false),
   need_plot(false),
   need_set_colors(false)
@@ -30,7 +30,7 @@ TI99::TI99() :
 TI99::~TI99()
 {
   if (need_vdp_command) { insert_vdp_command(); }
-  if (need_write_string) { insert_write_string(); }
+  if (need_print_string) { insert_print_string(); }
   if (need_clear_screen) { insert_clear_screen(); }
   if (need_plot) { insert_plot(); }
   if (need_set_colors) { insert_set_colors(); }
@@ -85,11 +85,11 @@ int TI99::start_init()
 
 int TI99::ti99_print()
 {
-  need_write_string = true;
+  need_print_string = true;
 
   fprintf(out, "  mov r%d, r1\n", REG_STACK(reg-1));
   fprintf(out, "  mov r11, *r10+\n");
-  fprintf(out, "  bl @_write_string\n");
+  fprintf(out, "  bl @_print_string\n");
   fprintf(out, "  ai r10, -2\n");
   fprintf(out, "  mov *r10, r11\n");
   reg--;
@@ -232,8 +232,11 @@ int TI99::ti99_clearScreen()
 
 int TI99::ti99_plot()
 {
-  //need_plot = true;
-  //fprintf(out, "  bl @_plot\n");
+  need_plot = true;
+  fprintf(out, "  mov r11, *r10+\n");
+  fprintf(out, "  bl @_plot\n");
+  fprintf(out, "  ai r10, -2\n");
+  fprintf(out, "  mov *r10, r11\n");
 
 /*
   fprintf(out, "  li r0, 32\n");
@@ -270,14 +273,14 @@ int TI99::ti99_setColors()
   return 0;
 }
 
-void TI99::insert_write_string()
+void TI99::insert_print_string()
 {
-  fprintf(out, "_write_string:\n");
+  fprintf(out, "_print_string:\n");
   fprintf(out, "  movb *r1+, r0\n");
-  fprintf(out, "  jeq _write_string_exit\n");
+  fprintf(out, "  jeq _print_string_exit\n");
   fprintf(out, "  movb r0, @VDP_WRITE\n");
-  fprintf(out, "  jmp _write_string\n");
-  fprintf(out, "_write_string_exit:\n");
+  fprintf(out, "  jmp _print_string\n");
+  fprintf(out, "_print_string_exit:\n");
   fprintf(out, "  b *r11\n\n");
 }
 
@@ -309,8 +312,9 @@ void TI99::insert_clear_screen()
 
 void TI99::insert_plot()
 {
+  fprintf(out, ";; plot(r0, r1, r2)\n");
   fprintf(out, "_plot:\n");
-  fprintf(out, "  li r0, 32\n");
+  //fprintf(out, "  li r0, 32\n");
   fprintf(out, "  mpy r%d, r0\n", REG_STACK(reg-2));
   fprintf(out, "  a r%d, r1\n", REG_STACK(reg-3));
   fprintf(out, "  mov r1, r0\n");
@@ -336,7 +340,7 @@ void TI99::insert_set_colors()
   fprintf(out, "  li r1, 32\n");
   fprintf(out, "_set_colors_loop:\n");
   fprintf(out, "  movb r0, @VDP_WRITE\n");
-  fprintf(out, "  ai r0, 0x1100\n");
+  fprintf(out, "  ai r0, 0x1000\n");
   fprintf(out, "  dec r1\n");
   fprintf(out, "  jne _set_colors_loop\n");
   fprintf(out, "  ;; Set pattern table\n");
@@ -344,7 +348,7 @@ void TI99::insert_set_colors()
   fprintf(out, "  movb r0, @VDP_COMMAND\n");
   fprintf(out, "  swpb r0\n");
   fprintf(out, "  movb r0, @VDP_COMMAND\n");
-  fprintf(out, "  li r0, 0x0f0f\n");
+  fprintf(out, "  li r0, 0xffff\n");
   fprintf(out, "  li r1, 2048\n");
   fprintf(out, "_set_patterns_loop:\n");
   fprintf(out, "  movb r0, @VDP_WRITE\n");

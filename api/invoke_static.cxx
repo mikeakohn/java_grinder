@@ -219,7 +219,7 @@ char function[256];
 
   if (ret == 0) { return 0; }
 
-  printf("invoke static const NOPE\n");
+  printf("invoke static const (not found)\n");
 
   return -1;
 }

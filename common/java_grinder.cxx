@@ -261,6 +261,8 @@ int n;
     if (compiler->compile_methods(true) == -1) { ret = -1; break; }
     // Compile all other methods.
     if (compiler->compile_methods(false) == -1) { ret = -1; break; }
+    // Add constants at end if needed.
+    if (compiler->add_constants() == -1) { ret = -1; break; }
   } while(0);
 
   delete generator;

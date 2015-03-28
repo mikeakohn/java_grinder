@@ -3,6 +3,8 @@ import net.mikekohn.java_grinder.TI99;
 
 public class GrinderDemoTi99
 {
+  //static String java = "JAVA";
+
   static public void drawMandelbrot()
   {
     final int DEC_PLACE = 4;
@@ -48,9 +50,10 @@ public class GrinderDemoTi99
         }
 
         //TI99.setTextColor(x, y, count);
-        TI99.setCursor(x, y);
+        //TI99.setCursor(x, y);
         //TI99.printChar((char)((count >> 2) + '0'));
         TI99.printChar((char)(count << 4));
+        //TI99.plot(x, y, (char)(count << 4));
 
         //rs += dx;
       }
@@ -73,8 +76,8 @@ public class GrinderDemoTi99
     int a;
 
     TI99.setCursor(10, 5);
-
-    //TI99.print("HELLO");
+    TI99.print("JAVA");
+/*
     for (a = 0; a < 10; a++)
     {
       TI99.printChar('J');
@@ -82,51 +85,16 @@ public class GrinderDemoTi99
       TI99.printChar('V');
       TI99.printChar('A');
     }
+*/
 
     for (a = 0; a < 32767; a++);
 
     TI99.setColors();
-
-/*
-    TI99.setCursor(0, 0);
-    a = 0; b = 0;
-    while (a < 40)
-    {
-      TI99.printChar((char)('0' + b));
-
-      b++;
-      if (b == 10) { b = 0; }
-      a++;
-    }
-*/
-
-/*
-    x = 512;
-    y = 512;
-
-    x = x * y;
-    //x = x % y;
-
-    TI99.printChar((char)(x + '0'));
-*/
     drawMandelbrot();
 
-/*
-    TI99.setGraphicsMode(TI99.MODE_2);
+    for (a = 0; a < 32767; a++);
+
     TI99.clearScreen();
-
-    TI99.setCursor(0, 0);
-    TI99.printChar('0');
-    TI99.printChar('1');
-
-    //TI99.plot(0,0,5);
-    //TI99.plot(4,0,3);
-    //TI99.plot(7,0,7);
-
-    //TI99.setCursor(0, 0);
-    //a = testMethod(1,5);
-    //TI99.printChar((char)(a + '0'));
-*/
 
     while(true);
   }

@@ -170,6 +170,11 @@ int STDC::push_integer_local(int index)
   return 0;
 }
 
+int STDC::push_string_const(int32_t n)
+{
+  return -1;
+}
+
 int STDC::push_ref_local(int index)
 {
   fprintf(out, "  stack_%d = local_%d;\n", stack++, index);
