@@ -722,6 +722,9 @@ int TMS9900::invoke_static_method(const char *name, int params, int is_void)
 {
   int n;
 
+  fprintf(out, "  ; invoke_static_method(%s,%d,%d)\n", name, params, is_void);
+  fprintf(out, "  mov r11, *r10+\n");
+
   // Push all registers from Java stack
   for (n = REG_START; n < reg - params; n++)
   {
@@ -749,9 +752,12 @@ int TMS9900::invoke_static_method(const char *name, int params, int is_void)
   // Pop all registers from Java stack
   for (n = reg - params - 1; n >= REG_START; n--)
   {
-    fprintf(out, "  ai r10, -1\n");
+    fprintf(out, "  ai r10, -2\n");
     fprintf(out, "  mov *r10, r%d\n", REG_STACK(n));
   }
+
+  fprintf(out, "  ai r10, -2\n");
+  fprintf(out, "  mov *r10, r11\n");
 
   reg -= params;
 
