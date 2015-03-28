@@ -47,19 +47,6 @@ public class GrinderDemoTi99
           zi = ti + is;
         }
 
-/*
-        if (count < 20) { a = '#'; }
-        else if (count < 40) { a = '@'; }
-        else if (count < 60) { a = '%'; }
-        else if (count < 80) { a = '$'; }
-        else if (count < 100) { a = '+'; }
-        else if (count < 120) { a = 'o'; }
-        else if (count < 140) { a = ':'; }
-        else if (count < 160) { a = '\''; }
-        else if (count < 180) { a = '.'; }
-        else { a = ' '; }
-*/
-
         //TI99.setTextColor(x, y, count);
         TI99.setCursor(x, y);
         TI99.printChar((char)((count >> 2) + '0'));
@@ -95,6 +82,10 @@ public class GrinderDemoTi99
       TI99.printChar('A');
     }
 
+    for (a = 0; a < 32767; a++);
+
+    TI99.setColors();
+
 /*
     TI99.setCursor(0, 0);
     a = 0; b = 0;
@@ -119,6 +110,7 @@ public class GrinderDemoTi99
 */
     drawMandelbrot();
 
+/*
     TI99.setGraphicsMode(TI99.MODE_2);
     TI99.clearScreen();
 
@@ -133,6 +125,7 @@ public class GrinderDemoTi99
     //TI99.setCursor(0, 0);
     //a = testMethod(1,5);
     //TI99.printChar((char)(a + '0'));
+*/
 
     while(true);
   }

@@ -32,17 +32,20 @@ public:
   virtual int ti99_setGraphicsMode(int mode);
   virtual int ti99_clearScreen();
   virtual int ti99_plot();
+  virtual int ti99_setColors();
 
 private:
   void insert_write_string();
   void insert_vdp_command();
   void insert_clear_screen();
   void insert_plot();
+  void insert_set_colors();
 
   bool need_vdp_command:1;
   bool need_write_string:1;
   bool need_clear_screen:1;
   bool need_plot:1;
+  bool need_set_colors:1;
   char app_name[16];
 };
 

@@ -31,5 +31,8 @@ abstract public class TI99
   public static void setGraphicsMode(int mode) { }
   public static void clearScreen() { }
   public static void plot(int x, int y, int color) { }
+
+  /** For mode 0, remove characters and set colors for drawing */
+  public static void setColors() { }
 }
 

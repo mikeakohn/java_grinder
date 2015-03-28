@@ -20,7 +20,8 @@ TI99::TI99() :
   need_vdp_command(false),
   need_write_string(false),
   need_clear_screen(false),
-  need_plot(false)
+  need_plot(false),
+  need_set_colors(false)
 {
 }
 
@@ -30,6 +31,7 @@ TI99::~TI99()
   if (need_write_string) { insert_write_string(); }
   if (need_clear_screen) { insert_clear_screen(); }
   if (need_plot) { insert_plot(); }
+  if (need_set_colors) { insert_set_colors(); }
 }
 
 int TI99::open(const char *filename)
@@ -238,12 +240,21 @@ int TI99::ti99_plot()
   return 0;
 }
 
+int TI99::ti99_setColors()
+{
+  need_set_colors = true;
+
+  fprintf(out, "  bl @_set_colors\n");
+
+  return 0;
+}
+
 void TI99::insert_write_string()
 {
   fprintf(out, "_write_string:\n");
   fprintf(out, "  movb *r1+, r0\n");
   fprintf(out, "  jeq _write_string_exit\n");
-  fprintf(out, "  mov r0, @VDP_WRITE\n");
+  fprintf(out, "  movb r0, @VDP_WRITE\n");
   fprintf(out, "  jmp _write_string\n");
   fprintf(out, "_write_string_exit:\n");
   fprintf(out, "  b *r11\n\n");
@@ -252,12 +263,10 @@ void TI99::insert_write_string()
 void TI99::insert_vdp_command()
 {
   fprintf(out, "_vdp_command:\n");
-  //fprintf(out, "  limi 0\n");
   fprintf(out, "  swpb r0\n");
   fprintf(out, "  movb r0, @VDP_COMMAND\n");
   fprintf(out, "  swpb r0\n");
   fprintf(out, "  movb r0, @VDP_COMMAND\n");
-  //fprintf(out, "  limi 2\n");
   fprintf(out, "  b *r11\n\n");
 }
 
@@ -271,7 +280,7 @@ void TI99::insert_clear_screen()
   fprintf(out, "  s r0, r0\n");
   fprintf(out, "  li r1, 0x300\n");
   fprintf(out, "_clear_screen_loop:\n");
-  fprintf(out, "  mov r0, @VDP_WRITE\n");
+  fprintf(out, "  movb r0, @VDP_WRITE\n");
   fprintf(out, "  dec r1\n");
   fprintf(out, "  jne _clear_screen_loop\n");
   fprintf(out, "  b *r11\n\n");
@@ -291,6 +300,33 @@ void TI99::insert_plot()
   fprintf(out, "  movb r%d, @VDP_WRITE\n", REG_STACK(reg-1));
   //fprintf(out, "  swpb r0\n");
   //fprintf(out, "  movb r0, @VDP_WRITE\n");
+  fprintf(out, "  b *r11\n\n");
+}
+
+void TI99::insert_set_colors()
+{
+  // Screen image is 300 bytes long (24x32) (defaults to 0x000)
+  // Color table is 32 bytes long. (defaults to 0x300)
+  // Character pattern table is 2048k (256 entries * 8 bytes) defaults to 0x370)
+  fprintf(out, "_set_colors:\n");
+  //fprintf(out, "  li r0, 0x0043\n");
+  fprintf(out, "  mov r11, *r10+\n");
+  fprintf(out, "  li r0, 0x0043\n");
+  fprintf(out, "  movb r0, @VDP_COMMAND\n");
+  fprintf(out, "  swpb r0\n");
+  fprintf(out, "  movb r0, @VDP_COMMAND\n");
+  //fprintf(out, "  bl @_vdp_command\n");
+  //fprintf(out, "  mov *r10-, r11\n");
+  fprintf(out, "  s r0, r0\n");
+  fprintf(out, "  li r0, 'A'\n");
+  fprintf(out, "  li r1, 32\n");
+  fprintf(out, "_set_colors_loop:\n");
+  fprintf(out, "  swpb r0\n");
+  fprintf(out, "  movb r0, @VDP_WRITE\n");
+  fprintf(out, "  swpb r0\n");
+  fprintf(out, "  inc r0\n");
+  fprintf(out, "  dec r1\n");
+  fprintf(out, "  jne _set_colors_loop\n");
   fprintf(out, "  b *r11\n\n");
 }
 
