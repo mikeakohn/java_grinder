@@ -324,23 +324,32 @@ void TI99::insert_plot()
 void TI99::insert_set_colors()
 {
   // Screen image is 300 bytes long (24x32) (defaults to 0x000)
-  // Color table is 32 bytes long. (defaults to 0x300)
-  // Character pattern table is 2048k (256 entries * 8 bytes) defaults to 0x370)
+  // Color table is 32 bytes long. (defaults to 0x380)
+  // Character pattern table is 2048k (256 entries * 8 bytes) defaults to 0x800)
   fprintf(out, "_set_colors:\n");
-  fprintf(out, "  li r0, 0x0040\n");
+  fprintf(out, "  ;; Set color table\n");
+  fprintf(out, "  li r0, 0x8043\n");
   fprintf(out, "  movb r0, @VDP_COMMAND\n");
   fprintf(out, "  swpb r0\n");
   fprintf(out, "  movb r0, @VDP_COMMAND\n");
   fprintf(out, "  s r0, r0\n");
-  //fprintf(out, "  li r0, 0x4141\n");
   fprintf(out, "  li r1, 32\n");
   fprintf(out, "_set_colors_loop:\n");
-  fprintf(out, "  swpb r0\n");
   fprintf(out, "  movb r0, @VDP_WRITE\n");
-  fprintf(out, "  swpb r0\n");
-  fprintf(out, "  inc r0\n");
+  fprintf(out, "  ai r0, 0x1100\n");
   fprintf(out, "  dec r1\n");
   fprintf(out, "  jne _set_colors_loop\n");
+  fprintf(out, "  ;; Set pattern table\n");
+  fprintf(out, "  li r0, 0x0048\n");
+  fprintf(out, "  movb r0, @VDP_COMMAND\n");
+  fprintf(out, "  swpb r0\n");
+  fprintf(out, "  movb r0, @VDP_COMMAND\n");
+  fprintf(out, "  li r0, 0x0f0f\n");
+  fprintf(out, "  li r1, 2048\n");
+  fprintf(out, "_set_patterns_loop:\n");
+  fprintf(out, "  movb r0, @VDP_WRITE\n");
+  fprintf(out, "  dec r1\n");
+  fprintf(out, "  jne _set_patterns_loop\n");
   fprintf(out, "  b *r11\n\n");
 }
 

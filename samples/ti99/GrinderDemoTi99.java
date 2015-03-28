@@ -49,7 +49,8 @@ public class GrinderDemoTi99
 
         //TI99.setTextColor(x, y, count);
         TI99.setCursor(x, y);
-        TI99.printChar((char)((count >> 2) + '0'));
+        //TI99.printChar((char)((count >> 2) + '0'));
+        TI99.printChar((char)(count << 4));
 
         //rs += dx;
       }
