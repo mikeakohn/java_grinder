@@ -39,12 +39,12 @@ int X86_64::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 
-  fprintf(out, "BITS 32\n");
+  fprintf(out, "BITS 64\n");
 
   // Set where RAM starts / ends
   // FIXME - Not sure what to set this to right now
-  fprintf(out, "ram_start equ 0\n");
-  fprintf(out, "ram_end equ 0x8000\n");
+  //fprintf(out, "ram_start equ 0\n");
+  //fprintf(out, "ram_end equ 0x8000\n");
 
   return 0;
 }
@@ -52,7 +52,8 @@ int X86_64::open(const char *filename)
 int X86_64::start_init()
 {
   // Add any set up items (stack, registers, etc).
-  fprintf(out, "global start\n");
+  fprintf(out, "SECTION .text\n");
+  fprintf(out, "global init\n");
   fprintf(out, "init:\n");
 
   return 0;
@@ -60,7 +61,8 @@ int X86_64::start_init()
 
 int X86_64::insert_static_field_define(const char *name, const char *type, int index)
 {
-  fprintf(out, "  %s: resb 32\n", name);
+  //fprintf(out, "  %s: resb 4\n", name);
+  fprintf(out, "  %s: resb 8  ; %s\n", name, type);
   return 0;
 }
 
