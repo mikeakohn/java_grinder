@@ -27,6 +27,8 @@ public:
   virtual int ti99_clearScreen() { return -1; }
   virtual int ti99_plot() { return -1; }
   virtual int ti99_setColors() { return -1; }
+  virtual int ti99_setSoundFreq() { return -1; }
+  virtual int ti99_setSoundVolume() { return -1; }
 };
 
 #endif

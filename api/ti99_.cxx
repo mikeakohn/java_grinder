@@ -45,6 +45,8 @@ int ti99(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(clearScreen,)
   CHECK_FUNC(plot,_III)
   CHECK_FUNC(setColors,)
+  CHECK_FUNC(setSoundFreq,_II)
+  CHECK_FUNC(setSoundVolume,_II)
 
   return -1;
 }
@@ -53,6 +55,8 @@ int ti99(JavaClass *java_class, Generator *generator, char *method_name, int con
 {
   CHECK_FUNC_CONST(printChar,_C)
   CHECK_FUNC_CONST(setGraphicsMode,_I)
+  //CHECK_FUNC_CONST(setSoundFreq,_II)
+  //CHECK_FUNC_CONST(setSoundVolume,_II)
 
   return -1;
 }

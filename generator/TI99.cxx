@@ -23,7 +23,9 @@ TI99::TI99() :
   need_print_string(false),
   need_clear_screen(false),
   need_plot(false),
-  need_set_colors(false)
+  need_set_colors(false),
+  need_set_sound_freq(false),
+  need_set_sound_volume(false)
 {
 }
 
@@ -34,6 +36,8 @@ TI99::~TI99()
   if (need_clear_screen) { insert_clear_screen(); }
   if (need_plot) { insert_plot(); }
   if (need_set_colors) { insert_set_colors(); }
+  if (need_set_sound_freq) { insert_set_sound_freq(); }
+  if (need_set_sound_volume) { insert_set_sound_volume(); }
 }
 
 int TI99::open(const char *filename)
@@ -233,28 +237,13 @@ int TI99::ti99_clearScreen()
 int TI99::ti99_plot()
 {
   need_plot = true;
+  fprintf(out, "  mov r%d, r0\n", REG_STACK(reg-3));
+  fprintf(out, "  mov r%d, r1\n", REG_STACK(reg-2));
+  fprintf(out, "  mov r%d, r9\n", REG_STACK(reg-1));
   fprintf(out, "  mov r11, *r10+\n");
   fprintf(out, "  bl @_plot\n");
   fprintf(out, "  ai r10, -2\n");
   fprintf(out, "  mov *r10, r11\n");
-
-/*
-  fprintf(out, "  li r0, 32\n");
-  fprintf(out, "  mpy r%d, r0\n", REG_STACK(reg-2));
-  fprintf(out, "  a r%d, r1\n", REG_STACK(reg-3));
-  fprintf(out, "  mov r1, r0\n");
-  //fprintf(out, "  ai r0, 0x4300\n");
-  fprintf(out, "  ai r0, 0x4000\n");
-  fprintf(out, "  movb r0, @VDP_COMMAND\n");
-  fprintf(out, "  swpb r0\n");
-  fprintf(out, "  movb r0, @VDP_COMMAND\n");
-  //fprintf(out, "  bl @_vdp_command\n");
-  //fprintf(out, "  mov r%d, r0\n", REG_STACK(reg-1));
-  fprintf(out, "  swpb r%d\n", REG_STACK(reg-1));
-  fprintf(out, "  movb r%d, @VDP_WRITE\n", REG_STACK(reg-1));
-  //fprintf(out, "  swpb r0\n");
-  //fprintf(out, "  movb r0, @VDP_WRITE\n");
-*/
 
   reg -= 3;
 
@@ -269,6 +258,38 @@ int TI99::ti99_setColors()
   fprintf(out, "  bl @_set_colors\n");
   fprintf(out, "  ai r10, -2\n");
   fprintf(out, "  mov *r10, r11\n");
+
+  return 0;
+}
+
+int TI99::ti99_setSoundFreq()
+{
+  need_set_sound_freq = true;
+
+  fprintf(out, "  mov r%d, r0\n", REG_STACK(reg-2));
+  fprintf(out, "  mov r%d, r1\n", REG_STACK(reg-1));
+  fprintf(out, "  mov r11, *r10+\n");
+  fprintf(out, "  bl @_set_sound_freq\n");
+  fprintf(out, "  ai r10, -2\n");
+  fprintf(out, "  mov *r10, r11\n");
+
+  reg -= 2;
+
+  return 0;
+}
+
+int TI99::ti99_setSoundVolume()
+{
+  need_set_sound_volume = true;
+
+  fprintf(out, "  mov r%d, r0\n", REG_STACK(reg-2));
+  fprintf(out, "  mov r%d, r1\n", REG_STACK(reg-1));
+  fprintf(out, "  mov r11, *r10+\n");
+  fprintf(out, "  bl @_set_sound_volume\n");
+  fprintf(out, "  ai r10, -2\n");
+  fprintf(out, "  mov *r10, r11\n");
+
+  reg -= 2;
 
   return 0;
 }
@@ -312,16 +333,17 @@ void TI99::insert_clear_screen()
 
 void TI99::insert_plot()
 {
-  fprintf(out, ";; plot(r0, r1, r2)\n");
+  fprintf(out, ";; plot(r0, r1, r9)\n");
   fprintf(out, "_plot:\n");
-  //fprintf(out, "  li r0, 32\n");
-  fprintf(out, "  mpy r%d, r0\n", REG_STACK(reg-2));
-  fprintf(out, "  a r%d, r1\n", REG_STACK(reg-3));
-  fprintf(out, "  mov r1, r0\n");
-  fprintf(out, "  ai r0, 0x4300\n");
-  fprintf(out, "  bl @_vdp_command\n");
-  fprintf(out, "  swpb r%d\n", REG_STACK(reg-1));
-  fprintf(out, "  movb r%d, @VDP_WRITE\n", REG_STACK(reg-1));
+  fprintf(out, "  sla r1, 5\n");
+  fprintf(out, "  a r1, r0\n");
+  fprintf(out, "  ai r0, 0x4000\n");
+  fprintf(out, "  swpb r0\n");
+  fprintf(out, "  movb r0, @VDP_COMMAND\n");
+  fprintf(out, "  swpb r0\n");
+  fprintf(out, "  movb r0, @VDP_COMMAND\n");
+  fprintf(out, "  swpb r9\n");
+  fprintf(out, "  movb r9, @VDP_WRITE\n");
   fprintf(out, "  b *r11\n\n");
 }
 
@@ -357,4 +379,29 @@ void TI99::insert_set_colors()
   fprintf(out, "  b *r11\n\n");
 }
 
+void TI99::insert_set_sound_freq()
+{
+  fprintf(out, ";; set_sound_freq(voice=r0, freq=r1);\n");
+  fprintf(out, "_set_sound_freq:\n");
+  fprintf(out, "  sla r0, 13\n");
+  fprintf(out, "  ori r0, 0x8000\n");
+  fprintf(out, "  soc r1, r0\n");
+  fprintf(out, "  movb r0, @0x8400\n");
+  fprintf(out, "  swpb r0\n");
+  fprintf(out, "  movb r0, @0x8400\n");
+  fprintf(out, "  b *r11\n\n");
+}
+
+void TI99::insert_set_sound_volume()
+{
+  fprintf(out, ";; set_sound_volume(voice=r0, volume=r1);\n");
+  fprintf(out, "_set_sound_volume:\n");
+  fprintf(out, "  sla r0, 13\n");
+  fprintf(out, "  ori r0, 0x9000\n");
+  fprintf(out, "  soc r1, r0\n");
+  fprintf(out, "  movb r0, @0x8400\n");
+  fprintf(out, "  swpb r0\n");
+  fprintf(out, "  movb r0, @0x8400\n");
+  fprintf(out, "  b *r11\n\n");
+}
 

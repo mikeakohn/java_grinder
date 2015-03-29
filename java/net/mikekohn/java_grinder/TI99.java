@@ -32,6 +32,9 @@ abstract public class TI99
   public static void clearScreen() { }
   public static void plot(int x, int y, int color) { }
 
+  public static void setSoundFreq(int voice, int freq) { }
+  public static void setSoundVolume(int voice, int volume) { }
+
   /** For mode 0, remove characters and set colors for drawing */
   public static void setColors() { }
 }

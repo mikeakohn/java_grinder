@@ -33,6 +33,8 @@ public:
   virtual int ti99_clearScreen();
   virtual int ti99_plot();
   virtual int ti99_setColors();
+  virtual int ti99_setSoundFreq();
+  virtual int ti99_setSoundVolume();
 
 private:
   void insert_print_string();
@@ -40,12 +42,16 @@ private:
   void insert_clear_screen();
   void insert_plot();
   void insert_set_colors();
+  void insert_set_sound_freq();
+  void insert_set_sound_volume();
 
   bool need_vdp_command:1;
   bool need_print_string:1;
   bool need_clear_screen:1;
   bool need_plot:1;
   bool need_set_colors:1;
+  bool need_set_sound_freq:1;
+  bool need_set_sound_volume:1;
   char app_name[16];
 };
 

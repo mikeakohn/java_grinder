@@ -52,8 +52,8 @@ public class GrinderDemoTi99
         //TI99.setTextColor(x, y, count);
         //TI99.setCursor(x, y);
         //TI99.printChar((char)((count >> 2) + '0'));
-        TI99.printChar((char)(count << 4));
-        //TI99.plot(x, y, (char)(count << 4));
+        //TI99.printChar((char)(count << 4));
+        TI99.plot(x, y, (char)(count << 4));
 
         //rs += dx;
       }
@@ -91,6 +91,8 @@ public class GrinderDemoTi99
 
     TI99.setColors();
     drawMandelbrot();
+
+    TI99.setSoundFreq(1, 100);
 
     for (a = 0; a < 32767; a++);
 
