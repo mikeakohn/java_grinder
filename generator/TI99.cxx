@@ -302,6 +302,12 @@ int TI99::ti99_setSpriteImage()
 {
   need_set_sprite_image = true;
 
+  if (reg < 2)
+  {
+    printf("Internal Error: Empty stack?\n");
+    return -1;
+  }
+
   fprintf(out, "  mov r%d, r0\n", REG_STACK(reg-2));
   fprintf(out, "  mov r%d, r1\n", REG_STACK(reg-1));
   fprintf(out, "  mov r11, *r10+\n");
@@ -322,7 +328,7 @@ int TI99::ti99_setSpritePos()
   fprintf(out, "  mov r%d, r1\n", REG_STACK(reg-2));
   fprintf(out, "  mov r%d, r9\n", REG_STACK(reg-1));
   fprintf(out, "  mov r11, *r10+\n");
-  fprintf(out, "  bl @_set_sprite_visible\n");
+  fprintf(out, "  bl @_set_sprite_pos\n");
   fprintf(out, "  ai r10, -2\n");
   fprintf(out, "  mov *r10, r11\n");
 
@@ -486,7 +492,7 @@ void TI99::insert_set_sprite_image()
   fprintf(out, "  movb r0, @VDP_COMMAND\n");
   fprintf(out, "  swpb r0\n");
   fprintf(out, "  movb r0, @VDP_COMMAND\n");
-  fprintf(out, "  mov @r1(-2), r0\n");
+  fprintf(out, "  mov @-2(r1), r0\n");
   fprintf(out, "_set_sprites_image_loop:\n");
   fprintf(out, "  movb *r1+, @VDP_WRITE\n");
   fprintf(out, "  dec r0\n");

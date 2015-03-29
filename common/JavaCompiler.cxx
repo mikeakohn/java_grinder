@@ -1545,9 +1545,16 @@ int instruction_length;
           break;
         }
 
-        if (gen32->tag == CONSTANT_METHODREF || type[0] == '[')
+        //if (gen32->tag == CONSTANT_METHODREF || type[0] == '[')
+        if (gen32->tag == CONSTANT_METHODREF)
         {
           stack->push(ref);
+        }
+          else
+        if (type[0] == '[')
+        {
+          //printf("%s %d %s\n", type, ref, field_name);
+          ret = generator->push_ref(field_name);
         }
           else
         {
