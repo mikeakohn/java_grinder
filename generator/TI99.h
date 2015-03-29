@@ -35,6 +35,10 @@ public:
   virtual int ti99_setColors();
   virtual int ti99_setSoundFreq();
   virtual int ti99_setSoundVolume();
+  virtual int ti99_setSpriteVisible();
+  virtual int ti99_setSpriteImage();
+  virtual int ti99_setSpritePos();
+  virtual int ti99_setSpriteColor();
 
 private:
   void insert_print_string();
@@ -44,6 +48,10 @@ private:
   void insert_set_colors();
   void insert_set_sound_freq();
   void insert_set_sound_volume();
+  void insert_set_sprite_visible();
+  void insert_set_sprite_image();
+  void insert_set_sprite_pos();
+  void insert_set_sprite_color();
 
   bool need_vdp_command:1;
   bool need_print_string:1;
@@ -52,6 +60,10 @@ private:
   bool need_set_colors:1;
   bool need_set_sound_freq:1;
   bool need_set_sound_volume:1;
+  bool need_set_sprite_visible:1;
+  bool need_set_sprite_image:1;
+  bool need_set_sprite_pos:1;
+  bool need_set_sprite_color:1;
   char app_name[16];
 };
 

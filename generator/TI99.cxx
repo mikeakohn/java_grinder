@@ -25,7 +25,11 @@ TI99::TI99() :
   need_plot(false),
   need_set_colors(false),
   need_set_sound_freq(false),
-  need_set_sound_volume(false)
+  need_set_sound_volume(false),
+  need_set_sprite_visible(false),
+  need_set_sprite_image(false),
+  need_set_sprite_pos(false),
+  need_set_sprite_color(false)
 {
 }
 
@@ -38,6 +42,10 @@ TI99::~TI99()
   if (need_set_colors) { insert_set_colors(); }
   if (need_set_sound_freq) { insert_set_sound_freq(); }
   if (need_set_sound_volume) { insert_set_sound_volume(); }
+  if (need_set_sprite_visible) { insert_set_sprite_visible(); }
+  if (need_set_sprite_image) { insert_set_sprite_image(); }
+  if (need_set_sprite_pos) { insert_set_sprite_pos(); }
+  if (need_set_sprite_color) { insert_set_sprite_color(); }
 }
 
 int TI99::open(const char *filename)
@@ -294,6 +302,42 @@ int TI99::ti99_setSoundVolume()
   return 0;
 }
 
+int TI99::ti99_setSpriteVisible()
+{
+  need_set_sprite_visible = true;
+
+  reg -= 2;
+
+  return -1;
+}
+
+int TI99::ti99_setSpriteImage()
+{
+  need_set_sprite_image = true;
+
+  reg -= 2;
+
+  return -1;
+}
+
+int TI99::ti99_setSpritePos()
+{
+  need_set_sprite_pos = true;
+
+  reg -= 3;
+
+  return -1;
+}
+
+int TI99::ti99_setSpriteColor()
+{
+  need_set_sprite_color = true;
+
+  reg -= 2;
+
+  return -1;
+}
+
 void TI99::insert_print_string()
 {
   fprintf(out, "_print_string:\n");
@@ -404,4 +448,21 @@ void TI99::insert_set_sound_volume()
   fprintf(out, "  movb r0, @0x8400\n");
   fprintf(out, "  b *r11\n\n");
 }
+
+void TI99::insert_set_sprite_visible()
+{
+}
+
+void TI99::insert_set_sprite_image()
+{
+}
+
+void TI99::insert_set_sprite_pos()
+{
+}
+
+void TI99::insert_set_sprite_color()
+{
+}
+
 

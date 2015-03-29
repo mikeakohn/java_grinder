@@ -29,6 +29,10 @@ public:
   virtual int ti99_setColors() { return -1; }
   virtual int ti99_setSoundFreq() { return -1; }
   virtual int ti99_setSoundVolume() { return -1; }
+  virtual int ti99_setSpriteVisible() { return -1; }
+  virtual int ti99_setSpriteImage() { return -1; }
+  virtual int ti99_setSpritePos() { return -1; }
+  virtual int ti99_setSpriteColor() { return -1; }
 };
 
 #endif

@@ -47,6 +47,10 @@ int ti99(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(setColors,)
   CHECK_FUNC(setSoundFreq,_II)
   CHECK_FUNC(setSoundVolume,_II)
+  CHECK_FUNC(setSpriteVisible,_II)
+  CHECK_FUNC(setSpriteImage,_IB)
+  CHECK_FUNC(setSpritePos,_III)
+  CHECK_FUNC(setSpriteColor,_I)
 
   return -1;
 }
