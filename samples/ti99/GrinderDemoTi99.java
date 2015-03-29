@@ -5,10 +5,26 @@ public class GrinderDemoTi99
 {
   static byte[] sprite_j =
   {
-    -1,   0,   -1,   0,   -1,   0,   -1,   0,
-    -1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x70,
-    -1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x71,
-    -1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x77,
+      0,    0,    0,    0,    0,    0,    0,    0,
+      0,    0,  -32,  112,  112,   56,   28,   15,
+     -4,   -4,  112,  112,  112,  112,  112,  112,
+    112,  112,  112,  112,  112,  -32,  -64,  -128,
+  };
+
+  static byte[] sprite_a =
+  {
+     15,   60,   60,  120,  120,  -16,  -16,   -1,
+     -1,  -16,  -16,  -16,  -16,  -16,  -16,  -16,
+   -128,  -32,  -32,  -16,  -16,  120,  120,   -8,
+     -8,  120,  120,  120,  120,  120,  120,  120,
+  };
+
+  static byte[] sprite_v =
+  {
+    -16,  -16,  -16,  -16,  -16,  -16,  -16,  -16,
+    -16,  -16,  -16,  120,  120,   60,   60,   15,
+    120,  120,  120,  120,  120,  120,  120,  120,
+    120,  120,  120,  -16,  -16,  -32,  -32,  -128,
   };
 
   static public void drawMandelbrot()
@@ -81,11 +97,21 @@ public class GrinderDemoTi99
 
     TI99.setCursor(10, 5);
     TI99.print("JAVA");
+    TI99.setSpriteSize(TI99.SPRITE_SIZE_16X16_SMALL);
 
     //TI99.setSpriteVisible(0, true);
     TI99.setSpriteImage(0, sprite_j);
+    TI99.setSpriteImage(1, sprite_a);
+    TI99.setSpriteImage(2, sprite_v);
+    TI99.setSpriteImage(3, sprite_a);
     TI99.setSpriteColor(0, 2);
-    TI99.setSpritePos(0, 0x40, 0x40);
+    TI99.setSpriteColor(1, 3);
+    TI99.setSpriteColor(2, 4);
+    TI99.setSpriteColor(3, 5);
+    TI99.setSpritePos(0, 0x20, 0x40);
+    TI99.setSpritePos(1, 0x40, 0x40);
+    TI99.setSpritePos(2, 0x60, 0x40);
+    TI99.setSpritePos(3, 0x80, 0x40);
 
     for (a = 0; a < 32767; a++);
 
@@ -107,7 +133,6 @@ public class GrinderDemoTi99
 
     TI99.clearScreen();
 
-    TI99.setSpriteSize(TI99.SPRITE_SIZE_8X8_BIG);
     for (a = 0; a < 32767; a++);
     TI99.setSpriteSize(TI99.SPRITE_SIZE_16X16_BIG);
 
