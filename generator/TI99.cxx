@@ -536,7 +536,6 @@ void TI99::insert_set_sprite_color()
   fprintf(out, ";; set_sprite_color(index=r0, color=r1)\n");
   fprintf(out, "_set_sprite_color:\n");
   fprintf(out, "  sla r0, 2\n");
-  fprintf(out, "  sla r1, 8\n");
   fprintf(out, "  ai r0, 0x4303\n");
   fprintf(out, "  swpb r0\n");
   fprintf(out, "  movb r0, @VDP_COMMAND\n");

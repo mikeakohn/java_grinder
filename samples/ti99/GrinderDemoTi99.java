@@ -84,8 +84,8 @@ public class GrinderDemoTi99
 
     //TI99.setSpriteVisible(0, true);
     TI99.setSpriteImage(0, sprite_j);
-    TI99.setSpriteColor(0, 4);
-    TI99.setSpritePos(0, 0x20, 0x20);
+    TI99.setSpriteColor(0, 2);
+    TI99.setSpritePos(0, 0x40, 0x40);
 
     for (a = 0; a < 32767; a++);
 
