@@ -521,11 +521,12 @@ void TI99::insert_set_sprite_image()
   // Need to set the pattern number for this sprite
   fprintf(out, "  mov r9, r0\n");
   fprintf(out, "  sla r0, 2\n");
-  fprintf(out, "  ai r0, 0x4300\n");
+  fprintf(out, "  ai r0, 0x4302\n");
   fprintf(out, "  swpb r0\n");
   fprintf(out, "  movb r0, @VDP_COMMAND\n");
   fprintf(out, "  swpb r0\n");
   fprintf(out, "  movb r0, @VDP_COMMAND\n");
+  fprintf(out, "  sla r9, 2\n");
   fprintf(out, "  swpb r9\n");
   fprintf(out, "  movb r9, @VDP_WRITE\n");
   fprintf(out, "  b *r11\n\n");
@@ -544,8 +545,8 @@ void TI99::insert_set_sprite_pos()
   fprintf(out, "  movb r0, @VDP_COMMAND\n");
   fprintf(out, "  swpb r1\n");
   fprintf(out, "  swpb r9\n");
-  fprintf(out, "  movb r1, @VDP_WRITE\n");
   fprintf(out, "  movb r9, @VDP_WRITE\n");
+  fprintf(out, "  movb r1, @VDP_WRITE\n");
   fprintf(out, "  b *r11\n\n");
 }
 
