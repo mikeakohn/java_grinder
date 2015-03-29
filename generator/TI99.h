@@ -40,7 +40,6 @@ public:
   virtual int ti99_setSpritePos();
   virtual int ti99_setSpriteColor();
   virtual int ti99_setSpriteSize();
-  virtual int ti99_setSpriteMagnified();
 
 private:
   void insert_print_string();

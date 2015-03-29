@@ -361,21 +361,12 @@ int TI99::ti99_setSpriteColor()
 
 int TI99::ti99_setSpriteSize()
 {
+  fprintf(out, "  sla r%d, 8\n", REG_STACK(reg-1));
+  fprintf(out, "  ori r%d, 0xe081\n", REG_STACK(reg-1));
+  fprintf(out, "  movb r%d, @VDP_COMMAND\n", REG_STACK(reg-1));
+  fprintf(out, "  swpb r%d\n", REG_STACK(reg-1));
+  fprintf(out, "  movb r%d, @VDP_COMMAND\n", REG_STACK(reg-1));
 
-  fprintf(out, "  mov r%d, r1\n", REG_STACK(reg-1));
-  fprintf(out, "  sla r%d, 9\n", REG_STACK(reg-1));
-  fprintf(out, "  ai r%d, 0x86\n", REG_STACK(reg-1));
-  fprintf(out, "  movb r0, @VDP_COMMAND\n");
-  fprintf(out, "  swpb r0\n");
-  fprintf(out, "  movb r0, @VDP_COMMAND\n");
-
-  reg -= 1;
-
-  return 0;
-}
-
-int TI99::ti99_setSpriteMagnified()
-{
   reg -= 1;
 
   return 0;
@@ -516,8 +507,6 @@ void TI99::insert_set_sprite_image()
   fprintf(out, "_set_sprite_image:\n");
   fprintf(out, "  mov r0, r9\n");
   fprintf(out, "  sla r0, 5\n");
-  //fprintf(out, "  ai r0, 0x43a0\n");
-  // CHANGE
   fprintf(out, "  ai r0, 0x4000|0x1800\n");
   fprintf(out, "  swpb r0\n");
   fprintf(out, "  movb r0, @VDP_COMMAND\n");

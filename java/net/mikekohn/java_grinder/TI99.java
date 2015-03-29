@@ -13,6 +13,11 @@ package net.mikekohn.java_grinder;
 
 abstract public class TI99
 {
+  public static final int SPRITE_SIZE_8X8_SMALL = 0;
+  public static final int SPRITE_SIZE_8X8_BIG = 1;
+  public static final int SPRITE_SIZE_16X16_SMALL = 2;
+  public static final int SPRITE_SIZE_16X16_BIG = 3;
+
   /** Standard Mode (Text) (32x24) */
   public static final int MODE_0 = 0;
   /** Text Mode (40x24) */
@@ -63,10 +68,6 @@ abstract public class TI99
   public static void setSpriteColor(int index, int color) { }
 
   /** Sets if the sprite is 8x8 or 16x16 pixels. */
-  public static void setSpriteSize(boolean big) { }
-
-  /** Sets if the sprite is doubled in size. */
-  public static void setSpriteMagnified(boolean magnified) { }
-
+  public static void setSpriteSize(int size) { }
 }
 

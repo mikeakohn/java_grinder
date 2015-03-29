@@ -107,6 +107,10 @@ public class GrinderDemoTi99
 
     TI99.clearScreen();
 
+    TI99.setSpriteSize(TI99.SPRITE_SIZE_8X8_BIG);
+    for (a = 0; a < 32767; a++);
+    TI99.setSpriteSize(TI99.SPRITE_SIZE_16X16_BIG);
+
     while(true);
   }
 }

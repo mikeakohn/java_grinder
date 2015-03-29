@@ -50,8 +50,7 @@ int ti99(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(setSpriteImage,_IaB)
   CHECK_FUNC(setSpritePos,_III)
   CHECK_FUNC(setSpriteColor,_II)
-  CHECK_FUNC(setSpriteSize,_Z)
-  CHECK_FUNC(setSpriteMagnified,_Z)
+  CHECK_FUNC(setSpriteSize,_I)
 
   return -1;
 }

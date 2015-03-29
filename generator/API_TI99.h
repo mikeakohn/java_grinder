@@ -34,7 +34,6 @@ public:
   virtual int ti99_setSpritePos() { return -1; }
   virtual int ti99_setSpriteColor() { return -1; }
   virtual int ti99_setSpriteSize() { return -1; }
-  virtual int ti99_setSpriteMagnified() { return -1; }
 };
 
 #endif
