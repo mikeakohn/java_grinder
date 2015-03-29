@@ -805,13 +805,13 @@ int TMS9900::insert_array(const char *name, int32_t *data, int len, uint8_t type
 {
   fprintf(out, ".align 16\n");
   if (type == TYPE_BYTE)
-  { return insert_db(name, data, len, TYPE_INT); }
+  { return insert_db(name, data, len, TYPE_SHORT); }
     else
   if (type == TYPE_SHORT)
-  { return insert_dw(name, data, len, TYPE_INT); } 
+  { return insert_dw(name, data, len, TYPE_SHORT); } 
     else
   if (type == TYPE_INT)
-  { return insert_dw(name, data, len, TYPE_INT); } 
+  { return insert_dw(name, data, len, TYPE_SHORT); } 
 
   return -1;
 }

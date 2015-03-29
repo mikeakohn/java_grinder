@@ -486,8 +486,9 @@ void TI99::insert_set_sprite_image()
   // Sprite patterns table is at 0x3a0-0x780
   fprintf(out, ";; set_sprite_image(index=r0, image=r1)\n");
   fprintf(out, "_set_sprite_image:\n");
+  fprintf(out, "  mov r0, r9\n");
   fprintf(out, "  sla r0, 5\n");
-  fprintf(out, "  ai r0, 0x4300\n");
+  fprintf(out, "  ai r0, 0x43a0\n");
   fprintf(out, "  swpb r0\n");
   fprintf(out, "  movb r0, @VDP_COMMAND\n");
   fprintf(out, "  swpb r0\n");
@@ -497,6 +498,17 @@ void TI99::insert_set_sprite_image()
   fprintf(out, "  movb *r1+, @VDP_WRITE\n");
   fprintf(out, "  dec r0\n");
   fprintf(out, "  jne _set_sprites_image_loop\n");
+  // Sprite attributes table is at 0x300
+  // Need to set the pattern number for this sprite
+  fprintf(out, "  mov r9, r0\n");
+  fprintf(out, "  sla r0, 2\n");
+  fprintf(out, "  ai r0, 0x4300\n");
+  fprintf(out, "  swpb r0\n");
+  fprintf(out, "  movb r0, @VDP_COMMAND\n");
+  fprintf(out, "  swpb r0\n");
+  fprintf(out, "  movb r0, @VDP_COMMAND\n");
+  fprintf(out, "  swpb r9\n");
+  fprintf(out, "  movb r9, @VDP_WRITE\n");
   fprintf(out, "  b *r11\n\n");
 }
 
