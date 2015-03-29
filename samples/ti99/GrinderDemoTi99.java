@@ -92,7 +92,12 @@ public class GrinderDemoTi99
     TI99.setColors();
     drawMandelbrot();
 
-    TI99.setSoundFreq(1, 100);
+    TI99.setSoundFreq(0, 0x60d);
+    TI99.setSoundVolume(0, 5);
+    TI99.setSoundFreq(1, 0xa0a);
+    TI99.setSoundVolume(1, 5);
+    TI99.setSoundFreq(2, 0xf08);
+    TI99.setSoundVolume(2, 5);
 
     for (a = 0; a < 32767; a++);
 
