@@ -61,5 +61,12 @@ abstract public class TI99
 
   /** Sets the color (between 0 and 15) of the sprite. */
   public static void setSpriteColor(int index, int color) { }
+
+  /** Sets if the sprite is 8x8 or 16x16 pixels. */
+  public static void setSpriteSize(boolean big) { }
+
+  /** Sets if the sprite is doubled in size. */
+  public static void setSpriteMagnified(boolean magnified) { }
+
 }
 

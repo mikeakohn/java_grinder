@@ -92,6 +92,12 @@ int TI99::start_init()
   // Add any set up items (stack, registers, etc).
   fprintf(out, "start:\n");
 
+  // Sprite pattern table should start at 0x1600
+  fprintf(out, "  li r0, 0x0386\n");
+  fprintf(out, "  movb r0, @VDP_COMMAND\n");
+  fprintf(out, "  swpb r0\n");
+  fprintf(out, "  movb r0, @VDP_COMMAND\n");
+
   return 0;
 }
 
@@ -353,6 +359,28 @@ int TI99::ti99_setSpriteColor()
   return 0;
 }
 
+int TI99::ti99_setSpriteSize()
+{
+
+  fprintf(out, "  mov r%d, r1\n", REG_STACK(reg-1));
+  fprintf(out, "  sla r%d, 9\n", REG_STACK(reg-1));
+  fprintf(out, "  ai r%d, 0x86\n", REG_STACK(reg-1));
+  fprintf(out, "  movb r0, @VDP_COMMAND\n");
+  fprintf(out, "  swpb r0\n");
+  fprintf(out, "  movb r0, @VDP_COMMAND\n");
+
+  reg -= 1;
+
+  return 0;
+}
+
+int TI99::ti99_setSpriteMagnified()
+{
+  reg -= 1;
+
+  return 0;
+}
+
 void TI99::insert_print_string()
 {
   fprintf(out, "_print_string:\n");
@@ -488,7 +516,9 @@ void TI99::insert_set_sprite_image()
   fprintf(out, "_set_sprite_image:\n");
   fprintf(out, "  mov r0, r9\n");
   fprintf(out, "  sla r0, 5\n");
-  fprintf(out, "  ai r0, 0x43a0\n");
+  //fprintf(out, "  ai r0, 0x43a0\n");
+  // CHANGE
+  fprintf(out, "  ai r0, 0x4000|0x1800\n");
   fprintf(out, "  swpb r0\n");
   fprintf(out, "  movb r0, @VDP_COMMAND\n");
   fprintf(out, "  swpb r0\n");
