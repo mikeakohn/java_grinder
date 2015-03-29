@@ -736,7 +736,9 @@ int instruction_length;
           if (ret == 0)
           {
             //ret = generator->push_integer(const_val);
-            ret = generator->push_string_const(const_val);
+            char name[128];
+            sprintf(name, "string_%d", const_val);
+            ret = generator->push_ref_static(name, const_val);
             java_class->needed_constants[const_val] = 1;
           }
             else

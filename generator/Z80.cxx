@@ -178,10 +178,10 @@ int Z80::push_integer_local(int index)
   return 0;
 }
 
-int Z80::push_string_const(int32_t n)
+int Z80::push_ref_static(const char *name, int index)
 {
-  fprintf(out, "  ;; push_string_const(%d)\n", n);
-  fprintf(out, "  ld hl, _string_%d\n", n);
+  fprintf(out, "  ;; push_ref_static(%d)\n", index);
+  fprintf(out, "  ld hl, _%s\n", name);
   fprintf(out, "  push hl\n");
   stack++;
 

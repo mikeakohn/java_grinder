@@ -271,16 +271,16 @@ int MSP430::push_integer_local(int index)
   return 0;
 }
 
-int MSP430::push_string_const(int32_t n)
+int MSP430::push_ref_static(const char *name, int index)
 {
   if (reg < reg_max)
   {
-    fprintf(out, "  mov.w #_string_%d, r%d\n", n, REG_STACK(reg));
+    fprintf(out, "  mov.w #_%s, r%d\n", name, REG_STACK(reg));
     reg++;
   }
     else
   {
-    fprintf(out, "  push #_string_%d\n", n);
+    fprintf(out, "  push #_%s\n", name);
     stack++;
   }
 

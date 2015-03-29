@@ -45,7 +45,7 @@ abstract public class TI99
   /** Set sound volume for a sound channel (voice).  The voice
       param can be between 0 to 2 for normal notes and 3 for a noise
       voice.  Anything out of that range will cause unknown results.
-      The volume can be between 0 and 15.  15 = sound is off. */
+      The volume can be between 0 and 15.  0 = loudest, 15 = sound is off. */
   public static void setSoundVolume(int voice, int volume) { }
 
   /** Change visibility of a sprite.  Sprite index can be between 0 and 32.

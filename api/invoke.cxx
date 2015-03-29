@@ -111,14 +111,20 @@ char *s;
 int ptr = 0;
 
   s = method_name;
-  while (*s != 0) { function[ptr++] = *s; s++; }
+  while (*s != 0)
+  {
+    function[ptr++] = *s;
+    s++;
+  }
 
   function[ptr++] = '_';
   s = method_sig + 1;
   while(*s != 0)
   {
     if (*s == ')') { break; }
-    function[ptr++] = *s;
+    if (*s == '[') { function[ptr++] = 'a'; }
+    else { function[ptr++] = *s; }
+    //function[ptr++] = *s;
     s++;
   }
 

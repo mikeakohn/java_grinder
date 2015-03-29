@@ -146,7 +146,7 @@ int MIPS::push_integer_local(int index)
   return -1;
 }
 
-int MIPS::push_string_const(int32_t n)
+int MIPS::push_ref_static(const char *name, int index)
 {
   return -1;
 }

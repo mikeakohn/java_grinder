@@ -285,7 +285,7 @@ int M6502::push_integer_local(int index)
   return 0;
 }
 
-int M6502::push_string_const(int32_t n)
+int M6502::push_ref_static(const char *name, int index)
 {
   return -1;
 }

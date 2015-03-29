@@ -190,7 +190,7 @@ int ARM::push_ref_local(int index)
   return push_integer_local(index);
 }
 
-int ARM::push_string_const(int32_t n)
+int ARM::push_ref_static(const char *name, int index)
 {
   return -1;
 }

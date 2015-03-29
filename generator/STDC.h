@@ -33,7 +33,7 @@ public:
   virtual void method_end(int local_count);
   virtual int push_integer(int32_t n);
   virtual int push_integer_local(int index);
-  virtual int push_string_const(int32_t n);
+  virtual int push_ref_static(const char *name, int index);
   virtual int push_ref_local(int index);
   virtual int push_fake();
   virtual int set_integer_local(int index, int value);

@@ -189,15 +189,15 @@ int X86::push_integer_local(int index)
   return 0;
 }
 
-int X86::push_string_const(int32_t n)
+int X86::push_ref_static(const char *name, int index)
 {
   if (reg < REG_MAX)
   {
-    fprintf(out, "  mov %s, _string_%d\n", REG_STACK(reg++), n);
+    fprintf(out, "  mov %s, _%s\n", REG_STACK(reg++), name);
   }
     else
   {
-    fprintf(out, "  push _string_%d\n", n);
+    fprintf(out, "  push _%s\n", name);
     stack++;
   }
 

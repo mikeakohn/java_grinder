@@ -170,7 +170,7 @@ int STDC::push_integer_local(int index)
   return 0;
 }
 
-int STDC::push_string_const(int32_t n)
+int STDC::push_ref_static(const char *name, int index)
 {
   return -1;
 }

@@ -155,7 +155,7 @@ int Epiphany::push_integer_local(int index)
   return -1;
 }
 
-int Epiphany::push_string_const(int32_t n)
+int Epiphany::push_ref_static(const char *name, int index)
 {
   return -1;
 }

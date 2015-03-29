@@ -3,7 +3,13 @@ import net.mikekohn.java_grinder.TI99;
 
 public class GrinderDemoTi99
 {
-  //static String java = "JAVA";
+  static byte[] sprite_j =
+  {
+    -1, 0x00, 0x00, 0x00,   -1, 0x00, 0x00, 0x00,
+    -1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x70,
+    -1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x71,
+    -1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x77,
+  };
 
   static public void drawMandelbrot()
   {
@@ -49,8 +55,6 @@ public class GrinderDemoTi99
           zi = ti + is;
         }
 
-        //TI99.setTextColor(x, y, count);
-        //TI99.setCursor(x, y);
         //TI99.printChar((char)((count >> 2) + '0'));
         //TI99.printChar((char)(count << 4));
         TI99.plot(x, y, (char)(count << 4));
@@ -77,15 +81,11 @@ public class GrinderDemoTi99
 
     TI99.setCursor(10, 5);
     TI99.print("JAVA");
-/*
-    for (a = 0; a < 10; a++)
-    {
-      TI99.printChar('J');
-      TI99.printChar('A');
-      TI99.printChar('V');
-      TI99.printChar('A');
-    }
-*/
+
+    //TI99.setSpriteVisible(0, true);
+    TI99.setSpriteImage(0, sprite_j);
+    TI99.setSpriteColor(0, 1);
+    TI99.setSpritePos(0, 10, 20);
 
     for (a = 0; a < 32767; a++);
 
@@ -93,13 +93,17 @@ public class GrinderDemoTi99
     drawMandelbrot();
 
     TI99.setSoundFreq(0, 0x60d);
-    TI99.setSoundVolume(0, 5);
+    TI99.setSoundVolume(0, 0);
     TI99.setSoundFreq(1, 0xa0a);
-    TI99.setSoundVolume(1, 5);
+    TI99.setSoundVolume(1, 0);
     TI99.setSoundFreq(2, 0xf08);
-    TI99.setSoundVolume(2, 5);
+    TI99.setSoundVolume(2, 0);
 
     for (a = 0; a < 32767; a++);
+
+    TI99.setSoundVolume(0, 15);
+    TI99.setSoundVolume(1, 15);
+    TI99.setSoundVolume(2, 15);
 
     TI99.clearScreen();
 

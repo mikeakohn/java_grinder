@@ -164,28 +164,6 @@ int TI99::ti99_setCursor(int x, int y)
   return 0;
 }
 
-#if 0
-int TI99::ti99_setTextColor()
-{
-  // FIXME - Is this better as a function?
-  fprintf(out, "  li r0, 32\n");
-  fprintf(out, "  mpy r%d, r0\n", REG_STACK(reg-2));
-  fprintf(out, "  a r%d, r1\n", REG_STACK(reg-3));
-  fprintf(out, "  mov r1, r0\n");
-  fprintf(out, "  ai r0, 0x4300\n");
-  fprintf(out, "  bl @_vdp_command\n");
-  //fprintf(out, "  mov r%d, r0\n", REG_STACK(reg-1));
-  fprintf(out, "  swpb r%d\n", REG_STACK(reg-1));
-  fprintf(out, "  movb r%d, @VDP_WRITE\n", REG_STACK(reg-1));
-  //fprintf(out, "  swpb r0\n");
-  //fprintf(out, "  movb r0, @VDP_WRITE\n");
-
-  reg -= 3;
-
-  return 0;
-}
-#endif
-
 int TI99::ti99_setGraphicsMode()
 {
   return -1;
@@ -234,6 +212,7 @@ int TI99::ti99_setGraphicsMode(int mode)
 int TI99::ti99_clearScreen()
 {
   need_clear_screen = true;
+
   fprintf(out, "  mov r11, *r10+\n");
   fprintf(out, "  bl @_clear_screen\n");
   fprintf(out, "  ai r10, -2\n");
@@ -245,6 +224,7 @@ int TI99::ti99_clearScreen()
 int TI99::ti99_plot()
 {
   need_plot = true;
+
   fprintf(out, "  mov r%d, r0\n", REG_STACK(reg-3));
   fprintf(out, "  mov r%d, r1\n", REG_STACK(reg-2));
   fprintf(out, "  mov r%d, r9\n", REG_STACK(reg-1));
@@ -306,36 +286,65 @@ int TI99::ti99_setSpriteVisible()
 {
   need_set_sprite_visible = true;
 
+  fprintf(out, "  mov r%d, r0\n", REG_STACK(reg-2));
+  fprintf(out, "  mov r%d, r1\n", REG_STACK(reg-1));
+  fprintf(out, "  mov r11, *r10+\n");
+  fprintf(out, "  bl @_set_sprite_visible\n");
+  fprintf(out, "  ai r10, -2\n");
+  fprintf(out, "  mov *r10, r11\n");
+
   reg -= 2;
 
-  return -1;
+  return 0;
 }
 
 int TI99::ti99_setSpriteImage()
 {
   need_set_sprite_image = true;
 
+  fprintf(out, "  mov r%d, r0\n", REG_STACK(reg-2));
+  fprintf(out, "  mov r%d, r1\n", REG_STACK(reg-1));
+  fprintf(out, "  mov r11, *r10+\n");
+  fprintf(out, "  bl @_set_sprite_image\n");
+  fprintf(out, "  ai r10, -2\n");
+  fprintf(out, "  mov *r10, r11\n");
+
   reg -= 2;
 
-  return -1;
+  return 0;
 }
 
 int TI99::ti99_setSpritePos()
 {
   need_set_sprite_pos = true;
 
+  fprintf(out, "  mov r%d, r0\n", REG_STACK(reg-3));
+  fprintf(out, "  mov r%d, r1\n", REG_STACK(reg-2));
+  fprintf(out, "  mov r%d, r9\n", REG_STACK(reg-1));
+  fprintf(out, "  mov r11, *r10+\n");
+  fprintf(out, "  bl @_set_sprite_visible\n");
+  fprintf(out, "  ai r10, -2\n");
+  fprintf(out, "  mov *r10, r11\n");
+
   reg -= 3;
 
-  return -1;
+  return 0;
 }
 
 int TI99::ti99_setSpriteColor()
 {
   need_set_sprite_color = true;
 
+  fprintf(out, "  mov r%d, r0\n", REG_STACK(reg-2));
+  fprintf(out, "  mov r%d, r1\n", REG_STACK(reg-1));
+  fprintf(out, "  mov r11, *r10+\n");
+  fprintf(out, "  bl @_set_sprite_color\n");
+  fprintf(out, "  ai r10, -2\n");
+  fprintf(out, "  mov *r10, r11\n");
+
   reg -= 2;
 
-  return -1;
+  return 0;
 }
 
 void TI99::insert_print_string()
@@ -451,18 +460,73 @@ void TI99::insert_set_sound_volume()
 
 void TI99::insert_set_sprite_visible()
 {
+  // Sprite attributes table is at 0x300-0x380
+  fprintf(out, ";; set_sprite_visible(index=r0, visible=r1)\n");
+  fprintf(out, "_set_sprite_visible:\n");
+  fprintf(out, "  sla r0, 2\n");
+  fprintf(out, "  sla r1, 8\n");
+  fprintf(out, "  ai r0, 0x4300\n");
+  fprintf(out, "  swpb r0\n");
+  fprintf(out, "  movb r0, @VDP_COMMAND\n");
+  fprintf(out, "  swpb r0\n");
+  fprintf(out, "  movb r0, @VDP_COMMAND\n");
+  fprintf(out, "  swpb r1\n");
+  fprintf(out, "  movb r1, @VDP_WRITE\n");
+  fprintf(out, "  b *r11\n\n");
 }
 
 void TI99::insert_set_sprite_image()
 {
+  // Sprite patterns table is at 0x3a0-0x780
+  fprintf(out, ";; set_sprite_image(index=r0, image=r1)\n");
+  fprintf(out, "_set_sprite_image:\n");
+  fprintf(out, "  sla r0, 5\n");
+  fprintf(out, "  ai r0, 0x4300\n");
+  fprintf(out, "  swpb r0\n");
+  fprintf(out, "  movb r0, @VDP_COMMAND\n");
+  fprintf(out, "  swpb r0\n");
+  fprintf(out, "  movb r0, @VDP_COMMAND\n");
+  fprintf(out, "  mov @r1(-2), r0\n");
+  fprintf(out, "_set_sprites_image_loop:\n");
+  fprintf(out, "  movb *r1+, @VDP_WRITE\n");
+  fprintf(out, "  dec r0\n");
+  fprintf(out, "  jne _set_sprites_image_loop\n");
+  fprintf(out, "  b *r11\n\n");
 }
 
 void TI99::insert_set_sprite_pos()
 {
+  // Sprite attributes table is at 0x300
+  fprintf(out, ";; set_sprite_pos(index=r0, x=r1, y=r9)\n");
+  fprintf(out, "_set_sprite_pos:\n");
+  fprintf(out, "  sla r0, 2\n");
+  fprintf(out, "  ai r0, 0x4300\n");
+  fprintf(out, "  swpb r0\n");
+  fprintf(out, "  movb r0, @VDP_COMMAND\n");
+  fprintf(out, "  swpb r0\n");
+  fprintf(out, "  movb r0, @VDP_COMMAND\n");
+  fprintf(out, "  swpb r1\n");
+  fprintf(out, "  swpb r9\n");
+  fprintf(out, "  movb r1, @VDP_WRITE\n");
+  fprintf(out, "  movb r9, @VDP_WRITE\n");
+  fprintf(out, "  b *r11\n\n");
 }
 
 void TI99::insert_set_sprite_color()
 {
+  // Sprite attributes table is at 0x300
+  fprintf(out, ";; set_sprite_color(index=r0, color=r1)\n");
+  fprintf(out, "_set_sprite_color:\n");
+  fprintf(out, "  sla r0, 2\n");
+  fprintf(out, "  sla r1, 8\n");
+  fprintf(out, "  ai r0, 0x4303\n");
+  fprintf(out, "  swpb r0\n");
+  fprintf(out, "  movb r0, @VDP_COMMAND\n");
+  fprintf(out, "  swpb r0\n");
+  fprintf(out, "  movb r0, @VDP_COMMAND\n");
+  fprintf(out, "  swpb r1\n");
+  fprintf(out, "  movb r1, @VDP_WRITE\n");
+  fprintf(out, "  b *r11\n\n");
 }
 
 
