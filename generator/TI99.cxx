@@ -543,8 +543,8 @@ void TI99::insert_set_sprite_pos()
   fprintf(out, "  movb r0, @VDP_COMMAND\n");
   fprintf(out, "  swpb r0\n");
   fprintf(out, "  movb r0, @VDP_COMMAND\n");
-  fprintf(out, "  swpb r1\n");
   fprintf(out, "  swpb r9\n");
+  fprintf(out, "  swpb r1\n");
   fprintf(out, "  movb r9, @VDP_WRITE\n");
   fprintf(out, "  movb r1, @VDP_WRITE\n");
   fprintf(out, "  b *r11\n\n");
