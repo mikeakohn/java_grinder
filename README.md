@@ -1,7 +1,10 @@
 java_grinder
 ============
 
-Compile Java bytecode to microcontroller assembly.  Currently supporting MSP430, dsPIC, and 6502/6510.
+Compile Java bytecode to microcontroller assembly.  Currently supporting
+MSP430, dsPIC, 6502/6510, TMS9900, and Z80 with platforms that include
+Commodore 64, TI99, and TI84.  Other CPU's have code but either aren't
+tested or aren't useful yet.
 
 Authors:<br>
 Michael Kohn<br>
@@ -62,8 +65,8 @@ the non-optimized version of the function instead.  Here's an example:</p>
 
 <p>In Generator.h there are two functions used for adding integers:</p>
 <pre>
-  virtual int and_integer() = 0;
-  virtual int and_integer(int num) { return -1; }
+  virtual int add_integer() = 0;
+  virtual int add_integer(int num) { return -1; }
 </pre>
 
 <p>The first one is the unoptimized version and is abstract.  It must be
@@ -98,8 +101,8 @@ or fprintf() some assembly code and return 0 if true.</p>
 <p>The same thing goes for API calls.  There are some API calls (such
 as initializing SPI in MSP430 and dsPIC) that if one or two parameters
 in Java are constants, the generator can produce optimized code for them.
-so spi_init() has an overloaded version of this function that takes in
-constants.  The optimizer in compile.cxx will automatically try and use
+So if spi_init() has an overloaded version of this function that takes in
+constants, the optimizer in compile.cxx will automatically try and use
 it first.</p>
 
 
