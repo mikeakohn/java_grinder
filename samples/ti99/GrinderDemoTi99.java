@@ -3,10 +3,14 @@ import net.mikekohn.java_grinder.TI99;
 
 public class GrinderDemoTi99
 {
-  static byte[] sprite_dx = new byte[4];
-  static byte[] sprite_dy = new byte[4];
-  static byte[] sprite_x = new byte[4];
-  static byte[] sprite_y = new byte[4];
+  //static byte[] sprite_dx = new byte[4];
+  //static byte[] sprite_dy = new byte[4];
+  //static int[] sprite_x = new int[4];
+  //static int[] sprite_y = new int[4];
+  static byte[] sprite_dx;
+  static byte[] sprite_dy;
+  static int[] sprite_x;
+  static int[] sprite_y;
 
   static short[] tones =
   {
@@ -210,12 +214,24 @@ public class GrinderDemoTi99
 
   static public void spritesInit()
   {
+    int a,x;
+
     TI99.setSpriteSize(TI99.SPRITE_SIZE_16X16_SMALL);
     TI99.setSpriteImage(0, sprite_j);
     TI99.setSpriteImage(1, sprite_a);
     TI99.setSpriteImage(2, sprite_v);
     TI99.setSpriteImage(3, sprite_a);
     hideSprites();
+
+    x = 0x45;
+    for (a = 0; a < 4; a++)
+    {
+      sprite_x[a] = x;
+      sprite_y[a] = 0x40;
+      sprite_dx[a] = 1;
+      sprite_dy[a] = 1;
+      x += 0x20;
+    }
   }
 
   static public void spritesDisplay()
@@ -253,13 +269,31 @@ public class GrinderDemoTi99
 
   static public void spritesDisplayFast()
   {
-    int x,y;
+    int a,x;
 
-    y = 0x45;
-    for (x = 0; x < 4; x++)
+    x = 0x45;
+    for (a = 0; a < 4; a++)
     {
-      TI99.setSpritePos(x, y, 0x40);
-      y += 0x20;
+      TI99.setSpritePos(a, x, 0x40);
+      x += 0x20;
+    }
+  }
+
+  static public void spritesBounce()
+  {
+    int a;
+
+    for (a = 0; a < 4; a++)
+    {
+      TI99.setSpritePos(a, sprite_x[a], sprite_y[a]);
+
+      sprite_x[a] += sprite_dx[a];
+      sprite_y[a] += sprite_dy[a];
+
+      if (sprite_x[a] == 0) { sprite_dx[a] = 1; }
+      if (sprite_y[a] == 0) { sprite_dy[a] = 1; }
+      if (sprite_x[a] > 0xd0 - 16) { sprite_dx[a] = 1; }
+      if (sprite_y[a] > 0xd0 - 16) { sprite_dy[a] = 1; }
     }
   }
 
@@ -290,6 +324,8 @@ public class GrinderDemoTi99
 
       count++;
       if (count > 200) { break; }
+
+      spritesBounce();
     }
   }
 
@@ -322,6 +358,11 @@ public class GrinderDemoTi99
 
   static public void main(String args[])
   {
+    sprite_dx = new byte[4];
+    sprite_dy = new byte[4];
+    sprite_x = new int[4];
+    sprite_y = new int[4];
+
     showSunMessage();
     spritesInit();
     spritesDisplay();

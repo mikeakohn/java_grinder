@@ -67,6 +67,9 @@ int TMS9900::open(const char *filename)
     //fprintf(out, "free_ram equ 0\n");
   }
 
+  //fprintf(out, "heap_ptr equ free_ram\n");
+  //fprintf(out, "free_ram equ ram_start+0\n");
+
   return 0;
 }
 
@@ -81,21 +84,15 @@ int TMS9900::start_init()
 
 int TMS9900::insert_static_field_define(const char *name, const char *type, int index)
 {
-  fprintf(out, "%s equ free_ram+%d\n", name, index * 2);
+  fprintf(out, "%s equ ram_start+%d\n", name, (index * 2) + 2);
   return 0;
 }
 
 
 int TMS9900::init_heap(int field_count)
 {
-  fprintf(out, "free_ram equ ram_start+0\n");
-
-  // TI99 - We aren't going to use a heap here since the scratch pad is
-  // only 256 bytes long.  Instread the heap will be in the VDP.
   fprintf(out, "  ;; Set up heap and static initializers\n");
-  //fprintf(out, "  li r0, free_ram+%d\n", (field_count + 1) * 2);
-  //fprintf(out, "  mov r0, @free_ram\n");
-  fprintf(out, "  li r10, free_ram+%d\n", field_count * 2);
+  fprintf(out, "  li r10, ram_start+%d\n", field_count * 2);
 
   return 0;
 }
@@ -783,7 +780,10 @@ int TMS9900::invoke_static_method(const char *name, int params, int is_void)
 
 int TMS9900::put_static(const char *name, int index)
 {
-  return -1;
+  fprintf(out, "  mov r%d, @%s\n", REG_STACK(reg - 1), name);
+  reg--;
+
+  return 0;
 }
 
 int TMS9900::get_static(const char *name, int index)
@@ -798,7 +798,18 @@ int TMS9900::brk()
 
 int TMS9900::new_array(uint8_t type)
 {
-  return -1;
+  fprintf(out, "  ;; new_array(%d)\n", type);
+  fprintf(out, "  mov @heap_ptr, r0\n");
+
+  if (type != TYPE_BYTE)
+  {
+    fprintf(out, "  sla r%d, 1\n", REG_STACK(reg - 1));
+  }
+
+  fprintf(out, "  a r%d, @heap_ptr\n", REG_STACK(reg - 1));
+  fprintf(out, "  mov r0, r%d\n", REG_STACK(reg - 1));
+
+  return 0;
 }
 
 int TMS9900::insert_array(const char *name, int32_t *data, int len, uint8_t type)
