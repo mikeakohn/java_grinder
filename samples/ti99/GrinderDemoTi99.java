@@ -290,10 +290,53 @@ public class GrinderDemoTi99
       sprite_x[a] += sprite_dx[a];
       sprite_y[a] += sprite_dy[a];
 
-      if (sprite_x[a] == 0) { sprite_dx[a] = 1; }
-      if (sprite_y[a] == 0) { sprite_dy[a] = 1; }
-      if (sprite_x[a] > 0xd0 - 16) { sprite_dx[a] = 1; }
-      if (sprite_y[a] > 0xd0 - 16) { sprite_dy[a] = 1; }
+      if (sprite_x[a] == 0x20) { sprite_dx[a] = 1; }
+      if (sprite_y[a] == 0x20) { sprite_dy[a] = 1; }
+      if (sprite_x[a] == 0xa0) { sprite_dx[a] = -1; }
+      if (sprite_y[a] == 0xa0) { sprite_dy[a] = -1; }
+    }
+  }
+
+  static public void spritesBounce_draw()
+  {
+    int a;
+
+    for (a = 0; a < 4; a++)
+    {
+      TI99.setSpritePos(a, sprite_x[a], sprite_y[a]);
+    }
+  }
+
+  static public void spritesBounce_inc()
+  {
+    int a;
+
+    for (a = 0; a < 4; a++)
+    {
+      sprite_x[a] += sprite_dx[a];
+      sprite_y[a] += sprite_dy[a];
+    }
+  }
+
+  static public void spritesBounce_check_x()
+  {
+    int a;
+
+    for (a = 0; a < 4; a++)
+    {
+      if (sprite_x[a] == 0x20) { sprite_dx[a] = 1; }
+      if (sprite_x[a] == 0xa0) { sprite_dx[a] = -1; }
+    }
+  }
+
+  static public void spritesBounce_check_y()
+  {
+    int a;
+
+    for (a = 0; a < 4; a++)
+    {
+      if (sprite_y[a] == 0x20) { sprite_dy[a] = 1; }
+      if (sprite_y[a] == 0xa0) { sprite_dy[a] = -1; }
     }
   }
 
@@ -325,7 +368,11 @@ public class GrinderDemoTi99
       count++;
       if (count > 200) { break; }
 
-      spritesBounce();
+      //spritesBounce();
+      spritesBounce_draw();
+      spritesBounce_inc();
+      spritesBounce_check_x();
+      spritesBounce_check_y();
     }
   }
 
