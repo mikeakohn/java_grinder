@@ -929,10 +929,10 @@ int TMS9900::array_write_int(const char *name, int field_id)
 void TMS9900::sign_extend()
 {
   fprintf(out, "  li r0, 0x80\n");
-  fprintf(out, "  coc r%d, r0\n", REG_STACK(reg-1));
+  fprintf(out, "  coc r0, r%d\n", REG_STACK(reg-1));
   fprintf(out, "  jne label_%d\n", label_count);
-  fprintf(out, "  ori r%d, #0xff00\n", REG_STACK(reg-1));
-  fprintf(out, "label_%d\n", label_count);
+  fprintf(out, "  ori r%d, 0xff00\n", REG_STACK(reg-1));
+  fprintf(out, "label_%d:\n", label_count);
   label_count++;
 }
 
