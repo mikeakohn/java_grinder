@@ -3,6 +3,11 @@ import net.mikekohn.java_grinder.TI99;
 
 public class GrinderDemoTi99
 {
+  static byte[] sprite_dx = new byte[4];
+  static byte[] sprite_dy = new byte[4];
+  static byte[] sprite_x = new byte[4];
+  static byte[] sprite_y = new byte[4];
+
   static short[] tones =
   {
     // C     C#      D     D#      E      F     F#      G     G#      A     A#
@@ -193,9 +198,9 @@ public class GrinderDemoTi99
 
   static public void showSunMessage()
   {
-    TI99.setCursor(10, 10);
+    TI99.setCursor(10, 8);
     TI99.print("IN MEMORY OF");
-    TI99.setCursor(8, 14);
+    TI99.setCursor(8, 12);
     TI99.print("SUN MICROSYSTEMS");
     TI99.setCursor(11, 16);
     TI99.print("1982-2010");
@@ -258,10 +263,40 @@ public class GrinderDemoTi99
     }
   }
 
+  static public void animateBox()
+  {
+    byte dx,dy;
+    byte x,y;
+    int count;
+
+    dx = 1; dy = 1;
+    x = 0; y = 0;
+    count = 0;
+
+    while(true)
+    {
+      TI99.clearScreen();
+      drawBoxFill(x, y, x + 4, y + 4, (x & 0xf) << 4);
+
+      x += dx;
+      y += dy;
+
+      if (x >= 27) { dx = -1; }
+      if (y >= 19) { dy = -1; }
+      if (x == 0) { dx = 1; }
+      if (y == 0) { dy = 1; }
+
+      delayShortTwo();
+
+      count++;
+      if (count > 200) { break; }
+    }
+  }
+
   static public void animateBoxes()
   {
-    int dx,dy;
-    int x,y;
+    byte dx,dy;
+    byte x,y;
     int count;
 
     dx = 1; dy = 1;
@@ -300,11 +335,11 @@ public class GrinderDemoTi99
 
     spritesDisplayFast();
 
+    animateBox();
     animateBoxes();
 
-
     scrollcolors();
-    delay();
+    //delay();
     TI99.setSpriteSize(TI99.SPRITE_SIZE_16X16_BIG);
     scrollcolors();
 
