@@ -3,10 +3,6 @@ import net.mikekohn.java_grinder.TI99;
 
 public class GrinderDemoTi99
 {
-  //static byte[] sprite_dx = new byte[4];
-  //static byte[] sprite_dy = new byte[4];
-  //static int[] sprite_x = new int[4];
-  //static int[] sprite_y = new int[4];
   static byte[] sprite_dx;
   static byte[] sprite_dy;
   static int[] sprite_x;
@@ -108,7 +104,7 @@ public class GrinderDemoTi99
   static public void delayLong()
   {
     int a;
-    for (a = 0; a < 4; a++) { delay(); }
+    for (a = 0; a < 2; a++) { delay(); }
   }
 
   static public void delayShort()
@@ -281,11 +277,15 @@ public class GrinderDemoTi99
 
   static public void spritesBounce()
   {
-    int a;
+    int a,c;
+
+    c = sprite_x[0] & 0xf;
 
     for (a = 0; a < 4; a++)
     {
       TI99.setSpritePos(a, sprite_x[a], sprite_y[a]);
+      TI99.setSpriteColor(a, c);
+      c++;
 
       sprite_x[a] += sprite_dx[a];
       sprite_y[a] += sprite_dy[a];
@@ -351,8 +351,13 @@ public class GrinderDemoTi99
       if (x == 0) { dx = 1; }
       if (y == 0) { dy = 1; }
 
+      if (count == 200)
+      {
+        TI99.setSpriteSize(TI99.SPRITE_SIZE_16X16_BIG);
+      }
+
       count++;
-      if (count > 10000) { break; }
+      if (count > 400) { break; }
 
       spritesBounce();
     }
@@ -381,10 +386,18 @@ public class GrinderDemoTi99
     animateBox();
     animateBoxes();
 
+    clearScreenSlow();
+    //spritesInit();
+
+    TI99.setSpritePos(0, 0x45, 0x40);
+    TI99.setSpritePos(1, 0x65, 0x40);
+    TI99.setSpritePos(2, 0x85, 0x40);
+    TI99.setSpritePos(3, 0xa5, 0x40);
+
     scrollcolors();
     //delay();
-    TI99.setSpriteSize(TI99.SPRITE_SIZE_16X16_BIG);
-    scrollcolors();
+    //TI99.setSpriteSize(TI99.SPRITE_SIZE_16X16_BIG);
+    //scrollcolors();
 
     while(true);
   }
