@@ -826,7 +826,7 @@ int TMS9900::brk()
 int TMS9900::new_array(uint8_t type)
 {
   fprintf(out, "  ;; new_array(%d)\n", type);
-  fprintf(out, "  mov @heap_ptr, r0\n");
+  //fprintf(out, "  mov @heap_ptr, r0\n");
 
   if (type != TYPE_BYTE)
   {
@@ -887,6 +887,7 @@ int TMS9900::array_read_byte()
   fprintf(out, "  a r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
   fprintf(out, "  movb *r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-2));
   fprintf(out, "  swpb r%d\n", REG_STACK(reg-2));
+  fprintf(out, "  andi r%d, 0xff\n", REG_STACK(reg-2));
   reg--;
   sign_extend();
   return 0;
@@ -914,6 +915,7 @@ int TMS9900::array_read_byte(const char *name, int field_id)
   fprintf(out, "  a r%d, r13\n", REG_STACK(reg-1));
   fprintf(out, "  movb *r13, r%d\n", REG_STACK(reg-1));
   fprintf(out, "  swpb r%d\n", REG_STACK(reg-1));
+  fprintf(out, "  andi r%d, 0xff\n", REG_STACK(reg-2));
   sign_extend();
 
   return 0;
