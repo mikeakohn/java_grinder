@@ -148,26 +148,73 @@ public class GrinderDemoTi99
     }
   }
 
-  static public void main(String args[])
+  static public void drawBox(int x0, int y0, int x1, int y1, int color)
   {
-    int a,pos;
+    int x,y;
 
-    TI99.setSpriteSize(TI99.SPRITE_SIZE_16X16_SMALL);
+    for (x = x0; x <= x1; x++)
+    {
+      TI99.plot(x, y0, color);
+      TI99.plot(x, y1, color);
+    }
 
+    for (y = y0; y <= y1; y++)
+    {
+      TI99.plot(x0, y, color);
+      TI99.plot(x1, y, color);
+    }
+  }
+
+  static public void drawBoxFill(int x0, int y0, int x1, int y1, int color)
+  {
+    int x,y;
+
+    for (y = y0; y <= y1; y++)
+    {
+      for (x = x0; x <= x1; x++)
+      {
+        TI99.plot(x, y, color);
+      }
+    }
+  }
+
+  static public void clearScreenSlow()
+  {
+    int x,y;
+
+    for (x = 0; x < 12; x++)
+    {
+      drawBox(x, x, 31 - x, 23 - x, 0);
+      delayShortTwo();
+    }
+
+    TI99.clearScreen();
+  }
+
+  static public void showSunMessage()
+  {
     TI99.setCursor(10, 10);
     TI99.print("IN MEMORY OF");
     TI99.setCursor(8, 14);
     TI99.print("SUN MICROSYSTEMS");
+    TI99.setCursor(11, 16);
+    TI99.print("1982-2010");
     delayLong();
     TI99.clearScreen();
+  }
 
-    //TI99.setSpriteVisible(0, true);
+  static public void spritesInit()
+  {
+    TI99.setSpriteSize(TI99.SPRITE_SIZE_16X16_SMALL);
     TI99.setSpriteImage(0, sprite_j);
     TI99.setSpriteImage(1, sprite_a);
     TI99.setSpriteImage(2, sprite_v);
     TI99.setSpriteImage(3, sprite_a);
     hideSprites();
+  }
 
+  static public void spritesDisplay()
+  {
     TI99.setSpritePos(0, 0x45, 0x40);
     playTone(0);
     TI99.setSpritePos(1, 0x65, 0x40);
@@ -193,24 +240,68 @@ public class GrinderDemoTi99
     TI99.setSoundVolume(1, 15);
     TI99.setSoundVolume(2, 15);
 
-    scrollcolors();
+    //scrollcolors();
 
     TI99.clearScreen();
     hideSprites();
+  }
+
+  static public void spritesDisplayFast()
+  {
+    int x,y;
+
+    y = 0x45;
+    for (x = 0; x < 4; x++)
+    {
+      TI99.setSpritePos(x, y, 0x40);
+      y += 0x20;
+    }
+  }
+
+  static public void animateBoxes()
+  {
+    int dx,dy;
+    int x,y;
+    int count;
+
+    dx = 1; dy = 1;
+    x = 0; y = 0;
+    count = 0;
+
+    while(true)
+    {
+      drawBoxFill(x, y, x + 4, y + 4, (x & 0xf) << 4);
+
+      x += dx;
+      y += dy;
+
+      if (x >= 27) { dx = -1; }
+      if (y >= 19) { dy = -1; }
+      if (x == 0) { dx = 1; }
+      if (y == 0) { dy = 1; }
+
+      count++;
+      if (count > 10000) { break; }
+    }
+  }
+
+  static public void main(String args[])
+  {
+    showSunMessage();
+    spritesInit();
+    spritesDisplay();
 
     TI99.setColors();
     drawMandelbrot();
 
     delay();
 
-    TI99.clearScreen();
+    clearScreenSlow();
 
-    pos = 0x45;
-    for (a = 0; a < 4; a++)
-    {
-      TI99.setSpritePos(a, pos, 0x40);
-      pos += 0x20;
-    }
+    spritesDisplayFast();
+
+    animateBoxes();
+
 
     scrollcolors();
     delay();
