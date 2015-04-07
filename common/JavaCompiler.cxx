@@ -1557,6 +1557,7 @@ int instruction_length;
           ret = generator->push_ref(field_name);
         }
           else
+        if (type[0] == 'L')
         {
           int index = java_class->get_field_index(field_name);
           generator->get_static(field_name, index);
@@ -1570,6 +1571,10 @@ int instruction_length;
             //generator->push_ref(field_name);
             stack->push(ref);
           }
+        }
+          else
+        {
+          ret = generator->push_ref(field_name);
         }
 
         break;
