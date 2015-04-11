@@ -10,11 +10,79 @@ public class GrinderDemoTi99
 
   static short[] tones =
   {
+    // 0      1      2      3      4      5      6      7      8      9     10
     // C     C#      D     D#      E      F     F#      G     G#      A     A#
     0x60d, 0xa0c, 0xe0b, 0x40b, 0xa0a, 0x00a, 0x709, 0xf08, 0x708, 0xf07, 0x807,
-    // BB
-    0x107
+    //11     12     13     14     15      16     17
+    // B,     C,    C#,     D,    D#       E      F
+    0x107, 0xb06, 0x506, 0xf05, 0xa05,  0x505, 0x005,
   };
+
+  static byte[] song_1 =
+  {
+    2, 9, 9,  2, 2, 0,
+    2, 9, 2,  2, 2, 0,
+    2, 9, 14,  2, 2, 0,
+    2, 9, 13,  2, 2, 0,
+    2, 8, 9,  2, 2, 0,
+    2, 8, 12,  2, 2, 0,
+    2, 8, 8,  2, 2, 0,
+    2, 8, 8,  2, 2, 0,
+
+    2, 9, 9,  2, 2, 0,
+    2, 9, 2,  2, 2, 0,
+    2, 9, 14,  2, 2, 0,
+    2, 9, 13,  2, 2, 0,
+    2, 10, 9,  2, 2, 0,
+    2, 10, 12,  2, 2, 0,
+    2, 10, 8,  2, 2, 0,
+    2, 10, 8,  2, 2, 0,
+  };
+
+  static byte[] song_2 =
+  {
+    2, 9, 6,  0, 0, 0,
+    9, 0, 0,  0, 15, 15,
+    16, 0, 14,  0, 15, 0,
+    14, 0, 0,  0, 15, 15,
+
+    2, 9, 6,  0, 0, 0,
+    9, 0, 0,  0, 15, 15,
+    16, 0, 14,  0, 15, 0,
+    14, 0, 0,  0, 15, 15,
+
+    2, 9, 6,  0, 0, 0,
+    9, 0, 0,  0, 15, 15,
+    16, 0, 14,  0, 15, 0,
+    14, 0, 0,  0, 15, 15,
+
+    2, 9, 6,  0, 0, 0,
+    9, 0, 0,  0, 15, 15,
+    16, 0, 14,  0, 15, 0,
+    14, 0, 0,  0, 15, 15,
+
+    0, 7, 4,  0, 0, 0,
+    7, 0, 0,  0, 15, 15,
+    14, 0, 16,  0, 15, 0,
+    12, 0, 0,  0, 15, 15,
+
+    0, 7, 4,  0, 0, 0,
+    7, 0, 0,  0, 15, 15,
+    14, 0, 16,  0, 15, 0,
+    12, 0, 0,  0, 15, 15,
+
+    0, 7, 4,  0, 0, 0,
+    7, 0, 0,  0, 15, 15,
+    14, 0, 16,  0, 15, 0,
+    12, 0, 0,  0, 15, 15,
+
+    0, 7, 4,  0, 0, 0,
+    7, 0, 0,  0, 15, 15,
+    14, 0, 16,  0, 15, 0,
+    12, 0, 0,  0, 15, 15,
+  };
+
+  static int song_ptr;
 
   static byte[] sprite_j =
   {
@@ -93,6 +161,37 @@ public class GrinderDemoTi99
 
       //is += dy;
     }
+  }
+
+  static public void playSong1()
+  {
+    TI99.setSoundFreq(0, tones[song_1[song_ptr++]]);
+    TI99.setSoundFreq(1, tones[song_1[song_ptr++]]);
+    TI99.setSoundFreq(2, tones[song_1[song_ptr++]]);
+    TI99.setSoundVolume(0, song_1[song_ptr++]);
+    TI99.setSoundVolume(1, song_1[song_ptr++]);
+    TI99.setSoundVolume(2, song_1[song_ptr++]);
+
+    if (song_ptr == song_1.length) { song_ptr = 0; }
+  }
+
+  static public void playSong2()
+  {
+    TI99.setSoundFreq(0, tones[song_2[song_ptr++]]);
+    TI99.setSoundFreq(1, tones[song_2[song_ptr++]]);
+    TI99.setSoundFreq(2, tones[song_2[song_ptr++]]);
+    TI99.setSoundVolume(0, song_2[song_ptr++]);
+    TI99.setSoundVolume(1, song_2[song_ptr++]);
+    TI99.setSoundVolume(2, song_2[song_ptr++]);
+
+    if (song_ptr == song_2.length) { song_ptr = 0; }
+  }
+
+  static public void soundOff()
+  {
+    TI99.setSoundVolume(0, 15);
+    TI99.setSoundVolume(1, 15);
+    TI99.setSoundVolume(2, 15);
   }
 
   static public void delay()
@@ -253,9 +352,7 @@ public class GrinderDemoTi99
 
     delay();
 
-    TI99.setSoundVolume(0, 15);
-    TI99.setSoundVolume(1, 15);
-    TI99.setSoundVolume(2, 15);
+    soundOff();
 
     //scrollcolors();
 
@@ -303,6 +400,8 @@ public class GrinderDemoTi99
     byte x,y;
     int count;
 
+    song_ptr = 0;
+
     dx = 1; dy = 1;
     x = 0; y = 0;
     count = 0;
@@ -322,11 +421,18 @@ public class GrinderDemoTi99
 
       delayShortTwo();
 
+      if ((count & 0x1) == 0)
+      {
+        playSong1();
+      }
+
       count++;
-      if (count > 200) { break; }
+      if (count > 100) { break; }
 
       spritesBounce();
     }
+
+    soundOff();
   }
 
   static public void animateBoxes()
@@ -334,6 +440,8 @@ public class GrinderDemoTi99
     byte dx,dy;
     byte x,y;
     int count;
+
+    song_ptr = 0;
 
     dx = 1; dy = 1;
     x = 0; y = 0;
@@ -356,11 +464,18 @@ public class GrinderDemoTi99
         TI99.setSpriteSize(TI99.SPRITE_SIZE_16X16_BIG);
       }
 
+      if ((count & 0xf) == 0)
+      {
+        playSong2();
+      }
+
       count++;
-      if (count > 400) { break; }
+      if (count > 1600) { break; }
 
       spritesBounce();
     }
+
+    soundOff();
   }
 
   static public void main(String args[])
