@@ -105,5 +105,71 @@ public class Test
 
     return total;
   }
+
+  public static void fill_array(byte[] a)
+  {
+    int i,len;
+
+    len = a.length;
+
+    for (i = 0; i < len; i++)
+    {
+      a[i] = (byte)(10 + i);
+    }
+  }
+
+  public static int add_array(short[] a)
+  {
+    int i,len;
+    int total = 0;
+
+    len = a.length;
+
+    for (i = 0; i < len; i++)
+    {
+      total += a[i];
+    }
+
+    return total;
+  }
+
+  public static void fill_array(short[] a)
+  {
+    int i,len;
+
+    len = a.length;
+
+    for (i = 0; i < len; i++)
+    {
+      a[i] = (short)(100 + i);
+    }
+  }
+
+  public static int add_array(int[] a)
+  {
+    int i,len;
+    int total = 0;
+
+    len = a.length;
+
+    for (i = 0; i < len; i++)
+    {
+      total += a[i];
+    }
+
+    return total;
+  }
+
+  public static void fill_array(int[] a)
+  {
+    int i,len;
+
+    len = a.length;
+
+    for (i = 0; i < len; i++)
+    {
+      a[i] = 1000 + i;
+    }
+  }
 }
 
