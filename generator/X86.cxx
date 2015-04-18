@@ -826,71 +826,138 @@ int X86::insert_string(const char *name, uint8_t *bytes, int len)
 
 int X86::push_array_length()
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  pop esi\n");
+    fprintf(out, "  push [esi-4]\n");
+  }
+    else
+  {
+    fprintf(out, "  mov %s, [%s-4]\n", REG_STACK(reg-1), REG_STACK(reg-1));
+  }
+
+  return 0;
 }
 
 int X86::push_array_length(const char *name, int field_id)
 {
-  return -1;
+  if (reg < REG_MAX)
+  {
+    fprintf(out, "  mov %s, [%s-4]\n", REG_STACK(reg++), name);
+  }
+    else
+  {
+    fprintf(out, "  push [%s-4]\n", name);
+    stack++;
+  }
+
+  return 0;
 }
 
 int X86::array_read_byte()
 {
-  return -1;
+  fprintf(out, "  ; array_read_byte()\n");
+  if (stack == 0)
+  {
+    fprintf(out, "  mov %s, [%s+%s]\n", REG_STACK8(reg-2), REG_STACK(reg-2), REG_STACK(reg-1));
+    reg--;
+    fprintf(out, "  movsx %s, %s\n", REG_STACK(reg-1), REG_STACK8(reg-1));
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  pop ebx\n");
+    fprintf(out, "  mov %s, [%s+ebx]\n", REG_STACK8(reg-1), REG_STACK(reg-1));
+    fprintf(out, "  movsx ebx, bl\n");
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  pop ebx\n");
+    fprintf(out, "  pop esi\n");
+    fprintf(out, "  mov bl, [esi+ebx]\n");
+    fprintf(out, "  movsx ebx, bl\n");
+    fprintf(out, "  push ebx\n");
+    stack--;
+  }
+
+  return 0;
 }
 
 int X86::array_read_short()
 {
+  fprintf(out, "  ; array_read_short()\n");
+
   return -1;
 }
 
 int X86::array_read_int()
 {
+  fprintf(out, "  ; array_read_int()\n");
+
   return -1;
 }
 
 int X86::array_read_byte(const char *name, int field_id)
 {
+  fprintf(out, "  ; array_read_byte(%s,%d)\n", name, field_id);
+
   return -1;
 }
 
 int X86::array_read_short(const char *name, int field_id)
 {
+  fprintf(out, "  ; array_read_short(%s,%d)\n", name, field_id);
+
   return -1;
 }
 
 int X86::array_read_int(const char *name, int field_id)
 {
+  fprintf(out, "  ; array_read_int(%s,%d)\n", name, field_id);
+
   return -1;
 }
 
 int X86::array_write_byte()
 {
+  fprintf(out, "  ; array_write_byte()\n");
+
   return -1;
 }
 
 int X86::array_write_short()
 {
+  fprintf(out, "  ; array_write_short()\n");
+
   return -1;
 }
 
 int X86::array_write_int()
 {
+  fprintf(out, "  ; array_write_int()\n");
+
   return -1;
 }
 
 int X86::array_write_byte(const char *name, int field_id)
 {
+  fprintf(out, "  ; array_write_byte(%s,%d)\n", name, field_id);
+
   return -1;
 }
 
 int X86::array_write_short(const char *name, int field_id)
 {
+  fprintf(out, "  ; array_write_short(%s,%d)\n", name, field_id);
+
   return -1;
 }
 
 int X86::array_write_int(const char *name, int field_id)
 {
+  fprintf(out, "  ; array_write_int(%s,%d)\n", name, field_id);
+
   return -1;
 }
 

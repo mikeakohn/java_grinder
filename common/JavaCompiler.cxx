@@ -539,10 +539,17 @@ int instruction_length;
         if (*s == ';') { *s = '_'; }
         else if (*s == 0) { s--; }
       }
+        else
+      if (*s == '[')
+      {
+        *s = 'a';
+        s++;
+      }
 
       param_count++;
       s++;
     }
+
     *s = 0;
     method_sig[0] = '_';
     if (method_sig[1] != 0 ) { strcat(method_name, method_sig); }

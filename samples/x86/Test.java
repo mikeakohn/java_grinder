@@ -90,5 +90,20 @@ public class Test
   {
     return long_method(a, 1, 2, 3, 4, 5);
   }
+
+  public static int add_array(byte[] a)
+  {
+    int i,len;
+    int total = 0;
+
+    len = a.length;
+
+    for (i = 0; i < len; i++)
+    {
+      total += a[i];
+    }
+
+    return total;
+  }
 }
 
