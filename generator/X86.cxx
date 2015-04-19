@@ -160,6 +160,8 @@ void X86::method_end(int local_count)
 
 int X86::push_integer(int32_t n)
 {
+  fprintf(out, "  // push_integer(%d)\n", n);
+
   if (reg < REG_MAX)
   {
     fprintf(out, "  mov %s, %d\n", REG_STACK(reg++), n);
@@ -175,6 +177,8 @@ int X86::push_integer(int32_t n)
 
 int X86::push_integer_local(int index)
 {
+  fprintf(out, "  // push_integer_local(%d)\n", index);
+
   if (reg < REG_MAX)
   {
     fprintf(out, "  mov %s, [ebp-%d]\n", REG_STACK(reg++), LOCALS(index));
@@ -191,6 +195,8 @@ int X86::push_integer_local(int index)
 
 int X86::push_ref_static(const char *name, int index)
 {
+  fprintf(out, "  // push_ref_static(%s, %d)\n", name, index);
+
   if (reg < REG_MAX)
   {
     fprintf(out, "  mov %s, _%s\n", REG_STACK(reg++), name);
@@ -529,12 +535,15 @@ int X86::xor_integer(int num)
 
 int X86::inc_integer(int index, int num)
 {
+  fprintf(out, "  // inc_integer(%d,%d)\n", index, num);
   fprintf(out, "  add dword [ebp-%d], %d\n", LOCALS(index), num);
   return 0;
 }
 
 int X86::integer_to_byte()
 {
+  fprintf(out, "  // integer_to_byte() (sign extend)\n");
+
   if (stack > 0)
   {
     fprintf(out, "  mov ebx, [esp]\n");
@@ -551,6 +560,8 @@ int X86::integer_to_byte()
 
 int X86::integer_to_short()
 {
+  fprintf(out, "  // integer_to_short() (sign extend)\n");
+
   if (stack > 0)
   {
     fprintf(out, "  mov ebx, [esp]\n");
@@ -567,6 +578,8 @@ int X86::integer_to_short()
 
 int X86::jump_cond(const char *label, int cond, int distance)
 {
+  fprintf(out, "  // jump_cond(%s, %d, %d)\n", label, cond, distance);
+
   if (stack > 0)
   {
     fprintf(out, "  pop ebx\n");
@@ -585,6 +598,8 @@ int X86::jump_cond(const char *label, int cond, int distance)
 
 int X86::jump_cond_integer(const char *label, int cond, int distance)
 {
+  fprintf(out, "  // jump_cond_integer(%s, %d, %d)\n", label, cond, distance);
+
   if (stack == 1)
   {
     fprintf(out, "  pop ebx\n");
@@ -870,6 +885,7 @@ int X86::array_read_byte()
     fprintf(out, "  pop ebx\n");
     fprintf(out, "  mov %s, [%s+ebx]\n", REG_STACK8(reg-1), REG_STACK(reg-1));
     fprintf(out, "  movsx %s, %s\n", REG_STACK(reg-1), REG_STACK8(reg-1));
+    stack--;
   }
     else
   {
@@ -902,6 +918,7 @@ int X86::array_read_short()
     fprintf(out, "  sal ebx, 1\n");
     fprintf(out, "  mov %s, [%s+ebx]\n", REG_STACK16(reg-1), REG_STACK(reg-1));
     fprintf(out, "  movsx %s, %s\n", REG_STACK(reg-1), REG_STACK16(reg-1));
+    stack--;
   }
     else
   {
@@ -933,6 +950,7 @@ int X86::array_read_int()
     fprintf(out, "  pop ebx\n");
     fprintf(out, "  sal ebx, 2\n");
     fprintf(out, "  mov %s, [%s+ebx]\n", REG_STACK(reg-1), REG_STACK(reg-1));
+    stack--;
   }
     else
   {
