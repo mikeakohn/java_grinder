@@ -827,7 +827,7 @@ int X86::new_array(uint8_t type)
 
 int X86::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 {
-  fprintf(out, "align 32\n");
+  fprintf(out, "align 4\n");
   if (type == TYPE_BYTE)
   { return insert_db(name, data, len, TYPE_INT); }
     else
@@ -842,7 +842,7 @@ int X86::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 
 int X86::insert_string(const char *name, uint8_t *bytes, int len)
 {
-  fprintf(out, "align 32\n");
+  fprintf(out, "align 4\n");
   fprintf(out, "  dc32 %d\n", len);
   return insert_utf8(name, bytes, len);
 }
