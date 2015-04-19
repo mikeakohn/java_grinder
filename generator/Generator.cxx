@@ -121,7 +121,7 @@ int Generator::insert_dw(const char *name, int32_t *data, int len, uint8_t len_t
   return 0;
 }
 
-int Generator::insert_dc32(const char *name, int32_t *data, int len, uint8_t len_type)
+int Generator::insert_dc32(const char *name, int32_t *data, int len, uint8_t len_type, const char *dc32)
 {
   int n;
 
@@ -133,14 +133,14 @@ int Generator::insert_dc32(const char *name, int32_t *data, int len, uint8_t len
     else
   if (len_type == TYPE_INT)
   {
-    fprintf(out, "  dc32 %d   ; %s.length\n", len, name);
+    fprintf(out, "  %s %d   ; %s.length\n", dc32, len, name);
   }
 
   fprintf(out, "_%s:\n", name);
 
   for (n = 0; n < len; n++)
   {
-    if ((n % 8) == 0) { fprintf(out, "  dc32"); }
+    if ((n % 8) == 0) { fprintf(out, "  %s", dc32); }
     else { fprintf(out, ","); }
 
     fprintf(out, " 0x%04x", (uint32_t)data[n]);

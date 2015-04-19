@@ -160,7 +160,7 @@ void X86::method_end(int local_count)
 
 int X86::push_integer(int32_t n)
 {
-  fprintf(out, "  // push_integer(%d)\n", n);
+  fprintf(out, "  ; push_integer(%d)\n", n);
 
   if (reg < REG_MAX)
   {
@@ -177,7 +177,7 @@ int X86::push_integer(int32_t n)
 
 int X86::push_integer_local(int index)
 {
-  fprintf(out, "  // push_integer_local(%d)\n", index);
+  fprintf(out, "  ; push_integer_local(%d)\n", index);
 
   if (reg < REG_MAX)
   {
@@ -195,7 +195,7 @@ int X86::push_integer_local(int index)
 
 int X86::push_ref_static(const char *name, int index)
 {
-  fprintf(out, "  // push_ref_static(%s, %d)\n", name, index);
+  fprintf(out, "  ; push_ref_static(%s, %d)\n", name, index);
 
   if (reg < REG_MAX)
   {
@@ -535,14 +535,14 @@ int X86::xor_integer(int num)
 
 int X86::inc_integer(int index, int num)
 {
-  fprintf(out, "  // inc_integer(%d,%d)\n", index, num);
+  fprintf(out, "  ; inc_integer(%d,%d)\n", index, num);
   fprintf(out, "  add dword [ebp-%d], %d\n", LOCALS(index), num);
   return 0;
 }
 
 int X86::integer_to_byte()
 {
-  fprintf(out, "  // integer_to_byte() (sign extend)\n");
+  fprintf(out, "  ; integer_to_byte() (sign extend)\n");
 
   if (stack > 0)
   {
@@ -560,7 +560,7 @@ int X86::integer_to_byte()
 
 int X86::integer_to_short()
 {
-  fprintf(out, "  // integer_to_short() (sign extend)\n");
+  fprintf(out, "  ; integer_to_short() (sign extend)\n");
 
   if (stack > 0)
   {
@@ -578,7 +578,7 @@ int X86::integer_to_short()
 
 int X86::jump_cond(const char *label, int cond, int distance)
 {
-  fprintf(out, "  // jump_cond(%s, %d, %d)\n", label, cond, distance);
+  fprintf(out, "  ; jump_cond(%s, %d, %d)\n", label, cond, distance);
 
   if (stack > 0)
   {
@@ -598,7 +598,7 @@ int X86::jump_cond(const char *label, int cond, int distance)
 
 int X86::jump_cond_integer(const char *label, int cond, int distance)
 {
-  fprintf(out, "  // jump_cond_integer(%s, %d, %d)\n", label, cond, distance);
+  fprintf(out, "  ; jump_cond_integer(%s, %d, %d)\n", label, cond, distance);
 
   if (stack == 1)
   {
@@ -819,7 +819,7 @@ int X86::new_array(uint8_t type)
 
 int X86::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 {
-  fprintf(out, ".align 32\n");
+  fprintf(out, "align 32\n");
   if (type == TYPE_BYTE)
   { return insert_db(name, data, len, TYPE_INT); }
     else
@@ -827,14 +827,14 @@ int X86::insert_array(const char *name, int32_t *data, int len, uint8_t type)
   { return insert_dw(name, data, len, TYPE_INT); } 
     else
   if (type == TYPE_INT)
-  { return insert_dc32(name, data, len, TYPE_INT); } 
+  { return insert_dc32(name, data, len, TYPE_INT, "dd"); } 
 
   return -1;
 }
 
 int X86::insert_string(const char *name, uint8_t *bytes, int len)
 {
-  fprintf(out, ".align 32\n");
+  fprintf(out, "align 32\n");
   fprintf(out, "  dc32 %d\n", len);
   return insert_utf8(name, bytes, len);
 }
