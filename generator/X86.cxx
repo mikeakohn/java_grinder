@@ -112,7 +112,7 @@ int X86::insert_field_init_int(char *name, int index, int value)
 int X86::insert_field_init(char *name, int index)
 {
   fprintf(out, "  mov ebx, _%s\n", name);
-  fprintf(out, "  mov %s, ebx\n", name);
+  fprintf(out, "  mov [%s], ebx\n", name);
   return 0;
 }
 
@@ -257,13 +257,15 @@ int X86::push_short(int16_t s)
 
 int X86::push_ref(char *name)
 {
+  fprintf(out, "  ; push_ref(%s)\n", name);
+
   if (reg < REG_MAX)
   {
-    fprintf(out, "  mov %s, %s\n", REG_STACK(reg++), name);
+    fprintf(out, "  mov %s, [%s]\n", REG_STACK(reg++), name);
   }
     else
   {
-    fprintf(out, "  push %s\n", name);
+    fprintf(out, "  push [%s]\n", name);
     stack++;
   }
 
@@ -308,6 +310,8 @@ int X86::pop()
 
 int X86::dup()
 {
+  fprintf(out, "  ; dup()\n");
+
   if (reg < REG_MAX)
   {
     fprintf(out, "  mov %s, %s\n", REG_STACK(reg), REG_STACK(reg - 1));
@@ -330,6 +334,8 @@ int X86::dup()
 
 int X86::dup2()
 {
+  fprintf(out, "  ; dup2()\n");
+
   if (reg == 2)
   {
     fprintf(out, "  mov %s, %s\n",  REG_STACK(reg), REG_STACK(reg-2));
@@ -361,6 +367,8 @@ int X86::dup2()
 
 int X86::swap()
 {
+  fprintf(out, "  ; swap()\n");
+
   if (reg < 2)
   {
     printf("Error: swap() requires 2 registers on the stack\n");
@@ -1249,6 +1257,8 @@ int X86::array_write_int(const char *name, int field_id)
 
 int X86::stack_alu(const char *instr)
 {
+  fprintf(out, "  ; %s\n", instr);
+
   if (stack == 1)
   {
     fprintf(out, "  pop ebx\n");
@@ -1273,6 +1283,8 @@ int X86::stack_alu(const char *instr)
 
 int X86::stack_alu(const char *instr, int num)
 {
+  fprintf(out, "  ; %s %d\n", instr, num);
+
   if (stack > 0)
   {
     fprintf(out, "  mov ebx, [esp]\n");
