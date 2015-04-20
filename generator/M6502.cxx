@@ -1598,7 +1598,7 @@ void M6502::insert_push_array_length()
   fprintf(out, "  lda (address),y\n");
   fprintf(out, "  sta result + 0\n");
   fprintf(out, "  ldy #1\n");
-  fprintf(out, "  lda (address),y)\n");
+  fprintf(out, "  lda (address),y\n");
   fprintf(out, "  sta result + 1\n");
 
   fprintf(out, "  lda result + 0\n");
