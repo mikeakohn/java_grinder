@@ -932,8 +932,8 @@ int X86::array_read_short()
 
   if (stack == 0)
   {
-    fprintf(out, "  sal %s, 1\n", REG_STACK(reg-1));
-    fprintf(out, "  mov %s, [%s+%s]\n", REG_STACK16(reg-2), REG_STACK(reg-2), REG_STACK(reg-1));
+    //fprintf(out, "  sal %s, 1\n", REG_STACK(reg-1));
+    fprintf(out, "  mov %s, [%s+%s*2]\n", REG_STACK16(reg-2), REG_STACK(reg-2), REG_STACK(reg-1));
     reg--;
     fprintf(out, "  movsx %s, %s\n", REG_STACK(reg-1), REG_STACK16(reg-1));
   }
@@ -941,8 +941,8 @@ int X86::array_read_short()
   if (stack == 1)
   {
     fprintf(out, "  pop ebx\n");
-    fprintf(out, "  sal ebx, 1\n");
-    fprintf(out, "  mov %s, [%s+ebx]\n", REG_STACK16(reg-1), REG_STACK(reg-1));
+    //fprintf(out, "  sal ebx, 1\n");
+    fprintf(out, "  mov %s, [%s+ebx*2]\n", REG_STACK16(reg-1), REG_STACK(reg-1));
     fprintf(out, "  movsx %s, %s\n", REG_STACK(reg-1), REG_STACK16(reg-1));
     stack--;
   }
@@ -950,8 +950,8 @@ int X86::array_read_short()
   {
     fprintf(out, "  pop ebx\n");
     fprintf(out, "  pop esi\n");
-    fprintf(out, "  sal ebx, 1\n");
-    fprintf(out, "  mov bx, [esi+ebx]\n");
+    //fprintf(out, "  sal ebx, 1\n");
+    fprintf(out, "  mov bx, [esi+ebx*2]\n");
     fprintf(out, "  movsx ebx, bx\n");
     fprintf(out, "  push ebx\n");
     stack--;
@@ -966,24 +966,24 @@ int X86::array_read_int()
 
   if (stack == 0)
   {
-    fprintf(out, "  sal %s, 2\n", REG_STACK(reg-1));
-    fprintf(out, "  mov %s, [%s+%s]\n", REG_STACK(reg-2), REG_STACK(reg-2), REG_STACK(reg-1));
+    //fprintf(out, "  sal %s, 2\n", REG_STACK(reg-1));
+    fprintf(out, "  mov %s, [%s+%s*4]\n", REG_STACK(reg-2), REG_STACK(reg-2), REG_STACK(reg-1));
     reg--;
   }
     else
   if (stack == 1)
   {
     fprintf(out, "  pop ebx\n");
-    fprintf(out, "  sal ebx, 2\n");
-    fprintf(out, "  mov %s, [%s+ebx]\n", REG_STACK(reg-1), REG_STACK(reg-1));
+    //fprintf(out, "  sal ebx, 2\n");
+    fprintf(out, "  mov %s, [%s+ebx*4]\n", REG_STACK(reg-1), REG_STACK(reg-1));
     stack--;
   }
     else
   {
     fprintf(out, "  pop ebx\n");
     fprintf(out, "  pop esi\n");
-    fprintf(out, "  sal ebx, 2\n");
-    fprintf(out, "  mov ebx, [esi+ebx]\n");
+    //fprintf(out, "  sal ebx, 2\n");
+    fprintf(out, "  mov ebx, [esi+ebx*4]\n");
     fprintf(out, "  push ebx\n");
     stack--;
   }
@@ -1017,15 +1017,15 @@ int X86::array_read_short(const char *name, int field_id)
 
   if (stack == 0)
   {
-    fprintf(out, "  sal %s, 1\n", REG_STACK8(reg-1));
-    fprintf(out, "  mov %s, [%s+%s]\n", REG_STACK8(reg-1), name, REG_STACK(reg-1));
+    //fprintf(out, "  sal %s, 1\n", REG_STACK8(reg-1));
+    fprintf(out, "  mov %s, [%s+%s*2]\n", REG_STACK8(reg-1), name, REG_STACK(reg-1));
     fprintf(out, "  movsx %s, %s\n", REG_STACK(reg-1), REG_STACK8(reg-1));
   }
     else
   {
     fprintf(out, "  pop ebx\n");
-    fprintf(out, "  sal ebx, 1\n");
-    fprintf(out, "  mov bl, [%s+ebx]\n", name);
+    //fprintf(out, "  sal ebx, 1\n");
+    fprintf(out, "  mov bl, [%s+ebx*2]\n", name);
     fprintf(out, "  movsx ebx, bl\n");
     fprintf(out, "  push ebx\n");
   }
@@ -1039,15 +1039,15 @@ int X86::array_read_int(const char *name, int field_id)
 
   if (stack == 0)
   {
-    fprintf(out, "  sal %s, 2\n", REG_STACK8(reg-1));
-    fprintf(out, "  mov %s, [%s+%s]\n", REG_STACK8(reg-1), name, REG_STACK(reg-1));
+    //fprintf(out, "  sal %s, 2\n", REG_STACK8(reg-1));
+    fprintf(out, "  mov %s, [%s+%s*4]\n", REG_STACK8(reg-1), name, REG_STACK(reg-1));
     fprintf(out, "  movsx %s, %s\n", REG_STACK(reg-1), REG_STACK8(reg-1));
   }
     else
   {
     fprintf(out, "  pop ebx\n");
-    fprintf(out, "  sal ebx, 2\n");
-    fprintf(out, "  mov bl, [%s+ebx]\n", name);
+    //fprintf(out, "  sal ebx, 2\n");
+    fprintf(out, "  mov bl, [%s+ebx*4]\n", name);
     fprintf(out, "  movsx ebx, bl\n");
     fprintf(out, "  push ebx\n");
   }
@@ -1100,16 +1100,16 @@ int X86::array_write_short()
 
   if (stack == 0)
   {
-    fprintf(out, "  sal %s, 1\n", REG_STACK(reg-2));
-    fprintf(out, "  mov [%s+%s], %s\n", REG_STACK(reg-3), REG_STACK(reg-2), REG_STACK16(reg-1));
+    //fprintf(out, "  sal %s, 1\n", REG_STACK(reg-2));
+    fprintf(out, "  mov [%s+%s*2], %s\n", REG_STACK(reg-3), REG_STACK(reg-2), REG_STACK16(reg-1));
     reg -= 3;
   }
     else
   if (stack == 1)
   {
     fprintf(out, "  pop ebx\n");
-    fprintf(out, "  sal %s, 1\n", REG_STACK(reg-1));
-    fprintf(out, "  mov [%s+%s], bx\n", REG_STACK(reg-2), REG_STACK(reg-1));
+    //fprintf(out, "  sal %s, 1\n", REG_STACK(reg-1));
+    fprintf(out, "  mov [%s+%s*2], bx\n", REG_STACK(reg-2), REG_STACK(reg-1));
     stack -= 1;
     reg -= 2;
   }
@@ -1118,8 +1118,8 @@ int X86::array_write_short()
   {
     fprintf(out, "  pop ebx\n");
     fprintf(out, "  pop edi\n");
-    fprintf(out, "  sal edi, 1\n");
-    fprintf(out, "  mov [edi+%s], bx\n", REG_STACK(reg-1));
+    //fprintf(out, "  sal edi, 1\n");
+    fprintf(out, "  mov [edi+%s*2], bx\n", REG_STACK(reg-1));
     stack -= 2;
     reg -= 1;
   }
@@ -1143,16 +1143,16 @@ int X86::array_write_int()
 
   if (stack == 0)
   {
-    fprintf(out, "  sal %s, 2\n", REG_STACK(reg-2));
-    fprintf(out, "  mov [%s+%s], %s\n", REG_STACK(reg-3), REG_STACK(reg-2), REG_STACK(reg-1));
+    //fprintf(out, "  sal %s, 2\n", REG_STACK(reg-2));
+    fprintf(out, "  mov [%s+%s*4], %s\n", REG_STACK(reg-3), REG_STACK(reg-2), REG_STACK(reg-1));
     reg -= 3;
   }
     else
   if (stack == 1)
   {
     fprintf(out, "  pop ebx\n");
-    fprintf(out, "  sal %s, 2\n", REG_STACK(reg-1));
-    fprintf(out, "  mov [%s+%s], ebx\n", REG_STACK(reg-2), REG_STACK(reg-1));
+    //fprintf(out, "  sal %s, 2\n", REG_STACK(reg-1));
+    fprintf(out, "  mov [%s+%s*4], ebx\n", REG_STACK(reg-2), REG_STACK(reg-1));
     stack -= 1;
     reg -= 2;
   }
@@ -1161,8 +1161,8 @@ int X86::array_write_int()
   {
     fprintf(out, "  pop ebx\n");
     fprintf(out, "  pop edi\n");
-    fprintf(out, "  sal edi, 2\n");
-    fprintf(out, "  mov [edi+%s], ebx\n", REG_STACK(reg-1));
+    //fprintf(out, "  sal edi, 2\n");
+    fprintf(out, "  mov [edi+%s*4], ebx\n", REG_STACK(reg-1));
     stack -= 2;
     reg -= 1;
   }
@@ -1215,16 +1215,16 @@ int X86::array_write_short(const char *name, int field_id)
 
   if (stack == 0)
   {
-    fprintf(out, "  sal %s, 1\n", REG_STACK(reg-2));
-    fprintf(out, "  mov [%s+%s], %s\n", name, REG_STACK(reg-2), REG_STACK16(reg-1));
+    //fprintf(out, "  sal %s, 1\n", REG_STACK(reg-2));
+    fprintf(out, "  mov [%s+%s*2], %s\n", name, REG_STACK(reg-2), REG_STACK16(reg-1));
     reg -= 2;
   }
     else
   if (stack == 1)
   {
     fprintf(out, "  pop ebx\n");
-    fprintf(out, "  sal %s, 1\n", REG_STACK(reg-1));
-    fprintf(out, "  mov [%s+%s], bx\n", name, REG_STACK(reg-1));
+    //fprintf(out, "  sal %s, 1\n", REG_STACK(reg-1));
+    fprintf(out, "  mov [%s+%s*2], bx\n", name, REG_STACK(reg-1));
     stack -= 1;
     reg -= 1;
   }
@@ -1233,8 +1233,8 @@ int X86::array_write_short(const char *name, int field_id)
   {
     fprintf(out, "  pop ebx\n");
     fprintf(out, "  pop edi\n");
-    fprintf(out, "  sal edi, 1\n");
-    fprintf(out, "  mov [%s+edi], bx\n", name);
+    //fprintf(out, "  sal edi, 1\n");
+    fprintf(out, "  mov [%s+edi*2], bx\n", name);
     stack -= 2;
   }
 
@@ -1247,16 +1247,16 @@ int X86::array_write_int(const char *name, int field_id)
 
   if (stack == 0)
   {
-    fprintf(out, "  sal %s, 2\n", REG_STACK(reg-2));
-    fprintf(out, "  mov [%s+%s], %s\n", name, REG_STACK(reg-2), REG_STACK(reg-1));
+    //fprintf(out, "  sal %s, 2\n", REG_STACK(reg-2));
+    fprintf(out, "  mov [%s+%s*4], %s\n", name, REG_STACK(reg-2), REG_STACK(reg-1));
     reg -= 2;
   }
     else
   if (stack == 1)
   {
     fprintf(out, "  pop ebx\n");
-    fprintf(out, "  sal %s, 2\n", REG_STACK(reg-1));
-    fprintf(out, "  mov [%s+%s], ebx\n", name, REG_STACK(reg-1));
+    //fprintf(out, "  sal %s, 2\n", REG_STACK(reg-1));
+    fprintf(out, "  mov [%s+%s*4], ebx\n", name, REG_STACK(reg-1));
     stack -= 1;
     reg -= 1;
   }
@@ -1265,8 +1265,8 @@ int X86::array_write_int(const char *name, int field_id)
   {
     fprintf(out, "  pop ebx\n");
     fprintf(out, "  pop edi\n");
-    fprintf(out, "  sal edi, 2\n");
-    fprintf(out, "  mov [%s+edi], ebx\n", name);
+    //fprintf(out, "  sal edi, 2\n");
+    fprintf(out, "  mov [%s+edi*4], ebx\n", name);
     stack -= 2;
   }
 
