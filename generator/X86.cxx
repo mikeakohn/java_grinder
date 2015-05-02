@@ -157,7 +157,7 @@ void X86::method_start(int local_count, int max_stack, int param_count, const ch
 
     for (i = 0; i < param_count; i++)
     {
-      fprintf(out, "  mov eax, [ebp+%d]\n", (i * 4) + 8);
+      fprintf(out, "  mov eax, [ebp+%d]\n", (i * 4) + 8 + 12);
       fprintf(out, "  mov [ebp-%d], eax\n", LOCALS(i));
     }
   }
