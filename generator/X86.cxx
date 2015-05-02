@@ -81,44 +81,51 @@ int X86::init_heap(int field_count)
 
 int X86::insert_field_init_boolean(char *name, int index, int value)
 {
-  fprintf(out, "  mov ebx, %d\n", value);
-  fprintf(out, "  mov [%s], ebx\n", name);
+  fprintf(out, "  mov eax, %d\n", value);
+  fprintf(out, "  mov [%s], eax\n", name);
   return 0;
 }
 
 int X86::insert_field_init_byte(char *name, int index, int value)
 {
-  //fprintf(out, "  mov ebx, %d\n", ((uint32_t)((uint8_t)value)));
-  fprintf(out, "  mov ebx, %d\n", value);
-  fprintf(out, "  mov [%s], ebx\n", name);
+  //fprintf(out, "  mov eax, %d\n", ((uint32_t)((uint8_t)value)));
+  fprintf(out, "  mov eax, %d\n", value);
+  fprintf(out, "  mov [%s], eax\n", name);
   return 0;
 }
 
 int X86::insert_field_init_short(char *name, int index, int value)
 {
-  //fprintf(out, "  mov ebx, %d\n", ((uint32_t)((uint16_t)value)));
-  fprintf(out, "  mov ebx, %d\n", value);
-  fprintf(out, "  mov [%s], ebx\n", name);
+  //fprintf(out, "  mov eax, %d\n", ((uint32_t)((uint16_t)value)));
+  fprintf(out, "  mov eax, %d\n", value);
+  fprintf(out, "  mov [%s], eax\n", name);
   return 0;
 }
 
 int X86::insert_field_init_int(char *name, int index, int value)
 {
-  fprintf(out, "  mov ebx, %d\n", value);
-  fprintf(out, "  mov [%s], ebx\n", name);
+  fprintf(out, "  mov eax, %d\n", value);
+  fprintf(out, "  mov [%s], eax\n", name);
   return 0;
 }
 
 int X86::insert_field_init(char *name, int index)
 {
-  fprintf(out, "  mov ebx, _%s\n", name);
-  fprintf(out, "  mov [%s], ebx\n", name);
+  fprintf(out, "  mov eax, _%s\n", name);
+  fprintf(out, "  mov [%s], eax\n", name);
   return 0;
 }
 
 void X86::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
   int i;
+
+  if (method_count == 0)
+  {
+    fprintf(out, "  ret\n\n");
+  }
+
+  method_count++;
 
   fprintf(out, "; int %s(", name);
   for (i = 0; i < param_count; i++)
@@ -131,6 +138,9 @@ void X86::method_start(int local_count, int max_stack, int param_count, const ch
   fprintf(out, "global %s\n", name);
   fprintf(out, "%s:\n", name);
 
+  fprintf(out, "  push ebx\n");
+  fprintf(out, "  push esi\n");
+  fprintf(out, "  push edi\n");
   fprintf(out, "  push ebp\n");
   fprintf(out, "  mov ebp, esp\n");
 
@@ -297,7 +307,7 @@ int X86::pop()
 {
   if (stack > 0)
   {
-    fprintf(out, "  push ebx\n");
+    fprintf(out, "  add esp, 4\n");
     stack--;
   }
     else
@@ -647,6 +657,10 @@ int X86::return_integer(int local_count)
   }
 
   fprintf(out, "  pop ebp\n");
+  fprintf(out, "  pop edi\n");
+  fprintf(out, "  pop esi\n");
+  fprintf(out, "  pop ebx\n");
+
   if (reg != 1)
   {
     fprintf(out, "  mov eax, %s\n", REG_STACK(reg - 1));
@@ -679,6 +693,10 @@ int X86::return_void(int local_count)
   }
 
   fprintf(out, "  pop ebp\n");
+  fprintf(out, "  pop edi\n");
+  fprintf(out, "  pop esi\n");
+  fprintf(out, "  pop ebx\n");
+
   fprintf(out, "  ret\n");
 
   return 0;
