@@ -9,7 +9,7 @@ LDFLAGS=
 VPATH=../generator:../common:../api
 
 API=adc.o c64_sid.o c64_vic.o cpu.o dsp.o invoke.o invoke_static.o invoke_virtual.o ioport.o java_lang_system.o java_lang_string.o memory.o spi.o ti84_.o ti99_.o timer.o uart.o
-CPUS=ARM.o AVR8.o DSPIC.o Epiphany.o M6502.o MC68000.o MIPS.o MSP430.o MSP430X.o STDC.o TMS9900.o X86.o X86_64.o Z80.o
+CPUS=ARM.o AVR8.o DSPIC.o Epiphany.o M6502.o MC68000.o MIPS.o MSP430.o MSP430X.o SegaGenesis.o STDC.o TMS9900.o X86.o X86_64.o Z80.o
 SYSTEMS=C64.o TI84.o TI99.o
 OBJS=fileio.o Compiler.o Generator.o JavaClass.o JavaCompiler.o execute_static.o table_java_instr.o $(CPUS) $(SYSTEMS) $(API)
 

@@ -27,6 +27,7 @@
 #include "MIPS.h"
 #include "MSP430.h"
 #include "MSP430X.h"
+#include "SegaGenesis.h"
 #include "STDC.h"
 #include "TI84.h"
 #include "TI99.h"
@@ -40,7 +41,7 @@
 
 static Generator *new_generator(const char *chip_type)
 {
-Generator *generator = NULL;
+  Generator *generator = NULL;
 
   if (strcasecmp("arm", chip_type) == 0)
   {
@@ -130,6 +131,11 @@ Generator *generator = NULL;
   if (strcasecmp("msp430f5529", chip_type) == 0)
   {
     generator = new MSP430X(MSP430F5529);
+  }
+    else
+  if (strcasecmp("sega_genesis", chip_type) == 0)
+  {
+    generator = new SegaGenesis();
   }
     else
   if (strcasecmp("stdc", chip_type) == 0)
