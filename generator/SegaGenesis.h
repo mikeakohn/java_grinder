@@ -28,6 +28,8 @@ protected:
 private:
   void add_exception_vectors();
   void add_cartridge_info_header();
+  void add_exception_handler();
+  void add_set_fonts();
 };
 
 #endif
