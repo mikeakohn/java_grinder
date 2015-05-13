@@ -42,7 +42,7 @@ SegaGenesis::~SegaGenesis()
     "  dc.b  \"hello \"\n"
     "  dc.b  0x7C,0x7D,0x7E,0x7F  ; \"SEGA\" logo characters\n"
     "  dc.b  \" world\"\n"
-    "  dc.b  0x7B    ; "."\n"
+    "  dc.b  0x7B    ; \".\"\n"
     "  dc.b  0\n");
   // FIXME - REMOVE REMOVE REMOVE
 
@@ -152,8 +152,9 @@ int SegaGenesis::start_init()
     "  bra.b print_msg\n");
 
   // Unblank display
-  fprintf("  ; Unblank display\n");
-  fprintf("  move.w  #0x8144,(a4)  ; C00004 reg 1 = 0x44 unblank display\n\n");
+  fprintf(out,
+    "  ; Unblank display\n"
+    "  move.w  #0x8144,(a4)  ; C00004 reg 1 = 0x44 unblank display\n\n");
 
   return 0;
 }
