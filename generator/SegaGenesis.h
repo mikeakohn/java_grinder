@@ -30,6 +30,7 @@ private:
   void add_cartridge_info_header();
   void add_exception_handler();
   void add_set_fonts();
+  void add_vdp_reg_init();
 };
 
 #endif

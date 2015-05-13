@@ -18,6 +18,11 @@
 
 #include "SegaGenesis.h"
 
+// a0 = VDP_data
+// a1 = VDP_control
+// a2 = temp
+// a3 = temp
+
 SegaGenesis::SegaGenesis()
 {
   // FIXME - What's this access prohibited crap?
@@ -28,6 +33,7 @@ SegaGenesis::SegaGenesis()
 
 SegaGenesis::~SegaGenesis()
 {
+  add_vdp_reg_init();
 }
 
 int SegaGenesis::open(const char *filename)
@@ -45,7 +51,37 @@ int SegaGenesis::start_init()
   MC68000::start_init();
 
   // Need to initialize the Genesis hardware
+  fprintf(out,
+    "  ; Initialize TMSS\n"
+    "  movea.l #VDP_data, a0\n"
+    "  movea.l #VDP_ctrl, a1\n"
+    "  movea.l #HW_version, a2\n"
+    "  movea.l #TMSS_reg, a3\n"
+    "  move.b  (a2), d0    ; A10001 test the hardware version\n"
+    "  andi.b  #0x0f, d0\n"
+    "  beq.b  start_1      ; branch if no TMSS\n"
+    "  move.l  #0x53454741, (a3)  ; A14000 disable TMSS\n"
+    "start_1:\n"
+    "  move.w  (a4), d0    ; C00004 read VDP status (interrupt acknowledge?)\n\n");
 
+  // Video initialization
+  fprintf(out,
+    "  ; Initialize video\n"
+    "  movea.l #vdp_reg_init_table, a2\n"
+    "  moveq  #24-1, d1  ; length of video initialization block\n"
+    "start_2:\n"
+    "  move.b (a2)+, d5  ; get next video control byte\n"
+    "  move.w d5, (a1)   ; C00004 send write register command to VDP\n"
+    //"  add.w #x100, d5   ; point to next VDP register\n" (dafuq?)
+    "  dbra d1, start_2  ; loop for rest of block\n\n");
+
+  // Wait on busy VDP
+  fprintf(out,
+    "  ; Wait on busy VDP\n"
+    "start_3:\n"
+    "    move.w  (a1), d4    ; C00004 read VDP status\n"
+    "    btst.b  #1, d4      ; test DMA busy flag\n"
+    "    bne.b start_3       ; loop while DMA busy\n\n");
 
   return 0;
 }
@@ -230,18 +266,18 @@ void SegaGenesis::add_set_fonts()
     "fontend:\n\n");
 }
 
-SegaGenesis::vdp_reg_init()
+void SegaGenesis::add_vdp_reg_init()
 {
-  printf(out,
-    "vdp_reg_init:\n"
-    "  dc.l  0x00008000  ; d5 = VDP register 0 write command\n"
-    "  dc.l  0    ; D6 = unused\n"
-    "  dc.l  0x00000100  ; d7 = video register offset\n"
-    "  dc.l  0    ; A0 = unused\n"
-    "  dc.l  HW_version  ; a1 = hardware version register\n"
-    "  dc.l  TMSS_reg    ; a2 = TMSS register\n"
-    "  dc.l  VDP_data    ; a3 = VDP data\n"
-    "  dc.l  VDP_ctrl    ; a4 = VDP control / status\n\n"
+  fprintf(out,
+    //"vdp_reg_init:\n"
+    //"  dc.l  0x00008000  ; d5 = VDP register 0 write command\n"
+    //"  dc.l  0    ; D6 = unused\n"
+    //"  dc.l  0x00000100  ; d7 = video register offset\n"
+    //"  dc.l  0    ; A0 = unused\n"
+    //"  dc.l  HW_version  ; a1 = hardware version register\n"
+    //"  dc.l  TMSS_reg    ; a2 = TMSS register\n"
+    //"  dc.l  VDP_data    ; a3 = VDP data\n"
+    //"  dc.l  VDP_ctrl    ; a4 = VDP control / status\n\n"
 
     "  ; VDP register initialization (24 bytes)\n"
     "vdp_reg_init_table:\n"
