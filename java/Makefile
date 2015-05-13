@@ -14,6 +14,7 @@ JAVA_SRC=\
   $(SRC_DIR)/IOPort5.java \
   $(SRC_DIR)/IOPort6.java \
   $(SRC_DIR)/Memory.java \
+  $(SRC_DIR)/SegaGenesis.java \
   $(SRC_DIR)/SPI.java \
   $(SRC_DIR)/SPI0.java \
   $(SRC_DIR)/SPI1.java \

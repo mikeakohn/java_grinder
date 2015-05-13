@@ -87,7 +87,7 @@ int MC68000::init_heap(int field_count)
 {
   fprintf(out, "  ;; Set up heap and static initializers\n");
   //fprintf(out, "  move.l #ram_start+%d, &ram_start\n", (field_count + 1) * 2);
-  fprintf(out, "  move.l #ram_start+%d, a5\n", field_count * 4);
+  fprintf(out, "  movea.l #ram_start+%d, a5\n", field_count * 4);
   return 0;
 }
 
@@ -139,7 +139,7 @@ void MC68000::method_start(int local_count, int max_stack, int param_count, cons
     else
   {
     fprintf(out, "  movea.l SP, a6\n");
-    fprintf(out, "  sub.l #0x%x, SP\n", local_count * 2);
+    fprintf(out, "  suba.l #0x%x, SP\n", local_count * 2);
   }
 }
 
@@ -613,7 +613,20 @@ int MC68000::return_void(int local_count)
 
 int MC68000::jump(const char *name, int distance)
 {
-  fprintf(out, "  bra %s\n", name);
+  if (distance < 64)
+  {
+    fprintf(out, "  bra.s %s\n", name);
+  }
+    else
+  if (distance < 20000)
+  {
+    fprintf(out, "  bra.w %s\n", name);
+  }
+    else
+  {
+    fprintf(out, "  bra.l %s\n", name);
+  }
+
   return 0;
 }
 

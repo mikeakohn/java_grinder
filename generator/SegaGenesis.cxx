@@ -7,6 +7,9 @@
  *
  * Copyright 2014-2015 by Michael Kohn
  *
+ * Sega Genesis initialization code is based on Bruce Tomlin's hello.asm:
+ * http://atariage.com/forums/topic/98540-sega-genesis-programming/
+ *
  */
 
 #include <stdio.h>
@@ -17,7 +20,6 @@
 
 SegaGenesis::SegaGenesis()
 {
-
 }
 
 SegaGenesis::~SegaGenesis()
