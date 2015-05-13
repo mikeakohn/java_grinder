@@ -34,6 +34,18 @@ SegaGenesis::SegaGenesis()
 SegaGenesis::~SegaGenesis()
 {
   add_vdp_reg_init();
+
+  // FIXME - REMOVE REMOVE REMOVE
+  fprintf(out,
+    "; startup message\n"
+    "hello_msg:\n"
+    "  dc.b  \"hello \"\n"
+    "  dc.b  0x7C,0x7D,0x7E,0x7F  ; \"SEGA\" logo characters\n"
+    "  dc.b  \" world\"\n"
+    "  dc.b  0x7B    ; "."\n"
+    "  dc.b  0\n");
+  // FIXME - REMOVE REMOVE REMOVE
+
 }
 
 int SegaGenesis::open(const char *filename)
@@ -62,7 +74,7 @@ int SegaGenesis::start_init()
     "  beq.b  start_1      ; branch if no TMSS\n"
     "  move.l  #0x53454741, (a3)  ; A14000 disable TMSS\n"
     "start_1:\n"
-    "  move.w  (a4), d0    ; C00004 read VDP status (interrupt acknowledge?)\n\n");
+    "  move.w  (a1), d0    ; C00004 read VDP status (interrupt acknowledge?)\n\n");
 
   // Video initialization
   fprintf(out,
@@ -79,9 +91,69 @@ int SegaGenesis::start_init()
   fprintf(out,
     "  ; Wait on busy VDP\n"
     "start_3:\n"
-    "    move.w  (a1), d4    ; C00004 read VDP status\n"
-    "    btst.b  #1, d4      ; test DMA busy flag\n"
-    "    bne.b start_3       ; loop while DMA busy\n\n");
+    "  move.w  (a1), d4    ; C00004 read VDP status\n"
+    "  btst.b  #1, d4      ; test DMA busy flag\n"
+    "  bne.b start_3       ; loop while DMA busy\n\n");
+
+  // Initalize CRAM
+  fprintf(out,
+    "  ; initialize CRAM\n"
+    "  move.l  #0x81048F02, (a1) ; C00004 reg 1 = 0x04, reg 15 = 0x02: blank, auto-increment=2\n"
+    "  move.l  #0xC0000000, (a1) ; C00004 write CRAM address 0x0000\n"
+    "  moveq  #32-1, d3  ; loop for 32 CRAM registers\n"
+    "start_4:\n"
+    "  move.l d0, (a0)   ; C00000 clear CRAM register\n"
+    "  dbra d3, start_4\n\n");
+
+  // Initalize VSRAM
+  fprintf(out,
+    "  ; initialize VSRAM\n"
+    "  move.l #0x40000010, (a1)  ; C00004 VSRAM write address 0x0000\n"
+    "  moveq #20-1,d4  ; loop for 20 VSRAM registers\n"
+    "start_5:\n"
+    "  move.l d0, (a0)    ; C00000 clear VSRAM register\n"
+    "  dbra d4, start_5\n\n");
+
+  // Initialize PSG
+  fprintf(out,
+    "  moveq #4-1, d5     ; loop for 4 PSG registers\n"
+    "  movea.l #psg_reg_init_table, a2\n"
+    "start_6:\n"
+    "  move.b (a2)+, (0x0011, a0)  ; C00011 copy PSG initialization commands\n"
+    "  dbra d5, start_6\n\n");
+
+  // Initialize palette (FIXME - This should be removed I think)
+  fprintf(out,
+    "  move.w (a2)+, d0     ; get length word\n"
+    "  move.l #0xC0020000, (a4)  ; C00004 CRAM write address = 0x0002\n"
+    "initcram_1:\n"
+    "  move.w (a2)+, (a5)   ; C00000 write next word to video\n"
+    "  dbra d0, initcram_1  ; loop until done\n\n");
+
+  // Copy message to screen (FIXME - this should be removed also)
+  fprintf(out,
+    "  move.l #0x4C200000, (a4)  ; C00004 VRAM write to 0x0C20\n"
+    "start_7:\n"
+    "  move.l (a1)+, (a5)     ; C00000 write next longword of charset to VDP\n"
+    "  dbra d6, start_7       ; loop until done\n"
+    "  lea (hello_msg-$-2,PC), a1\n"
+    "print_msg:\n"
+    "  move.l d5, (a4)        ; C00004 write next character to VDP\n"
+    "print_msg_1:\n"
+    "  moveq #0, d1           ; clear high byte of word\n"
+    "  move.b (a1)+, d1       ; get next byte\n"
+    "  bmi.b print_msg_3      ; branch if high bit set\n"
+    "  bne.b print_msg_2      ; store byte if not null\n"
+    "print_msg_2:\n"
+    "  move.w d1,(a5)         ; C00000 store next word of name data\n"
+    "  bra.b print_msg_1\n"
+    "print_msg_3:\n"
+    "  addi.l #0x01000000,d5  ; offset VRAM address by 0x0100 to skip a line\n"
+    "  bra.b print_msg\n");
+
+  // Unblank display
+  fprintf("  ; Unblank display\n");
+  fprintf("  move.w  #0x8144,(a4)  ; C00004 reg 1 = 0x44 unblank display\n\n");
 
   return 0;
 }
@@ -200,6 +272,7 @@ void SegaGenesis::add_exception_handler()
 void SegaGenesis::add_set_fonts()
 {
   fprintf(out,
+    ".align 32\n"
     "font:\n"
     "  dc.l 0x01111100, 0x11000110, 0x11000110, 0x11000110 ; A\n"
     "  dc.l 0x11111110, 0x11000110, 0x11000110, 0x00000000\n"
@@ -280,6 +353,7 @@ void SegaGenesis::add_vdp_reg_init()
     //"  dc.l  VDP_ctrl    ; a4 = VDP control / status\n\n"
 
     "  ; VDP register initialization (24 bytes)\n"
+    ".align 32\n" 
     "vdp_reg_init_table:\n"
     "  dc.b  0x04  ; reg  0 = mode reg 1: no H interrupt\n"
     "  dc.b  0x14  ; reg  1 = mode reg 2: blanked, no V interrupt, DMA enable\n"
@@ -307,6 +381,7 @@ void SegaGenesis::add_vdp_reg_init()
     "  dc.b  0x80  ; reg 23 = DMA source address high: VRAM fill, addr = 0x00xxxx\n\n"
 
     "  ; PSG initialization: set all channels to minimum volume\n"
+    "psg_reg_init_table:\n"
     "  dc.b  0x9f,0xbf,0xdf,0xff\n\n");
 }
 
