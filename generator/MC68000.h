@@ -105,6 +105,8 @@ public:
   //virtual void close();
 
 protected:
+  uint32_t ram_start;
+  uint32_t stack_start;
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 
   int stack;          // count how many things we put on the stack

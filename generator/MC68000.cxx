@@ -40,6 +40,8 @@
 static const char *cond_str[] = { "eq", "ne", "lt", "le", "gt", "ge" };
 
 MC68000::MC68000() :
+  ram_start(0),
+  stack_start(512),
   reg(0),
   reg_max(5),
   stack(0),
@@ -62,8 +64,8 @@ int MC68000::open(const char *filename)
 
   // Set where RAM starts / ends
   // FIXME - Not sure what to set this to right now
-  fprintf(out, "ram_start equ 0\n");
-  fprintf(out, "ram_end equ 0x8000\n");
+  fprintf(out, "ram_start equ 0x%x\n", ram_start);
+  //fprintf(out, "ram_end equ 0x8000\n");
 
   return 0;
 }
@@ -73,6 +75,7 @@ int MC68000::start_init()
   // Add any set up items (stack, registers, etc).
   //fprintf(out, ".org ???\n");
   fprintf(out, "start:\n");
+  fprintf(out, "  movea.l #0x%x, SP\n\n", stack_start);
 
   return 0;
 }

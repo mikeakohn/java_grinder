@@ -20,6 +20,10 @@
 
 SegaGenesis::SegaGenesis()
 {
+  // FIXME - What's this access prohibited crap?
+  //ram_start = 0xe00000;
+  ram_start = 0xff0000;
+  stack_start = 0x1000000;
 }
 
 SegaGenesis::~SegaGenesis()
@@ -30,14 +34,18 @@ int SegaGenesis::open(const char *filename)
 {
   if (MC68000::open(filename) != 0) { return -1; }
 
+  fprintf(out, ".include \"genesis.h\"\n\n");
+
   return 0;
 }
 
 int SegaGenesis::start_init()
 {
   // Add any set up items (stack, registers, etc).
-  //fprintf(out, ".org ???\n");
-  fprintf(out, "start:\n");
+  MC68000::start_init();
+
+  // Need to initialize the Genesis hardware
+
 
   return 0;
 }
@@ -221,5 +229,51 @@ void SegaGenesis::add_set_fonts()
     "  dc.l 0x02200220, 0x22000022, 0x22022222, 0x00000000\n"
     "fontend:\n\n");
 }
+
+SegaGenesis::vdp_reg_init()
+{
+  printf(out,
+    "vdp_reg_init:\n"
+    "  dc.l  0x00008000  ; d5 = VDP register 0 write command\n"
+    "  dc.l  0    ; D6 = unused\n"
+    "  dc.l  0x00000100  ; d7 = video register offset\n"
+    "  dc.l  0    ; A0 = unused\n"
+    "  dc.l  HW_version  ; a1 = hardware version register\n"
+    "  dc.l  TMSS_reg    ; a2 = TMSS register\n"
+    "  dc.l  VDP_data    ; a3 = VDP data\n"
+    "  dc.l  VDP_ctrl    ; a4 = VDP control / status\n\n"
+
+    "  ; VDP register initialization (24 bytes)\n"
+    "vdp_reg_init_table:\n"
+    "  dc.b  0x04  ; reg  0 = mode reg 1: no H interrupt\n"
+    "  dc.b  0x14  ; reg  1 = mode reg 2: blanked, no V interrupt, DMA enable\n"
+    "  dc.b  0x30  ; reg  2 = name table base for scroll A: 0xC000\n"
+    "  dc.b  0x3c  ; reg  3 = name table base for window:   0xF000\n"
+    "  dc.b  0x07  ; reg  4 = name table base for scroll B: 0xE000\n"
+    "  dc.b  0x6c  ; reg  5 = sprite attribute table base: 0xD800\n"
+    "  dc.b  0x00  ; reg  6 = unused register: 0x00\n"
+    "  dc.b  0x00  ; reg  7 = background color: 0x00\n"
+    "  dc.b  0x00  ; reg  8 = unused register: 0x00\n"
+    "  dc.b  0x00  ; reg  9 = unused register: 0x00\n"
+    "  dc.b  0xff  ; reg 10 = H interrupt register: 0xFF (esentially off)\n"
+    "  dc.b  0x00  ; reg 11 = mode reg 3: disable ext int, full H/V scroll\n"
+    "  dc.b  0x81  ; reg 12 = mode reg 4: 40 cell horiz mode, no interlace\n"
+    "  dc.b  0x37  ; reg 13 = H scroll table base: 0xFC00\n"
+    "  dc.b  0x00  ; reg 14 = unused register: 0x00\n"
+    "  dc.b  0x01  ; reg 15 = auto increment: 0x01\n"
+    "  dc.b  0x01  ; reg 16 = scroll size: V=32 cell, H=64 cell\n"
+    "  dc.b  0x00  ; reg 17 = window H position: 0x00\n"
+    "  dc.b  0x00  ; reg 18 = window V position: 0x00\n"
+    "  dc.b  0xff  ; reg 19 = DMA length count low:   0x00FF\n"
+    "  dc.b  0xff  ; reg 20 = DMA length count high:  0xFFxx\n"
+    "  dc.b  0x00  ; reg 21 = DMA source address low: 0xxxxx00\n"
+    "  dc.b  0x00  ; reg 22 = DMA source address mid: 0xxx00xx\n"
+    "  dc.b  0x80  ; reg 23 = DMA source address high: VRAM fill, addr = 0x00xxxx\n\n"
+
+    "  ; PSG initialization: set all channels to minimum volume\n"
+    "  dc.b  0x9f,0xbf,0xdf,0xff\n\n");
+}
+
+
 
 
