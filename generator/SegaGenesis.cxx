@@ -91,6 +91,7 @@ int SegaGenesis::start_init()
   fprintf(out,
     "  ; Initialize video\n"
     "  movea.l #vdp_reg_init_table, a2\n"
+    "  move.w #0x8000, d5\n"
     "  moveq #24-1, d1   ; length of video initialization block\n"
     "start_video_init:\n"
     "  move.b (a2)+, d5  ; get next video control byte\n"
@@ -116,7 +117,7 @@ int SegaGenesis::start_init()
     "  move.l #0xc0000000, (a1) ; C00004 write CRAM address 0x0000\n"
     "  moveq #32-1, d3          ; loop for 32 CRAM registers\n"
     "start_init_cram:\n"
-    "  move.l d0, (a0)          ; C00000 clear CRAM register\n"
+    "  move.l #0, (a0)          ; C00000 clear CRAM register\n"
     "  dbra d3, start_init_cram\n\n");
 
   // Initalize VSRAM
@@ -125,16 +126,16 @@ int SegaGenesis::start_init()
     "  move.l #0x40000010, (a1) ; C00004 VSRAM write address 0x0000\n"
     "  moveq #20-1, d4          ; loop for 20 VSRAM registers\n"
     "start_init_vsram:\n"
-    "  move.l d0, (a0)          ; C00000 clear VSRAM register\n"
+    "  move.l #0, (a0)          ; C00000 clear VSRAM register\n"
     "  dbra d4, start_init_vsram\n\n");
 
   // Initialize PSG
   fprintf(out,
     "  ; Initialize PSG\n"
-    "  moveq #4-1, d5     ; loop for 4 PSG registers\n"
+    "  moveq #4-1, d5             ; loop for 4 PSG registers\n"
     "  movea.l #psg_reg_init_table, a2\n"
     "start_init_psg:\n"
-    "  move.b (a2)+, (0x0011, a0)  ; C00011 copy PSG initialization commands\n"
+    "  move.b (a2)+, (0x0011, a0) ; C00011 copy PSG initialization commands\n"
     "  dbra d5, start_init_psg\n\n");
 
   // Initialize palette (FIXME - This should be removed I think)
