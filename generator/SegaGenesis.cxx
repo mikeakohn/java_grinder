@@ -44,7 +44,7 @@ SegaGenesis::~SegaGenesis()
     "  dc.b  0x7C,0x7D,0x7E,0x7F  ; \"SEGA\" logo characters\n"
     "  dc.b  \" world\"\n"
     "  dc.b  0x7B    ; \".\"\n"
-    "  dc.b  0\n");
+    "  dc.b  0\n\n");
   // FIXME - REMOVE REMOVE REMOVE
 
   // FIXME - Add if for this
@@ -69,71 +69,80 @@ int SegaGenesis::start_init()
   // Add any set up items (stack, registers, etc).
   MC68000::start_init();
 
-  // Need to initialize the Genesis hardware
+  // Setup registers used to talk to VDP
+  fprintf(out,
+    "  ; Setup registers used to talk to VDP\n"
+    "  movea.l #VDP_data, a0\n"
+    "  movea.l #VDP_ctrl, a1\n\n");
+
+  // Initialize TMSS
   fprintf(out,
     "  ; Initialize TMSS\n"
-    "  movea.l #VDP_data, a0\n"
-    "  movea.l #VDP_ctrl, a1\n"
     "  movea.l #HW_version, a2\n"
     "  movea.l #TMSS_reg, a3\n"
-    "  move.b  (a2), d0    ; A10001 test the hardware version\n"
-    "  andi.b  #0x0f, d0\n"
-    "  beq.b  start_1      ; branch if no TMSS\n"
-    "  move.l  #0x53454741, (a3)  ; A14000 disable TMSS\n"
-    "start_1:\n"
-    "  move.w  (a1), d0    ; C00004 read VDP status (interrupt acknowledge?)\n\n");
+    "  move.b (a2), d0           ; A10001 test the hardware version\n"
+    "  andi.b #0x0f, d0\n"
+    "  beq.b start_init_tmss     ; branch if no TMSS\n"
+    "  move.l #0x53454741, (a3)  ; A14000 disable TMSS\n"
+    "start_init_tmss:\n"
+    "  move.w (a1), d0    ; C00004 read VDP status (interrupt acknowledge?)\n\n");
 
   // Video initialization
   fprintf(out,
     "  ; Initialize video\n"
     "  movea.l #vdp_reg_init_table, a2\n"
-    "  moveq  #24-1, d1  ; length of video initialization block\n"
-    "start_2:\n"
+    "  moveq #24-1, d1   ; length of video initialization block\n"
+    "start_video_init:\n"
     "  move.b (a2)+, d5  ; get next video control byte\n"
     "  move.w d5, (a1)   ; C00004 send write register command to VDP\n"
-    //"  add.w #x100, d5   ; point to next VDP register\n" (dafuq?)
-    "  dbra d1, start_2  ; loop for rest of block\n\n");
+    "  add.w #0x100, d5  ; point to next VDP register\n"
+    "  dbra d1, start_video_init  ; loop for rest of block\n\n");
 
-  // Wait on busy VDP
+  // Use DMA to clear VRAM and wait on busy VDP
   fprintf(out,
+    "  ; DMA is now set up for 65535-byte fill of VRAM\n"
+    "  move.l #0x40000080, (a1)  ; C00004 = VRAM write to 0x0000\n"
+    "  move.w #0, (a0)      ; C00000 = write zero to VRAM (starts DMA fill)\n"
     "  ; Wait on busy VDP\n"
-    "start_3:\n"
-    "  move.w  (a1), d4    ; C00004 read VDP status\n"
-    "  btst.b  #1, d4      ; test DMA busy flag\n"
-    "  bne.b start_3       ; loop while DMA busy\n\n");
+    "start_wait_dma:\n"
+    "  move.w (a1), d4      ; C00004 read VDP status\n"
+    "  btst.b #1, d4        ; test DMA busy flag\n"
+    "  bne.b start_wait_dma ; loop while DMA busy\n\n");
 
   // Initalize CRAM
   fprintf(out,
     "  ; initialize CRAM\n"
-    "  move.l  #0x81048F02, (a1) ; C00004 reg 1 = 0x04, reg 15 = 0x02: blank, auto-increment=2\n"
-    "  move.l  #0xC0000000, (a1) ; C00004 write CRAM address 0x0000\n"
-    "  moveq  #32-1, d3          ; loop for 32 CRAM registers\n"
-    "start_4:\n"
-    "  move.l d0, (a0)           ; C00000 clear CRAM register\n"
-    "  dbra d3, start_4\n\n");
+    "  move.l #0x81048f02, (a1) ; C00004 reg 1 = 0x04, reg 15 = 0x02: blank, auto-increment=2\n"
+    "  move.l #0xc0000000, (a1) ; C00004 write CRAM address 0x0000\n"
+    "  moveq #32-1, d3          ; loop for 32 CRAM registers\n"
+    "start_init_cram:\n"
+    "  move.l d0, (a0)          ; C00000 clear CRAM register\n"
+    "  dbra d3, start_init_cram\n\n");
 
   // Initalize VSRAM
   fprintf(out,
-    "  ; initialize VSRAM\n"
+    "  ; Initialize VSRAM\n"
     "  move.l #0x40000010, (a1) ; C00004 VSRAM write address 0x0000\n"
     "  moveq #20-1, d4          ; loop for 20 VSRAM registers\n"
-    "start_5:\n"
+    "start_init_vsram:\n"
     "  move.l d0, (a0)          ; C00000 clear VSRAM register\n"
-    "  dbra d4, start_5\n\n");
+    "  dbra d4, start_init_vsram\n\n");
 
   // Initialize PSG
   fprintf(out,
+    "  ; Initialize PSG\n"
     "  moveq #4-1, d5     ; loop for 4 PSG registers\n"
     "  movea.l #psg_reg_init_table, a2\n"
-    "start_6:\n"
+    "start_init_psg:\n"
     "  move.b (a2)+, (0x0011, a0)  ; C00011 copy PSG initialization commands\n"
-    "  dbra d5, start_6\n\n");
+    "  dbra d5, start_init_psg\n\n");
 
   // Initialize palette (FIXME - This should be removed I think)
   fprintf(out,
-    "  move.l #0xc0020000, (a0)  ; C00004 CRAM write address = 0x0002\n"
-    "  move.w #0x0eee, (a1)      ; C00000 write next word to video\n"
-    "  move.w #0x0ee8, (a1)      ; C00000 write next word to video\n");
+    "  ; Initialize palette\n"
+    "  move.l #0xc0020000, (a1)  ; C00004 CRAM write address = 0x0002\n"
+    "  move.w #0x0eee, (a0)      ; C00000 write next word to video\n"
+    "  move.w #0x0ee8, (a0)      ; C00000 write next word to video\n");
 #if 0
   fprintf(out,
     "  move.w #cram_tab, a2      ; a2 points to color table\n"
@@ -150,8 +159,9 @@ int SegaGenesis::start_init()
   // Copy message to screen (FIXME - this should be removed also)
   fprintf(out,
     "  lea (hello_msg-$-2,PC), a2\n"
+    "  move.l #0x45940003, d5\n"
     "print_msg:\n"
-    "  move.l d5, (a0)        ; C00004 write next character to VDP\n"
+    "  move.l d5, (a1)        ; C00004 write next character to VDP\n"
     "print_msg_1:\n"
     "  moveq #0, d1           ; clear high byte of word\n"
     "  move.b (a2)+, d1       ; get next byte\n"
@@ -159,7 +169,7 @@ int SegaGenesis::start_init()
     "  bne.b print_msg_2      ; store byte if not null\n"
     "  bra.b print_msg_done\n"
     "print_msg_2:\n"
-    "  move.w d1, (a1)        ; C00000 store next word of name data\n"
+    "  move.w d1, (a0)        ; C00000 store next word of name data\n"
     "  bra.b print_msg_1\n"
     "print_msg_3:\n"
     "  addi.l #0x01000000, d5 ; offset VRAM address by 0x0100 to skip a line\n"
@@ -169,7 +179,7 @@ int SegaGenesis::start_init()
   // Unblank display
   fprintf(out,
     "  ; Unblank display\n"
-    "  move.w  #0x8144, (a4)  ; C00004 reg 1 = 0x44 unblank display\n\n");
+    "  move.w #0x8144, (a1)   ; C00004 reg 1 = 0x44 unblank display\n\n");
 
   return 0;
 }
@@ -177,9 +187,9 @@ int SegaGenesis::start_init()
 void SegaGenesis::add_exception_vectors()
 {
   fprintf(out,
-    ";-------------------------------:\n"
-    "; exception vectors\n"
-    ";-------------------------------:\n\n"
+    "  ;-------------------------------:\n"
+    "  ; exception vectors\n"
+    "  ;-------------------------------:\n\n"
 
     "  dc.l 0xfffffe00   ; startup SP\n"
     "  dc.l start        ; startup PC\n"
@@ -244,15 +254,15 @@ void SegaGenesis::add_exception_vectors()
     "  dc.l interrupt    ; Unused (reserved)\n"
     "  dc.l interrupt    ; Unused (reserved)\n"
     "  dc.l interrupt    ; Unused (reserved)\n"
-    "  dc.l interrupt    ; Unused (reserved)\n");
+    "  dc.l interrupt    ; Unused (reserved)\n\n");
 }
 
 void SegaGenesis::add_cartridge_info_header()
 {
   fprintf(out,
-    ";-------------------------------:\n"
-    "; cartridge info header\n"
-    ";-------------------------------:\n\n"
+    "  ;-------------------------------:\n"
+    "  ; cartridge info header\n"
+    "  ;-------------------------------:\n\n"
 
     "  dc.b \"SEGA GENESIS    \"  ; must start with \"SEGA\"\n"
     "  dc.b \"(C)---- \"          ; copyright\n"
@@ -274,9 +284,9 @@ void SegaGenesis::add_cartridge_info_header()
 void SegaGenesis::add_exception_handler()
 {
   fprintf(out,
-    ";-------------------------------:\n"
-    "; exception handlers\n"
-    ";-------------------------------:\n\n"
+    "  ;-------------------------------:\n"
+    "  ; exception handlers\n"
+    "  ;-------------------------------:\n\n"
 
     "extint:\n"
     "hsync:\n"
@@ -290,10 +300,10 @@ void SegaGenesis::add_set_fonts()
   fprintf(out,
     "_init_fonts:\n"
     "  move.w #((fontend - font) / 4) - 1, d6\n"
-    "  move.l #0x4c200000, (a0)  ; C00004 VRAM write to 0x0c20\n"
+    "  move.l #0x4c200000, (a1)  ; C00004 VRAM write to 0x0c20\n"
     "  movea.l #font, a2         ; Point to font set\n"
     "_init_fonts_loop:\n"
-    "  move.l (a2)+, (a1)        ; C00000 write next longword of charset to VDP\n"
+    "  move.l (a2)+, (a0)        ; C00000 write next longword of charset to VDP\n"
     "  dbra d6, _init_fonts_loop ; loop until done\n"
     "  rts\n\n");
 
