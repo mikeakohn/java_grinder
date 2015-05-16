@@ -46,6 +46,8 @@ SegaGenesis::~SegaGenesis()
     "  dc.b  0\n");
   // FIXME - REMOVE REMOVE REMOVE
 
+  // FIXME - Add if for this
+  add_set_fonts();
 }
 
 int SegaGenesis::open(const char *filename)
@@ -100,18 +102,18 @@ int SegaGenesis::start_init()
     "  ; initialize CRAM\n"
     "  move.l  #0x81048F02, (a1) ; C00004 reg 1 = 0x04, reg 15 = 0x02: blank, auto-increment=2\n"
     "  move.l  #0xC0000000, (a1) ; C00004 write CRAM address 0x0000\n"
-    "  moveq  #32-1, d3  ; loop for 32 CRAM registers\n"
+    "  moveq  #32-1, d3          ; loop for 32 CRAM registers\n"
     "start_4:\n"
-    "  move.l d0, (a0)   ; C00000 clear CRAM register\n"
+    "  move.l d0, (a0)           ; C00000 clear CRAM register\n"
     "  dbra d3, start_4\n\n");
 
   // Initalize VSRAM
   fprintf(out,
     "  ; initialize VSRAM\n"
-    "  move.l #0x40000010, (a1)  ; C00004 VSRAM write address 0x0000\n"
-    "  moveq #20-1,d4  ; loop for 20 VSRAM registers\n"
+    "  move.l #0x40000010, (a1) ; C00004 VSRAM write address 0x0000\n"
+    "  moveq #20-1, d4          ; loop for 20 VSRAM registers\n"
     "start_5:\n"
-    "  move.l d0, (a0)    ; C00000 clear VSRAM register\n"
+    "  move.l d0, (a0)          ; C00000 clear VSRAM register\n"
     "  dbra d4, start_5\n\n");
 
   // Initialize PSG
@@ -124,37 +126,45 @@ int SegaGenesis::start_init()
 
   // Initialize palette (FIXME - This should be removed I think)
   fprintf(out,
-    "  move.w (a2)+, d0     ; get length word\n"
-    "  move.l #0xC0020000, (a4)  ; C00004 CRAM write address = 0x0002\n"
+    "  move.l #0xc0020000, (a0)  ; C00004 CRAM write address = 0x0002\n"
+    "  move.w #0x0eee, (a1)      ; C00000 write next word to video\n"
+    "  move.w #0x0ee8, (a1)      ; C00000 write next word to video\n");
+#if 0
+  fprintf(out,
+    "  move.w #cram_tab, a2      ; a2 points to color table\n"
+    "  move.w (a2)+, d0          ; get length word\n"
+    "  move.l #0xc0020000, (a4)  ; C00004 CRAM write address = 0x0002\n"
     "initcram_1:\n"
-    "  move.w (a2)+, (a5)   ; C00000 write next word to video\n"
-    "  dbra d0, initcram_1  ; loop until done\n\n");
+    "  move.w (a2)+, (a5)        ; C00000 write next word to video\n"
+    "  dbra d0, initcram_1       ; loop until done\n\n");
+#endif
+
+  // Copy fonts into VDP
+  fprintf(out, "  jsr _init_fonts\n\n");
 
   // Copy message to screen (FIXME - this should be removed also)
   fprintf(out,
-    "  move.l #0x4C200000, (a4)  ; C00004 VRAM write to 0x0C20\n"
-    "start_7:\n"
-    "  move.l (a1)+, (a5)     ; C00000 write next longword of charset to VDP\n"
-    "  dbra d6, start_7       ; loop until done\n"
-    "  lea (hello_msg-$-2,PC), a1\n"
+    "  lea (hello_msg-$-2,PC), a2\n"
     "print_msg:\n"
-    "  move.l d5, (a4)        ; C00004 write next character to VDP\n"
+    "  move.l d5, (a0)        ; C00004 write next character to VDP\n"
     "print_msg_1:\n"
     "  moveq #0, d1           ; clear high byte of word\n"
-    "  move.b (a1)+, d1       ; get next byte\n"
+    "  move.b (a2)+, d1       ; get next byte\n"
     "  bmi.b print_msg_3      ; branch if high bit set\n"
     "  bne.b print_msg_2      ; store byte if not null\n"
+    "  bra.b print_msg_done\n"
     "print_msg_2:\n"
-    "  move.w d1,(a5)         ; C00000 store next word of name data\n"
+    "  move.w d1, (a1)        ; C00000 store next word of name data\n"
     "  bra.b print_msg_1\n"
     "print_msg_3:\n"
-    "  addi.l #0x01000000,d5  ; offset VRAM address by 0x0100 to skip a line\n"
-    "  bra.b print_msg\n");
+    "  addi.l #0x01000000, d5 ; offset VRAM address by 0x0100 to skip a line\n"
+    "  bra.b print_msg\n"
+    "print_msg_done:\n\n");
 
   // Unblank display
   fprintf(out,
     "  ; Unblank display\n"
-    "  move.w  #0x8144,(a4)  ; C00004 reg 1 = 0x44 unblank display\n\n");
+    "  move.w  #0x8144, (a4)  ; C00004 reg 1 = 0x44 unblank display\n\n");
 
   return 0;
 }
@@ -272,6 +282,16 @@ void SegaGenesis::add_exception_handler()
 
 void SegaGenesis::add_set_fonts()
 {
+  fprintf(out,
+    "_init_fonts:\n"
+    "  move.w #((fontend - font) / 4) - 1, d6\n"
+    "  move.l #0x4c200000, (a0)  ; C00004 VRAM write to 0x0c20\n"
+    "  movea.l #font, a2         ; Point to font set\n"
+    "_init_fonts_loop:\n"
+    "  move.l (a2)+, (a1)        ; C00000 write next longword of charset to VDP\n"
+    "  dbra d6, _init_fonts_loop ; loop until done\n"
+    "  rts\n\n");
+
   fprintf(out,
     ".align 32\n"
     "font:\n"
