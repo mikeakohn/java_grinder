@@ -28,7 +28,8 @@ SegaGenesis::SegaGenesis()
   // FIXME - What's this access prohibited crap?
   //ram_start = 0xe00000;
   ram_start = 0xff0000;
-  stack_start = 0x1000000;
+  //stack_start = 0x1000000;
+  stack_start = 0xfffffe00;  // <-- dafuq?
 }
 
 SegaGenesis::~SegaGenesis()
@@ -55,6 +56,10 @@ int SegaGenesis::open(const char *filename)
   if (MC68000::open(filename) != 0) { return -1; }
 
   fprintf(out, ".include \"genesis.h\"\n\n");
+
+  add_exception_vectors();
+  add_cartridge_info_header();
+  add_exception_handler();
 
   return 0;
 }
@@ -277,7 +282,7 @@ void SegaGenesis::add_exception_handler()
     "hsync:\n"
     "vsync:\n"
     "interrupt:\n"
-    "  rte\n");
+    "  rte\n\n");
 }
 
 void SegaGenesis::add_set_fonts()
