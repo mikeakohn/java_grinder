@@ -497,5 +497,30 @@ int SegaGenesis::sega_genesis_setPaletteColor(int color)
   return 0;
 }
 
+int SegaGenesis::sega_genesis_loadFonts()
+{
+  return -1;
+}
+
+int SegaGenesis::sega_genesis_setCursor()
+{
+  return -1;
+}
+
+int SegaGenesis::sega_genesis_setCursor(int x, int y)
+{
+  return -1;
+}
+
+int SegaGenesis::sega_genesis_printChar()
+{
+  return -1;
+}
+
+int SegaGenesis::sega_genesis_printChar(int c)
+{
+  return -1;
+}
+
 
 

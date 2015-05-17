@@ -27,6 +27,11 @@ public:
   virtual int sega_genesis_setPalettePointer(int index);
   virtual int sega_genesis_setPaletteColor();
   virtual int sega_genesis_setPaletteColor(int color);
+  virtual int sega_genesis_loadFonts();
+  virtual int sega_genesis_setCursor();
+  virtual int sega_genesis_setCursor(int x, int y);
+  virtual int sega_genesis_printChar();
+  virtual int sega_genesis_printChar(int c);
 
 protected:
 

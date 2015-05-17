@@ -27,5 +27,15 @@ abstract public class SegaGenesis
       setPalettePointer(0), and then call setPaletteColor() 4 times.  The
       color takes a binary format of 0000 BBB0 GGG0 RRR0. */
   public static void setPaletteColor(int color) { }
+
+  /** Load fonts. */
+  public static void loadFonts() { }
+
+  /** Move the text cursor to where the next character will be printed. */
+  public static void setCursor(int x, int y) { }
+
+  /** Print a character to the screen.  Must call setCursor() first.
+      The cursor will increment for every character printed. */
+  public static void printChar(char c) { }
 }
 
