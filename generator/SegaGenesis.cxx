@@ -75,39 +75,46 @@ int SegaGenesis::start_init()
     "  movea.l #VDP_data, a0\n"
     "  movea.l #VDP_ctrl, a1\n\n");
 
+  fprintf(out,
+    "  ; During initialization:\n"
+    "  ; d0 = 0\n"
+    "  ; d1 = data movement\n"
+    "  ; d2 = counter\n"
+    "  eor.l d0, d0\n\n");
+
   // Initialize TMSS
   fprintf(out,
     "  ; Initialize TMSS\n"
     "  movea.l #HW_version, a2\n"
     "  movea.l #TMSS_reg, a3\n"
-    "  move.b (a2), d0           ; A10001 test the hardware version\n"
-    "  andi.b #0x0f, d0\n"
+    "  move.b (a2), d1           ; A10001 test the hardware version\n"
+    "  andi.b #0x0f, d1\n"
     "  beq.b start_init_tmss     ; branch if no TMSS\n"
     "  move.l #0x53454741, (a3)  ; A14000 disable TMSS\n"
     "start_init_tmss:\n"
-    "  move.w (a1), d0    ; C00004 read VDP status (interrupt acknowledge?)\n\n");
+    "  move.w (a1), d1    ; C00004 read VDP status (interrupt acknowledge?)\n\n");
 
   // Video initialization
   fprintf(out,
     "  ; Initialize video\n"
     "  movea.l #vdp_reg_init_table, a2\n"
-    "  move.w #0x8000, d5\n"
-    "  moveq #24-1, d1   ; length of video initialization block\n"
+    "  move.w #0x8000, d1\n"
+    "  moveq #24-1, d2   ; length of video initialization block\n"
     "start_video_init:\n"
-    "  move.b (a2)+, d5  ; get next video control byte\n"
-    "  move.w d5, (a1)   ; C00004 send write register command to VDP\n"
-    "  add.w #0x100, d5  ; point to next VDP register\n"
-    "  dbra d1, start_video_init  ; loop for rest of block\n\n");
+    "  move.b (a2)+, d1  ; get next video control byte\n"
+    "  move.w d1, (a1)   ; C00004 send write register command to VDP\n"
+    "  add.w #0x100, d1  ; point to next VDP register\n"
+    "  dbra d2, start_video_init  ; loop for rest of block\n\n");
 
   // Use DMA to clear VRAM and wait on busy VDP
   fprintf(out,
     "  ; DMA is now set up for 65535-byte fill of VRAM\n"
     "  move.l #0x40000080, (a1)  ; C00004 = VRAM write to 0x0000\n"
-    "  move.w #0, (a0)      ; C00000 = write zero to VRAM (starts DMA fill)\n"
+    "  move.w d0, (a0)      ; C00000 = write zero to VRAM (starts DMA fill)\n"
     "  ; Wait on busy VDP\n"
     "start_wait_dma:\n"
-    "  move.w (a1), d4      ; C00004 read VDP status\n"
-    "  btst.b #1, d4        ; test DMA busy flag\n"
+    "  move.w (a1), d1      ; C00004 read VDP status\n"
+    "  btst.b #1, d1        ; test DMA busy flag\n"
     "  bne.b start_wait_dma ; loop while DMA busy\n\n");
 
   // Initalize CRAM
@@ -115,28 +122,28 @@ int SegaGenesis::start_init()
     "  ; initialize CRAM\n"
     "  move.l #0x81048f02, (a1) ; C00004 reg 1 = 0x04, reg 15 = 0x02: blank, auto-increment=2\n"
     "  move.l #0xc0000000, (a1) ; C00004 write CRAM address 0x0000\n"
-    "  moveq #32-1, d3          ; loop for 32 CRAM registers\n"
+    "  moveq #32-1, d2          ; loop for 32 CRAM registers\n"
     "start_init_cram:\n"
-    "  move.l #0, (a0)          ; C00000 clear CRAM register\n"
-    "  dbra d3, start_init_cram\n\n");
+    "  move.l d0, (a0)          ; C00000 clear CRAM register\n"
+    "  dbra d2, start_init_cram\n\n");
 
   // Initalize VSRAM
   fprintf(out,
     "  ; Initialize VSRAM\n"
     "  move.l #0x40000010, (a1) ; C00004 VSRAM write address 0x0000\n"
-    "  moveq #20-1, d4          ; loop for 20 VSRAM registers\n"
+    "  moveq #20-1, d2          ; loop for 20 VSRAM registers\n"
     "start_init_vsram:\n"
-    "  move.l #0, (a0)          ; C00000 clear VSRAM register\n"
-    "  dbra d4, start_init_vsram\n\n");
+    "  move.l d0, (a0)          ; C00000 clear VSRAM register\n"
+    "  dbra d2, start_init_vsram\n\n");
 
   // Initialize PSG
   fprintf(out,
     "  ; Initialize PSG\n"
-    "  moveq #4-1, d5             ; loop for 4 PSG registers\n"
+    "  moveq #4-1, d2             ; loop for 4 PSG registers\n"
     "  movea.l #psg_reg_init_table, a2\n"
     "start_init_psg:\n"
     "  move.b (a2)+, (0x0011, a0) ; C00011 copy PSG initialization commands\n"
-    "  dbra d5, start_init_psg\n\n");
+    "  dbra d2, start_init_psg\n\n");
 
   // Initialize palette (FIXME - This should be removed I think)
   fprintf(out,
@@ -167,8 +174,7 @@ int SegaGenesis::start_init()
     "  moveq #0, d1           ; clear high byte of word\n"
     "  move.b (a2)+, d1       ; get next byte\n"
     "  bmi.b print_msg_3      ; branch if high bit set\n"
-    "  bne.b print_msg_2      ; store byte if not null\n"
-    "  bra.b print_msg_done\n"
+    "  beq.b print_msg_done   ; store byte if not null\n"
     "print_msg_2:\n"
     "  move.w d1, (a0)        ; C00000 store next word of name data\n"
     "  bra.b print_msg_1\n"
