@@ -79,10 +79,10 @@ static void remove_illegal_chars(char *function)
 
 int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
 {
-char method_name[128];
-char method_sig[128];
-char method_class[128];
-char function[256];
+  char method_name[128];
+  char method_sig[128];
+  char method_class[128];
+  char function[256];
 
   printf("invoke_static()\n");
 
@@ -157,10 +157,10 @@ char function[256];
 
 int invoke_static(JavaClass *java_class, int method_id, Generator *generator, int *const_vals, int const_count)
 {
-char method_name[128];
-char method_sig[128];
-char method_class[128];
-char function[256];
+  char method_name[128];
+  char method_sig[128];
+  char method_class[128];
+  char function[256];
 
   printf("const invoke_static() const_count=%d\n", const_count);
 
@@ -171,7 +171,7 @@ char function[256];
     return -1;
   }
 
-  printf("const method: '%s as %s' from %s\n", method_name, method_sig, method_class);
+  printf("const method: '%s as %s' from %s\n  const_count=%d\n", method_name, method_sig, method_class, const_count);
 
   get_static_function(function, method_name, method_sig);
 

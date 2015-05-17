@@ -25,6 +25,7 @@ public:
   virtual int sega_genesis_setCursor(int x, int y) { return -1; }
   virtual int sega_genesis_printChar() { return -1; }
   virtual int sega_genesis_printChar(int c) { return -1; }
+  virtual int sega_genesis_print() { return -1; }
 };
 
 #endif

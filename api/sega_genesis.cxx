@@ -42,6 +42,7 @@ int sega_genesis(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(loadFonts,)
   CHECK_FUNC(setCursor,_II)
   CHECK_FUNC(printChar,_C)
+  CHECK_FUNC(print,_Ljava/lang/String;)
 
   return -1;
 }

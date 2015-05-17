@@ -32,6 +32,7 @@ public:
   virtual int sega_genesis_setCursor(int x, int y);
   virtual int sega_genesis_printChar();
   virtual int sega_genesis_printChar(int c);
+  virtual int sega_genesis_print();
 
 protected:
 
@@ -41,6 +42,9 @@ private:
   void add_exception_handler();
   void add_set_fonts();
   void add_vdp_reg_init();
+  void add_print_string();
+
+  bool need_print_string:1;
 };
 
 #endif

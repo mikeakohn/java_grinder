@@ -7,6 +7,9 @@ public class SegaGenesisJavaDemo
   {
     int a,b;
 
+    SegaGenesis.setCursor(10, 7);
+    SegaGenesis.print("mike kohn");
+
     while(true)
     {
       for (a = 0; a < 0xf; a++)

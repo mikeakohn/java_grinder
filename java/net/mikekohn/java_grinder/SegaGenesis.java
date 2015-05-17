@@ -37,5 +37,10 @@ abstract public class SegaGenesis
   /** Print a character to the screen.  Must call setCursor() first.
       The cursor will increment for every character printed. */
   public static void printChar(char c) { }
+
+  /** Print a string of characters to the screen.  Must call
+      setCursor() first.  The cursor will increment for every
+      character printed. */
+  public static void print(String text) { }
 }
 

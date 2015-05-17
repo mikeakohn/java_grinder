@@ -9,6 +9,7 @@
  *
  * Sega Genesis initialization code is based on Bruce Tomlin's hello.asm:
  * http://atariage.com/forums/topic/98540-sega-genesis-programming/
+ * http://emu-docs.org/Genesis/sega2f.htm
  *
  */
 
@@ -21,12 +22,26 @@
 // FIXME - This is redundant and kind of dangerous.
 #define REG_STACK(a) (a)
 
+#define CD_VRAM_WRITE 1
+#define CD_CRAM_WRITE 3
+#define CD_VSRAM_WRITE 5
+#define CD_VRAM_READ 0
+#define CD_CRRAM_READ 8
+#define CD_VSRAM_READ 4
+
+#define CTRL_REG(cd, a) \
+  (((cd & 0x3) << 30) | \
+  ((a & 0x3fff) << 16) | \
+  ((cd & 0x3c) << 2) | \
+  (a >> 14))
+
 // a0 = VDP_data
 // a1 = VDP_control
 // a2 = temp
 // a3 = temp
 
-SegaGenesis::SegaGenesis()
+SegaGenesis::SegaGenesis() :
+  need_print_string(false)
 {
   // FIXME - What's this access prohibited crap?
   //ram_start = 0xe00000;
@@ -52,6 +67,8 @@ SegaGenesis::~SegaGenesis()
 
   // FIXME - Add if for this
   add_set_fonts();
+
+  if (need_print_string) { add_print_string(); }
 }
 
 int SegaGenesis::open(const char *filename)
@@ -190,6 +207,129 @@ int SegaGenesis::start_init()
   fprintf(out,
     "  ; Unblank display\n"
     "  move.w #0x8144, (a1)   ; C00004 reg 1 = 0x44 unblank display\n\n");
+
+  return 0;
+}
+
+int SegaGenesis::sega_genesis_setPalettePointer()
+{
+  int d;
+
+  if (stack > 0)
+  {
+    d = 5;
+    fprintf(out, "  move.l (SP)+, d5\n");
+    stack--;
+  }
+    else
+  {
+    d = REG_STACK(reg-1);
+    reg--;
+  }
+
+  fprintf(out, "  lsl.l #8, d%d\n", d);
+  fprintf(out, "  lsl.l #8, d%d\n", d);
+  fprintf(out, "  or.l #0xc0000000, d%d\n", d);
+  fprintf(out, "  move.l d%d, (a1) ; Set CRAM write address\n", d);
+
+  return 0;
+}
+
+int SegaGenesis::sega_genesis_setPalettePointer(int index)
+{
+  if (index < 0 || index > 63)
+  {
+    printf("Palette index %d out of range 0-63\n", index);
+    return -1;
+  }
+
+  fprintf(out, "  move.l #0xc0%02x0000, (a1) ; Set CRAM write address\n", index);
+
+  return 0;
+}
+
+int SegaGenesis::sega_genesis_setPaletteColor()
+{
+  if (stack > 0)
+  {
+    fprintf(out, "  move.l (SP)+, (a0)\n");
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  move.l d%d, (a0)\n", REG_STACK(reg-1));
+    reg--;
+  }
+
+  return 0;
+}
+
+int SegaGenesis::sega_genesis_setPaletteColor(int color)
+{
+  if (color < 0 || color > 4095)
+  {
+    printf("Color %d is out of 12 bit range\n", color);
+    return -1;
+  }
+
+  fprintf(out, "  move.w #0x%03x, (a0)      ; setPaletteColor()\n", color);
+
+  return 0;
+}
+
+int SegaGenesis::sega_genesis_loadFonts()
+{
+  return -1;
+}
+
+int SegaGenesis::sega_genesis_setCursor()
+{
+  fprintf(out, "  ; Set cursor position in VDP\n");
+  fprintf(out, "  mulu.w #40, d%d\n", REG_STACK(reg-1));
+  fprintf(out, "  add.w d%d, d%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+  fprintf(out, "  asl.l #8, d%d\n", REG_STACK(reg-1));
+  fprintf(out, "  asl.l #8, d%d\n", REG_STACK(reg-1));
+  fprintf(out, "  add.l #0x%08x, d%d\n", CTRL_REG(CD_VRAM_WRITE, 0xc400), REG_STACK(reg-1));
+  fprintf(out, "  move.l d%d, (a1)\n", REG_STACK(reg-1));
+
+  reg -= 2;
+
+  return 0;
+}
+
+int SegaGenesis::sega_genesis_setCursor(int x, int y)
+{
+  // FIXME - This function isn't getting called when it should.
+  // 0100 0101 1001 0100 0000 0000 0000 0011
+  // CD = 000001 (VRAM WRITE)
+  //  A = 1100 0101 1001 0100 = 0xc594
+  fprintf(out,
+    "  move.l #0x45%02x0003, (a1) ; Set cursor position in VDP\n",
+    (y * 40 + x));
+
+  return 0;
+}
+
+int SegaGenesis::sega_genesis_printChar()
+{
+  return -1;
+}
+
+int SegaGenesis::sega_genesis_printChar(int c)
+{
+  fprintf(out, "  move.w #0x%02x, (a0) ; printChar(0x%02x)\n", c, c);
+
+  return 0;
+}
+
+int SegaGenesis::sega_genesis_print()
+{
+  need_print_string = true;
+
+  fprintf(out, "  movea.l d%d, a2\n", REG_STACK(reg-1));
+  fprintf(out, "  jsr _print_string\n");
+
+  reg--;
 
   return 0;
 }
@@ -431,96 +571,17 @@ void SegaGenesis::add_vdp_reg_init()
     "  dc.b  0x9f,0xbf,0xdf,0xff\n\n");
 }
 
-int SegaGenesis::sega_genesis_setPalettePointer()
+void SegaGenesis::add_print_string()
 {
-  int d;
-
-  if (stack > 0)
-  {
-    d = 5;
-    fprintf(out, "  move.l (SP)+, d5\n");
-    stack--;
-  }
-    else
-  {
-    d = REG_STACK(reg-1);
-    reg--;
-  }
-
-  fprintf(out, "  lsl.l #8, d%d\n", d);
-  fprintf(out, "  lsl.l #8, d%d\n", d);
-  fprintf(out, "  or.l #0xc0000000, d%d\n", d);
-  fprintf(out, "  move.l d%d, (a1) ; Set CRAM write address\n", d);
-
-  return 0;
+  fprintf(out,
+    "_print_string:\n"
+    "  move.l (-4,a2), d5\n"
+    "  eor.l d6, d6\n"
+    "_print_string_loop:\n"
+    "  move.b (a2)+, d6\n"
+    "  move.w d6, (a0)\n"
+    "  dbra d5, _print_string_loop\n"
+    "  rts\n\n");
 }
-
-int SegaGenesis::sega_genesis_setPalettePointer(int index)
-{
-  if (index < 0 || index > 63)
-  {
-    printf("Palette index %d out of range 0-63\n", index);
-    return -1;
-  }
-
-  fprintf(out, "  move.l #0xc0%02x0000, (a1) ; Set CRAM write address\n", index);
-
-  return 0;
-}
-
-int SegaGenesis::sega_genesis_setPaletteColor()
-{
-  if (stack > 0)
-  {
-    fprintf(out, "  move.l (SP)+, (a0)\n");
-    stack--;
-  }
-    else
-  {
-    fprintf(out, "  move.l d%d, (a0)\n", REG_STACK(reg-1));
-    reg--;
-  }
-
-  return 0;
-}
-
-int SegaGenesis::sega_genesis_setPaletteColor(int color)
-{
-  if (color < 0 || color > 4095)
-  {
-    printf("Color %d is out of 12 bit range\n", color);
-    return -1;
-  }
-
-  fprintf(out, "  move.w #0x%03x, (a0)      ; setPaletteColor()\n", color);
-
-  return 0;
-}
-
-int SegaGenesis::sega_genesis_loadFonts()
-{
-  return -1;
-}
-
-int SegaGenesis::sega_genesis_setCursor()
-{
-  return -1;
-}
-
-int SegaGenesis::sega_genesis_setCursor(int x, int y)
-{
-  return -1;
-}
-
-int SegaGenesis::sega_genesis_printChar()
-{
-  return -1;
-}
-
-int SegaGenesis::sega_genesis_printChar(int c)
-{
-  return -1;
-}
-
 
 
