@@ -18,6 +18,9 @@
 
 #include "SegaGenesis.h"
 
+// FIXME - This is redundant and kind of dangerous.
+#define REG_STACK(a) (a)
+
 // a0 = VDP_data
 // a1 = VDP_control
 // a2 = temp
@@ -448,7 +451,18 @@ int SegaGenesis::sega_genesis_setPalettePointer(int index)
 
 int SegaGenesis::sega_genesis_setPaletteColor()
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  move.l (SP)+, (a0)\n");
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  move.l d%d, (a0)\n", REG_STACK(reg-1));
+    reg--;
+  }
+
+  return 0;
 }
 
 int SegaGenesis::sega_genesis_setPaletteColor(int color)

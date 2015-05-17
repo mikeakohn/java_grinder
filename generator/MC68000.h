@@ -117,6 +117,7 @@ protected:
   int get_values_from_stack(int *value1, int *value2);
   int get_values_from_stack(int *value1);
   int get_ref_from_stack();
+  int get_jump_size(int distance);
 };
 
 #endif

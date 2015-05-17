@@ -16,7 +16,7 @@
 
 #include "MC68000.h"
 
-#define REG_STACK(a) (reg)
+#define REG_STACK(a) (a)
 #define LOCALS(i) (i * 4)
 
 // ABI is:
@@ -541,6 +541,8 @@ int MC68000::integer_to_short()
 
 int MC68000::jump_cond(const char *label, int cond, int distance)
 {
+  char size = get_jump_size(distance);
+
   if (stack > 0)
   {
     fprintf(out, "  cmp.l #0, (SP)+\n");
@@ -552,12 +554,14 @@ int MC68000::jump_cond(const char *label, int cond, int distance)
     reg--;
   }
 
-  fprintf(out, "  b%s %s\n", cond_str[cond], label);
+  fprintf(out, "  b%s.%c %s\n", cond_str[cond], size, label);
   return 0;
 }
 
 int MC68000::jump_cond_integer(const char *label, int cond, int distance)
 {
+  char size = get_jump_size(distance);
+
   if (stack > 1)
   {
     fprintf(out, "  move.l (SP)+, d7\n");
@@ -580,7 +584,7 @@ int MC68000::jump_cond_integer(const char *label, int cond, int distance)
     reg -= 2;
   }
 
-  fprintf(out, "  %s %s\n", cond_str[cond], label);
+  fprintf(out, "  b%s.%c %s\n", cond_str[cond], size, label);
 
   return 0;
 
@@ -616,6 +620,11 @@ int MC68000::return_void(int local_count)
 
 int MC68000::jump(const char *name, int distance)
 {
+  char size = get_jump_size(distance);
+
+  fprintf(out, "  bra.%c %s\n", size, name);
+
+#if 0
   if (distance < 64)
   {
     fprintf(out, "  bra.s %s\n", name);
@@ -629,6 +638,7 @@ int MC68000::jump(const char *name, int distance)
   {
     fprintf(out, "  bra.l %s\n", name);
   }
+#endif
 
   return 0;
 }
@@ -1128,19 +1138,21 @@ int MC68000::stack_alu(const char *instr)
 {
   if (stack == 0)
   {
-    fprintf(out, "  %s.l r%d, r%d\n", instr, REG_STACK(reg-1), REG_STACK(reg-2));
+printf("%d %d  reg=%d\n", REG_STACK(reg-1), REG_STACK(reg-2), reg);
+    fprintf(out, "  %s.l d%d, d%d\n", instr, REG_STACK(reg-1), REG_STACK(reg-2));
     reg--;
   }
     else
   if (stack == 1)
   {
-    fprintf(out, "  %s.l (SP)+, r%d\n", instr, REG_STACK(reg-1));
+    fprintf(out, "  %s.l (SP)+, d%d\n", instr, REG_STACK(reg-1));
     stack--;
   }
     else
   {
     fprintf(out, "  move.l (SP)+, d7\n");
     fprintf(out, "  %s.l d7, (SP)\n", instr);
+    stack--;
   }
 
   return 0;
@@ -1249,4 +1261,13 @@ int MC68000::get_ref_from_stack()
 
   return 0;
 }
+
+int MC68000::get_jump_size(int distance)
+{
+  if (distance < 64) { return 's'; }
+  if (distance < 20000) { return 'w'; }
+
+  return 'l';
+}
+
 
