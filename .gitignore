@@ -4,6 +4,8 @@
 *.class
 *.asm
 *.jar
+*.bin
+*.lst
 tests/*.hex
 tests/*.lst
 samples/c64/c64_demo.prg

@@ -428,6 +428,41 @@ void SegaGenesis::add_vdp_reg_init()
     "  dc.b  0x9f,0xbf,0xdf,0xff\n\n");
 }
 
+int SegaGenesis::sega_genesis_setPalettePointer()
+{
+  return -1;
+}
+
+int SegaGenesis::sega_genesis_setPalettePointer(int index)
+{
+  if (index < 0 || index > 63)
+  {
+    printf("Palette index %d out of range 0-63\n", index);
+    return -1;
+  }
+
+  fprintf(out, "  move.l #0xc0%02x0000, (a1) ; Set CRAM write address\n", index);
+
+  return 0;
+}
+
+int SegaGenesis::sega_genesis_setPaletteColor()
+{
+  return -1;
+}
+
+int SegaGenesis::sega_genesis_setPaletteColor(int color)
+{
+  if (color < 0 || color > 4095)
+  {
+    printf("Color %d is out of 12 bit range\n", color);
+    return -1;
+  }
+
+  fprintf(out, "  move.w #0x%03x, (a0)      ; setPaletteColor()\n", color);
+
+  return 0;
+}
 
 
 

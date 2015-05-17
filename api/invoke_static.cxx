@@ -25,6 +25,7 @@
 #include "dsp.h"
 #include "ioport.h"
 #include "memory.h"
+#include "sega_genesis.h"
 #include "spi.h"
 #include "ti84_.h"
 #include "ti99_.h"
@@ -130,6 +131,7 @@ char function[256];
     CHECK_WITH_PORT(SPI, spi, 1)
     CHECK_WITH_PORT(UART, uart, 0)
     CHECK_WITH_PORT(UART, uart, 1)
+    CHECK(SegaGenesis, sega_genesis)
     CHECK(TI84, ti84)
     CHECK(TI99, ti99)
       else
@@ -198,6 +200,7 @@ char function[256];
     CHECK_CONST(ADC, adc)
     CHECK_CONST(Timer, timer)
     CHECK_CONST(CPU, cpu)
+    CHECK_CONST(SegaGenesis, sega_genesis)
     CHECK_WITH_PORT_CONST(SPI, spi, 0)
     CHECK_WITH_PORT_CONST(SPI, spi, 1)
     CHECK_WITH_PORT_CONST(TI99, ti99, 0)
@@ -213,6 +216,7 @@ char function[256];
     CHECK_WITH_PORT_CONST_2(SPI, spi, 1)
     CHECK_CONST_2(Timer, timer)
     CHECK_CONST_2(TI99, ti99)
+    CHECK_CONST_2(SegaGenesis, sega_genesis)
       else
     {}
   }

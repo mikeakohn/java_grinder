@@ -18,10 +18,17 @@
 #include "API_C64.h"
 #include "API_DSP.h"
 #include "API_Microcontroller.h"
+#include "API_SegaGenesis.h"
 #include "API_TI84.h"
 #include "API_TI99.h"
 
-class Generator : public API_C64, public API_DSP, public API_Microcontroller, public API_TI84, public API_TI99
+class Generator :
+  public API_C64,
+  public API_DSP,
+  public API_Microcontroller,
+  public API_SegaGenesis,
+  public API_TI84,
+  public API_TI99
 {
 public:
   Generator();

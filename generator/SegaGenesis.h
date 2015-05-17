@@ -23,6 +23,11 @@ public:
   virtual int open(const char *filename);
   virtual int start_init();
 
+  virtual int sega_genesis_setPalettePointer();
+  virtual int sega_genesis_setPalettePointer(int index);
+  virtual int sega_genesis_setPaletteColor();
+  virtual int sega_genesis_setPaletteColor(int color);
+
 protected:
 
 private:
