@@ -5,7 +5,7 @@ public class SegaGenesisJavaDemo
 {
   static public void main(String args[])
   {
-    int a;
+    int a,b;
 
     while(true)
     {

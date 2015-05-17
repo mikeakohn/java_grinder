@@ -433,7 +433,26 @@ void SegaGenesis::add_vdp_reg_init()
 
 int SegaGenesis::sega_genesis_setPalettePointer()
 {
-  return -1;
+  int d;
+
+  if (stack > 0)
+  {
+    d = 5;
+    fprintf(out, "  move.l (SP)+, d5\n");
+    stack--;
+  }
+    else
+  {
+    d = REG_STACK(reg-1);
+    reg--;
+  }
+
+  fprintf(out, "  lsl.l #8, d%d\n", d);
+  fprintf(out, "  lsl.l #8, d%d\n", d);
+  fprintf(out, "  or.l #0xc0000000, d%d\n", d);
+  fprintf(out, "  move.l d%d, (a1) ; Set CRAM write address\n", d);
+
+  return 0;
 }
 
 int SegaGenesis::sega_genesis_setPalettePointer(int index)
