@@ -40,11 +40,12 @@ private:
   void add_exception_vectors();
   void add_cartridge_info_header();
   void add_exception_handler();
-  void add_set_fonts();
+  void add_load_fonts();
   void add_vdp_reg_init();
   void add_print_string();
 
   bool need_print_string:1;
+  bool need_load_fonts:1;
 };
 
 #endif

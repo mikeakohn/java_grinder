@@ -41,7 +41,8 @@
 // a3 = temp
 
 SegaGenesis::SegaGenesis() :
-  need_print_string(false)
+  need_print_string(false),
+  need_load_fonts(false)
 {
   // FIXME - What's this access prohibited crap?
   //ram_start = 0xe00000;
@@ -55,6 +56,7 @@ SegaGenesis::~SegaGenesis()
   add_vdp_reg_init();
 
   // FIXME - REMOVE REMOVE REMOVE
+#if 0
   fprintf(out,
     "; startup message\n"
     "hello_msg:\n"
@@ -63,12 +65,11 @@ SegaGenesis::~SegaGenesis()
     "  dc.b  \" world\"\n"
     "  dc.b  0x7B    ; \".\"\n"
     "  dc.b  0\n\n");
+#endif
   // FIXME - REMOVE REMOVE REMOVE
 
-  // FIXME - Add if for this
-  add_set_fonts();
-
   if (need_print_string) { add_print_string(); }
+  if (need_load_fonts) { add_load_fonts(); }
 }
 
 int SegaGenesis::open(const char *filename)
@@ -166,24 +167,18 @@ int SegaGenesis::start_init()
     "  dbra d2, start_init_psg\n\n");
 
   // Initialize palette (FIXME - This should be removed I think)
+#if 0
   fprintf(out,
     "  ; Initialize palette\n"
     "  move.l #0xc0020000, (a1)  ; C00004 CRAM write address = 0x0002\n"
     "  move.w #0x0eee, (a0)      ; C00000 write next word to video\n"
     "  move.w #0x0ee8, (a0)      ; C00000 write next word to video\n");
-#if 0
-  fprintf(out,
-    "  move.w #cram_tab, a2      ; a2 points to color table\n"
-    "  move.w (a2)+, d0          ; get length word\n"
-    "  move.l #0xc0020000, (a4)  ; C00004 CRAM write address = 0x0002\n"
-    "initcram_1:\n"
-    "  move.w (a2)+, (a5)        ; C00000 write next word to video\n"
-    "  dbra d0, initcram_1       ; loop until done\n\n");
 #endif
 
   // Copy fonts into VDP
-  fprintf(out, "  jsr _init_fonts\n\n");
+  //fprintf(out, "  jsr _load_fonts\n\n");
 
+#if 0
   // Copy message to screen (FIXME - this should be removed also)
   fprintf(out,
     "  lea (hello_msg-$-2,PC), a2\n"
@@ -202,6 +197,7 @@ int SegaGenesis::start_init()
     "  addi.l #0x01000000, d5 ; offset VRAM address by 0x0100 to skip a line\n"
     "  bra.b print_msg\n"
     "print_msg_done:\n\n");
+#endif
 
   // Unblank display
   fprintf(out,
@@ -279,7 +275,10 @@ int SegaGenesis::sega_genesis_setPaletteColor(int color)
 
 int SegaGenesis::sega_genesis_loadFonts()
 {
-  return -1;
+  need_load_fonts = true;
+
+  fprintf(out, "  jsr _load_fonts\n");
+  return 0;
 }
 
 int SegaGenesis::sega_genesis_setCursor()
@@ -445,16 +444,16 @@ void SegaGenesis::add_exception_handler()
     "  rte\n\n");
 }
 
-void SegaGenesis::add_set_fonts()
+void SegaGenesis::add_load_fonts()
 {
   fprintf(out,
-    "_init_fonts:\n"
+    "_load_fonts:\n"
     "  move.w #((fontend - font) / 4) - 1, d6\n"
     "  move.l #0x4c200000, (a1)  ; C00004 VRAM write to 0x0c20\n"
     "  movea.l #font, a2         ; Point to font set\n"
-    "_init_fonts_loop:\n"
+    "_load_fonts_loop:\n"
     "  move.l (a2)+, (a0)        ; C00000 write next longword of charset to VDP\n"
-    "  dbra d6, _init_fonts_loop ; loop until done\n"
+    "  dbra d6, _load_fonts_loop ; loop until done\n"
     "  rts\n\n");
 
   fprintf(out,

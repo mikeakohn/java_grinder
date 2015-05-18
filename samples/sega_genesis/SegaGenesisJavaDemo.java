@@ -7,8 +7,12 @@ public class SegaGenesisJavaDemo
   {
     int a,b;
 
+    SegaGenesis.loadFonts();
+
     SegaGenesis.setCursor(10, 7);
     SegaGenesis.print("mike kohn");
+    SegaGenesis.setCursor(0, 0);
+    SegaGenesis.print("java grinder");
 
     while(true)
     {
