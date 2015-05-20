@@ -283,12 +283,17 @@ int SegaGenesis::sega_genesis_loadFonts()
 
 int SegaGenesis::sega_genesis_setCursor()
 {
+  // FIXME - Holy crap.  This is fugly.  Should this just be a function?
   fprintf(out, "  ; Set cursor position in VDP\n");
-  fprintf(out, "  mulu.w #40, d%d\n", REG_STACK(reg-1));
+  fprintf(out, "  mulu.w #128, d%d\n", REG_STACK(reg-1));
   fprintf(out, "  add.w d%d, d%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
-  fprintf(out, "  asl.l #8, d%d\n", REG_STACK(reg-1));
-  fprintf(out, "  asl.l #8, d%d\n", REG_STACK(reg-1));
-  fprintf(out, "  add.l #0x%08x, d%d\n", CTRL_REG(CD_VRAM_WRITE, 0xc400), REG_STACK(reg-1));
+  //fprintf(out, "  move.l d%d, d5\n", REG_STACK(reg-1));
+  fprintf(out, "  lsl.l #8, d%d\n", REG_STACK(reg-1));
+  fprintf(out, "  lsl.l #8, d%d\n", REG_STACK(reg-1));
+  //fprintf(out, "  lsr.l #8, d5\n");
+  //fprintf(out, "  lsr.l #6, d5\n");
+  fprintf(out, "  or.l #0x%08x, d%d\n", CTRL_REG(CD_VRAM_WRITE, 0xc000), REG_STACK(reg-1));
+  //fprintf(out, "  or.l d5, d%d\n", REG_STACK(reg-1));
   fprintf(out, "  move.l d%d, (a1)\n", REG_STACK(reg-1));
 
   reg -= 2;
@@ -302,9 +307,11 @@ int SegaGenesis::sega_genesis_setCursor(int x, int y)
   // 0100 0101 1001 0100 0000 0000 0000 0011
   // CD = 000001 (VRAM WRITE)
   //  A = 1100 0101 1001 0100 = 0xc594
+  int address = (0xc000 + (y * 128 + x));
+
   fprintf(out,
-    "  move.l #0x45%02x0003, (a1) ; Set cursor position in VDP\n",
-    (y * 40 + x));
+    "  move.l #0x%8x, (a1) ; Set cursor position in VDP\n",
+    CTRL_REG(CD_VRAM_WRITE, address));
 
   return 0;
 }
