@@ -76,7 +76,12 @@ int SegaGenesis::open(const char *filename)
 {
   if (MC68000::open(filename) != 0) { return -1; }
 
-  fprintf(out, ".include \"genesis.h\"\n\n");
+  //fprintf(out, ".include \"genesis.h\"\n\n");
+  fprintf(out,
+    "  TMSS_reg equ 0xA14000\n"
+    "  HW_version equ 0xA10001\n"
+    "  VDP_data equ 0xc00000\n"
+    "  VDP_ctrl equ 0xc00004\n\n");
 
   add_exception_vectors();
   add_cartridge_info_header();
@@ -340,6 +345,24 @@ int SegaGenesis::sega_genesis_print()
   return 0;
 }
 
+int SegaGenesis::sega_genesis_setHorizontalScroll()
+{
+  fprintf(out,
+    "  move.l #0x%8x, (a1) ; Update horizontal scroll\n",
+    CTRL_REG(CD_VRAM_WRITE, 0xfc00));
+
+  reg--;
+
+  return -1;
+}
+
+int SegaGenesis::sega_genesis_setVerticalScroll()
+{
+  reg--;
+
+  return -1;
+}
+
 void SegaGenesis::add_exception_vectors()
 {
   fprintf(out,
@@ -589,5 +612,4 @@ void SegaGenesis::add_print_string()
     "  dbra d5, _print_string_loop\n"
     "  rts\n\n");
 }
-
 

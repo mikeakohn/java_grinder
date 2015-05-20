@@ -42,5 +42,11 @@ abstract public class SegaGenesis
       setCursor() first.  The cursor will increment for every
       character printed. */
   public static void print(String text) { }
+
+  /** Set horizontal scroll value. */
+  public static void setHorizontalScroll(int value) { }
+
+  /** Set vertical scroll value. */
+  public static void setVerticalScroll(int value) { }
 }
 

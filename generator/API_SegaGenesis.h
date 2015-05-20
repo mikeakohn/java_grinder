@@ -26,6 +26,8 @@ public:
   virtual int sega_genesis_printChar() { return -1; }
   virtual int sega_genesis_printChar(int c) { return -1; }
   virtual int sega_genesis_print() { return -1; }
+  virtual int sega_genesis_setHorizontalScroll() { return -1; }
+  virtual int sega_genesis_setVerticalScroll() { return -1; }
 };
 
 #endif

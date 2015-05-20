@@ -33,6 +33,8 @@ public:
   virtual int sega_genesis_printChar();
   virtual int sega_genesis_printChar(int c);
   virtual int sega_genesis_print();
+  virtual int sega_genesis_setHorizontalScroll();
+  virtual int sega_genesis_setVerticalScroll();
 
 protected:
 
