@@ -5,7 +5,7 @@ import "os"
 import "strconv"
 
 func main() {
-  fmt.Println("bin2java - Copyright 2015 by Michael Kohn")
+  fmt.Println("INFO: bin2java - Copyright 2015 by Michael Kohn")
 
   if len(os.Args) != 2 {
     fmt.Println("Usage: " + os.Args[0] + " <binfile>")
@@ -13,7 +13,7 @@ func main() {
   }
 
   // Open wav file for reading
-  fmt.Println("Reading: " + os.Args[1])
+  //fmt.Println("Reading: " + os.Args[1])
 
   file_in, err := os.Open(os.Args[1])
 
@@ -31,12 +31,13 @@ func main() {
 
   file_size := int(stat.Size())
 
-  fmt.Println(strconv.Itoa(file_size))
+  fmt.Println("INFO: " + strconv.Itoa(file_size))
+  fmt.Println()
 
   data := make([]byte, file_size)
   file_in.Read(data)
 
-  fmt.Println("public class BinFile\n{")
+  fmt.Println("public class ClassName\n{")
   fmt.Println("  public static byte[] code =\n  {")
 
   for i := 0; i < len(data); i++ {
