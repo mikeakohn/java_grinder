@@ -35,6 +35,10 @@ public:
   virtual int sega_genesis_print();
   virtual int sega_genesis_setHorizontalScroll();
   virtual int sega_genesis_setVerticalScroll();
+  virtual int sega_genesis_loadZ80();
+  virtual int sega_genesis_resetZ80();
+  virtual int sega_genesis_pauseZ80();
+  virtual int sega_genesis_startZ80();
 
 protected:
 
@@ -45,9 +49,11 @@ private:
   void add_load_fonts();
   void add_vdp_reg_init();
   void add_print_string();
+  void add_load_z80();
 
   bool need_print_string:1;
   bool need_load_fonts:1;
+  bool need_load_z80:1;
 };
 
 #endif

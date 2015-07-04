@@ -48,5 +48,19 @@ abstract public class SegaGenesis
 
   /** Set vertical scroll value. */
   public static void setVerticalScroll(int value) { }
+
+  /** Load code up to 8k in size into the Z80 process space.  Z80 will
+      be reset by the API. */
+  public static void loadZ80(byte[] code) { }
+
+  /** Reset the Z80. */
+  public static void resetZ80() { }
+
+  /** Pause Z80.  Needed so 68k can access something in Z80 space along
+      with just pausing the thing. */
+  public static void pauseZ80() { }
+
+  /** Start Z80.  Let the Z80 run again. */
+  public static void startZ80() { }
 }
 

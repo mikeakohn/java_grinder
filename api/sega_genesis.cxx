@@ -45,6 +45,10 @@ int sega_genesis(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(print,_Ljava/lang/String;)
   CHECK_FUNC(setVerticalScroll,_I)
   CHECK_FUNC(setHorizontalScroll,_I)
+  CHECK_FUNC(loadZ80,_B)
+  CHECK_FUNC(resetZ80,)
+  CHECK_FUNC(pauseZ80,)
+  CHECK_FUNC(startZ80,)
 
   return -1;
 }

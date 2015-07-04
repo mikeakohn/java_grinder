@@ -35,7 +35,7 @@
   ((cd & 0x3c) << 2) | \
   (a >> 14))
 
-// a0 = VDP_data
+// a0 = VDP_DATA
 // a1 = VDP_control
 // a2 = temp
 // a3 = temp
@@ -78,10 +78,13 @@ int SegaGenesis::open(const char *filename)
 
   //fprintf(out, ".include \"genesis.h\"\n\n");
   fprintf(out,
-    "  TMSS_reg equ 0xA14000\n"
-    "  HW_version equ 0xA10001\n"
-    "  VDP_data equ 0xc00000\n"
-    "  VDP_ctrl equ 0xc00004\n\n");
+    "  TMSS_REG equ 0xa14000\n"
+    "  HW_VERSION equ 0xa10001\n"
+    "  VDP_DATA equ 0xc00000\n"
+    "  VDP_CTRL equ 0xc00004\n"
+    "  Z80_RAM equ 0xa00000\n"
+    "  Z80_BUSREQ equ 0xa11100\n"
+    "  Z80_RESET equ 0xa11200\n\n");
 
   add_exception_vectors();
   add_cartridge_info_header();
@@ -98,8 +101,8 @@ int SegaGenesis::start_init()
   // Setup registers used to talk to VDP
   fprintf(out,
     "  ; Setup registers used to talk to VDP\n"
-    "  movea.l #VDP_data, a0\n"
-    "  movea.l #VDP_ctrl, a1\n\n");
+    "  movea.l #VDP_DATA, a0\n"
+    "  movea.l #VDP_CTRL, a1\n\n");
 
   fprintf(out,
     "  ; During initialization:\n"
@@ -111,8 +114,8 @@ int SegaGenesis::start_init()
   // Initialize TMSS
   fprintf(out,
     "  ; Initialize TMSS\n"
-    "  movea.l #HW_version, a2\n"
-    "  movea.l #TMSS_reg, a3\n"
+    "  movea.l #HW_VERSION, a2\n"
+    "  movea.l #TMSS_REG, a3\n"
     "  move.b (a2), d1           ; A10001 test the hardware version\n"
     "  andi.b #0x0f, d1\n"
     "  beq.b start_init_tmss     ; branch if no TMSS\n"
@@ -363,6 +366,26 @@ int SegaGenesis::sega_genesis_setVerticalScroll()
   return -1;
 }
 
+int SegaGenesis::sega_genesis_loadZ80()
+{
+  return -1;
+}
+
+int SegaGenesis::sega_genesis_resetZ80()
+{
+  return -1;
+}
+
+int SegaGenesis::sega_genesis_pauseZ80()
+{
+  return -1;
+}
+
+int SegaGenesis::sega_genesis_startZ80()
+{
+  return -1;
+}
+
 void SegaGenesis::add_exception_vectors()
 {
   fprintf(out,
@@ -562,10 +585,10 @@ void SegaGenesis::add_vdp_reg_init()
     //"  dc.l  0    ; D6 = unused\n"
     //"  dc.l  0x00000100  ; d7 = video register offset\n"
     //"  dc.l  0    ; A0 = unused\n"
-    //"  dc.l  HW_version  ; a1 = hardware version register\n"
-    //"  dc.l  TMSS_reg    ; a2 = TMSS register\n"
-    //"  dc.l  VDP_data    ; a3 = VDP data\n"
-    //"  dc.l  VDP_ctrl    ; a4 = VDP control / status\n\n"
+    //"  dc.l  HW_VERSION  ; a1 = hardware version register\n"
+    //"  dc.l  TMSS_REG    ; a2 = TMSS register\n"
+    //"  dc.l  VDP_DATA    ; a3 = VDP data\n"
+    //"  dc.l  VDP_CTRL    ; a4 = VDP control / status\n\n"
 
     "  ; VDP register initialization (24 bytes)\n"
     ".align 32\n" 
@@ -611,5 +634,27 @@ void SegaGenesis::add_print_string()
     "  move.w d6, (a0)\n"
     "  dbra d5, _print_string_loop\n"
     "  rts\n\n");
+}
+
+void SegaGenesis::add_load_z80()
+{
+  fprintf(out,
+  "  ; Load Z80 with software up to 8k.  a3 = pointer to code\n"
+  ".align 32\n" 
+  "_load_z80:\n"
+  "  move.w #0x100,(Z80_BUSREQ) ; Pause Z80\n"
+  "  move.w #0x100,(Z80_RESET)  ; Reset Z80\n"
+  "_load_z80_wait_reset:\n"
+  "  btst #0, (Z80_BUSREQ)\n"
+  "  bne.s _load_z80_wait_reset\n"
+  "  lea (Z80_RAM), a2          ; 8k RAM area\n"
+  "  move.l (a3,-4), d5         ; Code len\n"
+  "_load_z80_next_byte:\n"
+  "  move.b (a3)+, (a2)+\n"
+  "  dbf d5, _load_z80_next_byte\n"
+  "  move.w #0, (Z80_RESET)     ; Disable the Z80 reset.\n"
+  "  move.w #0, (Z80_BUSREQ)    ; Give the Z80 the bus back.\n"
+  "  move.w #0x100, (Z80_RESET) ; Reset Z80\n"
+  "  rts\n\n");
 }
 

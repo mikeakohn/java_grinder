@@ -28,6 +28,11 @@ public:
   virtual int sega_genesis_print() { return -1; }
   virtual int sega_genesis_setHorizontalScroll() { return -1; }
   virtual int sega_genesis_setVerticalScroll() { return -1; }
+  virtual int sega_genesis_loadZ80() { return -1; }
+  virtual int sega_genesis_resetZ80() { return -1; }
+  virtual int sega_genesis_pauseZ80() { return -1; }
+  virtual int sega_genesis_startZ80() { return -1; }
+
 };
 
 #endif
