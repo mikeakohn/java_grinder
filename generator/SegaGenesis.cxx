@@ -42,7 +42,8 @@
 
 SegaGenesis::SegaGenesis() :
   need_print_string(false),
-  need_load_fonts(false)
+  need_load_fonts(false),
+  need_load_z80(false)
 {
   // FIXME - What's this access prohibited crap?
   //ram_start = 0xe00000;
@@ -70,6 +71,7 @@ SegaGenesis::~SegaGenesis()
 
   if (need_print_string) { add_print_string(); }
   if (need_load_fonts) { add_load_fonts(); }
+  if (need_load_z80) { add_load_z80(); }
 }
 
 int SegaGenesis::open(const char *filename)
@@ -368,22 +370,35 @@ int SegaGenesis::sega_genesis_setVerticalScroll()
 
 int SegaGenesis::sega_genesis_loadZ80()
 {
-  return -1;
+  need_load_z80 = true;
+
+  fprintf(out, "  movea.l d%d, a3\n", REG_STACK(reg-1));
+  fprintf(out, "  jsr _load_z80\n");
+  reg--;
+
+  return 0;
 }
 
 int SegaGenesis::sega_genesis_resetZ80()
 {
-  return -1;
+  // REVIEW: Does there need to be code that waits for the reset like
+  //         done in the loading section?
+  fprintf(out, "  move.w #0x100, (Z80_RESET)  ; Reset Z80\n");
+  return 0;
 }
 
 int SegaGenesis::sega_genesis_pauseZ80()
 {
-  return -1;
+  fprintf(out, "  move.w #0x100, (Z80_BUSREQ) ; Pause Z80\n");
+
+  return 0;
 }
 
 int SegaGenesis::sega_genesis_startZ80()
 {
-  return -1;
+  fprintf(out, "  move.w #0x100, (Z80_BUSREQ) ; Start Z80\n");
+
+  return 0;
 }
 
 void SegaGenesis::add_exception_vectors()
@@ -642,13 +657,13 @@ void SegaGenesis::add_load_z80()
   "  ; Load Z80 with software up to 8k.  a3 = pointer to code\n"
   ".align 32\n" 
   "_load_z80:\n"
-  "  move.w #0x100,(Z80_BUSREQ) ; Pause Z80\n"
-  "  move.w #0x100,(Z80_RESET)  ; Reset Z80\n"
+  "  move.w #0x100, (Z80_BUSREQ) ; Pause Z80\n"
+  "  move.w #0x100, (Z80_RESET)  ; Reset Z80\n"
   "_load_z80_wait_reset:\n"
-  "  btst #0, (Z80_BUSREQ)\n"
+  "  btst.b #0, (Z80_BUSREQ)\n"
   "  bne.s _load_z80_wait_reset\n"
   "  lea (Z80_RAM), a2          ; 8k RAM area\n"
-  "  move.l (a3,-4), d5         ; Code len\n"
+  "  move.l (-4,a3), d5         ; Code len\n"
   "_load_z80_next_byte:\n"
   "  move.b (a3)+, (a2)+\n"
   "  dbf d5, _load_z80_next_byte\n"

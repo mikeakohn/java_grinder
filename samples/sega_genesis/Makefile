@@ -6,7 +6,7 @@ grind: SegaGenesisJavaDemo.class
 	naken_asm -I ~ -l -b -o sega_genesis_java_demo.bin sega_genesis_java_demo.asm
 
 z80:
-	naken_asm -l -b z80_play_dac.asm
+	naken_asm -l -b -o z80_play_dac.bin z80_play_dac.asm
 
 %.class: %.java
 	javac -classpath ../../build/JavaGrinder.jar:. $*.java

@@ -14,6 +14,8 @@ public class SegaGenesisJavaDemo
     SegaGenesis.setCursor(0, 0);
     SegaGenesis.print("java grinder");
 
+    SegaGenesis.loadZ80(PlayTitleSample.z80_code);
+
     while(true)
     {
       for (a = 0; a < 0xf; a++)

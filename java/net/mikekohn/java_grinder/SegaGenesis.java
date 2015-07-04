@@ -50,7 +50,7 @@ abstract public class SegaGenesis
   public static void setVerticalScroll(int value) { }
 
   /** Load code up to 8k in size into the Z80 process space.  Z80 will
-      be reset by the API. */
+      be reset by the API and code will start running. */
   public static void loadZ80(byte[] code) { }
 
   /** Reset the Z80. */

@@ -98,31 +98,31 @@ int MC68000::insert_field_init_boolean(char *name, int index, int value)
 {
   value = (value == 0) ? 0 : 1;
 
-  fprintf(out, "  move.l #%d, (%s,a4)\n", value, name);
+  fprintf(out, "  move.l #%d, (%s)\n", value, name);
   return 0;
 }
 
 int MC68000::insert_field_init_byte(char *name, int index, int value)
 {
-  fprintf(out, "  move.l #%d, (%s,a4)\n", value, name);
+  fprintf(out, "  move.l #%d, (%s)\n", value, name);
   return 0;
 }
 
 int MC68000::insert_field_init_short(char *name, int index, int value)
 {
-  fprintf(out, "  move.l #%d, (%s,a4)\n", value, name);
+  fprintf(out, "  move.l #%d, (%s)\n", value, name);
   return 0;
 }
 
 int MC68000::insert_field_init_int(char *name, int index, int value)
 {
-  fprintf(out, "  move.l #%d, (%s,a4)\n", value, name);
+  fprintf(out, "  move.l #%d, (%s)\n", value, name);
   return 0;
 }
 
 int MC68000::insert_field_init(char *name, int index)
 {
-  fprintf(out, "  move.l #_%s, (%s,a4)\n", name, name);
+  fprintf(out, "  move.l #_%s, (%s)\n", name, name);
   return 0;
 }
 
@@ -243,7 +243,7 @@ int MC68000::push_short(int16_t s)
 
 int MC68000::push_ref(char *name)
 {
-  fprintf(out, "  move.l #%s, a2\n", name);
+  fprintf(out, "  movea.l #%s, a2\n", name);
 
   if (reg < reg_max)
   {
@@ -774,7 +774,7 @@ int MC68000::brk()
 
 int MC68000::new_array(uint8_t type)
 {
-int array_length_reg;
+  int array_length_reg;
 
   // ref = heap + 4
   // heap = heap + sizeof(array) + 4 (to hold the length of the array)
@@ -861,7 +861,7 @@ int MC68000::push_array_length()
 
 int MC68000::push_array_length(const char *name, int field_id)
 {
-  fprintf(out, "  move.l (%s,a4), a2\n", name);
+  fprintf(out, "  movea.l (%s,a4), a2\n", name);
 
   if (reg < reg_max)
   {
@@ -880,8 +880,7 @@ int MC68000::push_array_length(const char *name, int field_id)
 
 int MC68000::array_read_byte()
 {
-int index_reg;
-//int ref_reg;
+  int index_reg;
 
   get_values_from_stack(&index_reg);
   get_ref_from_stack();
@@ -907,8 +906,7 @@ int index_reg;
 
 int MC68000::array_read_short()
 {
-int index_reg;
-//int ref_reg;
+  int index_reg;
 
   get_values_from_stack(&index_reg);
   get_ref_from_stack();
@@ -935,8 +933,7 @@ int index_reg;
 
 int MC68000::array_read_int()
 {
-int index_reg;
-//int ref_reg;
+  int index_reg;
 
   get_values_from_stack(&index_reg);
   get_ref_from_stack();
@@ -961,7 +958,7 @@ int index_reg;
 
 int MC68000::array_read_byte(const char *name, int field_id)
 {
-  fprintf(out, "  move.l (%s,a4), a2\n", name);
+  fprintf(out, "  movea.l (%s,a4), a2\n", name);
 
   if (stack > 0)
   {
@@ -982,7 +979,7 @@ int MC68000::array_read_byte(const char *name, int field_id)
 
 int MC68000::array_read_short(const char *name, int field_id)
 {
-  fprintf(out, "  move.l (%s,a4), a2\n", name);
+  fprintf(out, "  movea.l (%s,a4), a2\n", name);
 
   if (stack > 0)
   {
@@ -1009,7 +1006,7 @@ int MC68000::array_read_int(const char *name, int field_id)
   // FIXME - All array code can be heavily optimized.  This is the
   // worst possible way to do this.
   // A better way is with (a2,d7.l)
-  fprintf(out, "  move.l (%s,a4), a2\n", name);
+  fprintf(out, "  movea.l (%s,a4), a2\n", name);
 
   if (stack > 0)
   {
@@ -1031,9 +1028,8 @@ int MC68000::array_read_int(const char *name, int field_id)
 
 int MC68000::array_write_byte()
 {
-int value_reg;
-int index_reg;
-//int ref_reg;
+  int value_reg;
+  int index_reg;
 
   get_values_from_stack(&value_reg, &index_reg);
   get_ref_from_stack();
@@ -1047,9 +1043,8 @@ int index_reg;
 
 int MC68000::array_write_short()
 {
-int value_reg;
-int index_reg;
-//int ref_reg;
+  int value_reg;
+  int index_reg;
 
   get_values_from_stack(&value_reg, &index_reg);
   get_ref_from_stack();
@@ -1064,9 +1059,8 @@ int index_reg;
 
 int MC68000::array_write_int()
 {
-int value_reg;
-int index_reg;
-//int ref_reg;
+  int value_reg;
+  int index_reg;
 
   get_values_from_stack(&value_reg, &index_reg);
   get_ref_from_stack();
@@ -1080,8 +1074,8 @@ int index_reg;
 
 int MC68000::array_write_byte(const char *name, int field_id)
 {
-int value_reg;
-int index_reg;
+  int value_reg;
+  int index_reg;
 
   get_values_from_stack(&value_reg, &index_reg);
 
@@ -1096,8 +1090,8 @@ int index_reg;
 
 int MC68000::array_write_short(const char *name, int field_id)
 {
-int value_reg;
-int index_reg;
+  int value_reg;
+  int index_reg;
 
   get_values_from_stack(&value_reg, &index_reg);
 
@@ -1113,8 +1107,8 @@ int index_reg;
 
 int MC68000::array_write_int(const char *name, int field_id)
 {
-int value_reg;
-int index_reg;
+  int value_reg;
+  int index_reg;
 
   get_values_from_stack(&value_reg, &index_reg);
 
