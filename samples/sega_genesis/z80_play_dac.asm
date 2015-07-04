@@ -16,10 +16,10 @@ start:
   ld (FM1_REG_DATA), a
 
   ;; Turn on channel 6
-  ld a, 0xb4
-  ld (FM2_REG_SEL), a
-  ld a, 0xc0
-  ld (FM2_REG_DATA), a
+  ;ld a, 0xb4
+  ;ld (FM2_REG_SEL), a
+  ;ld a, 0xc0
+  ;ld (FM2_REG_DATA), a
 
   ;; Point to data
   ld ix, data
@@ -33,9 +33,7 @@ play_loop:
   ld (FM1_REG_DATA), a
   inc ix
   ;; 4000000MHz / 4000 samples = 1000 cycles delay per sample
-  ;; (7 + 13 + 19 + 10 + 6 + 12 + 7) = 74
   ;; (7 + 13 + 19 + 13 + 10 + 7 + 6 + 4 + 7 + 12) = 98
-  ;; (1000 - 74) / 13 = 71 loops
   ;; (1000 - 98) / 13 = 69 loops
   ld b, 62
 play_loop_delay:

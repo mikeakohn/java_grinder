@@ -12,7 +12,7 @@ then
   extra="-aviwrite out.avi"
 fi
 
-/usbdisk/source/mame/mess64 genesis -window \
+mess genesis -window \
   -cart1 sega_genesis_java_demo.bin \
   ${extra}
 
