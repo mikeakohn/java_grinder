@@ -1,7 +1,7 @@
 
 default: SegaGenesisJavaDemo.class
 
-grind: SegaGenesisJavaDemo.class
+grind: SegaGenesisJavaDemo.class PlayTitleSample.class
 	../../java_grinder SegaGenesisJavaDemo.class sega_genesis_java_demo.asm sega_genesis
 	naken_asm -I ~ -l -b -o sega_genesis_java_demo.bin sega_genesis_java_demo.asm
 
