@@ -368,6 +368,22 @@ int SegaGenesis::sega_genesis_setVerticalScroll()
   return -1;
 }
 
+int SegaGenesis::sega_genesis_setPatternTable()
+{
+  return -1;
+}
+
+int SegaGenesis::sega_genesis_setImageData()
+{
+  return -1;
+}
+
+int SegaGenesis::sega_genesis_setPaletteColors()
+{
+  return -1;
+}
+
+
 int SegaGenesis::sega_genesis_loadZ80()
 {
   need_load_z80 = true;

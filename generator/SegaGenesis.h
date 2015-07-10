@@ -35,6 +35,9 @@ public:
   virtual int sega_genesis_print();
   virtual int sega_genesis_setHorizontalScroll();
   virtual int sega_genesis_setVerticalScroll();
+  virtual int sega_genesis_setPatternTable();
+  virtual int sega_genesis_setImageData();
+  virtual int sega_genesis_setPaletteColors();
   virtual int sega_genesis_loadZ80();
   virtual int sega_genesis_resetZ80();
   virtual int sega_genesis_pauseZ80();
