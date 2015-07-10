@@ -7,6 +7,12 @@ public class SegaGenesisJavaDemo
   {
     int a,b;
 
+    SegaGenesis.setPaletteColors(ImageMike.palette);
+    SegaGenesis.setPatternTable(ImageMike.pattern);
+    SegaGenesis.setImageData(ImageMike.image);
+
+    for (a = 0; a < 500000; a++);
+
     SegaGenesis.loadFonts();
 
     SegaGenesis.setCursor(0, 7);

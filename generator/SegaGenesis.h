@@ -53,10 +53,16 @@ private:
   void add_vdp_reg_init();
   void add_print_string();
   void add_load_z80();
+  void add_set_pattern_table();
+  void add_set_image_data();
+  void add_set_palette_colors();
 
   bool need_print_string:1;
   bool need_load_fonts:1;
   bool need_load_z80:1;
+  bool need_set_pattern_table:1;
+  bool need_set_image_data:1;
+  bool need_set_palette_colors:1;
 };
 
 #endif

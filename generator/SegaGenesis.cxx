@@ -43,7 +43,10 @@
 SegaGenesis::SegaGenesis() :
   need_print_string(false),
   need_load_fonts(false),
-  need_load_z80(false)
+  need_load_z80(false),
+  need_set_pattern_table(false),
+  need_set_image_data(false),
+  need_set_palette_colors(false)
 {
   // FIXME - What's this access prohibited crap?
   //ram_start = 0xe00000;
@@ -72,6 +75,9 @@ SegaGenesis::~SegaGenesis()
   if (need_print_string) { add_print_string(); }
   if (need_load_fonts) { add_load_fonts(); }
   if (need_load_z80) { add_load_z80(); }
+  if (need_set_pattern_table) { add_set_pattern_table(); }
+  if (need_set_image_data) { add_set_image_data(); }
+  if (need_set_palette_colors) { add_set_palette_colors(); }
 }
 
 int SegaGenesis::open(const char *filename)
@@ -370,17 +376,35 @@ int SegaGenesis::sega_genesis_setVerticalScroll()
 
 int SegaGenesis::sega_genesis_setPatternTable()
 {
-  return -1;
+  need_set_pattern_table = true;
+
+  fprintf(out, "  movea.l d%d, a3\n", REG_STACK(reg-1));
+  fprintf(out, "  jsr _set_pattern_table\n");
+  reg--;
+
+  return 0;
 }
 
 int SegaGenesis::sega_genesis_setImageData()
 {
-  return -1;
+  need_set_image_data = true;
+
+  fprintf(out, "  movea.l d%d, a3\n", REG_STACK(reg-1));
+  fprintf(out, "  jsr _set_image_data\n");
+  reg--;
+
+  return 0;
 }
 
 int SegaGenesis::sega_genesis_setPaletteColors()
 {
-  return -1;
+  need_set_palette_colors = true;
+
+  fprintf(out, "  movea.l d%d, a3\n", REG_STACK(reg-1));
+  fprintf(out, "  jsr _set_palette_colors\n");
+  reg--;
+
+  return 0;
 }
 
 
@@ -670,22 +694,70 @@ void SegaGenesis::add_print_string()
 void SegaGenesis::add_load_z80()
 {
   fprintf(out,
-  "  ; Load Z80 with software up to 8k.  a3 = pointer to code\n"
-  ".align 32\n" 
-  "_load_z80:\n"
-  "  move.w #0x100, (Z80_BUSREQ) ; Pause Z80\n"
-  "  move.w #0x100, (Z80_RESET)  ; Reset Z80\n"
-  "_load_z80_wait_reset:\n"
-  "  btst.b #0, (Z80_BUSREQ)\n"
-  "  bne.s _load_z80_wait_reset\n"
-  "  lea (Z80_RAM), a2          ; 8k RAM area\n"
-  "  move.l (-4,a3), d5         ; Code len\n"
-  "_load_z80_next_byte:\n"
-  "  move.b (a3)+, (a2)+\n"
-  "  dbf d5, _load_z80_next_byte\n"
-  "  move.w #0, (Z80_RESET)     ; Disable the Z80 reset.\n"
-  "  move.w #0, (Z80_BUSREQ)    ; Give the Z80 the bus back.\n"
-  "  move.w #0x100, (Z80_RESET) ; Reset Z80\n"
-  "  rts\n\n");
+    "  ; Load Z80 with software up to 8k.  a3 = pointer to code\n"
+    ".align 32\n" 
+    "_load_z80:\n"
+    "  move.w #0x100, (Z80_BUSREQ) ; Pause Z80\n"
+    "  move.w #0x100, (Z80_RESET)  ; Reset Z80\n"
+    "_load_z80_wait_reset:\n"
+    "  btst.b #0, (Z80_BUSREQ)\n"
+    "  bne.s _load_z80_wait_reset\n"
+    "  lea (Z80_RAM), a2          ; 8k RAM area\n"
+    "  move.l (-4,a3), d5         ; Code len\n"
+    "_load_z80_next_byte:\n"
+    "  move.b (a3)+, (a2)+\n"
+    "  dbf d5, _load_z80_next_byte\n"
+    "  move.w #0, (Z80_RESET)     ; Disable the Z80 reset.\n"
+    "  move.w #0, (Z80_BUSREQ)    ; Give the Z80 the bus back.\n"
+    "  move.w #0x100, (Z80_RESET) ; Reset Z80\n"
+    "  rts\n\n");
+}
+
+void SegaGenesis::add_set_pattern_table()
+{
+  // a3 points to int[] array
+  fprintf(out,
+    "_set_pattern_table:\n"
+    "  move.l #0x4c200000, (a1)   ; C00004 VRAM write to 0x0c20\n"
+    "  move.l (-4,a3), d5         ; Code len\n"
+    "_set_pattern_table_loop:\n"
+    "  move.l (a3)+, (a0)\n"
+    "  dbf d5, _set_pattern_table_loop\n"
+    "  rts\n\n");
+}
+
+void SegaGenesis::add_set_image_data()
+{
+  int address = (0xc000 + (0 * 128 + 0));
+
+  // a3 points to byte[] array
+  fprintf(out,
+    "_set_image_data:\n"
+    "  move.l #0x%8x, (a1)        ; Set cursor position in VDP\n"
+    "  move.l (-4,a3), d5         ; Code len\n"
+    "  eor.w d6, d6\n"
+    "_set_image_data_loop:\n"
+    "  move.b (a3)+, (a0)\n"
+    "  add.w #1, d6\n"
+    "  cmp.w #40, d6\n"
+    "  bne.s _set_image_data_not_40\n"
+    "  eor.w d6, d6\n"
+    "  add.l #128-40, a3\n"
+    "_set_image_data_not_40:\n"
+    "  dbf d5, _set_image_data_loop\n"
+    "  rts\n\n", CTRL_REG(CD_VRAM_WRITE, address));
+}
+
+void SegaGenesis::add_set_palette_colors()
+{
+  // a3 points to short[] array
+  fprintf(out,
+    "_set_palette_colors:\n"
+    "  move.l #0xc0000000, (a1)   ; C00004 write CRAM address 0x0000\n"
+    "  move.l (-4,a3), d5         ; Code len\n"
+    "_set_palette_colors_loop:\n"
+    "  move.w (a3)+, (a0)\n"
+    "  dbf d5, _set_palette_colors_loop\n"
+    "  rts\n\n");
 }
 

@@ -50,7 +50,7 @@ abstract public class SegaGenesis
   public static void setVerticalScroll(int value) { }
 
   /** Set pattern table. */
-  public static void setPatternTable(byte[] patterns) { }
+  public static void setPatternTable(int[] patterns) { }
 
   /** Set image data. */
   public static void setImageData(byte[] image) { }

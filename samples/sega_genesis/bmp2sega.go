@@ -102,6 +102,23 @@ func writeInt16Array(data []int) {
   }
 }
 
+func writeInt32Array(data []uint8) {
+  for i := 0; i < len(data); i = i + 4 {
+    if i % 16 == 0 {
+      fmt.Print("\n   ")
+    }
+
+    n := (uint32(data[i]) << 24) |
+         (uint32(data[i+1]) << 16) |
+         (uint32(data[i+2]) << 8) |
+         (uint32(data[i+3]))
+
+    fmt.Printf(" 0x%08x,", int(n))
+  }
+
+  fmt.Println()
+}
+
 func getPixelColor(data []uint8) int {
   return (int(data[0]) >> 5) |
          ((int(data[1]) >> 5) << 3) |
@@ -208,10 +225,10 @@ func readData(file_in *os.File, image_size uint32) uint32 {
     return 0
   }
 
-  fmt.Println("  public static byte[] pattern =\n  {")
+  fmt.Println("  public static int[] pattern =\n  {")
   for index, pattern := range patterns {
-    fmt.Print("    // Pattern %d\n", index)
-    writeByteArray(pattern)
+    fmt.Printf("    // Pattern %d", index)
+    writeInt32Array(pattern)
   }
   fmt.Println("\n  };\n")
 
@@ -219,7 +236,7 @@ func readData(file_in *os.File, image_size uint32) uint32 {
   writeByteArray(image)
   fmt.Println("\n  };\n")
 
-  fmt.Print("  public static byte[] palette =\n  {")
+  fmt.Print("  public static short[] palette =\n  {")
   writeInt16Array(palette)
   fmt.Println("\n  };")
 
