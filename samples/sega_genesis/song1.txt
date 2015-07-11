@@ -1,0 +1,23 @@
+
+divisions 8;
+
+pattern intro
+{
+  voice 0: 0 A5 1;
+  voice 1: 0 C5 1;
+  voice 2: 0 E5 1;
+}
+
+pattern a
+{
+  voice 0: 0 A5 1, 2 C5 1;
+  voice 1: 0 C5 1, 2 E5 1;
+  voice 2: 0 E5 1, 2 G5 1;
+}
+
+song
+{
+  intro * 2,
+  a * 4,
+}
+
