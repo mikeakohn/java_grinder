@@ -718,7 +718,7 @@ void SegaGenesis::add_set_pattern_table()
   // a3 points to int[] array
   fprintf(out,
     "_set_pattern_table:\n"
-    "  move.l #0x4c200000, (a1)   ; C00004 VRAM write to 0x0c20\n"
+    "  move.l #0x40000000, (a1)   ; C00004 VRAM write to 0x0000\n"
     "  move.l (-4,a3), d5         ; Code len\n"
     "_set_pattern_table_loop:\n"
     "  move.l (a3)+, (a0)\n"
@@ -728,24 +728,26 @@ void SegaGenesis::add_set_pattern_table()
 
 void SegaGenesis::add_set_image_data()
 {
-  int address = (0xc000 + (0 * 128 + 0));
+  //int address = (0xc000 + (0 * 128 + 0));
 
   // a3 points to byte[] array
   fprintf(out,
     "_set_image_data:\n"
-    "  move.l #0x%8x, (a1)        ; Set cursor position in VDP\n"
+    "  move.l #0x40000003, d7     ; Set cursor position in VDP\n"
+    "  move.l d7, (a1)\n"
     "  move.l (-4,a3), d5         ; Code len\n"
     "  eor.w d6, d6\n"
     "_set_image_data_loop:\n"
-    "  move.b (a3)+, (a0)\n"
+    "  move.w (a3)+, (a0)\n"
     "  add.w #1, d6\n"
     "  cmp.w #40, d6\n"
     "  bne.s _set_image_data_not_40\n"
     "  eor.w d6, d6\n"
-    "  add.l #128-40, a3\n"
+    "  add.l #0x00800000, d7\n"
+    "  move.l d7, (a1)\n"
     "_set_image_data_not_40:\n"
     "  dbf d5, _set_image_data_loop\n"
-    "  rts\n\n", CTRL_REG(CD_VRAM_WRITE, address));
+    "  rts\n\n");
 }
 
 void SegaGenesis::add_set_palette_colors()

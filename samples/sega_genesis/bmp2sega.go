@@ -4,6 +4,8 @@ import "fmt"
 import "os"
 import "strconv"
 
+// convert -scale 320x224! -colors 16 -type truecolor -flip ~/3_billion_devices.bmp 3_billion_devices.bmp
+
 func readString(file_in *os.File) string {
   chars := make([]byte, 2)
   file_in.Read(chars)
@@ -41,7 +43,7 @@ func readBmpHeader(file_in *os.File) uint32 {
   fmt.Println("            Size: " + strconv.Itoa(int(bmp_size)))
   fmt.Println("          Offset: " + strconv.Itoa(int(offset)))
 
-  return bmp_size
+  return offset
 }
 
 func readBmpInfo(file_in *os.File) uint32 {
@@ -82,13 +84,13 @@ func readBmpInfo(file_in *os.File) uint32 {
   return width * uint32(height) * 3
 }
 
-func writeByteArray(data []uint8) {
+func writeImageArray(data []uint16) {
   for i := 0; i < len(data); i++ {
     if i % 8 == 0 {
       fmt.Print("\n   ")
     }
 
-    fmt.Printf(" 0x%02x,", data[i])
+    fmt.Printf(" 0x%04x,", data[i])
   }
 }
 
@@ -145,16 +147,12 @@ func readData(file_in *os.File, image_size uint32) uint32 {
   var palette_map map[int]int
   var pattern_nybble int
   var patterns [][]uint8
-  var image []uint8
-  //var pattern_byte
+  var image []uint16
 
   fmt.Println("readData: " + strconv.Itoa(int(image_size)))
 
   data := make([]uint8, image_size)
   palette := make([]int, 16)
-  //patterns := make([][]uint8, 0)
-  //image := make([]uint8, 40 * 28)
-  //image := make([]uint8, 0)
   palette_map = make(map[int]int)
   color_count := 0
 
@@ -181,6 +179,9 @@ func readData(file_in *os.File, image_size uint32) uint32 {
 
           if !ok {
             if color_count == 16 {
+              for _, color := range(palette_map) {
+                fmt.Printf("  %03x\n", color)
+              }
               fmt.Println("Too many colors in image")
               return 0
             }
@@ -207,14 +208,14 @@ func readData(file_in *os.File, image_size uint32) uint32 {
       for index, element := range patterns {
         //fmt.Printf("%q\n", element)
         if doesPatternMatch(element, pattern) {
-          image = append(image, uint8(index))
+          image = append(image, uint16(index))
           match = true
           break
         }
       }
 
       if match == false {
-        image = append(image, uint8(len(patterns)))
+        image = append(image, uint16(len(patterns)))
         patterns = append(patterns, pattern)
       }
     }
@@ -232,8 +233,8 @@ func readData(file_in *os.File, image_size uint32) uint32 {
   }
   fmt.Println("\n  };\n")
 
-  fmt.Print("  public static byte[] image =\n  {")
-  writeByteArray(image)
+  fmt.Print("  public static short[] image =\n  {")
+  writeImageArray(image)
   fmt.Println("\n  };\n")
 
   fmt.Print("  public static short[] palette =\n  {")
@@ -265,7 +266,9 @@ func main() {
   // Close the file if the program exits
   defer file_in.Close()
 
-  if (readBmpHeader(file_in) == 0) {
+  offset := readBmpHeader(file_in)
+
+  if (offset == 0) {
     return
   }
 
@@ -274,6 +277,8 @@ func main() {
   if (image_size == 0) {
     return
   }
+
+  file_in.Seek(int64(offset), os.SEEK_SET)
 
   if (readData(file_in, image_size) == 0) {
     return

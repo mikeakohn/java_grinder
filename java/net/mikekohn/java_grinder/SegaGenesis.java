@@ -53,7 +53,7 @@ abstract public class SegaGenesis
   public static void setPatternTable(int[] patterns) { }
 
   /** Set image data. */
-  public static void setImageData(byte[] image) { }
+  public static void setImageData(short[] image) { }
 
   /** Set palette colors. */
   public static void setPaletteColors(short[] palette) { }

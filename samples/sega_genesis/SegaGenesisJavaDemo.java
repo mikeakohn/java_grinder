@@ -7,6 +7,17 @@ public class SegaGenesisJavaDemo
   {
     int a,b;
 
+    SegaGenesis.setPaletteColors(ImageJavaGrinder.palette);
+    SegaGenesis.setPatternTable(ImageJavaGrinder.pattern);
+    SegaGenesis.setImageData(ImageJavaGrinder.image);
+    for (a = 0; a < 100000; a++);
+
+    SegaGenesis.loadZ80(PlayTitleSample.z80_code);
+
+    for (a = 0; a < 500000; a++);
+
+    SegaGenesis.pauseZ80();
+
     SegaGenesis.setPaletteColors(ImageMike.palette);
     SegaGenesis.setPatternTable(ImageMike.pattern);
     SegaGenesis.setImageData(ImageMike.image);
@@ -20,7 +31,6 @@ public class SegaGenesisJavaDemo
     SegaGenesis.setCursor(0, 0);
     SegaGenesis.print("java grinder");
 
-    SegaGenesis.loadZ80(PlayTitleSample.z80_code);
 
     while(true)
     {
