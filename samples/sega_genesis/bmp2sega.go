@@ -120,9 +120,9 @@ func writeInt32Array(data []uint8) {
 }
 
 func getPixelColor(data []uint8) int {
-  return (int(data[0]) >> 5) |
-         ((int(data[1]) >> 5) << 3) |
-         ((int(data[2]) >> 5) << 6)
+  return (int(data[0] >> 5) << 9) |
+         ((int(data[1] >> 5)) << 5) |
+         ((int(data[2] >> 5)) << 1)
 }
 
 func getPixelLocation(x int, y int) int {
