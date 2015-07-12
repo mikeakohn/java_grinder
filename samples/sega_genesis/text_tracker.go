@@ -4,6 +4,12 @@ import "fmt"
 import "os"
 import "strconv"
 
+// Not sure if anyone is looking at this source file, but if so they'd probably
+// ask why I didn't separate this out into smaller modules.  The reason is
+// I didn't want the Sega Genesis samples directory littered with Go files,
+// there are already enough of them there.  If I ever move these utils to a
+// new directory I'll modularize it. 
+
 type Tokens struct {
   text []byte
   size int
@@ -17,7 +23,11 @@ type Note struct {
 }
 
 type Pattern struct {
-  //name string
+  voices [][]Note
+  drums []int
+}
+
+type Song struct {
   voices [][]Note
   drums []int
 }
@@ -110,6 +120,18 @@ func ParseDivisions(tokens *Tokens) int {
   }
 
   n, _ := strconv.Atoi(divisions)
+
+  return n
+}
+
+func ParseBpm(tokens *Tokens) int {
+  bpm := tokens.Get()
+
+  if tokens.Get() != ";" {
+    fmt.Print("Error: Missing semicolon on line: %d", tokens.line)
+  }
+
+  n, _ := strconv.Atoi(bpm)
 
   return n
 }
@@ -209,6 +231,10 @@ func ParsePattern(tokens *Tokens, divisions int) (*Pattern,string) {
 }
 
 func ParseSong(tokens *Tokens, patterns map[string]*Pattern) []byte {
+  song := new(Song)
+
+  song.voices = make([][]Note, 6)
+
   if tokens.Get() != "{" {
     fmt.Print("Error: Missing { on line: %d", tokens.line)
   }
@@ -239,6 +265,13 @@ func ParseSong(tokens *Tokens, patterns map[string]*Pattern) []byte {
     }
 
     fmt.Printf("Pattern %s %d times\n", name, multiplyer)
+    for i := 0; i < multiplyer; i++ {
+      for voice := 0; voice < 6; voice++ {
+        song.voices[voice] = append(song.voices[voice], pattern.voices[voice]...)
+      }
+
+      song.drums = append(song.drums, pattern.drums...)
+    }
 
     if token == "}" { break }
     if token != "," {
@@ -253,6 +286,7 @@ func ParseSong(tokens *Tokens, patterns map[string]*Pattern) []byte {
 func main() {
   var patterns map[string]*Pattern
   divisions := 8
+  bpm := 60 
 
   fmt.Println("Text Tracker - Copyright 2015 by Michael Kohn")
 
@@ -279,6 +313,12 @@ func main() {
       if divisions == 0 {
         break
       }
+    } else if token == "bpm" {
+      bpm = ParseBpm(tokens)
+
+      if bpm == 0 {
+        break
+      }
     } else if token == "pattern" {
       pattern, name := ParsePattern(tokens, divisions)
 
@@ -297,10 +337,11 @@ func main() {
       panic("Unexpected token " + token)
     }
 
-    fmt.Println("'" + token + "'")
+    //fmt.Println("'" + token + "'")
   }
 
   fmt.Printf("Divisions: %d\n", divisions)
+  fmt.Printf("      BMP: %d\n", bpm)
 }
 
 
