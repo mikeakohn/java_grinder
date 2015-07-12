@@ -303,7 +303,7 @@ func WriteVarInt(time int) []uint8 {
   data := make([]uint8, 0)
 
   for true {
-    if (time & 0x7f) == 0 {
+    if (time & ^0x7f) == 0 {
       data = append([]uint8{ uint8(time & 0x7f) }, data...)
       break
     } else {
@@ -365,6 +365,8 @@ func CreateMidi(song *Song, divisions int, bpm int) {
         last_note = i + int(pattern[i].length)
       }
     }
+
+    track_data = append(track_data, []uint8{ 0, 0xff, 0x2f, 0x00 }...)
 
     file.WriteString("MTrk")
     WriteInt32(file, len(track_data))
