@@ -17,7 +17,7 @@ type Note struct {
 }
 
 type Pattern struct {
-  name string
+  //name string
   voices [][]Note
   drums []int
 }
@@ -169,19 +169,19 @@ func ParsePatternVoice(tokens *Tokens, voice []Note) bool {
   return true
 }
 
-func ParsePattern(tokens *Tokens, divisions int) *Pattern {
+func ParsePattern(tokens *Tokens, divisions int) (*Pattern,string) {
   pattern := new(Pattern)
   pattern.Init(divisions)
-  pattern.name = tokens.Get()
+  name := tokens.Get()
 
   if divisions == 0 {
     fmt.Printf("Error: No divisions set on line: %d", tokens.line)
-    return nil
+    return nil, ""
   }
 
   if tokens.Get() != "{" {
     fmt.Printf("Error: Missing { on line: %d", tokens.line)
-    return nil
+    return nil, ""
   }
 
   for true {
@@ -189,34 +189,69 @@ func ParsePattern(tokens *Tokens, divisions int) *Pattern {
     if token == "}" { break }
     if token == "" {
       fmt.Println("Error: Unexpected end of file")
-      return nil
+      return nil, ""
     }
     if token == "voice" {
       token = tokens.Get()
       voice, err := strconv.Atoi(token)
       if err != nil {
         fmt.Println("Error: Unexpected token " + token)
-        return nil
+        return nil, ""
       }
-      if !ParsePatternVoice(tokens, pattern.voices[voice]) { return nil }
+      if !ParsePatternVoice(tokens, pattern.voices[voice]) { return nil, "" }
     } else {
       fmt.Println("Error: Unexpected token " + token)
-      return nil
+      return nil, ""
     }
   }
 
-  return pattern
+  return pattern, name
 }
 
-func ParseSong(tokens *Tokens) []byte {
+func ParseSong(tokens *Tokens, patterns map[string]*Pattern) []byte {
   if tokens.Get() != "{" {
     fmt.Print("Error: Missing { on line: %d", tokens.line)
+  }
+
+  for true {
+    name := tokens.Get()
+    multiplyer := 1
+
+    if name == "}" { break }
+
+    pattern := patterns[name]
+
+    if pattern == nil {
+      fmt.Println("Error: Unknown pattern name " + name)
+      return nil
+    }
+
+    token := tokens.Get()
+    if token == "*" {
+      token = tokens.Get()
+      n, err := strconv.Atoi(token)
+      if err != nil {
+        fmt.Printf("Error: Not a number on line %d\n", tokens.line)
+        return nil
+      }
+      multiplyer = n
+      token = tokens.Get()
+    }
+
+    fmt.Printf("Pattern %s %d times\n", name, multiplyer)
+
+    if token == "}" { break }
+    if token != "," {
+      fmt.Printf("Error: Unexpected token %s on line %d\n", token, tokens.line)
+      return nil
+    }
   }
 
   return nil
 }
 
 func main() {
+  var patterns map[string]*Pattern
   divisions := 8
 
   fmt.Println("Text Tracker - Copyright 2015 by Michael Kohn")
@@ -232,6 +267,8 @@ func main() {
     return
   }
 
+  patterns = make(map[string]*Pattern)
+
   for true {
     token := tokens.Get()
     if token == "" { break }
@@ -243,13 +280,15 @@ func main() {
         break
       }
     } else if token == "pattern" {
-      pattern := ParsePattern(tokens, divisions)
+      pattern, name := ParsePattern(tokens, divisions)
 
       if pattern == nil {
         break
       }
+
+      patterns[name] = pattern
     } else if token == "song" {
-      song := ParseSong(tokens)
+      song := ParseSong(tokens, patterns)
 
       if song == nil {
         break
