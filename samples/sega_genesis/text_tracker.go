@@ -2,11 +2,24 @@ package main
 
 import "fmt"
 import "os"
+import "strconv"
 
 type Tokens struct {
   text []byte
   size int
   next int
+  line int
+}
+
+type Note struct {
+  value uint8
+  length uint8
+}
+
+type Pattern struct {
+  name string
+  voices [][]Note
+  drums []int
 }
 
 func (tokens *Tokens) Load(filename string) bool {
@@ -27,6 +40,7 @@ func (tokens *Tokens) Load(filename string) bool {
   tokens.size = int(stat.Size())
   tokens.text = make([]byte, tokens.size)
   tokens.next = 0
+  tokens.line = 1
 
   file.Read(tokens.text)
 
@@ -39,6 +53,7 @@ func (tokens *Tokens) Get() string {
       tokens.text[tokens.next] == '\r' ||
       tokens.text[tokens.next] == '\n' ||
       tokens.text[tokens.next] == '\t' {
+    if tokens.text[tokens.next] == '\n' { tokens.line++ }
     tokens.next++
     if tokens.next == tokens.size { return "" }
     continue
@@ -77,7 +92,133 @@ func (tokens *Tokens) Get() string {
   return string(tokens.text[j:i])
 }
 
+func (pattern *Pattern) Init(divisions int) {
+  pattern.voices = make([][]Note, 6)
+
+  for i := 0; i < 6; i++ {
+    pattern.voices[i] = make([]Note, divisions)
+  }
+
+  pattern.drums = make([]int, divisions)
+}
+
+func ParseDivisions(tokens *Tokens) int {
+  divisions := tokens.Get()
+
+  if tokens.Get() != ";" {
+    fmt.Print("Error: Missing semicolon on line: %d", tokens.line)
+  }
+
+  n, _ := strconv.Atoi(divisions)
+
+  return n
+}
+
+func ConvertNote(note string) int {
+  note_table := []uint8{ 0, 2, 3, 5, 7, 8, 10 }
+
+  if len(note) != 2 && len(note) != 3 {
+    fmt.Println("Error: Illegal note " + note)
+    return 0
+  }
+
+  note_num := int(note_table[note[0] - 'A'])
+  octave := int(note[1] - '0')
+
+  if len(note) > 2 {
+    if note[2] == '#' {
+      note_num++
+    } else if note[2] == 'b' {
+      note_num--
+    } else {
+      fmt.Print("Error: Unknown modifier " + note)
+      return 0
+    }
+  }
+
+  return 21 + (octave * 12) + note_num
+}
+
+func ParsePatternVoice(tokens *Tokens, voice []Note) bool {
+  if tokens.Get() != ":" {
+    fmt.Printf("Error: Missing : on line: %d", tokens.line)
+    return false
+  }
+
+  for true {
+    beat, _ := strconv.Atoi(tokens.Get())
+    note := ConvertNote(tokens.Get())
+    length, _ := strconv.Atoi(tokens.Get())
+    separator := tokens.Get()
+
+    if note == 0 || length == 0 {
+      fmt.Printf("Error: Problem on line %d\n", tokens.line)
+      return false
+    }
+
+    voice[beat].value = uint8(note)
+    voice[beat].length = uint8(length)
+
+    if separator == ";" { break }
+    if separator != "," {
+      fmt.Printf("Error: Expecting ; or , on line %d\n", tokens.line)
+      return false
+    }
+  }
+
+  return true
+}
+
+func ParsePattern(tokens *Tokens, divisions int) *Pattern {
+  pattern := new(Pattern)
+  pattern.Init(divisions)
+  pattern.name = tokens.Get()
+
+  if divisions == 0 {
+    fmt.Printf("Error: No divisions set on line: %d", tokens.line)
+    return nil
+  }
+
+  if tokens.Get() != "{" {
+    fmt.Printf("Error: Missing { on line: %d", tokens.line)
+    return nil
+  }
+
+  for true {
+    token := tokens.Get()
+    if token == "}" { break }
+    if token == "" {
+      fmt.Println("Error: Unexpected end of file")
+      return nil
+    }
+    if token == "voice" {
+      token = tokens.Get()
+      voice, err := strconv.Atoi(token)
+      if err != nil {
+        fmt.Println("Error: Unexpected token " + token)
+        return nil
+      }
+      if !ParsePatternVoice(tokens, pattern.voices[voice]) { return nil }
+    } else {
+      fmt.Println("Error: Unexpected token " + token)
+      return nil
+    }
+  }
+
+  return pattern
+}
+
+func ParseSong(tokens *Tokens) []byte {
+  if tokens.Get() != "{" {
+    fmt.Print("Error: Missing { on line: %d", tokens.line)
+  }
+
+  return nil
+}
+
 func main() {
+  divisions := 8
+
   fmt.Println("Text Tracker - Copyright 2015 by Michael Kohn")
 
   if len(os.Args) != 2 {
@@ -95,8 +236,32 @@ func main() {
     token := tokens.Get()
     if token == "" { break }
 
+    if token == "divisions" {
+      divisions = ParseDivisions(tokens)
+
+      if divisions == 0 {
+        break
+      }
+    } else if token == "pattern" {
+      pattern := ParsePattern(tokens, divisions)
+
+      if pattern == nil {
+        break
+      }
+    } else if token == "song" {
+      song := ParseSong(tokens)
+
+      if song == nil {
+        break
+      }
+    } else {
+      panic("Unexpected token " + token)
+    }
+
     fmt.Println("'" + token + "'")
   }
+
+  fmt.Printf("Divisions: %d\n", divisions)
 }
 
 
