@@ -230,7 +230,7 @@ func ParsePattern(tokens *Tokens, divisions int) (*Pattern,string) {
   return pattern, name
 }
 
-func ParseSong(tokens *Tokens, patterns map[string]*Pattern) []byte {
+func ParseSong(tokens *Tokens, patterns map[string]*Pattern) *Song {
   song := new(Song)
 
   song.voices = make([][]Note, 6)
@@ -280,13 +280,103 @@ func ParseSong(tokens *Tokens, patterns map[string]*Pattern) []byte {
     }
   }
 
-  return nil
+  return song
+}
+
+func WriteInt32(file *os.File, value int) {
+  data := make([]uint8, 4)
+  data[0] = uint8((value >> 24) & 0xff)
+  data[1] = uint8((value >> 16) & 0xff)
+  data[2] = uint8((value >> 8) & 0xff)
+  data[3] = uint8(value & 0xff)
+  file.Write(data)
+}
+
+func WriteInt16(file *os.File, value int) {
+  data := make([]uint8, 2)
+  data[0] = uint8((value >> 8) & 0xff)
+  data[1] = uint8(value & 0xff)
+  file.Write(data)
+}
+
+func WriteVarInt(time int) []uint8 {
+  data := make([]uint8, 0)
+
+  for true {
+    if (time & 0x7f) == 0 {
+      data = append([]uint8{ uint8(time & 0x7f) }, data...)
+      break
+    } else {
+      data = append([]uint8{ uint8((time & 0x7f) | 0x80) }, data...)
+      time >>= 7
+    }
+  }
+
+  return data
+}
+
+func WriteNote(delay int, channel int, value uint8, is_on bool) []uint8 {
+  var command uint8
+
+  track_data := WriteVarInt(delay)
+
+  if is_on { command = 0x90 } else { command = 0x80 }
+  command |= uint8(channel)
+
+  track_data = append(track_data, []uint8{ command, value, 127 }...)
+
+  return track_data
+}
+
+func CreateMidi(song *Song, divisions int, bpm int) {
+  file, err := os.Create("out.mid")
+  if err != nil { panic(err) }
+
+  track_has_data := make([]bool,6)
+  tracks := 0
+
+  for voice := 0; voice < 6; voice++ {
+    pattern := song.voices[voice]
+    for i := 0; i < len(pattern); i++ {
+      if pattern[i].value != 0 {
+        tracks++
+        track_has_data[voice] = true
+        break
+      }
+    }
+  }
+
+  file.WriteString("MThd")
+  WriteInt32(file, 6)         // length (always 6)
+  WriteInt16(file, 1)         // 0=single track, 1=multiple track, 2=multiple song
+  WriteInt16(file, tracks)    // number of track chunks
+  WriteInt16(file, divisions) // divisions
+
+  for voice := 0; voice < 6; voice++ {
+    track_data := make([]uint8, 0)
+    pattern := song.voices[voice]
+    last_note := 0
+
+    for i := 0; i < len(pattern); i++ {
+      if pattern[i].value != 0 {
+        delay := i - last_note
+        track_data = append(track_data, WriteNote(delay, voice, pattern[i].value, true)...)
+        track_data = append(track_data, WriteNote(delay + int(pattern[i].length), voice, pattern[i].value, false)...)
+        last_note = i + int(pattern[i].length)
+      }
+    }
+
+    file.WriteString("MTrk")
+    WriteInt32(file, len(track_data))
+    file.Write(track_data)
+  }
 }
 
 func main() {
   var patterns map[string]*Pattern
+  var song *Song
   divisions := 8
-  bpm := 60 
+  bpm := 60
 
   fmt.Println("Text Tracker - Copyright 2015 by Michael Kohn")
 
@@ -328,7 +418,7 @@ func main() {
 
       patterns[name] = pattern
     } else if token == "song" {
-      song := ParseSong(tokens, patterns)
+      song = ParseSong(tokens, patterns)
 
       if song == nil {
         break
@@ -342,6 +432,8 @@ func main() {
 
   fmt.Printf("Divisions: %d\n", divisions)
   fmt.Printf("      BMP: %d\n", bpm)
+
+  CreateMidi(song, divisions, bpm)
 }
 
 
