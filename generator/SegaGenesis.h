@@ -27,6 +27,9 @@ public:
   virtual int sega_genesis_setPalettePointer(int index);
   virtual int sega_genesis_setPaletteColor();
   virtual int sega_genesis_setPaletteColor(int color);
+  virtual int sega_genesis_initBitmap();
+  virtual int sega_genesis_clearBitmap();
+  virtual int sega_genesis_plot();
   virtual int sega_genesis_loadFonts();
   virtual int sega_genesis_setCursor();
   virtual int sega_genesis_setCursor(int x, int y);
@@ -56,6 +59,9 @@ private:
   void add_set_pattern_table();
   void add_set_image_data();
   void add_set_palette_colors();
+  void add_init_bitmap();
+  void add_clear_bitmap();
+  void add_plot();
 
   bool need_print_string:1;
   bool need_load_fonts:1;
@@ -63,6 +69,9 @@ private:
   bool need_set_pattern_table:1;
   bool need_set_image_data:1;
   bool need_set_palette_colors:1;
+  bool need_init_bitmap:1;
+  bool need_clear_bitmap:1;
+  bool need_plot:1;
 };
 
 #endif

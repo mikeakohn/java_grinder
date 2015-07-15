@@ -46,7 +46,10 @@ SegaGenesis::SegaGenesis() :
   need_load_z80(false),
   need_set_pattern_table(false),
   need_set_image_data(false),
-  need_set_palette_colors(false)
+  need_set_palette_colors(false),
+  need_init_bitmap(false),
+  need_clear_bitmap(false),
+  need_plot(false)
 {
   // FIXME - What's this access prohibited crap?
   //ram_start = 0xe00000;
@@ -78,6 +81,9 @@ SegaGenesis::~SegaGenesis()
   if (need_set_pattern_table) { add_set_pattern_table(); }
   if (need_set_image_data) { add_set_image_data(); }
   if (need_set_palette_colors) { add_set_palette_colors(); }
+  if (need_init_bitmap) { add_init_bitmap(); }
+  if (need_clear_bitmap) { add_clear_bitmap(); }
+  if (need_plot) { add_plot(); }
 }
 
 int SegaGenesis::open(const char *filename)
@@ -286,6 +292,31 @@ int SegaGenesis::sega_genesis_setPaletteColor(int color)
 
   fprintf(out, "  move.w #0x%03x, (a0)      ; setPaletteColor()\n", color);
 
+  return 0;
+}
+
+int SegaGenesis::sega_genesis_initBitmap()
+{
+  need_init_bitmap = true;
+
+  fprintf(out, "  jsr _init_bitmap\n");
+  return 0;
+}
+
+int SegaGenesis::sega_genesis_clearBitmap()
+{
+  need_clear_bitmap = true;
+
+  fprintf(out, "  jsr _clear_bitmap\n");
+  return 0;
+}
+
+int SegaGenesis::sega_genesis_plot()
+{
+  need_plot = true;
+
+  fprintf(out, "  load registers\n");
+  fprintf(out, "  jsr _plot\n");
   return 0;
 }
 
@@ -760,6 +791,27 @@ void SegaGenesis::add_set_palette_colors()
     "_set_palette_colors_loop:\n"
     "  move.w (a3)+, (a0)\n"
     "  dbf d5, _set_palette_colors_loop\n"
+    "  rts\n\n");
+}
+
+void SegaGenesis::add_init_bitmap()
+{
+  fprintf(out,
+    "_init_bitmap:\n"
+    "  rts\n\n");
+}
+
+void SegaGenesis::add_clear_bitmap()
+{
+  fprintf(out,
+    "_clear_bitmap:\n"
+    "  rts\n\n");
+}
+
+void SegaGenesis::add_plot()
+{
+  fprintf(out,
+    "_plot:\n"
     "  rts\n\n");
 }
 

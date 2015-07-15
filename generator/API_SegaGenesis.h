@@ -20,6 +20,9 @@ public:
   virtual int sega_genesis_setPalettePointer(int index) { return -1; }
   virtual int sega_genesis_setPaletteColor() { return -1; }
   virtual int sega_genesis_setPaletteColor(int color) { return -1; }
+  virtual int sega_genesis_initBitmap() { return -1; }
+  virtual int sega_genesis_clearBitmap() { return -1; }
+  virtual int sega_genesis_plot() { return -1; }
   virtual int sega_genesis_loadFonts() { return -1; }
   virtual int sega_genesis_setCursor() { return -1; }
   virtual int sega_genesis_setCursor(int x, int y) { return -1; }
