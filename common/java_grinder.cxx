@@ -28,6 +28,7 @@
 #include "MSP430.h"
 #include "MSP430X.h"
 #include "SegaGenesis.h"
+#include "SNES.h"
 #include "STDC.h"
 #include "TI84.h"
 #include "TI99.h"
@@ -136,6 +137,11 @@ static Generator *new_generator(const char *chip_type)
   if (strcasecmp("sega_genesis", chip_type) == 0)
   {
     generator = new SegaGenesis();
+  }
+    else
+  if (strcasecmp("snes", chip_type) == 0)
+  {
+    generator = new SNES();
   }
     else
   if (strcasecmp("stdc", chip_type) == 0)
