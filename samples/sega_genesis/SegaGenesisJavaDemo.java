@@ -24,6 +24,8 @@ public class SegaGenesisJavaDemo
 
     for (a = 0; a < 500000; a++);
 
+    SegaGenesis.initBitmap();
+    SegaGenesis.clearBitmap();
     SegaGenesis.loadFonts();
 
     SegaGenesis.setCursor(0, 7);

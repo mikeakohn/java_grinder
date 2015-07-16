@@ -62,19 +62,6 @@ SegaGenesis::~SegaGenesis()
 {
   add_vdp_reg_init();
 
-  // FIXME - REMOVE REMOVE REMOVE
-#if 0
-  fprintf(out,
-    "; startup message\n"
-    "hello_msg:\n"
-    "  dc.b  \"hello \"\n"
-    "  dc.b  0x7C,0x7D,0x7E,0x7F  ; \"SEGA\" logo characters\n"
-    "  dc.b  \" world\"\n"
-    "  dc.b  0x7B    ; \".\"\n"
-    "  dc.b  0\n\n");
-#endif
-  // FIXME - REMOVE REMOVE REMOVE
-
   if (need_print_string) { add_print_string(); }
   if (need_load_fonts) { add_load_fonts(); }
   if (need_load_z80) { add_load_z80(); }
@@ -759,7 +746,7 @@ void SegaGenesis::add_set_pattern_table()
 
 void SegaGenesis::add_set_image_data()
 {
-  //int address = (0xc000 + (0 * 128 + 0));
+  //int address = (0xc000 + (0 * 64 + 0));
 
   // a3 points to byte[] array
   fprintf(out,
@@ -798,6 +785,19 @@ void SegaGenesis::add_init_bitmap()
 {
   fprintf(out,
     "_init_bitmap:\n"
+    "  move.l #0x40000000, (a1)   ; C00004 VRAM write to 0x0000\n"
+    "  move.l #40*24*32, d5       ; Pattern len\n"
+    "  move.l #0, d6\n"
+    "_clear_pattern_table_loop:\n"
+    "  move.l d6, (a0)\n"
+    "  dbf d5, _clear_pattern_table_loop\n"
+    "  move.l #0x40000003, (a1)   ; C00004 VRAM write to 0xC000\n"
+    "  move.l #40*24*2, d5        ; data len\n"
+    "  move.l #0, d6\n"
+    "_init_bitmap_loop:\n"
+    "  move.l d6, (a0)\n"
+    "  add.w #1, d6\n"
+    "  dbf d5, _init_bitmap_loop\n"
     "  rts\n\n");
 }
 
@@ -805,6 +805,12 @@ void SegaGenesis::add_clear_bitmap()
 {
   fprintf(out,
     "_clear_bitmap:\n"
+    "  move.l #0x40000000, (a1)   ; C00004 VRAM write to 0x0000\n"
+    "  move.l #40*24*32, d5       ; Pattern len\n"
+    "  move.l #0, d6\n"
+    "_clear_bitmap_loop:\n"
+    "  move.l d6, (a0)\n"
+    "  dbf d5, _clear_bitmap_loop\n"
     "  rts\n\n");
 }
 
