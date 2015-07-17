@@ -155,7 +155,14 @@ int MC68000::push_integer(int32_t n)
 {
   if (reg < reg_max)
   {
-    fprintf(out, "  move.l #0x%02x, d%d\n", n, REG_STACK(reg));
+    if (n >= -128 && n <=127)
+    {
+      fprintf(out, "  moveq #%d, d%d\n", n, REG_STACK(reg));
+    }
+      else
+    {
+      fprintf(out, "  move.l #0x%02x, d%d\n", n, REG_STACK(reg));
+    }
     reg++;
   }
     else
@@ -196,7 +203,6 @@ int MC68000::push_ref_static(const char *name, int index)
     stack++;
   }
 
-  return 0;
   return 0;
 }
 
@@ -346,7 +352,19 @@ int MC68000::add_integer()
 
 int MC68000::add_integer(int num)
 {
-  fprintf(out, "  add.l #%d, d%d\n", num, REG_STACK(reg-1));
+  if (num >= 1 && num <= 8)
+  {
+    fprintf(out, "  addq.l #%d, d%d\n", num, REG_STACK(reg-1));
+  }
+    else
+  if (num >= -8 && num <= -1)
+  {
+    fprintf(out, "  subq.l #%d, d%d\n", -num, REG_STACK(reg-1));
+  }
+    else
+  {
+    fprintf(out, "  add.l #%d, d%d\n", num, REG_STACK(reg-1));
+  }
   return 0;
 }
 
@@ -357,7 +375,20 @@ int MC68000::sub_integer()
 
 int MC68000::sub_integer(int num)
 {
-  fprintf(out, "  sub.l #%d, d%d\n", num, REG_STACK(reg-1));
+  if (num >= 1 && num <= 8)
+  {
+    fprintf(out, "  subq.l #%d, d%d\n", num, REG_STACK(reg-1));
+  }
+    else
+  if (num >= -8 && num <= -1)
+  {
+    fprintf(out, "  addq.l #%d, d%d\n", -num, REG_STACK(reg-1));
+  }
+    else
+  {
+    fprintf(out, "  sub.l #%d, d%d\n", num, REG_STACK(reg-1));
+  }
+
   return 0;
 }
 

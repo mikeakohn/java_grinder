@@ -25,7 +25,16 @@ public class SegaGenesisJavaDemo
     for (a = 0; a < 500000; a++);
 
     SegaGenesis.initBitmap();
-    SegaGenesis.clearBitmap();
+    //SegaGenesis.clearBitmap();
+    //SegaGenesis.setPalettePointer(1);
+    //SegaGenesis.setPaletteColor(0xe);
+    SegaGenesis.plot(0, 0, 1);
+    SegaGenesis.plot(8, 8, 1);
+    SegaGenesis.plot(16, 16, 1);
+    SegaGenesis.plot(24, 24, 1);
+
+    for (a = 0; a < 500000; a++);
+
     SegaGenesis.loadFonts();
 
     SegaGenesis.setCursor(0, 7);

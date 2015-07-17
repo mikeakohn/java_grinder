@@ -302,8 +302,12 @@ int SegaGenesis::sega_genesis_plot()
 {
   need_plot = true;
 
-  fprintf(out, "  load registers\n");
+  // REVIEW: Can possibly save some CPU instructions by moving to stack
+  fprintf(out, "  move.l d%d, d5\n", REG_STACK(reg-3));
+  fprintf(out, "  move.l d%d, d6\n", REG_STACK(reg-2));
+  fprintf(out, "  move.l d%d, d7\n", REG_STACK(reg-1));
   fprintf(out, "  jsr _plot\n");
+  reg -= 3;
   return 0;
 }
 
@@ -783,41 +787,66 @@ void SegaGenesis::add_set_palette_colors()
 
 void SegaGenesis::add_init_bitmap()
 {
+  // REVIEW: Make faster by using a long write to (a0)
   fprintf(out,
     "_init_bitmap:\n"
     "  move.l #0x40000000, (a1)   ; C00004 VRAM write to 0x0000\n"
     "  move.l #40*24*32, d5       ; Pattern len\n"
-    "  move.l #0, d6\n"
+    "  eor.l d6, d6\n"
     "_clear_pattern_table_loop:\n"
-    "  move.l d6, (a0)\n"
+    "  move.w d6, (a0)\n"
     "  dbf d5, _clear_pattern_table_loop\n"
     "  move.l #0x40000003, (a1)   ; C00004 VRAM write to 0xC000\n"
     "  move.l #40*24*2, d5        ; data len\n"
-    "  move.l #0, d6\n"
+    //"  move.l #1, d5        ; data len\n"
     "_init_bitmap_loop:\n"
-    "  move.l d6, (a0)\n"
-    "  add.w #1, d6\n"
+    "  move.w d6, (a0)\n"
+    "  addq.l #1, d6\n"
     "  dbf d5, _init_bitmap_loop\n"
     "  rts\n\n");
 }
 
 void SegaGenesis::add_clear_bitmap()
 {
+  // REVIEW: Make faster by using a long write to (a0)
   fprintf(out,
     "_clear_bitmap:\n"
     "  move.l #0x40000000, (a1)   ; C00004 VRAM write to 0x0000\n"
     "  move.l #40*24*32, d5       ; Pattern len\n"
-    "  move.l #0, d6\n"
+    "  eor.l d6, d6\n"
     "_clear_bitmap_loop:\n"
-    "  move.l d6, (a0)\n"
+    "  move.w d6, (a0)\n"
     "  dbf d5, _clear_bitmap_loop\n"
     "  rts\n\n");
 }
 
 void SegaGenesis::add_plot()
 {
+  // block_x = x / 8
+  // block_y = y / 8
+  // address = (block_x + (block_y * 64 * 2)) * 32
+  // pixel_x = x % 8
+  // pixel_y = y % 8
+  // address += (pixel_x / 2) + (pixel_y * 4)
+
+  // d5 = X
+  // d6 = Y
+  // d7 = color
   fprintf(out,
+    "  ;; plot(x=d5, y=d6, d7=color);\n"
     "_plot:\n"
+    "  move.w d5, (-4,a7)\n"
+    "  move.w d6, (-6,a7)\n"
+    "  lsr.l #3, d5   ; block_x = x / 8\n"
+    "  lsr.l #3, d6   ; block_y = y / 8\n"
+    "  lsl.l #7, d6   ; block_y *= (64 * 2)\n"
+    "  add.l d6, d5   ; address = block_x + block_y\n"
+    "  lsl.l #5, d5   ; address *= 32\n"
+    "  lsl.l #8, d5\n"
+    "  lsl.l #8, d5   ; address <<= 16\n"
+    "  or.l #0x40000000, d5\n"
+    "  move.l d5, (a1)\n"
+    "  move.w d7, (a0)\n"
     "  rts\n\n");
 }
 
