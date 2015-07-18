@@ -790,19 +790,30 @@ void SegaGenesis::add_init_bitmap()
   // REVIEW: Make faster by using a long write to (a0)
   fprintf(out,
     "_init_bitmap:\n"
+    "  move.l d4, (-4,a7)         ; put d4 on stack (or really below)\n"
     "  move.l #0x40000000, (a1)   ; C00004 VRAM write to 0x0000\n"
     "  move.l #(40*28*16)-1, d5   ; Pattern len\n"
-    "  eor.l d6, d6\n"
+    "  eor.l d7, d7\n"
     "_clear_pattern_table_loop:\n"
-    "  move.w d6, (a0)\n"
+    "  move.w d7, (a0)\n"
     "  dbf d5, _clear_pattern_table_loop\n"
-    "  move.l #0x40000003, (a1)   ; C00004 VRAM write to 0xC000\n"
+    "  move.l #0x40000003, d4     ; Set cursor position in VDP\n"
+    "  move.l d4, (a1)            ; C00004 VRAM write to 0xC000\n"
     "  move.l #(40*28)-1, d5      ; data len\n"
+    "  eor.w d6, d6\n"
     //"  move.l #1, d5        ; data len\n"
     "_init_bitmap_loop:\n"
-    "  move.w d6, (a0)\n"
-    "  addq.l #1, d6\n"
+    "  move.w d7, (a0)\n"
+    "  add.w #1, d6\n"
+    "  cmp.w #40, d6\n"
+    "  bne.s _init_bitmap_loop_not_40\n"
+    "  eor.w d6, d6\n"
+    "  add.l #0x00800000, d4\n"
+    "  move.l d4, (a1)\n"
+    "_init_bitmap_loop_not_40:\n"
+    "  addq.l #1, d7\n"
     "  dbf d5, _init_bitmap_loop\n"
+    "  move.l (-4,a7), d4         ; recover d4\n"
     "  rts\n\n");
 }
 
@@ -824,9 +835,10 @@ void SegaGenesis::add_plot()
 {
   // block_x = x / 8
   // block_y = y / 8
-  // address = (block_x + (block_y * 64 * 2)) * 32
+  // address = (block_x + (block_y * (32 + 8))) * 32
   // pixel_x = x % 8
   // pixel_y = y % 8
+  // address += ((pixel_x) + (pixel_y * 8)) / 2  or
   // address += (pixel_x / 2) + (pixel_y * 4)
 
   // d5 = X
@@ -837,16 +849,52 @@ void SegaGenesis::add_plot()
     "_plot:\n"
     "  move.w d5, (-4,a7)\n"
     "  move.w d6, (-6,a7)\n"
-    "  lsr.l #3, d5   ; block_x = x / 8\n"
-    "  lsr.l #3, d6   ; block_y = y / 8\n"
-    "  lsl.l #7, d6   ; block_y *= (64 * 2)\n"
+    "  lsr.w #3, d5   ; block_x = x / 8\n"
+    //"  lsr.w #3, d6   ; block_y = y / 8\n"
+    //"  lsl.w #3, d6   ; block_y *= 8\n"
+    "  and.w #0xfff8, d6 ; block_y = (block_y / 8) * 8\n"
+    "  add.l d6, d5   ; address = block_x + block_y\n"
+    "  lsl.l #2, d6   ; block_y *= 4\n"
     "  add.l d6, d5   ; address = block_x + block_y\n"
     "  lsl.l #5, d5   ; address *= 32\n"
-    "  lsl.l #8, d5\n"
-    "  lsl.l #8, d5   ; address <<= 16\n"
+    "  move.w (-4,a7), d6\n"
+    "  and.l #0x7, d6 ; x = x %% 8\n"
+    "  lsr.w #1, d6   ; x = x / 2\n"
+    "  add.l d6, d5   ; address += x\n"
+    "  move.w (-6,a7), d6\n"
+    "  and.l #0x7, d6 ; y = y %% 8\n"
+    "  lsl.w #2, d6   ; y = y * 4\n"
+    "  add.l d6, d5   ; address += y\n"
+    "  and.b #0xfe, d5; address &= 0xfffffffe (always write to even address)\n"
+    //"  lsl.l #8, d5\n"
+    //"  lsl.l #8, d5   ; address <<= 16\n"
+    "  swap d5        ; address <<= 16\n"
     "  or.l #0x40000000, d5\n"
     "  move.l d5, (a1)\n"
+    "  move.w (-4,a7), d6\n"
+    "  and.w #0x3, d6 ; x = x & 0x3\n"
+    "  neg.w d6\n"
+    "  addq.w #3, d6\n"
+    "  lsl.w #2, d6\n"
+    "  lsl.w d6, d7\n"
+    //"  moveq.l #0, d4\n"
+    //"  movea.l #_pixel_shift_table, a2\n"
+    //"  move.b (0,a2,d6), d4\n"
+    //"  lsl.w d4, d7\n"
     "  move.w d7, (a0)\n"
-    "  rts\n\n");
+#if 0
+    "  subq.w #3, d6\n"
+    "  beq.s _plot_even_pixel  ; if X is even, shift color to the left\n"
+    "  move.w d7, (a0)\n"
+    "  rts\n"
+    "_plot_even_pixel:\n"
+    "  lsl.w #4, d7\n"
+    "  move.w d7, (a0)\n"
+#endif
+    "  rts\n\n"
+    "_pixel_shift_table:\n"
+    "  db 12, 8, 4, 0\n"
+    "_pixel_mask_table:\n"
+    "  dw 0x0fff, 0xf0ff, 0xff0f, 0x0fff0\n\n");
 }
 
