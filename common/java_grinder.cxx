@@ -189,13 +189,13 @@ static Generator *new_generator(const char *chip_type)
 
 int main(int argc, char *argv[])
 {
-Generator *generator;
-Compiler *compiler;
-const char *java_file;
-const char *asm_file;
-const char *chip_type;
-int option = 0;
-int n;
+  Generator *generator;
+  Compiler *compiler;
+  const char *java_file;
+  const char *asm_file;
+  const char *chip_type;
+  int option = 0;
+  int n;
 
   printf("\nJava Grinder\n"
          "Authors: Michael Kohn, Joe Davisson\n"

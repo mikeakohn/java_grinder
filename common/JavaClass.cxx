@@ -31,7 +31,7 @@ JavaClass::JavaClass(FILE *in) :
   methods_heap(NULL),
   attributes_heap(NULL)
 {
-int t;
+  int t;
 
   //memset(java_class, 0, sizeof(struct java_class_t));
 
@@ -104,10 +104,10 @@ JavaClass::~JavaClass()
 
 void JavaClass::read_attributes(FILE *in)
 {
-long marker;
-int count;
-int len = 0;
-int l;
+  long marker;
+  int count;
+  int len = 0;
+  int l;
 
   marker = ftell(in);
 
@@ -137,10 +137,10 @@ int l;
 
 void JavaClass::read_fields(FILE *in)
 {
-long marker;
-int count;
-int len = 0;
-int n,l,r;
+  long marker;
+  int count;
+  int len = 0;
+  int n,l,r;
 
   marker = ftell(in);
 
@@ -187,10 +187,10 @@ int n,l,r;
 
 void JavaClass::read_methods(FILE *in)
 {
-long marker;
-int count;
-int len = 0;
-int n,l,r;
+  long marker;
+  int count;
+  int len = 0;
+  int n,l,r;
 
   marker = ftell(in);
   //int attribute_count = 0;
@@ -241,9 +241,9 @@ int n,l,r;
 
 void JavaClass::read_constant_pool(FILE *in)
 {
-long marker;
-int len,count;
-int ch;
+  long marker;
+  int len,count;
+  int ch;
 
   marker = ftell(in);
   len = 0;
@@ -365,9 +365,9 @@ int ch;
 
 int JavaClass::get_name_constant(char *name, int len, int index)
 {
-struct constant_utf8_t *constant_utf8;
-int tag,offset;
-void *heap;
+  struct constant_utf8_t *constant_utf8;
+  int tag,offset;
+  void *heap;
 
   name[0] = 0;
   if (index > constant_pool_count) { return -1; }
@@ -388,7 +388,7 @@ void *heap;
 
 int JavaClass::get_method_name(char *name, int len, int index)
 {
-struct methods_t *method;
+  struct methods_t *method;
 
   name[0] = 0;
   if (index >= methods_count) { return -1; }
@@ -401,7 +401,7 @@ struct methods_t *method;
 
 int JavaClass::get_field_name(char *name, int len, int index)
 {
-struct fields_t *field;
+  struct fields_t *field;
 
   name[0] = 0;
   if (index >= fields_count) { return -1; }
@@ -414,7 +414,7 @@ struct fields_t *field;
 
 int JavaClass::get_field_type(char *type, int len, int index)
 {
-struct fields_t *field;
+  struct fields_t *field;
 
   type[0] = 0;
   if (index >= fields_count) { return -1; }
@@ -427,7 +427,7 @@ struct fields_t *field;
 
 const fields_t *JavaClass::get_field(int index)
 {
-struct fields_t *field;
+  struct fields_t *field;
 
   if (index >= fields_count) { return NULL; }
 
@@ -438,16 +438,14 @@ struct fields_t *field;
 
 int JavaClass::get_ref_name_type(char *name, char *type, int len, int index)
 {
-struct constant_fieldref_t *constant_fieldref;
-struct constant_methodref_t *constant_methodref;
-struct constant_nameandtype_t *constant_nameandtype;
-int tag,offset;
-void *heap;
-//char class_name[64];
+  struct constant_fieldref_t *constant_fieldref;
+  struct constant_methodref_t *constant_methodref;
+  struct constant_nameandtype_t *constant_nameandtype;
+  int tag,offset;
+  void *heap;
 
   name[0] = 0;
   type[0] = 0;
-  //class_name[0] = 0;
 
   while(1)
   {
@@ -499,11 +497,11 @@ void *heap;
 
 int JavaClass::get_class_name(char *name, int len, int index)
 {
-struct constant_fieldref_t *constant_fieldref;
-struct constant_methodref_t *constant_methodref;
-struct constant_class_t *constant_class;
-int tag,offset;
-void *heap;
+  struct constant_fieldref_t *constant_fieldref;
+  struct constant_methodref_t *constant_methodref;
+  struct constant_class_t *constant_class;
+  int tag,offset;
+  void *heap;
 
   name[0] = 0;
 
@@ -544,11 +542,10 @@ void *heap;
 
 int JavaClass::get_field_index(const char *field_name)
 {
-struct attributes_t *attribute;
-struct fields_t *field;
-int count,r,n;
-char name[256];
-//char desc[256];
+  struct attributes_t *attribute;
+  struct fields_t *field;
+  int count,r,n;
+  char name[256];
 
   //printf("----- FieldCount: %d\n", fields_count);
 
@@ -590,9 +587,9 @@ char name[256];
 
 int JavaClass::get_clinit_method()
 {
-int method_count = get_method_count();
-char method_name[128];
-int index;
+  int method_count = get_method_count();
+  char method_name[128];
+  int index;
 
   for (index = 0; index < method_count; index++)
   {
@@ -658,8 +655,8 @@ void JavaClass::print_access(int a)
 
 void JavaClass::print()
 {
-char name[128];
-int r;
+  char name[128];
+  int r;
 
   printf("   MagicNumber: 0x%02x%02x%02x%02x\n",((magic>>24)&0xff),
                                  ((magic>>16)&0xff),
@@ -701,21 +698,21 @@ int r;
 
 void JavaClass::print_constant_pool()
 {
-int count;
-int tag,offset;
-struct constant_class_t *constant_class;
-struct constant_fieldref_t *constant_fieldref;
-struct constant_methodref_t *constant_methodref;
-struct constant_interfacemethodref_t *constant_interfacemethodref;
-struct constant_string_t *constant_string;
-struct constant_integer_t *constant_integer;
-struct constant_float_t *constant_float;
-struct constant_long_t *constant_long;
-struct constant_double_t *constant_double;
-struct constant_nameandtype_t *constant_nameandtype;
-struct constant_utf8_t *constant_utf8;
-void *heap;
-int i;
+  int count;
+  int tag,offset;
+  struct constant_class_t *constant_class;
+  struct constant_fieldref_t *constant_fieldref;
+  struct constant_methodref_t *constant_methodref;
+  struct constant_interfacemethodref_t *constant_interfacemethodref;
+  struct constant_string_t *constant_string;
+  struct constant_integer_t *constant_integer;
+  struct constant_float_t *constant_float;
+  struct constant_long_t *constant_long;
+  struct constant_double_t *constant_double;
+  struct constant_nameandtype_t *constant_nameandtype;
+  struct constant_utf8_t *constant_utf8;
+  void *heap;
+  int i;
 
   printf("----- ConstantCount: %d\n", constant_pool_count);
 
@@ -807,10 +804,10 @@ int i;
 
 void JavaClass::print_attributes()
 {
-struct attributes_t *attribute;
-int count,r;
-char name[256];
-
+  struct attributes_t *attribute;
+  int count,r;
+  char name[256];
+  
   printf("----- Attributes: %d\n", attributes_count);
 
   for (count = 0; count < attributes_count; count++)
@@ -831,11 +828,11 @@ char name[256];
 
 void JavaClass::print_fields()
 {
-struct attributes_t *attribute;
-struct fields_t *field;
-int count,r,n;
-char name[256];
-char desc[256];
+  struct attributes_t *attribute;
+  struct fields_t *field;
+  int count,r,n;
+  char name[256];
+  char desc[256];
 
   printf("----- FieldCount: %d\n", fields_count);
 
@@ -874,11 +871,11 @@ char desc[256];
 
 void JavaClass::print_methods()
 {
-struct attributes_t *attribute;
-struct methods_t *method;
-int count,r,n;
-char name[256];
-char desc[256];
+  struct attributes_t *attribute;
+  struct methods_t *method;
+  int count,r,n;
+  char name[256];
+  char desc[256];
 
   printf("----- MethodCount: %d\n", methods_count);
 

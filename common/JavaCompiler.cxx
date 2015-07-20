@@ -120,9 +120,9 @@ JavaCompiler::~JavaCompiler()
 
 void JavaCompiler::fill_label_map(uint8_t *label_map, int label_map_len, uint8_t *bytes, int code_len, int pc_start)
 {
-int pc = pc_start;
-int wide = 0;
-int address;
+  int pc = pc_start;
+  int wide = 0;
+  int address;
 
   memset(label_map, 0, label_map_len);
 
@@ -187,7 +187,7 @@ int address;
 // FIXME - Too many parameters :(.
 int JavaCompiler::optimize_const(JavaClass *java_class, char *method_name, uint8_t *bytes, int pc, int pc_end, int address, int const_val)
 {
-int const_vals[2];
+  int const_vals[2];
 
   if (!optimize) { return 0; }
 
@@ -296,10 +296,10 @@ int const_vals[2];
 
 int JavaCompiler::optimize_compare(JavaClass *java_class, char *method_name, uint8_t *bytes, int pc, int pc_end, int address, int index)
 {
-int local_index = -1;
-bool check_for_compare = false;
-int skip_bytes = 0;
-int wide = 0;
+  int local_index = -1;
+  bool check_for_compare = false;
+  int skip_bytes = 0;
+  int wide = 0;
 
   // If we did some kind of ALU instruction, it's maybe possible we don't
   // have to do a cmp #0, reg which would require pushing on the stack
@@ -371,9 +371,9 @@ int wide = 0;
 
 int JavaCompiler::array_load(JavaClass *java_class, int constant_id, uint8_t array_type)
 {
-generic_32bit_t *gen32;
-char field_name[128];
-char type[128];
+  generic_32bit_t *gen32;
+  char field_name[128];
+  char type[128];
 
   gen32 = (generic_32bit_t *)java_class->get_constant(constant_id);
 
@@ -409,9 +409,9 @@ char type[128];
 
 int JavaCompiler::array_store(JavaClass *java_class, int constant_id, uint8_t array_type)
 {
-generic_32bit_t *gen32;
-char field_name[64];
-char type[64];
+  generic_32bit_t *gen32;
+  char field_name[64];
+  char type[64];
 
   gen32 = (generic_32bit_t *)java_class->get_constant(constant_id);
 
@@ -473,32 +473,30 @@ int JavaCompiler::push_ref(int index, _stack *stack)
 
 int JavaCompiler::compile_method(JavaClass *java_class, int method_id)
 {
-struct methods_t *method = java_class->get_method(method_id);
-uint8_t *bytes = method->attributes[0].info;
-int pc;
-const float fzero = 0.0;
-const float fone = 1.0;
-const float ftwo = 2.0;
-int wide = 0;
-int pc_start;
-int max_stack;
-int max_locals;
-int param_count;
-int code_len;
-uint32_t ref;
-struct generic_32bit_t *gen32;
-struct constant_float_t *constant_float;
-uint8_t *label_map;
-int ret = 0;
-char label[128];
-char method_name[64];
-_stack *stack;
-//uint32_t const_stack[CONST_STACK_SIZE];
-//int const_stack_ptr = 0;
-int const_val;
-int skip_bytes;
-int index;
-int instruction_length;
+  struct methods_t *method = java_class->get_method(method_id);
+  uint8_t *bytes = method->attributes[0].info;
+  int pc;
+  const float fzero = 0.0;
+  const float fone = 1.0;
+  const float ftwo = 2.0;
+  int wide = 0;
+  int pc_start;
+  int max_stack;
+  int max_locals;
+  int param_count;
+  int code_len;
+  uint32_t ref;
+  struct generic_32bit_t *gen32;
+  struct constant_float_t *constant_float;
+  uint8_t *label_map;
+  int ret = 0;
+  char label[128];
+  char method_name[64];
+  _stack *stack;
+  int const_val;
+  int skip_bytes;
+  int index;
+  int instruction_length;
 
   if (java_class->get_method_name(method_name, sizeof(method_name), method_id) != 0)
   {
@@ -1860,9 +1858,9 @@ int instruction_length;
 
 int JavaCompiler::load_class(const char *filename)
 {
-int index;
-int ptr;
-int last_slash = -1;
+  int index;
+  int ptr;
+  int last_slash = -1;
 
   printf("load_class(%s)\n", filename);
 
@@ -1961,10 +1959,10 @@ int last_slash = -1;
 
 void JavaCompiler::insert_static_field_defines()
 {
-const fields_t *field;
-int field_count = java_class->get_field_count();
-int index;
-int external_index;
+  const fields_t *field;
+  int field_count = java_class->get_field_count();
+  int index;
+  int external_index;
 
   // Add all fields from this class
   for (index = 0; index < field_count; index++)
@@ -1991,7 +1989,7 @@ int external_index;
 
 void JavaCompiler::init_heap()
 {
-int field_count = java_class->get_field_count();
+  int field_count = java_class->get_field_count();
 
   field_count += external_fields.size();
 
@@ -2001,7 +1999,7 @@ int field_count = java_class->get_field_count();
 
 int JavaCompiler::add_static_initializers()
 {
-int index;
+  int index;
 
   // Add all the static initializers
   index = java_class->get_clinit_method();
@@ -2064,10 +2062,10 @@ int JavaCompiler::execute_statics(int index)
 
 int JavaCompiler::compile_methods(bool do_main)
 {
-int method_count = java_class->get_method_count();
-char method_name[32];
-int index;
-bool did_execute_statics = false;
+  int method_count = java_class->get_method_count();
+  char method_name[32];
+  int index;
+  bool did_execute_statics = false;
 
   for (index = 0; index < method_count; index++)
   {
@@ -2131,8 +2129,8 @@ int JavaCompiler::add_constants()
 
 int JavaCompiler::field_type_to_int(char *field_type)
 {
-int len = sizeof(type_table) / sizeof (char *);
-int n;
+  int len = sizeof(type_table) / sizeof (char *);
+  int n;
 
   for (n = 0; n < len; n++)
   {
@@ -2145,8 +2143,8 @@ int n;
 
 const char *JavaCompiler::field_type_from_int(int type)
 {
-int is_array = (type & 0x80) >> 7;
-const char *field_type;
+  int is_array = (type & 0x80) >> 7;
+  const char *field_type;
 
   type = type & 0x7f;
 
