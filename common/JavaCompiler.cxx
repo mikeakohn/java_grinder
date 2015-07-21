@@ -471,7 +471,7 @@ int JavaCompiler::push_ref(int index, _stack *stack)
   return ret;
 }
 
-int JavaCompiler::compile_method(JavaClass *java_class, int method_id)
+int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const char *alt_name)
 {
   struct methods_t *method = java_class->get_method(method_id);
   uint8_t *bytes = method->attributes[0].info;
@@ -502,6 +502,8 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id)
   {
     strcpy(method_name, "error");
   }
+
+  if (alt_name != NULL) { strcpy(method_name, alt_name); }
 
   printf("--- Compiling method '%s' method_id=%d\n", method_name, method_id);
 
@@ -1895,8 +1897,9 @@ int JavaCompiler::load_class(const char *filename)
     constant_fieldref_t *constant_fieldref =
       (constant_fieldref_t *)java_class->get_constant(index);
 
-    if (constant_fieldref->tag == CONSTANT_FIELDREF &&
-        constant_fieldref->class_index != java_class->this_class)
+    if ((constant_fieldref->tag == CONSTANT_FIELDREF ||
+         constant_fieldref->tag == CONSTANT_METHODREF) &&
+         constant_fieldref->class_index != java_class->this_class)
     {
       char class_name[128];
       char field_name[128];
@@ -1913,7 +1916,9 @@ int JavaCompiler::load_class(const char *filename)
       }
       class_name[ptr] = 0;
 
-      //external_classes.insert(class_name);
+      if (!java_class->is_ref_external(index)) { continue; }
+      //printf("DEBUG: EXTERNAL class_name='%s' field_name='%s'\n", class_name, field_name);
+
       std::map<std::string,JavaClass *>::iterator iter;
 
       iter = external_classes.find(class_name);
@@ -1939,7 +1944,18 @@ int JavaCompiler::load_class(const char *filename)
 
         fclose(in);
       }
-      external_fields[field_name] = field_type_to_int(field_type);
+
+      if (constant_fieldref->tag == CONSTANT_FIELDREF)
+      {
+        external_fields[field_name] = field_type_to_int(field_type);
+      }
+#if 0
+        else
+      if (constant_fieldref->tag == CONSTANT_METHODREF)
+      {
+        // Do external methods need to be kept track of?
+      }
+#endif
     }
   }
 
@@ -2007,7 +2023,7 @@ int JavaCompiler::add_static_initializers()
   {
     if (execute_static(java_class, index, generator, false) != 0)
     {
-      printf("** Error setting statics.\n");
+      printf("** Error setting statics %s:%d.\n", __FILE__, __LINE__);
       return -1;
     }
   }
@@ -2016,13 +2032,19 @@ int JavaCompiler::add_static_initializers()
   std::map<std::string,JavaClass *>::iterator iter;
   for (iter = external_classes.begin(); iter != external_classes.end(); iter++)
   {
-    printf("CLASS %s\n", iter->first.c_str());
+    char name[128];
     JavaClass *java_class_external = iter->second;
     index = java_class_external->get_clinit_method();
 
+    if (index < 0) { continue; }
+
+    java_class_external->get_method_name(name, sizeof(name), index);
+
+    printf("CLASS %s.%s  index=%d\n", iter->first.c_str(), name, index);
+
     if (execute_static(java_class_external, index, generator, false, java_class) != 0)
     {
-      printf("** Error setting statics.\n");
+      printf("** Error setting statics %s:%d.\n", __FILE__, __LINE__);
       return -1;
     }
   }
@@ -2037,7 +2059,7 @@ int JavaCompiler::execute_statics(int index)
   // <clinit> method is executed for adding array static data
   if (index != -1 && execute_static(java_class, index, generator, true) != 0)
   {
-    printf("** Error setting statics.\n");
+    printf("** Error setting statics %s:%d.\n", __FILE__, __LINE__);
     return -1;
   }
 
@@ -2049,10 +2071,12 @@ int JavaCompiler::execute_statics(int index)
     JavaClass *java_class_external = iter->second;
     int index = java_class_external->get_clinit_method();
 
+    if (index < 0) { continue; }
+
     if (execute_static(java_class_external, index, generator, true,
                        java_class) != 0)
     {
-      printf("** Error setting statics.\n");
+      printf("** Error setting statics %s:%d.\n", __FILE__, __LINE__);
       return -1;
     }
   }
@@ -2102,7 +2126,52 @@ int JavaCompiler::compile_methods(bool do_main)
 
   if (!did_execute_statics && !do_main && external_classes.size() != 0)
   {
-    execute_statics(-1);
+    // Compile all needed methods from other classes.
+    std::map<std::string,JavaClass *>::iterator iter;
+    for (iter = external_classes.begin(); iter != external_classes.end(); iter++)
+    {
+      const char *class_name = iter->first.c_str();
+      JavaClass *java_class = iter->second;
+
+      printf("Compile Class: %s\n", class_name);
+
+      int constant_count = java_class->get_constant_count();
+
+      // For all methods in class
+      for (index = 0; index < constant_count; index++)
+      {
+        constant_methodref_t *constant_methodref =
+          (constant_methodref_t *)java_class->get_constant(index);
+
+        if (constant_methodref->tag == CONSTANT_METHODREF)
+        {
+          char method_name[128];
+          char alt_name[256+8]; // FIXME
+
+          if (java_class->get_method_name(method_name, sizeof(method_name), index) != 0)
+          {
+            continue;
+          }
+
+          if (strcmp(method_name, "<clinit>") == 0) { continue; }
+          if (strcmp(method_name, "<init>") == 0) { continue; }
+
+          sprintf(alt_name, "%s_%s", class_name, method_name);
+
+#if 0
+          if (external_fields.find(alt_name) == external_fields.end())
+          {
+            continue;
+          }
+#endif
+
+          printf("  compiling: %s.%s\n", class_name, method_name);
+          if (compile_method(java_class, index, alt_name) != 0) { return -1; }
+        }
+      }
+    }
+
+    if (execute_statics(-1) != 0) { return -1; }
   }
 
   return 0;

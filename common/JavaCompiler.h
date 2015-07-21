@@ -51,7 +51,7 @@ private:
   int array_load(JavaClass *java_class, int constant_id, uint8_t array_type);
   int array_store(JavaClass *java_class, int constant_id, uint8_t array_type);
   int push_ref(int index, _stack *stack);
-  int compile_method(JavaClass *java_class, int method_id);
+  int compile_method(JavaClass *java_class, int method_id, const char *alt_name = NULL);
   int field_type_to_int(char *field_type);
   const char *field_type_from_int(int type);
   int execute_statics(int index);

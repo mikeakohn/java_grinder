@@ -25,7 +25,7 @@
 // how to add the other code to the init section.  Maybe the trick is to
 // generate a brand new Java function and compile it.
 
-#define UNIMPL() { printf("Unimplemented\n"); ret = -1; break; }
+#define UNIMPL() { printf("Unimplemented opcode=%d %s:%d\n", bytes[pc], __FILE__, __LINE__); ret = -1; break; }
 #define CHECK_STACK(n) \
         if (stack->length() < n) \
         { \
@@ -43,29 +43,29 @@
 
 int execute_static(JavaClass *java_class, int method_id, Generator *generator, bool do_arrays, JavaClass *parent_class)
 {
-struct methods_t *method = java_class->get_method(method_id);
-uint8_t *bytes = method->attributes[0].info;
-generic_32bit_t *gen32;
-int pc;
-int wide = 0;
-int pc_start;
-int max_stack;
-int max_locals;
-int code_len;
-//int32_t *stack;
-int32_t temp;
-int32_t value;
-//int stack_ptr;
-_stack *stack;
-int32_t *array = NULL;
-int array_len;
-int array_type;
-int array_alloc_size = 0;
-char full_field_name[256];
-char *field_name;
-char type[128];
-int index;
-int ret = 0;
+  struct methods_t *method = java_class->get_method(method_id);
+  uint8_t *bytes = method->attributes[0].info;
+  generic_32bit_t *gen32;
+  int pc;
+  int wide = 0;
+  int pc_start;
+  int max_stack;
+  int max_locals;
+  int code_len;
+  //int32_t *stack;
+  int32_t temp;
+  int32_t value;
+  //int stack_ptr;
+  _stack *stack;
+  int32_t *array = NULL;
+  int array_len;
+  int array_type;
+  int array_alloc_size = 0;
+  char full_field_name[256];
+  char *field_name;
+  char type[128];
+  int index;
+  int ret = 0;
 
   printf("--- Executing static code\n");
 

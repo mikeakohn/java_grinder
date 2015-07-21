@@ -139,7 +139,8 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
   }
     else
   {
-    if (strcmp(method_class, java_class->class_name) == 0)
+    // FIXME: This probably is not good, although the assembler will catch it.
+    //if (strcmp(method_class, java_class->class_name) == 0)
     {
       int params,is_void;
       get_signature(method_sig, &params, &is_void);
@@ -150,7 +151,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
 
   if (ret == 0) { return 0; }
 
-  printf("--> Function not implemented '%s'\n", function);
+  printf("--> Function not implemented '%s' %s:%d\n", function, __FILE__, __LINE__);
 
   return -1;
 }
