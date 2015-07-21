@@ -17,7 +17,7 @@
 #include "MC68000.h"
 
 #define REG_STACK(a) (a)
-#define LOCALS(i) (i * 4)
+#define LOCALS(i) ((i + 1) * 4)
 
 // ABI is:
 // d0 - top of stack
@@ -135,6 +135,13 @@ void MC68000::method_start(int local_count, int max_stack, int param_count, cons
 
   // main() function goes here
   fprintf(out, "%s:\n", name);
+
+  if (local_count != 0)
+  {
+    fprintf(out, "  link a6, #-0x%x\n", local_count * 4);
+  }
+
+#if 0
   if (!is_main)
   {
     if (local_count != 0) { fprintf(out, "  link a6, #-0x%x\n", local_count * 4); }
@@ -144,6 +151,7 @@ void MC68000::method_start(int local_count, int max_stack, int param_count, cons
     fprintf(out, "  movea.l SP, a6\n");
     fprintf(out, "  suba.l #0x%x, SP\n", local_count * 4);
   }
+#endif
 }
 
 void MC68000::method_end(int local_count)
@@ -530,16 +538,16 @@ int MC68000::inc_integer(int index, int num)
 {
   if (num >= 1 && num <= 8)
   {
-    fprintf(out, "  addq.l #%d, (-%d,a6)\n", num, index * 4);
+    fprintf(out, "  addq.l #%d, (-%d,a6)\n", num, LOCALS(index));
   }
     else
   if (num >= -8 && num <= -1)
   {
-    fprintf(out, "  subq.l #%d, (-%d,a6)\n", -num, index * 4);
+    fprintf(out, "  subq.l #%d, (-%d,a6)\n", -num, LOCALS(index));
   }
     else
   {
-    fprintf(out, "  add.l #%d, (-%d,a6)\n", num, index * 4);
+    fprintf(out, "  add.l #%d, (-%d,a6)\n", num, LOCALS(index));
   }
 
   return 0;
@@ -563,7 +571,7 @@ int MC68000::integer_to_short()
 {
   if (stack != 0)
   {
-    fprintf(out, "  ext.l (a7)\n");
+    fprintf(out, "  ext.l (SP)\n");
   }
     else
   {
