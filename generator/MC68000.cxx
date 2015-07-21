@@ -394,12 +394,30 @@ int MC68000::sub_integer(int num)
 
 int MC68000::mul_integer()
 {
-  return stack_alu("muls");
+  if (stack == 0)
+  {
+    fprintf(out, "  muls.w d%d, d%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
+    reg--;
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  muls.w (SP)+, d%d\n", REG_STACK(reg-1));
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  move.l (SP)+, d7\n");
+    fprintf(out, "  muls.w d7, (SP)\n");
+    stack--;
+  }
+
+  return 0;
 }
 
 int MC68000::mul_integer(int num)
 {
-  fprintf(out, "  muls.l #%d, d%d\n", num, REG_STACK(reg-1));
+  fprintf(out, "  muls.w #%d, d%d\n", num, REG_STACK(reg-1));
   return 0;
 }
 
@@ -1163,7 +1181,6 @@ int MC68000::stack_alu(const char *instr)
 {
   if (stack == 0)
   {
-printf("%d %d  reg=%d\n", REG_STACK(reg-1), REG_STACK(reg-2), reg);
     fprintf(out, "  %s.l d%d, d%d\n", instr, REG_STACK(reg-1), REG_STACK(reg-2));
     reg--;
   }
