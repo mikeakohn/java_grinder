@@ -17,7 +17,7 @@
 #include <stdint.h>
 
 #include "JavaClass.h"
-#include "snes.h"
+#include "snes_.h"
 
 #define CHECK_FUNC(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \

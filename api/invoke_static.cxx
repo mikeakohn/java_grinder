@@ -27,6 +27,7 @@
 #include "memory.h"
 #include "sega_genesis.h"
 #include "spi.h"
+#include "snes_.h"
 #include "ti84_.h"
 #include "ti99_.h"
 #include "timer.h"
@@ -132,6 +133,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     CHECK_WITH_PORT(UART, uart, 0)
     CHECK_WITH_PORT(UART, uart, 1)
     CHECK(SegaGenesis, sega_genesis)
+    CHECK(SNES, snes)
     CHECK(TI84, ti84)
     CHECK(TI99, ti99)
       else
@@ -202,6 +204,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, in
     CHECK_CONST(Timer, timer)
     CHECK_CONST(CPU, cpu)
     CHECK_CONST(SegaGenesis, sega_genesis)
+    CHECK_CONST(SNES, snes)
     CHECK_WITH_PORT_CONST(SPI, spi, 0)
     CHECK_WITH_PORT_CONST(SPI, spi, 1)
     CHECK_WITH_PORT_CONST(TI99, ti99, 0)
@@ -218,6 +221,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, in
     CHECK_CONST_2(Timer, timer)
     CHECK_CONST_2(TI99, ti99)
     CHECK_CONST_2(SegaGenesis, sega_genesis)
+    CHECK_CONST_2(SNES, snes)
       else
     {}
   }
