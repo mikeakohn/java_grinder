@@ -112,7 +112,7 @@ protected:
   int stack;          // count how many things we put on the stack
   bool is_main : 1;
 
-  int stack_alu(const char *instr);
+  int stack_alu(const char *instr, const char *size = "l");
   int get_values_from_stack(int *value1, int *value2, int *value3);
   int get_values_from_stack(int *value1, int *value2);
   int get_values_from_stack(int *value1);

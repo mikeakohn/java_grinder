@@ -394,25 +394,7 @@ int MC68000::sub_integer(int num)
 
 int MC68000::mul_integer()
 {
-  if (stack == 0)
-  {
-    fprintf(out, "  muls.w d%d, d%d\n", REG_STACK(reg-1), REG_STACK(reg-2));
-    reg--;
-  }
-    else
-  if (stack == 1)
-  {
-    fprintf(out, "  muls.w (SP)+, d%d\n", REG_STACK(reg-1));
-    stack--;
-  }
-    else
-  {
-    fprintf(out, "  move.l (SP)+, d7\n");
-    fprintf(out, "  muls.w d7, (SP)\n");
-    stack--;
-  }
-
-  return 0;
+  return stack_alu("divs", "w");
 }
 
 int MC68000::mul_integer(int num)
@@ -423,12 +405,12 @@ int MC68000::mul_integer(int num)
 
 int MC68000::div_integer()
 {
-  return stack_alu("divs");
+  return stack_alu("divs", "w");
 }
 
 int MC68000::div_integer(int num)
 {
-  fprintf(out, "  divs.l #%d, d%d\n", num, REG_STACK(reg-1));
+  fprintf(out, "  divs.w #%d, d%d\n", num, REG_STACK(reg-1));
   return 0;
 }
 
@@ -436,7 +418,7 @@ int MC68000::mod_integer()
 {
   if (stack == 0)
   {
-    fprintf(out, "  divs.l d%d, d%d:d%d\n", REG_STACK(reg-1), REG_STACK(reg-2), REG_STACK(reg-1));
+    fprintf(out, "  divs.w d%d, d%d:d%d\n", REG_STACK(reg-1), REG_STACK(reg-2), REG_STACK(reg-1));
     reg--;
   }
     else
@@ -451,7 +433,7 @@ int MC68000::mod_integer(int num)
 {
   if (stack == 0)
   {
-    fprintf(out, "  divs.l #%d, r%d:r%d\n", num, REG_STACK(reg-2), REG_STACK(reg-1));
+    fprintf(out, "  divs.w #%d, r%d:r%d\n", num, REG_STACK(reg-2), REG_STACK(reg-1));
   }
     else
   {
@@ -482,6 +464,7 @@ int MC68000::shift_left_integer()
 
 int MC68000::shift_left_integer(int num)
 {
+  if (num > 8) { return -1; }
   fprintf(out, "  asl.l #%d, d%d\n", num, REG_STACK(reg-1));
   return 0;
 }
@@ -493,6 +476,7 @@ int MC68000::shift_right_integer()
 
 int MC68000::shift_right_integer(int num)
 {
+  if (num > 8) { return -1; }
   fprintf(out, "  asr.l #%d, d%d\n", num, REG_STACK(reg-1));
   return 0;
 }
@@ -504,6 +488,7 @@ int MC68000::shift_right_uinteger()
 
 int MC68000::shift_right_uinteger(int num)
 {
+  if (num > 8) { return -1; }
   fprintf(out, "  lsr.l #%d, d%d\n", num, REG_STACK(reg-1));
   return 0;
 }
@@ -576,13 +561,13 @@ int MC68000::integer_to_byte()
 
 int MC68000::integer_to_short()
 {
-  if (stack == 0)
+  if (stack != 0)
   {
-    fprintf(out, "  extw.l (SP)\n");
+    fprintf(out, "  ext.l (a7)\n");
   }
     else
   {
-    fprintf(out, "  extw.l d%d\n", REG_STACK(reg-1));
+    fprintf(out, "  ext.l d%d\n", REG_STACK(reg-1));
   }
 
   return 0;
@@ -655,15 +640,15 @@ int MC68000::return_integer(int local_count)
     fprintf(out, "  move.l d%d, d7\n", REG_STACK(reg - 1));
   }
 
-  if (local_count != 0) { fprintf(out, "  ulnk\n"); }
-  fprintf(out, "  ret\n");
+  if (local_count != 0) { fprintf(out, "  unlk a6\n"); }
+  fprintf(out, "  rts\n");
   return 0;
 }
 
 int MC68000::return_void(int local_count)
 {
-  if (local_count != 0) { fprintf(out, "  ulnk\n"); }
-  fprintf(out, "  ret\n");
+  if (local_count != 0) { fprintf(out, "  unlk a6\n"); }
+  fprintf(out, "  rts\n");
   return 0;
 }
 
@@ -1177,23 +1162,23 @@ void MC68000::close()
 }
 #endif
 
-int MC68000::stack_alu(const char *instr)
+int MC68000::stack_alu(const char *instr, const char *size)
 {
   if (stack == 0)
   {
-    fprintf(out, "  %s.l d%d, d%d\n", instr, REG_STACK(reg-1), REG_STACK(reg-2));
+    fprintf(out, "  %s.%s d%d, d%d\n", instr, size, REG_STACK(reg-1), REG_STACK(reg-2));
     reg--;
   }
     else
   if (stack == 1)
   {
-    fprintf(out, "  %s.l (SP)+, d%d\n", instr, REG_STACK(reg-1));
+    fprintf(out, "  %s.%s (SP)+, d%d\n", instr, size, REG_STACK(reg-1));
     stack--;
   }
     else
   {
     fprintf(out, "  move.l (SP)+, d7\n");
-    fprintf(out, "  %s.l d7, (SP)\n", instr);
+    fprintf(out, "  %s.%s d7, (SP)\n", instr, size);
     stack--;
   }
 
