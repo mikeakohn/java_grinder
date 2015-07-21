@@ -137,7 +137,7 @@ void MC68000::method_start(int local_count, int max_stack, int param_count, cons
   fprintf(out, "%s:\n", name);
   if (!is_main)
   {
-    if (local_count != 0) { fprintf(out, "  link a6, #0x%x\n", local_count * 4); }
+    if (local_count != 0) { fprintf(out, "  link a6, #-0x%x\n", local_count * 4); }
   }
     else
   {
