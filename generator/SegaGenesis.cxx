@@ -877,7 +877,7 @@ void SegaGenesis::add_plot()
     "  move.l d5, (a1); read word from VRAM and save in temp space\n"
     "  move.w (a0), d4\n"
     "  or.l #0x40000000, d5\n"
-    "  or.w d4, d5\n"
+    //"  or.w d4, d5\n"
     "  move.l d5, (a1)\n"
     "  move.w (-4,a7), d6\n"
     "  and.w #0x3, d6 ; x = x & 0x3\n"
