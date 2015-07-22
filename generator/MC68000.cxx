@@ -402,7 +402,7 @@ int MC68000::sub_integer(int num)
 
 int MC68000::mul_integer()
 {
-  return stack_alu("divs", "w");
+  return stack_alu("muls", "w");
 }
 
 int MC68000::mul_integer(int num)
@@ -596,7 +596,7 @@ int MC68000::jump_cond(const char *label, int cond, int distance)
     reg--;
   }
 
-  fprintf(out, "  b%s.%c %s\n", cond_str[cond], size, label);
+  fprintf(out, "  b%s.%c %s  ; distance=%d\n", cond_str[cond], size, label, distance);
   return 0;
 }
 
@@ -626,7 +626,7 @@ int MC68000::jump_cond_integer(const char *label, int cond, int distance)
     reg -= 2;
   }
 
-  fprintf(out, "  b%s.%c %s\n", cond_str[cond], size, label);
+  fprintf(out, "  b%s.%c %s  ; distance=%d\n", cond_str[cond], size, label, distance);
 
   return 0;
 
@@ -664,7 +664,7 @@ int MC68000::jump(const char *name, int distance)
 {
   char size = get_jump_size(distance);
 
-  fprintf(out, "  bra.%c %s\n", size, name);
+  fprintf(out, "  bra.%c %s  ; distance=%d\n", size, name, distance);
 
 #if 0
   if (distance < 64)
@@ -1299,7 +1299,7 @@ int MC68000::get_ref_from_stack()
 
 int MC68000::get_jump_size(int distance)
 {
-  if (distance < 64) { return 's'; }
+  if (distance < 40) { return 's'; }
   if (distance < 20000) { return 'w'; }
 
   return 'l';
