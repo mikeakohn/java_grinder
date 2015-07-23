@@ -1,7 +1,7 @@
 
-default: SegaGenesisJavaDemo.class
+default: SegaGenesisJavaDemo.class PlayTitleSample.class Mandelbrots.class
 
-grind: SegaGenesisJavaDemo.class PlayTitleSample.class
+grind: SegaGenesisJavaDemo.class PlayTitleSample.class Mandelbrots.class
 	../../java_grinder SegaGenesisJavaDemo.class sega_genesis_java_demo.asm sega_genesis
 	naken_asm -I ~ -l -b -o sega_genesis_java_demo.bin sega_genesis_java_demo.asm
 

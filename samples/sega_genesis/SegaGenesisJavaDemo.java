@@ -28,10 +28,12 @@ public class SegaGenesisJavaDemo
     //SegaGenesis.clearBitmap();
     //SegaGenesis.setPalettePointer(1);
     //SegaGenesis.setPaletteColor(0xe);
-    SegaGenesis.plot(1, 0, 1);
-    SegaGenesis.plot(8, 8, 1);
-    SegaGenesis.plot(16, 16, 1);
-    SegaGenesis.plot(24, 24, 1);
+    //SegaGenesis.plot(1, 0, 1);
+    //SegaGenesis.plot(8, 8, 1);
+    //SegaGenesis.plot(16, 16, 1);
+    //SegaGenesis.plot(24, 24, 1);
+    SegaGenesis.setPaletteColors(Mandelbrots.palette);
+    Mandelbrots.draw();
 
     for (a = 0; a < 500000; a++);
 
