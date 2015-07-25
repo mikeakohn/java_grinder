@@ -49,7 +49,8 @@ SegaGenesis::SegaGenesis() :
   need_set_palette_colors(false),
   need_init_bitmap(false),
   need_clear_bitmap(false),
-  need_plot(false)
+  need_plot(false),
+  need_set_plot_address(false)
 {
   // FIXME - What's this access prohibited crap?
   //ram_start = 0xe00000;
@@ -71,6 +72,7 @@ SegaGenesis::~SegaGenesis()
   if (need_init_bitmap) { add_init_bitmap(); }
   if (need_clear_bitmap) { add_clear_bitmap(); }
   if (need_plot) { add_plot(); }
+  if (need_set_plot_address) { add_set_plot_address(); }
 }
 
 int SegaGenesis::open(const char *filename)
@@ -303,13 +305,36 @@ int SegaGenesis::sega_genesis_plot()
   need_plot = true;
 
   // REVIEW: Can possibly save some CPU instructions by moving to stack
-  fprintf(out, "  move.l d%d, d5\n", REG_STACK(reg-3));
-  fprintf(out, "  move.l d%d, d6\n", REG_STACK(reg-2));
-  fprintf(out, "  move.l d%d, d7\n", REG_STACK(reg-1));
+  fprintf(out, "  move.l %s, d7\n", pop_reg());
+  fprintf(out, "  move.l %s, d6\n", pop_reg());
+  fprintf(out, "  move.l %s, d5\n", pop_reg());
   fprintf(out, "  jsr _plot\n");
-  reg -= 3;
   return 0;
 }
+
+int SegaGenesis::sega_genesis_setPlotAddress()
+{
+  need_set_plot_address = true;
+
+  fprintf(out, "  move.l d%d, d5\n", REG_STACK(reg-1));
+  fprintf(out, "  jsr _set_plot_address\n");
+
+  reg--;
+
+  return 0;
+
+}
+
+int SegaGenesis::sega_genesis_fastPlot()
+{
+  fprintf(out, "  move.w d%d, (a1)\n", REG_STACK(reg-2));
+  fprintf(out, "  move.w d%d, (a1)\n", REG_STACK(reg-1));
+
+  reg -= 2;
+
+  return 0;
+}
+
 
 int SegaGenesis::sega_genesis_loadFonts()
 {
@@ -325,13 +350,9 @@ int SegaGenesis::sega_genesis_setCursor()
   fprintf(out, "  ; Set cursor position in VDP\n");
   fprintf(out, "  mulu.w #128, d%d\n", REG_STACK(reg-1));
   fprintf(out, "  add.w d%d, d%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
-  //fprintf(out, "  move.l d%d, d5\n", REG_STACK(reg-1));
   fprintf(out, "  lsl.l #8, d%d\n", REG_STACK(reg-1));
   fprintf(out, "  lsl.l #8, d%d\n", REG_STACK(reg-1));
-  //fprintf(out, "  lsr.l #8, d5\n");
-  //fprintf(out, "  lsr.l #6, d5\n");
   fprintf(out, "  or.l #0x%08x, d%d\n", CTRL_REG(CD_VRAM_WRITE, 0xc000), REG_STACK(reg-1));
-  //fprintf(out, "  or.l d5, d%d\n", REG_STACK(reg-1));
   fprintf(out, "  move.l d%d, (a1)\n", REG_STACK(reg-1));
 
   reg -= 2;
@@ -370,10 +391,8 @@ int SegaGenesis::sega_genesis_print()
 {
   need_print_string = true;
 
-  fprintf(out, "  movea.l d%d, a2\n", REG_STACK(reg-1));
+  fprintf(out, "  movea.l %s, a2\n", pop_reg());
   fprintf(out, "  jsr _print_string\n");
-
-  reg--;
 
   return 0;
 }
@@ -400,9 +419,8 @@ int SegaGenesis::sega_genesis_setPatternTable()
 {
   need_set_pattern_table = true;
 
-  fprintf(out, "  movea.l d%d, a3\n", REG_STACK(reg-1));
+  fprintf(out, "  movea.l %s, a3\n", pop_reg());
   fprintf(out, "  jsr _set_pattern_table\n");
-  reg--;
 
   return 0;
 }
@@ -411,9 +429,8 @@ int SegaGenesis::sega_genesis_setImageData()
 {
   need_set_image_data = true;
 
-  fprintf(out, "  movea.l d%d, a3\n", REG_STACK(reg-1));
+  fprintf(out, "  movea.l %s, a3\n", pop_reg());
   fprintf(out, "  jsr _set_image_data\n");
-  reg--;
 
   return 0;
 }
@@ -851,8 +868,6 @@ void SegaGenesis::add_plot()
     "  move.w d5, (-4,a7)\n"
     "  move.w d6, (-6,a7)\n"
     "  lsr.w #3, d5   ; block_x = x / 8\n"
-    //"  lsr.w #3, d6   ; block_y = y / 8\n"
-    //"  lsl.w #3, d6   ; block_y *= 8\n"
     "  and.w #0xfff8, d6 ; block_y = (block_y / 8) * 8\n"
     "  add.l d6, d5   ; address = block_x + block_y\n"
     "  lsl.l #2, d6   ; block_y *= 4\n"
@@ -869,15 +884,12 @@ void SegaGenesis::add_plot()
     "  move.l d5, d4  ; need the upper 2 bits\n"
     "  rol.w #2, d4\n"
     "  and.w #3, d4\n"
-    //"  lsl.l #8, d5\n"
-    //"  lsl.l #8, d5   ; address <<= 16\n"
     "  and.w #0x3ffe, d5; address &= 0xffff3ffe (write to even address)\n"
     "  swap d5        ; address <<= 16\n"
     "  or.b d4, d5    ; move upper two bits of address into lower\n"
     "  move.l d5, (a1); read word from VRAM and save in temp space\n"
     "  move.w (a0), d4\n"
     "  or.l #0x40000000, d5\n"
-    //"  or.w d4, d5\n"
     "  move.l d5, (a1)\n"
     "  move.w (-4,a7), d6\n"
     "  and.w #0x3, d6 ; x = x & 0x3\n"
@@ -885,30 +897,29 @@ void SegaGenesis::add_plot()
     "  addq.w #3, d6\n"
     "  lsl.w #2, d6\n"
     "  lsl.w d6, d7\n"
-    //"  moveq.l #0, d4\n"
-    //"  movea.l #_pixel_shift_table, a2\n"
-    //"  move.b (0,a2,d6), d4\n"
-    //"  lsl.w d4, d7\n"
     "  move.w #0xfff0, d5\n"
     "  rol.w d6, d5\n"
     "  and.w d4, d5\n"
-//"  move.w d4, d5\n"
     "  or.w d5, d7\n"
     "  move.w d7, (a0)\n"
-#if 0
-    "  subq.w #3, d6\n"
-    "  beq.s _plot_even_pixel  ; if X is even, shift color to the left\n"
-    "  move.w d7, (a0)\n"
-    "  rts\n"
-    "_plot_even_pixel:\n"
-    "  lsl.w #4, d7\n"
-    "  move.w d7, (a0)\n"
-#endif
     "  move.w (-8,a7), d4 ; restore register\n"
-    "  rts\n\n"
-    //"_pixel_shift_table:\n"
-    //"  db 12, 8, 4, 0\n"
-    "_pixel_mask_table:\n"
-    "  dw 0x0fff, 0xf0ff, 0xff0f, 0x0fff0\n\n");
+    "  rts\n\n");
+}
+
+
+void SegaGenesis::add_set_plot_address()
+{
+  fprintf(out,
+    "  ;; set_plot_address(d5=address);\n"
+    "_set_plot_address:\n"
+    "  move.l d5, d6  ; need the upper 2 bits\n"
+    "  rol.w #2, d6\n"
+    "  and.w #3, d6\n"
+    "  and.w #0x3ffe, d5; address &= 0xffff3ffe (write to even address)\n"
+    "  swap d5        ; address <<= 16\n"
+    "  or.b d6, d5    ; move upper two bits of address into lower\n"
+    "  or.l #0x40000000, d5\n"
+    "  move.l d5, (a1); set write word to VRAM\n"
+    "  rts\n\n");
 }
 

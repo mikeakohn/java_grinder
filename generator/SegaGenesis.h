@@ -30,6 +30,8 @@ public:
   virtual int sega_genesis_initBitmap();
   virtual int sega_genesis_clearBitmap();
   virtual int sega_genesis_plot();
+  virtual int sega_genesis_setPlotAddress();
+  virtual int sega_genesis_fastPlot();
   virtual int sega_genesis_loadFonts();
   virtual int sega_genesis_setCursor();
   virtual int sega_genesis_setCursor(int x, int y);
@@ -62,6 +64,7 @@ private:
   void add_init_bitmap();
   void add_clear_bitmap();
   void add_plot();
+  void add_set_plot_address();
 
   bool need_print_string:1;
   bool need_load_fonts:1;
@@ -72,6 +75,7 @@ private:
   bool need_init_bitmap:1;
   bool need_clear_bitmap:1;
   bool need_plot:1;
+  bool need_set_plot_address:1;
 };
 
 #endif

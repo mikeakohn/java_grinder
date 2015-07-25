@@ -38,6 +38,12 @@ abstract public class SegaGenesis
   /** Set a pixel in the 128x128 bitmap */
   public static void plot(int x, int y, int color) { }
 
+  /** Set the VDP bitmap pointer to point to the next pattern address. */
+  public static void setPlotAddress(int address) { }
+
+  /** Set the next 4 pixels at the next word in the pattern table. */
+  public static void fastPlot(int color0, int color1, int color2, int color3) { }
+
   /** Load fonts. */
   public static void loadFonts() { }
 
