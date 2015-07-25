@@ -480,7 +480,7 @@ int JavaClass::get_ref_name_type(char *name, char *type, int len, int index)
       if (constant_methodref->class_index != this_class)
       {
         get_class_name(name, len, constant_methodref->class_index);
-        printf("  class_name='%s' %d\n", name, constant_fieldref->class_index);
+        printf("  class_name='%s' %d\n", name, constant_methodref->class_index);
         strcat(name, "_");
 
         // Is this needed?
