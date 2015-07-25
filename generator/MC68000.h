@@ -105,19 +105,23 @@ public:
   //virtual void close();
 
 protected:
-  uint32_t ram_start;
-  uint32_t stack_start;
-  int reg;            // count number of registers are are using as stack
-  int reg_max;        // size of register stack 
-  int stack;          // count how many things we put on the stack
-  bool is_main : 1;
-
+  char *pop_reg();
+  char *push_reg();
+  char *top_reg();
   int stack_alu(const char *instr, const char *size = "l");
   int get_values_from_stack(int *value1, int *value2, int *value3);
   int get_values_from_stack(int *value1, int *value2);
   int get_values_from_stack(int *value1);
   int get_ref_from_stack();
   int get_jump_size(int distance);
+
+  uint32_t ram_start;
+  uint32_t stack_start;
+  char reg_string[8];
+  int reg;            // count number of registers are are using as stack
+  int reg_max;        // size of register stack 
+  int stack;          // count how many things we put on the stack
+  bool is_main : 1;
 };
 
 #endif
