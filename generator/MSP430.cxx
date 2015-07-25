@@ -505,8 +505,8 @@ int MSP430::sub_integer(int num)
 
 int MSP430::mul_integer()
 {
-int n;
-int saved_registers;
+  int n;
+  int saved_registers;
 
   saved_registers = reg;
 
@@ -656,7 +656,7 @@ int MSP430::shift_left_integer()
 
 int MSP430::shift_left_integer(int count)
 {
-int n;
+  int n;
 
   if (stack != 0) { return -1; }
 
@@ -692,7 +692,7 @@ int MSP430::shift_right_integer()
 
 int MSP430::shift_right_integer(int count)
 {
-int n;
+  int n;
 
   if (stack != 0) { return -1; }
   if (count >= 8) { return -1; }
@@ -804,7 +804,7 @@ int MSP430::integer_to_short()
 
 int MSP430::jump_cond(const char *label, int cond, int distance)
 {
-bool reverse = false;
+  bool reverse = false;
 
   // MSP430 doesn't have LESS_EQUAL or GREATER so change them
   if (cond == COND_LESS_EQUAL)
@@ -861,7 +861,7 @@ int MSP430::jump_cond_zero(const char *label, int cond, int distance)
 
 int MSP430::jump_cond_integer(const char *label, int cond, int distance)
 {
-bool reverse = false;
+  bool reverse = false;
 
   // MSP430 doesn't have LESS_EQUAL or GREATER so change them
   if (cond == COND_LESS_EQUAL)
@@ -918,7 +918,7 @@ bool reverse = false;
 
 int MSP430::jump_cond_integer(const char *label, int cond, int const_val, int distance)
 {
-bool reverse = false;
+  bool reverse = false;
 
   // MSP430 doesn't have LESS_EQUAL or GREATER so change them
   if (cond == COND_LESS_EQUAL)
@@ -1024,11 +1024,11 @@ int MSP430::call(const char *name)
 
 int MSP430::invoke_static_method(const char *name, int params, int is_void)
 {
-int local;
-int stack_vars = stack;
-int reg_vars = reg;
-int saved_registers;
-int n;
+  int local;
+  int stack_vars = stack;
+  int reg_vars = reg;
+  int saved_registers;
+  int n;
 
   printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
 
@@ -1292,8 +1292,8 @@ int MSP430::push_array_length(const char *name, int field_id)
 
 int MSP430::array_read_byte()
 {
-int index_reg;
-int ref_reg;
+  int index_reg;
+  int ref_reg;
 
   get_values_from_stack(&index_reg, &ref_reg);
   fprintf(out, "  add.w r%d, r%d\n", index_reg, ref_reg);
@@ -1317,8 +1317,8 @@ int ref_reg;
 
 int MSP430::array_read_short()
 {
-int index_reg;
-int ref_reg;
+  int index_reg;
+  int ref_reg;
 
   get_values_from_stack(&index_reg, &ref_reg);
   fprintf(out, "  rla.w r%d\n", index_reg);
@@ -1393,9 +1393,9 @@ int MSP430::array_read_int(const char *name, int field_id)
 
 int MSP430::array_write_byte()
 {
-int value_reg;
-int index_reg;
-int ref_reg;
+  int value_reg;
+  int index_reg;
+  int ref_reg;
 
   get_values_from_stack(&value_reg, &index_reg, &ref_reg);
   fprintf(out, "  add.w r%d, r%d\n", index_reg, ref_reg);
@@ -1406,9 +1406,9 @@ int ref_reg;
 
 int MSP430::array_write_short()
 {
-int value_reg;
-int index_reg;
-int ref_reg;
+  int value_reg;
+  int index_reg;
+  int ref_reg;
 
   get_values_from_stack(&value_reg, &index_reg, &ref_reg);
   fprintf(out, "  rla.w r%d\n", index_reg);
@@ -1425,8 +1425,8 @@ int MSP430::array_write_int()
 
 int MSP430::array_write_byte(const char *name, int field_id)
 {
-int value_reg;
-int index_reg;
+  int value_reg;
+  int index_reg;
 
   get_values_from_stack(&value_reg, &index_reg);
 
@@ -1438,8 +1438,8 @@ int index_reg;
 
 int MSP430::array_write_short(const char *name, int field_id)
 {
-int value_reg;
-int index_reg;
+  int value_reg;
+  int index_reg;
 
   get_values_from_stack(&value_reg, &index_reg);
 
