@@ -146,8 +146,8 @@ int SegaGenesis::start_init()
     "  ; Wait on busy VDP\n"
     "start_wait_dma:\n"
     "  move.w (a1), d1      ; C00004 read VDP status\n"
-    "  btst.b #1, d1        ; test DMA busy flag\n"
-    "  bne.b start_wait_dma ; loop while DMA busy\n\n");
+    "  btst.l #1, d1        ; test DMA busy flag\n"
+    "  bne.s start_wait_dma ; loop while DMA busy\n\n");
 
   // Initalize CRAM
   fprintf(out,
@@ -335,6 +335,49 @@ int SegaGenesis::sega_genesis_fastPlot()
   return 0;
 }
 
+int SegaGenesis::sega_genesis_inVerticalBlank()
+{
+  const char *r = push_reg();
+
+  // NOTE: Documentation seems to have the flags wrong.
+  fprintf(out,
+    "  move.w (a1), %s      ; C00004 read VDP status\n"
+    "  and.l #8, %s         ; test vertical blank flag\n", r, r);
+
+  return 0;
+}
+
+int SegaGenesis::sega_genesis_waitVerticalBlank()
+{
+  // NOTE: Documentation seems to have the flags wrong.
+  fprintf(out,
+    "  ; Wait for vertical blank\n"
+    "_wait_vertical_blank_%d:\n"
+    "  move.w (a1), d5      ; C00004 read VDP status\n"
+    "  btst.l #3, d5        ; test vertical blank flag\n"
+    "  beq.s _wait_vertical_blank_%d\n",
+    label_count, label_count);
+
+  label_count++;
+
+  return 0;
+}
+
+int SegaGenesis::sega_genesis_waitHorizontalBlank()
+{
+  // NOTE: Documentation seems to have the flags wrong.
+  fprintf(out,
+    "  ; Wait for horizontal blank\n"
+    "_wait_horizontal_blank_%d:\n"
+    "  move.w (a1), d5      ; C00004 read VDP status\n"
+    "  btst.l #2, d5        ; test horizontal blank flag\n"
+    "  beq.s _wait_horizontal_blank_%d\n",
+    label_count, label_count);
+
+  label_count++;
+
+  return 0;
+}
 
 int SegaGenesis::sega_genesis_loadFonts()
 {

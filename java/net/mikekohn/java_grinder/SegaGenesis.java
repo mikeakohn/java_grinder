@@ -44,6 +44,17 @@ abstract public class SegaGenesis
   /** Set the next 4 pixels at the next word in the pattern table. */
   public static void fastPlot(int color0, int color1, int color2, int color3) { }
 
+  /** Returns true if the VDP (and display) is in vertical blanking mode.
+      The CPU will get faster access to the VDP at this point and changes
+      to the display won't suffer from tearing and such. */
+  public static boolean inVerticalBlank() { return false; }
+
+  /** Waits for VDP to go into vertical blanking mode. */
+  public static void waitVerticalBlank() { }
+
+  /** Waits for VDP to go into horizontal blanking mode. */
+  public static void waitHorizontalBlank() { }
+
   /** Load fonts. */
   public static void loadFonts() { }
 

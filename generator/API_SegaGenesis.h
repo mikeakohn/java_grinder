@@ -25,6 +25,9 @@ public:
   virtual int sega_genesis_plot() { return -1; }
   virtual int sega_genesis_setPlotAddress() { return -1; }
   virtual int sega_genesis_fastPlot() { return -1; }
+  virtual int sega_genesis_inVerticalBlank() { return -1; }
+  virtual int sega_genesis_waitVerticalBlank() { return -1; }
+  virtual int sega_genesis_waitHorizontalBlank() { return -1; }
   virtual int sega_genesis_loadFonts() { return -1; }
   virtual int sega_genesis_setCursor() { return -1; }
   virtual int sega_genesis_setCursor(int x, int y) { return -1; }

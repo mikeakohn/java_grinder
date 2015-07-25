@@ -32,6 +32,9 @@ public:
   virtual int sega_genesis_plot();
   virtual int sega_genesis_setPlotAddress();
   virtual int sega_genesis_fastPlot();
+  virtual int sega_genesis_inVerticalBlank();
+  virtual int sega_genesis_waitVerticalBlank();
+  virtual int sega_genesis_waitHorizontalBlank();
   virtual int sega_genesis_loadFonts();
   virtual int sega_genesis_setCursor();
   virtual int sega_genesis_setCursor(int x, int y);

@@ -3,6 +3,18 @@ import net.mikekohn.java_grinder.SegaGenesis;
 
 public class SegaGenesisJavaDemo
 {
+  static public void wait(int frames)
+  {
+    int a;
+
+    // 60 frames should be 1 second.
+    for (a = 0; a < frames; a++)
+    {
+      while(!SegaGenesis.inVerticalBlank());
+      while(SegaGenesis.inVerticalBlank());
+    }
+  }
+
   static public void main(String args[])
   {
     int a,b;
@@ -10,19 +22,17 @@ public class SegaGenesisJavaDemo
     SegaGenesis.setPaletteColors(ImageJavaGrinder.palette);
     SegaGenesis.setPatternTable(ImageJavaGrinder.pattern);
     SegaGenesis.setImageData(ImageJavaGrinder.image);
-    for (a = 0; a < 100000; a++);
+    wait(30);
 
     SegaGenesis.loadZ80(PlayTitleSample.z80_code);
-
-    for (a = 0; a < 500000; a++);
+    wait(120);
 
     SegaGenesis.pauseZ80();
 
     SegaGenesis.setPaletteColors(ImageMike.palette);
     SegaGenesis.setPatternTable(ImageMike.pattern);
     SegaGenesis.setImageData(ImageMike.image);
-
-    for (a = 0; a < 500000; a++);
+    wait(120);
 
     SegaGenesis.initBitmap();
     //SegaGenesis.clearBitmap();
@@ -35,7 +45,7 @@ public class SegaGenesisJavaDemo
     SegaGenesis.setPaletteColors(Mandelbrots.palette);
     Mandelbrots.draw();
 
-    for (a = 0; a < 500000; a++);
+    wait(60);
 
     SegaGenesis.clearBitmap();
     SegaGenesis.loadFonts();
@@ -48,11 +58,19 @@ public class SegaGenesisJavaDemo
 
     while(true)
     {
-      for (a = 0; a < 0xf; a++)
+      while(SegaGenesis.inVerticalBlank());
+
+      for (b = 0; b < 4; b++)
       {
-        SegaGenesis.setPalettePointer(1);
-        SegaGenesis.setPaletteColor((a << 8) | (a << 4) | a);
+        for (a = 0; a < 0xf; a++)
+        {
+          SegaGenesis.setPalettePointer(1);
+          SegaGenesis.setPaletteColor((a << 8) | (a << 4) | a);
+          SegaGenesis.waitHorizontalBlank();
+        }
       }
+
+      SegaGenesis.waitVerticalBlank();
     }
 
     //while(true);
