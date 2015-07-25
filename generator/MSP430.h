@@ -182,6 +182,8 @@ public:
 
 protected:
   int set_periph(const char *instr, const char *periph);
+  char *pop_reg();
+  char *top_reg();
   int stack_alu(const char *instr);
   void push_reg(const char *reg);
   void pop_reg(char *reg);
@@ -196,6 +198,7 @@ protected:
   int reg_max;
   int stack;
   int label_count;
+  char reg_string[8];
   bool need_read_spi:1;
   bool need_mul_integers:1;
   bool need_div_integers:1;

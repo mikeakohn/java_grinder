@@ -488,8 +488,7 @@ int MSP430::add_integer()
 
 int MSP430::add_integer(int num)
 {
-  if (stack != 0) { return -1; }
-  fprintf(out, "  add.w #%d, r%d\n", num, REG_STACK(reg-1));
+  fprintf(out, "  add.w #%d, %s\n", num, top_reg());
   return 0;
 }
 
@@ -500,8 +499,7 @@ int MSP430::sub_integer()
 
 int MSP430::sub_integer(int num)
 {
-  if (stack != 0) { return -1; }
-  fprintf(out, "  sub.w #%d, r%d\n", num, REG_STACK(reg-1));
+  fprintf(out, "  sub.w #%d, %s\n", num, top_reg());
   return 0;
 }
 
@@ -560,8 +558,8 @@ int saved_registers;
 
 int MSP430::div_integer()
 {
-int n;
-int saved_registers;
+  int n;
+  int saved_registers;
 
   saved_registers = reg;
 
@@ -618,16 +616,7 @@ int MSP430::mod_integer()
 
 int MSP430::neg_integer()
 {
-  if (stack > 0)
-  {
-    fprintf(out, "  neg.w @SP\n");
-    stack--;
-  }
-    else
-  {
-    fprintf(out, "  neg.w r%d\n", REG_STACK(reg-1));
-  }
-
+  fprintf(out, "  neg.w %s\n", top_reg());
   return 0;
 }
 
@@ -689,29 +678,10 @@ int n;
 int MSP430::shift_right_integer()
 {
   // FIXME - for MSP430x, this can be sped up
-  if (stack > 0)
-  {
-    fprintf(out, "  pop r15\n");
-    stack--;
-  }
-    else
-  if (reg > 0)
-  {
-    fprintf(out, "  mov.w r%d, r15\n", REG_STACK(reg-1));
-    reg--;
-  }
+  fprintf(out, "  mov.w %s, r15\n", pop_reg());
 
   fprintf(out, "label_%d:\n", label_count);
-
-  if (stack > 0)
-  {
-    fprintf(out, "  rra.w @SP\n");
-  }
-    else
-  {
-    fprintf(out, "  rra.w r%d\n", REG_STACK(reg-1));
-  }
-
+  fprintf(out, "  rra.w %s\n", top_reg());
   fprintf(out, "  dec.w r15\n");
   fprintf(out, "  jnz label_%d\n", label_count);
 
@@ -738,7 +708,7 @@ int n;
 
   for (n = 0; n < count; n ++)
   {
-    fprintf(out, "  rra.w r%d\n", REG_STACK(reg-1));
+    fprintf(out, "  rra.w %s\n", top_reg());
   }
 
   return 0;
@@ -747,29 +717,10 @@ int n;
 int MSP430::shift_right_uinteger()
 {
   // FIXME - for MSP430x, this can be sped up
-  if (stack > 0)
-  {
-    fprintf(out, "  pop r15\n");
-    stack--;
-  }
-    else
-  if (reg > 0)
-  {
-    fprintf(out, "  mov.w r%d, r15\n", REG_STACK(reg-1));
-    reg--;
-  }
+  fprintf(out, "  mov.w %s, r15\n", pop_reg());
 
   fprintf(out, "label_%d:\n", label_count);
-
-  if (stack > 0)
-  {
-    fprintf(out, "  rra.w @SP\n");
-  }
-    else
-  {
-    fprintf(out, "  rra.w r%d\n", REG_STACK(reg-1));
-  }
-
+  fprintf(out, "  rra.w %s\n", top_reg());
   fprintf(out, "  dec.w r15\n");
   fprintf(out, "  jnz label_%d\n", label_count);
 
@@ -794,7 +745,7 @@ int n;
   if (count != 0) { fprintf(out, "  clrc\n"); }
   for (n = 0; n < count; n ++)
   {
-    fprintf(out, "  rrc.w r%d\n", REG_STACK(reg-1));
+    fprintf(out, "  rrc.w %s\n", top_reg());
   }
 
   return 0;
@@ -807,8 +758,7 @@ int MSP430::and_integer()
 
 int MSP430::and_integer(int num)
 {
-  if (stack != 0) { return -1; }
-  fprintf(out, "  and.w #%d, r%d\n", num, REG_STACK(reg-1));
+  fprintf(out, "  and.w #%d, %s\n", num, top_reg());
   return 0;
 }
 
@@ -819,8 +769,7 @@ int MSP430::or_integer()
 
 int MSP430::or_integer(int num)
 {
-  if (stack != 0) { return -1; }
-  fprintf(out, "  bis.w #%d, r%d\n", num, REG_STACK(reg-1));
+  fprintf(out, "  bis.w #%d, %s\n", num, top_reg());
   return 0;
 }
 
@@ -831,8 +780,7 @@ int MSP430::xor_integer()
 
 int MSP430::xor_integer(int num)
 {
-  if (stack != 0) { return -1; }
-  fprintf(out, "  xor.w #%d, r%d\n", num, REG_STACK(reg-1));
+  fprintf(out, "  xor.w #%d, %s\n", num, top_reg());
   return 0;
 }
 
@@ -844,15 +792,7 @@ int MSP430::inc_integer(int index, int num)
 
 int MSP430::integer_to_byte()
 {
-  if (stack == 0)
-  {
-    fprintf(out, "  sxt @SP\n");
-  }
-    else
-  {
-    fprintf(out, "  sxt r%d\n", REG_STACK(reg-1));
-  }
-
+  fprintf(out, "  sxt %s\n", top_reg());
   return 0;
 }
 
@@ -1030,17 +970,7 @@ int MSP430::return_local(int index, int local_count)
 
 int MSP430::return_integer(int local_count)
 {
-  if (stack > 0)
-  {
-    fprintf(out, "  pop.w @SP, r15\n");
-    stack--;
-  }
-    else
-  {
-    fprintf(out, "  mov.w r%d, r15\n", REG_STACK(reg - 1));
-    reg--;
-  }
-
+  fprintf(out, "  mov.w %s, r15\n", pop_reg());
   fprintf(out, "  mov.w r12, SP\n");
   if (!is_main) { fprintf(out, "  pop r12\n"); }
   fprintf(out, "  ret\n");
@@ -2134,6 +2064,36 @@ int MSP430::set_periph(const char *instr, const char *periph)
   }
 
   return 0;
+}
+
+char *MSP430::pop_reg()
+{
+  if (stack == 0)
+  {
+    sprintf(reg_string, "r%d", REG_STACK(reg-1));
+    reg--;
+  }
+    else
+  {
+    strcpy(reg_string, "@SP+");
+    stack--;
+  }
+
+  return reg_string;
+}
+
+char *MSP430::top_reg()
+{
+  if (stack == 0)
+  {
+    sprintf(reg_string, "r%d", REG_STACK(reg-1));
+  }
+    else
+  {
+    strcpy(reg_string, "@SP");
+  }
+
+  return reg_string;
 }
 
 int MSP430::stack_alu(const char *instr)
