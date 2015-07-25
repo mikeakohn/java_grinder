@@ -513,11 +513,14 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
     return 0;
   }
 
+#if 0
+  // This breaks interface methods
   if ((method->access_flags & ACC_STATIC) == 0)
   {
-    printf("Error: Method %s is not static.\n", method_name);
+    printf("Error: Method %s is not static %s:%d.\n", method_name, __FILE__, __LINE__);
     return -1;
   }
+#endif
 
   param_count = 0;
 
