@@ -39,6 +39,7 @@ load_setup:
   inc ix
   djnz load_setup
 
+  ;; Channel 1
   ld a, CH1_SOUND_ON
   ld (FM1_REG_SEL), a
   ld a, 0xc0
@@ -54,7 +55,29 @@ load_setup:
   ld a, 0x69
   ld (FM1_REG_DATA), a
 
+  ;; Channel 2
+  ld a, CH1_SOUND_ON + 1
+  ld (FM1_REG_SEL), a
+  ld a, 0xc0
+  ld (FM1_REG_DATA), a
+
+  ld a, CH1_FREQ_MSB + 1
+  ld (FM1_REG_SEL), a
+  ld a, 0x22
+  ld (FM1_REG_DATA), a
+
+  ld a, CH1_FREQ_LSB + 1
+  ld (FM1_REG_SEL), a
+  ld a, 0xb4
+  ld (FM1_REG_DATA), a
+
+  ;; Play notes
   ld a, KEY_PRESS
+  ld (FM1_REG_SEL), a
+  ld a, 0xf0
+  ld (FM1_REG_DATA), a
+
+  ld a, KEY_PRESS + 1
   ld (FM1_REG_SEL), a
   ld a, 0xf0
   ld (FM1_REG_DATA), a
