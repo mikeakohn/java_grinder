@@ -42,6 +42,9 @@ public class SegaGenesisJavaDemo
     //SegaGenesis.plot(8, 8, 1);
     //SegaGenesis.plot(16, 16, 1);
     //SegaGenesis.plot(24, 24, 1);
+    //for (a = 0; a < 8; a++) { SegaGenesis.plot(a, a, 1); }
+    //wait(120);
+
     SegaGenesis.setPaletteColors(Mandelbrots.palette);
     Mandelbrots.draw();
 

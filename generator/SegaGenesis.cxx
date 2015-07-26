@@ -177,39 +177,6 @@ int SegaGenesis::start_init()
     "  move.b (a2)+, (0x0011, a0) ; C00011 copy PSG initialization commands\n"
     "  dbra d2, start_init_psg\n\n");
 
-  // Initialize palette (FIXME - This should be removed I think)
-#if 0
-  fprintf(out,
-    "  ; Initialize palette\n"
-    "  move.l #0xc0020000, (a1)  ; C00004 CRAM write address = 0x0002\n"
-    "  move.w #0x0eee, (a0)      ; C00000 write next word to video\n"
-    "  move.w #0x0ee8, (a0)      ; C00000 write next word to video\n");
-#endif
-
-  // Copy fonts into VDP
-  //fprintf(out, "  jsr _load_fonts\n\n");
-
-#if 0
-  // Copy message to screen (FIXME - this should be removed also)
-  fprintf(out,
-    "  lea (hello_msg-$-2,PC), a2\n"
-    "  move.l #0x45940003, d5\n"
-    "print_msg:\n"
-    "  move.l d5, (a1)        ; C00004 write next character to VDP\n"
-    "print_msg_1:\n"
-    "  moveq #0, d1           ; clear high byte of word\n"
-    "  move.b (a2)+, d1       ; get next byte\n"
-    "  bmi.b print_msg_3      ; branch if high bit set\n"
-    "  beq.b print_msg_done   ; store byte if not null\n"
-    "print_msg_2:\n"
-    "  move.w d1, (a0)        ; C00000 store next word of name data\n"
-    "  bra.b print_msg_1\n"
-    "print_msg_3:\n"
-    "  addi.l #0x01000000, d5 ; offset VRAM address by 0x0100 to skip a line\n"
-    "  bra.b print_msg\n"
-    "print_msg_done:\n\n");
-#endif
-
   // Unblank display
   fprintf(out,
     "  ; Unblank display\n"
@@ -257,6 +224,8 @@ int SegaGenesis::sega_genesis_setPalettePointer(int index)
 
 int SegaGenesis::sega_genesis_setPaletteColor()
 {
+  fprintf(out, "  move.l %s, (a0)\n", pop_reg());
+#if 0
   if (stack > 0)
   {
     fprintf(out, "  move.l (SP)+, (a0)\n");
@@ -267,6 +236,7 @@ int SegaGenesis::sega_genesis_setPaletteColor()
     fprintf(out, "  move.l d%d, (a0)\n", REG_STACK(reg-1));
     reg--;
   }
+#endif
 
   return 0;
 }
@@ -316,7 +286,7 @@ int SegaGenesis::sega_genesis_setPlotAddress()
 {
   need_set_plot_address = true;
 
-  fprintf(out, "  move.l d%d, d5\n", REG_STACK(reg-1));
+  fprintf(out, "  move.l %s, d5\n", pop_reg());
   fprintf(out, "  jsr _set_plot_address\n");
 
   reg--;
@@ -327,6 +297,7 @@ int SegaGenesis::sega_genesis_setPlotAddress()
 
 int SegaGenesis::sega_genesis_fastPlot()
 {
+  // FIXME
   fprintf(out, "  move.w d%d, (a1)\n", REG_STACK(reg-2));
   fprintf(out, "  move.w d%d, (a1)\n", REG_STACK(reg-1));
 
@@ -852,7 +823,7 @@ void SegaGenesis::add_init_bitmap()
     "_init_bitmap:\n"
     "  move.l d4, (-4,a7)         ; put d4 on stack (or really below)\n"
     "  move.l #0x40000000, (a1)   ; C00004 VRAM write to 0x0000\n"
-    "  move.l #(40*28*16)-1, d5   ; Pattern len\n"
+    "  move.l #(40*28*16)+15, d5  ; Pattern len (plus 1)\n"
     "  eor.l d7, d7\n"
     "_clear_pattern_table_loop:\n"
     "  move.w d7, (a0)\n"
@@ -861,7 +832,6 @@ void SegaGenesis::add_init_bitmap()
     "  move.l d4, (a1)            ; C00004 VRAM write to 0xC000\n"
     "  move.l #(40*28)-1, d5      ; data len\n"
     "  eor.w d6, d6\n"
-    //"  move.l #1, d5        ; data len\n"
     "_init_bitmap_loop:\n"
     "  move.w d7, (a0)\n"
     "  add.w #1, d6\n"
@@ -874,6 +844,15 @@ void SegaGenesis::add_init_bitmap()
     "  addq.l #1, d7\n"
     "  dbf d5, _init_bitmap_loop\n"
     "  move.l (-4,a7), d4         ; recover d4\n"
+
+    "  move.l #0x60000003, d7     ; Set cursor position in VDP\n"
+    "  move.l d7, (a1)            ; C00004 VRAM write to 0xC000\n"
+    "  move.l #0x1000-1, d5       ; data len\n"
+    "  move.w #0x460, d7          ; blank pattern\n"
+    "_init_bitmap_other_loop:\n"
+    "  move.w d7, (a0)\n"
+    "  dbf d5, _init_bitmap_other_loop\n"
+    "  move.l (-4,a7), d4         ; recover d4\n"
     "  rts\n\n");
 }
 
@@ -883,7 +862,7 @@ void SegaGenesis::add_clear_bitmap()
   fprintf(out,
     "_clear_bitmap:\n"
     "  move.l #0x40000000, (a1)   ; C00004 VRAM write to 0x0000\n"
-    "  move.l #(40*28*16)-1, d5   ; Pattern len\n"
+    "  move.l #(40*28*16)+15, d5  ; Pattern len (w*h*16 words) (plus 1)\n"
     "  eor.l d6, d6\n"
     "_clear_bitmap_loop:\n"
     "  move.w d6, (a0)\n"
@@ -948,7 +927,6 @@ void SegaGenesis::add_plot()
     "  move.w (-8,a7), d4 ; restore register\n"
     "  rts\n\n");
 }
-
 
 void SegaGenesis::add_set_plot_address()
 {

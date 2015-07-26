@@ -52,10 +52,7 @@ public class Mandelbrots
 
         if (count == 16) { count = 15; }
 
-        if (x > 8 && y > 8) // FIXME
-        {
-          SegaGenesis.plot(x, y, count);
-        }
+        SegaGenesis.plot(x, y, count);
 
         rs += dx;
       }
