@@ -23,18 +23,15 @@ CH1_FREQ_MSB equ 0xa4
 CH1_SOUND_ON equ 0xb4
 
 start:
+  ld sp, 0x2000
   ld ix, setup
   ld c, 0x30
   ld b, setup_end - setup
 
 load_setup:
-  ld a, c
-  ld (FM1_REG_SEL), a
-  ld a, (ix)
-  ld (FM1_REG_DATA), a
-  inc c
-  inc c
-  inc c
+  call init_channel
+  call init_channel
+  call init_channel
   inc c
   inc ix
   djnz load_setup
@@ -63,12 +60,12 @@ load_setup:
 
   ld a, CH1_FREQ_MSB + 1
   ld (FM1_REG_SEL), a
-  ld a, 0x22
+  ld a, 0x23
   ld (FM1_REG_DATA), a
 
   ld a, CH1_FREQ_LSB + 1
   ld (FM1_REG_SEL), a
-  ld a, 0xb4
+  ld a, 0x09
   ld (FM1_REG_DATA), a
 
   ;; Play notes
@@ -77,13 +74,25 @@ load_setup:
   ld a, 0xf0
   ld (FM1_REG_DATA), a
 
-  ld a, KEY_PRESS + 1
+  ld a, KEY_PRESS
   ld (FM1_REG_SEL), a
-  ld a, 0xf0
+  ld a, 0xf1
   ld (FM1_REG_DATA), a
 
 while_1:
   jp while_1
+
+init_channel:
+  ld a, c
+  ld (FM1_REG_SEL), a
+  ld a, (ix)
+  ld (FM1_REG_DATA), a
+  ;ld a, c
+  ;ld (FM2_REG_SEL), a
+  ;ld a, (ix)
+  ;ld (FM2_REG_DATA), a
+  inc c
+  ret
 
 setup:
   db 0x71, 0x0d, 0x33, 0x01
