@@ -68,6 +68,22 @@ load_setup:
   ld a, 0x09
   ld (FM1_REG_DATA), a
 
+  ;; Channel 4
+  ld a, CH1_SOUND_ON
+  ld (FM2_REG_SEL), a
+  ld a, 0xc0
+  ld (FM2_REG_DATA), a
+
+  ld a, CH1_FREQ_MSB
+  ld (FM2_REG_SEL), a
+  ld a, 0x23
+  ld (FM2_REG_DATA), a
+
+  ld a, CH1_FREQ_LSB
+  ld (FM2_REG_SEL), a
+  ld a, 0x9c
+  ld (FM2_REG_DATA), a
+
   ;; Play notes
   ld a, KEY_PRESS
   ld (FM1_REG_SEL), a
@@ -79,6 +95,11 @@ load_setup:
   ld a, 0xf1
   ld (FM1_REG_DATA), a
 
+  ld a, KEY_PRESS
+  ld (FM1_REG_SEL), a
+  ld a, 0xf4
+  ld (FM1_REG_DATA), a
+
 while_1:
   jp while_1
 
@@ -87,10 +108,10 @@ init_channel:
   ld (FM1_REG_SEL), a
   ld a, (ix)
   ld (FM1_REG_DATA), a
-  ;ld a, c
-  ;ld (FM2_REG_SEL), a
-  ;ld a, (ix)
-  ;ld (FM2_REG_DATA), a
+  ld a, c
+  ld (FM2_REG_SEL), a
+  ld a, (ix)
+  ld (FM2_REG_DATA), a
   inc c
   ret
 
