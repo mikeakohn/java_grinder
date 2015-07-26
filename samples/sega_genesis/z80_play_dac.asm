@@ -46,6 +46,12 @@ play_loop_delay:
   cp 0
   jr nz, play_loop
 
+  ;; Turn off Yamaha 2612 DAC mode for channel 6
+  ld a, DAC_ENABLE
+  ld (FM1_REG_SEL), a
+  ld a, 0x00
+  ld (FM1_REG_DATA), a
+
 while_1:
   jp while_1
 

@@ -13,7 +13,7 @@ then
 fi
 
 mess genesis -window \
-  -cart1 sega_genesis_java_demo.bin \
+  -cart sega_genesis_java_demo.bin \
   ${extra}
 
 if [ "$1" = "avi" ]

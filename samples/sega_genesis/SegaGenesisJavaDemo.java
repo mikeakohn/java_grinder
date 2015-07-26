@@ -45,6 +45,7 @@ public class SegaGenesisJavaDemo
     //for (a = 0; a < 8; a++) { SegaGenesis.plot(a, a, 1); }
     //wait(120);
 
+    SegaGenesis.loadZ80(PlaySong.z80_code);
     SegaGenesis.setPaletteColors(Mandelbrots.palette);
     Mandelbrots.draw();
 

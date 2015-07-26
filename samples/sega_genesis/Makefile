@@ -1,13 +1,17 @@
 
-default: SegaGenesisJavaDemo.class PlayTitleSample.class Mandelbrots.class
+default: SegaGenesisJavaDemo.class Mandelbrots.class PlaySong.class PlayTitleSample.class
 
-grind: SegaGenesisJavaDemo.class PlayTitleSample.class Mandelbrots.class
+grind: SegaGenesisJavaDemo.class Mandelbrots.class PlaySong.class PlayTitleSample.class
 	../../java_grinder SegaGenesisJavaDemo.class sega_genesis_java_demo.asm sega_genesis
 	naken_asm -I ~ -l -b -o sega_genesis_java_demo.bin sega_genesis_java_demo.asm
 
-z80:
+dac:
 	naken_asm -l -b -o z80_play_dac.bin z80_play_dac.asm
 	go run bin2java.go z80_play_dac.bin | grep -v INFO | sed 's/ClassName/PlayTitleSample/' | sed 's/code/z80_code/' > PlayTitleSample.java
+
+synth:
+	naken_asm -l -b -o z80_play_synth.bin z80_play_synth.asm
+	go run bin2java.go z80_play_synth.bin | grep -v INFO | sed 's/ClassName/PlaySong/' | sed 's/code/z80_code/' > PlaySong.java
 
 %.class: %.java
 	javac -classpath ../../build/JavaGrinder.jar:. $*.java
