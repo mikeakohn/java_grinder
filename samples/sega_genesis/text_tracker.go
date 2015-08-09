@@ -17,6 +17,11 @@ type Tokens struct {
   line int
 }
 
+type TimeSignature struct {
+  beats int
+  note_value int
+}
+
 type Note struct {
   value uint8
   length uint8
@@ -57,7 +62,12 @@ func (tokens *Tokens) Load(filename string) bool {
   return true
 }
 
-func (tokens *Tokens) Get() string {
+func (time_signature *TimeSignature) Init() {
+  time_signature.beats = 4
+  time_signature.note_value = 4
+}
+
+func (tokens *Tokens) Strip() {
   // Strip whitespace
   for tokens.text[tokens.next] == ' ' ||
       tokens.text[tokens.next] == '\r' ||
@@ -65,8 +75,20 @@ func (tokens *Tokens) Get() string {
       tokens.text[tokens.next] == '\t' {
     if tokens.text[tokens.next] == '\n' { tokens.line++ }
     tokens.next++
-    if tokens.next == tokens.size { return "" }
+    if tokens.next == tokens.size { break }
     continue
+  }
+}
+
+func (tokens *Tokens) Get() string {
+  tokens.Strip()
+  if tokens.next == tokens.size { return "" }
+
+  // Remove commented lines
+  if tokens.text[tokens.next] == '/' && tokens.text[tokens.next + 1] == '/' {
+    for tokens.text[tokens.next] != '\n' { tokens.next++ }
+    tokens.Strip()
+    if tokens.next == tokens.size { return "" }
   }
 
   switch tokens.text[tokens.next] {
@@ -85,7 +107,8 @@ func (tokens *Tokens) Get() string {
   for true {
     if tokens.text[i] >= '0' && tokens.text[i] <= '9' ||
        tokens.text[i] >= 'A' && tokens.text[i] <= 'Z' ||
-       tokens.text[i] >= 'a' && tokens.text[i] <= 'z' {
+       tokens.text[i] >= 'a' && tokens.text[i] <= 'z' ||
+       tokens.text[i] == '#' {
       i++
     } else {
       break
@@ -136,7 +159,25 @@ func ParseBpm(tokens *Tokens) int {
   return n
 }
 
+func ParseTimeSignature(tokens *Tokens, time_signature *TimeSignature) {
+  beats := tokens.Get()
+
+  if tokens.Get() != "/" {
+    fmt.Print("Error: Missing / on line: %d", tokens.line)
+  }
+
+  note_value := tokens.Get()
+
+  if tokens.Get() != ";" {
+    fmt.Print("Error: Missing semicolon on line: %d", tokens.line)
+  }
+
+  time_signature.beats, _ = strconv.Atoi(beats)
+  time_signature.note_value, _ = strconv.Atoi(note_value)
+}
+
 func ConvertNote(note string) int {
+  var octave int
   note_table := []uint8{ 0, 2, 3, 5, 7, 8, 10 }
 
   if len(note) != 2 && len(note) != 3 {
@@ -145,17 +186,19 @@ func ConvertNote(note string) int {
   }
 
   note_num := int(note_table[note[0] - 'A'])
-  octave := int(note[1] - '0')
 
-  if len(note) > 2 {
-    if note[2] == '#' {
-      note_num++
-    } else if note[2] == 'b' {
+  if note[1] == 'b' || note[1] == '#' {
+    if note[1] == 'b' {
       note_num--
+    } else if note[1] == '#' {
+      note_num++
     } else {
       fmt.Print("Error: Unknown modifier " + note)
       return 0
     }
+    octave = int(note[2] - '0')
+  } else {
+    octave = int(note[1] - '0')
   }
 
   return 21 + (octave * 12) + note_num
@@ -191,9 +234,9 @@ func ParsePatternVoice(tokens *Tokens, voice []Note) bool {
   return true
 }
 
-func ParsePattern(tokens *Tokens, divisions int) (*Pattern,string) {
+func ParsePattern(tokens *Tokens, time_signature *TimeSignature, divisions int) (*Pattern, string) {
   pattern := new(Pattern)
-  pattern.Init(divisions)
+  pattern.Init(divisions * time_signature.beats)
   name := tokens.Get()
 
   if divisions == 0 {
@@ -328,7 +371,9 @@ func WriteNote(delay int, channel int, value uint8, is_on bool) []uint8 {
   return track_data
 }
 
-func CreateMidi(song *Song, divisions int, bpm int) {
+func CreateMidi(song *Song, time_signature *TimeSignature, divisions int, bpm int) {
+  var note_value uint8
+
   file, err := os.Create("out.mid")
   if err != nil { panic(err) }
 
@@ -346,6 +391,18 @@ func CreateMidi(song *Song, divisions int, bpm int) {
     }
   }
 
+  switch time_signature.note_value {
+    case 1: note_value = 0; break
+    case 2: note_value = 1; break
+    case 4: note_value = 2; break
+    case 8: note_value = 4; break
+    case 16: note_value = 5; break
+    case 32: note_value = 6; break
+    default:
+      fmt.Println("Bad time signature note value")
+      return
+  }
+
   file.WriteString("MThd")
   WriteInt32(file, 6)         // length (always 6)
   WriteInt16(file, 1)         // 0=single track, 1=multiple track, 2=multiple song
@@ -356,6 +413,8 @@ func CreateMidi(song *Song, divisions int, bpm int) {
     track_data := make([]uint8, 0)
     pattern := song.voices[voice]
     last_note := 0
+
+    track_data = append(track_data, []uint8{ 0, 0xff, 0x58, 0x04, uint8(time_signature.beats), note_value, uint8(divisions), 8 }...)
 
     for i := 0; i < len(pattern); i++ {
       if pattern[i].value != 0 {
@@ -377,8 +436,11 @@ func CreateMidi(song *Song, divisions int, bpm int) {
 func main() {
   var patterns map[string]*Pattern
   var song *Song
+  var time_signature TimeSignature
   divisions := 8
   bpm := 60
+
+  time_signature.Init()
 
   fmt.Println("Text Tracker - Copyright 2015 by Michael Kohn")
 
@@ -411,8 +473,14 @@ func main() {
       if bpm == 0 {
         break
       }
+    } else if token == "time_signature" {
+      ParseTimeSignature(tokens, &time_signature)
+
+      if time_signature.beats == 0 || time_signature.note_value == 0 {
+        break
+      }
     } else if token == "pattern" {
-      pattern, name := ParsePattern(tokens, divisions)
+      pattern, name := ParsePattern(tokens, &time_signature, divisions)
 
       if pattern == nil {
         break
@@ -432,10 +500,11 @@ func main() {
     //fmt.Println("'" + token + "'")
   }
 
-  fmt.Printf("Divisions: %d\n", divisions)
-  fmt.Printf("      BMP: %d\n", bpm)
+  fmt.Printf(     "Divisions: %d\n", divisions)
+  fmt.Printf("           BPM: %d\n", bpm)
+  fmt.Printf("Time Signature: %d/%d\n", time_signature.beats, time_signature.note_value)
 
-  CreateMidi(song, divisions, bpm)
+  CreateMidi(song, &time_signature, divisions, bpm)
 }
 
 

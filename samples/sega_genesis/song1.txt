@@ -1,11 +1,12 @@
 
 divisions 8;
+bpm 60;
 
 pattern intro
 {
-  voice 0: 0 A5 1;
-  voice 1: 0 C5 1;
-  voice 2: 0 E5 1;
+  voice 0: 0 F5 1, 8 F5 1, 16 F5 1, 24 F5 1;
+  voice 2: 0 C5 1, 8 D5 1, 16 C5 1, 24 C5 1;
+  //voice 1: 0 A5 1, 8 A5 1, 16 A5 1, 24 Ab5 1;
 }
 
 pattern a
@@ -17,7 +18,7 @@ pattern a
 
 song
 {
-  intro * 2,
+  intro * 4,
   a * 4,
 }
 
