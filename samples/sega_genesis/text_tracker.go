@@ -216,6 +216,8 @@ func ParsePatternVoice(tokens *Tokens, voice []Note) bool {
     length, _ := strconv.Atoi(tokens.Get())
     separator := tokens.Get()
 
+    // fmt.Printf("  %d %d %d\n", beat, note, length)
+
     if note == 0 || length == 0 {
       fmt.Printf("Error: Problem on line %d\n", tokens.line)
       return false
@@ -259,6 +261,9 @@ func ParsePattern(tokens *Tokens, time_signature *TimeSignature, divisions int) 
     if token == "voice" {
       token = tokens.Get()
       voice, err := strconv.Atoi(token)
+
+      // fmt.Println("Voice: " + token)
+
       if err != nil {
         fmt.Println("Error: Unexpected token " + token)
         return nil, ""
@@ -342,17 +347,16 @@ func WriteInt16(file *os.File, value int) {
   file.Write(data)
 }
 
-func WriteVarInt(time int) []uint8 {
+func GetVarInt(time int) []uint8 {
   data := make([]uint8, 0)
+  var bit7 uint8 = 0x00
 
   for true {
-    if (time & ^0x7f) == 0 {
-      data = append([]uint8{ uint8(time & 0x7f) }, data...)
-      break
-    } else {
-      data = append([]uint8{ uint8((time & 0x7f) | 0x80) }, data...)
-      time >>= 7
-    }
+    data = append([]uint8{ uint8(time & 0x7f) | bit7 }, data...)
+    bit7 = 0x80
+
+    time >>= 7
+    if time == 0 { break }
   }
 
   return data
@@ -361,10 +365,10 @@ func WriteVarInt(time int) []uint8 {
 func WriteNote(delay int, channel int, value uint8, is_on bool) []uint8 {
   var command uint8
 
-  track_data := WriteVarInt(delay)
+  track_data := GetVarInt(delay)
 
   if is_on { command = 0x90 } else { command = 0x80 }
-  command |= uint8(channel)
+  //command |= uint8(channel)
 
   track_data = append(track_data, []uint8{ command, value, 127 }...)
 
@@ -377,11 +381,12 @@ func CreateMidi(song *Song, time_signature *TimeSignature, divisions int, bpm in
   file, err := os.Create("out.mid")
   if err != nil { panic(err) }
 
-  track_has_data := make([]bool,6)
+  track_has_data := make([]bool, 6)
   tracks := 0
 
   for voice := 0; voice < 6; voice++ {
     pattern := song.voices[voice]
+
     for i := 0; i < len(pattern); i++ {
       if pattern[i].value != 0 {
         tracks++
@@ -403,18 +408,31 @@ func CreateMidi(song *Song, time_signature *TimeSignature, divisions int, bpm in
       return
   }
 
+  // Write MIDI SMF header
   file.WriteString("MThd")
   WriteInt32(file, 6)         // length (always 6)
   WriteInt16(file, 1)         // 0=single track, 1=multiple track, 2=multiple song
   WriteInt16(file, tracks)    // number of track chunks
   WriteInt16(file, divisions) // divisions
 
+  // Track 0 is just: time signature, (tempo), end of track
+  tempo := 75000 * 2
+  track_data := make([]uint8, 0)
+  track_data = append(track_data, []uint8{ 0, 0xff, 0x58, 0x04, uint8(time_signature.beats), note_value, uint8(divisions), 8 }...)
+  track_data = append(track_data, []uint8{ 0, 0xff, 0x51, 0x03, uint8(tempo >> 16), uint8((tempo >> 8) & 0xff), uint8(tempo & 0xff) }...)
+  track_data = append(track_data, []uint8{ 0, 0xff, 0x2f, 0x00 }...)
+
+  file.WriteString("MTrk")
+  WriteInt32(file, len(track_data))
+  file.Write(track_data)
+
+  // Write music data to tracks
   for voice := 0; voice < 6; voice++ {
+    if !track_has_data[voice] { continue }
+
     track_data := make([]uint8, 0)
     pattern := song.voices[voice]
     last_note := 0
-
-    track_data = append(track_data, []uint8{ 0, 0xff, 0x58, 0x04, uint8(time_signature.beats), note_value, uint8(divisions), 8 }...)
 
     for i := 0; i < len(pattern); i++ {
       if pattern[i].value != 0 {
@@ -430,6 +448,12 @@ func CreateMidi(song *Song, time_signature *TimeSignature, divisions int, bpm in
     file.WriteString("MTrk")
     WriteInt32(file, len(track_data))
     file.Write(track_data)
+
+    // Debug output
+    //for _,element := range track_data {
+    //  fmt.Printf(" %02x", element)
+    //}
+    //fmt.Printf("\n\n")
   }
 }
 
