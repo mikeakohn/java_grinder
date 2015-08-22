@@ -36,71 +36,41 @@ load_setup:
   inc ix
   djnz load_setup
 
-.if 0
-  ;; Channel 1
+  ;; Channel 0
   ld a, CH1_SOUND_ON
   ld (FM1_REG_SEL), a
   ld a, 0xc0
   ld (FM1_REG_DATA), a
 
-  ld a, CH1_FREQ_MSB
-  ld (FM1_REG_SEL), a
-  ld a, 0x22
-  ld (FM1_REG_DATA), a
-
-  ld a, CH1_FREQ_LSB
-  ld (FM1_REG_SEL), a
-  ld a, 0x69
-  ld (FM1_REG_DATA), a
-
-  ;; Channel 2
+  ;; Channel 1
   ld a, CH1_SOUND_ON + 1
   ld (FM1_REG_SEL), a
   ld a, 0xc0
   ld (FM1_REG_DATA), a
 
-  ld a, CH1_FREQ_MSB + 1
+  ;; Channel 2
+  ld a, CH1_SOUND_ON + 2
   ld (FM1_REG_SEL), a
-  ld a, 0x23
+  ld a, 0xc0
   ld (FM1_REG_DATA), a
 
-  ld a, CH1_FREQ_LSB + 1
-  ld (FM1_REG_SEL), a
-  ld a, 0x09
-  ld (FM1_REG_DATA), a
-
-  ;; Channel 4
+  ;; Channel 3
   ld a, CH1_SOUND_ON
   ld (FM2_REG_SEL), a
   ld a, 0xc0
   ld (FM2_REG_DATA), a
 
-  ld a, CH1_FREQ_MSB
+  ;; Channel 4
+  ld a, CH1_SOUND_ON + 1
   ld (FM2_REG_SEL), a
-  ld a, 0x23
+  ld a, 0xc0
   ld (FM2_REG_DATA), a
 
-  ld a, CH1_FREQ_LSB
+  ;; Channel 5
+  ld a, CH1_SOUND_ON + 2
   ld (FM2_REG_SEL), a
-  ld a, 0x9c
+  ld a, 0xc0
   ld (FM2_REG_DATA), a
-
-  ;; Play notes
-  ld a, KEY_PRESS
-  ld (FM1_REG_SEL), a
-  ld a, 0xf0
-  ld (FM1_REG_DATA), a
-
-  ld a, KEY_PRESS
-  ld (FM1_REG_SEL), a
-  ld a, 0xf1
-  ld (FM1_REG_DATA), a
-
-  ld a, KEY_PRESS
-  ld (FM1_REG_SEL), a
-  ld a, 0xf4
-  ld (FM1_REG_DATA), a
-.endif
 
 while_1:
   jp while_1

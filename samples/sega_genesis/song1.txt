@@ -13,14 +13,14 @@ pattern intro
   //voice 2: 0 C5 1, 192 D5 1, 384 E5 1, 576 F5 1;
 }
 
-pattern a
+pattern pattern_1
 {
   voice 0: 0 A5 1, 2 C5 1;
   voice 1: 0 C5 1, 2 E5 1;
   voice 2: 0 E5 1, 2 G5 1;
 }
 
-pattern b
+pattern pattern_2
 {
   voice 0: 0 A6 1;
   voice 1: 0 C6 1;
@@ -30,6 +30,7 @@ pattern b
 song
 {
   intro * 4,
-  b * 4,
+  pattern_1 * 4,
+  pattern_2 * 4,
 }
 

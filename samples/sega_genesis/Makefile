@@ -13,6 +13,10 @@ synth:
 	naken_asm -l -b -o z80_play_synth.bin z80_play_synth.asm
 	go run bin2java.go z80_play_synth.bin | grep -v INFO | sed 's/ClassName/PlaySong/' | sed 's/code/z80_code/' > PlaySong.java
 
+setup:
+	naken_asm -l -b -o z80_setup_synth.bin z80_setup_synth.asm
+	go run bin2java.go z80_setup_synth.bin | grep -v INFO | sed 's/ClassName/SetupSynth/' | sed 's/code/z80_code/' > SetupSynth.java
+
 %.class: %.java
 	javac -classpath ../../build/JavaGrinder.jar:. $*.java
 

@@ -108,7 +108,8 @@ func (tokens *Tokens) Get() string {
     if tokens.text[i] >= '0' && tokens.text[i] <= '9' ||
        tokens.text[i] >= 'A' && tokens.text[i] <= 'Z' ||
        tokens.text[i] >= 'a' && tokens.text[i] <= 'z' ||
-       tokens.text[i] == '#' || tokens.text[i] == '.' {
+       tokens.text[i] == '#' || tokens.text[i] == '.' ||
+       tokens.text[i] == '_' {
       i++
     } else {
       break
@@ -283,8 +284,9 @@ func ParsePattern(tokens *Tokens, time_signature *TimeSignature, divisions int) 
   return pattern, name
 }
 
-func ParseSong(tokens *Tokens, patterns map[string]*Pattern) *Song {
+func ParseSong(tokens *Tokens, patterns map[string]*Pattern) (*Song, []string) {
   song := new(Song)
+  song_patterns := make([]string, 0)
 
   song.voices = make([][]Note, 6)
 
@@ -302,7 +304,7 @@ func ParseSong(tokens *Tokens, patterns map[string]*Pattern) *Song {
 
     if pattern == nil {
       fmt.Println("Error: Unknown pattern name " + name)
-      return nil
+      return nil, nil
     }
 
     token := tokens.Get()
@@ -311,7 +313,7 @@ func ParseSong(tokens *Tokens, patterns map[string]*Pattern) *Song {
       n, err := strconv.Atoi(token)
       if err != nil {
         fmt.Printf("Error: Not a number on line %d\n", tokens.line)
-        return nil
+        return nil, nil
       }
       multiplyer = n
       token = tokens.Get()
@@ -324,16 +326,63 @@ func ParseSong(tokens *Tokens, patterns map[string]*Pattern) *Song {
       }
 
       song.drums = append(song.drums, pattern.drums...)
+      song_patterns = append(song_patterns, name)
     }
 
     if token == "}" { break }
     if token != "," {
       fmt.Printf("Error: Unexpected token %s on line %d\n", token, tokens.line)
-      return nil
+      return nil, nil
     }
   }
 
-  return song
+  return song, song_patterns
+}
+
+func CreateZ80(patterns map[string]*Pattern, song_patterns []string, divisions_in_measure int) {
+  var last_division int
+
+  for name, _ := range patterns {
+    fmt.Printf("%s:\n  db", name)
+
+    pattern := patterns[name]
+    count := 0
+    last_division = 0
+
+    for i := 0; i < divisions_in_measure; i++ {
+      for voice := 0; voice < 6; voice++ {
+        note := pattern.voices[voice][i]
+        if note.value != 0 {
+          distance := i - last_division
+          last_division = i
+
+          if count >= 4 {
+            fmt.Printf("\n  db")
+            count = 0
+          }
+
+          fmt.Printf(" 0x%02x, 0x%02x, 0x%02x,", distance >> 2, voice, note.value)
+          count += 1
+        }
+      }
+    }
+
+    // Add an extra event to the end of the pattern to signify the end
+    if count >= 4 { fmt.Printf("\n  db") }
+    fmt.Printf(" 0x%02x, 0xff, 0xff,",
+      (divisions_in_measure - last_division) >> 2)
+
+    fmt.Println()
+  }
+
+  fmt.Println("song:")
+  for i, _ := range song_patterns {
+    if (i % 4) == 0 {
+      fmt.Print("\n  dw")
+    }
+    fmt.Print(" " + song_patterns[i] + ",")
+  }
+  fmt.Println("\n  dw 0\n")
 }
 
 func WriteInt32(file *os.File, value int) {
@@ -467,6 +516,7 @@ func CreateMidi(song *Song, time_signature *TimeSignature, divisions int, bpm in
 func main() {
   var patterns map[string]*Pattern
   var song *Song
+  var song_patterns []string
   var time_signature TimeSignature
   divisions := 8
   bpm := 60
@@ -519,7 +569,7 @@ func main() {
 
       patterns[name] = pattern
     } else if token == "song" {
-      song = ParseSong(tokens, patterns)
+      song, song_patterns = ParseSong(tokens, patterns)
 
       if song == nil {
         break
@@ -536,6 +586,7 @@ func main() {
   fmt.Printf("Time Signature: %d/%d\n", time_signature.beats, time_signature.note_value)
 
   CreateMidi(song, &time_signature, divisions, bpm)
+  CreateZ80(patterns, song_patterns, divisions * time_signature.beats)
 }
 
 
