@@ -85,7 +85,7 @@ func (tokens *Tokens) Get() string {
   if tokens.next == tokens.size { return "" }
 
   // Remove commented lines
-  if tokens.text[tokens.next] == '/' && tokens.text[tokens.next + 1] == '/' {
+  for tokens.text[tokens.next] == '/' && tokens.text[tokens.next + 1] == '/' {
     for tokens.text[tokens.next] != '\n' { tokens.next++ }
     tokens.Strip()
     if tokens.next == tokens.size { return "" }
@@ -108,7 +108,7 @@ func (tokens *Tokens) Get() string {
     if tokens.text[i] >= '0' && tokens.text[i] <= '9' ||
        tokens.text[i] >= 'A' && tokens.text[i] <= 'Z' ||
        tokens.text[i] >= 'a' && tokens.text[i] <= 'z' ||
-       tokens.text[i] == '#' {
+       tokens.text[i] == '#' || tokens.text[i] == '.' {
       i++
     } else {
       break
@@ -204,17 +204,19 @@ func ConvertNote(note string) int {
   return 21 + (octave * 12) + note_num
 }
 
-func ParsePatternVoice(tokens *Tokens, voice []Note) bool {
+func ParsePatternVoice(tokens *Tokens, voice []Note, divisions int) bool {
   if tokens.Get() != ":" {
     fmt.Printf("Error: Missing : on line: %d", tokens.line)
     return false
   }
 
   for true {
-    beat, _ := strconv.Atoi(tokens.Get())
+    beat_float, _ := strconv.ParseFloat(tokens.Get(), 64)
     note := ConvertNote(tokens.Get())
     length, _ := strconv.Atoi(tokens.Get())
     separator := tokens.Get()
+
+    beat := int(float64(divisions) * beat_float)
 
     // fmt.Printf("  %d %d %d\n", beat, note, length)
 
@@ -238,7 +240,8 @@ func ParsePatternVoice(tokens *Tokens, voice []Note) bool {
 
 func ParsePattern(tokens *Tokens, time_signature *TimeSignature, divisions int) (*Pattern, string) {
   pattern := new(Pattern)
-  pattern.Init(divisions * time_signature.beats)
+  divisions_in_measure := divisions * time_signature.beats
+  pattern.Init(divisions_in_measure)
   name := tokens.Get()
 
   if divisions == 0 {
@@ -268,7 +271,9 @@ func ParsePattern(tokens *Tokens, time_signature *TimeSignature, divisions int) 
         fmt.Println("Error: Unexpected token " + token)
         return nil, ""
       }
-      if !ParsePatternVoice(tokens, pattern.voices[voice]) { return nil, "" }
+      if !ParsePatternVoice(tokens, pattern.voices[voice], divisions) {
+        return nil, ""
+      }
     } else {
       fmt.Println("Error: Unexpected token " + token)
       return nil, ""
@@ -416,7 +421,9 @@ func CreateMidi(song *Song, time_signature *TimeSignature, divisions int, bpm in
   WriteInt16(file, divisions) // divisions
 
   // Track 0 is just: time signature, (tempo), end of track
-  tempo := 75000 * 2
+  tempo := 60000000 / bpm
+  fmt.Printf("tempo=%d\n", tempo)
+
   track_data := make([]uint8, 0)
   track_data = append(track_data, []uint8{ 0, 0xff, 0x58, 0x04, uint8(time_signature.beats), note_value, uint8(divisions), 8 }...)
   track_data = append(track_data, []uint8{ 0, 0xff, 0x51, 0x03, uint8(tempo >> 16), uint8((tempo >> 8) & 0xff), uint8(tempo & 0xff) }...)

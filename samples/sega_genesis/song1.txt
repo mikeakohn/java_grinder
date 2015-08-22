@@ -1,12 +1,16 @@
 
-divisions 8;
+divisions 192;
 bpm 60;
 
 pattern intro
 {
-  voice 0: 0 F5 1, 8 F5 1, 16 F5 1, 24 F5 1;
-  voice 2: 0 C5 1, 8 D5 1, 16 C5 1, 24 C5 1;
-  //voice 1: 0 A5 1, 8 A5 1, 16 A5 1, 24 Ab5 1;
+  voice 0: 0 F5 1, 1 F5 1, 2 F5 1, 3 F5 1;
+  voice 1: 0 A5 1, 1 A5 1, 2 A5 1, 3 Ab5 1;
+  voice 2: 0 C5 1, 1 D5 1, 2 E5 1, 3 F5 1;
+
+  //voice 0: 0 F5 1, 192 F5 1, 384 F5 1, 576 F5 1;
+  //voice 1: 0 A5 1, 192 A5 1, 384 A5 1, 576 Ab5 1;
+  //voice 2: 0 C5 1, 192 D5 1, 384 E5 1, 576 F5 1;
 }
 
 pattern a
@@ -16,9 +20,16 @@ pattern a
   voice 2: 0 E5 1, 2 G5 1;
 }
 
+pattern b
+{
+  voice 0: 0 A6 1;
+  voice 1: 0 C6 1;
+  voice 2: 0 E6 1;
+}
+
 song
 {
   intro * 4,
-  a * 4,
+  b * 4,
 }
 
