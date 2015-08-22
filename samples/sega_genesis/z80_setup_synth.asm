@@ -36,6 +36,7 @@ load_setup:
   inc ix
   djnz load_setup
 
+.if 0
   ;; Channel 1
   ld a, CH1_SOUND_ON
   ld (FM1_REG_SEL), a
@@ -99,6 +100,7 @@ load_setup:
   ld (FM1_REG_SEL), a
   ld a, 0xf4
   ld (FM1_REG_DATA), a
+.endif
 
 while_1:
   jp while_1
