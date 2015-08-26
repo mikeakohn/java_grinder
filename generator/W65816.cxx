@@ -17,22 +17,18 @@
 
 #include "W65816.h"
 
-// ABI is:
-
-//static const char *cond_str[] = { "eq", "ne", "lt", "le", "gt", "ge" };
-
 W65816::W65816() :
-  reg(0),
-  reg_max(9),
   stack(0),
-  is_main(0)
+  is_main(0),
+  need_mul_integer(0),
+  need_div_integer(0)
 {
-
 }
 
 W65816::~W65816()
 {
-  write_constants();
+  if(need_mul_integer) { insert_mul_integer(); }
+  if(need_div_integer) { insert_mul_integer(); }
 }
 
 int W65816::open(const char *filename)
@@ -41,15 +37,49 @@ int W65816::open(const char *filename)
 
   fprintf(out, ".65816\n");
 
+  // ram start
+  fprintf(out, "ram_start equ 0x8000\n");
+  fprintf(out, "heap_ptr equ ram_start\n");
+
+  // points to locals
+  fprintf(out, "locals equ 0x00\n");
+
+  // temp variables
+  fprintf(out, "result equ 0x00\n");
+  fprintf(out, "remainder equ 0x02\n");
+  fprintf(out, "length equ 0x04\n");
+  fprintf(out, "value1 equ 0x06\n");
+  fprintf(out, "value2 equ 0x08\n");
+  fprintf(out, "value3 equ 0x10\n");
+
+  // start
+  fprintf(out, ".org 0x2000\n");
+  fprintf(out, "; change to 16-bit mode\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  xce\n");
+  fprintf(out, "; all 16-bit registers\n");
+  fprintf(out, "  rep #0x30\n");
+  fprintf(out, "; set up stack\n");
+  fprintf(out, "  lda #0x1FF\n");
+  fprintf(out, "  tcs\n");
+  fprintf(out, "; set up direct-page\n");
+  fprintf(out, "  pea 0x0000\n");
+//FIXME remove
+  fprintf(out, "; do something\n");
+  fprintf(out, "  lda #0xabcd\n");
+  fprintf(out, "  sta 0x3000\n");
+  fprintf(out, "; exit to monitor\n");
+//  fprintf(out, "  sec\n");
+//  fprintf(out, "  xce\n");
+//  fprintf(out, "loop:\n");
+//  fprintf(out, "  jmp loop\n");
+  fprintf(out, "  brk\n");
+
   return 0;
 }
 
 int W65816::start_init()
 {
-  // Add any set up items (stack, registers, etc).
-  //fprintf(out, ".org ???\n");
-  fprintf(out, "start:\n");
-
   return 0;
 }
 
@@ -323,7 +353,8 @@ int W65816::return_integer(int local_count)
 
 int W65816::return_void(int local_count)
 {
-  return -1;
+//FIXME for testing
+  return 0;
 }
 
 int W65816::jump(const char *name, int distance)
@@ -450,4 +481,12 @@ int W65816::array_write_int(const char *name, int field_id)
   return -1;
 }
 
+// subroutines
+void W65816::insert_mul_integer()
+{
+}
+
+void W65816::insert_div_integer()
+{
+}
 

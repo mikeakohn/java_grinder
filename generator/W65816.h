@@ -103,10 +103,14 @@ public:
   virtual int array_write_int(const char *name, int field_id);
 
 protected:
-  int reg;            // count number of registers are are using as stack
-  int reg_max;        // size of register stack 
-  int stack;          // count how many things we put on the stack
+  int stack;
   bool is_main : 1;
+
+  bool need_mul_integer:1;
+  bool need_div_integer:1;
+
+  void insert_mul_integer();
+  void insert_div_integer();
 };
 
 #endif
