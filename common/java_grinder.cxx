@@ -21,6 +21,7 @@
 #include "DSPIC.h"
 #include "M6502.h"
 #include "C64.h"
+#include "AppleIIgs.h"
 #include "AVR8.h"
 #include "Epiphany.h"
 #include "MC68000.h"
@@ -34,6 +35,7 @@
 #include "TI99.h"
 #include "TMS9900.h"
 #include "W65816.h"
+#include "W65C265SXB.h"
 #include "X86.h"
 #include "X86_64.h"
 #include "Z80.h"
@@ -45,6 +47,11 @@ static Generator *new_generator(const char *chip_type)
 {
   Generator *generator = NULL;
 
+  if (strcasecmp("appleiigs", chip_type) == 0)
+  {
+    generator = new AppleIIgs();
+  }
+    else
   if (strcasecmp("arm", chip_type) == 0)
   {
     generator = new ARM();
@@ -173,6 +180,11 @@ static Generator *new_generator(const char *chip_type)
   if (strcasecmp("w65816", chip_type) == 0)
   {
     generator = new W65816();
+  }
+    else
+  if (strcasecmp("w65c265sxb", chip_type) == 0)
+  {
+    generator = new W65C265SXB();
   }
     else
   if (strcasecmp("x86", chip_type) == 0)
