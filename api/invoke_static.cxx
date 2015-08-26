@@ -19,6 +19,7 @@
 #include "invoke.h"
 #include "invoke_static.h"
 #include "adc.h"
+#include "appleiigs_.h"
 #include "c64_sid.h"
 #include "c64_vic.h"
 #include "cpu.h"
@@ -32,6 +33,7 @@
 #include "ti99_.h"
 #include "timer.h"
 #include "uart.h"
+#include "w65c265sxb_.h"
 
 #define CHECK_WITH_PORT(a,b,c) \
     if (strcmp(cls, #a#c) == 0) \
@@ -126,6 +128,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     CHECK_WITH_PORT(IOPort, ioport, 6)
     CHECK(Memory, memory)
     CHECK(DSP, dsp)
+    CHECK(AppleIIgs, appleiigs)
     CHECK(ADC, adc)
     CHECK(Timer, timer)
     CHECK_WITH_PORT(SPI, spi, 0)
@@ -136,6 +139,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     CHECK(SNES, snes)
     CHECK(TI84, ti84)
     CHECK(TI99, ti99)
+    CHECK(W65C265SXB, w65c265sxb)
       else
     {}
   }
@@ -201,10 +205,12 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, in
     CHECK_WITH_PORT_CONST(IOPort, ioport, 6)
     CHECK_CONST(Memory, memory)
     CHECK_CONST(ADC, adc)
+    CHECK_CONST(AppleIIgs, appleiigs)
     CHECK_CONST(Timer, timer)
     CHECK_CONST(CPU, cpu)
     CHECK_CONST(SegaGenesis, sega_genesis)
     CHECK_CONST(SNES, snes)
+    CHECK_CONST(W65C265SXB, w65c265sxb)
     CHECK_WITH_PORT_CONST(SPI, spi, 0)
     CHECK_WITH_PORT_CONST(SPI, spi, 1)
     CHECK_WITH_PORT_CONST(TI99, ti99, 0)
