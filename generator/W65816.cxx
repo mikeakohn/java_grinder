@@ -13,9 +13,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 
 #include "W65816.h"
+
+#define LOCALS(a) (a)
 
 W65816::W65816() :
   stack(0),
@@ -29,6 +32,10 @@ W65816::~W65816()
 {
   if(need_mul_integer) { insert_mul_integer(); }
   if(need_div_integer) { insert_mul_integer(); }
+
+//FIXME for testing
+  fprintf(out, "; exit to monitor\n");
+  fprintf(out, "  brk\n");
 }
 
 int W65816::open(const char *filename)
@@ -37,20 +44,23 @@ int W65816::open(const char *filename)
 
   fprintf(out, ".65816\n");
 
+  // stack location
+  fprintf(out, "stack equ 0x100\n");
+
   // ram start
-  fprintf(out, "ram_start equ 0x8000\n");
+  fprintf(out, "ram_start equ 0x7000\n");
   fprintf(out, "heap_ptr equ ram_start\n");
 
   // points to locals
   fprintf(out, "locals equ 0x00\n");
 
   // temp variables
-  fprintf(out, "result equ 0x00\n");
-  fprintf(out, "remainder equ 0x02\n");
-  fprintf(out, "length equ 0x04\n");
-  fprintf(out, "value1 equ 0x06\n");
-  fprintf(out, "value2 equ 0x08\n");
-  fprintf(out, "value3 equ 0x10\n");
+  fprintf(out, "result equ 0x02\n");
+  fprintf(out, "remainder equ 0x04\n");
+  fprintf(out, "length equ 0x06\n");
+  fprintf(out, "value1 equ 0x08\n");
+  fprintf(out, "value2 equ 0x10\n");
+  fprintf(out, "value3 equ 0x12\n");
 
   // start
   fprintf(out, ".org 0x2000\n");
@@ -64,16 +74,6 @@ int W65816::open(const char *filename)
   fprintf(out, "  tcs\n");
   fprintf(out, "; set up direct-page\n");
   fprintf(out, "  pea 0x0000\n");
-//FIXME remove
-  fprintf(out, "; do something\n");
-  fprintf(out, "  lda #0xabcd\n");
-  fprintf(out, "  sta 0x3000\n");
-  fprintf(out, "; exit to monitor\n");
-//  fprintf(out, "  sec\n");
-//  fprintf(out, "  xce\n");
-//  fprintf(out, "loop:\n");
-//  fprintf(out, "  jmp loop\n");
-  fprintf(out, "  brk\n");
 
   return 0;
 }
@@ -85,60 +85,133 @@ int W65816::start_init()
 
 int W65816::insert_static_field_define(const char *name, const char *type, int index)
 {
-  return -1;
+  fprintf(out, "; insert_static_field_define\n");
+  fprintf(out, "  %s equ ram_start + %d\n", name, (index + 1) * 2);
+
+  return 0;
 }
 
 int W65816::init_heap(int field_count)
 {
-  return -1;
+  fprintf(out, "  ; Set up heap and static initializers\n");
+  fprintf(out, "  lda #(ram_start + %d)\n", (field_count + 1) * 2);
+  fprintf(out, "  sta ram_start\n");
+
+  return 0;
 }
 
 int W65816::insert_field_init_boolean(char *name, int index, int value)
 {
-  return -1;
+  fprintf(out, "; insert_field_init_boolean\n");
+  fprintf(out, "  lda #%d\n", value);
+  fprintf(out, "  sta #%s\n", name);
+
+  return 0;
 }
 
 int W65816::insert_field_init_byte(char *name, int index, int value)
 {
-  return insert_field_init_int(name, index, value);
+  if (value < -128 || value > 255) { return -1; }
+  int16_t n = value;
+  uint16_t v = (n & 0xffff);
+
+  fprintf(out, "; insert_field_init_byte\n");
+  fprintf(out, "  lda #%d\n", (uint8_t)v);
+  fprintf(out, "  sta %s\n", name);
+
+  return 0;
 }
 
 int W65816::insert_field_init_short(char *name, int index, int value)
 {
-  return insert_field_init_int(name, index, value);
+  if (value < -32768 || value > 65535) { return -1; }
+
+  fprintf(out, "; insert_field_init_short\n");
+  fprintf(out, "  lda #%d\n", (uint16_t)value);
+  fprintf(out, "  sta %s\n", name);
+
+  return 0;
 }
 
 int W65816::insert_field_init_int(char *name, int index, int value)
 {
-  return -1;
+  return insert_field_init_short(name, index, value);
 }
 
 int W65816::insert_field_init(char *name, int index)
 {
-  return -1;
+  fprintf(out, "; insert_field_init\n");
+  fprintf(out, "  lda #_%s\n", name);
+  fprintf(out, "  sta %s\n", name);
+
+  return 0;
 }
 
 void W65816::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
+  stack = 0;
+
+  is_main = (strcmp(name, "main") == 0) ? 1 : 0;
+
+  fprintf(out, "%s:\n", name);
+
+  // main() function goes here
+  if (!is_main)
+  {
+    fprintf(out, "  lda locals\n");
+    fprintf(out, "  pha\n");
+  }
+
+  fprintf(out, "  tsc\n");
+  fprintf(out, "  sta locals\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  sbc #0x%04x\n", local_count);
+  fprintf(out, "  tcs\n");
 }
 
 void W65816::method_end(int local_count)
 {
+  fprintf(out, "\n");
 }
 
 int W65816::push_integer(int32_t n)
 {
-  return -1;
+  if (n > 65535 || n < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", n);
+
+    return -1;
+  }
+
+  uint16_t value = (n & 0xffff);
+
+  fprintf(out, "; push_integer\n");
+  fprintf(out, "  lda #0x%04x\n", value);
+  fprintf(out, "  pha\n");
+  stack++;
+
+  return 0;
 }
 
 int W65816::push_integer_local(int index)
 {
-  return -1;
+  fprintf(out, "; push_integer_local\n");
+  fprintf(out, "  ldx locals\n");
+  fprintf(out, "  lda #stack - %d,x\n", LOCALS(index));
+  fprintf(out, "  pha\n");
+  stack++;
+
+  return 0;
 }
 
 int W65816::push_ref_static(const char *name, int index)
 {
-  return -1;
+  fprintf(out, "; push_ref_static\n");
+  fprintf(out, "  lda #_%s\n", name);
+  fprintf(out, "  pha\n");
+  stack++;
+
+  return 0;
 }
 
 int W65816::push_ref_local(int index)
@@ -153,42 +226,65 @@ int W65816::push_fake()
 
 int W65816::push_long(int64_t n)
 {
-  return -1;
+  return push_integer((int32_t)n);
 }
 
 int W65816::push_float(float f)
 {
+  printf("Float is not supported right now.\n");
   return -1;
 }
 
 int W65816::push_double(double f)
 {
+  printf("Double is not supported right now.\n");
   return -1;
 }
 
 int W65816::push_byte(int8_t b)
 {
-  int32_t value = (int32_t)b;
+  int16_t n = b;
+  uint16_t value = (n & 0xffff);
 
-  return push_integer(value);
+  fprintf(out, "; push_byte\n");
+  fprintf(out, "  lda #0x%04x\n", value);
+  fprintf(out, "  pha\n");
+  stack++;
+
+  return 0;
 }
 
 int W65816::push_short(int16_t s)
 {
-  int32_t value = (int32_t)s;
+  uint16_t value = (s & 0xffff);
 
-  return push_integer(value);
+  fprintf(out, "; push_short\n");
+  fprintf(out, "  lda #0x%04x\n", value);
+  fprintf(out, "  pha\n");
+  stack++;
+
+  return 0;
 }
 
 int W65816::push_ref(char *name)
 {
-  // Need to move the address of name to the top of stack
-  return -1;
+  fprintf(out, "; push_ref\n");
+  fprintf(out, "  lda %s\n", name);
+  fprintf(out, "  pha\n");
+  stack++;
+
+  return 0;
 }
 
 int W65816::pop_integer_local(int index)
 {
-  return -1;
+  fprintf(out, "; pop_integer_local\n");
+  fprintf(out, "  ldx locals\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta stack - %d,x\n", LOCALS(index));
+  stack--;
+
+  return 0;
 }
 
 int W65816::pop_ref_local(int index)
@@ -198,51 +294,117 @@ int W65816::pop_ref_local(int index)
 
 int W65816::pop()
 {
-  return -1;
+  fprintf(out, "; pop\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result\n");
+  stack--;
+
+  return 0;
 }
 
 int W65816::dup()
 {
-  return -1;
+  fprintf(out, "; dup\n");
+  fprintf(out, "  tsx\n");
+  fprintf(out, "  lda stack,x\n");
+  fprintf(out, "  pha\n");
+
+  stack++;
+
+  return 0;
 }
 
 int W65816::dup2()
 {
+  printf("Need to implement dup2()\n");
   return -1;
 }
 
 int W65816::swap()
 {
-  return -1;
+  fprintf(out, "; swap\n");
+  fprintf(out, "  tsx\n");
+  // x ^= y
+  fprintf(out, "  lda stack,x\n");
+  fprintf(out, "  eor stack - 1,x\n");
+  fprintf(out, "  sta stack,x\n");
+  // y ^= x
+  fprintf(out, "  lda stack - 1,x\n");
+  fprintf(out, "  eor stack,x\n");
+  fprintf(out, "  sta stack - 1,x\n");
+  // x ^= y
+  fprintf(out, "  lda stack,x\n");
+  fprintf(out, "  eor stack - 1,x\n");
+  fprintf(out, "  sta stack,x\n");
+
+  return 0;
+/*
+  fprintf(out, "; swap\n");
+  fprintf(out, "  tsx\n");
+  fprintf(out, "  lda stack,x\n");
+  fprintf(out, "  sta value,x\n");
+
+  fprintf(out, "  lda stack - 1,x\n");
+  fprintf(out, "  sta stack,x\n");
+
+  fprintf(out, "  lda value1\n");
+  fprintf(out, "  sta stack - 1,x\n");
+
+  return 0;
+*/
 }
 
 int W65816::add_integer()
 {
-  return -1;
+  fprintf(out, "; add_integer\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  adc result\n");
+  fprintf(out, "  sta result\n");
+  fprintf(out, "  pha\n");
+  stack--;
+
+  return 0;
 }
 
-int W65816::add_integer(int num)
+int W65816::add_integer(int const_val)
 {
   return -1;
 }
 
 int W65816::sub_integer()
 {
-  return -1;
+  fprintf(out, "; sub_integer\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  sbc result\n");
+  fprintf(out, "  sta result\n");
+  fprintf(out, "  pha\n");
+  stack--;
+
+  return 0;
 }
 
-int W65816::sub_integer(int num)
+int W65816::sub_integer(int const_val)
 {
   return -1;
 }
 
 int W65816::mul_integer()
 {
+//  fprintf(out, "  jsr mul_integer\n");
+//  stack--;
   return -1;
 }
 
 int W65816::div_integer()
 {
+//  fprintf(out, "  jsr div_integer\n");
+//  stack--;
   return -1;
 }
 
@@ -253,7 +415,17 @@ int W65816::mod_integer()
 
 int W65816::neg_integer()
 {
-  return -1;
+  fprintf(out, "; neg_integer\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result\n");
+
+  fprintf(out, "  sec\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sbc result\n");
+  fprintf(out, "  sta result\n");
+  fprintf(out, "  pha\n");
+
+  return 0;
 }
 
 int W65816::shift_left_integer()
@@ -261,7 +433,7 @@ int W65816::shift_left_integer()
   return -1;
 }
 
-int W65816::shift_left_integer(int num)
+int W65816::shift_left_integer(int const_val)
 {
   return -1;
 }
@@ -288,7 +460,9 @@ int W65816::shift_right_uinteger(int num)
 
 int W65816::and_integer()
 {
-  return -1;
+  fprintf(out, "; and_integer\n");
+  stack--;
+  return 0;
 }
 
 int W65816::and_integer(int num)
@@ -298,7 +472,9 @@ int W65816::and_integer(int num)
 
 int W65816::or_integer()
 {
-  return -1;
+  fprintf(out, "; or_integer\n");
+  stack--;
+  return 0;
 }
 
 int W65816::or_integer(int num)
@@ -308,7 +484,9 @@ int W65816::or_integer(int num)
 
 int W65816::xor_integer()
 {
-  return -1;
+  fprintf(out, "; xor_integer\n");
+  stack--;
+  return 0;
 }
 
 int W65816::xor_integer(int num)
@@ -318,17 +496,35 @@ int W65816::xor_integer(int num)
 
 int W65816::inc_integer(int index, int num)
 {
-  return -1;
+  uint16_t value = num & 0xffff;
+
+  fprintf(out, "; inc_integer num = %d\n", num);
+  fprintf(out, "  ldx locals\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda stack - %d,x\n", LOCALS(index));
+  fprintf(out, "  adc #0x%04x\n", value);
+  fprintf(out, "  sta stack - %d,x\n", LOCALS(index));
+
+  return 0;
 }
 
 int W65816::integer_to_byte()
 {
-  return -1;
+  // (x ^ 128) - 128
+  fprintf(out, "integer_to_byte:\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  eor #128\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  sbc #128\n");
+  fprintf(out, "  pha\n");
+
+  return 0;
 }
 
 int W65816::integer_to_short()
 {
-  return -1;
+  // integers are already shorts so do nothing
+  return 0;
 }
 
 int W65816::jump_cond(const char *label, int cond, int distance)
@@ -343,28 +539,75 @@ int W65816::jump_cond_integer(const char *label, int cond, int distance)
 
 int W65816::return_local(int index, int local_count)
 {
-  return -1;
+  fprintf(out, "; return_local\n");
+  fprintf(out, "  ldx locals\n");
+  fprintf(out, "  lda stack - %d,x\n", LOCALS(index));
+  fprintf(out, "  sta result\n");
+
+  fprintf(out, "  txs\n");
+
+  if (!is_main)
+  {
+    fprintf(out, "  pla\n");
+    fprintf(out, "  sta locals\n");
+  }
+
+  fprintf(out, "  rts\n");
+
+  return 0;
 }
 
 int W65816::return_integer(int local_count)
 {
-  return -1;
+  fprintf(out, "; return_integer\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta result\n");
+  stack--;
+
+  fprintf(out, "  ldx locals\n");
+  fprintf(out, "  txs\n");
+
+  if (!is_main)
+  {
+    fprintf(out, "  pla\n");
+    fprintf(out, "  sta locals\n");
+  }
+
+  fprintf(out, "  rts\n");
+
+  return 0;
+
 }
 
 int W65816::return_void(int local_count)
 {
-//FIXME for testing
+  fprintf(out, "; return_void\n");
+  fprintf(out, "  ldx locals\n");
+  fprintf(out, "  txs\n");
+
+  if (!is_main)
+  {
+    fprintf(out, "  pla\n");
+    fprintf(out, "  sta locals\n");
+  }
+
+  fprintf(out, "  rts\n");
+
   return 0;
 }
 
 int W65816::jump(const char *name, int distance)
 {
-  return -1;
+  fprintf(out, "  jmp %s\n", name);
+
+  return 0;
 }
 
 int W65816::call(const char *name)
 {
-  return -1;
+  fprintf(out, "  jsr %s\n", name);
+
+  return 0;
 }
 
 int W65816::invoke_static_method(const char *name, int params, int is_void)
