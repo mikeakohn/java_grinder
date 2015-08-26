@@ -7,15 +7,15 @@
  *
  * Copyright 2014-2015 by Michael Kohn
  *
- * SNES by Joe Davisson
+ * AppleIIgs by Joe Davisson
  *
  */
 
 package net.mikekohn.java_grinder;
 
-abstract public class SNES
+abstract public class AppleIIgs
 {
-  protected SNES() { }
+  protected AppleIIgs() { }
   //public static void setSomething() { }
 }
 

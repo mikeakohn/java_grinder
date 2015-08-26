@@ -2,6 +2,7 @@ PKG_DIR=net/mikekohn/java_grinder
 
 SRC_DIR=net/mikekohn/java_grinder
 JAVA_SRC=\
+  $(SRC_DIR)/AppleIIgs.java \
   $(SRC_DIR)/ADC.java \
   $(SRC_DIR)/CPU.java \
   $(SRC_DIR)/DSP.java \
@@ -27,7 +28,8 @@ JAVA_SRC=\
   $(SRC_DIR)/UART0.java \
   $(SRC_DIR)/UART1.java \
   $(SRC_DIR)/C64/SID.java \
-  $(SRC_DIR)/C64/VIC.java
+  $(SRC_DIR)/C64/VIC.java \
+  $(SRC_DIR)/W65C265SXB.java
 
 default:
 	javac -classpath . -d ../build $(JAVA_SRC) 

@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#include "API_APPLEIIGS.h"
 #include "API_C64.h"
 #include "API_DSP.h"
 #include "API_Microcontroller.h"
@@ -22,15 +23,18 @@
 #include "API_SNES.h"
 #include "API_TI84.h"
 #include "API_TI99.h"
+#include "API_W65C265SXB.h"
 
 class Generator :
+  public API_AppleIIgs,
   public API_C64,
   public API_DSP,
   public API_Microcontroller,
   public API_SegaGenesis,
   public API_SNES,
   public API_TI84,
-  public API_TI99
+  public API_TI99,
+  public API_W65C265SXB
 {
 public:
   Generator();
