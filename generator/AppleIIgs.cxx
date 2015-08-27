@@ -83,6 +83,7 @@ int AppleIIgs::appleiigs_printChar_C()
   fprintf(out,
     "  ;; printChar()\n"
     "  pla\n"
+    "  ora #0x80\n"
     "  sec\n"
     "  xce\n"
     "  jsr 0xfded\n"
