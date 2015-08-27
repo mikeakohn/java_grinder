@@ -16,7 +16,8 @@ class API_AppleIIgs
 {
 public:
   // AppleIIgs
-  //virtual int appleiigs_printChar_C() { return -1; }
+  virtual int appleiigs_plotChar_IC() { return -1; }
+  virtual int appleiigs_printChar_C() { return -1; }
 };
 
 #endif

@@ -16,6 +16,7 @@ package net.mikekohn.java_grinder;
 abstract public class AppleIIgs
 {
   protected AppleIIgs() { }
-  //public static void setSomething() { }
+  public static void plotChar(int address, char c) { }
+  public static void printChar(char c) { }
 }
 

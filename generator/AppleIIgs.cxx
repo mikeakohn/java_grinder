@@ -30,4 +30,27 @@ int AppleIIgs::open(const char *filename)
   return 0;
 }
 
+int AppleIIgs::appleiigs_plotChar_IC()
+{
+  fprintf(out,
+    "  ;; plotChar()\n"
+    "ply\n"
+    "pla\n"
+    "sep #0x20\n"
+    "sta 0x0000,y\n"
+    "rep #0x20\n");
+
+  return 0;
+}
+
+int AppleIIgs::appleiigs_printChar_C()
+{
+  fprintf(out,
+    "  ;; printChar()\n"
+    "  pla\n"
+    "  jsr 0xfded\n");
+
+  return 0;
+}
+
 

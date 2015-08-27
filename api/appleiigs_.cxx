@@ -31,6 +31,8 @@
 
 int appleiigs(JavaClass *java_class, Generator *generator, char *function)
 {
+  CHECK_FUNC(plotChar,_IC)
+  CHECK_FUNC(printChar,_C)
   return -1;
 }
 
