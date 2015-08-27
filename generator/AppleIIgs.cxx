@@ -48,7 +48,11 @@ int AppleIIgs::appleiigs_printChar_C()
   fprintf(out,
     "  ;; printChar()\n"
     "  pla\n"
-    "  jsr 0xfded\n");
+    "  sec\n"
+    "  xce\n"
+    "  jsr 0xfded\n"
+    "  clc\n"
+    "  xce\n");
 
   return 0;
 }
