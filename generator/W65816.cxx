@@ -18,7 +18,7 @@
 
 #include "W65816.h"
 
-#define LOCALS(a) (a)
+#define LOCALS(a) (a * 2)
 
 W65816::W65816() :
   stack(0),
@@ -35,7 +35,9 @@ W65816::~W65816()
 
 //FIXME for testing
   fprintf(out, "; exit to monitor\n");
-  fprintf(out, "  brk\n");
+  fprintf(out, "  lda #0xABCD\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  rtl\n");
 }
 
 int W65816::open(const char *filename)
