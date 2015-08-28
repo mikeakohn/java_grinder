@@ -23,6 +23,18 @@
 // X
 // Y
 
+#define PUSH \
+  fprintf(out, "; PUSH\n"); \
+  fprintf(out, "  sta stack,x\n"); \
+  fprintf(out, "  dex\n"); \
+  fprintf(out, "  dex\n")
+
+#define POP \
+  fprintf(out, "; POP\n"); \
+  fprintf(out, "  inx\n"); \
+  fprintf(out, "  inx\n"); \
+  fprintf(out, "  lda stack,x\n")
+
 #define LOCALS(a) (a * 2)
 
 W65816::W65816() :
@@ -45,8 +57,8 @@ int W65816::open(const char *filename)
 
   fprintf(out, ".65816\n");
 
-  // stack location
-  fprintf(out, "stack equ 0x0000\n");
+  // java stack
+  fprintf(out, "stack equ 0x0200\n");
 
   // ram start
   fprintf(out, "ram_start equ 0x7000\n");
@@ -64,18 +76,28 @@ int W65816::open(const char *filename)
   fprintf(out, "value3 equ 0x12\n");
 
   // start
-  fprintf(out, ".org 0x2000\n");
+  fprintf(out, ".org 0x0300\n");
   fprintf(out, "; change to 16-bit mode\n");
   fprintf(out, "  clc\n");
   fprintf(out, "  xce\n");
   fprintf(out, "; all 16-bit registers\n");
   fprintf(out, "  rep #0x30\n");
-  fprintf(out, "; set up stack\n");
+  fprintf(out, "; set up processor stack\n");
   fprintf(out, "  lda #0x1FF\n");
-  fprintf(out, "  tax\n");
   fprintf(out, "  tcs\n");
   fprintf(out, "; set up direct-page\n");
   fprintf(out, "  pea 0x0000\n");
+  fprintf(out, "; clear java stack\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  ldx #0\n");
+  fprintf(out, "clear_java_stack:\n");
+  fprintf(out, "  sta stack,x\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  cpx #0x100\n");
+  fprintf(out, "  bne clear_java_stack\n");
+  fprintf(out, "; set up java stack pointer\n");
+  fprintf(out, "  ldx #0xFE\n");
 
   return 0;
 }
@@ -162,14 +184,13 @@ void W65816::method_start(int local_count, int max_stack, int param_count, const
   if (!is_main)
   {
     fprintf(out, "  lda locals\n");
-    fprintf(out, "  pha\n");
+    PUSH;
   }
 
-  fprintf(out, "  tsc\n");
-  fprintf(out, "  sta locals\n");
+  fprintf(out, "  stx locals\n");
   fprintf(out, "  sec\n");
   fprintf(out, "  sbc #0x%04x\n", local_count);
-  fprintf(out, "  tcs\n");
+  fprintf(out, "  tax\n");
 }
 
 void W65816::method_end(int local_count)
@@ -190,7 +211,7 @@ int W65816::push_integer(int32_t n)
 
   fprintf(out, "; push_integer\n");
   fprintf(out, "  lda #0x%04x\n", value);
-  fprintf(out, "  pha\n");
+  PUSH;
   stack++;
 
   return 0;
@@ -199,9 +220,9 @@ int W65816::push_integer(int32_t n)
 int W65816::push_integer_local(int index)
 {
   fprintf(out, "; push_integer_local\n");
-  fprintf(out, "  ldx locals\n");
-  fprintf(out, "  lda stack - %d,x\n", LOCALS(index));
-  fprintf(out, "  pha\n");
+  fprintf(out, "  ldy locals\n");
+  fprintf(out, "  lda stack - %d,y\n", LOCALS(index));
+  PUSH;
   stack++;
 
   return 0;
@@ -251,7 +272,7 @@ int W65816::push_byte(int8_t b)
 
   fprintf(out, "; push_byte\n");
   fprintf(out, "  lda #0x%04x\n", value);
-  fprintf(out, "  pha\n");
+  PUSH;
   stack++;
 
   return 0;
@@ -263,7 +284,7 @@ int W65816::push_short(int16_t s)
 
   fprintf(out, "; push_short\n");
   fprintf(out, "  lda #0x%04x\n", value);
-  fprintf(out, "  pha\n");
+  PUSH;
   stack++;
 
   return 0;
@@ -273,7 +294,7 @@ int W65816::push_ref(char *name)
 {
   fprintf(out, "; push_ref\n");
   fprintf(out, "  lda %s\n", name);
-  fprintf(out, "  pha\n");
+  PUSH;
   stack++;
 
   return 0;
@@ -282,9 +303,9 @@ int W65816::push_ref(char *name)
 int W65816::pop_integer_local(int index)
 {
   fprintf(out, "; pop_integer_local\n");
-  fprintf(out, "  ldx locals\n");
-  fprintf(out, "  pla\n");
-  fprintf(out, "  sta stack - %d,x\n", LOCALS(index));
+  fprintf(out, "  ldy locals\n");
+  POP;
+  fprintf(out, "  sta stack - %d,y\n", LOCALS(index));
   stack--;
 
   return 0;
@@ -298,7 +319,7 @@ int W65816::pop_ref_local(int index)
 int W65816::pop()
 {
   fprintf(out, "; pop\n");
-  fprintf(out, "  pla\n");
+  POP;
   fprintf(out, "  sta result\n");
   stack--;
 
@@ -308,9 +329,10 @@ int W65816::pop()
 int W65816::dup()
 {
   fprintf(out, "; dup\n");
-  fprintf(out, "  tsx\n");
-  fprintf(out, "  lda stack,x\n");
-  fprintf(out, "  pha\n");
+  fprintf(out, "  tsc\n");
+  fprintf(out, "  tay\n");
+  fprintf(out, "  lda stack,y\n");
+  PUSH;
 
   stack++;
 
@@ -326,47 +348,31 @@ int W65816::dup2()
 int W65816::swap()
 {
   fprintf(out, "; swap\n");
-  fprintf(out, "  tsx\n");
-  // x ^= y
-  fprintf(out, "  lda stack,x\n");
-  fprintf(out, "  eor stack - 1,x\n");
-  fprintf(out, "  sta stack,x\n");
-  // y ^= x
-  fprintf(out, "  lda stack - 1,x\n");
-  fprintf(out, "  eor stack,x\n");
-  fprintf(out, "  sta stack - 1,x\n");
-  // x ^= y
-  fprintf(out, "  lda stack,x\n");
-  fprintf(out, "  eor stack - 1,x\n");
-  fprintf(out, "  sta stack,x\n");
+  fprintf(out, "  txa\n");
+  fprintf(out, "  tay\n");
 
-  return 0;
-/*
-  fprintf(out, "; swap\n");
-  fprintf(out, "  tsx\n");
-  fprintf(out, "  lda stack,x\n");
-  fprintf(out, "  sta value,x\n");
+  fprintf(out, "  lda stack,y\n");
+  fprintf(out, "  sta value1,y\n");
 
-  fprintf(out, "  lda stack - 1,x\n");
-  fprintf(out, "  sta stack,x\n");
+  fprintf(out, "  lda stack - 1,y\n");
+  fprintf(out, "  sta stack,y\n");
 
   fprintf(out, "  lda value1\n");
-  fprintf(out, "  sta stack - 1,x\n");
+  fprintf(out, "  sta stack - 1,y\n");
 
   return 0;
-*/
 }
 
 int W65816::add_integer()
 {
   fprintf(out, "; add_integer\n");
-  fprintf(out, "  pla\n");
+  POP;
   fprintf(out, "  sta result\n");
-  fprintf(out, "  pla\n");
+  POP;
   fprintf(out, "  clc\n");
   fprintf(out, "  adc result\n");
   fprintf(out, "  sta result\n");
-  fprintf(out, "  pha\n");
+  PUSH;
   stack--;
 
   return 0;
@@ -380,13 +386,13 @@ int W65816::add_integer(int const_val)
 int W65816::sub_integer()
 {
   fprintf(out, "; sub_integer\n");
-  fprintf(out, "  pla\n");
+  POP;
   fprintf(out, "  sta result\n");
-  fprintf(out, "  pla\n");
+  POP;
   fprintf(out, "  sec\n");
   fprintf(out, "  sbc result\n");
   fprintf(out, "  sta result\n");
-  fprintf(out, "  pha\n");
+  PUSH;
   stack--;
 
   return 0;
@@ -419,14 +425,13 @@ int W65816::mod_integer()
 int W65816::neg_integer()
 {
   fprintf(out, "; neg_integer\n");
-  fprintf(out, "  pla\n");
+  POP;
   fprintf(out, "  sta result\n");
-
   fprintf(out, "  lda #0\n");
   fprintf(out, "  sec\n");
   fprintf(out, "  sbc result\n");
   fprintf(out, "  sta result\n");
-  fprintf(out, "  pha\n");
+  PUSH;
 
   return 0;
 }
@@ -502,18 +507,17 @@ int W65816::inc_integer(int index, int num)
   uint16_t value = num & 0xffff;
 
   fprintf(out, "; inc_integer num = %d\n", num);
-  fprintf(out, "  ldx locals\n");
+  fprintf(out, "  ldy locals\n");
   fprintf(out, "  clc\n");
-  fprintf(out, "  lda stack - %d,x\n", LOCALS(index));
+  fprintf(out, "  lda stack - %d,y\n", LOCALS(index));
   fprintf(out, "  adc #0x%04x\n", value);
-  fprintf(out, "  sta stack - %d,x\n", LOCALS(index));
+  fprintf(out, "  sta stack - %d,y\n", LOCALS(index));
 
   return 0;
 }
 
 int W65816::integer_to_byte()
 {
-  // (x ^ 128) - 128
   fprintf(out, "integer_to_byte:\n");
   fprintf(out, "  pla\n");
   fprintf(out, "  eor #128\n");
@@ -543,15 +547,15 @@ int W65816::jump_cond_integer(const char *label, int cond, int distance)
 int W65816::return_local(int index, int local_count)
 {
   fprintf(out, "; return_local\n");
-  fprintf(out, "  ldx locals\n");
-  fprintf(out, "  lda stack - %d,x\n", LOCALS(index));
+  fprintf(out, "  ldy locals\n");
+  fprintf(out, "  lda stack - %d,y\n", LOCALS(index));
   fprintf(out, "  sta result\n");
 
-  fprintf(out, "  txs\n");
+  fprintf(out, "  ldx locals\n");
 
   if (!is_main)
   {
-    fprintf(out, "  pla\n");
+    POP;
     fprintf(out, "  sta locals\n");
   }
 
@@ -563,16 +567,15 @@ int W65816::return_local(int index, int local_count)
 int W65816::return_integer(int local_count)
 {
   fprintf(out, "; return_integer\n");
-  fprintf(out, "  pla\n");
+  POP;
   fprintf(out, "  sta result\n");
   stack--;
 
   fprintf(out, "  ldx locals\n");
-  fprintf(out, "  txs\n");
 
   if (!is_main)
   {
-    fprintf(out, "  pla\n");
+    POP;
     fprintf(out, "  sta locals\n");
   }
 
@@ -586,16 +589,16 @@ int W65816::return_void(int local_count)
 {
   fprintf(out, "; return_void\n");
   fprintf(out, "  ldx locals\n");
-  fprintf(out, "  txs\n");
 
   if (!is_main)
   {
-    fprintf(out, "  pla\n");
+    POP;
     fprintf(out, "  sta locals\n");
     fprintf(out, "  rts\n");
   }
   else
   {
+//FIXME not sure what to do, for now exit to monitor
     fprintf(out, "  brk\n");
   }
 
