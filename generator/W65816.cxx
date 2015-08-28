@@ -18,6 +18,11 @@
 
 #include "W65816.h"
 
+// ABI is:
+// A:
+// X: java stack pointer
+// Y:
+
 #define LOCALS(a) (a * 2)
 
 W65816::W65816() :
@@ -73,6 +78,7 @@ int W65816::open(const char *filename)
   fprintf(out, "  rep #0x30\n");
   fprintf(out, "; set up stack\n");
   fprintf(out, "  lda #0x1FF\n");
+  fprintf(out, "  tax\n");
   fprintf(out, "  tcs\n");
   fprintf(out, "; set up direct-page\n");
   fprintf(out, "  pea 0x0000\n");
@@ -104,6 +110,7 @@ int W65816::init_heap(int field_count)
 
 int W65816::insert_field_init_boolean(char *name, int index, int value)
 {
+  value = (value == 0) ? 0 : 1;
   fprintf(out, "; insert_field_init_boolean\n");
   fprintf(out, "  lda #%d\n", value);
   fprintf(out, "  sta #%s\n", name);
@@ -199,7 +206,7 @@ int W65816::push_integer_local(int index)
 {
   fprintf(out, "; push_integer_local\n");
   fprintf(out, "  ldx locals\n");
-  fprintf(out, "  lda #stack - %d,x\n", LOCALS(index));
+  fprintf(out, "  lda stack - %d,x\n", LOCALS(index));
   fprintf(out, "  pha\n");
   stack++;
 
@@ -421,8 +428,8 @@ int W65816::neg_integer()
   fprintf(out, "  pla\n");
   fprintf(out, "  sta result\n");
 
-  fprintf(out, "  sec\n");
   fprintf(out, "  lda #0\n");
+  fprintf(out, "  sec\n");
   fprintf(out, "  sbc result\n");
   fprintf(out, "  sta result\n");
   fprintf(out, "  pha\n");
