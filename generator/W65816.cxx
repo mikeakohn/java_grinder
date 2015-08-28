@@ -19,9 +19,9 @@
 #include "W65816.h"
 
 // ABI is:
-// A:
-// X: java stack pointer
-// Y:
+// A
+// X
+// Y
 
 #define LOCALS(a) (a * 2)
 
@@ -37,12 +37,6 @@ W65816::~W65816()
 {
   if(need_mul_integer) { insert_mul_integer(); }
   if(need_div_integer) { insert_mul_integer(); }
-
-//FIXME for testing
-  fprintf(out, "; exit to monitor\n");
-  fprintf(out, "  lda #0xABCD\n");
-  fprintf(out, "  pha\n");
-  fprintf(out, "  rtl\n");
 }
 
 int W65816::open(const char *filename)
@@ -52,7 +46,7 @@ int W65816::open(const char *filename)
   fprintf(out, ".65816\n");
 
   // stack location
-  fprintf(out, "stack equ 0x100\n");
+  fprintf(out, "stack equ 0x0000\n");
 
   // ram start
   fprintf(out, "ram_start equ 0x7000\n");
@@ -598,9 +592,12 @@ int W65816::return_void(int local_count)
   {
     fprintf(out, "  pla\n");
     fprintf(out, "  sta locals\n");
+    fprintf(out, "  rts\n");
   }
-
-  fprintf(out, "  rts\n");
+  else
+  {
+    fprintf(out, "  brk\n");
+  }
 
   return 0;
 }
