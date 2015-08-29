@@ -443,7 +443,7 @@ int W65816::shift_left_integer()
 
   fprintf(out, "  asl result\n");
   fprintf(out, "  dey\n");
-  fprintf(out, "  bne #-4\n");
+  fprintf(out, "  bne #-6\n");
   fprintf(out, "  lda result\n");
   PUSH;
   
@@ -466,7 +466,7 @@ int W65816::shift_right_integer()
 
   fprintf(out, "  lsr result\n");
   fprintf(out, "  dey\n");
-  fprintf(out, "  bne #-4\n");
+  fprintf(out, "  bne #-6\n");
   fprintf(out, "  lda result\n");
   PUSH;
 
@@ -573,12 +573,157 @@ int W65816::integer_to_short()
 
 int W65816::jump_cond(const char *label, int cond, int distance)
 {
-  return -1;
+  bool reverse = false;
+
+  if (stack > 0)
+  {
+    fprintf(out, "; jump_cond\n");
+    fprintf(out, "  inx\n");
+    fprintf(out, "  inx\n");
+    fprintf(out, "  txy\n");
+
+    if(cond == COND_LESS_EQUAL)
+    {
+      reverse = true;
+      cond = COND_GREATER_EQUAL;
+    }
+      else
+    if(cond == COND_GREATER)
+    {
+      reverse = true;
+      cond = COND_LESS;
+    }
+    switch(cond)
+    {
+      case COND_EQUAL:
+        fprintf(out, "  lda stack,y\n");
+        fprintf(out, "  cmp #0\n");
+        fprintf(out, "  bne #3\n");
+        fprintf(out, "  jmp %s\n", label);
+        break;
+      case COND_NOT_EQUAL:
+        fprintf(out, "  lda stack,y\n");
+        fprintf(out, "  cmp #0\n");
+        fprintf(out, "  beq #3\n");
+        fprintf(out, "  jmp %s\n", label);
+        break;
+      case COND_LESS:
+        if(reverse == false)
+        {
+          fprintf(out, "  lda stack,y\n");
+          fprintf(out, "  cmp #0\n");
+          fprintf(out, "  bpl #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
+          else
+        {
+          fprintf(out, "  lda #0\n");
+          fprintf(out, "  cmp stack,y\n");
+          fprintf(out, "  bpl #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
+        break;
+      case COND_GREATER_EQUAL:
+        if(reverse == false)
+        {
+          fprintf(out, "  lda stack,y\n");
+          fprintf(out, "  cmp #0\n");
+          fprintf(out, "  bmi #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
+          else
+        {
+          fprintf(out, "  lda #0\n");
+          fprintf(out, "  cmp stack,y\n");
+          fprintf(out, "  bmi #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
+        break;
+    }
+
+    stack--;
+  }
+
+  return 0;
 }
 
 int W65816::jump_cond_integer(const char *label, int cond, int distance)
 {
-  return -1;
+  bool reverse = false;
+
+  if (stack > 1)
+  {
+    fprintf(out, "; jump_cond_integer\n");
+    fprintf(out, "  inx\n");
+    fprintf(out, "  inx\n");
+    fprintf(out, "  inx\n");
+    fprintf(out, "  inx\n");
+    fprintf(out, "  txy\n");
+
+    if(cond == COND_LESS_EQUAL)
+    {
+      reverse = true;
+      cond = COND_GREATER_EQUAL;
+    }
+      else
+    if(cond == COND_GREATER)
+    {
+      reverse = true;
+      cond = COND_LESS;
+    }
+
+    switch(cond)
+    {
+      case COND_EQUAL:
+        fprintf(out, "  lda stack - 0,y\n");
+        fprintf(out, "  cmp stack - 2,y\n");
+        fprintf(out, "  bne #3\n");
+        fprintf(out, "  jmp %s\n", label);
+        break;
+      case COND_NOT_EQUAL:
+        fprintf(out, "  lda stack - 0,y\n");
+        fprintf(out, "  cmp stack - 2,y\n");
+        fprintf(out, "  beq #3\n");
+        fprintf(out, "  jmp %s\n", label);
+        break;
+      case COND_LESS:
+        if(reverse == false)
+        {
+          fprintf(out, "  lda stack - 0,y\n");
+          fprintf(out, "  cmp stack - 2,y\n");
+          fprintf(out, "  bpl #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
+          else
+        {
+          fprintf(out, "  lda stack - 2,y\n");
+          fprintf(out, "  cmp stack - 0,y\n");
+          fprintf(out, "  bpl #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
+        break;
+      case COND_GREATER_EQUAL:
+        if(reverse == false)
+        {
+          fprintf(out, "  lda stack - 0,y\n");
+          fprintf(out, "  cmp stack - 2,y\n");
+          fprintf(out, "  bmi #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
+          else
+        {
+          fprintf(out, "  lda stack - 2,y\n");
+          fprintf(out, "  cmp stack - 0,y\n");
+          fprintf(out, "  bmi #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
+        break;
+    }
+
+    stack -= 2;
+  }
+
+  return 0;
 }
 
 int W65816::return_local(int index, int local_count)
