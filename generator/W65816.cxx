@@ -328,12 +328,9 @@ int W65816::pop()
 
 int W65816::dup()
 {
-  fprintf(out, "; dup\n");
-  fprintf(out, "  tsc\n");
-  fprintf(out, "  tay\n");
+  fprintf(out, "; txy\n");
   fprintf(out, "  lda stack,y\n");
   PUSH;
-
   stack++;
 
   return 0;
@@ -438,7 +435,19 @@ int W65816::neg_integer()
 
 int W65816::shift_left_integer()
 {
-  return -1;
+  fprintf(out, "; shift_left_integer\n");
+  POP;
+  fprintf(out, "  tay\n");
+  POP;
+  fprintf(out, "  sta result\n");
+
+  fprintf(out, "  asl result\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bne #-4\n");
+  fprintf(out, "  lda result\n");
+  PUSH;
+  
+  return 0;
 }
 
 int W65816::shift_left_integer(int const_val)
@@ -448,7 +457,20 @@ int W65816::shift_left_integer(int const_val)
 
 int W65816::shift_right_integer()
 {
-  return -1;
+//FIXME
+  fprintf(out, "; shift_right_integer\n");
+  POP;
+  fprintf(out, "  tay\n");
+  POP;
+  fprintf(out, "  sta result\n");
+
+  fprintf(out, "  lsr result\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bne #-4\n");
+  fprintf(out, "  lda result\n");
+  PUSH;
+
+  return 0;
 }
 
 int W65816::shift_right_integer(int num)
@@ -458,7 +480,22 @@ int W65816::shift_right_integer(int num)
 
 int W65816::shift_right_uinteger()
 {
-  return -1;
+  fprintf(out, "; shift_right_uinteger\n");
+  POP;
+  fprintf(out, "  tay\n");
+  POP;
+  fprintf(out, "  sta result\n");
+
+  fprintf(out, "  ora #0x8000\n");
+  fprintf(out, "  lsr result\n");
+  fprintf(out, "  ora result\n");
+  fprintf(out, "  sta result\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bne #-13\n");
+  fprintf(out, "  lda result\n");
+  PUSH;
+
+  return 0;
 }
 
 int W65816::shift_right_uinteger(int num)
