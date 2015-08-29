@@ -48,7 +48,7 @@ W65816::W65816() :
 W65816::~W65816()
 {
   if(need_mul_integer) { insert_mul_integer(); }
-  if(need_div_integer) { insert_mul_integer(); }
+  if(need_div_integer) { insert_div_integer(); }
 }
 
 int W65816::open(const char *filename)
@@ -1026,9 +1026,10 @@ void W65816::insert_div_integer()
 {
   fprintf(out, "div_integer:\n");
   POP;
-  fprintf(out, "  sta value2\n");
+  fprintf(out, "  tay\n");
   POP;
-  fprintf(out, "  sta value1\n");
+  fprintf(out, "  sta remainder\n");
+  fprintf(out, "  tya\n");
   fprintf(out, "  stz value3\n");
   fprintf(out, "  ldy #1\n");
   fprintf(out, "div_integer_1:\n");
@@ -1041,9 +1042,9 @@ void W65816::insert_div_integer()
   fprintf(out, "  ror\n");
   fprintf(out, "div_integer_4:\n");
   fprintf(out, "  pha\n");
-  fprintf(out, "  lda remainder");
+  fprintf(out, "  lda remainder\n");
   fprintf(out, "  sec\n");
-  fprintf(out, "  sbc 1,S\n");
+  fprintf(out, "  sbc 1,s\n");
   fprintf(out, "  bcc div_integer_3\n");
   fprintf(out, "  sta remainder\n");
   fprintf(out, "div_integer_3:\n");
