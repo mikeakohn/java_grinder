@@ -919,39 +919,60 @@ int W65816::array_write_int(const char *name, int field_id)
 void W65816::insert_mul_integer()
 {
   fprintf(out, "mul_integer:\n");
-  // load values
   POP;
   fprintf(out, "  sta value2\n");
   POP;
   fprintf(out, "  sta value1\n");
-
-  // clear result
   fprintf(out, "  lda #0\n");
-  fprintf(out, "  sta result\n");
-  fprintf(out, "  ldy #16\n");
-
-  // loop
-  fprintf(out, "  asl result\n");
-  fprintf(out, "  asl value1\n");
-  fprintf(out, "  bcc #7\n");
-
-  // add
+  fprintf(out, "mul_integer_1:\n");
+  fprintf(out, "  ldy value1\n");
+  fprintf(out, "  beq mul_integer_done\n");
+  fprintf(out, "  lsr value1\n");
+  fprintf(out, "  bcc mul_integer_2\n");
   fprintf(out, "  clc\n");
-  fprintf(out, "  lda result\n");
   fprintf(out, "  adc value2\n");
+  fprintf(out, "mul_integer_2:\n");
+  fprintf(out, "  asl value2\n");
+  fprintf(out, "  bra mul_integer_1\n");
+  fprintf(out, "mul_integer_done:\n");
   fprintf(out, "  sta result\n");
-
-  // next
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bne #-18\n");
-
-  // push result
-  fprintf(out, "  lda result\n");
   PUSH;
   fprintf(out, "  rts\n");
 }
 
 void W65816::insert_div_integer()
 {
+  fprintf(out, "div_integer:\n");
+  POP;
+  fprintf(out, "  sta value2\n");
+  POP;
+  fprintf(out, "  sta value1\n");
+  fprintf(out, "  stz value3\n");
+  fprintf(out, "  ldy #1\n");
+  fprintf(out, "div_integer_1:\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  bcs div_integer_2\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  cpy #17\n");
+  fprintf(out, "  bne div_integer_1\n");
+  fprintf(out, "div_integer_2:\n");
+  fprintf(out, "  ror\n");
+  fprintf(out, "div_integer_4:\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  lda remainder");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  sbc 1,S\n");
+  fprintf(out, "  bcc div_integer_3\n");
+  fprintf(out, "  sta remainder\n");
+  fprintf(out, "div_integer_3:\n");
+  fprintf(out, "  rol value3\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  lsr\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bne div_integer_4\n");
+  fprintf(out, "div_integer_done:\n");
+  fprintf(out, "  lda value3\n");
+  PUSH;
+  fprintf(out, "  rts\n");
 }
 
