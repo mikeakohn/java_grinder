@@ -918,6 +918,37 @@ int W65816::array_write_int(const char *name, int field_id)
 // subroutines
 void W65816::insert_mul_integer()
 {
+  fprintf(out, "mul_integer:\n");
+  // load values
+  POP;
+  fprintf(out, "  sta value2\n");
+  POP;
+  fprintf(out, "  sta value1\n");
+
+  // clear result
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sta result\n");
+  fprintf(out, "  ldy #16\n");
+
+  // loop
+  fprintf(out, "  asl result\n");
+  fprintf(out, "  asl value1\n");
+  fprintf(out, "  bcc #7\n");
+
+  // add
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda result\n");
+  fprintf(out, "  adc value2\n");
+  fprintf(out, "  sta result\n");
+
+  // next
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bne #-18\n");
+
+  // push result
+  fprintf(out, "  lda result\n");
+  PUSH;
+  fprintf(out, "  rts\n");
 }
 
 void W65816::insert_div_integer()
