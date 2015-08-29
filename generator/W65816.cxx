@@ -402,21 +402,31 @@ int W65816::sub_integer(int const_val)
 
 int W65816::mul_integer()
 {
-//  fprintf(out, "  jsr mul_integer\n");
-//  stack--;
-  return -1;
+  need_mul_integer = 1;
+  fprintf(out, "  jsr mul_integer\n");
+  stack--;
+  return 0;
 }
 
+// unsigned only for now
 int W65816::div_integer()
 {
-//  fprintf(out, "  jsr div_integer\n");
-//  stack--;
-  return -1;
+  need_div_integer = 1;
+  fprintf(out, "  jsr div_integer\n");
+  stack--;
+  return 0;
 }
 
+// unsigned only for now
 int W65816::mod_integer()
 {
-  return -1;
+  need_div_integer = 1;
+  fprintf(out, "  jsr div_integer\n");
+  fprintf(out, "  lda remainder\n");
+  fprintf(out, "  sta result\n");
+  PUSH;
+  stack--;
+  return 0;
 }
 
 int W65816::neg_integer()
@@ -972,6 +982,7 @@ void W65816::insert_div_integer()
   fprintf(out, "  bne div_integer_4\n");
   fprintf(out, "div_integer_done:\n");
   fprintf(out, "  lda value3\n");
+  fprintf(out, "  sta result\n");
   PUSH;
   fprintf(out, "  rts\n");
 }
