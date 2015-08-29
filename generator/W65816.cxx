@@ -232,7 +232,7 @@ int W65816::push_ref_static(const char *name, int index)
 {
   fprintf(out, "; push_ref_static\n");
   fprintf(out, "  lda #_%s\n", name);
-  fprintf(out, "  pha\n");
+  PUSH;
   stack++;
 
   return 0;
@@ -556,11 +556,11 @@ int W65816::inc_integer(int index, int num)
 int W65816::integer_to_byte()
 {
   fprintf(out, "integer_to_byte:\n");
-  fprintf(out, "  pla\n");
+  POP;
   fprintf(out, "  eor #128\n");
   fprintf(out, "  sec\n");
   fprintf(out, "  sbc #128\n");
-  fprintf(out, "  pha\n");
+  PUSH;
 
   return 0;
 }
