@@ -405,6 +405,7 @@ int W65816::mul_integer()
   need_mul_integer = 1;
   fprintf(out, "  jsr mul_integer\n");
   stack--;
+
   return 0;
 }
 
@@ -414,6 +415,7 @@ int W65816::div_integer()
   need_div_integer = 1;
   fprintf(out, "  jsr div_integer\n");
   stack--;
+
   return 0;
 }
 
@@ -426,6 +428,7 @@ int W65816::mod_integer()
   fprintf(out, "  sta result\n");
   PUSH;
   stack--;
+
   return 0;
 }
 
@@ -535,13 +538,6 @@ int W65816::and_integer(int num)
 int W65816::or_integer()
 {
   fprintf(out, "; or_integer\n");
-  stack--;
-  return 0;
-}
-
-int W65816::or_integer(int num)
-{
-  fprintf(out, "; or_integer\n");
   POP;
   fprintf(out, "  sta result\n");
   POP;
@@ -551,6 +547,11 @@ int W65816::or_integer(int num)
   stack--;
 
   return 0;
+}
+
+int W65816::or_integer(int num)
+{
+  return -1;
 }
 
 int W65816::xor_integer()
@@ -836,17 +837,65 @@ int W65816::call(const char *name)
 
 int W65816::invoke_static_method(const char *name, int params, int is_void)
 {
-  return -1;
+int local;
+int stack_vars = stack;
+
+  printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
+
+  fprintf(out, "; invoke_static_method\n");
+
+  local = -params;
+  while(local != 0)
+  {
+    if(stack_vars > 0)
+    {
+      fprintf(out, "  txy\n");
+      fprintf(out, "  lda stack + 2 + %d,y\n", (stack - stack_vars) * 2);
+      fprintf(out, "  sta stack + 2 %d,y\n", local - 2);
+      stack_vars--;
+    }
+
+    local++;
+  }
+
+  fprintf(out, "  jsr %s\n", name);
+
+  if((stack - stack_vars) > 0)
+  {
+    fprintf(out, "  txa\n");
+    fprintf(out, "  clc\n");
+    fprintf(out, "  adc #%d\n", (stack - stack_vars) * 2);
+    fprintf(out, "  tax\n");
+
+    params -= (stack - stack_vars);
+  }
+
+  if(!is_void)
+  {
+    fprintf(out, "  lda result\n");
+    PUSH;
+    stack++;
+  }
+
+  return 0;
 }
 
 int W65816::put_static(const char *name, int index)
 {
-  return -1;
+  fprintf(out, "  lda %s\n", name);
+  PUSH;
+  stack++;
+
+  return 0;
 }
 
 int W65816::get_static(const char *name, int index)
 {
-  return -1;
+  fprintf(out, "  lda %s\n", name);
+  PUSH;
+  stack++;
+
+  return 0;
 }
 
 int W65816::brk()
