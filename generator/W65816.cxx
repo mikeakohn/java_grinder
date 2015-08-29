@@ -515,8 +515,15 @@ int W65816::shift_right_uinteger(int num)
 
 int W65816::and_integer()
 {
-  fprintf(out, "; and_integer\n");
+  fprintf(out, "; add_integer\n");
+  POP;
+  fprintf(out, "  sta result\n");
+  POP;
+  fprintf(out, "  and result\n");
+  fprintf(out, "  sta result\n");
+  PUSH;
   stack--;
+
   return 0;
 }
 
@@ -534,13 +541,29 @@ int W65816::or_integer()
 
 int W65816::or_integer(int num)
 {
-  return -1;
+  fprintf(out, "; or_integer\n");
+  POP;
+  fprintf(out, "  sta result\n");
+  POP;
+  fprintf(out, "  ora result\n");
+  fprintf(out, "  sta result\n");
+  PUSH;
+  stack--;
+
+  return 0;
 }
 
 int W65816::xor_integer()
 {
   fprintf(out, "; xor_integer\n");
+  POP;
+  fprintf(out, "  sta result\n");
+  POP;
+  fprintf(out, "  eor result\n");
+  fprintf(out, "  sta result\n");
+  PUSH;
   stack--;
+
   return 0;
 }
 
