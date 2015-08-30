@@ -611,7 +611,7 @@ int W65816::jump_cond(const char *label, int cond, int distance)
 {
   bool reverse = false;
 
-  if (stack > 0)
+  if(stack > 0)
   {
     fprintf(out, "; jump_cond\n");
     fprintf(out, "  inx\n");
@@ -687,7 +687,7 @@ int W65816::jump_cond_integer(const char *label, int cond, int distance)
 {
   bool reverse = false;
 
-  if (stack > 1)
+  if(stack > 1)
   {
     fprintf(out, "; jump_cond_integer\n");
     fprintf(out, "  inx\n");
