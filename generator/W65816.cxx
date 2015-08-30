@@ -851,7 +851,7 @@ int stack_vars = stack;
     {
       fprintf(out, "  txy\n");
       fprintf(out, "  lda stack + 2 + %d,y\n", (stack - stack_vars) * 2);
-      fprintf(out, "  sta stack + 2 %d,y\n", local - 3);
+      fprintf(out, "  sta stack + 2 %d,y\n", local - 2);
       stack_vars--;
     }
 
