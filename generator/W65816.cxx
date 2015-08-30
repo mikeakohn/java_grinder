@@ -74,6 +74,7 @@ int W65816::open(const char *filename)
   fprintf(out, "value1 equ 0x08\n");
   fprintf(out, "value2 equ 0x10\n");
   fprintf(out, "value3 equ 0x12\n");
+  fprintf(out, "address equ 0x14\n");
 
   // start
   fprintf(out, ".org 0x0300\n");
@@ -1059,5 +1060,37 @@ void W65816::insert_div_integer()
   fprintf(out, "  sta result\n");
   PUSH;
   fprintf(out, "  rts\n");
+}
+
+// API
+int W65816::memory_read8()
+{
+  return -1;
+}
+
+int W65816::memory_write8()
+{
+  fprintf(out, "; memory_write8\n");
+  POP;
+  fprintf(out, "  pha\n");
+  POP;
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  sta (address)\n");
+  fprintf(out, "  rep #0x30\n");
+  stack -= 2;
+
+  return 0;
+}
+
+int W65816::memory_read16()
+{
+  return -1;
+}
+
+int W65816::memory_write16()
+{
+  return -1;
 }
 

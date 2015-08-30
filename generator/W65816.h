@@ -102,6 +102,12 @@ public:
   virtual int array_write_short(const char *name, int field_id);
   virtual int array_write_int(const char *name, int field_id);
 
+  // Memory API
+  virtual int memory_read8();
+  virtual int memory_write8();
+  virtual int memory_read16();
+  virtual int memory_write16();
+
 protected:
   int stack;
   bool is_main : 1;
