@@ -34,6 +34,11 @@ public class SegaGenesisJavaDemo
     SegaGenesis.setImageData(ImageMike.image);
     wait(120);
 
+    SegaGenesis.setSpritePosition(0, 10, 20);
+    SegaGenesis.setSpritePosition(1, 10, 20);
+    SegaGenesis.setSpriteConfig1(0,
+      SegaGenesis.SPRITE_CONFIG1_HORIZONTAL_SIZE_2_CELL);
+
     SegaGenesis.initBitmap();
     //SegaGenesis.clearBitmap();
     //SegaGenesis.setPalettePointer(1);

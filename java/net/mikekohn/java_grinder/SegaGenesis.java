@@ -13,6 +13,26 @@ package net.mikekohn.java_grinder;
 
 abstract public class SegaGenesis
 {
+  public static final int SPRITE_CONFIG1_HORIZONTAL_SIZE_1_CELL = 0x0000;
+  public static final int SPRITE_CONFIG1_HORIZONTAL_SIZE_2_CELL = 0x0400;
+  public static final int SPRITE_CONFIG1_HORIZONTAL_SIZE_3_CELL = 0x0800;
+  public static final int SPRITE_CONFIG1_HORIZONTAL_SIZE_4_CELL = 0x0c00;
+
+  public static final int SPRITE_CONFIG1_VERTICAL_SIZE_1_CELL = 0x0000;
+  public static final int SPRITE_CONFIG1_VERTICAL_SIZE_2_CELL = 0x0100;
+  public static final int SPRITE_CONFIG1_VERTICAL_SIZE_3_CELL = 0x0200;
+  public static final int SPRITE_CONFIG1_VERTICAL_SIZE_4_CELL = 0x0300;
+
+  public static final int SPRITE_CONFIG2_PRIORITY = 0x8000;
+
+  public static final int SPRITE_CONFIG2_PALETTE_0 = 0x0000;
+  public static final int SPRITE_CONFIG2_PALETTE_1 = 0x2000;
+  public static final int SPRITE_CONFIG2_PALETTE_2 = 0x4000;
+  public static final int SPRITE_CONFIG2_PALETTE_3 = 0x6000;
+
+  public static final int SPRITE_CONFIG2_HORIZONTAL_FLIP = 0x0800;
+  public static final int SPRITE_CONFIG2_VERTICAL_FLIP = 0x1000;
+
   protected SegaGenesis() { }
 
   /** Set a the palette pointer.  Sets the palette pointer to the next
@@ -88,26 +108,21 @@ abstract public class SegaGenesis
   /** Set sprite's position on the screen. */
   public static void setSpritePosition(int index, int x, int y) { }
 
-  /** Set sprite's color palette. */
-  public static void setSpritePalette(int index, int palette) { }
+  /** Set sprite's x,y stretching and link field value.
+      Bits 11-10: horizontal stretch value
+      Bits   9-8: vertical stretch value
+      Bits   7-0: link field value */
+  public static void setSpriteConfig1(int index, int value) { }
 
-  /** Set sprite's stretch size (0 to 3 are only valid values). */
-  public static void setSpriteStretchSize(int index, int width, int height) { }
-
-  /** Set sprite's pattern start index. */
-  public static void setSpritePattern(int index, int start) { }
-
-  /** Set sprite flip horizontal. */
-  public static void setSpriteFlipHorizontal(int index, boolean is_flipped) { }
-
-  /** Set sprite flip vertical. */
-  public static void setSpriteFlipVertical(int index, boolean is_flipped) { }
-
-  /** Set sprite priority. */
-  public static void setSpritePriority(int index, boolean is_high) { }
-
-  /** Set sprite link field. */
-  public static void setSpriteLinkField(int index, int link_field) { }
+  /** Set sprite's priority, palette, vertical flip, horizontal flip,
+      pattern start index.
+      Bit     15: priority
+      Bits 14-13: palette number
+      Bit     12: vertical flip
+      Bit     11: horizontal flip
+      Bits  10-0: pattern start index
+      */
+  public static void setSpriteConfig2(int index, int value) { }
 
   /** Load code up to 8k in size into the Z80 process space.  Z80 will
       be reset by the API and code will start running. */
