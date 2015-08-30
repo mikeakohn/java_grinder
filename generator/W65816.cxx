@@ -456,9 +456,10 @@ int W65816::shift_left_integer()
 
   fprintf(out, "  asl result\n");
   fprintf(out, "  dey\n");
-  fprintf(out, "  bne #-6\n");
+  fprintf(out, "  bne #-5\n");
   fprintf(out, "  lda result\n");
   PUSH;
+  stack--;
   
   return 0;
 }
@@ -470,18 +471,21 @@ int W65816::shift_left_integer(int const_val)
 
 int W65816::shift_right_integer()
 {
-//FIXME
   fprintf(out, "; shift_right_integer\n");
   POP;
   fprintf(out, "  tay\n");
   POP;
   fprintf(out, "  sta result\n");
 
+  fprintf(out, "  and #0x8000\n");
   fprintf(out, "  lsr result\n");
+  fprintf(out, "  ora result\n");
+  fprintf(out, "  sta result\n");
   fprintf(out, "  dey\n");
-  fprintf(out, "  bne #-6\n");
+  fprintf(out, "  bne #-12\n");
   fprintf(out, "  lda result\n");
   PUSH;
+  stack--;
 
   return 0;
 }
@@ -499,15 +503,12 @@ int W65816::shift_right_uinteger()
   POP;
   fprintf(out, "  sta result\n");
 
-  fprintf(out, "  ora #0x8000\n");
   fprintf(out, "  lsr result\n");
-  fprintf(out, "  ora result\n");
-  fprintf(out, "  sta result\n");
   fprintf(out, "  dey\n");
-  fprintf(out, "  bne #-13\n");
+  fprintf(out, "  bne #-5\n");
   fprintf(out, "  lda result\n");
   PUSH;
-
+  stack--;
   return 0;
 }
 
