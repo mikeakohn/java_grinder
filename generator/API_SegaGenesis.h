@@ -39,6 +39,14 @@ public:
   virtual int sega_genesis_setPatternTable() { return -1; }
   virtual int sega_genesis_setImageData() { return -1; }
   virtual int sega_genesis_setPaletteColors() { return -1; }
+  virtual int sega_genesis_setSpritePosition() { return -1; }
+  virtual int sega_genesis_setSpritePalette() { return -1; }
+  virtual int sega_genesis_setSpriteStretchSize() { return -1; }
+  virtual int sega_genesis_setSpritePattern() { return -1; }
+  virtual int sega_genesis_setSpriteFlipHorizontal() { return -1; }
+  virtual int sega_genesis_setSpriteFlipVertical() { return -1; }
+  virtual int sega_genesis_setSpritePriority() { return -1; }
+  virtual int sega_genesis_setSpriteLinkField() { return -1; }
   virtual int sega_genesis_loadZ80() { return -1; }
   virtual int sega_genesis_resetZ80() { return -1; }
   virtual int sega_genesis_pauseZ80() { return -1; }

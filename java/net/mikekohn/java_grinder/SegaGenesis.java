@@ -85,6 +85,30 @@ abstract public class SegaGenesis
   /** Set palette colors. */
   public static void setPaletteColors(short[] palette) { }
 
+  /** Set sprite's position on the screen. */
+  public static void setSpritePosition(int index, int x, int y) { }
+
+  /** Set sprite's color palette. */
+  public static void setSpritePalette(int index, int palette) { }
+
+  /** Set sprite's stretch size (0 to 3 are only valid values). */
+  public static void setSpriteStretchSize(int index, int width, int height) { }
+
+  /** Set sprite's pattern start index. */
+  public static void setSpritePattern(int index, int start) { }
+
+  /** Set sprite flip horizontal. */
+  public static void setSpriteFlipHorizontal(int index, boolean is_flipped) { }
+
+  /** Set sprite flip vertical. */
+  public static void setSpriteFlipVertical(int index, boolean is_flipped) { }
+
+  /** Set sprite priority. */
+  public static void setSpritePriority(int index, boolean is_high) { }
+
+  /** Set sprite link field. */
+  public static void setSpriteLinkField(int index, int link_field) { }
+
   /** Load code up to 8k in size into the Z80 process space.  Z80 will
       be reset by the API and code will start running. */
   public static void loadZ80(byte[] code) { }

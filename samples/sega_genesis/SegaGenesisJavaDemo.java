@@ -32,7 +32,6 @@ public class SegaGenesisJavaDemo
     SegaGenesis.setPaletteColors(ImageMike.palette);
     SegaGenesis.setPatternTable(ImageMike.pattern);
     SegaGenesis.setImageData(ImageMike.image);
-    SegaGenesis.loadZ80(SetupSynth.z80_code);
     wait(120);
 
     SegaGenesis.initBitmap();

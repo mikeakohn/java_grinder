@@ -460,6 +460,45 @@ int SegaGenesis::sega_genesis_setPaletteColors()
   return 0;
 }
 
+int SegaGenesis::sega_genesis_setSpritePosition()
+{
+  return -1;
+}
+
+int SegaGenesis::sega_genesis_setSpritePalette()
+{
+  return -1;
+}
+
+int SegaGenesis::sega_genesis_setSpriteStretchSize()
+{
+  return -1;
+}
+
+int SegaGenesis::sega_genesis_setSpritePattern()
+{
+  return -1;
+}
+
+int SegaGenesis::sega_genesis_setSpriteFlipHorizontal()
+{
+  return -1;
+}
+
+int SegaGenesis::sega_genesis_setSpriteFlipVertical()
+{
+  return -1;
+}
+
+int SegaGenesis::sega_genesis_setSpritePriority()
+{
+  return -1;
+}
+
+int SegaGenesis::sega_genesis_setSpriteLinkField()
+{
+  return -1;
+}
 
 int SegaGenesis::sega_genesis_loadZ80()
 {
