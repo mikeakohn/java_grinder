@@ -591,7 +591,7 @@ int W65816::inc_integer(int index, int num)
 
 int W65816::integer_to_byte()
 {
-  fprintf(out, "integer_to_byte:\n");
+  fprintf(out, "; integer_to_byte\n");
   POP;
   fprintf(out, "  eor #128\n");
   fprintf(out, "  sec\n");

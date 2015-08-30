@@ -30,7 +30,7 @@ int AppleIIgs::open(const char *filename)
   fprintf(out, ".65816\n");
 
   // stack location
-  fprintf(out, "stack equ 0x100\n");
+  fprintf(out, "stack equ 0x0c00\n");
 
   // ram start
 //FIXME this is not correct
@@ -47,6 +47,7 @@ int AppleIIgs::open(const char *filename)
   fprintf(out, "value1 equ 0x08\n");
   fprintf(out, "value2 equ 0x10\n");
   fprintf(out, "value3 equ 0x12\n");
+  fprintf(out, "address equ 0x14\n");
 
   // start
   fprintf(out, ".org 0x9100\n");
@@ -55,11 +56,22 @@ int AppleIIgs::open(const char *filename)
   fprintf(out, "  xce\n");
   fprintf(out, "; all 16-bit registers\n");
   fprintf(out, "  rep #0x30\n");
-  fprintf(out, "; set up stack\n");
+  fprintf(out, "; set up processor stack\n");
   fprintf(out, "  lda #0x1FF\n");
   fprintf(out, "  tcs\n");
   fprintf(out, "; set up direct-page\n");
   fprintf(out, "  pea 0x0000\n");
+  fprintf(out, "; clear java stack\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  ldx #0\n");
+  fprintf(out, "clear_java_stack:\n");
+  fprintf(out, "  sta stack,x\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  cpx #0x100\n");
+  fprintf(out, "  bne clear_java_stack\n");
+  fprintf(out, "; set up java stack pointer\n");
+  fprintf(out, "  ldx #0xFE\n");
 
   return 0;
 }
