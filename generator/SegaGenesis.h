@@ -47,13 +47,8 @@ public:
   virtual int sega_genesis_setImageData();
   virtual int sega_genesis_setPaletteColors();
   virtual int sega_genesis_setSpritePosition();
-  virtual int sega_genesis_setSpritePalette();
-  virtual int sega_genesis_setSpriteStretchSize();
-  virtual int sega_genesis_setSpritePattern();
-  virtual int sega_genesis_setSpriteFlipHorizontal();
-  virtual int sega_genesis_setSpriteFlipVertical();
-  virtual int sega_genesis_setSpritePriority();
-  virtual int sega_genesis_setSpriteLinkField();
+  virtual int sega_genesis_setSpriteConfig1();
+  virtual int sega_genesis_setSpriteConfig2();
   virtual int sega_genesis_loadZ80();
   virtual int sega_genesis_resetZ80();
   virtual int sega_genesis_pauseZ80();
@@ -77,6 +72,7 @@ private:
   void add_plot();
   void add_set_plot_address();
 
+  uint16_t sprite_attribute_table;     // address of 640 byte table
   bool need_print_string:1;
   bool need_load_fonts:1;
   bool need_load_z80:1;

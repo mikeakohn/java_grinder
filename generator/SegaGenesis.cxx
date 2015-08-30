@@ -35,12 +35,21 @@
   ((cd & 0x3c) << 2) | \
   (a >> 14))
 
+// Functions that return voice should never use the stack for registers.. ?
+#define CHECK_STACK \
+  if (stack != 0) \
+  { \
+    printf("Internal Error: %s:%d\n", __FILE__, __LINE__); \
+    return -1; \
+  }
+
 // a0 = VDP_DATA
 // a1 = VDP_control
 // a2 = temp
 // a3 = temp
 
 SegaGenesis::SegaGenesis() :
+  sprite_attribute_table(0xd800),
   need_print_string(false),
   need_load_fonts(false),
   need_load_z80(false),
@@ -298,6 +307,8 @@ int SegaGenesis::sega_genesis_setPlotAddress()
 int SegaGenesis::sega_genesis_fastPlot()
 {
   // FIXME
+  CHECK_STACK
+
   fprintf(out, "  move.w d%d, (a1)\n", REG_STACK(reg-2));
   fprintf(out, "  move.w d%d, (a1)\n", REG_STACK(reg-1));
 
@@ -462,42 +473,55 @@ int SegaGenesis::sega_genesis_setPaletteColors()
 
 int SegaGenesis::sega_genesis_setSpritePosition()
 {
-  return -1;
+  CHECK_STACK
+
+  fprintf(out, "  asl.w #3, d%d\n", REG_STACK(reg-3));
+  fprintf(out, "  swap d%d\n", REG_STACK(reg-3));
+
+  fprintf(out, "  ;; setSpritePosition()\n");
+  fprintf(out, "  move.l #0x%08x, d5\n", CTRL_REG(CD_VRAM_WRITE, (sprite_attribute_table + 6)));
+  fprintf(out, "  add.l d%d, d5\n", REG_STACK(reg-3));
+  fprintf(out, "  move.l d5, (a1)\n");
+  fprintf(out, "  move.w d%d, (a0)\n", REG_STACK(reg-2));
+
+  fprintf(out, "  move.l #0x%08x, d5\n", CTRL_REG(CD_VRAM_WRITE, sprite_attribute_table));
+  fprintf(out, "  add.l d%d, d5\n", REG_STACK(reg-3));
+  fprintf(out, "  move.l d5, (a1)\n");
+  fprintf(out, "  move.w d%d, (a1)\n", REG_STACK(reg-1));
+
+  reg -= 3;
+
+  return 0;
 }
 
-int SegaGenesis::sega_genesis_setSpritePalette()
+int SegaGenesis::sega_genesis_setSpriteConfig1()
 {
-  return -1;
+  CHECK_STACK
+
+  fprintf(out, "  ;; setSpriteConfig1()\n");
+  fprintf(out, "  move.l #0x%08x, d5\n", CTRL_REG(CD_VRAM_WRITE, (sprite_attribute_table + 2)));
+  fprintf(out, "  add.l d%d, d5\n", REG_STACK(reg-2));
+  fprintf(out, "  move.l d5, (a1)\n");
+  fprintf(out, "  move.w d%d, (a0)\n", REG_STACK(reg-1));
+
+  reg -= 2;
+
+  return 0;
 }
 
-int SegaGenesis::sega_genesis_setSpriteStretchSize()
+int SegaGenesis::sega_genesis_setSpriteConfig2()
 {
-  return -1;
-}
+  CHECK_STACK
 
-int SegaGenesis::sega_genesis_setSpritePattern()
-{
-  return -1;
-}
+  fprintf(out, "  ;; setSpriteConfig2()\n");
+  fprintf(out, "  move.l #0x%08x, d5\n", CTRL_REG(CD_VRAM_WRITE, (sprite_attribute_table + 4)));
+  fprintf(out, "  add.l d%d, d5\n", REG_STACK(reg-2));
+  fprintf(out, "  move.l d5, (a1)\n");
+  fprintf(out, "  move.w d%d, (a0)\n", REG_STACK(reg-1));
 
-int SegaGenesis::sega_genesis_setSpriteFlipHorizontal()
-{
-  return -1;
-}
+  reg -= 2;
 
-int SegaGenesis::sega_genesis_setSpriteFlipVertical()
-{
-  return -1;
-}
-
-int SegaGenesis::sega_genesis_setSpritePriority()
-{
-  return -1;
-}
-
-int SegaGenesis::sega_genesis_setSpriteLinkField()
-{
-  return -1;
+  return 0;
 }
 
 int SegaGenesis::sega_genesis_loadZ80()
