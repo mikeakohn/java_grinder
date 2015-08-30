@@ -844,18 +844,18 @@ int stack_vars = stack;
 
   fprintf(out, "; invoke_static_method\n");
 
-  local = -params;
+  local = (params * -2);
   while(local != 0)
   {
     if(stack_vars > 0)
     {
       fprintf(out, "  txy\n");
       fprintf(out, "  lda stack + 2 + %d,y\n", (stack - stack_vars) * 2);
-      fprintf(out, "  sta stack + 2 %d,y\n", local - 2);
+      fprintf(out, "  sta stack + 2 %d,y\n", local - 3);
       stack_vars--;
     }
 
-    local++;
+    local += 2;
   }
 
   fprintf(out, "  jsr %s\n", name);
