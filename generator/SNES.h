@@ -25,6 +25,8 @@ public:
   virtual int open(const char *filename);
 
 private:
+  void write_interrupts();
+  void write_cartridge_info();
 };
 
 #endif
