@@ -110,6 +110,7 @@ public:
 
 protected:
   int stack;
+  int start_org;
   bool is_main : 1;
 
   bool need_mul_integer:1;

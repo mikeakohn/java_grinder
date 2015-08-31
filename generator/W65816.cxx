@@ -39,6 +39,7 @@
 
 W65816::W65816() :
   stack(0),
+  start_org(0x300),
   is_main(0),
   need_mul_integer(0),
   need_div_integer(0)
@@ -77,7 +78,8 @@ int W65816::open(const char *filename)
   fprintf(out, "address equ 0x14\n");
 
   // start
-  fprintf(out, ".org 0x0300\n");
+  fprintf(out, ".org 0x%04x\n", start_org);
+  fprintf(out, "start:\n");
   fprintf(out, "; change to 16-bit mode\n");
   fprintf(out, "  clc\n");
   fprintf(out, "  xce\n");

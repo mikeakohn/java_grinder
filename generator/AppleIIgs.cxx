@@ -17,6 +17,7 @@
 
 AppleIIgs::AppleIIgs()
 {
+  start_org = 0x9100;
 }
 
 AppleIIgs::~AppleIIgs()
