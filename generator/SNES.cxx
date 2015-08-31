@@ -19,10 +19,13 @@
 
 SNES::SNES()
 {
+  start_org = 0x8000;
 }
 
 SNES::~SNES()
 {
+  write_interrupts();
+  write_cartridge_info();
 }
 
 int SNES::open(const char *filename)

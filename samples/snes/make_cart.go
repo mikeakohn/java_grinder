@@ -4,7 +4,12 @@ import "fmt"
 import "os"
 
 func main() {
-  file_in, err := os.Open("test.bin")
+  if len(os.Args) != 3 {
+    fmt.Println("Usage: " + os.Args[0] + " <binfile> <smcfile>")
+    os.Exit(0)
+  }
+
+  file_in, err := os.Open(os.Args[1])
 
   if err != nil {
     panic(err)
@@ -34,7 +39,7 @@ func main() {
   header[0] = byte(i & 0xff)
   header[1] = byte(i >> 8)
 
-  file_out, err := os.Create("test.smc")
+  file_out, err := os.Create(os.Args[2])
   file_out.Write(header)
   file_out.Write(cart)
   file_out.Close()

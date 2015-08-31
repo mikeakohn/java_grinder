@@ -1,10 +1,10 @@
 
 default: SnesJavaDemo.class
 
-grind: SnesJavaDemo.class PlayTitleSample.class
+grind: SnesJavaDemo.class
 	../../java_grinder SnesJavaDemo.class snes_java_demo.asm snes
 	naken_asm -I ~ -l -b -o snes_java_demo.bin snes_java_demo.asm
-	go run make_cart.go
+	go run make_cart.go snes_java_demo.bin snes_java_demo.smc
 
 %.class: %.java
 	javac -classpath ../../build/JavaGrinder.jar:. $*.java
