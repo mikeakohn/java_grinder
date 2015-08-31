@@ -16,6 +16,7 @@ package net.mikekohn.java_grinder;
 abstract public class SNES
 {
   protected SNES() { }
-  //public static void setSomething() { }
+
+  public static void setBackgroundColor(int color) { }
 }
 

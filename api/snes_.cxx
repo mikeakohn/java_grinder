@@ -22,23 +22,25 @@
 #define CHECK_FUNC(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return generator->snes_##funct(); \
+    return generator->snes_##funct##sig(); \
   }
 
-#define CHECK_FUNC_CONST(funct,sig) \
+#define CHECK_FUNC_CONST_1(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return generator->snes_##funct(const_val); \
+    return generator->snes_##funct##sig(const_val); \
   }
 
 #define CHECK_FUNC_CONST_2(funct,sig) \
-  if (strcmp(#funct#sig, function) == 0) \
+  if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return generator->snes_##funct(const_val1, const_val2); \
+    return generator->snes_##funct##sig(const_val1, const_val2); \
   }
 
 int snes(JavaClass *java_class, Generator *generator, char *method_name)
 {
+  CHECK_FUNC(setBackgroundColor,_I)
+
   return -1;
 }
 

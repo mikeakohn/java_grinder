@@ -18,7 +18,7 @@ class API_SNES
 {
 public:
   // Super Nintendo
-  //virtual int snes_setPalettePointer() { return -1; }
+  virtual int snes_setBackgroundColor_I() { return -1; }
 };
 
 #endif
