@@ -84,7 +84,7 @@ int SNES::snes_setBackgroundColor_I()
   fprintf(out, "  ; snes_setBackgroundColor_I()\n");
   fprintf(out, "  sep #0x30\n");
   fprintf(out, "  lda.b #010000000b\n");
-  fprintf(out, "  sta 0x2100\n");
+  fprintf(out, "  sta 0x2100\n");             // Disable screen
   fprintf(out, "  pla\n");
   fprintf(out, "  sta 0x2122\n");
   fprintf(out, "  xba\n");
@@ -92,7 +92,7 @@ int SNES::snes_setBackgroundColor_I()
 
   // Dafuq is this?
   fprintf(out, "  lda.b #000001111b  ; End VBlank, setting brightness to 15 (100%%).\n");
-  fprintf(out, "  sta 0x2100\n");
+  fprintf(out, "  sta 0x2100\n");             // Enable screen and set brightness
   fprintf(out, "  rep #0x30\n");
 
   return 0;
