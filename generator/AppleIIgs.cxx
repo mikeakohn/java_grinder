@@ -17,7 +17,7 @@
 
 AppleIIgs::AppleIIgs()
 {
-  start_org = 0x9100;
+  start_org = 0x0c00;
 }
 
 AppleIIgs::~AppleIIgs()
@@ -31,7 +31,7 @@ int AppleIIgs::open(const char *filename)
   fprintf(out, ".65816\n");
 
   // stack location
-  fprintf(out, "stack equ 0x0c00\n");
+  fprintf(out, "stack equ 0x0200\n");
 
   // ram start
 //FIXME this is not correct
@@ -51,7 +51,7 @@ int AppleIIgs::open(const char *filename)
   fprintf(out, "address equ 0x14\n");
 
   // start
-  fprintf(out, ".org 0x9100\n");
+  fprintf(out, ".org 0x0c00\n");
   fprintf(out, "; change to 16-bit mode\n");
   fprintf(out, "  clc\n");
   fprintf(out, "  xce\n");
@@ -60,8 +60,9 @@ int AppleIIgs::open(const char *filename)
   fprintf(out, "; set up processor stack\n");
   fprintf(out, "  lda #0x1FF\n");
   fprintf(out, "  tcs\n");
-  fprintf(out, "; set up direct-page\n");
-  fprintf(out, "  pea 0x0000\n");
+//  fprintf(out, "; set up direct-page\n");
+//  fprintf(out, "  pea 0x0000\n");
+ // fprintf(out, "  pld\n");
   fprintf(out, "; clear java stack\n");
   fprintf(out, "  lda #0\n");
   fprintf(out, "  ldx #0\n");
@@ -97,12 +98,15 @@ int AppleIIgs::appleiigs_printChar_C()
     "  ;; printChar()\n"
     "  pla\n"
     "  ora #0x80\n"
+    "  phx\n"
+    "  sep #0x30\n"
     "  sec\n"
     "  xce\n"
     "  jsr 0xfded\n"
     "  clc\n"
     "  xce\n"
-    "  rep #0x30\n");
+    "  rep #0x30\n"
+    "  plx\n");
 
   return 0;
 }
