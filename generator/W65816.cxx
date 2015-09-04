@@ -1074,24 +1074,7 @@ int W65816::memory_read8()
 
 int W65816::memory_write8()
 {
-  fprintf(out, "; memory_write8\n");
-  POP();
-  fprintf(out, "  pha\n");
-  POP();
-  fprintf(out, "  sta address\n");
-
-  fprintf(out, "  sep #0x30\n");
-  fprintf(out, "  lda.b #0xE1\n");
-  fprintf(out, "  sta address + 2\n");
-  fprintf(out, "  rep #0x30\n");
-
-  fprintf(out, "  pla\n");
-  fprintf(out, "  sep #0x30\n");
-  fprintf(out, "  sta [address]\n");
-  fprintf(out, "  rep #0x30\n");
-  stack -= 2;
-
-  return 0;
+  return -1;
 }
 
 int W65816::memory_read16()
