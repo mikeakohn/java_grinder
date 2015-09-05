@@ -103,12 +103,10 @@ int AppleIIgs::appleiigs_plotChar_IC()
 
 int AppleIIgs::appleiigs_printChar_C()
 {
-//FIXME broked
   fprintf(out, ";; printChar()\n");
   POP();
 
   fprintf(out, "  phx\n");
-  fprintf(out, "  phy\n");
   fprintf(out, "  ora #0x80\n");
   fprintf(out, "  sep #0x30\n");
   fprintf(out, "  sec\n");
@@ -117,8 +115,22 @@ int AppleIIgs::appleiigs_printChar_C()
   fprintf(out, "  clc\n");
   fprintf(out, "  xce\n");
   fprintf(out, "  rep #0x30\n");
-  fprintf(out, "  ply\n");
   fprintf(out, "  plx\n");
+
+  stack--;
+
+  return 0;
+}
+
+int AppleIIgs::appleiigs_setBank_I()
+{
+  fprintf(out, ";; setBank()\n");
+  POP();
+
+  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  plb\n");
+  fprintf(out, "  rep #0x30\n");
 
   stack--;
 

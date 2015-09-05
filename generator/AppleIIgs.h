@@ -23,6 +23,7 @@ public:
   virtual int open(const char *filename);
   virtual int appleiigs_plotChar_IC();
   virtual int appleiigs_printChar_C();
+  virtual int appleiigs_setBank_I();
 
 private:
 };

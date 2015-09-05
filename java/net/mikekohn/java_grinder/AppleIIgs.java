@@ -18,5 +18,6 @@ abstract public class AppleIIgs
   protected AppleIIgs() { }
   public static void plotChar(int address, char c) { }
   public static void printChar(char c) { }
+  public static void setBank(int c) { }
 }
 
