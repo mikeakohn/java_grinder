@@ -19,6 +19,17 @@
 
 #include "SegaGenesis.h"
 
+// Notes:
+// Screen size: 32x28 cells (or 256 x 224)
+// Scroll A is set to 64x32 = 64 * 32 * 2 bytes = 4096 bytes (0x1000)
+// Pattern Table: 32 * 28 * (8 * 8 / 2) = 28672 bytes (0x7000)
+// Font table: 32 * 27 = 864 bytes (0x360).  Load at 0x7000 (pattern #896)
+
+// Screen size: 40 cells (or 320 x 224)
+// Scroll A is set to 64x32 = 64 * 32 * 2 bytes = 4096 bytes (0x1000)
+// Pattern Table: 40 * 28 * (8 * 8 / 2) = 35840 bytes (0x8c00)
+// Font table: 32 * 27 = 864 bytes (0x360).  Load at 0x8c00 (pattern #1120)
+
 // FIXME - This is redundant and kind of dangerous.
 #define REG_STACK(a) (a)
 
@@ -375,6 +386,7 @@ int SegaGenesis::sega_genesis_setCursor()
   fprintf(out, "  ; Set cursor position in VDP\n");
   fprintf(out, "  mulu.w #128, d%d\n", REG_STACK(reg-1));
   fprintf(out, "  add.w d%d, d%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+  // FIXME - swap?
   fprintf(out, "  lsl.l #8, d%d\n", REG_STACK(reg-1));
   fprintf(out, "  lsl.l #8, d%d\n", REG_STACK(reg-1));
   fprintf(out, "  or.l #0x%08x, d%d\n", CTRL_REG(CD_VRAM_WRITE, 0xc000), REG_STACK(reg-1));
@@ -391,7 +403,8 @@ int SegaGenesis::sega_genesis_setCursor(int x, int y)
   // 0100 0101 1001 0100 0000 0000 0000 0011
   // CD = 000001 (VRAM WRITE)
   //  A = 1100 0101 1001 0100 = 0xc594
-  int address = (0xc000 + (y * 128 + x));
+  //int address = (0xc000 + (y * 128 + x));
+  int address = (0xf000 + (y * 128 + x));
 
   fprintf(out,
     "  move.l #0x%8x, (a1) ; Set cursor position in VDP\n",
@@ -407,7 +420,8 @@ int SegaGenesis::sega_genesis_printChar()
 
 int SegaGenesis::sega_genesis_printChar(int c)
 {
-  fprintf(out, "  move.w #0x%02x, (a0) ; printChar(0x%02x)\n", c, c);
+  int pattern = (c - 'A') + 1120;
+  fprintf(out, "  move.w #0x%02x, (a0) ; printChar(0x%02x)\n", pattern, c);
 
   return 0;
 }
@@ -640,8 +654,8 @@ void SegaGenesis::add_cartridge_info_header()
     "  dc.b \"SEGA GENESIS    \"  ; must start with \"SEGA\"\n"
     "  dc.b \"(C)---- \"          ; copyright\n"
     "  dc.b \"2015.MAY\"          ; date\n"
-    "  dc.b \"HELLO WORLD                                     \" ; cart name\n"
-    "  dc.b \"HELLO WORLD                                     \" ; cart name (alt. language)\n"
+    "  dc.b \"JAVA GRINDER                                    \" ; cart name\n"
+    "  dc.b \"JAVA GRINDER                                    \" ; cart name (alt. language)\n"
     "  dc.b \"GM MK-0000 -00\"    ; program type / catalog number\n"
     "  dc.w 0x0000                ; ROM checksum\n"
     "  dc.b \"J               \"  ; hardware used\n"
@@ -673,12 +687,13 @@ void SegaGenesis::add_load_fonts()
   fprintf(out,
     "_load_fonts:\n"
     "  move.w #((fontend - font) / 4) - 1, d6\n"
-    "  move.l #0x4c200000, (a1)  ; C00004 VRAM write to 0x0c20\n"
+    //"  move.l #0x4c200000, (a1)  ; C00004 VRAM write to 0x0c20\n"
+    "  move.l #0x%08x, (a1)  ; C00004 VRAM write to 0x8c00\n"
     "  movea.l #font, a2         ; Point to font set\n"
     "_load_fonts_loop:\n"
     "  move.l (a2)+, (a0)        ; C00000 write next longword of charset to VDP\n"
     "  dbra d6, _load_fonts_loop ; loop until done\n"
-    "  rts\n\n");
+    "  rts\n\n", CTRL_REG(CD_VRAM_WRITE, 0x8c00));
 
   fprintf(out,
     ".align 32\n"
@@ -735,16 +750,8 @@ void SegaGenesis::add_load_fonts()
     "  dc.l 0x00111000, 0x00111000, 0x00111000, 0x00000000\n"
     "  dc.l 0x11111110, 0x00001110, 0x00011100, 0x00111000 ; Z\n"
     "  dc.l 0x01110000, 0x11100000, 0x11111110, 0x00000000\n"
-    "  dc.l 0x00000000, 0x00000000, 0x00000000, 0x00000000 ; 7B = .\n"
-    "  dc.l 0x00000000, 0x01100000, 0x01100000, 0x00000000\n"
-    "  dc.l 0x02222200, 0x22000220, 0x22000000, 0x02222200 ; 7C = S\n"
-    "  dc.l 0x00000220, 0x22000220, 0x02222200, 0x00000000\n"
-    "  dc.l 0x02222220, 0x22000000, 0x22000000, 0x22222200 ; 7D = E\n"
-    "  dc.l 0x22000000, 0x22000000, 0x02222220, 0x00000000\n"
-    "  dc.l 0x02222200, 0x22000220, 0x22000000, 0x22002220 ; 7E = G\n"
-    "  dc.l 0x22000220, 0x22000220, 0x02222220, 0x00000000\n"
-    "  dc.l 0x00022000, 0x00222200, 0x00222200, 0x02200220 ; 7F = A\n"
-    "  dc.l 0x02200220, 0x22000022, 0x22022222, 0x00000000\n"
+    "  dc.l 0x00000000, 0x00000000, 0x00000000, 0x00000000 ; ' '\n"
+    "  dc.l 0x00000000, 0x00000000, 0x00000000, 0x00000000\n"
     "fontend:\n\n");
 }
 
@@ -777,6 +784,7 @@ void SegaGenesis::add_vdp_reg_init()
     "  dc.b  0xff  ; reg 10 = H interrupt register: 0xFF (esentially off)\n"
     "  dc.b  0x00  ; reg 11 = mode reg 3: disable ext int, full H/V scroll\n"
     "  dc.b  0x81  ; reg 12 = mode reg 4: 40 cell horiz mode, no interlace\n"
+    //"  dc.b  0x00  ; reg 12 = mode reg 4: 32 cell horiz mode, no interlace\n"
     "  dc.b  0x37  ; reg 13 = H scroll table base: 0xFC00\n"
     "  dc.b  0x00  ; reg 14 = unused register: 0x00\n"
     "  dc.b  0x01  ; reg 15 = auto increment: 0x01\n"
@@ -799,9 +807,10 @@ void SegaGenesis::add_print_string()
   fprintf(out,
     "_print_string:\n"
     "  move.l (-4,a2), d5\n"
-    "  eor.l d6, d6\n"
     "_print_string_loop:\n"
+    "  eor.l d6, d6\n"
     "  move.b (a2)+, d6\n"
+    "  add.w #1120 - 'A', d6\n"
     "  move.w d6, (a0)\n"
     "  dbra d5, _print_string_loop\n"
     "  rts\n\n");
@@ -886,7 +895,7 @@ void SegaGenesis::add_init_bitmap()
     "_init_bitmap:\n"
     "  move.l d4, (-4,a7)         ; put d4 on stack (or really below)\n"
     "  move.l #0x40000000, (a1)   ; C00004 VRAM write to 0x0000\n"
-    "  move.l #(40*28*16)+15, d5  ; Pattern len (plus 1)\n"
+    "  move.l #(40*28*16)+15, d5  ; Pattern count * 16 bytes (plus an extra)\n"
     "  eor.l d7, d7\n"
     "_clear_pattern_table_loop:\n"
     "  move.w d7, (a0)\n"

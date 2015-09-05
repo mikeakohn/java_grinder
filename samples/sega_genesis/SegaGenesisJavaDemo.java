@@ -60,9 +60,9 @@ public class SegaGenesisJavaDemo
     SegaGenesis.loadFonts();
 
     SegaGenesis.setCursor(0, 7);
-    SegaGenesis.print("mike kohn");
+    SegaGenesis.print("MIKE[KOHN");
     SegaGenesis.setCursor(0, 0);
-    SegaGenesis.print("java grinder");
+    SegaGenesis.print("JAVA[GRINDER");
 
 
     while(true)
