@@ -105,22 +105,22 @@ int AppleIIgs::appleiigs_printChar_C()
 {
 //FIXME broked
   fprintf(out, ";; printChar()\n");
-  fprintf(out, "  pha\n");
+  POP();
+
   fprintf(out, "  phx\n");
   fprintf(out, "  phy\n");
-  POP();
-  fprintf(out,
-    "  ora #0x80\n"
-    "  sep #0x30\n"
-    "  sec\n"
-    "  xce\n"
-    "  jsr 0xfded\n"
-    "  clc\n"
-    "  xce\n"
-    "  rep #0x30\n");
+  fprintf(out, "  ora #0x80\n");
+  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  xce\n");
+  fprintf(out, "  jsr 0xfded\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  xce\n");
+  fprintf(out, "  rep #0x30\n");
   fprintf(out, "  ply\n");
   fprintf(out, "  plx\n");
-  fprintf(out, "  pla\n");
+
+  stack--;
 
   return 0;
 }
