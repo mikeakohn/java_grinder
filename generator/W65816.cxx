@@ -1077,8 +1077,8 @@ int W65816::memory_write8()
   fprintf(out, "  sta value1\n");
   POP();
   fprintf(out, "  sta address\n");
-  fprintf(out, "  lda value1\n");
   fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  lda value1\n");
   fprintf(out, "  sta (address)\n");
   fprintf(out, "  rep #0x30\n");
   stack -= 2;
