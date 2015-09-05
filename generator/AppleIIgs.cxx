@@ -122,14 +122,31 @@ int AppleIIgs::appleiigs_printChar_C()
   return 0;
 }
 
-int AppleIIgs::appleiigs_setBank_I()
+int AppleIIgs::appleiigs_hiresEnable()
 {
-  fprintf(out, ";; setBank()\n");
-  POP();
-
+  fprintf(out, ";; hiresEnable()\n");
   fprintf(out, "  sep #0x30\n");
-  fprintf(out, "  pha\n");
-  fprintf(out, "  plb\n");
+  fprintf(out, "  lda.b #10000001b\n");
+  fprintf(out, "  sta.l 0xe1c029\n");
+  fprintf(out, "  lda.b #0\n");
+  fprintf(out, "  sta.l 0xe1c034\n");
+  fprintf(out, "  rep #0x30\n");
+
+  return 0;
+}
+
+int AppleIIgs::appleiigs_hiresPlot_II()
+{
+  fprintf(out, ";; hiresPlot()\n");
+  POP();
+  fprintf(out, "  sta value1\n");
+  POP();
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  lda.b #0xe1\n");
+  fprintf(out, "  sta address + 2\n");
+  fprintf(out, "  lda.b value1\n");
+  fprintf(out, "  sta [address]\n");
   fprintf(out, "  rep #0x30\n");
 
   stack--;
