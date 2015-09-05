@@ -15,6 +15,18 @@
 
 #include "AppleIIgs.h"
 
+#define PUSH() \
+  fprintf(out, "; PUSH\n"); \
+  fprintf(out, "  sta stack,x\n"); \
+  fprintf(out, "  dex\n"); \
+  fprintf(out, "  dex\n")
+
+#define POP() \
+  fprintf(out, "; POP\n"); \
+  fprintf(out, "  inx\n"); \
+  fprintf(out, "  inx\n"); \
+  fprintf(out, "  lda stack,x\n")
+
 AppleIIgs::AppleIIgs()
 {
   start_org = 0x0c00;
@@ -51,7 +63,7 @@ int AppleIIgs::open(const char *filename)
   fprintf(out, "address equ 0x14\n");
 
   // start
-  fprintf(out, ".org 0x0c00\n");
+  fprintf(out, ".org 0x%04x\n", start_org);
   fprintf(out, "; change to 16-bit mode\n");
   fprintf(out, "  clc\n");
   fprintf(out, "  xce\n");
@@ -60,9 +72,9 @@ int AppleIIgs::open(const char *filename)
   fprintf(out, "; set up processor stack\n");
   fprintf(out, "  lda #0x1FF\n");
   fprintf(out, "  tcs\n");
-//  fprintf(out, "; set up direct-page\n");
-//  fprintf(out, "  pea 0x0000\n");
- // fprintf(out, "  pld\n");
+  fprintf(out, "; set up direct-page\n");
+  fprintf(out, "  pea 0x0000\n");
+  fprintf(out, "  pld\n");
   fprintf(out, "; clear java stack\n");
   fprintf(out, "  lda #0\n");
   fprintf(out, "  ldx #0\n");
@@ -74,7 +86,6 @@ int AppleIIgs::open(const char *filename)
   fprintf(out, "  bne clear_java_stack\n");
   fprintf(out, "; set up java stack pointer\n");
   fprintf(out, "  ldx #0xFE\n");
-
   return 0;
 }
 
@@ -94,9 +105,9 @@ int AppleIIgs::appleiigs_plotChar_IC()
 
 int AppleIIgs::appleiigs_printChar_C()
 {
+  fprintf(out, ";; printChar()\n");
+  POP();
   fprintf(out,
-    "  ;; printChar()\n"
-    "  pla\n"
     "  ora #0x80\n"
     "  phx\n"
     "  sep #0x30\n"

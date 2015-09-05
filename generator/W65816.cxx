@@ -88,9 +88,9 @@ int W65816::open(const char *filename)
   fprintf(out, "; set up processor stack\n");
   fprintf(out, "  lda #0x1FF\n");
   fprintf(out, "  tcs\n");
-//  fprintf(out, "; set up direct-page\n");
-//  fprintf(out, "  pea 0x0000\n");
-//  fprintf(out, "  pld\n");
+  fprintf(out, "; set up direct-page\n");
+  fprintf(out, "  pea 0x0000\n");
+  fprintf(out, "  pld\n");
   fprintf(out, "; clear java stack\n");
   fprintf(out, "  lda #0\n");
   fprintf(out, "  ldx #0\n");
@@ -192,6 +192,7 @@ void W65816::method_start(int local_count, int max_stack, int param_count, const
   }
 
   fprintf(out, "  stx locals\n");
+  fprintf(out, "  txa\n");
   fprintf(out, "  sec\n");
   fprintf(out, "  sbc #0x%04x\n", local_count);
   fprintf(out, "  tax\n");
