@@ -29,7 +29,7 @@
 
 AppleIIgs::AppleIIgs()
 {
-  start_org = 0x0c00;
+  start_org = 0x1000;
 }
 
 AppleIIgs::~AppleIIgs()
@@ -43,11 +43,11 @@ int AppleIIgs::open(const char *filename)
   fprintf(out, ".65816\n");
 
   // stack location
-  fprintf(out, "stack equ 0x0200\n");
+  fprintf(out, "stack equ 0x4000\n");
 
   // ram start
 //FIXME this is not correct
-  fprintf(out, "ram_start equ 0x9500\n");
+  fprintf(out, "ram_start equ 0x4200\n");
   fprintf(out, "heap_ptr equ ram_start\n");
 
   // points to locals
@@ -72,9 +72,6 @@ int AppleIIgs::open(const char *filename)
   fprintf(out, "; set up processor stack\n");
   fprintf(out, "  lda #0x1FF\n");
   fprintf(out, "  tcs\n");
-  fprintf(out, "; set up direct-page\n");
-  fprintf(out, "  pea 0x0000\n");
-  fprintf(out, "  pld\n");
   fprintf(out, "; clear java stack\n");
   fprintf(out, "  lda #0\n");
   fprintf(out, "  ldx #0\n");
@@ -86,6 +83,7 @@ int AppleIIgs::open(const char *filename)
   fprintf(out, "  bne clear_java_stack\n");
   fprintf(out, "; set up java stack pointer\n");
   fprintf(out, "  ldx #0xFE\n");
+
   return 0;
 }
 
@@ -105,19 +103,24 @@ int AppleIIgs::appleiigs_plotChar_IC()
 
 int AppleIIgs::appleiigs_printChar_C()
 {
+//FIXME broked
   fprintf(out, ";; printChar()\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  phx\n");
+  fprintf(out, "  phy\n");
   POP();
   fprintf(out,
     "  ora #0x80\n"
-    "  phx\n"
     "  sep #0x30\n"
     "  sec\n"
     "  xce\n"
     "  jsr 0xfded\n"
     "  clc\n"
     "  xce\n"
-    "  rep #0x30\n"
-    "  plx\n");
+    "  rep #0x30\n");
+  fprintf(out, "  ply\n");
+  fprintf(out, "  plx\n");
+  fprintf(out, "  pla\n");
 
   return 0;
 }

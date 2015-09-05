@@ -88,9 +88,6 @@ int W65816::open(const char *filename)
   fprintf(out, "; set up processor stack\n");
   fprintf(out, "  lda #0x1FF\n");
   fprintf(out, "  tcs\n");
-  fprintf(out, "; set up direct-page\n");
-  fprintf(out, "  pea 0x0000\n");
-  fprintf(out, "  pld\n");
   fprintf(out, "; clear java stack\n");
   fprintf(out, "  lda #0\n");
   fprintf(out, "  ldx #0\n");
@@ -194,7 +191,7 @@ void W65816::method_start(int local_count, int max_stack, int param_count, const
   fprintf(out, "  stx locals\n");
   fprintf(out, "  txa\n");
   fprintf(out, "  sec\n");
-  fprintf(out, "  sbc #0x%04x\n", local_count);
+  fprintf(out, "  sbc #0x%04x\n", local_count * 2);
   fprintf(out, "  tax\n");
 }
 
@@ -429,7 +426,7 @@ int W65816::mod_integer()
 {
   need_div_integer = 1;
   fprintf(out, "  jsr div_integer\n");
-  POP();
+//  POP();
   fprintf(out, "  lda remainder\n");
   fprintf(out, "  sta result\n");
   PUSH();
@@ -1075,7 +1072,18 @@ int W65816::memory_read8()
 
 int W65816::memory_write8()
 {
-  return -1;
+  fprintf(out, "; Memory.write8\n");
+  POP();
+  fprintf(out, "  sta value1\n");
+  POP();
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  lda value1\n");
+  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  sta (address)\n");
+  fprintf(out, "  rep #0x30\n");
+  stack -= 2;
+
+  return 0;
 }
 
 int W65816::memory_read16()
