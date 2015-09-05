@@ -1,33 +1,67 @@
-import net.mikekohn.java_grinder.CPU;
 import net.mikekohn.java_grinder.AppleIIgs;
 
 public class AppleIIgsJavaDemo
 {
-  static public void main(String args[])
+  public static void main()
   {
-    int i, j;
+    int x, y, i;
+    int recen = -8;
+    int imcen = 0;
+    int re, im, re2, im2, rec, imc;
+    int yy = 0;
 
-    for(j = (int)'A'; j < (int)'Z'; j++) 
+    AppleIIgs.printChar((char)13);
+
+    for(y = 0; y < 20 * 16; y += 16)
     {
-      for(i = (int)'A'; i < (int)'Z'; i++) 
+      imc = (y - 10 * 16) >> 4;
+      imc += imcen;
+
+      int xx = 0;
+
+      for(x = 0; x < 40 * 16; x += 16)
       {
-        AppleIIgs.printChar((char)i);
-        AppleIIgs.printChar((char)j);
-        AppleIIgs.printChar((char)i);
-        AppleIIgs.printChar((char)j);
-        AppleIIgs.printChar((char)i);
-        AppleIIgs.printChar((char)j);
+        rec = (x - 20 * 16) >> 4;
+        rec += recen;
+
+        re = rec;
+        im = imc;
+
+        re2 = (re * re) >> 4;
+        im2 = (im * im) >> 4;
+
+        for(i = 0; i < 16; i++)
+        {
+          if((re2 + im2) > 4 * 16)
+            break;
+
+          im = (re * im) >> 3;
+          im += imc;
+
+          re = (re2 - im2) + rec;
+
+          re2 = (re * re) >> 4;
+          im2 = (im * im) >> 4;
+        }
+
+        if(i == 16)
+        {
+          AppleIIgs.printChar(' ');
+        }
+        else
+        {
+          AppleIIgs.printChar('*');
+        }
+
+        xx++;
       }
+
+      yy++;
     }
 
-//    AppleIIgs.printChar('M');
-//    AppleIIgs.printChar('I');
-//    AppleIIgs.printChar('K');
-//    AppleIIgs.printChar('E');
-
-//    CPU.asm("brk\n");
-
-    while(true) { }
+    while(true)
+    {
+    }
   }
 }
 
