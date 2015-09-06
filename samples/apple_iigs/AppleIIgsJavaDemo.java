@@ -4,14 +4,48 @@ import net.mikekohn.java_grinder.CPU;
 
 public class AppleIIgsJavaDemo
 {
+  public static void rect(int x1, int y1, int x2, int y2, int color)
+  {
+    int x, y, address;
+
+    for(x = x1; x <= x2; x++)
+    {
+      address = 0x2000 + x + 160 * y1;
+      AppleIIgs.hiresPlot(address, color);
+      address = 0x2000 + x + 160 * y2;
+      AppleIIgs.hiresPlot(address, color);
+    }
+
+    for(y = y1; y <= y2; y++)
+    {
+      address = 0x2000 + x1 + 160 * y;
+      AppleIIgs.hiresPlot(address, color);
+      address = 0x2000 + x2 + 160 * y;
+      AppleIIgs.hiresPlot(address, color);
+    }
+  }
+
+  public static void rectfill(int x1, int y1, int x2, int y2, int color)
+  {
+    int x, y, address;
+
+    for(y = y1; y <= y2; y++)
+    {
+      for(x = x1; x <= x2; x++)
+      {
+        address = 0x2000 + x + 160 * y;
+        AppleIIgs.hiresPlot(address, color);
+      }
+    }
+  }
+
   public static void main()
   {
-    int x, y, i;
     int recen = -8;
     int imcen = 0;
     int re, im, re2, im2, rec, imc;
-    int yy = 0;
-    int address = 0x2000;
+    int address, address2;
+    int x, y, i;
 
     AppleIIgs.hiresEnable();
 
@@ -49,16 +83,31 @@ public class AppleIIgsJavaDemo
     CPU.asm("lda #0x000\n");
     CPU.asm("sta.l 0xe19e1e\n");
 
-    for(y = 0; y < 200 * 16; y += 16)
+    for(address = 0x2000; address < 0x9d00; address++) 
+      AppleIIgs.hiresPlot(address, 255);
+
+    address = 0x2000;
+    address2 = 0x9c60;
+    int yy = 0;
+
+    for(y = 0; y < 100 * 16; y += 16, yy++, address2 -= 320)
     {
       imc = (y - 100 * 16) >> 5;
       imc += imcen;
 
       int xx = 0;
 
-      for(x = 0; x < 160 * 16; x += 16)
+      for(x = 0; x < 160 * 16; x += 16, xx++, address++, address2++)
       {
-        rec = (x - 80 * 16) >> 5;
+        boolean skip = false;
+
+        if((xx < 50 || xx > 110 || yy < 50 || yy > 145) ||
+           (xx > 78 && xx < 93 && yy > 85 && yy < 115))
+        {
+          continue;
+        }
+
+        rec = (x - 80 * 16) >> 4;
         rec += recen;
 
         re = rec;
@@ -81,13 +130,32 @@ public class AppleIIgsJavaDemo
           im2 = (im * im) >> 4;
         }
 
-        AppleIIgs.hiresPlot(address, (byte)(i | (i << 4)));
-
-        xx++;
-        address++;
+        AppleIIgs.hiresPlot(address, (i | (i << 4)));
+        AppleIIgs.hiresPlot(address2, (i | (i << 4)));
       }
+    }
 
-      yy++;
+    int x1 = 49;
+    int x2 = 111;
+    int y1 = 49;
+    int y2 = 146;
+
+    for(i = 0; i < 16; i++)
+    {
+      rect(x1, y1, x2, y2, 0);
+      x1--;
+      x2++;
+      y1--;
+      y2++;
+    }
+
+    for(i = 0; i < 16; i++)
+    {
+      rect(x1, y1, x2, y2, i | (i << 4));
+      x1--;
+      x2++;
+      y1--;
+      y2++;
     }
 
     while(true)
