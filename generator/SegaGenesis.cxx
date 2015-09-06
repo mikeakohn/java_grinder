@@ -311,10 +311,7 @@ int SegaGenesis::sega_genesis_setPlotAddress()
   fprintf(out, "  move.l %s, d5\n", pop_reg());
   fprintf(out, "  jsr _set_plot_address\n");
 
-  reg--;
-
   return 0;
-
 }
 
 int SegaGenesis::sega_genesis_fastPlot()
@@ -322,10 +319,16 @@ int SegaGenesis::sega_genesis_fastPlot()
   // FIXME
   CHECK_STACK
 
-  fprintf(out, "  move.w d%d, (a1)\n", REG_STACK(reg-2));
-  fprintf(out, "  move.w d%d, (a1)\n", REG_STACK(reg-1));
+  fprintf(out, "  lsl.w #4, d%d\n", REG_STACK(reg-2));
+  fprintf(out, "  lsl.w #8, d%d\n", REG_STACK(reg-3));
+  fprintf(out, "  lsl.w #8, d%d\n", REG_STACK(reg-4));
+  fprintf(out, "  lsl.w #4, d%d\n", REG_STACK(reg-4));
+  fprintf(out, "  or.w d%d, d%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+  fprintf(out, "  or.w d%d, d%d\n", REG_STACK(reg-3), REG_STACK(reg-1));
+  fprintf(out, "  or.w d%d, d%d\n", REG_STACK(reg-4), REG_STACK(reg-1));
+  fprintf(out, "  move.w d%d, (a0)\n", REG_STACK(reg-1));
 
-  reg -= 2;
+  reg -= 4;
 
   return 0;
 }
