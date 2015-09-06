@@ -55,6 +55,7 @@ public:
   virtual int sub_integer();
   virtual int sub_integer(int num);
   virtual int mul_integer();
+//  virtual int mul_integer(int num);
   virtual int div_integer();
   virtual int mod_integer();
   virtual int neg_integer();

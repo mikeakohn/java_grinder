@@ -425,6 +425,40 @@ int W65816::mul_integer()
   return 0;
 }
 
+/*
+int W65816::mul_integer(int num)
+{
+  int i, j;
+
+  fprintf(out, "; mul_integer (0x%04x)\n", num);
+  POP();
+  fprintf(out, "  sta value1\n");
+  fprintf(out, "  stz value2\n");
+
+  for(i = 15; i > 0; i--)
+  {
+    if(num & (1 << i))
+    {
+      fprintf(out, "  lda value1\n");
+
+      for(j = 0; j < i; j++)
+      {
+        fprintf(out, "  asl\n");
+      }
+
+      fprintf(out, "  adc value2\n");
+      fprintf(out, "  sta value2\n");
+    }
+  }
+
+  fprintf(out, "  lda value2\n");
+  fprintf(out, "  sta result\n");
+  PUSH();
+
+  return 0;
+}
+*/
+
 // unsigned only for now
 int W65816::div_integer()
 {

@@ -20,6 +20,7 @@ abstract public class AppleIIgs
   public static void printChar(char c) { }
   public static void hiresEnable() { }
   public static void hiresPlot(int address, int c) { }
+  public static void hiresSpan(int address, int c, int length) { }
   public static int hiresRead(int address) { return 0; }
 }
 

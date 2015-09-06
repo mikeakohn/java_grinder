@@ -4,6 +4,15 @@ import net.mikekohn.java_grinder.CPU;
 
 public class AppleIIgsJavaDemo
 {
+  public static void wait(int time)
+  {
+    int i;
+
+    for(i = 0; i < time; i++)
+    {
+    }
+  }
+
   public static void paletteGray()
   {
     CPU.asm("palette_gray:\n");
@@ -58,15 +67,12 @@ public class AppleIIgsJavaDemo
     if(y2 > 199)
       y2 = 199;
 
-    int x, y, address;
+    int y, address;
 
     for(y = y1; y <= y2; y++)
     {
-      for(x = x1; x <= x2; x++)
-      {
-        address = 0x2000 + x + 160 * y;
-        AppleIIgs.hiresPlot(address, color);
-      }
+      address = 0x2000 + x1 + 160 * y;
+      AppleIIgs.hiresSpan(address, color, (x2 - x1) + 1);
     }
   }
 
@@ -81,8 +87,13 @@ public class AppleIIgsJavaDemo
     AppleIIgs.hiresEnable();
     paletteGray();
 
-    for(address = 0x2000; address < 0x9d00; address++) 
-      AppleIIgs.hiresPlot(address, 255);
+    address = 0x2000;
+
+    for(i = 0; i < 200; i++) 
+    {
+      AppleIIgs.hiresSpan(address, 255, 160);
+      address += 160;
+    }
 
     address = 0x2000;
     address2 = 0x9c60;
@@ -97,8 +108,6 @@ public class AppleIIgsJavaDemo
 
       for(x = 0; x < 160 * 16; x += 16, xx++, address++, address2++)
       {
-        boolean skip = false;
-
         if((xx < 50 || xx > 110 || yy < 50 || yy > 145) ||
            (xx > 78 && xx < 93 && yy > 85 && yy < 115))
         {
@@ -169,9 +178,11 @@ public class AppleIIgsJavaDemo
 
     for(x = 0; x < 80; x++) 
     {
+      int incy = 0;
       for(y = 0; y < 200; y++) 
       {
-        AppleIIgs.hiresPlot(0x2000 + x + 160 * y, 255 - AppleIIgs.hiresRead(0x2000 + x + 160 * y));
+        AppleIIgs.hiresPlot(0x2000 + x + incy, 255 - AppleIIgs.hiresRead(0x2000 + x + 160 * y));
+        incy += 160;
       }
     }
 
@@ -181,19 +192,56 @@ public class AppleIIgsJavaDemo
       AppleIIgs.hiresPlot(0x9cff - i, AppleIIgs.hiresRead(0x2000 + i));
     }
 
-    rectfill(0, 0, 79, 49, 0);
-    rectfill(80, 100, 159, 149, 0x22);
-    rectfill(0, 150, 79, 199, 0x44);
-    rectfill(80, 0, 159, 49, 0x66);
+    for(i = 0xff; i >= 0; i -= 0x11)
+    {
+      rectfill(0, 0, 79, 49, i);
+      wait(1000);
+    }
 
-    rectfill(0, 100, 79, 149, 0x88);
-    rectfill(80, 50, 159, 99, 0xaa);
-    rectfill(0, 50, 79, 99, 0xcc);
-    rectfill(80, 150, 159, 199, 0xdd);
+    for(i = 0xff; i >= 0x22; i -= 0x11)
+    {
+      rectfill(80, 100, 159, 149, i);
+      wait(1000);
+    }
+
+    for(i = 0xff; i >= 0x44; i -= 0x11)
+    {
+      rectfill(0, 150, 79, 199, i);
+      wait(1000);
+    }
+
+    for(i = 0xff; i >= 0x66; i -= 0x11)
+    {
+      rectfill(80, 0, 159, 49, i);
+      wait(1000);
+    }
+
+    for(i = 0; i <= 0x88; i += 0x11)
+    {
+      rectfill(0, 100, 79, 149, i);
+      wait(1000);
+    }
+
+    for(i = 0; i <= 0xaa; i += 0x11)
+    {
+      rectfill(80, 50, 159, 99, i);
+      wait(1000);
+    }
+
+    for(i = 0; i <= 0xcc; i += 0x11)
+    {
+      rectfill(0, 50, 79, 99, i);
+      wait(1000);
+    }
+
+    for(i = 0; i <= 0xdd; i += 0x11)
+    {
+      rectfill(80, 150, 159, 199, i);
+      wait(1000);
+    }
 
     while(true)
     {
-      // infinite loop
     }
   }
 }
