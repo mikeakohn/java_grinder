@@ -139,13 +139,13 @@ int AppleIIgs::appleiigs_hiresPlot_II()
 {
   fprintf(out, ";; hiresPlot()\n");
   POP();
-  fprintf(out, "  sta value1\n");
+  fprintf(out, "  tay\n");
   POP();
   fprintf(out, "  sta address\n");
-  fprintf(out, "  sep #0x30\n");
-  fprintf(out, "  lda.b #0xe1\n");
+  fprintf(out, "  lda #0xe1\n");
   fprintf(out, "  sta address + 2\n");
-  fprintf(out, "  lda.b value1\n");
+  fprintf(out, "  tya\n");
+  fprintf(out, "  sep #0x30\n");
   fprintf(out, "  sta [address]\n");
   fprintf(out, "  rep #0x30\n");
 
