@@ -377,9 +377,16 @@ int W65816::add_integer()
   return 0;
 }
 
-int W65816::add_integer(int const_val)
+int W65816::add_integer(int num)
 {
-  return -1;
+  fprintf(out, "; add_integer (0x%04x)\n", num);
+  POP();
+  fprintf(out, "  clc\n");
+  fprintf(out, "  adc #0x%04x\n", num);
+  fprintf(out, "  sta result\n");
+  PUSH();
+
+  return 0;
 }
 
 int W65816::sub_integer()
@@ -397,9 +404,16 @@ int W65816::sub_integer()
   return 0;
 }
 
-int W65816::sub_integer(int const_val)
+int W65816::sub_integer(int num)
 {
-  return -1;
+  fprintf(out, "; add_integer (0x%04x)\n", num);
+  POP();
+  fprintf(out, "  sec\n");
+  fprintf(out, "  sbc #0x%04x\n", num);
+  fprintf(out, "  sta result\n");
+  PUSH();
+
+  return 0;
 }
 
 int W65816::mul_integer()
@@ -426,7 +440,7 @@ int W65816::mod_integer()
 {
   need_div_integer = 1;
   fprintf(out, "  jsr div_integer\n");
-//  POP();
+  POP();
   fprintf(out, "  lda remainder\n");
   fprintf(out, "  sta result\n");
   PUSH();
@@ -439,10 +453,8 @@ int W65816::neg_integer()
 {
   fprintf(out, "; neg_integer\n");
   POP();
-  fprintf(out, "  sta result\n");
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  sec\n");
-  fprintf(out, "  sbc result\n");
+  fprintf(out, "  eor #0xffff\n");
+  fprintf(out, "  inc\n");
   fprintf(out, "  sta result\n");
   PUSH();
 
@@ -455,21 +467,30 @@ int W65816::shift_left_integer()
   POP();
   fprintf(out, "  tay\n");
   POP();
-  fprintf(out, "  sta result\n");
-
-  fprintf(out, "  asl result\n");
+  fprintf(out, "  asl\n");
   fprintf(out, "  dey\n");
-  fprintf(out, "  bne #-5\n");
-  fprintf(out, "  lda result\n");
+  fprintf(out, "  bne #-4\n");
+  fprintf(out, "  sta result\n");
   PUSH();
   stack--;
   
   return 0;
 }
 
-int W65816::shift_left_integer(int const_val)
+int W65816::shift_left_integer(int num)
 {
-  return -1;
+int i;
+
+  fprintf(out, "; shift_left_integer (0x%04x)\n", num);
+  POP();
+
+  for(i = 0; i < num; i++)
+    fprintf(out, "  asl\n");
+
+  fprintf(out, "  sta result\n");
+  PUSH();
+
+  return 0;
 }
 
 int W65816::shift_right_integer()
@@ -478,15 +499,11 @@ int W65816::shift_right_integer()
   POP();
   fprintf(out, "  tay\n");
   POP();
-  fprintf(out, "  sta result\n");
-
-  fprintf(out, "  and #0x8000\n");
-  fprintf(out, "  lsr result\n");
-  fprintf(out, "  ora result\n");
-  fprintf(out, "  sta result\n");
+  fprintf(out, "  cmp #0x8000\n");
+  fprintf(out, "  ror\n");
   fprintf(out, "  dey\n");
-  fprintf(out, "  bne #-12\n");
-  fprintf(out, "  lda result\n");
+  fprintf(out, "  bne #-7\n");
+  fprintf(out, "  sta result\n");
   PUSH();
   stack--;
 
@@ -495,7 +512,21 @@ int W65816::shift_right_integer()
 
 int W65816::shift_right_integer(int num)
 {
-  return -1;
+int i;
+
+  fprintf(out, "; shift_right_integer (0x%04x)\n", num);
+  POP();
+
+  for(i = 0; i < num; i++)
+  {
+    fprintf(out, "  cmp #0x8000\n");
+    fprintf(out, "  ror\n");
+  }
+
+  fprintf(out, "  sta result\n");
+  PUSH();
+
+  return 0;
 }
 
 int W65816::shift_right_uinteger()
@@ -504,12 +535,10 @@ int W65816::shift_right_uinteger()
   POP();
   fprintf(out, "  tay\n");
   POP();
-  fprintf(out, "  sta result\n");
-
-  fprintf(out, "  lsr result\n");
+  fprintf(out, "  lsr\n");
   fprintf(out, "  dey\n");
-  fprintf(out, "  bne #-5\n");
-  fprintf(out, "  lda result\n");
+  fprintf(out, "  bne #-4\n");
+  fprintf(out, "  sta result\n");
   PUSH();
   stack--;
   return 0;
@@ -517,12 +546,23 @@ int W65816::shift_right_uinteger()
 
 int W65816::shift_right_uinteger(int num)
 {
-  return -1;
+int i;
+
+  fprintf(out, "; shift_right_uinteger (0x%04x)\n", num);
+  POP();
+
+  for(i = 0; i < num; i++)
+    fprintf(out, "  lsr\n");
+
+  fprintf(out, "  sta result\n");
+  PUSH();
+
+  return 0;
 }
 
 int W65816::and_integer()
 {
-  fprintf(out, "; add_integer\n");
+  fprintf(out, "; and_integer\n");
   POP();
   fprintf(out, "  sta result\n");
   POP();
@@ -536,7 +576,13 @@ int W65816::and_integer()
 
 int W65816::and_integer(int num)
 {
-  return -1;
+  fprintf(out, "; and_integer (0x%04x)\n", num);
+  POP();
+  fprintf(out, "  and #0x%04x\n", num);
+  fprintf(out, "  sta result\n");
+  PUSH();
+
+  return 0;
 }
 
 int W65816::or_integer()
@@ -555,7 +601,13 @@ int W65816::or_integer()
 
 int W65816::or_integer(int num)
 {
-  return -1;
+  fprintf(out, "; or_integer (0x%04x)\n", num);
+  POP();
+  fprintf(out, "  ora #0x%04x\n", num);
+  fprintf(out, "  sta result\n");
+  PUSH();
+
+  return 0;
 }
 
 int W65816::xor_integer()
@@ -574,7 +626,13 @@ int W65816::xor_integer()
 
 int W65816::xor_integer(int num)
 {
-  return -1;
+  fprintf(out, "; xor_integer (0x%04x)\n", num);
+  POP();
+  fprintf(out, "  eor #0x%04x\n", num);
+  fprintf(out, "  sta result\n");
+  PUSH();
+
+  return 0;
 }
 
 int W65816::inc_integer(int index, int num)
@@ -618,7 +676,6 @@ int W65816::jump_cond(const char *label, int cond, int distance)
     fprintf(out, "; jump_cond\n");
     fprintf(out, "  inx\n");
     fprintf(out, "  inx\n");
-    fprintf(out, "  txy\n");
 
     if(cond == COND_LESS_EQUAL)
     {
@@ -634,13 +691,13 @@ int W65816::jump_cond(const char *label, int cond, int distance)
     switch(cond)
     {
       case COND_EQUAL:
-        fprintf(out, "  lda stack,y\n");
+        fprintf(out, "  lda stack,x\n");
         fprintf(out, "  cmp #0\n");
         fprintf(out, "  bne #3\n");
         fprintf(out, "  jmp %s\n", label);
         break;
       case COND_NOT_EQUAL:
-        fprintf(out, "  lda stack,y\n");
+        fprintf(out, "  lda stack,x\n");
         fprintf(out, "  cmp #0\n");
         fprintf(out, "  beq #3\n");
         fprintf(out, "  jmp %s\n", label);
@@ -648,7 +705,7 @@ int W65816::jump_cond(const char *label, int cond, int distance)
       case COND_LESS:
         if(reverse == false)
         {
-          fprintf(out, "  lda stack,y\n");
+          fprintf(out, "  lda stack,x\n");
           fprintf(out, "  cmp #0\n");
           fprintf(out, "  bpl #3\n");
           fprintf(out, "  jmp %s\n", label);
@@ -656,7 +713,7 @@ int W65816::jump_cond(const char *label, int cond, int distance)
           else
         {
           fprintf(out, "  lda #0\n");
-          fprintf(out, "  cmp stack,y\n");
+          fprintf(out, "  cmp stack,x\n");
           fprintf(out, "  bpl #3\n");
           fprintf(out, "  jmp %s\n", label);
         }
@@ -664,7 +721,7 @@ int W65816::jump_cond(const char *label, int cond, int distance)
       case COND_GREATER_EQUAL:
         if(reverse == false)
         {
-          fprintf(out, "  lda stack,y\n");
+          fprintf(out, "  lda stack,x\n");
           fprintf(out, "  cmp #0\n");
           fprintf(out, "  bmi #3\n");
           fprintf(out, "  jmp %s\n", label);
@@ -672,7 +729,7 @@ int W65816::jump_cond(const char *label, int cond, int distance)
           else
         {
           fprintf(out, "  lda #0\n");
-          fprintf(out, "  cmp stack,y\n");
+          fprintf(out, "  cmp stack,x\n");
           fprintf(out, "  bmi #3\n");
           fprintf(out, "  jmp %s\n", label);
         }
@@ -696,7 +753,6 @@ int W65816::jump_cond_integer(const char *label, int cond, int distance)
     fprintf(out, "  inx\n");
     fprintf(out, "  inx\n");
     fprintf(out, "  inx\n");
-    fprintf(out, "  txy\n");
 
     if(cond == COND_LESS_EQUAL)
     {
@@ -713,29 +769,29 @@ int W65816::jump_cond_integer(const char *label, int cond, int distance)
     switch(cond)
     {
       case COND_EQUAL:
-        fprintf(out, "  lda stack - 0,y\n");
-        fprintf(out, "  cmp stack - 2,y\n");
+        fprintf(out, "  lda stack - 0,x\n");
+        fprintf(out, "  cmp stack - 2,x\n");
         fprintf(out, "  bne #3\n");
         fprintf(out, "  jmp %s\n", label);
         break;
       case COND_NOT_EQUAL:
-        fprintf(out, "  lda stack - 0,y\n");
-        fprintf(out, "  cmp stack - 2,y\n");
+        fprintf(out, "  lda stack - 0,x\n");
+        fprintf(out, "  cmp stack - 2,x\n");
         fprintf(out, "  beq #3\n");
         fprintf(out, "  jmp %s\n", label);
         break;
       case COND_LESS:
         if(reverse == false)
         {
-          fprintf(out, "  lda stack - 0,y\n");
-          fprintf(out, "  cmp stack - 2,y\n");
+          fprintf(out, "  lda stack - 0,x\n");
+          fprintf(out, "  cmp stack - 2,x\n");
           fprintf(out, "  bpl #3\n");
           fprintf(out, "  jmp %s\n", label);
         }
           else
         {
-          fprintf(out, "  lda stack - 2,y\n");
-          fprintf(out, "  cmp stack - 0,y\n");
+          fprintf(out, "  lda stack - 2,x\n");
+          fprintf(out, "  cmp stack - 0,x\n");
           fprintf(out, "  bpl #3\n");
           fprintf(out, "  jmp %s\n", label);
         }
@@ -743,15 +799,15 @@ int W65816::jump_cond_integer(const char *label, int cond, int distance)
       case COND_GREATER_EQUAL:
         if(reverse == false)
         {
-          fprintf(out, "  lda stack - 0,y\n");
-          fprintf(out, "  cmp stack - 2,y\n");
+          fprintf(out, "  lda stack - 0,x\n");
+          fprintf(out, "  cmp stack - 2,x\n");
           fprintf(out, "  bmi #3\n");
           fprintf(out, "  jmp %s\n", label);
         }
           else
         {
-          fprintf(out, "  lda stack - 2,y\n");
-          fprintf(out, "  cmp stack - 0,y\n");
+          fprintf(out, "  lda stack - 2,x\n");
+          fprintf(out, "  cmp stack - 0,x\n");
           fprintf(out, "  bmi #3\n");
           fprintf(out, "  jmp %s\n", label);
         }
