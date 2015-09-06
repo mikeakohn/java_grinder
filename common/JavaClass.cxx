@@ -20,7 +20,7 @@
 #include "fileio.h"
 #include "JavaClass.h"
 
-JavaClass::JavaClass(FILE *in) :
+JavaClass::JavaClass(FILE *in, bool is_main_class) :
   constant_pool(NULL),
   interfaces(NULL),
   fields(NULL),
@@ -29,7 +29,8 @@ JavaClass::JavaClass(FILE *in) :
   constants_heap(NULL),
   fields_heap(NULL),
   methods_heap(NULL),
-  attributes_heap(NULL)
+  attributes_heap(NULL),
+  is_main_class(is_main_class)
 {
   int t;
 
@@ -475,9 +476,9 @@ int JavaClass::get_ref_name_type(char *name, char *type, int len, int index)
       constant_methodref = (constant_methodref_t *)heap;
       index = constant_methodref->name_and_type_index;
 
-      // If the constant doesn't exist in this class, then add the class
+      // If the method doesn't exist in this class, then add the class
       // name to the field.
-      if (constant_methodref->class_index != this_class)
+      if (constant_methodref->class_index != this_class || use_full_method_name())
       {
         get_class_name(name, len, constant_methodref->class_index);
         printf("  class_name='%s' %d\n", name, constant_methodref->class_index);

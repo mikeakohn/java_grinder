@@ -176,7 +176,7 @@ struct methods_t
 class JavaClass
 {
 public:
-  JavaClass(FILE *in);
+  JavaClass(FILE *in, bool is_main_class=true);
   ~JavaClass();
   void print();
   int get_name_constant(char *name, int len, int index);
@@ -195,6 +195,7 @@ public:
   int get_field_index(const char *field_name);
   int get_clinit_method();
   static const char *tag_as_string(int tag);
+  bool use_full_method_name() { return is_main_class == false; }
 
   int32_t magic;
   int16_t minor_version;
@@ -240,6 +241,8 @@ private:
   uint8_t *fields_heap;
   uint8_t *methods_heap;
   uint8_t *attributes_heap;
+
+  bool is_main_class : 1;
 };
 
 #endif

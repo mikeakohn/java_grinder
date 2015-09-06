@@ -1942,7 +1942,7 @@ int JavaCompiler::load_class(const char *filename)
           return -1;
         }
 
-        JavaClass *java_class_external = new JavaClass(in);
+        JavaClass *java_class_external = new JavaClass(in, false);
         external_classes[class_name] = java_class_external;
 
         fclose(in);
