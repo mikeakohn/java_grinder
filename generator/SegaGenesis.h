@@ -36,6 +36,7 @@ public:
   virtual int sega_genesis_waitVerticalBlank();
   virtual int sega_genesis_waitHorizontalBlank();
   virtual int sega_genesis_loadFonts();
+  virtual int sega_genesis_clearText();
   virtual int sega_genesis_setCursor();
   virtual int sega_genesis_setCursor(int x, int y);
   virtual int sega_genesis_printChar();
@@ -61,6 +62,7 @@ private:
   void add_cartridge_info_header();
   void add_exception_handler();
   void add_load_fonts();
+  void add_clear_text();
   void add_vdp_reg_init();
   void add_print_string();
   void add_load_z80();
@@ -75,6 +77,7 @@ private:
   uint16_t sprite_attribute_table;     // address of 640 byte table
   bool need_print_string:1;
   bool need_load_fonts:1;
+  bool need_clear_text:1;
   bool need_load_z80:1;
   bool need_set_pattern_table:1;
   bool need_set_image_data:1;

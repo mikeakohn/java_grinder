@@ -78,6 +78,9 @@ abstract public class SegaGenesis
   /** Load fonts. */
   public static void loadFonts() { }
 
+  /** Clear the text window. */
+  public static void clearText() { }
+
   /** Move the text cursor to where the next character will be printed. */
   public static void setCursor(int x, int y) { }
 

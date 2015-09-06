@@ -29,6 +29,7 @@ public:
   virtual int sega_genesis_waitVerticalBlank() { return -1; }
   virtual int sega_genesis_waitHorizontalBlank() { return -1; }
   virtual int sega_genesis_loadFonts() { return -1; }
+  virtual int sega_genesis_clearText() { return -1; }
   virtual int sega_genesis_setCursor() { return -1; }
   virtual int sega_genesis_setCursor(int x, int y) { return -1; }
   virtual int sega_genesis_printChar() { return -1; }

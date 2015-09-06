@@ -22,6 +22,8 @@ public class SegaGenesisJavaDemo
     SegaGenesis.setPaletteColors(ImageJavaGrinder.palette);
     SegaGenesis.setPatternTable(ImageJavaGrinder.pattern);
     SegaGenesis.setImageData(ImageJavaGrinder.image);
+
+    SegaGenesis.loadFonts();
     wait(30);
 
     SegaGenesis.loadZ80(PlayTitleSample.z80_code);
@@ -57,13 +59,12 @@ public class SegaGenesisJavaDemo
     wait(60);
 
     SegaGenesis.clearBitmap();
-    SegaGenesis.loadFonts();
+    SegaGenesis.clearText();
 
     SegaGenesis.setCursor(0, 7);
     SegaGenesis.print("MIKE[KOHN");
-    SegaGenesis.setCursor(0, 0);
+    SegaGenesis.setCursor(0, 1);
     SegaGenesis.print("JAVA[GRINDER");
-
 
     while(true)
     {

@@ -63,6 +63,7 @@ SegaGenesis::SegaGenesis() :
   sprite_attribute_table(0xd800),
   need_print_string(false),
   need_load_fonts(false),
+  need_clear_text(false),
   need_load_z80(false),
   need_set_pattern_table(false),
   need_set_image_data(false),
@@ -85,6 +86,7 @@ SegaGenesis::~SegaGenesis()
 
   if (need_print_string) { add_print_string(); }
   if (need_load_fonts) { add_load_fonts(); }
+  if (need_clear_text) { add_clear_text(); }
   if (need_load_z80) { add_load_z80(); }
   if (need_set_pattern_table) { add_set_pattern_table(); }
   if (need_set_image_data) { add_set_image_data(); }
@@ -380,16 +382,23 @@ int SegaGenesis::sega_genesis_loadFonts()
   return 0;
 }
 
+int SegaGenesis::sega_genesis_clearText()
+{
+  need_clear_text = true;
+
+  fprintf(out, "  jsr _clear_text\n");
+  return 0;
+}
+
 int SegaGenesis::sega_genesis_setCursor()
 {
   // FIXME - Holy crap.  This is fugly.  Should this just be a function?
-  fprintf(out, "  ; Set cursor position in VDP\n");
-  fprintf(out, "  mulu.w #128, d%d\n", REG_STACK(reg-1));
+  fprintf(out, "  ; setCursor() - Set cursor position in VDP\n");
+  //fprintf(out, "  mulu.w #128, d%d\n", REG_STACK(reg-1));
+  fprintf(out, "  lsl.w #7, d%d\n", REG_STACK(reg-1));
   fprintf(out, "  add.w d%d, d%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
-  // FIXME - swap?
-  fprintf(out, "  lsl.l #8, d%d\n", REG_STACK(reg-1));
-  fprintf(out, "  lsl.l #8, d%d\n", REG_STACK(reg-1));
-  fprintf(out, "  or.l #0x%08x, d%d\n", CTRL_REG(CD_VRAM_WRITE, 0xc000), REG_STACK(reg-1));
+  fprintf(out, "  swap d%d\n", REG_STACK(reg-1));
+  fprintf(out, "  or.l #0x%08x, d%d\n", CTRL_REG(CD_VRAM_WRITE, 0xe000), REG_STACK(reg-1));
   fprintf(out, "  move.l d%d, (a1)\n", REG_STACK(reg-1));
 
   reg -= 2;
@@ -404,7 +413,7 @@ int SegaGenesis::sega_genesis_setCursor(int x, int y)
   // CD = 000001 (VRAM WRITE)
   //  A = 1100 0101 1001 0100 = 0xc594
   //int address = (0xc000 + (y * 128 + x));
-  int address = (0xf000 + (y * 128 + x));
+  int address = (0xe000 + (y * 128 + x));
 
   fprintf(out,
     "  move.l #0x%8x, (a1) ; Set cursor position in VDP\n",
@@ -755,6 +764,19 @@ void SegaGenesis::add_load_fonts()
     "fontend:\n\n");
 }
 
+void SegaGenesis::add_clear_text()
+{
+  fprintf(out,
+    "_clear_text:\n"
+    "  move.w #(40 * 28 / 4) - 1, d6\n"
+    "  move.l #0x%08x, (a1)  ; C00004 VRAM write to 0x8c00\n"
+    "  move.l #((1120 + (']' - 'A')) << 16) | (1120 + (']' - 'A')), d7\n"
+    "_clear_text_loop:\n"
+    "  move.l d7, (a0)           ; C00000 write next longword of ' ' to VDP\n"
+    "  dbra d6, _clear_text_loop ; loop until done\n"
+    "  rts\n\n", CTRL_REG(CD_VRAM_WRITE, 0xf000));
+}
+
 void SegaGenesis::add_vdp_reg_init()
 {
   fprintf(out,
@@ -773,10 +795,10 @@ void SegaGenesis::add_vdp_reg_init()
     "vdp_reg_init_table:\n"
     "  dc.b  0x04  ; reg  0 = mode reg 1: no H interrupt\n"
     "  dc.b  0x14  ; reg  1 = mode reg 2: blanked, no V interrupt, DMA enable\n"
-    "  dc.b  0x30  ; reg  2 = name table base for scroll A: 0xC000\n"
-    "  dc.b  0x3c  ; reg  3 = name table base for window:   0xF000\n"
-    "  dc.b  0x07  ; reg  4 = name table base for scroll B: 0xE000\n"
-    "  dc.b  0x6c  ; reg  5 = sprite attribute table base: 0xD800\n"
+    "  dc.b  0x30  ; reg  2 = name table base for scroll A: 0xc000\n"
+    "  dc.b  0x3c  ; reg  3 = name table base for window:   0xf000\n"
+    "  dc.b  0x07  ; reg  4 = name table base for scroll B: 0xe000\n"
+    "  dc.b  0x6c  ; reg  5 = sprite attribute table base: 0xd800\n"
     "  dc.b  0x00  ; reg  6 = unused register: 0x00\n"
     "  dc.b  0x00  ; reg  7 = background color: 0x00\n"
     "  dc.b  0x00  ; reg  8 = unused register: 0x00\n"
@@ -920,7 +942,7 @@ void SegaGenesis::add_init_bitmap()
     "  move.l #0x60000003, d7     ; Set cursor position in VDP\n"
     "  move.l d7, (a1)            ; C00004 VRAM write to 0xC000\n"
     "  move.l #0x1000-1, d5       ; data len\n"
-    "  move.w #0x460, d7          ; blank pattern\n"
+    "  move.w #(1120 + ('A' - ']')), d7          ; blank pattern\n"
     "_init_bitmap_other_loop:\n"
     "  move.w d7, (a0)\n"
     "  dbf d5, _init_bitmap_other_loop\n"
