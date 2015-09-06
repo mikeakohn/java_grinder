@@ -46,6 +46,18 @@ public class AppleIIgsJavaDemo
 
   public static void rectfill(int x1, int y1, int x2, int y2, int color)
   {
+    if(x1 < 0)
+      x1 = 0;
+
+    if(x2 > 159)
+      x2 = 159;
+
+    if(y1 < 0)
+      y1 = 0;
+
+    if(y2 > 199)
+      y2 = 199;
+
     int x, y, address;
 
     for(y = y1; y <= y2; y++)
@@ -150,33 +162,38 @@ public class AppleIIgsJavaDemo
     for(address = 0x2000; address < 0x9d00; address++) 
       AppleIIgs.hiresPlot(address, 255 - AppleIIgs.hiresRead(address));
 
-    int r = 32767;
-    int s = 1;
-
-    for(i = 0; i < 32767; i++) 
+    for(i = 0; i < 32000; i++) 
     {
-      r ^= s;
-      s += 32767;
-      r %= 32000;
-      AppleIIgs.hiresPlot(0x2000 + r, 255 - AppleIIgs.hiresRead(0x2000 + r));
+      AppleIIgs.hiresPlot(0x2000 + i, 255 - AppleIIgs.hiresRead(0x9cff - i));
     }
 
-    x1 = 0;
-    x2 = 159;
-    y1 = 0;
-    y2 = 199;
-
-    for(i = 0; i < 100; i++)
+    for(x = 0; x < 80; x++) 
     {
-      rect(x1, y1, x2, y2, 255);
-      x1++;
-      x2--;
-      y1++;
-      y2--;
+      for(y = 0; y < 200; y++) 
+      {
+        AppleIIgs.hiresPlot(0x2000 + x + 160 * y, 255 - AppleIIgs.hiresRead(0x2000 + x + 160 * y));
+      }
     }
+
+    for(i = 0; i < 8000; i++) 
+    {
+      AppleIIgs.hiresPlot(0x2000 + i, 255 - AppleIIgs.hiresRead(0x9cff - i));
+      AppleIIgs.hiresPlot(0x9cff - i, AppleIIgs.hiresRead(0x2000 + i));
+    }
+
+    rectfill(0, 0, 79, 49, 0);
+    rectfill(80, 100, 159, 149, 0x22);
+    rectfill(0, 150, 79, 199, 0x44);
+    rectfill(80, 0, 159, 49, 0x66);
+
+    rectfill(0, 100, 79, 149, 0x88);
+    rectfill(80, 50, 159, 99, 0xaa);
+    rectfill(0, 50, 79, 99, 0xcc);
+    rectfill(80, 150, 159, 199, 0xdd);
 
     while(true)
     {
+      // infinite loop
     }
   }
 }
