@@ -602,11 +602,11 @@ int MC68000::call(const char *name)
 
 int MC68000::invoke_static_method(const char *name, int params, int is_void)
 {
-int local;
-int stack_vars = stack;
-int reg_vars = reg;
-int saved_registers;
-int n;
+  int local;
+  int stack_vars = stack;
+  int reg_vars = reg;
+  int saved_registers;
+  int n;
 
   printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
 
