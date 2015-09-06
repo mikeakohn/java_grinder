@@ -4,6 +4,25 @@ import net.mikekohn.java_grinder.CPU;
 
 public class AppleIIgsJavaDemo
 {
+  public static void paletteGray()
+  {
+    CPU.asm("palette_gray:\n");
+    CPU.asm("  lda #0x9e00\n");
+    CPU.asm("  sta address\n");
+    CPU.asm("  lda #0xe1\n");
+    CPU.asm("  sta address + 2\n");
+    CPU.asm("  ldy #0\n");
+    CPU.asm("  lda #0xfff\n");
+    CPU.asm("palette_gray_loop:\n");
+    CPU.asm("  sta [address],y\n");
+    CPU.asm("  sec\n");
+    CPU.asm("  sbc #0x111\n");
+    CPU.asm("  iny\n");
+    CPU.asm("  iny\n");
+    CPU.asm("  cpy #32\n");
+    CPU.asm("  bne palette_gray_loop\n");
+  }
+
   public static void rect(int x1, int y1, int x2, int y2, int color)
   {
     int x, y, address;
@@ -48,40 +67,7 @@ public class AppleIIgsJavaDemo
     int x, y, i;
 
     AppleIIgs.hiresEnable();
-
-    // make palette (api method coming soon when arrays are working)
-    CPU.asm("lda #0xfff\n");
-    CPU.asm("sta.l 0xe19e00\n");
-    CPU.asm("lda #0xeee\n");
-    CPU.asm("sta.l 0xe19e02\n");
-    CPU.asm("lda #0xddd\n");
-    CPU.asm("sta.l 0xe19e04\n");
-    CPU.asm("lda #0xccc\n");
-    CPU.asm("sta.l 0xe19e06\n");
-    CPU.asm("lda #0xbbb\n");
-    CPU.asm("sta.l 0xe19e08\n");
-    CPU.asm("lda #0xaaa\n");
-    CPU.asm("sta.l 0xe19e0a\n");
-    CPU.asm("lda #0x999\n");
-    CPU.asm("sta.l 0xe19e0c\n");
-    CPU.asm("lda #0x888\n");
-    CPU.asm("sta.l 0xe19e0e\n");
-    CPU.asm("lda #0x777\n");
-    CPU.asm("sta.l 0xe19e10\n");
-    CPU.asm("lda #0x666\n");
-    CPU.asm("sta.l 0xe19e12\n");
-    CPU.asm("lda #0x555\n");
-    CPU.asm("sta.l 0xe19e14\n");
-    CPU.asm("lda #0x444\n");
-    CPU.asm("sta.l 0xe19e16\n");
-    CPU.asm("lda #0x333\n");
-    CPU.asm("sta.l 0xe19e18\n");
-    CPU.asm("lda #0x222\n");
-    CPU.asm("sta.l 0xe19e1a\n");
-    CPU.asm("lda #0x111\n");
-    CPU.asm("sta.l 0xe19e1c\n");
-    CPU.asm("lda #0x000\n");
-    CPU.asm("sta.l 0xe19e1e\n");
+    paletteGray();
 
     for(address = 0x2000; address < 0x9d00; address++) 
       AppleIIgs.hiresPlot(address, 255);
@@ -140,7 +126,7 @@ public class AppleIIgsJavaDemo
     int y1 = 49;
     int y2 = 146;
 
-    for(i = 0; i < 16; i++)
+    for(i = 0; i < 8; i++)
     {
       rect(x1, y1, x2, y2, 0);
       x1--;
@@ -149,13 +135,44 @@ public class AppleIIgsJavaDemo
       y2++;
     }
 
-    for(i = 0; i < 16; i++)
+    for(i = 0; i < 16; i += 2)
     {
       rect(x1, y1, x2, y2, i | (i << 4));
       x1--;
       x2++;
       y1--;
       y2++;
+      rect(x1, y1, x2, y2, i | (i << 4));
+      y1--;
+      y2++;
+    }
+
+    for(address = 0x2000; address < 0x9d00; address++) 
+      AppleIIgs.hiresPlot(address, 255 - AppleIIgs.hiresRead(address));
+
+    int r = 32767;
+    int s = 1;
+
+    for(i = 0; i < 32767; i++) 
+    {
+      r ^= s;
+      s += 32767;
+      r %= 32000;
+      AppleIIgs.hiresPlot(0x2000 + r, 255 - AppleIIgs.hiresRead(0x2000 + r));
+    }
+
+    x1 = 0;
+    x2 = 159;
+    y1 = 0;
+    y2 = 199;
+
+    for(i = 0; i < 100; i++)
+    {
+      rect(x1, y1, x2, y2, 255);
+      x1++;
+      x2--;
+      y1++;
+      y2--;
     }
 
     while(true)
