@@ -25,6 +25,7 @@ public:
   virtual int appleiigs_printChar_C();
   virtual int appleiigs_hiresEnable();
   virtual int appleiigs_hiresPlot_II();
+  virtual int appleiigs_hiresRead_I();
 
 private:
 };

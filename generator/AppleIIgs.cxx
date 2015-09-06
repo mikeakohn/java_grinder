@@ -149,7 +149,21 @@ int AppleIIgs::appleiigs_hiresPlot_II()
   fprintf(out, "  sta [address]\n");
   fprintf(out, "  rep #0x30\n");
 
-  stack--;
+  stack -= 2;
+
+  return 0;
+}
+
+int AppleIIgs::appleiigs_hiresRead_I()
+{
+  fprintf(out, ";; hiresRead()\n");
+  POP();
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  lda #0xe1\n");
+  fprintf(out, "  sta address + 2\n");
+  fprintf(out, "  lda [address]\n");
+  fprintf(out, "  and #0xff\n");
+  PUSH();
 
   return 0;
 }

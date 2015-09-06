@@ -20,6 +20,7 @@ public:
   virtual int appleiigs_printChar_C() { return -1; }
   virtual int appleiigs_hiresEnable() { return -1; }
   virtual int appleiigs_hiresPlot_II() { return -1; }
+  virtual int appleiigs_hiresRead_I() { return -1; }
 };
 
 #endif

@@ -35,6 +35,7 @@ int appleiigs(JavaClass *java_class, Generator *generator, char *function)
   CHECK_FUNC(printChar,_C)
   CHECK_FUNC(hiresEnable,)
   CHECK_FUNC(hiresPlot,_II)
+  CHECK_FUNC(hiresRead,_I)
   return -1;
 }
 

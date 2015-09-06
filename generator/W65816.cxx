@@ -439,6 +439,7 @@ int W65816::div_integer()
 int W65816::mod_integer()
 {
   need_div_integer = 1;
+  fprintf(out, "; mod_integer\n");
   fprintf(out, "  jsr div_integer\n");
   POP();
   fprintf(out, "  lda remainder\n");
