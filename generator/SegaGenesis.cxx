@@ -420,7 +420,7 @@ int SegaGenesis::sega_genesis_setCursor(int x, int y)
   int address = (0xe000 + (y * 128 + x * 2));
 
   fprintf(out,
-    "  move.l #0x%8x, (a1) ; Set cursor position in VDP\n",
+    "  move.l #0x%8x, (a1) ; setCursor(const,const) Set cursor position in VDP\n",
     CTRL_REG(CD_VRAM_WRITE, address));
 
   return 0;

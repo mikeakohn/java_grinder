@@ -289,6 +289,20 @@ int JavaCompiler::optimize_const(JavaClass *java_class, char *method_name, uint8
     return 4;
   }
 
+  // invokestatic with two const
+  // 16 (0x10) bipush
+  if (pc + 4 < pc_end &&
+      bytes[pc] == 0x10 &&
+      bytes[pc+2] == 0xb8)
+  {
+    const_vals[0] = const_val;
+    const_vals[1] = (int8_t)bytes[pc + 1];
+    int ref = GET_PC_UINT16(3);
+    if (invoke_static(java_class, ref, generator, const_vals, 2) != 0)
+    { return 0; }
+    return 5;
+  }
+
   // FIXME - add more invoke(const,const) combinations.
 
   return 0;
