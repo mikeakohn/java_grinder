@@ -399,6 +399,7 @@ int SegaGenesis::sega_genesis_setCursor()
   fprintf(out, "  ; setCursor() - Set cursor position in VDP\n");
   //fprintf(out, "  mulu.w #128, d%d\n", REG_STACK(reg-1));
   fprintf(out, "  lsl.w #7, d%d\n", REG_STACK(reg-1));
+  fprintf(out, "  lsl.w #1, d%d\n", REG_STACK(reg-2));
   fprintf(out, "  add.w d%d, d%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
   fprintf(out, "  swap d%d\n", REG_STACK(reg-1));
   fprintf(out, "  or.l #0x%08x, d%d\n", CTRL_REG(CD_VRAM_WRITE, 0xe000), REG_STACK(reg-1));
@@ -416,7 +417,7 @@ int SegaGenesis::sega_genesis_setCursor(int x, int y)
   // CD = 000001 (VRAM WRITE)
   //  A = 1100 0101 1001 0100 = 0xc594
   //int address = (0xc000 + (y * 128 + x));
-  int address = (0xe000 + (y * 128 + x));
+  int address = (0xe000 + (y * 128 + x * 2));
 
   fprintf(out,
     "  move.l #0x%8x, (a1) ; Set cursor position in VDP\n",
@@ -822,6 +823,7 @@ void SegaGenesis::add_print_string()
   fprintf(out,
     "_print_string:\n"
     "  move.l (-4,a2), d5\n"
+    "  subq.l #1, d5\n"
     "_print_string_loop:\n"
     "  eor.l d6, d6\n"
     "  move.b (a2)+, d6\n"

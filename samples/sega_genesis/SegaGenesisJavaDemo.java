@@ -43,6 +43,7 @@ public class SegaGenesisJavaDemo
       SegaGenesis.SPRITE_CONFIG1_HORIZONTAL_SIZE_2_CELL);
 
     SegaGenesis.initBitmap();
+
     //SegaGenesis.clearBitmap();
     //SegaGenesis.setPalettePointer(1);
     //SegaGenesis.setPaletteColor(0xe);
@@ -53,6 +54,10 @@ public class SegaGenesisJavaDemo
     //for (a = 0; a < 8; a++) { SegaGenesis.plot(a, a, 1); }
     //wait(120);
 
+    SegaGenesis.setCursor(3, 7);
+    SegaGenesis.print("TESTING[TEXT");
+    wait(60);
+
     SegaGenesis.loadZ80(PlaySong.z80_code);
     SegaGenesis.setPaletteColors(Mandelbrots.palette);
     Mandelbrots.draw();
@@ -61,6 +66,10 @@ public class SegaGenesisJavaDemo
 
     SegaGenesis.clearBitmap();
 
+    //SegaGenesis.setPlotAddress(0);
+    //SegaGenesis.fastPlot(1,2,3,4);
+
+    SegaGenesis.clearText();
     SegaGenesis.setCursor(0, 7);
     SegaGenesis.print("MIKE[KOHN");
     SegaGenesis.setCursor(0, 1);
