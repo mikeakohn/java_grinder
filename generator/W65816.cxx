@@ -86,7 +86,7 @@ int W65816::open(const char *filename)
   fprintf(out, "; all 16-bit registers\n");
   fprintf(out, "  rep #0x30\n");
   fprintf(out, "; set up processor stack\n");
-  fprintf(out, "  lda #0x1FF\n");
+  fprintf(out, "  lda #0x1ff\n");
   fprintf(out, "  tcs\n");
   fprintf(out, "; clear java stack\n");
   fprintf(out, "  lda #0\n");
@@ -98,7 +98,7 @@ int W65816::open(const char *filename)
   fprintf(out, "  cpx #0x100\n");
   fprintf(out, "  bne clear_java_stack\n");
   fprintf(out, "; set up java stack pointer\n");
-  fprintf(out, "  ldx #0xFE\n");
+  fprintf(out, "  ldx #0xfe\n");
 
   return 0;
 }

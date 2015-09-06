@@ -43,11 +43,11 @@ int AppleIIgs::open(const char *filename)
   fprintf(out, ".65816\n");
 
   // stack location
-  fprintf(out, "stack equ 0x4000\n");
+  fprintf(out, "stack equ 0x800\n");
 
   // ram start
 //FIXME this is not correct
-  fprintf(out, "ram_start equ 0x4200\n");
+  fprintf(out, "ram_start equ 0x7000\n");
   fprintf(out, "heap_ptr equ ram_start\n");
 
   // points to locals
@@ -82,7 +82,7 @@ int AppleIIgs::open(const char *filename)
   fprintf(out, "  cpx #0x100\n");
   fprintf(out, "  bne clear_java_stack\n");
   fprintf(out, "; set up java stack pointer\n");
-  fprintf(out, "  ldx #0xFE\n");
+  fprintf(out, "  ldx #0xfe\n");
 
   return 0;
 }
