@@ -250,7 +250,7 @@ func main() {
   fmt.Println("bmp2sega - Copyright 2015 by Michael Kohn")
 
   if len(os.Args) != 2 {
-    fmt.Println("Usage: " + os.Args[0] + " <wavfile>")
+    fmt.Println("Usage: " + os.Args[0] + " <file.bmp>")
     os.Exit(0)
   }
 
