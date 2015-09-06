@@ -20,7 +20,7 @@ tests:
 %.class: %.java
 	javac $*.java
 
-grind: samples
+grind_old: samples
 	./java_grinder samples/LCD.class lcd_msp430.asm msp430g2231
 	naken_asm -I /storage/git/naken_asm/include/msp430 -l -o lcd_msp430.hex lcd_msp430.asm
 	./java_grinder samples/MethodCall.class method_call_msp430.asm msp430g2231

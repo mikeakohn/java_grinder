@@ -768,36 +768,26 @@ void SegaGenesis::add_clear_text()
 {
   fprintf(out,
     "_clear_text:\n"
-    "  move.w #(40 * 28 / 4) - 1, d6\n"
-    "  move.l #0x%08x, (a1)  ; C00004 VRAM write to 0x8c00\n"
+    "  move.w #(64 * 32 / 2) - 1, d6\n"
+    "  move.l #0x%08x, (a1)  ; C00004 VRAM write to 0xe000\n"
     "  move.l #((1120 + (']' - 'A')) << 16) | (1120 + (']' - 'A')), d7\n"
     "_clear_text_loop:\n"
     "  move.l d7, (a0)           ; C00000 write next longword of ' ' to VDP\n"
     "  dbra d6, _clear_text_loop ; loop until done\n"
-    "  rts\n\n", CTRL_REG(CD_VRAM_WRITE, 0xf000));
+    "  rts\n\n", CTRL_REG(CD_VRAM_WRITE, 0xe000));
 }
 
 void SegaGenesis::add_vdp_reg_init()
 {
   fprintf(out,
-    //"vdp_reg_init:\n"
-    //"  dc.l  0x00008000  ; d5 = VDP register 0 write command\n"
-    //"  dc.l  0    ; D6 = unused\n"
-    //"  dc.l  0x00000100  ; d7 = video register offset\n"
-    //"  dc.l  0    ; A0 = unused\n"
-    //"  dc.l  HW_VERSION  ; a1 = hardware version register\n"
-    //"  dc.l  TMSS_REG    ; a2 = TMSS register\n"
-    //"  dc.l  VDP_DATA    ; a3 = VDP data\n"
-    //"  dc.l  VDP_CTRL    ; a4 = VDP control / status\n\n"
-
     "  ; VDP register initialization (24 bytes)\n"
     ".align 32\n" 
     "vdp_reg_init_table:\n"
     "  dc.b  0x04  ; reg  0 = mode reg 1: no H interrupt\n"
     "  dc.b  0x14  ; reg  1 = mode reg 2: blanked, no V interrupt, DMA enable\n"
-    "  dc.b  0x30  ; reg  2 = name table base for scroll A: 0xc000\n"
+    "  dc.b  0x30  ; reg  2 = name table base for scroll A: 0xe000\n"
     "  dc.b  0x3c  ; reg  3 = name table base for window:   0xf000\n"
-    "  dc.b  0x07  ; reg  4 = name table base for scroll B: 0xe000\n"
+    "  dc.b  0x07  ; reg  4 = name table base for scroll B: 0xc000\n"
     "  dc.b  0x6c  ; reg  5 = sprite attribute table base: 0xd800\n"
     "  dc.b  0x00  ; reg  6 = unused register: 0x00\n"
     "  dc.b  0x00  ; reg  7 = background color: 0x00\n"
@@ -912,23 +902,33 @@ void SegaGenesis::add_set_palette_colors()
 
 void SegaGenesis::add_init_bitmap()
 {
-  // REVIEW: Make faster by using a long write to (a0)
+  need_clear_bitmap = true;
+
   fprintf(out,
+    "  ;; 1) Clear out first 1120 pattersn\n"
+    "  ;; 2) Set the 40x28 pattern area in Scroll B to the first 1120 patterns\n"
+    "  ;; 3) Set the other patterns in Sroll B to a blank pattern\n"
     "_init_bitmap:\n"
     "  move.l d4, (-4,a7)         ; put d4 on stack (or really below)\n"
-    "  move.l #0x40000000, (a1)   ; C00004 VRAM write to 0x0000\n"
-    "  move.l #(40*28*16)+15, d5  ; Pattern count * 16 bytes (plus an extra)\n"
-    "  eor.l d7, d7\n"
-    "_clear_pattern_table_loop:\n"
-    "  move.w d7, (a0)\n"
-    "  dbf d5, _clear_pattern_table_loop\n"
+    "  jsr _clear_bitmap\n"
+
+    "  ; Set pattern table to blank pattern\n"
+    "  move.l #0x40000003, (a1)   ; C00004 VRAM write to 0xC000\n"
+    "  move.l #(0x1000 / 4)-1, d5 ; pattern table len in longs minus 1\n"
+    "  move.l #((1120 + (']' - 'A')) << 16) | (1120 + (']' - 'A')), d7\n"
+    "_init_bitmap_other_loop:\n"
+    "  move.l d7, (a0)\n"
+    "  dbf d5, _init_bitmap_other_loop\n"
+
+    "  ; Set up pattern table\n"
     "  move.l #0x40000003, d4     ; Set cursor position in VDP\n"
     "  move.l d4, (a1)            ; C00004 VRAM write to 0xC000\n"
-    "  move.l #(40*28)-1, d5      ; data len\n"
-    "  eor.w d6, d6\n"
+    "  move.w #(40*28)-1, d5      ; data len\n"
+    "  eor.l d6, d6\n"
+    "  move.l d6, d7\n"
     "_init_bitmap_loop:\n"
     "  move.w d7, (a0)\n"
-    "  add.w #1, d6\n"
+    "  addq.l #1, d6\n"
     "  cmp.w #40, d6\n"
     "  bne.s _init_bitmap_loop_not_40\n"
     "  eor.w d6, d6\n"
@@ -937,29 +937,20 @@ void SegaGenesis::add_init_bitmap()
     "_init_bitmap_loop_not_40:\n"
     "  addq.l #1, d7\n"
     "  dbf d5, _init_bitmap_loop\n"
-    "  move.l (-4,a7), d4         ; recover d4\n"
 
-    "  move.l #0x60000003, d7     ; Set cursor position in VDP\n"
-    "  move.l d7, (a1)            ; C00004 VRAM write to 0xC000\n"
-    "  move.l #0x1000-1, d5       ; data len\n"
-    "  move.w #(1120 + ('A' - ']')), d7          ; blank pattern\n"
-    "_init_bitmap_other_loop:\n"
-    "  move.w d7, (a0)\n"
-    "  dbf d5, _init_bitmap_other_loop\n"
     "  move.l (-4,a7), d4         ; recover d4\n"
     "  rts\n\n");
 }
 
 void SegaGenesis::add_clear_bitmap()
 {
-  // REVIEW: Make faster by using a long write to (a0)
   fprintf(out,
     "_clear_bitmap:\n"
-    "  move.l #0x40000000, (a1)   ; C00004 VRAM write to 0x0000\n"
-    "  move.l #(40*28*16)+15, d5  ; Pattern len (w*h*16 words) (plus 1)\n"
+    "  move.l #0x40000000, (a1)     ; C00004 VRAM write to 0x0000\n"
+    "  move.l #((40*28*32)/4)-1, d5 ; Pattern len (w*h*32 bytes)\n"
     "  eor.l d6, d6\n"
     "_clear_bitmap_loop:\n"
-    "  move.w d6, (a0)\n"
+    "  move.l d6, (a0)\n"
     "  dbf d5, _clear_bitmap_loop\n"
     "  rts\n\n");
 }

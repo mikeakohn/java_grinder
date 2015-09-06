@@ -24,6 +24,7 @@ public class SegaGenesisJavaDemo
     SegaGenesis.setImageData(ImageJavaGrinder.image);
 
     SegaGenesis.loadFonts();
+    SegaGenesis.clearText();
     wait(30);
 
     SegaGenesis.loadZ80(PlayTitleSample.z80_code);
@@ -59,7 +60,6 @@ public class SegaGenesisJavaDemo
     wait(60);
 
     SegaGenesis.clearBitmap();
-    SegaGenesis.clearText();
 
     SegaGenesis.setCursor(0, 7);
     SegaGenesis.print("MIKE[KOHN");
