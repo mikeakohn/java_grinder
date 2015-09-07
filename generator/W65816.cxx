@@ -1134,7 +1134,6 @@ int W65816::array_read_byte()
   fprintf(out, "  clc\n");
   fprintf(out, "  lda value2\n");
   fprintf(out, "  adc value1\n");
-  fprintf(out, "  sta value2\n");
   fprintf(out, "  sta address\n");
   fprintf(out, "  lda (address)\n");
   fprintf(out, "  eor #128\n");
