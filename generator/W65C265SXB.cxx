@@ -19,6 +19,9 @@
 
 W65C265SXB::W65C265SXB()
 {
+  start_org = 0x300;
+  java_stack = 0x200;
+  ram_start = 0x7000;
 }
 
 W65C265SXB::~W65C265SXB()

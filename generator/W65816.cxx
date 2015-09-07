@@ -40,6 +40,8 @@
 W65816::W65816() :
   stack(0),
   start_org(0x300),
+  java_stack(0x200),
+  ram_start(0x7000),
   is_main(0),
   need_mul_integer(0),
   need_div_integer(0)
@@ -59,10 +61,10 @@ int W65816::open(const char *filename)
   fprintf(out, ".65816\n");
 
   // java stack
-  fprintf(out, "stack equ 0x0200\n");
+  fprintf(out, "stack equ 0x%04x\n", java_stack);
 
   // ram start
-  fprintf(out, "ram_start equ 0x7000\n");
+  fprintf(out, "ram_start equ 0x%04x\n", ram_start);
   fprintf(out, "heap_ptr equ ram_start\n");
 
   // points to locals

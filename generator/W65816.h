@@ -112,6 +112,8 @@ public:
 protected:
   int stack;
   int start_org;
+  int java_stack;
+  int ram_start;
   bool is_main : 1;
 
   bool need_mul_integer:1;
