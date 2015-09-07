@@ -103,6 +103,8 @@ public:
   virtual int array_write_short(const char *name, int field_id);
   virtual int array_write_int(const char *name, int field_id);
 
+  virtual int get_values_from_stack(int num);
+
   // Memory API
   virtual int memory_read8();
   virtual int memory_write8();

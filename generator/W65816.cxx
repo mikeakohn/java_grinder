@@ -1002,7 +1002,69 @@ int W65816::brk()
 
 int W65816::new_array(uint8_t type)
 {
-  return -1;
+  if (stack > 0)
+  {
+    if (type == TYPE_SHORT || type == TYPE_CHAR || type == TYPE_INT)
+    {
+      fprintf(out, "; new_array_int\n");
+      POP();
+      fprintf(out, "  sta length\n");
+      fprintf(out, "  lda heap_ptr\n");
+      fprintf(out, "  sta result\n");
+      fprintf(out, "  sta address\n");
+      fprintf(out, "  lda length\n");
+      fprintf(out, "  sta (address)\n");
+
+      fprintf(out, "  asl length\n");
+
+      fprintf(out, "  inc length\n");
+      fprintf(out, "  inc length\n");
+
+      fprintf(out, "  clc\n");
+      fprintf(out, "  lda heap_ptr\n");
+      fprintf(out, "  adc length\n");
+      fprintf(out, "  sta heap_ptr\n");
+
+      fprintf(out, "  inc result\n");
+      fprintf(out, "  inc result\n");
+      fprintf(out, "  inc result\n");
+
+      fprintf(out, "  lda result\n");
+      fprintf(out, "  and #254\n");
+      fprintf(out, "  sta result\n");
+      PUSH();
+    }
+      else
+    {
+      fprintf(out, "; new_array_byte\n");
+      POP();
+      fprintf(out, "  sta length\n");
+      fprintf(out, "  lda heap_ptr\n");
+      fprintf(out, "  sta result\n");
+      fprintf(out, "  sta address\n");
+      fprintf(out, "  lda length\n");
+      fprintf(out, "  sta (address)\n");
+
+      fprintf(out, "  inc length\n");
+      fprintf(out, "  inc length\n");
+
+      fprintf(out, "  clc\n");
+      fprintf(out, "  lda heap_ptr\n");
+      fprintf(out, "  adc length\n");
+      fprintf(out, "  sta heap_ptr\n");
+
+      fprintf(out, "  inc result\n");
+      fprintf(out, "  inc result\n");
+      fprintf(out, "  inc result\n");
+
+      fprintf(out, "  lda result\n");
+      fprintf(out, "  and #254\n");
+      fprintf(out, "  sta result\n");
+      PUSH();
+    }
+  }
+
+  return 0;
 }
 
 int W65816::insert_array(const char *name, int32_t *data, int len, uint8_t type)
@@ -1026,72 +1088,237 @@ int W65816::insert_string(const char *name, uint8_t *bytes, int len)
 
 int W65816::push_array_length()
 {
-  return -1;
+  if(stack > 0)
+  {
+    fprintf(out, "; push_array_length\n");
+    POP();
+    fprintf(out, "  sta result\n");
+    fprintf(out, "  sta address\n");
+    fprintf(out, "  dec address\n");
+    fprintf(out, "  dec address\n");
+    fprintf(out, "  lda (address)\n");
+    fprintf(out, "  sta result\n");
+    PUSH();
+  }
+
+  return 0;
 }
 
 int W65816::push_array_length(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "; push_array_length2\n");
+  fprintf(out, "  lda %s\n", name);
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  dec address\n");
+  fprintf(out, "  dec address\n");
+  fprintf(out, "  lda (address)\n");
+  PUSH();
+
+  stack++;
+
+  return 0;
 }
 
 int W65816::array_read_byte()
 {
-  return -1;
+  get_values_from_stack(2);
+
+  fprintf(out, "; array_read_byte\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda value2\n");
+  fprintf(out, "  adc value1\n");
+  fprintf(out, "  sta value2\n");
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  lda (address),y\n");
+  fprintf(out, "  eor #128\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  sbc #128\n");
+  fprintf(out, "  sta result\n");
+  PUSH();
+
+  stack++;
+
+  return 0;
 }
 
 int W65816::array_read_short()
 {
-  return -1;
+  return array_read_int();
 }
 
 int W65816::array_read_int()
 {
-  return -1;
+  get_values_from_stack(2);
+
+  fprintf(out, "; array_read_int\n");
+  fprintf(out, "  asl value1\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda value2\n");
+  fprintf(out, "  adc value1\n");
+  fprintf(out, "  sta value2\n");
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  lda (address),y\n");
+  fprintf(out, "  sta result\n");
+  PUSH();
+
+  stack++;
+
+  return 0;
 }
 
 int W65816::array_read_byte(const char *name, int field_id)
 {
-  return -1;
+  if(stack > 0)
+  {
+    fprintf(out, "; array_read_byte2\n");
+    fprintf(out, "  lda %s\n", name);
+    fprintf(out, "  sta address");
+    POP();
+    fprintf(out, "  sta result");
+    fprintf(out, "  clc");
+    fprintf(out, "  lda address");
+    fprintf(out, "  adc result");
+    fprintf(out, "  lda (address)");
+    fprintf(out, "  eor #128\n");
+    fprintf(out, "  sec\n");
+    fprintf(out, "  sbc #128\n");
+    fprintf(out, "  sta result");
+    PUSH();
+
+    stack++;
+  }
+
+  return 0;
 }
 
 int W65816::array_read_short(const char *name, int field_id)
 {
-  return -1;
+  return array_read_int(name, field_id);
 }
 
 int W65816::array_read_int(const char *name, int field_id)
 {
-  return -1;
+  if(stack > 0)
+  {
+    fprintf(out, "; array_read_int2\n");
+    fprintf(out, "  lda %s\n", name);
+    fprintf(out, "  sta address");
+    POP();
+    fprintf(out, "  sta result");
+    fprintf(out, "  asl result");
+    fprintf(out, "  clc");
+    fprintf(out, "  lda address");
+    fprintf(out, "  adc result");
+    fprintf(out, "  lda (address)");
+    fprintf(out, "  sta result");
+    PUSH();
+
+    stack++;
+  }
+
+  return 0;
 }
 
 int W65816::array_write_byte()
 {
-  return -1;
+  get_values_from_stack(3);
+
+  fprintf(out, "; array_write_byte\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda value3\n");
+  fprintf(out, "  adc value2\n");
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  lda value1\n");
+  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  sta (address)\n");
+  fprintf(out, "  rep #0x30\n");
+
+  return 0;
 }
 
 int W65816::array_write_short()
 {
-  return -1;
+  return array_write_int();
 }
 
 int W65816::array_write_int()
 {
-  return -1;
+  get_values_from_stack(3);
+
+  fprintf(out, "; array_write_byte\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda value3\n");
+  fprintf(out, "  adc value2\n");
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  lda value1\n");
+  fprintf(out, "  sta (address)\n");
+
+  return 0;
 }
 
 int W65816::array_write_byte(const char *name, int field_id)
 {
-  return -1;
+  get_values_from_stack(3);
+
+  fprintf(out, "; array_write_byte2\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda value2\n");
+  fprintf(out, "  adc %s\n", name);
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  lda value1\n");
+  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  sta (address)\n");
+  fprintf(out, "  rep #0x30\n");
+
+  return 0;
 }
 
 int W65816::array_write_short(const char *name, int field_id)
 {
-  return -1;
+  return array_write_int(name, field_id);
 }
 
 int W65816::array_write_int(const char *name, int field_id)
 {
-  return -1;
+  get_values_from_stack(3);
+
+  fprintf(out, "; array_write_int2\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda value2\n");
+  fprintf(out, "  adc %s\n", name);
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  lda value1\n");
+  fprintf(out, "  sta (address)\n");
+
+  return 0;
+} 
+
+int W65816::get_values_from_stack(int num)
+{
+  fprintf(out, "; get_values_from_stack, num = %d\n", num);
+
+  if(num > 0)
+  {
+    POP();
+    fprintf(out, "  sta value1\n");
+    stack--;
+  }
+
+  if(num > 1)
+  {
+    POP();
+    fprintf(out, "  sta value2\n");
+    stack--;
+  }
+
+  if(num > 2)
+  {
+    POP();
+    fprintf(out, "  sta value3\n");
+    stack--;
+  }
+
+  return 0;
 }
 
 // subroutines
