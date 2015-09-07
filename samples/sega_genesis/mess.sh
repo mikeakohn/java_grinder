@@ -9,7 +9,7 @@ fi
 
 if [ "$1" = "avi" ]
 then
-  extra="-aviwrite out.avi"
+  extra="-aviwrite out.avi -snapsize 320x216"
 fi
 
 mess genesis -window \
