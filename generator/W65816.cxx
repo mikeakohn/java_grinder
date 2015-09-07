@@ -332,7 +332,8 @@ int W65816::pop()
 
 int W65816::dup()
 {
-  fprintf(out, "; txy\n");
+  fprintf(out, "; dup\n");
+  fprintf(out, "  txy\n");
   fprintf(out, "  lda stack,y\n");
   PUSH();
   stack++;
@@ -1129,7 +1130,7 @@ int W65816::array_read_byte()
   fprintf(out, "  adc value1\n");
   fprintf(out, "  sta value2\n");
   fprintf(out, "  sta address\n");
-  fprintf(out, "  lda (address),y\n");
+  fprintf(out, "  lda (address)\n");
   fprintf(out, "  eor #128\n");
   fprintf(out, "  sec\n");
   fprintf(out, "  sbc #128\n");
@@ -1157,7 +1158,7 @@ int W65816::array_read_int()
   fprintf(out, "  adc value1\n");
   fprintf(out, "  sta value2\n");
   fprintf(out, "  sta address\n");
-  fprintf(out, "  lda (address),y\n");
+  fprintf(out, "  lda (address)\n");
   fprintf(out, "  sta result\n");
   PUSH();
 
@@ -1172,20 +1173,18 @@ int W65816::array_read_byte(const char *name, int field_id)
   {
     fprintf(out, "; array_read_byte2\n");
     fprintf(out, "  lda %s\n", name);
-    fprintf(out, "  sta address");
+    fprintf(out, "  sta address\n");
     POP();
-    fprintf(out, "  sta result");
-    fprintf(out, "  clc");
-    fprintf(out, "  lda address");
-    fprintf(out, "  adc result");
-    fprintf(out, "  lda (address)");
+    fprintf(out, "  sta result\n");
+    fprintf(out, "  clc\n");
+    fprintf(out, "  lda address\n");
+    fprintf(out, "  adc result\n");
+    fprintf(out, "  lda (address)\n");
     fprintf(out, "  eor #128\n");
     fprintf(out, "  sec\n");
     fprintf(out, "  sbc #128\n");
-    fprintf(out, "  sta result");
+    fprintf(out, "  sta result\n");
     PUSH();
-
-    stack++;
   }
 
   return 0;
@@ -1202,18 +1201,16 @@ int W65816::array_read_int(const char *name, int field_id)
   {
     fprintf(out, "; array_read_int2\n");
     fprintf(out, "  lda %s\n", name);
-    fprintf(out, "  sta address");
+    fprintf(out, "  sta address\n");
     POP();
-    fprintf(out, "  sta result");
-    fprintf(out, "  asl result");
-    fprintf(out, "  clc");
-    fprintf(out, "  lda address");
-    fprintf(out, "  adc result");
-    fprintf(out, "  lda (address)");
-    fprintf(out, "  sta result");
+    fprintf(out, "  sta result\n");
+    fprintf(out, "  asl result\n");
+    fprintf(out, "  clc\n");
+    fprintf(out, "  lda address\n");
+    fprintf(out, "  adc result\n");
+    fprintf(out, "  lda (address)\n");
+    fprintf(out, "  sta result\n");
     PUSH();
-
-    stack++;
   }
 
   return 0;
@@ -1228,8 +1225,8 @@ int W65816::array_write_byte()
   fprintf(out, "  lda value3\n");
   fprintf(out, "  adc value2\n");
   fprintf(out, "  sta address\n");
-  fprintf(out, "  lda value1\n");
   fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  lda value1\n");
   fprintf(out, "  sta (address)\n");
   fprintf(out, "  rep #0x30\n");
 
@@ -1245,7 +1242,8 @@ int W65816::array_write_int()
 {
   get_values_from_stack(3);
 
-  fprintf(out, "; array_write_byte\n");
+  fprintf(out, "; array_write_int\n");
+  fprintf(out, "  asl value2\n");
   fprintf(out, "  clc\n");
   fprintf(out, "  lda value3\n");
   fprintf(out, "  adc value2\n");
