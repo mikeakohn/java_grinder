@@ -1077,7 +1077,6 @@ int M6502::array_read_byte(const char *name, int field_id)
     fprintf(out, "  sta address + 1\n");
 
     fprintf(out, "jsr array_read_byte2\n");
-    stack++;
   }
 
   return 0;
@@ -1099,7 +1098,6 @@ int M6502::array_read_int(const char *name, int field_id)
     fprintf(out, "  lda %s + 1\n", name);
     fprintf(out, "  sta address + 1\n");
     fprintf(out, "jsr array_read_int2\n");
-    stack++;
   }
 
   return 0;
