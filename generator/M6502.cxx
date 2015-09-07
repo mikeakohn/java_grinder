@@ -1559,6 +1559,7 @@ void M6502::insert_integer_to_byte()
   fprintf(out, "  rts\n");
 }
 
+// FIXME this may be broken
 void M6502::insert_dup()
 {
   fprintf(out, "dup:\n");
