@@ -22,5 +22,20 @@ abstract public class AppleIIgs
   public static void hiresPlot(int address, int c) { }
   public static void hiresSpan(int address, int c, int length) { }
   public static int hiresRead(int address) { return 0; }
+
+  /** Sound wave table. */
+  public static void loadWaveTable(byte[] data) { }
+
+  /** Turn on oscillators (up to 32). */
+  public static void enableOscillators(int count) { }
+
+  /** Set master volume (0 to 15). */
+  public static void setMasterVolume(int level) { }
+
+  /** Set volume of individual voice (0 to 255). */
+  public static void setSoundVolume(int voice, int level) { }
+
+  /** Set frequency of individual voice (0 to 65535). */
+  public static void setSoundFrequency(int voice, int frequency) { }
 }
 

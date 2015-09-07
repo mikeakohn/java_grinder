@@ -28,6 +28,12 @@ public:
   virtual int appleiigs_hiresSpan_III();
   virtual int appleiigs_hiresRead_I();
 
+  virtual int appleiigs_loadWaveTable_BA();
+  virtual int appleiigs_enableOscillators_I();
+  virtual int appleiigs_setMasterVolume_I();
+  virtual int appleiigs_setSoundVolume_II();
+  virtual int appleiigs_setSoundFrequency_II();
+
 private:
 };
 

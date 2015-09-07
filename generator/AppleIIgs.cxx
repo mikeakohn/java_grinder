@@ -192,3 +192,32 @@ int AppleIIgs::appleiigs_hiresRead_I()
   return 0;
 }
 
+// Sound API
+int AppleIIgs::appleiigs_loadWaveTable_BA()
+{
+  return -1;
+}
+
+int AppleIIgs::appleiigs_enableOscillators_I()
+{
+  return -1;
+}
+
+int AppleIIgs::appleiigs_setMasterVolume_I()
+{
+  return -1;
+}
+
+int AppleIIgs::appleiigs_setSoundVolume_II()
+{
+  return -1;
+}
+
+int AppleIIgs::appleiigs_setSoundFrequency_II()
+{
+  return -1;
+}
+
+
+
+
