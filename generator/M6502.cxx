@@ -1559,15 +1559,14 @@ void M6502::insert_integer_to_byte()
   fprintf(out, "  rts\n");
 }
 
-// FIXME this may be broken
 void M6502::insert_dup()
 {
   fprintf(out, "dup:\n");
-  fprintf(out, "  txa\n");
-  fprintf(out, "  tay\n");
-  fprintf(out, "  lda stack_lo,y\n");
+  POP_HI();
+  POP_LO();
   PUSH_LO();
-  fprintf(out, "  lda stack_hi,y\n");
+  PUSH_HI();
+  PUSH_LO();
   PUSH_HI();
   fprintf(out, "  rts\n");
 }
