@@ -4,6 +4,9 @@ import net.mikekohn.java_grinder.CPU;
 
 public class AppleIIgsJavaDemo
 {
+// sprite test
+//  static byte sprite[] = { (byte)255, (byte)255, (byte)255, (byte)255, (byte)255, (byte)255, (byte)255, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
   public static void wait(int time)
   {
     int i;
@@ -94,6 +97,10 @@ public class AppleIIgsJavaDemo
       AppleIIgs.hiresSpan(address, 255, 160);
       address += 160;
     }
+
+// sprite test
+//    AppleIIgs.hiresBlit(sprite, 0x2000, 4, 16);
+//    while(true);
 
     address = 0x2000;
     address2 = 0x9c60;

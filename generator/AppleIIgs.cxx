@@ -131,7 +131,7 @@ int AppleIIgs::appleiigs_hiresSpan_III()
   fprintf(out, "  bpl #-5\n");
   fprintf(out, "  rep #0x30\n");
 
-  stack -= 2;
+  stack -= 3;
 
   return 0;
 }
@@ -150,6 +150,65 @@ int AppleIIgs::appleiigs_hiresRead_I()
   return 0;
 }
 
+//FIXME this will only work once, need to add label_count
+int AppleIIgs::appleiigs_hiresBlit_aBIII()
+{
+  fprintf(out, ";; hiresBlit()\n");
+  // length
+  POP();
+  fprintf(out, "  sta length\n");
+  // width
+  POP();
+  fprintf(out, "  sta value1\n");
+  // dest
+  POP();
+  fprintf(out, "  sta address\n");
+  // src
+  POP();
+  fprintf(out, "  sta value2\n");
+
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "  phx\n");
+  fprintf(out, "  ldx #0\n");
+
+  // read from array
+  fprintf(out, "blitloop:\n");
+//  fprintf(out, "  lda #0xe1\n");
+//  fprintf(out, "  sta value2 + 2\n");
+  fprintf(out, "  lda (value2),y\n");
+  fprintf(out, "  sta value3\n");
+
+  // write pixel
+  fprintf(out, "  lda #0xe1\n");
+  fprintf(out, "  sta address + 2\n");
+  fprintf(out, "  phy\n");
+  fprintf(out, "  txy\n");
+  fprintf(out, "  lda value3\n");
+  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  sta [address],y\n");
+  fprintf(out, "  rep #0x30\n");
+  fprintf(out, "  ply\n");
+
+  // move down a line when width is reached
+  fprintf(out, "  iny\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  cpy length\n");
+  fprintf(out, "  beq done\n");
+  fprintf(out, "  cpx value1\n");
+  fprintf(out, "  bne blitloop\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda address\n");
+  fprintf(out, "  adc #160\n");
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  ldx #0\n");
+  fprintf(out, "  jmp blitloop\n");
+  fprintf(out, "done:\n");
+  fprintf(out, "  plx\n");
+  
+  stack -= 4;
+
+  return 0;
+}
 // Sound API
 int AppleIIgs::appleiigs_loadWaveTable_BA()
 {

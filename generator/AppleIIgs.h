@@ -27,6 +27,7 @@ public:
   virtual int appleiigs_hiresPlot_II();
   virtual int appleiigs_hiresSpan_III();
   virtual int appleiigs_hiresRead_I();
+  virtual int appleiigs_hiresBlit_aBIII();
 
   virtual int appleiigs_loadWaveTable_BA();
   virtual int appleiigs_enableOscillators_I();
