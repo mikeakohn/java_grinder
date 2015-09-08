@@ -173,8 +173,6 @@ int AppleIIgs::appleiigs_hiresBlit_aBIII()
 
   // read from array
   fprintf(out, "blitloop:\n");
-//  fprintf(out, "  lda #0xe1\n");
-//  fprintf(out, "  sta value2 + 2\n");
   fprintf(out, "  lda (value2),y\n");
   fprintf(out, "  sta value3\n");
 
@@ -184,7 +182,7 @@ int AppleIIgs::appleiigs_hiresBlit_aBIII()
   fprintf(out, "  phy\n");
   fprintf(out, "  txy\n");
   fprintf(out, "  lda value3\n");
-  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  sep #0x20\n");
   fprintf(out, "  sta [address],y\n");
   fprintf(out, "  rep #0x30\n");
   fprintf(out, "  ply\n");
