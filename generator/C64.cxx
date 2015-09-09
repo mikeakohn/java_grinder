@@ -90,7 +90,7 @@ int C64::open(const char *filename)
 
   // java stack
   fprintf(out, "stack_lo equ 0x%04x\n", java_stack_lo);
-  fprintf(out, "stack_hi equ 0x%04x\n", java_stack_lo);
+  fprintf(out, "stack_hi equ 0x%04x\n", java_stack_hi);
 
   // points to locals
   fprintf(out, "locals equ 0xfe\n");
