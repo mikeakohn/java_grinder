@@ -42,6 +42,7 @@ W65816::W65816() :
   start_org(0x300),
   java_stack(0x200),
   ram_start(0x7000),
+  label_count(0),
   is_main(0),
   need_mul_integer(0),
   need_div_integer(0)

@@ -116,6 +116,7 @@ protected:
   int start_org;
   int java_stack;
   int ram_start;
+  int label_count;
 
   bool is_main : 1;
 

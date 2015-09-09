@@ -150,7 +150,6 @@ int AppleIIgs::appleiigs_hiresRead_I()
   return 0;
 }
 
-//FIXME this will only work once, need to add label_count
 int AppleIIgs::appleiigs_hiresBlit_aBIII()
 {
   fprintf(out, ";; hiresBlit()\n");
@@ -172,7 +171,7 @@ int AppleIIgs::appleiigs_hiresBlit_aBIII()
   fprintf(out, "  ldx #0\n");
 
   // read from array
-  fprintf(out, "blitloop:\n");
+  fprintf(out, "label_%d:\n", label_count + 0);
   fprintf(out, "  lda (value2),y\n");
   fprintf(out, "  sta value3\n");
 
@@ -191,19 +190,20 @@ int AppleIIgs::appleiigs_hiresBlit_aBIII()
   fprintf(out, "  iny\n");
   fprintf(out, "  inx\n");
   fprintf(out, "  cpy length\n");
-  fprintf(out, "  beq done\n");
+  fprintf(out, "  beq label_%d\n", label_count + 1);
   fprintf(out, "  cpx value1\n");
-  fprintf(out, "  bne blitloop\n");
+  fprintf(out, "  bne label_%d\n", label_count + 0);
   fprintf(out, "  clc\n");
   fprintf(out, "  lda address\n");
   fprintf(out, "  adc #160\n");
   fprintf(out, "  sta address\n");
   fprintf(out, "  ldx #0\n");
-  fprintf(out, "  jmp blitloop\n");
-  fprintf(out, "done:\n");
+  fprintf(out, "  jmp label_%d\n", label_count + 0);
+  fprintf(out, "label_%d:\n", label_count + 1);
   fprintf(out, "  plx\n");
   
   stack -= 4;
+  label_count += 2;
 
   return 0;
 }
