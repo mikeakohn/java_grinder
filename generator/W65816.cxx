@@ -19,9 +19,9 @@
 #include "W65816.h"
 
 // ABI is:
-// A
-// X
-// Y
+// A - accumulator
+// X - java stack index register
+// Y - general-purpose index register
 
 #define PUSH() \
   fprintf(out, "; PUSH\n"); \
@@ -423,40 +423,6 @@ int W65816::mul_integer()
 
   return 0;
 }
-
-/*
-int W65816::mul_integer(int num)
-{
-  int i, j;
-
-  fprintf(out, "; mul_integer (0x%04x)\n", num);
-  POP();
-  fprintf(out, "  sta value1\n");
-  fprintf(out, "  stz value2\n");
-
-  for(i = 15; i > 0; i--)
-  {
-    if(num & (1 << i))
-    {
-      fprintf(out, "  lda value1\n");
-
-      for(j = 0; j < i; j++)
-      {
-        fprintf(out, "  asl\n");
-      }
-
-      fprintf(out, "  adc value2\n");
-      fprintf(out, "  sta value2\n");
-    }
-  }
-
-  fprintf(out, "  lda value2\n");
-//  fprintf(out, "  sta result\n");
-  PUSH();
-
-  return 0;
-}
-*/
 
 // unsigned only for now
 int W65816::div_integer()
@@ -895,7 +861,7 @@ int W65816::return_void(int local_count)
   }
   else
   {
-//FIXME not sure what to do, for now exit to monitor
+    // exit to monitor/operating system
     fprintf(out, "  brk\n");
   }
 
@@ -1364,7 +1330,7 @@ void W65816::insert_div_integer()
   fprintf(out, "  rts\n");
 }
 
-// API
+// Memory API
 int W65816::memory_read8()
 {
   return -1;
