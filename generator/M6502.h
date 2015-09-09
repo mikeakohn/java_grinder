@@ -115,6 +115,11 @@ public:
 
 protected:
   int stack;
+  int start_org;
+  int java_stack_lo;
+  int java_stack_hi;
+  int ram_start;
+  int label_count;
   bool is_main:1;
 
   bool need_swap:1;

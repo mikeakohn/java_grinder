@@ -18,11 +18,6 @@
 
 #include "C64.h"
 
-// ABI is:
-// A
-// X
-// Y
-
 #define PUSH_LO() \
   fprintf(out, "; PUSH_LO\n"); \
   fprintf(out, "  sta stack_lo,x\n")
@@ -62,7 +57,10 @@ C64::C64() :
   need_c64_vic_text_plot(0),
   need_c64_vic_color_ram_clear(0)
 {
-
+  start_org = 0x07ff;
+  java_stack_lo = 0x200;
+  java_stack_hi = 0x300;
+  ram_start = 0xa000;
 }
 
 C64::~C64()
@@ -84,15 +82,15 @@ int C64::open(const char *filename)
   fprintf(out, ".65xx\n");
 
   // heap
-  fprintf(out, "ram_start equ 0xa000\n");
+  fprintf(out, "ram_start equ 0x%04x\n", ram_start);
   fprintf(out, "heap_ptr equ ram_start\n");
 
   // for indirection (2 bytes)
   fprintf(out, "address equ 0xfb\n");
 
   // java stack
-  fprintf(out, "stack_lo equ 0x200\n");
-  fprintf(out, "stack_hi equ 0x300\n");
+  fprintf(out, "stack_lo equ 0x%04x\n", java_stack_lo);
+  fprintf(out, "stack_hi equ 0x%04x\n", java_stack_lo);
 
   // points to locals
   fprintf(out, "locals equ 0xfe\n");
@@ -113,7 +111,7 @@ int C64::open(const char *filename)
   fprintf(out, "sprite_y equ 0x13\n");
 
   // basic loader
-  fprintf(out, ".org 0x07ff\n\n");
+  fprintf(out, ".org 0x%04x\n", start_org);
 
   fprintf(out, "dw 0x0801\n");
   fprintf(out, "dw start\n");

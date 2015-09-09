@@ -19,9 +19,9 @@
 #include "M6502.h"
 
 // ABI is:
-// A
-// X
-// Y
+// A - accumulator
+// X - java stack index register
+// Y - general-purpose index register
 
 #define PUSH_LO() \
   fprintf(out, "; PUSH_LO\n"); \
@@ -45,6 +45,11 @@
 
 M6502::M6502() :
   stack(0),
+  start_org(0x400),
+  java_stack_lo(0x200),
+  java_stack_hi(0x300),
+  ram_start(0xa000),
+  label_count(0),
   is_main(0),
 
   need_swap(0),
@@ -110,15 +115,15 @@ int M6502::open(const char *filename)
   fprintf(out, ".65xx\n");
 
   // heap
-  fprintf(out, "ram_start equ 0xa000\n");
+  fprintf(out, "ram_start equ 0x%04x\n", ram_start);
   fprintf(out, "heap_ptr equ ram_start\n");
 
   // for indirection (2 bytes)
   fprintf(out, "address equ 0xfb\n");
 
   // java stack
-  fprintf(out, "stack_lo equ 0x200\n");
-  fprintf(out, "stack_hi equ 0x300\n");
+  fprintf(out, "stack_lo equ 0x%04x\n", java_stack_lo);
+  fprintf(out, "stack_hi equ 0x%04x\n", java_stack_hi);
 
   // points to locals
   fprintf(out, "locals equ 0xfe\n");
@@ -132,7 +137,7 @@ int M6502::open(const char *filename)
   fprintf(out, "value3 equ 0x2e\n");
 
   // start at 0x0400 when using simulator
-  fprintf(out, ".org 0x0400\n");
+  fprintf(out, ".org 0x%04x\n", start_org);
   fprintf(out, "  sei\n");
   fprintf(out, "  cld\n");
   fprintf(out, "  lda #0xff\n");
