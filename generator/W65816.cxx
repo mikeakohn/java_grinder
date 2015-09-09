@@ -324,7 +324,6 @@ int W65816::pop()
 {
   fprintf(out, "; pop\n");
   POP();
-  fprintf(out, "  sta result\n");
   stack--;
 
   return 0;
@@ -369,11 +368,10 @@ int W65816::add_integer()
 {
   fprintf(out, "; add_integer\n");
   POP();
-  fprintf(out, "  sta result\n");
+  fprintf(out, "  sta value1\n");
   POP();
   fprintf(out, "  clc\n");
-  fprintf(out, "  adc result\n");
-  fprintf(out, "  sta result\n");
+  fprintf(out, "  adc value1\n");
   PUSH();
   stack--;
 
@@ -386,7 +384,6 @@ int W65816::add_integer(int num)
   POP();
   fprintf(out, "  clc\n");
   fprintf(out, "  adc #0x%04x\n", num);
-  fprintf(out, "  sta result\n");
   PUSH();
 
   return 0;
@@ -396,11 +393,10 @@ int W65816::sub_integer()
 {
   fprintf(out, "; sub_integer\n");
   POP();
-  fprintf(out, "  sta result\n");
+  fprintf(out, "  sta value1\n");
   POP();
   fprintf(out, "  sec\n");
-  fprintf(out, "  sbc result\n");
-  fprintf(out, "  sta result\n");
+  fprintf(out, "  sbc value1\n");
   PUSH();
   stack--;
 
@@ -413,7 +409,6 @@ int W65816::sub_integer(int num)
   POP();
   fprintf(out, "  sec\n");
   fprintf(out, "  sbc #0x%04x\n", num);
-  fprintf(out, "  sta result\n");
   PUSH();
 
   return 0;
@@ -455,7 +450,7 @@ int W65816::mul_integer(int num)
   }
 
   fprintf(out, "  lda value2\n");
-  fprintf(out, "  sta result\n");
+//  fprintf(out, "  sta result\n");
   PUSH();
 
   return 0;
@@ -480,7 +475,6 @@ int W65816::mod_integer()
   fprintf(out, "  jsr div_integer\n");
   POP();
   fprintf(out, "  lda remainder\n");
-  fprintf(out, "  sta result\n");
   PUSH();
   stack--;
 
@@ -493,7 +487,6 @@ int W65816::neg_integer()
   POP();
   fprintf(out, "  eor #0xffff\n");
   fprintf(out, "  inc\n");
-  fprintf(out, "  sta result\n");
   PUSH();
 
   return 0;
@@ -508,7 +501,6 @@ int W65816::shift_left_integer()
   fprintf(out, "  asl\n");
   fprintf(out, "  dey\n");
   fprintf(out, "  bne #-4\n");
-  fprintf(out, "  sta result\n");
   PUSH();
   stack--;
   
@@ -525,7 +517,6 @@ int i;
   for(i = 0; i < num; i++)
     fprintf(out, "  asl\n");
 
-  fprintf(out, "  sta result\n");
   PUSH();
 
   return 0;
@@ -541,7 +532,6 @@ int W65816::shift_right_integer()
   fprintf(out, "  ror\n");
   fprintf(out, "  dey\n");
   fprintf(out, "  bne #-7\n");
-  fprintf(out, "  sta result\n");
   PUSH();
   stack--;
 
@@ -561,7 +551,6 @@ int i;
     fprintf(out, "  ror\n");
   }
 
-  fprintf(out, "  sta result\n");
   PUSH();
 
   return 0;
@@ -576,9 +565,9 @@ int W65816::shift_right_uinteger()
   fprintf(out, "  lsr\n");
   fprintf(out, "  dey\n");
   fprintf(out, "  bne #-4\n");
-  fprintf(out, "  sta result\n");
   PUSH();
   stack--;
+
   return 0;
 }
 
@@ -592,7 +581,6 @@ int i;
   for(i = 0; i < num; i++)
     fprintf(out, "  lsr\n");
 
-  fprintf(out, "  sta result\n");
   PUSH();
 
   return 0;
@@ -602,10 +590,9 @@ int W65816::and_integer()
 {
   fprintf(out, "; and_integer\n");
   POP();
-  fprintf(out, "  sta result\n");
+  fprintf(out, "  sta value1\n");
   POP();
-  fprintf(out, "  and result\n");
-  fprintf(out, "  sta result\n");
+  fprintf(out, "  and value1\n");
   PUSH();
   stack--;
 
@@ -617,7 +604,6 @@ int W65816::and_integer(int num)
   fprintf(out, "; and_integer (0x%04x)\n", num);
   POP();
   fprintf(out, "  and #0x%04x\n", num);
-  fprintf(out, "  sta result\n");
   PUSH();
 
   return 0;
@@ -627,10 +613,9 @@ int W65816::or_integer()
 {
   fprintf(out, "; or_integer\n");
   POP();
-  fprintf(out, "  sta result\n");
+  fprintf(out, "  sta value1\n");
   POP();
-  fprintf(out, "  ora result\n");
-  fprintf(out, "  sta result\n");
+  fprintf(out, "  ora value1\n");
   PUSH();
   stack--;
 
@@ -642,7 +627,6 @@ int W65816::or_integer(int num)
   fprintf(out, "; or_integer (0x%04x)\n", num);
   POP();
   fprintf(out, "  ora #0x%04x\n", num);
-  fprintf(out, "  sta result\n");
   PUSH();
 
   return 0;
@@ -652,10 +636,9 @@ int W65816::xor_integer()
 {
   fprintf(out, "; xor_integer\n");
   POP();
-  fprintf(out, "  sta result\n");
+  fprintf(out, "  sta value1\n");
   POP();
-  fprintf(out, "  eor result\n");
-  fprintf(out, "  sta result\n");
+  fprintf(out, "  eor value1\n");
   PUSH();
   stack--;
 
@@ -667,7 +650,6 @@ int W65816::xor_integer(int num)
   fprintf(out, "; xor_integer (0x%04x)\n", num);
   POP();
   fprintf(out, "  eor #0x%04x\n", num);
-  fprintf(out, "  sta result\n");
   PUSH();
 
   return 0;
@@ -1011,7 +993,7 @@ int W65816::new_array(uint8_t type)
       POP();
       fprintf(out, "  sta length\n");
       fprintf(out, "  lda heap_ptr\n");
-      fprintf(out, "  sta result\n");
+      fprintf(out, "  sta value1\n");
       fprintf(out, "  sta address\n");
       fprintf(out, "  lda length\n");
       fprintf(out, "  sta (address)\n");
@@ -1029,13 +1011,10 @@ int W65816::new_array(uint8_t type)
       fprintf(out, "  sta heap_ptr\n");
 
       fprintf(out, "  clc\n");
-      fprintf(out, "  lda result\n");
+      fprintf(out, "  lda value1\n");
       fprintf(out, "  adc #3\n");
-      fprintf(out, "  sta result\n");
 
-      fprintf(out, "  lda result\n");
       fprintf(out, "  and #0xfffe\n");
-      fprintf(out, "  sta result\n");
       PUSH();
     }
       else
@@ -1044,7 +1023,7 @@ int W65816::new_array(uint8_t type)
       POP();
       fprintf(out, "  sta length\n");
       fprintf(out, "  lda heap_ptr\n");
-      fprintf(out, "  sta result\n");
+      fprintf(out, "  sta value1\n");
       fprintf(out, "  sta address\n");
       fprintf(out, "  lda length\n");
       fprintf(out, "  sta (address)\n");
@@ -1060,13 +1039,10 @@ int W65816::new_array(uint8_t type)
       fprintf(out, "  sta heap_ptr\n");
 
       fprintf(out, "  clc\n");
-      fprintf(out, "  lda result\n");
+      fprintf(out, "  lda value1\n");
       fprintf(out, "  adc #3\n");
-      fprintf(out, "  sta result\n");
 
-      fprintf(out, "  lda result\n");
       fprintf(out, "  and #0xfffe\n");
-      fprintf(out, "  sta result\n");
       PUSH();
     }
   }
@@ -1111,7 +1087,6 @@ int W65816::push_array_length()
     fprintf(out, "  sbc #2\n");
     fprintf(out, "  sta address\n");
     fprintf(out, "  lda (address)\n");
-    fprintf(out, "  sta result\n");
     PUSH();
   }
 
@@ -1126,7 +1101,6 @@ int W65816::push_array_length(const char *name, int field_id)
   fprintf(out, "  sbc #2\n");
   fprintf(out, "  sta address\n");
   fprintf(out, "  lda (address)\n");
-  fprintf(out, "  sta result\n");
   PUSH();
 
   stack++;
@@ -1147,7 +1121,6 @@ int W65816::array_read_byte()
   fprintf(out, "  eor #128\n");
   fprintf(out, "  sec\n");
   fprintf(out, "  sbc #128\n");
-  fprintf(out, "  sta result\n");
   PUSH();
 
   stack++;
@@ -1172,7 +1145,6 @@ int W65816::array_read_int()
   fprintf(out, "  sta value2\n");
   fprintf(out, "  sta address\n");
   fprintf(out, "  lda (address)\n");
-  fprintf(out, "  sta result\n");
   PUSH();
 
   stack++;
@@ -1188,15 +1160,14 @@ int W65816::array_read_byte(const char *name, int field_id)
     fprintf(out, "  lda %s\n", name);
     fprintf(out, "  sta address\n");
     POP();
-    fprintf(out, "  sta result\n");
+    fprintf(out, "  sta value1\n");
     fprintf(out, "  clc\n");
     fprintf(out, "  lda address\n");
-    fprintf(out, "  adc result\n");
+    fprintf(out, "  adc value1\n");
     fprintf(out, "  lda (address)\n");
     fprintf(out, "  eor #128\n");
     fprintf(out, "  sec\n");
     fprintf(out, "  sbc #128\n");
-    fprintf(out, "  sta result\n");
     PUSH();
   }
 
@@ -1216,13 +1187,12 @@ int W65816::array_read_int(const char *name, int field_id)
     fprintf(out, "  lda %s\n", name);
     fprintf(out, "  sta address\n");
     POP();
-    fprintf(out, "  sta result\n");
-    fprintf(out, "  asl result\n");
+    fprintf(out, "  sta value1\n");
+    fprintf(out, "  asl value1\n");
     fprintf(out, "  clc\n");
     fprintf(out, "  lda address\n");
-    fprintf(out, "  adc result\n");
+    fprintf(out, "  adc value1\n");
     fprintf(out, "  lda (address)\n");
-    fprintf(out, "  sta result\n");
     PUSH();
   }
 
@@ -1352,7 +1322,6 @@ void W65816::insert_mul_integer()
   fprintf(out, "  asl value2\n");
   fprintf(out, "  bra mul_integer_1\n");
   fprintf(out, "mul_integer_done:\n");
-  fprintf(out, "  sta result\n");
   PUSH();
   fprintf(out, "  rts\n");
 }
@@ -1390,7 +1359,6 @@ void W65816::insert_div_integer()
   fprintf(out, "  bne div_integer_4\n");
   fprintf(out, "div_integer_done:\n");
   fprintf(out, "  lda value3\n");
-  fprintf(out, "  sta result\n");
   PUSH();
   fprintf(out, "  rts\n");
 }
