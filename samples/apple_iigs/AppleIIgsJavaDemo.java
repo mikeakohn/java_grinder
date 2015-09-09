@@ -5,7 +5,26 @@ import net.mikekohn.java_grinder.CPU;
 public class AppleIIgsJavaDemo
 {
 // sprite test
-//  static byte sprite[] = { (byte)255, (byte)255, (byte)255, (byte)255, (byte)255, (byte)255, (byte)255, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+//  static byte sprite[] = { 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+  static int palette[] =
+  {
+    0xfff,
+    0xeee,
+    0xddd,
+    0xccc,
+    0xbbb,
+    0xaaa,
+    0x999,
+    0x888,
+    0x777,
+    0x666,
+    0x555,
+    0x444,
+    0x333,
+    0x222,
+    0x111,
+    0x000
+  };
 
   public static void wait(int time)
   {
@@ -14,25 +33,6 @@ public class AppleIIgsJavaDemo
     for(i = 0; i < time; i++)
     {
     }
-  }
-
-  public static void paletteGray()
-  {
-    CPU.asm("palette_gray:\n");
-    CPU.asm("  lda #0x9e00\n");
-    CPU.asm("  sta address\n");
-    CPU.asm("  lda #0xe1\n");
-    CPU.asm("  sta address + 2\n");
-    CPU.asm("  ldy #0\n");
-    CPU.asm("  lda #0xfff\n");
-    CPU.asm("palette_gray_loop:\n");
-    CPU.asm("  sta [address],y\n");
-    CPU.asm("  sec\n");
-    CPU.asm("  sbc #0x111\n");
-    CPU.asm("  iny\n");
-    CPU.asm("  iny\n");
-    CPU.asm("  cpy #32\n");
-    CPU.asm("  bne palette_gray_loop\n");
   }
 
   public static void rect(int x1, int y1, int x2, int y2, int color)
@@ -88,7 +88,7 @@ public class AppleIIgsJavaDemo
     int x, y, i;
 
     AppleIIgs.hiresEnable();
-    paletteGray();
+    AppleIIgs.hiresPalette(palette);
 
     address = 0x2000;
 
@@ -100,6 +100,8 @@ public class AppleIIgsJavaDemo
 
 // sprite test
 //    AppleIIgs.hiresBlit(sprite, 0x2000, 4, 16);
+//    AppleIIgs.hiresBlit(sprite, 0x2000 + 50 + 160 * 50, 4, 16);
+//    AppleIIgs.hiresBlit(sprite, 0x2000 + 100 + 160 * 175, 4, 16);
 //    while(true);
 
     address = 0x2000;

@@ -59,6 +59,7 @@ int AppleIIgs::appleiigs_plotChar_IC()
   return 0;
 }
 
+// printChar(char c) - output char to text screen
 int AppleIIgs::appleiigs_printChar_C()
 {
   fprintf(out, ";; printChar()\n");
@@ -80,6 +81,7 @@ int AppleIIgs::appleiigs_printChar_C()
   return 0;
 }
 
+// hiresEnable() - enable super-hires screen
 int AppleIIgs::appleiigs_hiresEnable()
 {
   fprintf(out, ";; hiresEnable()\n");
@@ -93,6 +95,7 @@ int AppleIIgs::appleiigs_hiresEnable()
   return 0;
 }
 
+// hiresPlot(address, color) - plot pixel
 int AppleIIgs::appleiigs_hiresPlot_II()
 {
   fprintf(out, ";; hiresPlot()\n");
@@ -112,6 +115,7 @@ int AppleIIgs::appleiigs_hiresPlot_II()
   return 0;
 }
 
+// hiresSpan(address, color, width) - draws horizontal line
 int AppleIIgs::appleiigs_hiresSpan_III()
 {
   fprintf(out, ";; hiresSpan()\n");
@@ -136,6 +140,7 @@ int AppleIIgs::appleiigs_hiresSpan_III()
   return 0;
 }
 
+// hiresRead(address) - read pixel color
 int AppleIIgs::appleiigs_hiresRead_I()
 {
   fprintf(out, ";; hiresRead()\n");
@@ -150,6 +155,8 @@ int AppleIIgs::appleiigs_hiresRead_I()
   return 0;
 }
 
+// hiresBlit(byte[] source, int dest, int width, int length)
+// draw an image, length is source.length
 int AppleIIgs::appleiigs_hiresBlit_aBIII()
 {
   fprintf(out, ";; hiresBlit()\n");
@@ -207,6 +214,33 @@ int AppleIIgs::appleiigs_hiresBlit_aBIII()
 
   return 0;
 }
+
+// hiresPalette(byte[] source) - change palette
+//FIXME need to be able to set all 16 palettes and choose between
+int AppleIIgs::appleiigs_hiresPalette_aI()
+{
+  fprintf(out, ";; hiresPalette()\n");
+  POP();
+  fprintf(out, "  sta value2\n");
+  fprintf(out, "  lda #0x9e00\n");
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  lda #0xe1\n");
+  fprintf(out, "  sta address + 2\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "label_%d:\n", label_count);
+  fprintf(out, "  lda (value2),y \n");
+  fprintf(out, "  sta [address],y\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  cpy #32\n");
+  fprintf(out, "  bne label_%d\n", label_count);
+
+  stack--;
+  label_count++;
+
+  return 0;
+}
+
 // Sound API
 int AppleIIgs::appleiigs_loadWaveTable_BA()
 {
@@ -232,7 +266,4 @@ int AppleIIgs::appleiigs_setSoundFrequency_II()
 {
   return -1;
 }
-
-
-
 
