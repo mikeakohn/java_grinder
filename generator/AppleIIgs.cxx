@@ -215,28 +215,58 @@ int AppleIIgs::appleiigs_hiresBlit_aBIII()
   return 0;
 }
 
-// hiresPalette(byte[] source) - change palette
-//FIXME need to be able to set all 16 palettes and choose between
-int AppleIIgs::appleiigs_hiresPalette_aI()
+// hiresPalette(int palette, byte[] source) - change palette
+int AppleIIgs::appleiigs_hiresPalette_IaI()
 {
   fprintf(out, ";; hiresPalette()\n");
   POP();
   fprintf(out, "  sta value2\n");
+  POP();
+  fprintf(out, "  tay\n");
+  fprintf(out, "  clc\n");
   fprintf(out, "  lda #0x9e00\n");
   fprintf(out, "  sta address\n");
+  fprintf(out, "label_%d:\n", label_count + 0);
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bmi label_%d\n", label_count + 1);
+  fprintf(out, "  adc #32\n");
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  jmp label_%d\n", label_count + 0);
+  fprintf(out, "label_%d:\n", label_count + 1);
   fprintf(out, "  lda #0xe1\n");
   fprintf(out, "  sta address + 2\n");
   fprintf(out, "  ldy #0\n");
-  fprintf(out, "label_%d:\n", label_count);
+  fprintf(out, "label_%d:\n", label_count + 2);
   fprintf(out, "  lda (value2),y \n");
   fprintf(out, "  sta [address],y\n");
   fprintf(out, "  iny\n");
   fprintf(out, "  iny\n");
   fprintf(out, "  cpy #32\n");
-  fprintf(out, "  bne label_%d\n", label_count);
+  fprintf(out, "  bne label_%d\n", label_count + 2);
 
-  stack--;
-  label_count++;
+  stack -= 2;
+  label_count += 3;
+
+  return 0;
+}
+
+// hiresSetLinePalette(int line, int palette) - set palette for line
+int AppleIIgs::appleiigs_hiresSetLinePalette_II()
+{
+  fprintf(out, ";; hiresSetLinePalette()\n");
+  POP();
+  fprintf(out, "  and #15\n");
+  fprintf(out, "  sta value1\n");
+  POP();
+  fprintf(out, "  txy\n");
+  fprintf(out, "  tax\n");
+  fprintf(out, "  lda value1\n");
+  fprintf(out, "  sep #0x20\n");
+  fprintf(out, "  sta.l 0xe19d00,x\n");
+  fprintf(out, "  rep #0x30\n");
+  fprintf(out, "  tyx\n");
+
+  stack -= 2;
 
   return 0;
 }

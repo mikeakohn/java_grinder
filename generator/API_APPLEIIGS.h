@@ -23,7 +23,8 @@ public:
   virtual int appleiigs_hiresSpan_III() { return -1; }
   virtual int appleiigs_hiresRead_I() { return -1; }
   virtual int appleiigs_hiresBlit_aBIII() { return -1; }
-  virtual int appleiigs_hiresPalette_aI() { return -1; }
+  virtual int appleiigs_hiresPalette_IaI() { return -1; }
+  virtual int appleiigs_hiresSetLinePalette_II() { return -1; }
 
   // Sound Chip
   virtual int appleiigs_loadWaveTable_BA() { return -1; }

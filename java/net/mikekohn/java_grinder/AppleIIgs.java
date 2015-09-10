@@ -23,7 +23,8 @@ abstract public class AppleIIgs
   public static void hiresSpan(int address, int c, int length) { }
   public static int hiresRead(int address) { return 0; }
   public static void hiresBlit(byte[] data, int address, int width, int length) { }
-  public static void hiresPalette(int[] data) { }
+  public static void hiresPalette(int palette, int[] data) { }
+  public static void hiresSetLinePalette(int line, int palette) { }
 
   /** Sound wave table. */
   public static void loadWaveTable(byte[] data) { }
