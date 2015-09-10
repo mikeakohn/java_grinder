@@ -8,81 +8,21 @@ public class AppleIIgsJavaDemo
 //  static byte sprite[] = { 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
   static int palette1[] =
   {
-    0x0ff,
-    0x0ee,
-    0x0dd,
-    0x0cc,
-    0x0bb,
-    0x0aa,
-    0x099,
-    0x088,
-    0x077,
-    0x066,
-    0x055,
-    0x044,
-    0x033,
-    0x022,
-    0x011,
-    0x000
-  };
-
-  static int palette2[] =
-  {
-    0xf0f,
-    0xe0e,
-    0xd0d,
-    0xc0c,
-    0xb0b,
-    0xa0a,
-    0x909,
-    0x808,
-    0x707,
-    0x606,
-    0x505,
-    0x404,
-    0x303,
-    0x202,
-    0x101,
-    0x000
-  };
-
-  static int palette3[] =
-  {
-    0xff0,
-    0xee0,
-    0xdd0,
-    0xcc0,
-    0xbb0,
-    0xaa0,
-    0x990,
-    0x880,
-    0x770,
-    0x660,
-    0x550,
-    0x440,
-    0x330,
-    0x220,
-    0x110,
-    0x000
-  };
-
-  static int palette4[] =
-  {
     0xfff,
-    0xeee,
-    0xddd,
-    0xccc,
+    0xff0,
+    0xf60,
+    0xd00,
+    0xf09,
+    0x309,
+    0x00c,
+    0x09f,
+    0x0a0,
+    0x060,
+    0x630,
+    0x963,
     0xbbb,
-    0xaaa,
-    0x999,
     0x888,
-    0x777,
-    0x666,
-    0x555,
     0x444,
-    0x333,
-    0x222,
-    0x111,
     0x000
   };
 
@@ -149,21 +89,9 @@ public class AppleIIgsJavaDemo
 
     AppleIIgs.hiresEnable();
     AppleIIgs.hiresPalette(0, palette1);
-    AppleIIgs.hiresPalette(1, palette2);
-    AppleIIgs.hiresPalette(2, palette3);
-    AppleIIgs.hiresPalette(3, palette4);
 
-    for(i = 0; i <= 49; i++) 
+    for(i = 0; i <= 199; i++) 
       AppleIIgs.hiresSetLinePalette(i, 0);
-
-    for(i = 50; i <= 99; i++) 
-      AppleIIgs.hiresSetLinePalette(i, 1);
-
-    for(i = 100; i <= 149; i++) 
-      AppleIIgs.hiresSetLinePalette(i, 2);
-
-    for(i = 150; i <= 199; i++) 
-      AppleIIgs.hiresSetLinePalette(i, 3);
 
     address = 0x2000;
 
