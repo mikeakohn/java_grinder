@@ -39,20 +39,59 @@
 
 W65816::W65816() :
   stack(0),
-  start_org(0x300),
   java_stack(0x200),
   ram_start(0x7000),
   label_count(0),
   is_main(0),
+
+  need_swap(0),
+  need_add_integer(0),
   need_mul_integer(0),
-  need_div_integer(0)
+  need_div_integer(0),
+  need_neg_integer(0),
+  need_shift_left_integer(0),
+  need_shift_right_integer(0),
+  need_shift_right_uinteger(0),
+  need_and_integer(0),
+  need_or_integer(0),
+  need_xor_integer(0),
+  need_integer_to_byte(0),
+  need_dup(0),
+  need_push_array_length(0),
+  need_push_array_length2(0),
+  need_array_byte_support(0),
+  need_array_int_support(0),
+  need_memory_read8(0),
+  need_memory_write8(0),
+  need_memory_read16(0),
+  need_memory_write16(0)
 {
 }
 
 W65816::~W65816()
 {
+  if(need_swap) { insert_swap(); }
+  if(need_add_integer) { insert_add_integer(); }
+  if(need_sub_integer) { insert_sub_integer(); }
   if(need_mul_integer) { insert_mul_integer(); }
   if(need_div_integer) { insert_div_integer(); }
+  if(need_neg_integer) { insert_neg_integer(); }
+  if(need_shift_left_integer) { insert_shift_left_integer(); }
+  if(need_shift_right_integer) { insert_shift_right_integer(); }
+  if(need_shift_right_uinteger) { insert_shift_right_uinteger(); }
+  if(need_and_integer) { insert_and_integer(); }
+  if(need_or_integer) { insert_or_integer(); }
+  if(need_xor_integer) { insert_xor_integer(); }
+  if(need_integer_to_byte) { insert_integer_to_byte(); }
+  if(need_dup) { insert_dup(); }
+  if(need_push_array_length) { insert_push_array_length(); }
+  if(need_push_array_length2) { insert_push_array_length2(); }
+  if(need_array_byte_support) { insert_array_byte_support(); }
+  if(need_array_int_support) { insert_array_int_support(); }
+  if(need_memory_read8) { insert_memory_read8(); }
+  if(need_memory_write8) { insert_memory_write8(); }
+  if(need_memory_read16) { insert_memory_read16(); }
+  if(need_memory_write16) { insert_memory_write16(); }
 }
 
 int W65816::open(const char *filename)
@@ -332,10 +371,7 @@ int W65816::pop()
 
 int W65816::dup()
 {
-  fprintf(out, "; dup\n");
-  POP();
-  PUSH();
-  PUSH();
+  fprintf(out, "jsr dup\n");
   stack++;
 
   return 0;
@@ -349,31 +385,16 @@ int W65816::dup2()
 
 int W65816::swap()
 {
-  fprintf(out, "; swap\n");
-  fprintf(out, "  txa\n");
-  fprintf(out, "  tay\n");
-
-  fprintf(out, "  lda stack,y\n");
-  fprintf(out, "  sta value1,y\n");
-
-  fprintf(out, "  lda stack - 1,y\n");
-  fprintf(out, "  sta stack,y\n");
-
-  fprintf(out, "  lda value1\n");
-  fprintf(out, "  sta stack - 1,y\n");
+  need_swap = 1;
+  fprintf(out, "jsr swap\n");
 
   return 0;
 }
 
 int W65816::add_integer()
 {
-  fprintf(out, "; add_integer\n");
-  POP();
-  fprintf(out, "  sta value1\n");
-  POP();
-  fprintf(out, "  clc\n");
-  fprintf(out, "  adc value1\n");
-  PUSH();
+  need_add_integer = 1;
+  fprintf(out, "jsr add_integer\n");
   stack--;
 
   return 0;
@@ -392,13 +413,8 @@ int W65816::add_integer(int num)
 
 int W65816::sub_integer()
 {
-  fprintf(out, "; sub_integer\n");
-  POP();
-  fprintf(out, "  sta value1\n");
-  POP();
-  fprintf(out, "  sec\n");
-  fprintf(out, "  sbc value1\n");
-  PUSH();
+  need_sub_integer = 1;
+  fprintf(out, "jsr sub_integer\n");
   stack--;
 
   return 0;
@@ -450,36 +466,24 @@ int W65816::mod_integer()
 
 int W65816::neg_integer()
 {
-  fprintf(out, "; neg_integer\n");
-  POP();
-  fprintf(out, "  eor #0xffff\n");
-  fprintf(out, "  inc\n");
-  PUSH();
+  need_neg_integer = 1;
+  fprintf(out, "; jsr neg_integer\n");
 
   return 0;
 }
 
 int W65816::shift_left_integer()
 {
-  fprintf(out, "; shift_left_integer\n");
-  POP();
-  fprintf(out, "  tay\n");
-  POP();
-  fprintf(out, "label_%d\n", label_count);
-  fprintf(out, "  asl\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bne label_%d\n", label_count);
-  PUSH();
-
+  need_shift_left_integer = 1;
+  fprintf(out, "jsr shift_left_integer\n");
   stack--;
-  label_count++;
   
   return 0;
 }
 
 int W65816::shift_left_integer(int num)
 {
-int i;
+  int i;
 
   fprintf(out, "; shift_left_integer (0x%04x)\n", num);
   POP();
@@ -494,26 +498,16 @@ int i;
 
 int W65816::shift_right_integer()
 {
-  fprintf(out, "; shift_right_integer\n");
-  POP();
-  fprintf(out, "  tay\n");
-  POP();
-  fprintf(out, "label_%d\n", label_count);
-  fprintf(out, "  cmp #0x8000\n");
-  fprintf(out, "  ror\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bne label_%d\n", label_count);
-  PUSH();
-
+  need_shift_right_integer = 1;
+  fprintf(out, "jsr shift_right_integer\n");
   stack--;
-  label_count++;
 
   return 0;
 }
 
 int W65816::shift_right_integer(int num)
 {
-int i;
+  int i;
 
   fprintf(out, "; shift_right_integer (0x%04x)\n", num);
   POP();
@@ -531,25 +525,16 @@ int i;
 
 int W65816::shift_right_uinteger()
 {
-  fprintf(out, "; shift_right_uinteger\n");
-  POP();
-  fprintf(out, "  tay\n");
-  POP();
-  fprintf(out, "label_%d\n", label_count);
-  fprintf(out, "  lsr\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bne label_%d\n", label_count);
-  PUSH();
-
+  need_shift_right_uinteger = 1;
+  fprintf(out, "jsr shift_right_uinteger\n");
   stack--;
-  label_count++;
 
   return 0;
 }
 
 int W65816::shift_right_uinteger(int num)
 {
-int i;
+  int i;
 
   fprintf(out, "; shift_right_uinteger (0x%04x)\n", num);
   POP();
@@ -564,12 +549,8 @@ int i;
 
 int W65816::and_integer()
 {
-  fprintf(out, "; and_integer\n");
-  POP();
-  fprintf(out, "  sta value1\n");
-  POP();
-  fprintf(out, "  and value1\n");
-  PUSH();
+  need_and_integer = 1;
+  fprintf(out, "jsr and_integer\n");
   stack--;
 
   return 0;
@@ -587,12 +568,8 @@ int W65816::and_integer(int num)
 
 int W65816::or_integer()
 {
-  fprintf(out, "; or_integer\n");
-  POP();
-  fprintf(out, "  sta value1\n");
-  POP();
-  fprintf(out, "  ora value1\n");
-  PUSH();
+  need_or_integer = 1;
+  fprintf(out, "jsr or_integer\n");
   stack--;
 
   return 0;
@@ -610,12 +587,8 @@ int W65816::or_integer(int num)
 
 int W65816::xor_integer()
 {
-  fprintf(out, "; xor_integer\n");
-  POP();
-  fprintf(out, "  sta value1\n");
-  POP();
-  fprintf(out, "  eor value1\n");
-  PUSH();
+  need_xor_integer = 1;
+  fprintf(out, "jsr xor_integer\n");
   stack--;
 
   return 0;
@@ -647,12 +620,8 @@ int W65816::inc_integer(int index, int num)
 
 int W65816::integer_to_byte()
 {
-  fprintf(out, "; integer_to_byte\n");
-  POP();
-  fprintf(out, "  eor #128\n");
-  fprintf(out, "  sec\n");
-  fprintf(out, "  sbc #128\n");
-  PUSH();
+  need_integer_to_byte = 1;
+  fprintf(out, "jsr integer_to_byte\n");
 
   return 0;
 }
@@ -965,61 +934,13 @@ int W65816::new_array(uint8_t type)
   {
     if (type == TYPE_SHORT || type == TYPE_CHAR || type == TYPE_INT)
     {
-      fprintf(out, "; new_array_int\n");
-      POP();
-      fprintf(out, "  sta length\n");
-      fprintf(out, "  lda heap_ptr\n");
-      fprintf(out, "  sta value1\n");
-      fprintf(out, "  sta address\n");
-      fprintf(out, "  lda length\n");
-      fprintf(out, "  sta (address)\n");
-
-      fprintf(out, "  asl length\n");
-
-      fprintf(out, "  clc\n");
-      fprintf(out, "  lda length\n");
-      fprintf(out, "  adc #2\n");
-      fprintf(out, "  sta length\n");
-
-      fprintf(out, "  clc\n");
-      fprintf(out, "  lda heap_ptr\n");
-      fprintf(out, "  adc length\n");
-      fprintf(out, "  sta heap_ptr\n");
-
-      fprintf(out, "  clc\n");
-      fprintf(out, "  lda value1\n");
-      fprintf(out, "  adc #3\n");
-
-      fprintf(out, "  and #0xfffe\n");
-      PUSH();
+      need_array_int_support = 1;
+      fprintf(out, "jsr new_array_int\n");
     }
       else
     {
-      fprintf(out, "; new_array_byte\n");
-      POP();
-      fprintf(out, "  sta length\n");
-      fprintf(out, "  lda heap_ptr\n");
-      fprintf(out, "  sta value1\n");
-      fprintf(out, "  sta address\n");
-      fprintf(out, "  lda length\n");
-      fprintf(out, "  sta (address)\n");
-
-      fprintf(out, "  clc\n");
-      fprintf(out, "  lda length\n");
-      fprintf(out, "  adc #2\n");
-      fprintf(out, "  sta length\n");
-
-      fprintf(out, "  clc\n");
-      fprintf(out, "  lda heap_ptr\n");
-      fprintf(out, "  adc length\n");
-      fprintf(out, "  sta heap_ptr\n");
-
-      fprintf(out, "  clc\n");
-      fprintf(out, "  lda value1\n");
-      fprintf(out, "  adc #3\n");
-
-      fprintf(out, "  and #0xfffe\n");
-      PUSH();
+      need_array_byte_support = 1;
+      fprintf(out, "jsr new_array_byte\n");
     }
   }
 
@@ -1057,13 +978,8 @@ int W65816::push_array_length()
 {
   if(stack > 0)
   {
-    fprintf(out, "; push_array_length\n");
-    POP();
-    fprintf(out, "  sec\n");
-    fprintf(out, "  sbc #2\n");
-    fprintf(out, "  sta address\n");
-    fprintf(out, "  lda (address)\n");
-    PUSH();
+    need_push_array_length = 1;
+    fprintf(out, "jsr push_array_length\n");
   }
 
   return 0;
@@ -1071,14 +987,9 @@ int W65816::push_array_length()
 
 int W65816::push_array_length(const char *name, int field_id)
 {
-  fprintf(out, "; push_array_length2\n");
+  need_push_array_length2 = 1;
   fprintf(out, "  lda %s\n", name);
-  fprintf(out, "  sec\n");
-  fprintf(out, "  sbc #2\n");
-  fprintf(out, "  sta address\n");
-  fprintf(out, "  lda (address)\n");
-  PUSH();
-
+  fprintf(out, "jsr push_array_length2\n");
   stack++;
 
   return 0;
@@ -1086,19 +997,9 @@ int W65816::push_array_length(const char *name, int field_id)
 
 int W65816::array_read_byte()
 {
+  need_array_byte_support = 1;
   get_values_from_stack(2);
-
-  fprintf(out, "; array_read_byte\n");
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda value2\n");
-  fprintf(out, "  adc value1\n");
-  fprintf(out, "  sta address\n");
-  fprintf(out, "  lda (address)\n");
-  fprintf(out, "  eor #128\n");
-  fprintf(out, "  sec\n");
-  fprintf(out, "  sbc #128\n");
-  PUSH();
-
+  fprintf(out, "jsr array_read_byte\n");
   stack++;
 
   return 0;
@@ -1111,18 +1012,9 @@ int W65816::array_read_short()
 
 int W65816::array_read_int()
 {
+  need_array_int_support = 1;
   get_values_from_stack(2);
-
-  fprintf(out, "; array_read_int\n");
-  fprintf(out, "  asl value1\n");
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda value2\n");
-  fprintf(out, "  adc value1\n");
-  fprintf(out, "  sta value2\n");
-  fprintf(out, "  sta address\n");
-  fprintf(out, "  lda (address)\n");
-  PUSH();
-
+  fprintf(out, "jsr array_read_int\n");
   stack++;
 
   return 0;
@@ -1132,19 +1024,10 @@ int W65816::array_read_byte(const char *name, int field_id)
 {
   if(stack > 0)
   {
-    fprintf(out, "; array_read_byte2\n");
+    need_array_byte_support = 1;
     fprintf(out, "  lda %s\n", name);
     fprintf(out, "  sta address\n");
-    POP();
-    fprintf(out, "  sta value1\n");
-    fprintf(out, "  clc\n");
-    fprintf(out, "  lda address\n");
-    fprintf(out, "  adc value1\n");
-    fprintf(out, "  lda (address)\n");
-    fprintf(out, "  eor #128\n");
-    fprintf(out, "  sec\n");
-    fprintf(out, "  sbc #128\n");
-    PUSH();
+    fprintf(out, "jsr array_read_byte2\n");
   }
 
   return 0;
@@ -1159,17 +1042,10 @@ int W65816::array_read_int(const char *name, int field_id)
 {
   if(stack > 0)
   {
-    fprintf(out, "; array_read_int2\n");
+    need_array_int_support = 1;
     fprintf(out, "  lda %s\n", name);
     fprintf(out, "  sta address\n");
-    POP();
-    fprintf(out, "  sta value1\n");
-    fprintf(out, "  asl value1\n");
-    fprintf(out, "  clc\n");
-    fprintf(out, "  lda address\n");
-    fprintf(out, "  adc value1\n");
-    fprintf(out, "  lda (address)\n");
-    PUSH();
+    fprintf(out, "jsr array_read_int2\n");
   }
 
   return 0;
@@ -1177,17 +1053,9 @@ int W65816::array_read_int(const char *name, int field_id)
 
 int W65816::array_write_byte()
 {
+  need_array_byte_support = 1;
   get_values_from_stack(3);
-
-  fprintf(out, "; array_write_byte\n");
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda value3\n");
-  fprintf(out, "  adc value2\n");
-  fprintf(out, "  sta address\n");
-  fprintf(out, "  lda value1\n");
-  fprintf(out, "  sep #0x30\n");
-  fprintf(out, "  sta (address)\n");
-  fprintf(out, "  rep #0x30\n");
+  fprintf(out, "jsr array_write_byte\n");
 
   return 0;
 }
@@ -1199,24 +1067,17 @@ int W65816::array_write_short()
 
 int W65816::array_write_int()
 {
+  need_array_int_support = 1;
   get_values_from_stack(3);
-
-  fprintf(out, "; array_write_int\n");
-  fprintf(out, "  asl value2\n");
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda value3\n");
-  fprintf(out, "  adc value2\n");
-  fprintf(out, "  sta address\n");
-  fprintf(out, "  lda value1\n");
-  fprintf(out, "  sta (address)\n");
+  fprintf(out, "jsr array_write_int\n");
 
   return 0;
 }
 
 int W65816::array_write_byte(const char *name, int field_id)
 {
-  get_values_from_stack(3);
-
+  need_array_byte_support = 1;
+  get_values_from_stack(2);
   fprintf(out, "; array_write_byte2\n");
   fprintf(out, "  clc\n");
   fprintf(out, "  lda value2\n");
@@ -1237,8 +1098,8 @@ int W65816::array_write_short(const char *name, int field_id)
 
 int W65816::array_write_int(const char *name, int field_id)
 {
-  get_values_from_stack(3);
-
+  need_array_int_support = 1;
+  get_values_from_stack(2);
   fprintf(out, "; array_write_int2\n");
   fprintf(out, "  clc\n");
   fprintf(out, "  lda value2\n");
@@ -1279,6 +1140,47 @@ int W65816::get_values_from_stack(int num)
 }
 
 // subroutines
+void W65816::insert_swap()
+{
+  fprintf(out, "swap:\n");
+  fprintf(out, "  txa\n");
+  fprintf(out, "  tay\n");
+
+  fprintf(out, "  lda stack,y\n");
+  fprintf(out, "  sta value1,y\n");
+
+  fprintf(out, "  lda stack - 1,y\n");
+  fprintf(out, "  sta stack,y\n");
+
+  fprintf(out, "  lda value1\n");
+  fprintf(out, "  sta stack - 1,y\n");
+  fprintf(out, "  rts\n");
+}
+
+void W65816::insert_add_integer()
+{
+  fprintf(out, "add_integer:\n");
+  POP();
+  fprintf(out, "  sta value1\n");
+  POP();
+  fprintf(out, "  clc\n");
+  fprintf(out, "  adc value1\n");
+  PUSH();
+  fprintf(out, "  rts\n");
+}
+
+void W65816::insert_sub_integer()
+{
+  fprintf(out, "sub_integer:\n");
+  POP();
+  fprintf(out, "  sta value1\n");
+  POP();
+  fprintf(out, "  sec\n");
+  fprintf(out, "  sbc value1\n");
+  PUSH();
+  fprintf(out, "  rts\n");
+}
+
 void W65816::insert_mul_integer()
 {
   fprintf(out, "mul_integer:\n");
@@ -1339,15 +1241,325 @@ void W65816::insert_div_integer()
   fprintf(out, "  rts\n");
 }
 
+void W65816::insert_neg_integer()
+{
+  fprintf(out, "neg_integer:\n");
+  POP();
+  fprintf(out, "  eor #0xffff\n");
+  fprintf(out, "  inc\n");
+  PUSH();
+  fprintf(out, "  rts\n");
+}
+
+void W65816::insert_shift_left_integer()
+{
+  fprintf(out, "shift_left_integer:\n");
+  POP();
+  fprintf(out, "  tay\n");
+  POP();
+  fprintf(out, "shift_left_integer_loop:\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bne shift_left_integer_loop\n");
+  PUSH();
+  fprintf(out, "  rts\n");
+}
+
+void W65816::insert_shift_right_integer()
+{
+  fprintf(out, "shift_right_integer:\n");
+  POP();
+  fprintf(out, "  tay\n");
+  POP();
+  fprintf(out, "shift_right_integer_loop:\n");
+  fprintf(out, "  cmp #0x8000\n");
+  fprintf(out, "  ror\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bne shift_right_integer_loop\n");
+  PUSH();
+  fprintf(out, "  rts\n");
+}
+
+void W65816::insert_shift_right_uinteger()
+{
+  fprintf(out, "shift_right_uinteger:\n");
+  POP();
+  fprintf(out, "  tay\n");
+  POP();
+  fprintf(out, "shift_right_uinteger_loop:\n");
+  fprintf(out, "  lsr\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bne label_%d\n", label_count);
+  PUSH();
+  fprintf(out, "  rts\n");
+}
+
+void W65816::insert_and_integer()
+{
+  fprintf(out, "and_integer:\n");
+  POP();
+  fprintf(out, "  sta value1\n");
+  POP();
+  fprintf(out, "  and value1\n");
+  PUSH();
+  fprintf(out, "  rts\n");
+}
+
+void W65816::insert_or_integer()
+{
+  fprintf(out, "or_integer:\n");
+  POP();
+  fprintf(out, "  sta value1\n");
+  POP();
+  fprintf(out, "  ora value1\n");
+  PUSH();
+  fprintf(out, "  rts\n");
+}
+
+void W65816::insert_xor_integer()
+{
+  fprintf(out, "xor_integer:\n");
+  POP();
+  fprintf(out, "  sta value1\n");
+  POP();
+  fprintf(out, "  eor value1\n");
+  PUSH();
+  fprintf(out, "  rts\n");
+}
+
+void W65816::insert_integer_to_byte()
+{
+  fprintf(out, "integer_to_byte:\n");
+  POP();
+  fprintf(out, "  eor #128\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  sbc #128\n");
+  PUSH();
+  fprintf(out, "  rts\n");
+}
+
+void W65816::insert_dup()
+{
+  fprintf(out, "dup:\n");
+  POP();
+  PUSH();
+  PUSH();
+  fprintf(out, "  rts\n");
+}
+
+void W65816::insert_push_array_length()
+{
+  fprintf(out, "push_array_length:\n");
+  POP();
+  fprintf(out, "  sec\n");
+  fprintf(out, "  sbc #2\n");
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  lda (address)\n");
+  PUSH();
+  fprintf(out, "  rts\n");
+}
+
+void W65816::insert_push_array_length2()
+{
+  fprintf(out, "push_array_length2:\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  sbc #2\n");
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  lda (address)\n");
+  PUSH();
+  fprintf(out, "  rts\n");
+}
+
+void W65816::insert_array_byte_support()
+{
+  // new_array_byte
+  fprintf(out, "new_array_byte:\n");
+  POP();
+  fprintf(out, "  sta length\n");
+  fprintf(out, "  lda heap_ptr\n");
+  fprintf(out, "  sta value1\n");
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  lda length\n");
+  fprintf(out, "  sta (address)\n");
+
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda length\n");
+  fprintf(out, "  adc #2\n");
+  fprintf(out, "  sta length\n");
+
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda heap_ptr\n");
+  fprintf(out, "  adc length\n");
+  fprintf(out, "  sta heap_ptr\n");
+
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda value1\n");
+  fprintf(out, "  adc #3\n");
+
+  fprintf(out, "  and #0xfffe\n");
+  PUSH();
+  fprintf(out, "  rts\n");
+
+  // array_read_byte
+  fprintf(out, "array_read_byte:\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda value2\n");
+  fprintf(out, "  adc value1\n");
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  lda (address)\n");
+  fprintf(out, "  eor #128\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  sbc #128\n");
+  PUSH();
+  fprintf(out, "  rts\n");
+
+  // array_read_byte2
+  fprintf(out, "array_read_byte2:\n");
+  POP();
+  fprintf(out, "  sta value1\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda address\n");
+  fprintf(out, "  adc value1\n");
+  fprintf(out, "  lda (address)\n");
+  fprintf(out, "  eor #128\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  sbc #128\n");
+  PUSH();
+  fprintf(out, "  rts\n");
+
+  // array_write_byte
+  fprintf(out, "array_write_byte:\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda value3\n");
+  fprintf(out, "  adc value2\n");
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  lda value1\n");
+  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  sta (address)\n");
+  fprintf(out, "  rep #0x30\n");
+  fprintf(out, "  rts\n");
+}
+
+void W65816::insert_array_int_support()
+{
+  // new_array_int
+  fprintf(out, "new_array_int:\n");
+  POP();
+  fprintf(out, "  sta length\n");
+  fprintf(out, "  lda heap_ptr\n");
+  fprintf(out, "  sta value1\n");
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  lda length\n");
+  fprintf(out, "  sta (address)\n");
+
+  fprintf(out, "  asl length\n");
+
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda length\n");
+  fprintf(out, "  adc #2\n");
+  fprintf(out, "  sta length\n");
+
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda heap_ptr\n");
+  fprintf(out, "  adc length\n");
+  fprintf(out, "  sta heap_ptr\n");
+
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda value1\n");
+  fprintf(out, "  adc #3\n");
+
+  fprintf(out, "  and #0xfffe\n");
+  PUSH();
+  fprintf(out, "  rts\n");
+
+  // array_read_int
+  fprintf(out, "array_read_int:\n");
+  fprintf(out, "  asl value1\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda value2\n");
+  fprintf(out, "  adc value1\n");
+  fprintf(out, "  sta value2\n");
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  lda (address)\n");
+  PUSH();
+  fprintf(out, "  rts\n");
+
+  // array_read_int2
+  fprintf(out, "array_read_int2:\n");
+  POP();
+  fprintf(out, "  sta value1\n");
+  fprintf(out, "  asl value1\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda address\n");
+  fprintf(out, "  adc value1\n");
+  fprintf(out, "  lda (address)\n");
+  PUSH();
+  fprintf(out, "  rts\n");
+
+  // array_write_int
+  fprintf(out, "array_write_int:\n");
+  fprintf(out, "  asl value2\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda value3\n");
+  fprintf(out, "  adc value2\n");
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  lda value1\n");
+  fprintf(out, "  sta (address)\n");
+  fprintf(out, "  rts\n");
+}
+
 // Memory API
 int W65816::memory_read8()
 {
-  return -1;
+  need_memory_read8 = 1;
+
+  fprintf(out, "; memory_read8\n");
+  fprintf(out, "jsr memory_read8\n");
+
+  return 0;
 }
 
 int W65816::memory_write8()
 {
-  fprintf(out, "; Memory.write8\n");
+  need_memory_write8 = 1;
+
+  fprintf(out, "; memory_write8\n");
+  fprintf(out, "jsr memory_write8\n");
+  stack -= 2;
+
+  return 0;
+}
+
+int W65816::memory_read16()
+{
+  need_memory_read16 = 1;
+
+  fprintf(out, "; memory_read16\n");
+  fprintf(out, "jsr memory_read16\n");
+
+  return 0;
+}
+
+int W65816::memory_write16()
+{
+  need_memory_write16 = 1;
+
+  fprintf(out, "; memory_write16\n");
+  fprintf(out, "jsr memory_write16\n");
+  stack -= 2;
+
+  return 0;
+}
+
+void W65816::insert_memory_read8()
+{
+  fprintf(out, "memory_read8:\n");
+  fprintf(out, "  rts\n");
+}
+
+void W65816::insert_memory_write8()
+{
+  fprintf(out, "memory.write8:\n");
   POP();
   fprintf(out, "  sta value1\n");
   POP();
@@ -1356,18 +1568,18 @@ int W65816::memory_write8()
   fprintf(out, "  lda value1\n");
   fprintf(out, "  sta (address)\n");
   fprintf(out, "  rep #0x30\n");
-  stack -= 2;
-
-  return 0;
+  fprintf(out, "  rts\n");
 }
 
-int W65816::memory_read16()
+void W65816::insert_memory_read16()
 {
-  return -1;
+  fprintf(out, "memory_read16:\n");
+  fprintf(out, "  rts\n");
 }
 
-int W65816::memory_write16()
+void W65816::insert_memory_write16()
 {
-  return -1;
+  fprintf(out, "memory_write16:\n");
+  fprintf(out, "  rts\n");
 }
 

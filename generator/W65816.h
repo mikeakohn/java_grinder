@@ -119,11 +119,53 @@ protected:
 
   bool is_main : 1;
 
+  bool need_swap:1;
+  bool need_add_integer:1;
+  bool need_sub_integer:1;
   bool need_mul_integer:1;
   bool need_div_integer:1;
+  bool need_neg_integer:1;
+  bool need_shift_left_integer:1;
+  bool need_shift_right_integer:1;
+  bool need_shift_right_uinteger:1;
+  bool need_and_integer:1;
+  bool need_or_integer:1;
+  bool need_xor_integer:1;
+  bool need_integer_to_byte:1;
+  bool need_dup:1;
+  bool need_push_array_length:1;
+  bool need_push_array_length2:1;
+  bool need_array_byte_support:1;
+  bool need_array_int_support:1;
 
+  bool need_memory_read8:1;
+  bool need_memory_write8:1;
+  bool need_memory_read16:1;
+  bool need_memory_write16:1;
+
+  void insert_swap();
+  void insert_add_integer();
+  void insert_sub_integer();
   void insert_mul_integer();
   void insert_div_integer();
+  void insert_neg_integer();
+  void insert_shift_left_integer();
+  void insert_shift_right_integer();
+  void insert_shift_right_uinteger();
+  void insert_and_integer();
+  void insert_or_integer();
+  void insert_xor_integer();
+  void insert_integer_to_byte();
+  void insert_dup();
+  void insert_push_array_length();
+  void insert_push_array_length2();
+  void insert_array_byte_support();
+  void insert_array_int_support();
+
+  void insert_memory_read8();
+  void insert_memory_write8();
+  void insert_memory_read16();
+  void insert_memory_write16();
 };
 
 #endif
