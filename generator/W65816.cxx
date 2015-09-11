@@ -465,11 +465,14 @@ int W65816::shift_left_integer()
   POP();
   fprintf(out, "  tay\n");
   POP();
+  fprintf(out, "label_%d\n", label_count);
   fprintf(out, "  asl\n");
   fprintf(out, "  dey\n");
-  fprintf(out, "  bne #-4\n");
+  fprintf(out, "  bne label_%d\n", label_count);
   PUSH();
+
   stack--;
+  label_count++;
   
   return 0;
 }
@@ -495,12 +498,15 @@ int W65816::shift_right_integer()
   POP();
   fprintf(out, "  tay\n");
   POP();
+  fprintf(out, "label_%d\n", label_count);
   fprintf(out, "  cmp #0x8000\n");
   fprintf(out, "  ror\n");
   fprintf(out, "  dey\n");
-  fprintf(out, "  bne #-7\n");
+  fprintf(out, "  bne label_%d\n", label_count);
   PUSH();
+
   stack--;
+  label_count++;
 
   return 0;
 }
@@ -529,11 +535,14 @@ int W65816::shift_right_uinteger()
   POP();
   fprintf(out, "  tay\n");
   POP();
+  fprintf(out, "label_%d\n", label_count);
   fprintf(out, "  lsr\n");
   fprintf(out, "  dey\n");
-  fprintf(out, "  bne #-4\n");
+  fprintf(out, "  bne label_%d\n", label_count);
   PUSH();
+
   stack--;
+  label_count++;
 
   return 0;
 }
