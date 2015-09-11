@@ -1110,6 +1110,7 @@ int M6502::array_read_int(const char *name, int field_id)
 
 int M6502::array_write_byte()
 {
+  need_array_byte_support = 1;
   get_values_from_stack(3);
   fprintf(out, "jsr array_write_byte\n");
 
@@ -1123,6 +1124,7 @@ int M6502::array_write_short()
 
 int M6502::array_write_int()
 {
+  need_array_int_support = 1;
   get_values_from_stack(3);
   fprintf(out, "jsr array_write_int\n");
 
