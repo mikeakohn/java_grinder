@@ -156,7 +156,7 @@ int AppleIIgs::appleiigs_hiresRead_I()
 }
 
 // hiresBlit(byte[] source, int dest, int width, int length)
-// draw an image, length is source.length
+// draw an image, width is in *bytes* length is source.length
 int AppleIIgs::appleiigs_hiresBlit_aBIII()
 {
   fprintf(out, ";; hiresBlit()\n");
