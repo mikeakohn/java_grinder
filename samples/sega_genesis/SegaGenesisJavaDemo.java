@@ -35,7 +35,30 @@ public class SegaGenesisJavaDemo
     SegaGenesis.setPaletteColors(ImageMike.palette);
     SegaGenesis.setPatternTable(ImageMike.pattern);
     SegaGenesis.setImageData(ImageMike.image);
-    wait(120);
+
+    b = 1;
+    a = 0;
+    for (int n = 0; n < 120; n++)
+    {
+      while(!SegaGenesis.inVerticalBlank());
+
+      for (int c = 0; c < 100; c++)
+      {
+        SegaGenesis.setHorizontalScrollB(c, a);
+      }
+
+      a += b;
+
+      if (a >=24) { b = -1; }
+      else if (a == 0) { b = 0; }
+
+      while(SegaGenesis.inVerticalBlank());
+    }
+
+    for (int c = 0; c < 216; c++)
+    {
+      SegaGenesis.setHorizontalScrollB(c, 0);
+    }
 
     SegaGenesis.setSpritePosition(0, 10, 20);
     SegaGenesis.setSpritePosition(1, 10, 20);

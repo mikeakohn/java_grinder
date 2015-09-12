@@ -42,7 +42,8 @@ public:
   virtual int sega_genesis_printChar();
   virtual int sega_genesis_printChar(int c);
   virtual int sega_genesis_print();
-  virtual int sega_genesis_setHorizontalScroll();
+  virtual int sega_genesis_setHorizontalScrollA();
+  virtual int sega_genesis_setHorizontalScrollB();
   virtual int sega_genesis_setVerticalScroll();
   virtual int sega_genesis_setPatternTable();
   virtual int sega_genesis_setImageData();

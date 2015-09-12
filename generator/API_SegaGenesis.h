@@ -35,7 +35,8 @@ public:
   virtual int sega_genesis_printChar() { return -1; }
   virtual int sega_genesis_printChar(int c) { return -1; }
   virtual int sega_genesis_print() { return -1; }
-  virtual int sega_genesis_setHorizontalScroll() { return -1; }
+  virtual int sega_genesis_setHorizontalScrollA() { return -1; }
+  virtual int sega_genesis_setHorizontalScrollB() { return -1; }
   virtual int sega_genesis_setVerticalScroll() { return -1; }
   virtual int sega_genesis_setPatternTable() { return -1; }
   virtual int sega_genesis_setImageData() { return -1; }

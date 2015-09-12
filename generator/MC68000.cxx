@@ -244,7 +244,7 @@ int MC68000::push_ref(char *name)
 
 int MC68000::pop_integer_local(int index)
 {
-  fprintf(out, "  move.l %s ,(-%d,a6)\n", pop_reg(), LOCALS(index));
+  fprintf(out, "  move.l %s, (-%d,a6)\n", pop_reg(), LOCALS(index));
   return 0;
 }
 

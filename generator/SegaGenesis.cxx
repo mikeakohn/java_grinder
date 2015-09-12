@@ -416,7 +416,6 @@ int SegaGenesis::sega_genesis_setCursor(int x, int y)
   // 0100 0101 1001 0100 0000 0000 0000 0011
   // CD = 000001 (VRAM WRITE)
   //  A = 1100 0101 1001 0100 = 0xc594
-  //int address = (0xc000 + (y * 128 + x));
   int address = (0xe000 + (y * 128 + x * 2));
 
   fprintf(out,
@@ -449,15 +448,46 @@ int SegaGenesis::sega_genesis_print()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setHorizontalScroll()
+int SegaGenesis::sega_genesis_setHorizontalScrollA()
 {
   fprintf(out,
-    "  move.l #0x%8x, (a1) ; Update horizontal scroll\n",
-    CTRL_REG(CD_VRAM_WRITE, 0xfc00));
+    "  ;; Update horizontal scroll A\n"
+    "  lsl.l #2, d%d\n"
+    "  swap d%d\n"
+    "  move.l #0x%8x, d7\n"
+    "  add.l d%d, d7\n"
+    "  move.l d7, (a1)\n"
+    "  move.w d%d, (a0)\n",
+    REG_STACK(reg-2),
+    REG_STACK(reg-2),
+    CTRL_REG(CD_VRAM_WRITE, 0xfc00),
+    REG_STACK(reg-2),
+    REG_STACK(reg-1));
 
-  reg--;
+  reg -= 2;
 
-  return -1;
+  return 0;
+}
+
+int SegaGenesis::sega_genesis_setHorizontalScrollB()
+{
+  fprintf(out,
+    "  ;; Update horizontal scroll A\n"
+    "  lsl.l #2, d%d\n"
+    "  swap d%d\n"
+    "  move.l #0x%8x, d7\n"
+    "  add.l d%d, d7\n"
+    "  move.l d7, (a1)\n"
+    "  move.w d%d, (a0)\n",
+    REG_STACK(reg-2),
+    REG_STACK(reg-2),
+    CTRL_REG(CD_VRAM_WRITE, 0xfc02),
+    REG_STACK(reg-2),
+    REG_STACK(reg-1));
+
+  reg -= 2;
+
+  return 0;
 }
 
 int SegaGenesis::sega_genesis_setVerticalScroll()
@@ -798,17 +828,16 @@ void SegaGenesis::add_vdp_reg_init()
     "  dc.b  0x00  ; reg  8 = unused register: 0x00\n"
     "  dc.b  0x00  ; reg  9 = unused register: 0x00\n"
     "  dc.b  0xff  ; reg 10 = H interrupt register: 0xFF (esentially off)\n"
-    "  dc.b  0x00  ; reg 11 = mode reg 3: disable ext int, full H/V scroll\n"
+    "  dc.b  0x03  ; reg 11 = mode reg 3: disable ext int, full H/V scroll\n"
     "  dc.b  0x81  ; reg 12 = mode reg 4: 40 cell horiz mode, no interlace\n"
-    //"  dc.b  0x00  ; reg 12 = mode reg 4: 32 cell horiz mode, no interlace\n"
-    "  dc.b  0x37  ; reg 13 = H scroll table base: 0xFC00\n"
+    "  dc.b  0x3f  ; reg 13 = H scroll table base: 0xfc00\n"
     "  dc.b  0x00  ; reg 14 = unused register: 0x00\n"
     "  dc.b  0x01  ; reg 15 = auto increment: 0x01\n"
     "  dc.b  0x01  ; reg 16 = scroll size: V=32 cell, H=64 cell\n"
     "  dc.b  0x00  ; reg 17 = window H position: 0x00\n"
     "  dc.b  0x00  ; reg 18 = window V position: 0x00\n"
-    "  dc.b  0xff  ; reg 19 = DMA length count low:   0x00FF\n"
-    "  dc.b  0xff  ; reg 20 = DMA length count high:  0xFFxx\n"
+    "  dc.b  0xff  ; reg 19 = DMA length count low:   0x00ff\n"
+    "  dc.b  0xff  ; reg 20 = DMA length count high:  0xffxx\n"
     "  dc.b  0x00  ; reg 21 = DMA source address low: 0xxxxx00\n"
     "  dc.b  0x00  ; reg 22 = DMA source address mid: 0xxx00xx\n"
     "  dc.b  0x80  ; reg 23 = DMA source address high: VRAM fill, addr = 0x00xxxx\n\n"
@@ -870,8 +899,6 @@ void SegaGenesis::add_set_pattern_table()
 
 void SegaGenesis::add_set_image_data()
 {
-  //int address = (0xc000 + (0 * 64 + 0));
-
   // a3 points to byte[] array
   fprintf(out,
     "_set_image_data:\n"
