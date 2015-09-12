@@ -104,10 +104,15 @@ public:
   virtual int array_write_int(const char *name, int field_id);
   //virtual void close();
 
+  // Memory methods
+  virtual int memory_allocStackBytes_I();
+  virtual int memory_allocStackShorts_I();
+  virtual int memory_allocStackInts_I();
+
 protected:
-  char *pop_reg();
-  char *push_reg();
-  char *top_reg();
+  const char *pop_reg();
+  const char *push_reg();
+  const char *top_reg();
   int stack_alu(const char *instr, const char *size = "l");
   int get_values_from_stack(int *value1, int *value2, int *value3);
   int get_values_from_stack(int *value1, int *value2);

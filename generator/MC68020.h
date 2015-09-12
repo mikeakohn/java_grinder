@@ -20,6 +20,9 @@ public:
   MC68020();
   virtual ~MC68020();
 
+  virtual int integer_to_byte();
+  virtual int array_read_byte();
+  virtual int array_read_byte(const char *name, int field_id);
   virtual int mul_integer();
   virtual int mul_integer(int num);
   virtual int div_integer();

@@ -13,26 +13,30 @@ package net.mikekohn.java_grinder;
 
 public class Memory
 {
-  private Memory()
-  {
-  }
+  private Memory() { }
 
-  public static byte read8(int address)
-  {
-    return 0;
-  }
+  /** Read a single byte from an address */
+  public static byte read8(int address) { return 0; }
 
-  public static void write8(int address, byte value)
-  {
-  }
+  /** Write a single byte to an address */
+  public static void write8(int address, byte value) { }
 
-  public static short read16(int address)
-  {
-    return 0;
-  }
+  /** Read a 2 byte value from an address */
+  public static short read16(int address) { return 0; }
 
-  public static void write16(int address, short value)
-  {
-  }
+  /** Write a 2 byte value to an address */
+  public static void write16(int address, short value) { }
+
+  /** Allocate a byte array on the stack.  Automatically free()'d when
+      the current method ends. */
+  public static byte[] allocStackBytes(int length) { return null; }
+
+  /** Allocate a short array on the stack.  Automatically free()'d when
+      the current method ends. */
+  public static short[] allocStackShorts(int length) { return null; }
+
+  /** Allocate a int array on the stack.  Automatically free()'d when
+      the current method ends. */
+  public static int[] allocStackInts(int length) { return null; }
 }
 
