@@ -1509,7 +1509,7 @@ void W65816::insert_array_int_support()
 }
 
 // Memory API
-int W65816::memory_read8()
+int W65816::memory_read8_I()
 {
   need_memory_read8 = 1;
 
@@ -1519,7 +1519,7 @@ int W65816::memory_read8()
   return 0;
 }
 
-int W65816::memory_write8()
+int W65816::memory_write8_IB()
 {
   need_memory_write8 = 1;
 
@@ -1530,7 +1530,7 @@ int W65816::memory_write8()
   return 0;
 }
 
-int W65816::memory_read16()
+int W65816::memory_read16_I()
 {
   need_memory_read16 = 1;
 
@@ -1540,7 +1540,7 @@ int W65816::memory_read16()
   return 0;
 }
 
-int W65816::memory_write16()
+int W65816::memory_write16_IS()
 {
   need_memory_write16 = 1;
 

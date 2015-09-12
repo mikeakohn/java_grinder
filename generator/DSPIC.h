@@ -139,10 +139,10 @@ public:
   virtual int cpu_nop();
 
   // Memory
-  virtual int memory_read8();
-  virtual int memory_write8();
-  virtual int memory_read16();
-  virtual int memory_write16();
+  virtual int memory_read8_I();
+  virtual int memory_write8_IB();
+  virtual int memory_read16_I();
+  virtual int memory_write16_IS();
 
   // DSP (dsPIC stuff)
   virtual int dsp_getA();

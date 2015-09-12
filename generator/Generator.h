@@ -21,6 +21,7 @@
 #include "API_Microcontroller.h"
 #include "API_SegaGenesis.h"
 #include "API_SNES.h"
+#include "API_System.h"
 #include "API_TI84.h"
 #include "API_TI99.h"
 #include "API_W65C265SXB.h"
@@ -32,6 +33,7 @@ class Generator :
   public API_Microcontroller,
   public API_SegaGenesis,
   public API_SNES,
+  public API_System,
   public API_TI84,
   public API_TI99,
   public API_W65C265SXB
@@ -126,12 +128,6 @@ public:
   virtual int array_write_short(const char *name, int field_id) = 0;
   virtual int array_write_int(const char *name, int field_id) = 0;
   //virtual void close() = 0;
-
-  // Memory
-  virtual int memory_read8() { return -1; }
-  virtual int memory_write8() { return -1; }
-  virtual int memory_read16() { return -1; }
-  virtual int memory_write16() { return -1; }
 
   // CPU
   virtual int cpu_asm(const char *code, int len);

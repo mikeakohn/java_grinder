@@ -73,13 +73,6 @@ public:
   virtual int timer_getValue() { return -1; }
   virtual int timer_setValue() { return -1; }
   virtual int timer_setValue(int const_value) { return -1; }
-
-  // CPU functions
-  virtual int cpu_setClock16() { return -1; }
-  virtual int cpu_setClock25() { return -1; }
-  virtual int cpu_setClockExternal2() { return -1; }
-  virtual int cpu_nop() { return -1; }
-  virtual int cpu_asm(const char *code, int len) { return -1; }
 };
 
 #endif

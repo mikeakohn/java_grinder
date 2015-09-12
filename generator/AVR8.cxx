@@ -1919,9 +1919,9 @@ void AVR8::insert_get_values_from_stack()
 }
 
 // Memory API
-int AVR8::memory_read8()
+int AVR8::memory_read8_I()
 {
-  fprintf(out, "; memory_read8\n");
+  fprintf(out, "; memory_read8_I\n");
   POP_HI("XH");
   POP_LO("XL");
   fprintf(out, "  ld result0, X\n");
@@ -1938,9 +1938,9 @@ int AVR8::memory_read8()
   return 0;
 }
 
-int AVR8::memory_write8()
+int AVR8::memory_write8_IB()
 {
-  fprintf(out, "; memory_write8\n");
+  fprintf(out, "; memory_write8_IB\n");
   POP_HI("temp");
   POP_LO("temp");
   POP_HI("XH");
@@ -1952,9 +1952,9 @@ int AVR8::memory_write8()
   return 0;
 }
 
-int AVR8::memory_read16()
+int AVR8::memory_read16_I()
 {
-  fprintf(out, "; memory_read16\n");
+  fprintf(out, "; memory_read16_I\n");
   POP_HI("XH");
   POP_LO("XL");
   fprintf(out, "  ld result0, X+\n");
@@ -1965,9 +1965,9 @@ int AVR8::memory_read16()
   return 0;
 }
 
-int AVR8::memory_write16()
+int AVR8::memory_write16_IS()
 {
-  fprintf(out, "; memory_write16\n");
+  fprintf(out, "; memory_write16_IS\n");
   POP_HI("value11");
   POP_LO("value10");
   POP_HI("XH");

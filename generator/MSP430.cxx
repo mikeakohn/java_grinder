@@ -1939,7 +1939,7 @@ int MSP430::timer_setValue(int const_value)
 }
 
 // Memory
-int MSP430::memory_read8()
+int MSP430::memory_read8_I()
 {
   if (stack != 0)
   {
@@ -1953,7 +1953,7 @@ int MSP430::memory_read8()
   return 0;
 }
 
-int MSP430::memory_write8()
+int MSP430::memory_write8_IB()
 {
   if (stack >= 2)
   {
@@ -1979,7 +1979,7 @@ int MSP430::memory_write8()
   return 0;
 }
 
-int MSP430::memory_read16()
+int MSP430::memory_read16_I()
 {
   if (stack != 0)
   {
@@ -1993,7 +1993,7 @@ int MSP430::memory_read16()
   return 0;
 }
 
-int MSP430::memory_write16()
+int MSP430::memory_write16_IS()
 {
   if (stack >= 2)
   {

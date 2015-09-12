@@ -118,10 +118,10 @@ public:
   virtual int get_values_from_stack(int num);
 
   // Memory API
-  virtual int memory_read8();
-  virtual int memory_write8();
-  virtual int memory_read16();
-  virtual int memory_write16();
+  virtual int memory_read8_I();
+  virtual int memory_write8_IB();
+  virtual int memory_read16_I();
+  virtual int memory_write16_IS();
 
   // GPIO functions
   virtual int ioport_setPinsAsInput(int port);

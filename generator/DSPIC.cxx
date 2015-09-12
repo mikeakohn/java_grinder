@@ -1393,7 +1393,7 @@ int DSPIC::cpu_nop()
 
 
 // Memory
-int DSPIC::memory_read8()
+int DSPIC::memory_read8_I()
 {
   if (stack != 0)
   {
@@ -1409,7 +1409,7 @@ int DSPIC::memory_read8()
   return 0;
 }
 
-int DSPIC::memory_write8()
+int DSPIC::memory_write8_IB()
 {
   if (stack >= 2)
   {
@@ -1436,7 +1436,7 @@ int DSPIC::memory_write8()
   return 0;
 }
 
-int DSPIC::memory_read16()
+int DSPIC::memory_read16_I()
 {
   if (stack != 0)
   {
@@ -1452,7 +1452,7 @@ int DSPIC::memory_read16()
   return 0;
 }
 
-int DSPIC::memory_write16()
+int DSPIC::memory_write16_IS()
 {
   if (stack >= 2)
   {
