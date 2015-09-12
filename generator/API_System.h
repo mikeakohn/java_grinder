@@ -20,6 +20,9 @@ public:
   virtual int memory_write8_IB() { return -1; }
   virtual int memory_read16_I() { return -1; }
   virtual int memory_write16_IS() { return -1; }
+  virtual int memory_allocStackBytes_I() { return -1; }
+  virtual int memory_allocStackShorts_I() { return -1; }
+  virtual int memory_allocStackInts_I() { return -1; }
 
   // CPU functions
   virtual int cpu_setClock16() { return -1; }

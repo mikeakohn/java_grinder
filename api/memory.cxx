@@ -35,6 +35,9 @@ int memory(JavaClass *java_class, Generator *generator, char *function)
   CHECK_FUNC(write8,_IB)
   CHECK_FUNC(read16,_I)
   CHECK_FUNC(write16,_IS)
+  CHECK_FUNC(allocStackBytes,_I)
+  CHECK_FUNC(allocStackShorts,_I)
+  CHECK_FUNC(allocStackInts,_I)
 
   return -1;
 }
