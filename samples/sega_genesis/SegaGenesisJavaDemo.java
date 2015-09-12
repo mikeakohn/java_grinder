@@ -42,10 +42,12 @@ public class SegaGenesisJavaDemo
     {
       while(!SegaGenesis.inVerticalBlank());
 
-      for (int c = 0; c < 100; c++)
+      for (int c = 0; c < 90; c++)
       {
         SegaGenesis.setHorizontalScrollB(c, a);
       }
+
+      SegaGenesis.setVerticalScrollB(a);
 
       a += b;
 

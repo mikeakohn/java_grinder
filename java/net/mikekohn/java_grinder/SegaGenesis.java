@@ -93,14 +93,19 @@ abstract public class SegaGenesis
       character printed. */
   public static void print(String text) { }
 
-  /** Set horizontal scroll value for a specific row on the Scroll A screen. */
+  /** Set horizontal scroll value for a specific row on the Scroll A screen
+      (text). */
   public static void setHorizontalScrollA(int row, int value) { }
 
-  /** Set horizontal scroll value for a specific row on the Scroll B screen. */
+  /** Set horizontal scroll value for a specific row on the Scroll B screen
+      (graphics). */
   public static void setHorizontalScrollB(int row, int value) { }
 
-  /** Set vertical scroll value. */
-  public static void setVerticalScroll(int value) { }
+  /** Set vertical scroll value for entire Scroll A display (text) */
+  public static void setVerticalScrollA(int value) { }
+
+  /** Set vertical scroll value for entire Scroll B display (graphics). */
+  public static void setVerticalScrollB(int value) { }
 
   /** Set pattern table. */
   public static void setPatternTable(int[] patterns) { }

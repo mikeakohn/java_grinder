@@ -451,7 +451,7 @@ int SegaGenesis::sega_genesis_print()
 int SegaGenesis::sega_genesis_setHorizontalScrollA()
 {
   fprintf(out,
-    "  ;; Update horizontal scroll A\n"
+    "  ;; Update horizontal scroll A (text)\n"
     "  lsl.l #2, d%d\n"
     "  swap d%d\n"
     "  move.l #0x%8x, d7\n"
@@ -472,7 +472,7 @@ int SegaGenesis::sega_genesis_setHorizontalScrollA()
 int SegaGenesis::sega_genesis_setHorizontalScrollB()
 {
   fprintf(out,
-    "  ;; Update horizontal scroll A\n"
+    "  ;; Update horizontal scroll B (bitmap)\n"
     "  lsl.l #2, d%d\n"
     "  swap d%d\n"
     "  move.l #0x%8x, d7\n"
@@ -490,11 +490,32 @@ int SegaGenesis::sega_genesis_setHorizontalScrollB()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setVerticalScroll()
+int SegaGenesis::sega_genesis_setVerticalScrollA()
 {
+  fprintf(out,
+    "  ;; Update vertical scroll A\n"
+    "  move.l #0x%8x, (a1)\n"
+    "  move.w d%d, (a0)\n",
+    CTRL_REG(CD_VSRAM_WRITE, 0x0000),
+    REG_STACK(reg-1));
+
   reg--;
 
-  return -1;
+  return 0;
+}
+
+int SegaGenesis::sega_genesis_setVerticalScrollB()
+{
+  fprintf(out,
+    "  ;; Update vertical scroll B\n"
+    "  move.l #0x%8x, (a1)\n"
+    "  move.w d%d, (a0)\n",
+    CTRL_REG(CD_VSRAM_WRITE, 0x0002),
+    REG_STACK(reg-1));
+
+  reg--;
+
+  return 0;
 }
 
 int SegaGenesis::sega_genesis_setPatternTable()
