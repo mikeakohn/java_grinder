@@ -834,9 +834,6 @@ int MC68000::array_read_short()
   get_values_from_stack(&index_reg);
   get_ref_from_stack();
 
-  // MARKER
-  //fprintf(out, "  lsl.l #1, d%d\n", index_reg);
-
   if (reg < reg_max)
   {
     fprintf(out, "  move.w (0,a2,d%d.w), d%d\n", index_reg, REG_STACK(reg));
@@ -860,9 +857,6 @@ int MC68000::array_read_int()
 
   get_values_from_stack(&index_reg);
   get_ref_from_stack();
-
-  // MARKER
-  //fprintf(out, "  lsl.l #2, d%d\n", index_reg);
 
   if (reg < reg_max)
   {
@@ -970,8 +964,6 @@ int MC68000::array_write_short()
   get_values_from_stack(&value_reg, &index_reg);
   get_ref_from_stack();
 
-  //MARKER
-  //fprintf(out, "  lsl.l #1, d%d\n", index_reg);
   fprintf(out, "  move.w d%d, (0,a2,d%d.w)\n", value_reg, index_reg);
 
   return 0;
@@ -985,8 +977,6 @@ int MC68000::array_write_int()
   get_values_from_stack(&value_reg, &index_reg);
   get_ref_from_stack();
 
-  //MARKER
-  //fprintf(out, "  lsl.l #2, d%d\n", index_reg);
   fprintf(out, "  move.l d%d, (0,a2,d%d.l)\n", value_reg, index_reg);
 
   return 0;
@@ -1253,7 +1243,7 @@ int MC68000::get_ref_from_stack()
 
 int MC68000::get_jump_size(int distance)
 {
-  if (distance < 32) { return 's'; }
+  if (distance < 28) { return 's'; }
   if (distance < 20000) { return 'w'; }
 
   return 'l';

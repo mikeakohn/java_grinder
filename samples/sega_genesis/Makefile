@@ -1,7 +1,7 @@
 
-default: SegaGenesisJavaDemo.class Mandelbrots.class PlaySong.class PlayTitleSample.class Stars.class
+default: SegaGenesisJavaDemo.class Mandelbrots.class PlaySong.class PlayTitleSample.class Stars.class PlayLaser.class
 
-grind: SegaGenesisJavaDemo.class Mandelbrots.class PlaySong.class PlayTitleSample.class Stars.class
+grind: SegaGenesisJavaDemo.class Mandelbrots.class PlaySong.class PlayTitleSample.class Stars.class PlayLaser.class
 	../../java_grinder SegaGenesisJavaDemo.class sega_genesis_java_demo.asm sega_genesis
 	naken_asm -I ~ -l -b -o sega_genesis_java_demo.bin sega_genesis_java_demo.asm
 
@@ -12,6 +12,10 @@ dac:
 synth:
 	naken_asm -l -b -o z80_play_synth.bin z80_play_synth.asm
 	go run bin2java.go z80_play_synth.bin | grep -v INFO | sed 's/ClassName/PlaySong/' | sed 's/code/z80_code/' > PlaySong.java
+
+laser:
+	naken_asm -l -b -o z80_play_laser.bin z80_play_laser.asm
+	go run bin2java.go z80_play_laser.bin | grep -v INFO | sed 's/ClassName/PlayLaser/' | sed 's/code/z80_code/' > PlayLaser.java
 
 setup:
 	naken_asm -l -b -o z80_setup_synth.bin z80_setup_synth.asm

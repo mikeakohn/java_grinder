@@ -52,23 +52,30 @@ public class SegaGenesisJavaDemo
     SegaGenesis.setPatternTable(NakenLogo.pattern);
     SegaGenesis.setImageData(NakenLogo.image);
 
-    b = 1;
-    a = 0;
-    for (int n = 0; n < 120; n++)
+    wait(120);
+
+    SegaGenesis.loadZ80(PlayLaser.z80_code);
+
+    for (int n = 0; n < 200; n++)
     {
       while(!SegaGenesis.inVerticalBlank());
 
-      for (int c = 0; c < 90; c++)
+      for (int c = 68; c < 160; c++)
       {
+        a = 68 - c + n;
+        if (a < 0) { a = 0; }
+        a = a << 2;
+        if (a > 253) { a = 253; }
+
         SegaGenesis.setHorizontalScrollB(c, a);
       }
 
-      SegaGenesis.setVerticalScrollB(a);
+      //SegaGenesis.setVerticalScrollB(a);
 
-      a += b;
+      //a += b;
 
-      if (a >=24) { b = -1; }
-      else if (a == 0) { b = 0; }
+      //if (a >=24) { b = -1; }
+      //else if (a == 0) { b = 0; }
 
       while(SegaGenesis.inVerticalBlank());
     }
@@ -78,11 +85,13 @@ public class SegaGenesisJavaDemo
       SegaGenesis.setHorizontalScrollB(c, 0);
     }
 
+/*
     SegaGenesis.setSpritePosition(0, 150, 150);
     SegaGenesis.setSpriteConfig1(0,
       SegaGenesis.SPRITE_CONFIG1_HORIZONTAL_SIZE_2_CELL |
       SegaGenesis.SPRITE_CONFIG1_VERTICAL_SIZE_2_CELL);
     SegaGenesis.setSpriteConfig2(0, 1120);
+*/
 
     SegaGenesis.initBitmap();
 
