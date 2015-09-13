@@ -41,18 +41,14 @@ public class AppleIIgsJavaDemo
 
     for(x = x1; x <= x2; x++)
     {
-      address = 0x2000 + x + 160 * y1;
-      AppleIIgs.hiresPlot(address, color);
-      address = 0x2000 + x + 160 * y2;
-      AppleIIgs.hiresPlot(address, color);
+      AppleIIgs.hiresPlot(x, y1, color);
+      AppleIIgs.hiresPlot(x, y2, color);
     }
 
     for(y = y1; y <= y2; y++)
     {
-      address = 0x2000 + x1 + 160 * y;
-      AppleIIgs.hiresPlot(address, color);
-      address = 0x2000 + x2 + 160 * y;
-      AppleIIgs.hiresPlot(address, color);
+      AppleIIgs.hiresPlot(x1, y, color);
+      AppleIIgs.hiresPlot(x2, y, color);
     }
   }
 
@@ -70,13 +66,10 @@ public class AppleIIgsJavaDemo
     if(y2 > 199)
       y2 = 199;
 
-    int y, address;
+    int y;
 
     for(y = y1; y <= y2; y++)
-    {
-      address = 0x2000 + x1 + 160 * y;
-      AppleIIgs.hiresSpan(address, color, (x2 - x1) + 1);
-    }
+      AppleIIgs.hiresSpan(x1, y, (x2 - x1) + 1, color);
   }
 
   public static void main()
@@ -91,34 +84,39 @@ public class AppleIIgsJavaDemo
     AppleIIgs.hiresPalette(0, palette1);
 
     for(i = 0; i <= 199; i++) 
-      AppleIIgs.hiresSetLine(i, 0);
-
-    address = 0x2000;
+      AppleIIgs.hiresSetRow(i, 0);
 
     for(i = 0; i < 200; i++) 
-    {
-      AppleIIgs.hiresSpan(address, 255, 160);
-      address += 160;
-    }
+      AppleIIgs.hiresSpan(0, i, 160, 255);
 
+// line test
+    AppleIIgs.hiresLine(0, 0, 159, 199, 8 | (8 << 4));
+    AppleIIgs.hiresLine(100, 40, 64, 96, 7 | (7 << 4));
+    AppleIIgs.hiresLine(50, 10, 140, 34, 6 | (6 << 4));
+    AppleIIgs.hiresLine(25, 100, 40, 180, 5 | (5 << 4));
+    AppleIIgs.hiresLine(150, 4, 4, 140, 4 | (4 << 4));
+
+    wait(10000);
+    wait(10000);
+    wait(10000);
+    wait(10000);
+    wait(10000);
 // sprite test
 //    AppleIIgs.hiresBlit(sprite, 0x2000, 4, 16);
 //    AppleIIgs.hiresBlit(sprite, 0x2000 + 50 + 160 * 50, 4, 16);
 //    AppleIIgs.hiresBlit(sprite, 0x2000 + 100 + 160 * 175, 4, 16);
 //    while(true);
 
-    address = 0x2000;
-    address2 = 0x9c60;
     int yy = 0;
 
-    for(y = 0; y < 100 * 16; y += 16, yy++, address2 -= 320)
+    for(y = 0; y < 100 * 16; y += 16, yy++)
     {
       imc = (y - 100 * 16) >> 5;
       imc += imcen;
 
       int xx = 0;
 
-      for(x = 0; x < 160 * 16; x += 16, xx++, address++, address2++)
+      for(x = 0; x < 160 * 16; x += 16, xx++)
       {
         if((xx < 50 || xx > 110 || yy < 50 || yy > 145) ||
            (xx > 78 && xx < 93 && yy > 85 && yy < 115))
@@ -149,8 +147,8 @@ public class AppleIIgsJavaDemo
           im2 = (im * im) >> 4;
         }
 
-        AppleIIgs.hiresPlot(address, (i | (i << 4)));
-        AppleIIgs.hiresPlot(address2, (i | (i << 4)));
+        AppleIIgs.hiresPlot(xx, yy, (i | (i << 4)));
+        AppleIIgs.hiresPlot(xx, 199 - yy, (i | (i << 4)));
       }
     }
 
@@ -180,77 +178,29 @@ public class AppleIIgsJavaDemo
       y2++;
     }
 
-    for(address = 0x2000; address < 0x9d00; address++) 
-      AppleIIgs.hiresPlot(address, 255 - AppleIIgs.hiresRead(address));
-
-    for(i = 0; i < 32000; i++) 
-    {
-      AppleIIgs.hiresPlot(0x2000 + i, 255 - AppleIIgs.hiresRead(0x9cff - i));
-    }
-
-    for(x = 0; x < 80; x++) 
-    {
-      int incy = 0;
-      for(y = 0; y < 200; y++) 
-      {
-        AppleIIgs.hiresPlot(0x2000 + x + incy, 255 - AppleIIgs.hiresRead(0x2000 + x + 160 * y));
-        incy += 160;
-      }
-    }
-
-    for(i = 0; i < 8000; i++) 
-    {
-      AppleIIgs.hiresPlot(0x2000 + i, 255 - AppleIIgs.hiresRead(0x9cff - i));
-      AppleIIgs.hiresPlot(0x9cff - i, AppleIIgs.hiresRead(0x2000 + i));
-    }
-
     for(i = 0xff; i >= 0; i -= 0x11)
-    {
       rectfill(0, 0, 79, 49, i);
-      wait(1000);
-    }
 
     for(i = 0xff; i >= 0x22; i -= 0x11)
-    {
       rectfill(80, 100, 159, 149, i);
-      wait(1000);
-    }
 
     for(i = 0xff; i >= 0x44; i -= 0x11)
-    {
       rectfill(0, 150, 79, 199, i);
-      wait(1000);
-    }
 
     for(i = 0xff; i >= 0x66; i -= 0x11)
-    {
       rectfill(80, 0, 159, 49, i);
-      wait(1000);
-    }
 
     for(i = 0; i <= 0x88; i += 0x11)
-    {
       rectfill(0, 100, 79, 149, i);
-      wait(1000);
-    }
 
     for(i = 0; i <= 0xaa; i += 0x11)
-    {
       rectfill(80, 50, 159, 99, i);
-      wait(1000);
-    }
 
     for(i = 0; i <= 0xcc; i += 0x11)
-    {
       rectfill(0, 50, 79, 99, i);
-      wait(1000);
-    }
 
     for(i = 0; i <= 0xdd; i += 0x11)
-    {
       rectfill(80, 150, 159, 199, i);
-      wait(1000);
-    }
 
     while(true)
     {

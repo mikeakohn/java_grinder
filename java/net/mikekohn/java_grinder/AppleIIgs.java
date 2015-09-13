@@ -19,12 +19,13 @@ abstract public class AppleIIgs
   public static void plotChar(int address, char c) { }
   public static void printChar(char c) { }
   public static void hiresEnable() { }
-  public static void hiresPlot(int address, int c) { }
-  public static void hiresSpan(int address, int c, int length) { }
+  public static void hiresPlot(int x, int y, int c) { }
+  public static void hiresLine(int x1, int y1, int x2, int y2, int c) { }
+  public static void hiresSpan(int x, int y, int length, int c) { }
   public static int hiresRead(int address) { return 0; }
   public static void hiresBlit(byte[] data, int address, int width, int length) { }
   public static void hiresPalette(int palette, int[] data) { }
-  public static void hiresSetLine(int line, int palette) { }
+  public static void hiresSetRow(int row, int palette) { }
 
   /** Sound wave table. */
   public static void loadWaveTable(byte[] data) { }
