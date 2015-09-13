@@ -24,12 +24,13 @@ public:
   virtual int appleiigs_plotChar_IC();
   virtual int appleiigs_printChar_C();
   virtual int appleiigs_hiresEnable();
-  virtual int appleiigs_hiresPlot_II();
-  virtual int appleiigs_hiresSpan_III();
+  virtual int appleiigs_hiresPlot_III();
+  virtual int appleiigs_hiresLine_IIIII();
+  virtual int appleiigs_hiresSpan_IIII();
   virtual int appleiigs_hiresRead_I();
   virtual int appleiigs_hiresBlit_aBIII();
   virtual int appleiigs_hiresPalette_IaI();
-  virtual int appleiigs_hiresSetLine_II();
+  virtual int appleiigs_hiresSetRow_II();
 
   virtual int appleiigs_loadWaveTable_BA();
   virtual int appleiigs_enableOscillators_I();
@@ -40,19 +41,21 @@ public:
 private:
   void insert_hires_enable();
   void insert_hires_plot();
+  void insert_hires_line();
   void insert_hires_span();
   void insert_hires_read();
   void insert_hires_blit();
   void insert_hires_palette();
-  void insert_hires_set_line();
+  void insert_hires_set_row();
 
   bool need_hires_enable:1;
   bool need_hires_plot:1;
+  bool need_hires_line:1;
   bool need_hires_span:1;
   bool need_hires_read:1;
   bool need_hires_blit:1;
   bool need_hires_palette:1;
-  bool need_hires_set_line:1;
+  bool need_hires_set_row:1;
 };
 
 #endif

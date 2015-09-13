@@ -19,12 +19,13 @@ public:
   virtual int appleiigs_plotChar_IC() { return -1; }
   virtual int appleiigs_printChar_C() { return -1; }
   virtual int appleiigs_hiresEnable() { return -1; }
-  virtual int appleiigs_hiresPlot_II() { return -1; }
-  virtual int appleiigs_hiresSpan_III() { return -1; }
+  virtual int appleiigs_hiresPlot_III() { return -1; }
+  virtual int appleiigs_hiresLine_IIIII() { return -1; }
+  virtual int appleiigs_hiresSpan_IIII() { return -1; }
   virtual int appleiigs_hiresRead_I() { return -1; }
   virtual int appleiigs_hiresBlit_aBIII() { return -1; }
   virtual int appleiigs_hiresPalette_IaI() { return -1; }
-  virtual int appleiigs_hiresSetLine_II() { return -1; }
+  virtual int appleiigs_hiresSetRow_II() { return -1; }
 
   // Sound Chip
   virtual int appleiigs_loadWaveTable_BA() { return -1; }
