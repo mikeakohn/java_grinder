@@ -110,6 +110,9 @@ abstract public class SegaGenesis
   /** Set pattern table. */
   public static void setPatternTable(int[] patterns) { }
 
+  /** Set pattern table starting at an index. */
+  public static void setPatternTableAtIndex(int index, int[] patterns) { }
+
   /** Set image data. */
   public static void setImageData(short[] image) { }
 

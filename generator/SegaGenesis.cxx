@@ -515,6 +515,18 @@ int SegaGenesis::sega_genesis_setPatternTable()
   need_set_pattern_table = true;
 
   fprintf(out, "  movea.l %s, a3\n", pop_reg());
+  fprintf(out, "  moveq.l #0, d7\n");
+  fprintf(out, "  jsr _set_pattern_table\n");
+
+  return 0;
+}
+
+int SegaGenesis::sega_genesis_setPatternTableAtIndex()
+{
+  need_set_pattern_table = true;
+
+  fprintf(out, "  movea.l %s, a3\n", pop_reg());
+  fprintf(out, "  move.l %s, d7\n", pop_reg());
   fprintf(out, "  jsr _set_pattern_table\n");
 
   return 0;
@@ -903,8 +915,18 @@ void SegaGenesis::add_set_pattern_table()
   // a3 points to int[] array
   fprintf(out,
     "_set_pattern_table:\n"
-    "  move.l #0x40000000, (a1)   ; C00004 VRAM write to 0x0000\n"
+    //"  move.l #0x%08x, d6\n"
+    "  lsl.l #5, d7               ; pattern_index * 32\n"
+    "  move.l d7, d5\n"
+    "  rol.w #2, d5\n"
+    "  and.w #3, d5               ; d5 = upper 2 bits moved to lower 2 bits\n"
+    "  and.w #0x3ffe, d7          ; d7 = lower 13 bits\n"
+    "  or.w #0x4000, d7\n"
+    "  swap d7\n"
+    "  or.w d5, d7\n"
+    "  move.l d7, (a1)\n"
     "  move.l (-4,a3), d5         ; Code len\n"
+    "  subq.l #1, d5\n"
     "_set_pattern_table_loop:\n"
     "  move.l (a3)+, (a0)\n"
     "  dbf d5, _set_pattern_table_loop\n"

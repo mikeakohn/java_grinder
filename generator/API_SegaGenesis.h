@@ -40,6 +40,7 @@ public:
   virtual int sega_genesis_setVerticalScrollA() { return -1; }
   virtual int sega_genesis_setVerticalScrollB() { return -1; }
   virtual int sega_genesis_setPatternTable() { return -1; }
+  virtual int sega_genesis_setPatternTableAtIndex() { return -1; }
   virtual int sega_genesis_setImageData() { return -1; }
   virtual int sega_genesis_setPaletteColors() { return -1; }
   virtual int sega_genesis_setSpritePosition() { return -1; }
