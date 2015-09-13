@@ -47,6 +47,7 @@ private:
   void insert_hires_blit();
   void insert_hires_palette();
   void insert_hires_set_row();
+  void insert_hires_calc_address();
 
   bool need_hires_enable:1;
   bool need_hires_plot:1;

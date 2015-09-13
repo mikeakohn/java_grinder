@@ -54,6 +54,7 @@ AppleIIgs::~AppleIIgs()
   if (need_hires_blit) { insert_hires_blit(); }
   if (need_hires_palette) { insert_hires_palette(); }
   if (need_hires_set_row) { insert_hires_set_row(); }
+  insert_hires_calc_address();
 }
 
 int AppleIIgs::open(const char *filename)
@@ -236,39 +237,7 @@ void AppleIIgs::insert_hires_plot()
   fprintf(out, "hires_plot:\n");
   POP();
   fprintf(out, "  tay\n");
-  POP();
-  fprintf(out, "  sta value1\n");
-// y * 128
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  sta address\n");
-// y * 32
-  fprintf(out, "  lda value1\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-// (* 160)
-  fprintf(out, "  clc\n");
-  fprintf(out, "  adc address\n");
-  fprintf(out, "  sta address\n");
-
-  POP();
-  fprintf(out, "  clc\n");
-  fprintf(out, "  adc address\n");
-  fprintf(out, "  sta address\n");
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda #0x2000\n");
-  fprintf(out, "  adc address\n");
-  fprintf(out, "  sta address\n");
-  fprintf(out, "  lda #0xe1\n");
-  fprintf(out, "  sta address + 2\n");
+  fprintf(out, "  jsr hires_calc_address\n");
   fprintf(out, "  tya\n");
   fprintf(out, "  sep #0x30\n");
   fprintf(out, "  sta [address]\n");
@@ -278,7 +247,6 @@ void AppleIIgs::insert_hires_plot()
 
 void AppleIIgs::insert_hires_line()
 {
-/// dx, dy, inx, iny, e
   fprintf(out, "hires_line:\n");
   POP();
   fprintf(out, "  sta _color\n");
@@ -415,69 +383,18 @@ void AppleIIgs::insert_hires_span()
 {
   fprintf(out, "hires_span:\n");
   POP();
-  fprintf(out, "  pha\n");
+  fprintf(out, "  sta value2\n");
   POP();
   fprintf(out, "  tay\n");
   fprintf(out, "  dey\n");
-  POP();
-  fprintf(out, "  sta value1\n");
-// y * 128
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  sta address\n");
-// y * 32
-  fprintf(out, "  lda value1\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-// (* 160)
-  fprintf(out, "  clc\n");
-  fprintf(out, "  adc address\n");
-  fprintf(out, "  sta address\n");
-
-  POP();
-  fprintf(out, "  clc\n");
-  fprintf(out, "  adc address\n");
-  fprintf(out, "  sta address\n");
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda #0x2000\n");
-  fprintf(out, "  adc address\n");
-  fprintf(out, "  sta address\n");
-  fprintf(out, "  lda #0xe1\n");
-  fprintf(out, "  sta address + 2\n");
-
-  fprintf(out, "  pla\n");
+  fprintf(out, "  jsr hires_calc_address\n");
+  fprintf(out, "  lda value2\n");
   fprintf(out, "  sep #0x20\n");
   fprintf(out, "  sta [address],y\n");
   fprintf(out, "  dey\n");
   fprintf(out, "  bpl #-5\n");
   fprintf(out, "  rep #0x30\n");
   fprintf(out, "  rts\n");
-/*
-  POP();
-  fprintf(out, "  tay\n");
-  fprintf(out, "  dey\n");
-  POP();
-  fprintf(out, "  sta value1\n");
-  POP();
-  fprintf(out, "  sta address\n");
-  fprintf(out, "  lda #0xe1\n");
-  fprintf(out, "  sta address + 2\n");
-  fprintf(out, "  sep #0x20\n");
-  fprintf(out, "  lda value1\n");
-  fprintf(out, "  sta [address],y\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bpl #-5\n");
-  fprintf(out, "  rep #0x30\n");
-  fprintf(out, "  rts\n");
-*/
 }
 
 void AppleIIgs::insert_hires_read()
@@ -591,6 +508,41 @@ void AppleIIgs::insert_hires_set_row()
   fprintf(out, "  sta.l 0xe19d00,x\n");
   fprintf(out, "  rep #0x30\n");
   fprintf(out, "  tyx\n");
+  fprintf(out, "  rts\n");
+}
+
+void AppleIIgs::insert_hires_calc_address()
+{
+  fprintf(out, "hires_calc_address:\n");
+  POP();
+  fprintf(out, "  sta value1\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  lda value1\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  adc address\n");
+  fprintf(out, "  sta address\n");
+  POP();
+  fprintf(out, "  clc\n");
+  fprintf(out, "  adc address\n");
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda #0x2000\n");
+  fprintf(out, "  adc address\n");
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  lda #0xe1\n");
+  fprintf(out, "  sta address + 2\n");
   fprintf(out, "  rts\n");
 }
 
