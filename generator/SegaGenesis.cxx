@@ -419,7 +419,11 @@ int SegaGenesis::sega_genesis_setCursor(int x, int y)
 
 int SegaGenesis::sega_genesis_printChar()
 {
-  return -1;
+  fprintf(out, "  add.w #(1120 - 'A'), %s; printChar()\n", pop_reg());
+  fprintf(out, "  or.w #0x6000, %s\n", pop_reg());
+  fprintf(out, "  move.w %s, (a0)\n", pop_reg());
+
+  return 0;
 }
 
 int SegaGenesis::sega_genesis_printChar(int c)
@@ -528,6 +532,35 @@ int SegaGenesis::sega_genesis_setPatternTableAtIndex()
   fprintf(out, "  movea.l %s, a3\n", pop_reg());
   fprintf(out, "  move.l %s, d7\n", pop_reg());
   fprintf(out, "  jsr _set_pattern_table\n");
+
+  return 0;
+}
+
+int SegaGenesis::sega_genesis_setPatternLocation()
+{
+  fprintf(out, "  ; setPatternLocation()\n");
+  fprintf(out, "  lsl.w #7, d%d\n", REG_STACK(reg-1));
+  fprintf(out, "  lsl.w #1, d%d\n", REG_STACK(reg-2));
+  fprintf(out, "  add.w d%d, d%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+  fprintf(out, "  swap d%d\n", REG_STACK(reg-1));
+  fprintf(out, "  or.l #0x%08x, d%d\n", CTRL_REG(CD_VRAM_WRITE, 0xc000), REG_STACK(reg-1));
+  fprintf(out, "  move.l d%d, (a1)\n", REG_STACK(reg-1));
+
+  reg -= 2;
+
+  return 0;
+}
+
+int SegaGenesis::sega_genesis_putPattern()
+{
+  fprintf(out, "  move.w %s, (a0) ; putPattern()\n", pop_reg());
+
+  return 0;
+}
+
+int SegaGenesis::sega_genesis_putPattern(int c)
+{
+  fprintf(out, "  move.w #0x%04x, (a0) ; putPattern(0x%04x)\n", c, c);
 
   return 0;
 }

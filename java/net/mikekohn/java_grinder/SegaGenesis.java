@@ -113,6 +113,22 @@ abstract public class SegaGenesis
   /** Set pattern table starting at an index. */
   public static void setPatternTableAtIndex(int index, int[] patterns) { }
 
+  /** Move the cursor to where the next pattern will be printed.
+      Note: x can be between 0 and 63 and y can be between 0 and 31.
+      Any x above 39 will be off screen and can be scrolled in and any
+      y above 27 will be off screen and can be scrolled in. */
+  public static void setPatternLocation(int x, int y) { }
+
+  /** After using setPatternLocation(), putPattern() will place an 8x8
+      pattern (tile) in that location and increment X.  The index is
+      actually a set of bit fields: 
+      Bit     15: Priority flag (set to 1, this tile will be displayed on top)
+      Bits 14-13: Palette number to use for this tile (0 to 3)
+      Bit     12: Vertical flip this tile.
+      Bit     11: Horizontal flip this tile.
+      Bits  10-0: Pattern index to use for this tile. */
+  public static void putPattern(int index) { }
+
   /** Set image data. */
   public static void setImageData(short[] image) { }
 

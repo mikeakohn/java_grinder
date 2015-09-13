@@ -58,6 +58,8 @@ int sega_genesis(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(setVerticalScrollB,_I)
   CHECK_FUNC(setPatternTable,_aI)
   CHECK_FUNC(setPatternTableAtIndex,_IaI)
+  CHECK_FUNC(setPatternLocation,_II)
+  CHECK_FUNC(putPattern,_I)
   CHECK_FUNC(setImageData,_aS)
   CHECK_FUNC(setPaletteColors,_aS)
   CHECK_FUNC(setSpritePosition,_III)
@@ -76,6 +78,7 @@ int sega_genesis(JavaClass *java_class, Generator *generator, char *method_name,
   CHECK_FUNC_CONST(setPalettePointer,_I)
   CHECK_FUNC_CONST(setPaletteColor,_I)
   CHECK_FUNC_CONST(printChar,_C)
+  CHECK_FUNC_CONST(putPattern,_I)
 
   return -1;
 }
