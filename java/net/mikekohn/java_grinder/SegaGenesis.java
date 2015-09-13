@@ -119,13 +119,17 @@ abstract public class SegaGenesis
   /** Set palette colors. */
   public static void setPaletteColors(short[] palette) { }
 
-  /** Set sprite's position on the screen. */
+  /** Set sprite's position on the screen.  Note: (0,0) on the display
+      is sprite position (128,128).  If sprites aren't showing up make
+      sure that x and y are bigger than 128. */
   public static void setSpritePosition(int index, int x, int y) { }
 
   /** Set sprite's x,y stretching and link field value.
       Bits 11-10: horizontal size value (0=1 cell, 1=2cell, 2=3cell, 3=4cells)
       Bits   9-8: vertical size value (0=1 cell, 1=2cell, 2=3cell, 3=4cells)
-      Bits   7-0: link field value */
+      Bits   7-0: link field value
+      The link value points to the next sprite index to be displayed on the
+      screen.  If the link value is 0, this is the last sprite to be drawn. */
   public static void setSpriteConfig1(int index, int value) { }
 
   /** Set sprite's priority, palette, vertical flip, horizontal flip,
