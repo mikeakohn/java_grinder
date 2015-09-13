@@ -15,12 +15,14 @@ public class SegaGenesisJavaDemo
     }
   }
 
+/*
   public static int[] pattern =
   {
     // Pattern 0
     0x00000001, 0x00010000, 0x00000001, 0x00010000,
     0x00001000, 0x00000001, 0x00001000, 0x00000001,
   };
+*/
 
   static public void main(String args[])
   {
@@ -36,10 +38,10 @@ public class SegaGenesisJavaDemo
     SegaGenesis.clearText();
     wait(30);
 
-    SegaGenesis.setCursor(0, 0);
-    SegaGenesis.print("ABCD");
+    //SegaGenesis.setCursor(0, 0);
+    //SegaGenesis.print("ABCD");
     //SegaGenesis.setPatternTableAtIndex(896, pattern);
-    SegaGenesis.setPatternTableAtIndex(1120, pattern);
+    //SegaGenesis.setPatternTableAtIndex(1120, pattern);
 
     SegaGenesis.loadZ80(PlayTitleSample.z80_code);
     wait(120);
@@ -76,10 +78,11 @@ public class SegaGenesisJavaDemo
       SegaGenesis.setHorizontalScrollB(c, 0);
     }
 
-    SegaGenesis.setSpritePosition(0, 10, 20);
-    SegaGenesis.setSpritePosition(1, 10, 20);
+    SegaGenesis.setSpritePosition(0, 150, 150);
     SegaGenesis.setSpriteConfig1(0,
-      SegaGenesis.SPRITE_CONFIG1_HORIZONTAL_SIZE_2_CELL);
+      SegaGenesis.SPRITE_CONFIG1_HORIZONTAL_SIZE_2_CELL |
+      SegaGenesis.SPRITE_CONFIG1_VERTICAL_SIZE_2_CELL);
+    SegaGenesis.setSpriteConfig2(0, 1120);
 
     SegaGenesis.initBitmap();
 
