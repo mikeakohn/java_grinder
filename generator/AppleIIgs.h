@@ -27,8 +27,8 @@ public:
   virtual int appleiigs_hiresPlot_III();
   virtual int appleiigs_hiresLine_IIIII();
   virtual int appleiigs_hiresSpan_IIII();
-  virtual int appleiigs_hiresRead_I();
-  virtual int appleiigs_hiresBlit_aBIII();
+  virtual int appleiigs_hiresRead_II();
+  virtual int appleiigs_hiresBlit_aBIIII();
   virtual int appleiigs_hiresPalette_IaI();
   virtual int appleiigs_hiresSetRow_II();
 
