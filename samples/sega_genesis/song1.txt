@@ -7,6 +7,7 @@ pattern intro
   voice 0: 0 F5 1, 1 F5 1, 2 F5 1, 3 F5 1;
   voice 1: 0 A5 1, 1 A5 1, 2 A5 1, 3 Ab5 1;
   voice 2: 0 C5 1, 1 D5 1, 2 E5 1, 3 F5 1;
+  drums: 0 bass, 1 snare, 2 bass, 3 snare;
 
   //voice 0: 0 F5 1, 192 F5 1, 384 F5 1, 576 F5 1;
   //voice 1: 0 A5 1, 192 A5 1, 384 A5 1, 576 Ab5 1;

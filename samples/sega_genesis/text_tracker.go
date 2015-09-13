@@ -239,6 +239,38 @@ func ParsePatternVoice(tokens *Tokens, voice []Note, divisions int) bool {
   return true
 }
 
+func ParsePatternDrums(tokens *Tokens, drums []int, divisions int) bool {
+  if tokens.Get() != ":" {
+    fmt.Printf("Error: Missing : on line: %d", tokens.line)
+    return false
+  }
+
+  for true {
+    beat_float, _ := strconv.ParseFloat(tokens.Get(), 64)
+    drum := tokens.Get()
+    separator := tokens.Get()
+
+    beat := int(float64(divisions) * beat_float)
+
+    if drum == "bass" {
+      drums[beat] = 36
+    } else if drum == "snare" {
+      drums[beat] = 38
+    } else {
+      fmt.Printf("Error: Unexpected token %s on line %d\n", drum, tokens.line)
+      return false
+    }
+
+    if separator == ";" { break }
+    if separator != "," {
+      fmt.Printf("Error: Expecting ; or , on line %d\n", tokens.line)
+      return false
+    }
+  }
+
+  return true
+}
+
 func ParsePattern(tokens *Tokens, time_signature *TimeSignature, divisions int) (*Pattern, string) {
   pattern := new(Pattern)
   divisions_in_measure := divisions * time_signature.beats
@@ -266,13 +298,15 @@ func ParsePattern(tokens *Tokens, time_signature *TimeSignature, divisions int) 
       token = tokens.Get()
       voice, err := strconv.Atoi(token)
 
-      // fmt.Println("Voice: " + token)
-
       if err != nil {
         fmt.Println("Error: Unexpected token " + token)
         return nil, ""
       }
       if !ParsePatternVoice(tokens, pattern.voices[voice], divisions) {
+        return nil, ""
+      }
+    } else if token == "drums" {
+      if !ParsePatternDrums(tokens, pattern.drums, divisions) {
         return nil, ""
       }
     } else {
@@ -577,8 +611,6 @@ func main() {
     } else {
       panic("Unexpected token " + token)
     }
-
-    //fmt.Println("'" + token + "'")
   }
 
   fmt.Printf(     "Divisions: %d\n", divisions)
