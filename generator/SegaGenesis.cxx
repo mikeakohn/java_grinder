@@ -223,8 +223,11 @@ int SegaGenesis::sega_genesis_setPalettePointer()
     reg--;
   }
 
-  fprintf(out, "  lsl.l #8, d%d\n", d);
-  fprintf(out, "  lsl.l #8, d%d\n", d);
+  //fprintf(out, "  lsl.l #8, d%d\n", d);
+  //fprintf(out, "  lsl.l #8, d%d\n", d);
+  fprintf(out, "  // setPalettePointer()\n");
+  fprintf(out, "  lsl.l #1, d%d\n", d);
+  fprintf(out, "  swap d%d\n", d);
   fprintf(out, "  or.l #0xc0000000, d%d\n", d);
   fprintf(out, "  move.l d%d, (a1) ; Set CRAM write address\n", d);
 
@@ -239,26 +242,15 @@ int SegaGenesis::sega_genesis_setPalettePointer(int index)
     return -1;
   }
 
-  fprintf(out, "  move.l #0xc0%02x0000, (a1) ; Set CRAM write address\n", index);
+  fprintf(out, "  // setPalettePointer(%d)\n", index);
+  fprintf(out, "  move.l #0xc0%02x0000, (a1) ; Set CRAM write address\n", index * 2);
 
   return 0;
 }
 
 int SegaGenesis::sega_genesis_setPaletteColor()
 {
-  fprintf(out, "  move.l %s, (a0)\n", pop_reg());
-#if 0
-  if (stack > 0)
-  {
-    fprintf(out, "  move.l (SP)+, (a0)\n");
-    stack--;
-  }
-    else
-  {
-    fprintf(out, "  move.l d%d, (a0)\n", REG_STACK(reg-1));
-    reg--;
-  }
-#endif
+  fprintf(out, "  move.w %s, (a0)\n", pop_reg());
 
   return 0;
 }
@@ -432,7 +424,7 @@ int SegaGenesis::sega_genesis_printChar()
 
 int SegaGenesis::sega_genesis_printChar(int c)
 {
-  int pattern = (c - 'A') + 1120;
+  int pattern = 0x6000 | ((c - 'A') + 1120);
   fprintf(out, "  move.w #0x%02x, (a0) ; printChar(0x%02x)\n", pattern, c);
 
   return 0;
@@ -878,6 +870,7 @@ void SegaGenesis::add_print_string()
     "  eor.l d6, d6\n"
     "  move.b (a2)+, d6\n"
     "  add.w #1120 - 'A', d6\n"
+    "  or.w #0x6000, d6\n"
     "  move.w d6, (a0)\n"
     "  dbra d5, _print_string_loop\n"
     "  rts\n\n");

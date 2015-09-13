@@ -120,8 +120,8 @@ abstract public class SegaGenesis
   public static void setSpritePosition(int index, int x, int y) { }
 
   /** Set sprite's x,y stretching and link field value.
-      Bits 11-10: horizontal stretch value
-      Bits   9-8: vertical stretch value
+      Bits 11-10: horizontal size value (0=1 cell, 1=2cell, 2=3cell, 3=4cells)
+      Bits   9-8: vertical size value (0=1 cell, 1=2cell, 2=3cell, 3=4cells)
       Bits   7-0: link field value */
   public static void setSpriteConfig1(int index, int value) { }
 

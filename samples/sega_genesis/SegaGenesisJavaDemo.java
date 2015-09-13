@@ -23,6 +23,8 @@ public class SegaGenesisJavaDemo
     SegaGenesis.setPatternTable(ImageJavaGrinder.pattern);
     SegaGenesis.setImageData(ImageJavaGrinder.image);
 
+    SegaGenesis.setPalettePointer(49);
+    SegaGenesis.setPaletteColor(0xeee);
     SegaGenesis.loadFonts();
     SegaGenesis.clearText();
     wait(30);
@@ -32,9 +34,9 @@ public class SegaGenesisJavaDemo
 
     SegaGenesis.pauseZ80();
 
-    SegaGenesis.setPaletteColors(ImageMike.palette);
-    SegaGenesis.setPatternTable(ImageMike.pattern);
-    SegaGenesis.setImageData(ImageMike.image);
+    SegaGenesis.setPaletteColors(NakenLogo.palette);
+    SegaGenesis.setPatternTable(NakenLogo.pattern);
+    SegaGenesis.setImageData(NakenLogo.image);
 
     b = 1;
     a = 0;
@@ -110,7 +112,7 @@ public class SegaGenesisJavaDemo
       {
         for (a = 0; a < 0xf; a++)
         {
-          SegaGenesis.setPalettePointer(1);
+          SegaGenesis.setPalettePointer(49);
           SegaGenesis.setPaletteColor((a << 8) | (a << 4) | a);
           SegaGenesis.waitHorizontalBlank();
         }
