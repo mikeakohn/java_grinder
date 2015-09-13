@@ -2084,7 +2084,7 @@ int JavaCompiler::execute_statics(int index)
   std::map<std::string,JavaClass *>::iterator iter;
   for (iter = external_classes.begin(); iter != external_classes.end(); iter++)
   {
-    printf("CLASS %s\n", iter->first.c_str());
+    printf("Adding external class: %s\n", iter->first.c_str());
     JavaClass *java_class_external = iter->second;
     int index = java_class_external->get_clinit_method();
 
@@ -2141,16 +2141,21 @@ int JavaCompiler::compile_methods(bool do_main)
     }
   }
 
-  if (!did_execute_statics && !do_main && external_classes.size() != 0)
+  printf("external_classes.size()=%ld did_execute_statics=%d do_main=%d\n", external_classes.size(), did_execute_statics, do_main);
+
+  //if (!did_execute_statics && !do_main && external_classes.size() != 0)
+  if (!do_main && external_classes.size() != 0)
   {
     // Compile all needed methods from other classes.
     std::map<std::string,JavaClass *>::iterator iter;
-    for (iter = external_classes.begin(); iter != external_classes.end(); iter++)
+    for (iter = external_classes.begin();
+         iter != external_classes.end();
+         iter++)
     {
       const char *class_name = iter->first.c_str();
       JavaClass *java_class = iter->second;
 
-      printf("Compile Class: %s\n", class_name);
+      printf("Compile Class: %s (%p)\n", class_name, this);
 
       int constant_count = java_class->get_constant_count();
 
@@ -2188,7 +2193,12 @@ int JavaCompiler::compile_methods(bool do_main)
       }
     }
 
-    if (execute_statics(-1) != 0) { return -1; }
+    // Had to add this "if" to deal with static arrays in the main class...
+    // it stopped compiling external methods otherwise.
+    if (!did_execute_statics)
+    {
+      if (execute_statics(-1) != 0) { return -1; }
+    }
   }
 
   return 0;
