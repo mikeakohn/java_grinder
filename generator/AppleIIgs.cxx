@@ -27,7 +27,16 @@
   fprintf(out, "  inx\n"); \
   fprintf(out, "  lda stack,x\n")
 
-AppleIIgs::AppleIIgs()
+AppleIIgs::AppleIIgs() :
+//  need_plot_char(false),
+//  need_print_char(false),
+  need_hires_enable(false),
+  need_hires_plot(false),
+  need_hires_span(false),
+  need_hires_read(false),
+  need_hires_blit(false),
+  need_hires_palette(false),
+  need_hires_set_line(false)
 {
   start_org = 0x1000;
   java_stack = 0x800;
@@ -36,6 +45,13 @@ AppleIIgs::AppleIIgs()
 
 AppleIIgs::~AppleIIgs()
 {
+  if (need_hires_enable) { insert_hires_enable(); }
+  if (need_hires_plot) { insert_hires_plot(); }
+  if (need_hires_span) { insert_hires_span(); }
+  if (need_hires_read) { insert_hires_read(); }
+  if (need_hires_blit) { insert_hires_blit(); }
+  if (need_hires_palette) { insert_hires_palette(); }
+  if (need_hires_set_line) { insert_hires_set_line(); }
 }
 
 int AppleIIgs::open(const char *filename)
@@ -47,6 +63,8 @@ int AppleIIgs::open(const char *filename)
 
 int AppleIIgs::appleiigs_plotChar_IC()
 {
+//  need_plot_char = true;
+//FIXME put into subroutine
 //FIXME broked
   fprintf(out,
     "  ;; plotChar()\n"
@@ -62,6 +80,8 @@ int AppleIIgs::appleiigs_plotChar_IC()
 // printChar(char c) - output char to text screen
 int AppleIIgs::appleiigs_printChar_C()
 {
+//  need_print_char = true;
+//FIXME put into subroutine
   fprintf(out, ";; printChar()\n");
   POP();
 
@@ -84,13 +104,8 @@ int AppleIIgs::appleiigs_printChar_C()
 // hiresEnable() - enable super-hires screen
 int AppleIIgs::appleiigs_hiresEnable()
 {
-  fprintf(out, ";; hiresEnable()\n");
-  fprintf(out, "  sep #0x30\n");
-  fprintf(out, "  lda.b #10000001b\n");
-  fprintf(out, "  sta.l 0xe1c029\n");
-  fprintf(out, "  lda.b #0\n");
-  fprintf(out, "  sta.l 0xe1c034\n");
-  fprintf(out, "  rep #0x30\n");
+  need_hires_enable = true;
+  fprintf(out, "jsr hires_enable\n");
 
   return 0;
 }
@@ -98,7 +113,112 @@ int AppleIIgs::appleiigs_hiresEnable()
 // hiresPlot(address, color) - plot pixel
 int AppleIIgs::appleiigs_hiresPlot_II()
 {
-  fprintf(out, ";; hiresPlot()\n");
+  need_hires_plot = true;
+  fprintf(out, "jsr hires_plot\n");
+
+  stack -= 2;
+
+  return 0;
+}
+
+// hiresSpan(address, color, width) - draws horizontal line
+int AppleIIgs::appleiigs_hiresSpan_III()
+{
+  need_hires_span = true;
+  fprintf(out, "jsr hires_span\n");
+
+  stack -= 3;
+
+  return 0;
+}
+
+// hiresRead(address) - read pixel color
+int AppleIIgs::appleiigs_hiresRead_I()
+{
+  need_hires_read = true;
+  fprintf(out, "jsr hires_read\n");
+
+  return 0;
+}
+
+// hiresBlit(byte[] source, int dest, int width, int length)
+// draw an image, width is in *bytes* length is source.length
+int AppleIIgs::appleiigs_hiresBlit_aBIII()
+{
+  need_hires_blit = true;
+  fprintf(out, "jsr hires_blit\n");
+  
+  stack -= 4;
+  label_count += 2;
+
+  return 0;
+}
+
+// hiresPalette(int palette, byte[] source) - change palette
+int AppleIIgs::appleiigs_hiresPalette_IaI()
+{
+  need_hires_palette = true;
+  fprintf(out, "jsr hires_palette\n");
+
+  stack -= 2;
+  label_count += 3;
+
+  return 0;
+}
+
+// hiresSetLine(int line, int palette) - set palette for line
+int AppleIIgs::appleiigs_hiresSetLine_II()
+{
+  need_hires_set_line = true;
+  fprintf(out, "jsr hires_set_line\n");
+
+  stack -= 2;
+
+  return 0;
+}
+
+// Sound API
+int AppleIIgs::appleiigs_loadWaveTable_BA()
+{
+  return -1;
+}
+
+int AppleIIgs::appleiigs_enableOscillators_I()
+{
+  return -1;
+}
+
+int AppleIIgs::appleiigs_setMasterVolume_I()
+{
+  return -1;
+}
+
+int AppleIIgs::appleiigs_setSoundVolume_II()
+{
+  return -1;
+}
+
+int AppleIIgs::appleiigs_setSoundFrequency_II()
+{
+  return -1;
+}
+
+// subroutines
+void AppleIIgs::insert_hires_enable()
+{
+  fprintf(out, "hires_enable:\n");
+  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  lda.b #10000001b\n");
+  fprintf(out, "  sta.l 0xe1c029\n");
+  fprintf(out, "  lda.b #0\n");
+  fprintf(out, "  sta.l 0xe1c034\n");
+  fprintf(out, "  rep #0x30\n");
+  fprintf(out, "  rts\n");
+}
+
+void AppleIIgs::insert_hires_plot()
+{
+  fprintf(out, "hires_plot:\n");
   POP();
   fprintf(out, "  tay\n");
   POP();
@@ -109,16 +229,12 @@ int AppleIIgs::appleiigs_hiresPlot_II()
   fprintf(out, "  sep #0x30\n");
   fprintf(out, "  sta [address]\n");
   fprintf(out, "  rep #0x30\n");
-
-  stack -= 2;
-
-  return 0;
+  fprintf(out, "  rts\n");
 }
 
-// hiresSpan(address, color, width) - draws horizontal line
-int AppleIIgs::appleiigs_hiresSpan_III()
+void AppleIIgs::insert_hires_span()
 {
-  fprintf(out, ";; hiresSpan()\n");
+  fprintf(out, "hires_span:\n");
   POP();
   fprintf(out, "  tay\n");
   fprintf(out, "  dey\n");
@@ -134,16 +250,12 @@ int AppleIIgs::appleiigs_hiresSpan_III()
   fprintf(out, "  dey\n");
   fprintf(out, "  bpl #-5\n");
   fprintf(out, "  rep #0x30\n");
-
-  stack -= 3;
-
-  return 0;
+  fprintf(out, "  rts\n");
 }
 
-// hiresRead(address) - read pixel color
-int AppleIIgs::appleiigs_hiresRead_I()
+void AppleIIgs::insert_hires_read()
 {
-  fprintf(out, ";; hiresRead()\n");
+  fprintf(out, "hires_read:\n");
   POP();
   fprintf(out, "  sta address\n");
   fprintf(out, "  lda #0xe1\n");
@@ -151,15 +263,12 @@ int AppleIIgs::appleiigs_hiresRead_I()
   fprintf(out, "  lda [address]\n");
   fprintf(out, "  and #0xff\n");
   PUSH();
-
-  return 0;
+  fprintf(out, "  rts\n");
 }
 
-// hiresBlit(byte[] source, int dest, int width, int length)
-// draw an image, width is in *bytes* length is source.length
-int AppleIIgs::appleiigs_hiresBlit_aBIII()
+void AppleIIgs::insert_hires_blit()
 {
-  fprintf(out, ";; hiresBlit()\n");
+  fprintf(out, "hires_blit:\n");
   // length
   POP();
   fprintf(out, "  sta length\n");
@@ -208,17 +317,12 @@ int AppleIIgs::appleiigs_hiresBlit_aBIII()
   fprintf(out, "  jmp label_%d\n", label_count + 0);
   fprintf(out, "label_%d:\n", label_count + 1);
   fprintf(out, "  plx\n");
-  
-  stack -= 4;
-  label_count += 2;
-
-  return 0;
+  fprintf(out, "  rts\n");
 }
 
-// hiresPalette(int palette, byte[] source) - change palette
-int AppleIIgs::appleiigs_hiresPalette_IaI()
+void AppleIIgs::insert_hires_palette()
 {
-  fprintf(out, ";; hiresPalette()\n");
+  fprintf(out, "hires_palette:\n");
   POP();
   fprintf(out, "  sta value2\n");
   POP();
@@ -243,17 +347,12 @@ int AppleIIgs::appleiigs_hiresPalette_IaI()
   fprintf(out, "  iny\n");
   fprintf(out, "  cpy #32\n");
   fprintf(out, "  bne label_%d\n", label_count + 2);
-
-  stack -= 2;
-  label_count += 3;
-
-  return 0;
+  fprintf(out, "  rts\n");
 }
 
-// hiresSetLinePalette(int line, int palette) - set palette for line
-int AppleIIgs::appleiigs_hiresSetLinePalette_II()
+void AppleIIgs::insert_hires_set_line()
 {
-  fprintf(out, ";; hiresSetLinePalette()\n");
+  fprintf(out, "hires_set_line:\n");
   POP();
   fprintf(out, "  and #15\n");
   fprintf(out, "  sta value1\n");
@@ -265,35 +364,6 @@ int AppleIIgs::appleiigs_hiresSetLinePalette_II()
   fprintf(out, "  sta.l 0xe19d00,x\n");
   fprintf(out, "  rep #0x30\n");
   fprintf(out, "  tyx\n");
-
-  stack -= 2;
-
-  return 0;
-}
-
-// Sound API
-int AppleIIgs::appleiigs_loadWaveTable_BA()
-{
-  return -1;
-}
-
-int AppleIIgs::appleiigs_enableOscillators_I()
-{
-  return -1;
-}
-
-int AppleIIgs::appleiigs_setMasterVolume_I()
-{
-  return -1;
-}
-
-int AppleIIgs::appleiigs_setSoundVolume_II()
-{
-  return -1;
-}
-
-int AppleIIgs::appleiigs_setSoundFrequency_II()
-{
-  return -1;
+  fprintf(out, "  rts\n");
 }
 
