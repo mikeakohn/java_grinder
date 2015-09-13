@@ -91,7 +91,7 @@ public class AppleIIgsJavaDemo
     AppleIIgs.hiresPalette(0, palette1);
 
     for(i = 0; i <= 199; i++) 
-      AppleIIgs.hiresSetLinePalette(i, 0);
+      AppleIIgs.hiresSetLine(i, 0);
 
     address = 0x2000;
 

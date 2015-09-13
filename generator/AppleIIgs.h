@@ -29,7 +29,7 @@ public:
   virtual int appleiigs_hiresRead_I();
   virtual int appleiigs_hiresBlit_aBIII();
   virtual int appleiigs_hiresPalette_IaI();
-  virtual int appleiigs_hiresSetLinePalette_II();
+  virtual int appleiigs_hiresSetLine_II();
 
   virtual int appleiigs_loadWaveTable_BA();
   virtual int appleiigs_enableOscillators_I();
@@ -38,6 +38,21 @@ public:
   virtual int appleiigs_setSoundFrequency_II();
 
 private:
+  void insert_hires_enable();
+  void insert_hires_plot();
+  void insert_hires_span();
+  void insert_hires_read();
+  void insert_hires_blit();
+  void insert_hires_palette();
+  void insert_hires_set_line();
+
+  bool need_hires_enable:1;
+  bool need_hires_plot:1;
+  bool need_hires_span:1;
+  bool need_hires_read:1;
+  bool need_hires_blit:1;
+  bool need_hires_palette:1;
+  bool need_hires_set_line:1;
 };
 
 #endif
