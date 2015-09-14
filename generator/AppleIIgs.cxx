@@ -434,9 +434,11 @@ void AppleIIgs::insert_hires_blit()
   // write pixel
   fprintf(out, "  phy\n");
   fprintf(out, "  txy\n");
-  fprintf(out, "  lda value3\n");
   fprintf(out, "  sep #0x20\n");
+  fprintf(out, "  lda value3\n");
+  fprintf(out, "  beq hires_blit_skip_mask\n");
   fprintf(out, "  sta [address],y\n");
+  fprintf(out, "hires_blit_skip_mask:\n");
   fprintf(out, "  rep #0x30\n");
   fprintf(out, "  ply\n");
 
