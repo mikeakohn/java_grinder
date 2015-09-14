@@ -50,9 +50,12 @@ public class Mandelbrots
           zi = ti + is;
         }
 
-        if (count == 16) { count = 15; }
+        //if (count == 16) { count = 15; }
 
-        SegaGenesis.plot(x, y, count);
+        if (count < 15)
+        {
+          SegaGenesis.plot(x, y, count);
+        }
 
         rs += dx;
       }
