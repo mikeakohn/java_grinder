@@ -27,8 +27,8 @@ public:
   virtual int appleiigs_hiresPlot_III();
   virtual int appleiigs_hiresLine_IIIII();
   virtual int appleiigs_hiresSpan_IIII();
-  virtual int appleiigs_hiresRead_I();
-  virtual int appleiigs_hiresBlit_aBIII();
+  virtual int appleiigs_hiresRead_II();
+  virtual int appleiigs_hiresBlit_aBIIII();
   virtual int appleiigs_hiresPalette_IaI();
   virtual int appleiigs_hiresSetRow_II();
 
@@ -47,6 +47,7 @@ private:
   void insert_hires_blit();
   void insert_hires_palette();
   void insert_hires_set_row();
+  void insert_hires_calc_address();
 
   bool need_hires_enable:1;
   bool need_hires_plot:1;

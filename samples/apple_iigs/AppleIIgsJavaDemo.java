@@ -4,8 +4,26 @@ import net.mikekohn.java_grinder.CPU;
 
 public class AppleIIgsJavaDemo
 {
-// sprite test
-//  static byte sprite[] = { 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+  static byte sprite[] =
+  {
+    0,
+    (1 | 1 << 4),
+    (1 | 1 << 4),
+    (1 | 1 << 4),
+    (1 | 1 << 4),
+    (1 | 1 << 4),
+    (1 | 1 << 4),
+    (1 | 1 << 4),
+    (1 | 1 << 4),
+    (1 | 1 << 4),
+    (1 | 1 << 4),
+    (1 | 1 << 4),
+    (1 | 1 << 4),
+    (1 | 1 << 4),
+    (1 | 1 << 4),
+    (3 | 3 << 4)
+  };
+
   static int palette1[] =
   {
     0xfff,
@@ -101,11 +119,6 @@ public class AppleIIgsJavaDemo
     wait(10000);
     wait(10000);
     wait(10000);
-// sprite test
-//    AppleIIgs.hiresBlit(sprite, 0x2000, 4, 16);
-//    AppleIIgs.hiresBlit(sprite, 0x2000 + 50 + 160 * 50, 4, 16);
-//    AppleIIgs.hiresBlit(sprite, 0x2000 + 100 + 160 * 175, 4, 16);
-//    while(true);
 
     int yy = 0;
 
@@ -201,6 +214,10 @@ public class AppleIIgsJavaDemo
 
     for(i = 0; i <= 0xdd; i += 0x11)
       rectfill(80, 150, 159, 199, i);
+
+    AppleIIgs.hiresBlit(sprite, 0, 0, 4, 16);
+    AppleIIgs.hiresBlit(sprite, 100, 100, 4, 16);
+    AppleIIgs.hiresBlit(sprite, 120, 160, 4, 16);
 
     while(true)
     {
