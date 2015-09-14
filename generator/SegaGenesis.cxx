@@ -288,11 +288,28 @@ int SegaGenesis::sega_genesis_plot()
 {
   need_plot = true;
 
-  // REVIEW: Can possibly save some CPU instructions by moving to stack
-  fprintf(out, "  move.l %s, d7\n", pop_reg());
-  fprintf(out, "  move.l %s, d6\n", pop_reg());
-  fprintf(out, "  move.l %s, d5\n", pop_reg());
+  if (reg != 3)
+  {
+    fprintf(out, "  push.l d0\n");
+    fprintf(out, "  push.l d1\n");
+    fprintf(out, "  push.l d2\n");
+
+    fprintf(out, "  move.l d%d, d0\n", REG_STACK(reg - 3));
+    fprintf(out, "  move.l d%d, d1\n", REG_STACK(reg - 2));
+    fprintf(out, "  move.l d%d, d2\n", REG_STACK(reg - 1));
+  }
+
   fprintf(out, "  jsr _plot\n");
+
+  if (reg != 3)
+  {
+    fprintf(out, "  pop.l d2\n");
+    fprintf(out, "  pop.l d1\n");
+    fprintf(out, "  pop.l d0\n");
+  }
+
+  reg -= 3;
+
   return 0;
 }
 
@@ -1070,51 +1087,51 @@ void SegaGenesis::add_plot()
   // address += ((pixel_x) + (pixel_y * 8)) / 2  or
   // address += (pixel_x / 2) + (pixel_y * 4)
 
-  // d5 = X
-  // d6 = Y
-  // d7 = color
+  // d0 = X
+  // d1 = Y
+  // d2 = color
   fprintf(out,
-    "  ;; plot(x=d5, y=d6, d7=color);\n"
+    "  ;; plot(x=d0, y=d1, d2=color);\n"
     "_plot:\n"
-    "  move.w d4, (-8,a7) ; save register so it can be used for other stuff\n"
-    "  move.w d5, (-4,a7)\n"
-    "  move.w d6, (-6,a7)\n"
-    "  lsr.w #3, d5   ; block_x = x / 8\n"
-    "  and.w #0xfff8, d6 ; block_y = (block_y / 8) * 8\n"
-    "  add.l d6, d5   ; address = block_x + block_y\n"
-    "  lsl.l #2, d6   ; block_y *= 4\n"
-    "  add.l d6, d5   ; address = block_x + block_y\n"
-    "  lsl.l #5, d5   ; address *= 32\n"
-    "  move.w (-4,a7), d6\n"
-    "  and.l #0x7, d6 ; x = x %% 8\n"
-    "  lsr.w #1, d6   ; x = x / 2\n"
-    "  add.l d6, d5   ; address += x\n"
-    "  move.w (-6,a7), d6\n"
-    "  and.l #0x7, d6 ; y = y %% 8\n"
-    "  lsl.w #2, d6   ; y = y * 4\n"
-    "  add.l d6, d5   ; address += y\n"
-    "  move.l d5, d4  ; need the upper 2 bits\n"
-    "  rol.w #2, d4\n"
-    "  and.w #3, d4\n"
-    "  and.w #0x3ffe, d5; address &= 0xffff3ffe (write to even address)\n"
-    "  swap d5        ; address <<= 16\n"
-    "  or.b d4, d5    ; move upper two bits of address into lower\n"
-    "  move.l d5, (a1); read word from VRAM and save in temp space\n"
-    "  move.w (a0), d4\n"
-    "  or.l #0x40000000, d5\n"
-    "  move.l d5, (a1)\n"
-    "  move.w (-4,a7), d6\n"
-    "  and.w #0x3, d6 ; x = x & 0x3\n"
-    "  neg.w d6\n"
-    "  addq.w #3, d6\n"
-    "  lsl.w #2, d6\n"
-    "  lsl.w d6, d7\n"
-    "  move.w #0xfff0, d5\n"
-    "  rol.w d6, d5\n"
-    "  and.w d4, d5\n"
-    "  or.w d5, d7\n"
-    "  move.w d7, (a0)\n"
-    "  move.w (-8,a7), d4 ; restore register\n"
+    //"  move.w d4, (-8,a7) ; save register so it can be used for other stuff\n"
+    "  move.w d0, d7\n"
+    "  move.w d1, d6\n"
+    "  lsr.w #3, d0   ; block_x = x / 8\n"
+    "  and.w #0xfff8, d1 ; block_y = (block_y / 8) * 8\n"
+    "  add.l d1, d0   ; address = block_x + block_y\n"
+    "  lsl.l #2, d1   ; block_y *= 4\n"
+    "  add.l d1, d0   ; address = block_x + block_y\n"
+    "  lsl.l #5, d0   ; address *= 32\n"
+    "  move.w d7, d1\n"
+    "  and.l #0x7, d1 ; x = x %% 8\n"
+    "  lsr.w #1, d1   ; x = x / 2\n"
+    "  add.l d1, d0   ; address += x\n"
+    "  move.w d6, d1\n"
+    "  and.l #0x7, d1 ; y = y %% 8\n"
+    "  lsl.w #2, d1   ; y = y * 4\n"
+    "  add.l d1, d0   ; address += y\n"
+    "  move.l d0, d5  ; need the upper 2 bits\n"
+    "  rol.w #2, d5\n"
+    "  and.w #3, d5\n"
+    "  and.w #0x3ffe, d0; address &= 0xffff3ffe (write to even address)\n"
+    "  swap d0        ; address <<= 16\n"
+    "  or.b d5, d0    ; move upper two bits of address into lower\n"
+    "  move.l d0, (a1); read word from VRAM and save in temp space\n"
+    "  move.w (a0), d5\n"
+    "  or.l #0x40000000, d0\n"
+    "  move.l d0, (a1)\n"
+    "  move.w d7, d1\n"
+    "  and.w #0x3, d1 ; x = x & 0x3\n"
+    "  neg.w d1\n"
+    "  addq.w #3, d1\n"
+    "  lsl.w #2, d1\n"
+    "  lsl.w d1, d2\n"
+    "  move.w #0xfff0, d0\n"
+    "  rol.w d1, d0\n"
+    "  and.w d5, d0\n"
+    "  or.w d0, d2\n"
+    "  move.w d2, (a0)\n"
+    //"  move.w (-8,a7), d4 ; restore register\n"
     "  rts\n\n");
 }
 
