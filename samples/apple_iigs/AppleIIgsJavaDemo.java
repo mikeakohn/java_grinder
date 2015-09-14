@@ -215,9 +215,9 @@ public class AppleIIgsJavaDemo
     for(i = 0; i <= 0xdd; i += 0x11)
       rectfill(80, 150, 159, 199, i);
 
-    AppleIIgs.hiresBlit(sprite, 0, 0, 4, 16);
-    AppleIIgs.hiresBlit(sprite, 100, 100, 4, 16);
-    AppleIIgs.hiresBlit(sprite, 120, 160, 4, 16);
+    AppleIIgs.hiresSprite(sprite, 0, 0, 4, 16);
+    AppleIIgs.hiresSprite(sprite, 100, 100, 4, 16);
+    AppleIIgs.hiresSprite(sprite, 120, 160, 4, 16);
 
     while(true)
     {

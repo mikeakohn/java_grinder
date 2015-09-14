@@ -35,7 +35,7 @@ AppleIIgs::AppleIIgs() :
   need_hires_line(false),
   need_hires_span(false),
   need_hires_read(false),
-  need_hires_blit(false),
+  need_hires_sprite(false),
   need_hires_palette(false),
   need_hires_set_row(false)
 {
@@ -51,7 +51,7 @@ AppleIIgs::~AppleIIgs()
   if (need_hires_line) { insert_hires_line(); }
   if (need_hires_span) { insert_hires_span(); }
   if (need_hires_read) { insert_hires_read(); }
-  if (need_hires_blit) { insert_hires_blit(); }
+  if (need_hires_sprite) { insert_hires_sprite(); }
   if (need_hires_palette) { insert_hires_palette(); }
   if (need_hires_set_row) { insert_hires_set_row(); }
   insert_hires_calc_address();
@@ -163,10 +163,10 @@ int AppleIIgs::appleiigs_hiresRead_II()
   return 0;
 }
 
-int AppleIIgs::appleiigs_hiresBlit_aBIIII()
+int AppleIIgs::appleiigs_hiresSprite_aBIIII()
 {
-  need_hires_blit = true;
-  fprintf(out, "jsr hires_blit\n");
+  need_hires_sprite = true;
+  fprintf(out, "jsr hires_sprite\n");
   
   stack -= 5;
 
@@ -407,9 +407,9 @@ void AppleIIgs::insert_hires_read()
   fprintf(out, "  rts\n");
 }
 
-void AppleIIgs::insert_hires_blit()
+void AppleIIgs::insert_hires_sprite()
 {
-  fprintf(out, "hires_blit:\n");
+  fprintf(out, "hires_sprite:\n");
   // length
   POP();
   fprintf(out, "  sta length\n");
@@ -427,7 +427,7 @@ void AppleIIgs::insert_hires_blit()
   fprintf(out, "  ldx #0\n");
 
   // read from array
-  fprintf(out, "hires_blit_y_loop:\n");
+  fprintf(out, "hires_sprite_y_loop:\n");
   fprintf(out, "  lda (value2),y\n");
   fprintf(out, "  sta value3\n");
 
@@ -436,9 +436,9 @@ void AppleIIgs::insert_hires_blit()
   fprintf(out, "  txy\n");
   fprintf(out, "  sep #0x20\n");
   fprintf(out, "  lda value3\n");
-  fprintf(out, "  beq hires_blit_skip_mask\n");
+  fprintf(out, "  beq hires_sprite_skip_mask\n");
   fprintf(out, "  sta [address],y\n");
-  fprintf(out, "hires_blit_skip_mask:\n");
+  fprintf(out, "hires_sprite_skip_mask:\n");
   fprintf(out, "  rep #0x30\n");
   fprintf(out, "  ply\n");
 
@@ -446,16 +446,16 @@ void AppleIIgs::insert_hires_blit()
   fprintf(out, "  iny\n");
   fprintf(out, "  inx\n");
   fprintf(out, "  cpy length\n");
-  fprintf(out, "  beq hires_blit_end\n");
+  fprintf(out, "  beq hires_sprite_end\n");
   fprintf(out, "  cpx value1\n");
-  fprintf(out, "  bne hires_blit_y_loop\n");
+  fprintf(out, "  bne hires_sprite_y_loop\n");
   fprintf(out, "  clc\n");
   fprintf(out, "  lda address\n");
   fprintf(out, "  adc #160\n");
   fprintf(out, "  sta address\n");
   fprintf(out, "  ldx #0\n");
-  fprintf(out, "  jmp hires_blit_y_loop\n");
-  fprintf(out, "hires_blit_end:\n");
+  fprintf(out, "  jmp hires_sprite_y_loop\n");
+  fprintf(out, "hires_sprite_end:\n");
   fprintf(out, "  plx\n");
   fprintf(out, "  rts\n");
 }

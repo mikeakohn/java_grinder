@@ -23,7 +23,7 @@ abstract public class AppleIIgs
   public static void hiresLine(int x1, int y1, int x2, int y2, int c) { }
   public static void hiresSpan(int x, int y, int length, int c) { }
   public static int hiresRead(int x, int y) { return 0; }
-  public static void hiresBlit(byte[] data, int x, int y, int width, int length) { }
+  public static void hiresSprite(byte[] data, int x, int y, int width, int length) { }
   public static void hiresPalette(int palette, int[] data) { }
   public static void hiresSetRow(int row, int palette) { }
 

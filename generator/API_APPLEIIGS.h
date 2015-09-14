@@ -23,7 +23,7 @@ public:
   virtual int appleiigs_hiresLine_IIIII() { return -1; }
   virtual int appleiigs_hiresSpan_IIII() { return -1; }
   virtual int appleiigs_hiresRead_II() { return -1; }
-  virtual int appleiigs_hiresBlit_aBIIII() { return -1; }
+  virtual int appleiigs_hiresSprite_aBIIII() { return -1; }
   virtual int appleiigs_hiresPalette_IaI() { return -1; }
   virtual int appleiigs_hiresSetRow_II() { return -1; }
 

@@ -38,7 +38,7 @@ int appleiigs(JavaClass *java_class, Generator *generator, char *function)
   CHECK_FUNC(hiresLine,_IIIII)
   CHECK_FUNC(hiresSpan,_IIII)
   CHECK_FUNC(hiresRead,_II)
-  CHECK_FUNC(hiresBlit,_aBIIII)
+  CHECK_FUNC(hiresSprite,_aBIIII)
   CHECK_FUNC(hiresPalette,_IaI)
   CHECK_FUNC(hiresSetRow,_II)
 

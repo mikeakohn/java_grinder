@@ -28,7 +28,7 @@ public:
   virtual int appleiigs_hiresLine_IIIII();
   virtual int appleiigs_hiresSpan_IIII();
   virtual int appleiigs_hiresRead_II();
-  virtual int appleiigs_hiresBlit_aBIIII();
+  virtual int appleiigs_hiresSprite_aBIIII();
   virtual int appleiigs_hiresPalette_IaI();
   virtual int appleiigs_hiresSetRow_II();
 
@@ -44,7 +44,7 @@ private:
   void insert_hires_line();
   void insert_hires_span();
   void insert_hires_read();
-  void insert_hires_blit();
+  void insert_hires_sprite();
   void insert_hires_palette();
   void insert_hires_set_row();
   void insert_hires_calc_address();
@@ -54,7 +54,7 @@ private:
   bool need_hires_line:1;
   bool need_hires_span:1;
   bool need_hires_read:1;
-  bool need_hires_blit:1;
+  bool need_hires_sprite:1;
   bool need_hires_palette:1;
   bool need_hires_set_row:1;
 };
