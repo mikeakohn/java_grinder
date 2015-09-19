@@ -379,8 +379,16 @@ int W65816::dup()
 
 int W65816::dup2()
 {
-  printf("Need to implement dup2()\n");
-  return -1;
+  POP();
+  POP();
+  PUSH();
+  PUSH();
+  PUSH();
+  PUSH();
+
+  stack += 2;
+
+  return 0;
 }
 
 int W65816::swap()
