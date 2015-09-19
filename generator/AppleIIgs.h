@@ -49,6 +49,7 @@ private:
   void insert_hires_palette();
   void insert_hires_set_row();
   void insert_hires_calc_address();
+  void insert_rnd();
 
   bool need_hires_enable:1;
   bool need_hires_plot:1;
@@ -58,6 +59,7 @@ private:
   bool need_hires_sprite:1;
   bool need_hires_palette:1;
   bool need_hires_set_row:1;
+  bool need_rnd:1;
 };
 
 #endif

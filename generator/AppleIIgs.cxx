@@ -37,7 +37,8 @@ AppleIIgs::AppleIIgs() :
   need_hires_read(false),
   need_hires_sprite(false),
   need_hires_palette(false),
-  need_hires_set_row(false)
+  need_hires_set_row(false),
+  need_rnd(false)
 {
   start_org = 0x1000;
   java_stack = 0x800;
@@ -54,6 +55,7 @@ AppleIIgs::~AppleIIgs()
   if (need_hires_sprite) { insert_hires_sprite(); }
   if (need_hires_palette) { insert_hires_palette(); }
   if (need_hires_set_row) { insert_hires_set_row(); }
+  if (need_rnd) { insert_rnd(); }
   insert_hires_calc_address();
 }
 
@@ -76,8 +78,9 @@ int AppleIIgs::open(const char *filename)
 
   // random number seed
   fprintf(out, "_seed equ _vars + 20\n");
+  fprintf(out, "_bit equ _vars + 22\n");
   fprintf(out, "rep #0x30\n");
-  fprintf(out, "lda #12345\n");
+  fprintf(out, "lda #0xace1\n");
   fprintf(out, "sta _seed\n");
 
   return 0;
@@ -202,6 +205,7 @@ int AppleIIgs::appleiigs_hiresSetRow_II()
 
 int AppleIIgs::appleiigs_rnd()
 {
+/*
   fprintf(out, ";; rnd()\n");
   fprintf(out, "  clc\n");
   fprintf(out, "  lda _seed\n");
@@ -214,6 +218,13 @@ int AppleIIgs::appleiigs_rnd()
   fprintf(out, "  sta _seed\n");
   PUSH();
 
+  stack++;
+
+  return 0;
+
+*/
+  need_rnd = true;
+  fprintf(out, "jsr rnd\n");
   stack++;
 
   return 0;
@@ -565,6 +576,22 @@ void AppleIIgs::insert_hires_calc_address()
   fprintf(out, "  sta address\n");
   fprintf(out, "  lda #0xe1\n");
   fprintf(out, "  sta address + 2\n");
+  fprintf(out, "  rts\n");
+}
+
+void AppleIIgs::insert_rnd()
+{
+  fprintf(out, "rnd:\n");
+  fprintf(out, "  lda _seed\n");
+  PUSH();
+  fprintf(out, "  lda #31421\n");
+  PUSH();
+  fprintf(out, "  jsr mul_integer\n");
+  POP();
+  fprintf(out, "  clc\n");
+  fprintf(out, "  adc #6927\n");
+  fprintf(out, "  sta _seed\n");
+  PUSH();
   fprintf(out, "  rts\n");
 }
 
