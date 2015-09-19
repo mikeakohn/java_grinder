@@ -205,11 +205,11 @@ public class AppleIIgsJavaDemo
     for(i = 0; i <= 0xdd; i += 0x11)
       rectfill(80, 150, 159, 199, i);
 
-    for(x = 0; x < 4000; x++)
+    for(x = 0; x < 10000; x++)
     {
       int c = AppleIIgs.rnd() & 15;
-      AppleIIgs.hiresSprite(sprite, AppleIIgs.rnd() % 156,
-                                    AppleIIgs.rnd() % 196,
+      AppleIIgs.hiresSprite(sprite, AppleIIgs.rnd() % 157,
+                                    AppleIIgs.rnd() % 197,
                                     4, 16);
     }
     AppleIIgs.hiresSprite(sprite, 0, 0, 4, 16);
