@@ -26,6 +26,7 @@ public:
   virtual int appleiigs_hiresSprite_aBIIII() { return -1; }
   virtual int appleiigs_hiresPalette_IaI() { return -1; }
   virtual int appleiigs_hiresSetRow_II() { return -1; }
+  virtual int appleiigs_rnd() { return -1; }
 
   // Sound Chip
   virtual int appleiigs_loadWaveTable_BA() { return -1; }

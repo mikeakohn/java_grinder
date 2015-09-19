@@ -31,6 +31,7 @@ public:
   virtual int appleiigs_hiresSprite_aBIIII();
   virtual int appleiigs_hiresPalette_IaI();
   virtual int appleiigs_hiresSetRow_II();
+  virtual int appleiigs_rnd();
 
   virtual int appleiigs_loadWaveTable_BA();
   virtual int appleiigs_enableOscillators_I();

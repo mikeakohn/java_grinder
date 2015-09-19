@@ -26,6 +26,7 @@ abstract public class AppleIIgs
   public static void hiresSprite(byte[] data, int x, int y, int width, int length) { }
   public static void hiresPalette(int palette, int[] data) { }
   public static void hiresSetRow(int row, int palette) { }
+  public static int rnd() { return 0; }
 
   /** Sound wave table. */
   public static void loadWaveTable(byte[] data) { }

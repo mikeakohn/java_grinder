@@ -61,6 +61,7 @@ int AppleIIgs::open(const char *filename)
 {
   if (W65816::open(filename) != 0) { return -1; }
 
+  // for line drawing
   fprintf(out, "_vars equ 0x7f00\n");
   fprintf(out, "_x1 equ _vars + 0\n");
   fprintf(out, "_y1 equ _vars + 2\n");
@@ -72,6 +73,12 @@ int AppleIIgs::open(const char *filename)
   fprintf(out, "_inx equ _vars + 14\n");
   fprintf(out, "_iny equ _vars + 16\n");
   fprintf(out, "_e equ _vars + 18\n");
+
+  // random number seed
+  fprintf(out, "_seed equ _vars + 20\n");
+  fprintf(out, "rep #0x30\n");
+  fprintf(out, "lda #12345\n");
+  fprintf(out, "sta _seed\n");
 
   return 0;
 }
@@ -189,6 +196,25 @@ int AppleIIgs::appleiigs_hiresSetRow_II()
   fprintf(out, "jsr hires_set_row\n");
 
   stack -= 2;
+
+  return 0;
+}
+
+int AppleIIgs::appleiigs_rnd()
+{
+  fprintf(out, ";; rnd()\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda _seed\n");
+  fprintf(out, "  sbc #32765\n");
+  PUSH();
+  fprintf(out, "  lda #12345\n");
+  PUSH();
+  fprintf(out, "  jsr mul_integer\n");
+  POP();
+  fprintf(out, "  sta _seed\n");
+  PUSH();
+
+  stack++;
 
   return 0;
 }

@@ -6,22 +6,10 @@ public class AppleIIgsJavaDemo
 {
   static byte sprite[] =
   {
-    0,
-    (1 | 1 << 4),
-    (1 | 1 << 4),
-    (1 | 1 << 4),
-    (1 | 1 << 4),
-    (1 | 1 << 4),
-    (1 | 1 << 4),
-    (1 | 1 << 4),
-    (1 | 1 << 4),
-    (1 | 1 << 4),
-    (1 | 1 << 4),
-    (1 | 1 << 4),
-    (1 | 1 << 4),
-    (1 | 1 << 4),
-    (1 | 1 << 4),
-    (3 | 3 << 4)
+    (byte)0x00, (byte)0x88, (byte)0x88, (byte)0x00,
+    (byte)0x88, (byte)0x66, (byte)0x66, (byte)0x88,
+    (byte)0x88, (byte)0x66, (byte)0x66, (byte)0x88,
+    (byte)0x00, (byte)0x88, (byte)0x88, (byte)0x00
   };
 
   static int palette1[] =
@@ -107,18 +95,15 @@ public class AppleIIgsJavaDemo
     for(i = 0; i < 200; i++) 
       AppleIIgs.hiresSpan(0, i, 160, 255);
 
-// line test
-    AppleIIgs.hiresLine(0, 0, 159, 199, 8 | (8 << 4));
-    AppleIIgs.hiresLine(100, 40, 64, 96, 7 | (7 << 4));
-    AppleIIgs.hiresLine(50, 10, 140, 34, 6 | (6 << 4));
-    AppleIIgs.hiresLine(25, 100, 40, 180, 5 | (5 << 4));
-    AppleIIgs.hiresLine(150, 4, 4, 140, 4 | (4 << 4));
-
-    wait(10000);
-    wait(10000);
-    wait(10000);
-    wait(10000);
-    wait(10000);
+    for(x = 0; x < 1000; x++)
+    {
+      int c = AppleIIgs.rnd() & 15;
+      AppleIIgs.hiresLine(AppleIIgs.rnd() % 160,
+                          AppleIIgs.rnd() % 200,
+                          AppleIIgs.rnd() % 160,
+                          AppleIIgs.rnd() % 200,
+                          c | (c << 4));
+    }
 
     int yy = 0;
 
@@ -131,9 +116,14 @@ public class AppleIIgsJavaDemo
 
       for(x = 0; x < 160 * 16; x += 16, xx++)
       {
-        if((xx < 50 || xx > 110 || yy < 50 || yy > 145) ||
-           (xx > 78 && xx < 93 && yy > 85 && yy < 115))
+        if(xx < 50 || xx > 110 || yy < 50 || yy > 145)
+          continue;
+
+        if(xx > 78 && xx < 93 && yy > 85 && yy < 115)
         {
+          AppleIIgs.hiresPlot(xx, yy, (15 | (15 << 4)));
+          AppleIIgs.hiresPlot(xx, 199 - yy, (15 | (15 << 4)));
+
           continue;
         }
 
@@ -215,6 +205,13 @@ public class AppleIIgsJavaDemo
     for(i = 0; i <= 0xdd; i += 0x11)
       rectfill(80, 150, 159, 199, i);
 
+    for(x = 0; x < 4000; x++)
+    {
+      int c = AppleIIgs.rnd() & 15;
+      AppleIIgs.hiresSprite(sprite, AppleIIgs.rnd() % 156,
+                                    AppleIIgs.rnd() % 196,
+                                    4, 16);
+    }
     AppleIIgs.hiresSprite(sprite, 0, 0, 4, 16);
     AppleIIgs.hiresSprite(sprite, 100, 100, 4, 16);
     AppleIIgs.hiresSprite(sprite, 120, 160, 4, 16);
