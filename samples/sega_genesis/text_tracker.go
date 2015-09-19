@@ -24,7 +24,7 @@ type TimeSignature struct {
 
 type Note struct {
   value uint8
-  length uint8
+  length int
 }
 
 type Pattern struct {
@@ -214,8 +214,10 @@ func ParsePatternVoice(tokens *Tokens, voice []Note, divisions int) bool {
   for true {
     beat_float, _ := strconv.ParseFloat(tokens.Get(), 64)
     note := ConvertNote(tokens.Get())
-    length, _ := strconv.Atoi(tokens.Get())
+    length, _ := strconv.ParseFloat(tokens.Get(), 64)
     separator := tokens.Get()
+
+    length *= float64(divisions)
 
     beat := int(float64(divisions) * beat_float)
 
@@ -227,7 +229,7 @@ func ParsePatternVoice(tokens *Tokens, voice []Note, divisions int) bool {
     }
 
     voice[beat].value = uint8(note)
-    voice[beat].length = uint8(length)
+    voice[beat].length = int(length)
 
     if separator == ";" { break }
     if separator != "," {
@@ -536,9 +538,16 @@ func CreateMidi(song *Song, time_signature *TimeSignature, divisions int, bpm in
     for i := 0; i < len(pattern); i++ {
       if pattern[i].value != 0 {
         delay := i - last_note
+        //fmt.Printf("ON: i=%d last_note=%d delay=%d\n", i, last_note, delay)
+        if delay < 0 { fmt.Println("ERROR! @") }
         track_data = append(track_data, WriteNote(delay, 0, pattern[i].value, true)...)
-        track_data = append(track_data, WriteNote(delay + int(pattern[i].length), 0, pattern[i].value, false)...)
-        last_note = i + int(pattern[i].length)
+        last_note = i + delay
+        delay = pattern[i].length
+        //fmt.Printf("OFF: i=%d (%d) last_note=%d delay=%d\n", i, i + pattern[i].length, last_note, delay)
+        if delay < 0 { fmt.Printf("ERROR! %d\n", delay) }
+
+        track_data = append(track_data, WriteNote(delay, 0, pattern[i].value, false)...)
+        last_note += delay
       }
     }
 
