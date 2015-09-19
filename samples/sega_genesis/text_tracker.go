@@ -456,7 +456,7 @@ func WriteNote(delay int, channel int, value uint8, is_on bool) []uint8 {
   track_data := GetVarInt(delay)
 
   if is_on { command = 0x90 } else { command = 0x80 }
-  //command |= uint8(channel)
+  command |= uint8(channel)
 
   track_data = append(track_data, []uint8{ command, value, 127 }...)
 
@@ -470,7 +470,8 @@ func CreateMidi(song *Song, time_signature *TimeSignature, divisions int, bpm in
   if err != nil { panic(err) }
 
   track_has_data := make([]bool, 6)
-  tracks := 0
+  drums_has_data := false
+  tracks := 1
 
   for voice := 0; voice < 6; voice++ {
     pattern := song.voices[voice]
@@ -481,6 +482,14 @@ func CreateMidi(song *Song, time_signature *TimeSignature, divisions int, bpm in
         track_has_data[voice] = true
         break
       }
+    }
+  }
+
+  for i := 0; i < len(song.drums); i++ {
+    if song.drums[i] != 0 {
+      drums_has_data = true
+      tracks++
+      break
     }
   }
 
@@ -527,8 +536,8 @@ func CreateMidi(song *Song, time_signature *TimeSignature, divisions int, bpm in
     for i := 0; i < len(pattern); i++ {
       if pattern[i].value != 0 {
         delay := i - last_note
-        track_data = append(track_data, WriteNote(delay, voice, pattern[i].value, true)...)
-        track_data = append(track_data, WriteNote(delay + int(pattern[i].length), voice, pattern[i].value, false)...)
+        track_data = append(track_data, WriteNote(delay, 0, pattern[i].value, true)...)
+        track_data = append(track_data, WriteNote(delay + int(pattern[i].length), 0, pattern[i].value, false)...)
         last_note = i + int(pattern[i].length)
       }
     }
@@ -538,12 +547,26 @@ func CreateMidi(song *Song, time_signature *TimeSignature, divisions int, bpm in
     file.WriteString("MTrk")
     WriteInt32(file, len(track_data))
     file.Write(track_data)
+  }
 
-    // Debug output
-    //for _,element := range track_data {
-    //  fmt.Printf(" %02x", element)
-    //}
-    //fmt.Printf("\n\n")
+  // Write drum data to track
+  if drums_has_data {
+    track_data := make([]uint8, 0)
+    last_note := 0
+
+    for i := 0; i < len(song.drums); i++ {
+      if song.drums[i] != 0 {
+        delay := i - last_note
+        track_data = append(track_data, WriteNote(delay, 9, uint8(song.drums[i]), true)...)
+        last_note = i
+      }
+    }
+
+    track_data = append(track_data, []uint8{ 0, 0xff, 0x2f, 0x00 }...)
+
+    file.WriteString("MTrk")
+    WriteInt32(file, len(track_data))
+    file.Write(track_data)
   }
 }
 
