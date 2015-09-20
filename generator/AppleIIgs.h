@@ -25,6 +25,7 @@ public:
   virtual int appleiigs_printChar_C();
   virtual int appleiigs_hiresEnable();
   virtual int appleiigs_hiresClear_I();
+  virtual int appleiigs_hiresUpdate();
   virtual int appleiigs_hiresPlot_III();
   virtual int appleiigs_hiresLine_IIIII();
   virtual int appleiigs_hiresSpan_IIII();
@@ -43,6 +44,7 @@ public:
 private:
   void insert_hires_enable();
   void insert_hires_clear();
+  void insert_hires_update();
   void insert_hires_plot();
   void insert_hires_line();
   void insert_hires_span();
@@ -55,6 +57,7 @@ private:
 
   bool need_hires_enable:1;
   bool need_hires_clear:1;
+  bool need_hires_update:1;
   bool need_hires_plot:1;
   bool need_hires_line:1;
   bool need_hires_span:1;

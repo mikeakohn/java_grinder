@@ -32,6 +32,7 @@ AppleIIgs::AppleIIgs() :
 //  need_print_char(false),
   need_hires_enable(false),
   need_hires_clear(false),
+  need_hires_update(false),
   need_hires_plot(false),
   need_hires_line(false),
   need_hires_span(false),
@@ -50,6 +51,7 @@ AppleIIgs::~AppleIIgs()
 {
   if (need_hires_enable) { insert_hires_enable(); }
   if (need_hires_clear) { insert_hires_clear(); }
+  if (need_hires_update) { insert_hires_update(); }
   if (need_hires_plot) { insert_hires_plot(); }
   if (need_hires_line) { insert_hires_line(); }
   if (need_hires_span) { insert_hires_span(); }
@@ -141,6 +143,14 @@ int AppleIIgs::appleiigs_hiresClear_I()
   fprintf(out, "  jsr hires_clear\n");
 
   stack--;
+
+  return 0;
+}
+
+int AppleIIgs::appleiigs_hiresUpdate()
+{
+  need_hires_update = true;
+  fprintf(out, "  jsr hires_update\n");
 
   return 0;
 }
@@ -267,16 +277,43 @@ void AppleIIgs::insert_hires_clear()
 {
   fprintf(out, "hires_clear:\n");
   POP();
+  fprintf(out, "  sta value1\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  ora value1\n");
   fprintf(out, "  phx\n");
   fprintf(out, "  ldx #0\n");
   fprintf(out, "hires_clear_loop:\n");
-  fprintf(out, "  sta.l 0xe12000,x\n");
+  fprintf(out, "  sta.l 0x022000,x\n");
+  fprintf(out, "  inx\n");
   fprintf(out, "  inx\n");
   fprintf(out, "  cpx #32000\n");
   fprintf(out, "  bne hires_clear_loop\n");
   fprintf(out, "  plx\n");
   fprintf(out, "  rts\n");
 
+}
+
+void AppleIIgs::insert_hires_update()
+{
+  fprintf(out, "hires_update:\n");
+  fprintf(out, "  phx\n");
+  fprintf(out, "  ldx #0\n");
+  fprintf(out, "hires_update_loop:\n");
+  fprintf(out, "  lda.l 0x022000,x\n");
+  fprintf(out, "  sta.l 0xe12000,x\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  cpx #32000\n");
+  fprintf(out, "  bne hires_update_loop\n");
+  fprintf(out, "  plx\n");
+  fprintf(out, "  rts\n");
 }
 
 void AppleIIgs::insert_hires_plot()
@@ -593,7 +630,7 @@ void AppleIIgs::insert_hires_calc_address()
   fprintf(out, "  lda #0x2000\n");
   fprintf(out, "  adc address\n");
   fprintf(out, "  sta address\n");
-  fprintf(out, "  lda #0xe1\n");
+  fprintf(out, "  lda #0x02\n");
   fprintf(out, "  sta address + 2\n");
   fprintf(out, "  rts\n");
 }
