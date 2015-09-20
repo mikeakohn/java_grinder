@@ -4,6 +4,12 @@ import net.mikekohn.java_grinder.CPU;
 
 public class AppleIIgsJavaDemo
 {
+  static int sine_table[] =
+  {
+    4, 4, 4, 4, 3, 3, 3, 2, 2, 1, 0, -1, -2, -2, -3, -3, -3, -4, -4, -4, -4,
+    -3, -3, -3, -2, -2, -1, 0, 1, 2, 2, 3, 3, 3
+  };
+
   static byte sprite[] =
   {
     (byte)0x00, (byte)0x88, (byte)0x88, (byte)0x00,
@@ -31,6 +37,11 @@ public class AppleIIgsJavaDemo
     0x444,
     0x000
   };
+
+  public static int sine(int x)
+  {
+    return sine_table[x % 34];
+  }
 
   public static void wait(int time)
   {
@@ -95,6 +106,7 @@ public class AppleIIgsJavaDemo
     for(i = 0; i < 200; i++) 
       AppleIIgs.hiresSpan(0, i, 160, 255);
 
+/*
     for(x = 0; x < 1000; x++)
     {
       int c = AppleIIgs.rnd() & 15;
@@ -103,6 +115,11 @@ public class AppleIIgsJavaDemo
                           AppleIIgs.rnd() % 160,
                           AppleIIgs.rnd() % 200,
                           c | (c << 4));
+    }
+*/
+    for(i = 0; i < 160; i++)
+    {
+      AppleIIgs.hiresPlot(i, 100 + 4 * sine(i), 0);
     }
 
     int yy = 0;
