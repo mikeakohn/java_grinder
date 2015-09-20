@@ -377,6 +377,9 @@ func ParseSong(tokens *Tokens, patterns map[string]*Pattern) (*Song, []string) {
 
 func CreateZ80(patterns map[string]*Pattern, song_patterns []string, divisions_in_measure int) {
   var last_division int
+  var drums_off int
+
+  drums_off = -1
 
   for name, _ := range patterns {
     fmt.Printf("%s:\n  db", name)
@@ -386,8 +389,23 @@ func CreateZ80(patterns map[string]*Pattern, song_patterns []string, divisions_i
     last_division = 0
 
     for i := 0; i < divisions_in_measure; i++ {
+      if i == drums_off {
+        distance := i - last_division
+        last_division = i
+
+        if count >= 4 {
+          fmt.Printf("\n  db")
+          count = 0
+        }
+
+        fmt.Printf(" 0x%02x, 7, 0,", distance >> 2)
+        drums_off = -1
+        count += 1
+      }
+
       for voice := 0; voice < 6; voice++ {
         note := pattern.voices[voice][i]
+
         if note.value != 0 {
           distance := i - last_division
           last_division = i
@@ -400,6 +418,21 @@ func CreateZ80(patterns map[string]*Pattern, song_patterns []string, divisions_i
           fmt.Printf(" 0x%02x, 0x%02x, 0x%02x,", distance >> 2, voice, note.value)
           count += 1
         }
+      }
+
+      if pattern.drums[i] != 0 {
+        distance := i - last_division
+        last_division = i
+
+        if count >= 4 {
+          fmt.Printf("\n  db")
+          count = 0
+        }
+
+        fmt.Printf(" 0x%02x, 7, 0x%02x,", distance >> 2, pattern.drums[i])
+
+        drums_off = last_division + (192 / 8)
+        count += 1
       }
     }
 
