@@ -40,7 +40,7 @@ public class AppleIIgsJavaDemo
     -12, -10, -9, -7, -6, -4, -3, -1 
   };
 
-  static int point[] =
+  static int box_points[] =
   {
     -32, -32, -32, 0,
      32, -32, -32, 0,
@@ -52,7 +52,7 @@ public class AppleIIgsJavaDemo
     -32,  32,  32, 0,
   };
 
-  static int edge[] =
+  static int box_edges[] =
   {
     // top
     0, 1,
@@ -73,6 +73,7 @@ public class AppleIIgsJavaDemo
     3, 7
   };
 
+/*
   static byte sprite[] =
   {
     (byte)0x00, (byte)0x88, (byte)0x88, (byte)0x00,
@@ -80,39 +81,39 @@ public class AppleIIgsJavaDemo
     (byte)0x88, (byte)0x66, (byte)0x66, (byte)0x88,
     (byte)0x00, (byte)0x88, (byte)0x88, (byte)0x00
   };
+*/
 
-  static int palette1[] =
+  static int palette_gray[] =
   {
-    0xfff,
-    0xff0,
-    0xf60,
-    0xd00,
-    0xf09,
-    0x409,
-    0x00c,
-    0x09f,
-    0x0a0,
-    0x060,
-    0x630,
-    0x963,
-    0xbbb,
-    0x888,
-    0x444,
-    0x000
+    0xfff, 0xeee, 0xddd, 0xccc, 0xbbb, 0xaaa, 0x999, 0x888,
+    0x777, 0x666, 0x555, 0x444, 0x333, 0x222, 0x111, 0x000
+  };
+ 
+  static int palette_color[] =
+  {
+    0xfff, 0xff0, 0xf60, 0xd00, 0xf09, 0x409, 0x00c, 0x09f,
+    0x0a0, 0x060, 0x630, 0x963, 0xbbb, 0x888, 0x444, 0x000
   };
 
   public static void wait(int time)
   {
     int i;
 
-    for(i = 0; i < time; i++)
-    {
-    }
+    for(i = 0; i < time; i++) { }
+    for(i = 0; i < time; i++) { }
+    for(i = 0; i < time; i++) { }
+    for(i = 0; i < time; i++) { }
+    for(i = 0; i < time; i++) { }
+    for(i = 0; i < time; i++) { }
+    for(i = 0; i < time; i++) { }
+    for(i = 0; i < time; i++) { }
+    for(i = 0; i < time; i++) { }
+    for(i = 0; i < time; i++) { }
   }
 
   public static void rect(int x1, int y1, int x2, int y2, int color)
   {
-    int x, y, address;
+    int x, y;
 
     for(x = x1; x <= x2; x++)
     {
@@ -159,13 +160,14 @@ public class AppleIIgsJavaDemo
     int x2, y2, z2;
     int nx, ny, nz;
     int sin, cos;
-    int point_buf[] = new int[24];
+    int box_buf[] = new int[24];
 
     AppleIIgs.hiresEnable();
-    AppleIIgs.hiresPalette(0, palette1);
+    AppleIIgs.hiresPalette(0, palette_gray);
+    AppleIIgs.hiresPalette(1, palette_color);
 
     for(i = 0; i <= 199; i++) 
-      AppleIIgs.hiresSetRow(i, 0);
+      AppleIIgs.hiresSetRow(i, 1);
 
     AppleIIgs.hiresClear(0xff);
 
@@ -255,6 +257,11 @@ public class AppleIIgsJavaDemo
       y2++;
     }
 
+    for(i = 0; i <= 199; i++) 
+      AppleIIgs.hiresSetRow(i, 0);
+
+    wait(5000);
+
     for(i = 0xff; i >= 0; i -= 0x11)
       rectfill(0, 0, 79, 49, i);
 
@@ -279,6 +286,7 @@ public class AppleIIgsJavaDemo
     for(i = 0; i <= 0xdd; i += 0x11)
       rectfill(80, 150, 159, 199, i);
 
+/*
     for(x = 0; x < 5000; x++)
     {
       c = AppleIIgs.rnd() & 15;
@@ -286,12 +294,12 @@ public class AppleIIgsJavaDemo
                                     AppleIIgs.rnd() % 197,
                                     4, 16);
     }
-
-    AppleIIgs.hiresSprite(sprite, 0, 0, 4, 16);
-    AppleIIgs.hiresSprite(sprite, 100, 100, 4, 16);
-    AppleIIgs.hiresSprite(sprite, 120, 160, 4, 16);
+*/
 
     AppleIIgs.hiresClear(0xff);
+
+    for(i = 0; i <= 199; i++) 
+      AppleIIgs.hiresSetRow(i, 1);
 
     while(true)
     {
@@ -304,9 +312,9 @@ public class AppleIIgsJavaDemo
 
         for(i = 0; i < 32; i += 4)
         {
-          x = point[i];
-          y = point[i + 1];
-          z = point[i + 2];
+          x = box_points[i];
+          y = box_points[i + 1];
+          z = box_points[i + 2];
 
           // x rotate
           ny = ((y * cos) >> 6) - ((z * sin) >> 6);
@@ -326,17 +334,17 @@ public class AppleIIgsJavaDemo
           // x = nx;
           // y = ny;
 
-          point_buf[i] = nx;
-          point_buf[i + 1] = ny;
-          // point_buf[i + 2] = nz;
+          box_buf[i] = nx;
+          box_buf[i + 1] = ny;
+          // box_buf[i + 2] = nz;
         }
 
         for(i = 0; i < 24; i += 2)
         {
-          x1 = point_buf[(edge[i] << 2) + 0];
-          y1 = point_buf[(edge[i] << 2) + 1];
-          x2 = point_buf[(edge[i + 1] << 2) + 0];
-          y2 = point_buf[(edge[i + 1] << 2) + 1];
+          x1 = box_buf[(box_edges[i] << 2) + 0];
+          y1 = box_buf[(box_edges[i] << 2) + 1];
+          x2 = box_buf[(box_edges[i + 1] << 2) + 0];
+          y2 = box_buf[(box_edges[i + 1] << 2) + 1];
 
           x1 += 80;
           y1 += 100;
