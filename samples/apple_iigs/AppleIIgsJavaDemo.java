@@ -232,7 +232,8 @@ public class AppleIIgsJavaDemo
         AppleIIgs.hiresPlot(xx, 199 - yy, (i | (i << 4)));
       }
 
-      AppleIIgs.hiresUpdate();
+      if(yy >= 50 && yy <= 145)
+        AppleIIgs.hiresUpdate();
     }
 
     x1 = 49;
