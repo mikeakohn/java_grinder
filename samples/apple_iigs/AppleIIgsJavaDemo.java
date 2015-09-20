@@ -6,8 +6,71 @@ public class AppleIIgsJavaDemo
 {
   static int sine_table[] =
   {
-    4, 4, 4, 4, 3, 3, 3, 2, 2, 1, 0, -1, -2, -2, -3, -3, -3, -4, -4, -4, -4,
-    -3, -3, -3, -2, -2, -1, 0, 1, 2, 2, 3, 3, 3
+    0, 1, 3, 4, 6, 7, 9, 10, 
+    12, 14, 15, 17, 18, 20, 21, 23, 
+    24, 25, 27, 28, 30, 31, 32, 34, 
+    35, 36, 38, 39, 40, 41, 42, 44, 
+    45, 46, 47, 48, 49, 50, 51, 52, 
+    53, 54, 54, 55, 56, 57, 57, 58, 
+    59, 59, 60, 60, 61, 61, 62, 62, 
+    62, 63, 63, 63, 63, 63, 63, 63, 
+    64, 63, 63, 63, 63, 63, 63, 63, 
+    62, 62, 62, 61, 61, 60, 60, 59, 
+    59, 58, 57, 57, 56, 55, 54, 54, 
+    53, 52, 51, 50, 49, 48, 47, 46, 
+    45, 44, 42, 41, 40, 39, 38, 36, 
+    35, 34, 32, 31, 30, 28, 27, 25, 
+    24, 23, 21, 20, 18, 17, 15, 14, 
+    12, 10, 9, 7, 6, 4, 3, 1, 
+    0, -1, -3, -4, -6, -7, -9, -10, 
+    -12, -14, -15, -17, -18, -20, -21, -23, 
+    -24, -25, -27, -28, -30, -31, -32, -34, 
+    -35, -36, -38, -39, -40, -41, -42, -44, 
+    -45, -46, -47, -48, -49, -50, -51, -52, 
+    -53, -54, -54, -55, -56, -57, -57, -58, 
+    -59, -59, -60, -60, -61, -61, -62, -62, 
+    -62, -63, -63, -63, -63, -63, -63, -63, 
+    -64, -63, -63, -63, -63, -63, -63, -63, 
+    -62, -62, -62, -61, -61, -60, -60, -59, 
+    -59, -58, -57, -57, -56, -55, -54, -54, 
+    -53, -52, -51, -50, -49, -48, -47, -46, 
+    -45, -44, -42, -41, -40, -39, -38, -36, 
+    -35, -34, -32, -31, -30, -28, -27, -25, 
+    -24, -23, -21, -20, -18, -17, -15, -14, 
+    -12, -10, -9, -7, -6, -4, -3, -1 
+  };
+
+  static int point[] =
+  {
+    -32, -32, -32, 0,
+     32, -32, -32, 0,
+     32,  32, -32, 0,
+    -32,  32, -32, 0,
+    -32, -32,  32, 0,
+     32, -32,  32, 0,
+     32,  32,  32, 0,
+    -32,  32,  32, 0,
+  };
+
+  static int edge[] =
+  {
+    // top
+    0, 1,
+    1, 2,
+    2, 3,
+    3, 0,
+
+    // bottom
+    4, 5,
+    5, 6,
+    6, 7,
+    7, 4,
+
+    // sides
+    0, 4,
+    1, 5,
+    2, 6,
+    3, 7
   };
 
   static byte sprite[] =
@@ -37,11 +100,6 @@ public class AppleIIgsJavaDemo
     0x444,
     0x000
   };
-
-  public static int sine(int x)
-  {
-    return sine_table[x % 34];
-  }
 
   public static void wait(int time)
   {
@@ -95,7 +153,13 @@ public class AppleIIgsJavaDemo
     int imcen = 0;
     int re, im, re2, im2, rec, imc;
     int address, address2;
-    int x, y, i;
+
+    int x, y, z;
+    int i, j;
+    int x1, y1, z1;
+    int x2, y2, z2;
+    int nx, ny, nz;
+    int point_buf[] = new int[24];
 
     AppleIIgs.hiresEnable();
     AppleIIgs.hiresPalette(0, palette1);
@@ -103,11 +167,9 @@ public class AppleIIgsJavaDemo
     for(i = 0; i <= 199; i++) 
       AppleIIgs.hiresSetRow(i, 0);
 
-    for(i = 0; i < 200; i++) 
-      AppleIIgs.hiresSpan(0, i, 160, 255);
+    AppleIIgs.hiresClear(0xff);
 
-/*
-    for(x = 0; x < 1000; x++)
+    for(x = 0; x < 500; x++)
     {
       int c = AppleIIgs.rnd() & 15;
       AppleIIgs.hiresLine(AppleIIgs.rnd() % 160,
@@ -115,11 +177,6 @@ public class AppleIIgsJavaDemo
                           AppleIIgs.rnd() % 160,
                           AppleIIgs.rnd() % 200,
                           c | (c << 4));
-    }
-*/
-    for(i = 0; i < 160; i++)
-    {
-      AppleIIgs.hiresPlot(i, 100 + 4 * sine(i), 0);
     }
 
     int yy = 0;
@@ -172,10 +229,10 @@ public class AppleIIgsJavaDemo
       }
     }
 
-    int x1 = 49;
-    int x2 = 111;
-    int y1 = 49;
-    int y2 = 146;
+    x1 = 49;
+    x2 = 111;
+    y1 = 49;
+    y2 = 146;
 
     for(i = 0; i < 8; i++)
     {
@@ -222,19 +279,73 @@ public class AppleIIgsJavaDemo
     for(i = 0; i <= 0xdd; i += 0x11)
       rectfill(80, 150, 159, 199, i);
 
-    for(x = 0; x < 10000; x++)
+    for(x = 0; x < 5000; x++)
     {
       int c = AppleIIgs.rnd() & 15;
       AppleIIgs.hiresSprite(sprite, AppleIIgs.rnd() % 157,
                                     AppleIIgs.rnd() % 197,
                                     4, 16);
     }
+
     AppleIIgs.hiresSprite(sprite, 0, 0, 4, 16);
     AppleIIgs.hiresSprite(sprite, 100, 100, 4, 16);
     AppleIIgs.hiresSprite(sprite, 120, 160, 4, 16);
 
+    AppleIIgs.hiresClear(0xff);
+
     while(true)
     {
+      for(j = 0; j < 256; j++)
+      {
+        AppleIIgs.hiresClear(0xff);
+
+        int sin = sine_table[j];
+        int cos = sine_table[(j + 64) & 255];
+
+        for(i = 0; i < 32; i += 4)
+        {
+          x = point[i];
+          y = point[i + 1];
+          z = point[i + 2];
+
+          // x rotate
+          ny = ((y * cos) >> 6) - ((z * sin) >> 6);
+          nz = ((z * sin) >> 6) + ((y * sin) >> 6);
+          y = ny;
+          z = nz;
+
+          // y rotate
+          nx = ((x * cos) >> 6) - ((z * sin) >> 6);
+          // nz = ((z * cos) >> 6) + ((x * sin) >> 6);
+          x = nx;
+          // z = nz;
+
+          // z rotate
+          nx = ((x * cos) >> 6) - ((y * sin) >> 6);
+          ny = ((y * cos) >> 6) + ((x * sin) >> 6);
+          // x = nx;
+          // y = ny;
+
+          point_buf[i] = nx;
+          point_buf[i + 1] = ny;
+          // point_buf[i + 2] = nz;
+        }
+
+        for(i = 0; i < 24; i += 2)
+        {
+          x1 = point_buf[(edge[i] << 2) + 0];
+          y1 = point_buf[(edge[i] << 2) + 1];
+          x2 = point_buf[(edge[i + 1] << 2) + 0];
+          y2 = point_buf[(edge[i + 1] << 2) + 1];
+
+          x1 += 80;
+          y1 += 100;
+          x2 += 80;
+          y2 += 100;
+
+          AppleIIgs.hiresLine(x1, y1, x2, y2, 0x11);
+        }
+      }
     }
   }
 }

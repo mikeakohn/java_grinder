@@ -19,6 +19,7 @@ public:
   virtual int appleiigs_plotChar_IC() { return -1; }
   virtual int appleiigs_printChar_C() { return -1; }
   virtual int appleiigs_hiresEnable() { return -1; }
+  virtual int appleiigs_hiresClear_I() { return -1; }
   virtual int appleiigs_hiresPlot_III() { return -1; }
   virtual int appleiigs_hiresLine_IIIII() { return -1; }
   virtual int appleiigs_hiresSpan_IIII() { return -1; }
