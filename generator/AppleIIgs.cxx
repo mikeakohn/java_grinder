@@ -79,7 +79,7 @@ int AppleIIgs::open(const char *filename)
   // random number seed
   fprintf(out, "_seed equ _vars + 20\n");
   fprintf(out, "_bit equ _vars + 22\n");
-  fprintf(out, "rep #0x30\n");
+//  fprintf(out, "rep #0x30\n");
   fprintf(out, "lda #0xace1\n");
   fprintf(out, "sta _seed\n");
 
@@ -278,6 +278,15 @@ void AppleIIgs::insert_hires_line()
   POP();
   fprintf(out, "  sta _x1\n");
 
+  fprintf(out, "  lda _x1\n");
+  fprintf(out, "  cmp _x2\n");
+  fprintf(out, "  bne hires_line_start\n");
+  fprintf(out, "  lda _y1\n");
+  fprintf(out, "  cmp _y2\n");
+  fprintf(out, "  bne hires_line_start\n");
+  fprintf(out, "  jmp hires_line_end\n");
+
+  fprintf(out, "hires_line_start:\n");
   fprintf(out, "  sec\n");
   fprintf(out, "  lda _x2\n");
   fprintf(out, "  sbc _x1\n");
