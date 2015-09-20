@@ -31,6 +31,7 @@ AppleIIgs::AppleIIgs() :
 //  need_plot_char(false),
 //  need_print_char(false),
   need_hires_enable(false),
+  need_hires_clear(false),
   need_hires_plot(false),
   need_hires_line(false),
   need_hires_span(false),
@@ -48,6 +49,7 @@ AppleIIgs::AppleIIgs() :
 AppleIIgs::~AppleIIgs()
 {
   if (need_hires_enable) { insert_hires_enable(); }
+  if (need_hires_clear) { insert_hires_clear(); }
   if (need_hires_plot) { insert_hires_plot(); }
   if (need_hires_line) { insert_hires_line(); }
   if (need_hires_span) { insert_hires_span(); }
@@ -79,7 +81,7 @@ int AppleIIgs::open(const char *filename)
   // random number seed
   fprintf(out, "_seed equ _vars + 20\n");
   fprintf(out, "_bit equ _vars + 22\n");
-  fprintf(out, "rep #0x30\n");
+//  fprintf(out, "rep #0x30\n");
   fprintf(out, "lda #0xace1\n");
   fprintf(out, "sta _seed\n");
 
@@ -128,7 +130,17 @@ int AppleIIgs::appleiigs_printChar_C()
 int AppleIIgs::appleiigs_hiresEnable()
 {
   need_hires_enable = true;
-  fprintf(out, "jsr hires_enable\n");
+  fprintf(out, "  jsr hires_enable\n");
+
+  return 0;
+}
+
+int AppleIIgs::appleiigs_hiresClear_I()
+{
+  need_hires_clear = true;
+  fprintf(out, "  jsr hires_clear\n");
+
+  stack--;
 
   return 0;
 }
@@ -136,7 +148,7 @@ int AppleIIgs::appleiigs_hiresEnable()
 int AppleIIgs::appleiigs_hiresPlot_III()
 {
   need_hires_plot = true;
-  fprintf(out, "jsr hires_plot\n");
+  fprintf(out, "  jsr hires_plot\n");
 
   stack -= 3;
 
@@ -146,7 +158,7 @@ int AppleIIgs::appleiigs_hiresPlot_III()
 int AppleIIgs::appleiigs_hiresLine_IIIII()
 {
   need_hires_line = true;
-  fprintf(out, "jsr hires_line\n");
+  fprintf(out, "  jsr hires_line\n");
 
   stack -= 5;
 
@@ -156,7 +168,7 @@ int AppleIIgs::appleiigs_hiresLine_IIIII()
 int AppleIIgs::appleiigs_hiresSpan_IIII()
 {
   need_hires_span = true;
-  fprintf(out, "jsr hires_span\n");
+  fprintf(out, "  jsr hires_span\n");
 
   stack -= 4;
 
@@ -166,7 +178,7 @@ int AppleIIgs::appleiigs_hiresSpan_IIII()
 int AppleIIgs::appleiigs_hiresRead_II()
 {
   need_hires_read = true;
-  fprintf(out, "jsr hires_read\n");
+  fprintf(out, "  jsr hires_read\n");
 
   stack--;
 
@@ -176,7 +188,7 @@ int AppleIIgs::appleiigs_hiresRead_II()
 int AppleIIgs::appleiigs_hiresSprite_aBIIII()
 {
   need_hires_sprite = true;
-  fprintf(out, "jsr hires_sprite\n");
+  fprintf(out, "  jsr hires_sprite\n");
   
   stack -= 5;
 
@@ -186,7 +198,7 @@ int AppleIIgs::appleiigs_hiresSprite_aBIIII()
 int AppleIIgs::appleiigs_hiresPalette_IaI()
 {
   need_hires_palette = true;
-  fprintf(out, "jsr hires_palette\n");
+  fprintf(out, "  jsr hires_palette\n");
 
   stack -= 2;
 
@@ -196,7 +208,7 @@ int AppleIIgs::appleiigs_hiresPalette_IaI()
 int AppleIIgs::appleiigs_hiresSetRow_II()
 {
   need_hires_set_row = true;
-  fprintf(out, "jsr hires_set_row\n");
+  fprintf(out, "  jsr hires_set_row\n");
 
   stack -= 2;
 
@@ -206,7 +218,7 @@ int AppleIIgs::appleiigs_hiresSetRow_II()
 int AppleIIgs::appleiigs_rnd()
 {
   need_rnd = true;
-  fprintf(out, "jsr rnd\n");
+  fprintf(out, "  jsr rnd\n");
   stack++;
 
   return 0;
@@ -251,6 +263,22 @@ void AppleIIgs::insert_hires_enable()
   fprintf(out, "  rts\n");
 }
 
+void AppleIIgs::insert_hires_clear()
+{
+  fprintf(out, "hires_clear:\n");
+  POP();
+  fprintf(out, "  phx\n");
+  fprintf(out, "  ldx #0\n");
+  fprintf(out, "hires_clear_loop:\n");
+  fprintf(out, "  sta.l 0xe12000,x\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  cpx #32000\n");
+  fprintf(out, "  bne hires_clear_loop\n");
+  fprintf(out, "  plx\n");
+  fprintf(out, "  rts\n");
+
+}
+
 void AppleIIgs::insert_hires_plot()
 {
   fprintf(out, "hires_plot:\n");
@@ -278,6 +306,15 @@ void AppleIIgs::insert_hires_line()
   POP();
   fprintf(out, "  sta _x1\n");
 
+  fprintf(out, "  lda _x1\n");
+  fprintf(out, "  cmp _x2\n");
+  fprintf(out, "  bne hires_line_start\n");
+  fprintf(out, "  lda _y1\n");
+  fprintf(out, "  cmp _y2\n");
+  fprintf(out, "  bne hires_line_start\n");
+  fprintf(out, "  jmp hires_line_end\n");
+
+  fprintf(out, "hires_line_start:\n");
   fprintf(out, "  sec\n");
   fprintf(out, "  lda _x2\n");
   fprintf(out, "  sbc _x1\n");

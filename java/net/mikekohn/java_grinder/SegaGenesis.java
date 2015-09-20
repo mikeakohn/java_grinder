@@ -48,14 +48,16 @@ abstract public class SegaGenesis
       color takes a binary format of 0000 BBB0 GGG0 RRR0. */
   public static void setPaletteColor(int color) { }
 
-  /** Setup pattern table and display area for plotting pixels. */
+  /** Setup pattern table and display area for plotting pixels.  This method
+      sets up the first 40*28 tiles to be patterns 0-1120. */
   public static void initBitmap() { }
 
   /** Clear pattern table (called after initBitmap to set entire display
       to palette color 0). */
   public static void clearBitmap() { }
 
-  /** Set a pixel in the 128x128 bitmap */
+  /** Set a pixel in the 320x224 bitmap area of Scroll B.  In order for this
+      to work, initBitmap() has to be called first. */
   public static void plot(int x, int y, int color) { }
 
   /** Set the VDP bitmap pointer to point to the next pattern address. */
