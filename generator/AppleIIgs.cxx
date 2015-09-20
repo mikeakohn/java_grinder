@@ -205,24 +205,6 @@ int AppleIIgs::appleiigs_hiresSetRow_II()
 
 int AppleIIgs::appleiigs_rnd()
 {
-/*
-  fprintf(out, ";; rnd()\n");
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda _seed\n");
-  fprintf(out, "  sbc #32765\n");
-  PUSH();
-  fprintf(out, "  lda #12345\n");
-  PUSH();
-  fprintf(out, "  jsr mul_integer\n");
-  POP();
-  fprintf(out, "  sta _seed\n");
-  PUSH();
-
-  stack++;
-
-  return 0;
-
-*/
   need_rnd = true;
   fprintf(out, "jsr rnd\n");
   stack++;
