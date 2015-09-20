@@ -297,10 +297,9 @@ public class AppleIIgsJavaDemo
     {
       for(j = 0; j < 256; j++)
       {
-        AppleIIgs.hiresClear(0xff);
-
         int sin = sine_table[j];
         int cos = sine_table[(j + 64) & 255];
+        int c = 0;
 
         for(i = 0; i < 32; i += 4)
         {
@@ -343,7 +342,9 @@ public class AppleIIgsJavaDemo
           x2 += 80;
           y2 += 100;
 
-          AppleIIgs.hiresLine(x1, y1, x2, y2, 0x11);
+          AppleIIgs.hiresLine(x1, y1, x2, y2, c);
+          c += 0x11;
+          c &= 0xff;
         }
       }
     }
