@@ -152,13 +152,13 @@ public class AppleIIgsJavaDemo
     int recen = -8;
     int imcen = 0;
     int re, im, re2, im2, rec, imc;
-    int address, address2;
 
-    int x, y, z;
+    int x, y, z, c;
     int i, j;
     int x1, y1, z1;
     int x2, y2, z2;
     int nx, ny, nz;
+    int sin, cos;
     int point_buf[] = new int[24];
 
     AppleIIgs.hiresEnable();
@@ -171,7 +171,7 @@ public class AppleIIgsJavaDemo
 
     for(x = 0; x < 500; x++)
     {
-      int c = AppleIIgs.rnd() & 15;
+      c = AppleIIgs.rnd() & 15;
       AppleIIgs.hiresLine(AppleIIgs.rnd() % 160,
                           AppleIIgs.rnd() % 200,
                           AppleIIgs.rnd() % 160,
@@ -281,7 +281,7 @@ public class AppleIIgsJavaDemo
 
     for(x = 0; x < 5000; x++)
     {
-      int c = AppleIIgs.rnd() & 15;
+      c = AppleIIgs.rnd() & 15;
       AppleIIgs.hiresSprite(sprite, AppleIIgs.rnd() % 157,
                                     AppleIIgs.rnd() % 197,
                                     4, 16);
@@ -295,11 +295,12 @@ public class AppleIIgsJavaDemo
 
     while(true)
     {
+      c = 0;
+
       for(j = 0; j < 256; j++)
       {
-        int sin = sine_table[j];
-        int cos = sine_table[(j + 64) & 255];
-        int c = 0;
+        sin = sine_table[j];
+        cos = sine_table[(j + 64) & 255];
 
         for(i = 0; i < 32; i += 4)
         {
@@ -342,10 +343,11 @@ public class AppleIIgsJavaDemo
           x2 += 80;
           y2 += 100;
 
-          AppleIIgs.hiresLine(x1, y1, x2, y2, c);
-          c += 0x11;
-          c &= 0xff;
+          AppleIIgs.hiresLine(x1, y1, x2, y2, c | (c << 4));
         }
+
+        c++;
+        c &= 0xf;
       }
     }
   }
