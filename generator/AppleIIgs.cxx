@@ -288,12 +288,11 @@ void AppleIIgs::insert_hires_clear()
   fprintf(out, "  asl\n");
   fprintf(out, "  ora value1\n");
   fprintf(out, "  phx\n");
-  fprintf(out, "  ldx #0\n");
+  fprintf(out, "  ldx #31998\n");
   fprintf(out, "hires_clear_loop:\n");
   fprintf(out, "  sta.l 0x022000,x\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  cpx #32000\n");
+  fprintf(out, "  dex\n");
+  fprintf(out, "  dex\n");
   fprintf(out, "  bne hires_clear_loop\n");
   fprintf(out, "  plx\n");
   fprintf(out, "  rts\n");
@@ -304,14 +303,13 @@ void AppleIIgs::insert_hires_update()
 {
   fprintf(out, "hires_update:\n");
   fprintf(out, "  phx\n");
-  fprintf(out, "  ldx #0\n");
+  fprintf(out, "  ldx #31998\n");
   fprintf(out, "hires_update_loop:\n");
   fprintf(out, "  lda.l 0x022000,x\n");
   fprintf(out, "  sta.l 0xe12000,x\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  cpx #32000\n");
-  fprintf(out, "  bne hires_update_loop\n");
+  fprintf(out, "  dex\n");
+  fprintf(out, "  dex\n");
+  fprintf(out, "  bpl hires_update_loop\n");
   fprintf(out, "  plx\n");
   fprintf(out, "  rts\n");
 }

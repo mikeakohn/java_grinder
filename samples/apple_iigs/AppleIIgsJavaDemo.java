@@ -350,7 +350,7 @@ public class AppleIIgsJavaDemo
 
           // x rotate
           ny = ((y * cos) >> 6) - ((z * sin) >> 6);
-          nz = ((z * sin) >> 6) + ((y * sin) >> 6);
+          nz = ((z * cos) >> 6) + ((y * sin) >> 6);
           y = ny;
           z = nz;
 
@@ -373,11 +373,13 @@ public class AppleIIgsJavaDemo
 
         for(i = 0; i < 24; i += 2)
         {
-          x1 = box_buf[(box_edges[i] << 2) + 0];
+          x1 = box_buf[(box_edges[i] << 2)];
           y1 = box_buf[(box_edges[i] << 2) + 1];
-          x2 = box_buf[(box_edges[i + 1] << 2) + 0];
+          x2 = box_buf[(box_edges[i + 1] << 2)];
           y2 = box_buf[(box_edges[i + 1] << 2) + 1];
 
+          x1 >>= 1;
+          x2 >>= 1;
           x1 += 80;
           y1 += 100;
           x2 += 80;
