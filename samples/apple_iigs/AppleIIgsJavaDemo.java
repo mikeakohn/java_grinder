@@ -6,6 +6,43 @@ public class AppleIIgsJavaDemo
 {
   static int sine_table[] =
   {
+    0, 1, 3, 4, 6, 7, 9, 10, 
+    12, 14, 15, 17, 18, 20, 21, 23, 
+    24, 25, 27, 28, 30, 31, 32, 34, 
+    35, 36, 38, 39, 40, 41, 42, 44, 
+    45, 46, 47, 48, 49, 50, 51, 52, 
+    53, 54, 54, 55, 56, 57, 57, 58, 
+    59, 59, 60, 60, 61, 61, 62, 62, 
+    62, 63, 63, 63, 63, 63, 63, 63, 
+    64, 63, 63, 63, 63, 63, 63, 63, 
+    62, 62, 62, 61, 61, 60, 60, 59, 
+    59, 58, 57, 57, 56, 55, 54, 54, 
+    53, 52, 51, 50, 49, 48, 47, 46, 
+    45, 44, 42, 41, 40, 39, 38, 36, 
+    35, 34, 32, 31, 30, 28, 27, 25, 
+    24, 23, 21, 20, 18, 17, 15, 14, 
+    12, 10, 9, 7, 6, 4, 3, 1, 
+    0, -1, -3, -4, -6, -7, -9, -10, 
+    -12, -14, -15, -17, -18, -20, -21, -23, 
+    -24, -25, -27, -28, -30, -31, -32, -34, 
+    -35, -36, -38, -39, -40, -41, -42, -44, 
+    -45, -46, -47, -48, -49, -50, -51, -52, 
+    -53, -54, -54, -55, -56, -57, -57, -58, 
+    -59, -59, -60, -60, -61, -61, -62, -62, 
+    -62, -63, -63, -63, -63, -63, -63, -63, 
+    -64, -63, -63, -63, -63, -63, -63, -63, 
+    -62, -62, -62, -61, -61, -60, -60, -59, 
+    -59, -58, -57, -57, -56, -55, -54, -54, 
+    -53, -52, -51, -50, -49, -48, -47, -46, 
+    -45, -44, -42, -41, -40, -39, -38, -36, 
+    -35, -34, -32, -31, -30, -28, -27, -25, 
+    -24, -23, -21, -20, -18, -17, -15, -14, 
+    -12, -10, -9, -7, -6, -4, -3, -1 
+  };
+
+/*
+  static int sine_table[] =
+  {
     0, 6, 12, 18, 24, 31, 37, 43, 
     49, 55, 61, 68, 74, 79, 85, 91, 
     97, 103, 109, 114, 120, 125, 131, 136, 
@@ -39,6 +76,7 @@ public class AppleIIgsJavaDemo
     -97, -91, -85, -79, -74, -68, -61, -55, 
     -49, -43, -37, -31, -24, -18, -12, -6 
   };
+*/
 
   static int box_points[] =
   {
@@ -181,24 +219,24 @@ public class AppleIIgsJavaDemo
                           c | (c << 4));
     }
 
-    int yy = 0;
+    y1 = 0;
 
-    for(y = 0; y < 100 * 16; y += 16, yy++)
+    for(y = 0; y < 100 * 16; y += 16, y1++)
     {
       imc = (y - 100 * 16) >> 5;
       imc += imcen;
 
-      int xx = 0;
+      x1 = 0;
 
-      for(x = 0; x < 160 * 16; x += 16, xx++)
+      for(x = 0; x < 160 * 16; x += 16, x1++)
       {
-        if(xx < 50 || xx > 110 || yy < 50 || yy > 145)
+        if(x1 < 50 || x1 > 110 || y1 < 50 || y1 > 145)
           continue;
 
-        if(xx > 78 && xx < 93 && yy > 85 && yy < 115)
+        if(x1 > 78 && x1 < 93 && y1 > 85 && y1 < 115)
         {
-          AppleIIgs.hiresPlot(xx, yy, (15 | (15 << 4)));
-          AppleIIgs.hiresPlot(xx, 199 - yy, (15 | (15 << 4)));
+          AppleIIgs.hiresPlot(x1, y1, (15 | (15 << 4)));
+          AppleIIgs.hiresPlot(x1, 199 - y1, (15 | (15 << 4)));
 
           continue;
         }
@@ -226,8 +264,8 @@ public class AppleIIgsJavaDemo
           im2 = (im * im) >> 4;
         }
 
-        AppleIIgs.hiresPlot(xx, yy, (i | (i << 4)));
-        AppleIIgs.hiresPlot(xx, 199 - yy, (i | (i << 4)));
+        AppleIIgs.hiresPlot(x1, y1, (i | (i << 4)));
+        AppleIIgs.hiresPlot(x1, 199 - y1, (i | (i << 4)));
       }
     }
 
@@ -313,39 +351,40 @@ public class AppleIIgsJavaDemo
         cos = sine_table[(j + 64) & 255];
         AppleIIgs.hiresClear(0xff);
 
+//FIXME reduce this
+//FIXME one of the sin/cos is wrong here
+        int xx = ((cos * cos) >> 6);
+        int xy = -((sin * cos) >> 6);
+        int xz = -sin;
+
+        int yx = ((sin * cos) >> 6) - ((((cos * sin) >> 6) * sin) >> 6);
+        int yy = ((cos * cos) >> 6) + ((((sin * sin) >> 6) * sin) >> 6);
+        int yz = -((cos * sin) >> 6);
+
+        int zx = ((sin * sin) >> 6) + ((((cos * sin) >> 6) * cos) >> 6);
+        int zy = ((cos * sin) >> 6) - ((((sin * sin) >> 6) * cos) >> 6);
+        int zz = ((cos * cos) >> 6);
+
         for(i = 0; i < 32; i += 4)
         {
-          x = box_points[i];
+          x = box_points[i + 0];
           y = box_points[i + 1];
           z = box_points[i + 2];
 
-          // x rotate
-          ny = ((y * cos) >> 8) - ((z * sin) >> 8);
-          nz = ((z * cos) >> 8) + ((y * sin) >> 8);
-          y = ny;
-          z = nz;
+//FIXME eliminate nx, ny, nz
+          nx = ((x * xx) >> 6) + ((y * xy) >> 6) + ((z * xz) >> 6);
+          ny = ((x * yx) >> 6) + ((y * yy) >> 6) + ((z * yz) >> 6);
+//          nz = ((x * zx) >> 6) + ((y * zy) >> 6) + ((z * zz) >> 6);
 
-          // y rotate
-          nx = ((x * cos) >> 8) - ((z * sin) >> 8);
-          // nz = ((z * cos) >> 8) + ((x * sin) >> 8);
-          x = nx;
-          // z = nz;
-
-          // z rotate
-          nx = ((x * cos) >> 8) - ((y * sin) >> 8);
-          ny = ((y * cos) >> 8) + ((x * sin) >> 8);
-          // x = nx;
-          // y = ny;
-
-          box_buf[i] = nx;
+          box_buf[i + 0] = nx;
           box_buf[i + 1] = ny;
           // box_buf[i + 2] = nz;
         }
 
         for(i = 0; i < 24; i += 2)
         {
-          x1 = box_buf[(box_edges[i] << 2)];
-          y1 = box_buf[(box_edges[i] << 2) + 1];
+          x1 = box_buf[(box_edges[i + 0] << 2)];
+          y1 = box_buf[(box_edges[i + 0] << 2) + 1];
           x2 = box_buf[(box_edges[i + 1] << 2)];
           y2 = box_buf[(box_edges[i + 1] << 2) + 1];
 
