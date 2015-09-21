@@ -33,7 +33,7 @@ int appleiigs(JavaClass *java_class, Generator *generator, char *function)
 {
   CHECK_FUNC(plotChar,_IC)
   CHECK_FUNC(printChar,_C)
-  CHECK_FUNC(hiresEnable,)
+  CHECK_FUNC(hiresEnable,_I)
   CHECK_FUNC(hiresClear,_I)
   CHECK_FUNC(hiresUpdate,)
   CHECK_FUNC(hiresPlot,_III)

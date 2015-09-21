@@ -87,6 +87,9 @@ int AppleIIgs::open(const char *filename)
   fprintf(out, "lda #0xace1\n");
   fprintf(out, "sta _seed\n");
 
+  // graphics bank
+  fprintf(out, "_bank equ _vars + 24\n");
+
   return 0;
 }
 
@@ -129,10 +132,12 @@ int AppleIIgs::appleiigs_printChar_C()
   return 0;
 }
 
-int AppleIIgs::appleiigs_hiresEnable()
+int AppleIIgs::appleiigs_hiresEnable_I()
 {
   need_hires_enable = true;
   fprintf(out, "  jsr hires_enable\n");
+
+  stack--;
 
   return 0;
 }
@@ -270,12 +275,18 @@ void AppleIIgs::insert_hires_enable()
   fprintf(out, "  lda.b #0\n");
   fprintf(out, "  sta.l 0xe1c034\n");
   fprintf(out, "  rep #0x30\n");
+  POP();
+  fprintf(out, "  sta _bank\n");
   fprintf(out, "  rts\n");
 }
 
 void AppleIIgs::insert_hires_clear()
 {
   fprintf(out, "hires_clear:\n");
+  fprintf(out, "  lda #0x2000\n");
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  lda _bank\n");
+  fprintf(out, "  sta address + 2\n");
   POP();
   fprintf(out, "  sta value1\n");
   fprintf(out, "  asl\n");
@@ -287,14 +298,12 @@ void AppleIIgs::insert_hires_clear()
   fprintf(out, "  asl\n");
   fprintf(out, "  asl\n");
   fprintf(out, "  ora value1\n");
-  fprintf(out, "  phx\n");
-  fprintf(out, "  ldx #31998\n");
+  fprintf(out, "  ldy #31998\n");
   fprintf(out, "hires_clear_loop:\n");
-  fprintf(out, "  sta.l 0x022000,x\n");
-  fprintf(out, "  dex\n");
-  fprintf(out, "  dex\n");
-  fprintf(out, "  bne hires_clear_loop\n");
-  fprintf(out, "  plx\n");
+  fprintf(out, "  sta [address],y\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bpl hires_clear_loop\n");
   fprintf(out, "  rts\n");
 
 }
@@ -628,7 +637,7 @@ void AppleIIgs::insert_hires_calc_address()
   fprintf(out, "  lda #0x2000\n");
   fprintf(out, "  adc address\n");
   fprintf(out, "  sta address\n");
-  fprintf(out, "  lda #0x02\n");
+  fprintf(out, "  lda _bank\n");
   fprintf(out, "  sta address + 2\n");
   fprintf(out, "  rts\n");
 }

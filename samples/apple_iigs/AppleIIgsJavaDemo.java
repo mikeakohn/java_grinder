@@ -162,7 +162,7 @@ public class AppleIIgsJavaDemo
     int sin, cos;
     int box_buf[] = new int[24];
 
-    AppleIIgs.hiresEnable();
+    AppleIIgs.hiresEnable(0xe1);
     AppleIIgs.hiresPalette(0, palette_gray);
     AppleIIgs.hiresPalette(1, palette_color);
 
@@ -179,8 +179,6 @@ public class AppleIIgsJavaDemo
                           AppleIIgs.rnd() % 160,
                           AppleIIgs.rnd() % 200,
                           c | (c << 4));
-      if((x & 7) == 7)
-        AppleIIgs.hiresUpdate();
     }
 
     int yy = 0;
@@ -231,9 +229,6 @@ public class AppleIIgsJavaDemo
         AppleIIgs.hiresPlot(xx, yy, (i | (i << 4)));
         AppleIIgs.hiresPlot(xx, 199 - yy, (i | (i << 4)));
       }
-
-      if(yy >= 50 && yy <= 145)
-        AppleIIgs.hiresUpdate();
     }
 
     x1 = 49;
@@ -248,7 +243,6 @@ public class AppleIIgsJavaDemo
       x2++;
       y1--;
       y2++;
-      AppleIIgs.hiresUpdate();
     }
 
     for(i = 0; i < 16; i += 2)
@@ -261,7 +255,6 @@ public class AppleIIgsJavaDemo
       rect(x1, y1, x2, y2, i | (i << 4));
       y1--;
       y2++;
-      AppleIIgs.hiresUpdate();
     }
 
     for(i = 0; i <= 199; i++) 
@@ -270,52 +263,28 @@ public class AppleIIgsJavaDemo
     wait(5000);
 
     for(i = 0xff; i >= 0; i -= 0x22)
-    {
       rectfill(0, 0, 79, 49, i);
-      AppleIIgs.hiresUpdate();
-    }
 
     for(i = 0xff; i >= 0x22; i -= 0x22)
-    {
       rectfill(80, 100, 159, 149, i);
-      AppleIIgs.hiresUpdate();
-    }
 
     for(i = 0xff; i >= 0x44; i -= 0x22)
-    {
       rectfill(0, 150, 79, 199, i);
-      AppleIIgs.hiresUpdate();
-    }
 
     for(i = 0xff; i >= 0x66; i -= 0x22)
-    {
       rectfill(80, 0, 159, 49, i);
-      AppleIIgs.hiresUpdate();
-    }
 
     for(i = 0; i <= 0x88; i += 0x22)
-    {
       rectfill(0, 100, 79, 149, i);
-      AppleIIgs.hiresUpdate();
-    }
 
     for(i = 0; i <= 0xaa; i += 0x22)
-    {
       rectfill(80, 50, 159, 99, i);
-      AppleIIgs.hiresUpdate();
-    }
 
     for(i = 0; i <= 0xcc; i += 0x22)
-    {
       rectfill(0, 50, 79, 99, i);
-      AppleIIgs.hiresUpdate();
-    }
 
     for(i = 0; i <= 0xdd; i += 0x22)
-    {
       rectfill(80, 150, 159, 199, i);
-      AppleIIgs.hiresUpdate();
-    }
 
 /*
     for(x = 0; x < 5000; x++)
@@ -331,6 +300,8 @@ public class AppleIIgsJavaDemo
 
     for(i = 0; i <= 199; i++) 
       AppleIIgs.hiresSetRow(i, 1);
+
+    AppleIIgs.hiresEnable(0x02);
 
     while(true)
     {

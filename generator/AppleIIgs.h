@@ -23,7 +23,7 @@ public:
   virtual int open(const char *filename);
   virtual int appleiigs_plotChar_IC();
   virtual int appleiigs_printChar_C();
-  virtual int appleiigs_hiresEnable();
+  virtual int appleiigs_hiresEnable_I();
   virtual int appleiigs_hiresClear_I();
   virtual int appleiigs_hiresUpdate();
   virtual int appleiigs_hiresPlot_III();
