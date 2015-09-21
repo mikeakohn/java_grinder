@@ -40,44 +40,6 @@ public class AppleIIgsJavaDemo
     -12, -10, -9, -7, -6, -4, -3, -1 
   };
 
-/*
-  static int sine_table[] =
-  {
-    0, 6, 12, 18, 24, 31, 37, 43, 
-    49, 55, 61, 68, 74, 79, 85, 91, 
-    97, 103, 109, 114, 120, 125, 131, 136, 
-    141, 146, 151, 156, 161, 166, 171, 175, 
-    180, 184, 188, 193, 197, 201, 204, 208, 
-    212, 215, 218, 221, 224, 227, 230, 233, 
-    235, 237, 240, 242, 244, 245, 247, 248, 
-    250, 251, 252, 253, 253, 254, 254, 254, 
-    255, 254, 254, 254, 253, 253, 252, 251, 
-    250, 248, 247, 245, 244, 242, 240, 237, 
-    235, 233, 230, 227, 224, 221, 218, 215, 
-    212, 208, 204, 201, 197, 193, 188, 184, 
-    180, 175, 171, 166, 161, 156, 151, 146, 
-    141, 136, 131, 125, 120, 114, 109, 103, 
-    97, 91, 85, 79, 74, 68, 61, 55, 
-    49, 43, 37, 31, 24, 18, 12, 6, 
-    0, -6, -12, -18, -24, -31, -37, -43, 
-    -49, -55, -61, -68, -74, -79, -85, -91, 
-    -97, -103, -109, -114, -120, -125, -131, -136, 
-    -141, -146, -151, -156, -161, -166, -171, -175, 
-    -180, -184, -188, -193, -197, -201, -204, -208, 
-    -212, -215, -218, -221, -224, -227, -230, -233, 
-    -235, -237, -240, -242, -244, -245, -247, -248, 
-    -250, -251, -252, -253, -253, -254, -254, -254, 
-    -255, -254, -254, -254, -253, -253, -252, -251, 
-    -250, -248, -247, -245, -244, -242, -240, -237, 
-    -235, -233, -230, -227, -224, -221, -218, -215, 
-    -212, -208, -204, -201, -197, -193, -188, -184, 
-    -180, -175, -171, -166, -161, -156, -151, -146, 
-    -141, -136, -131, -125, -120, -114, -109, -103, 
-    -97, -91, -85, -79, -74, -68, -61, -55, 
-    -49, -43, -37, -31, -24, -18, -12, -6 
-  };
-*/
-
   static int box_points[] =
   {
     -32, -32, -32, 0,
@@ -196,8 +158,6 @@ public class AppleIIgsJavaDemo
     int i, j;
     int x1, y1, z1;
     int x2, y2, z2;
-    int nx, ny, nz;
-    int sin, cos;
     int box_buf[] = new int[24];
 
     AppleIIgs.hiresEnable(0xe1);
@@ -345,25 +305,28 @@ public class AppleIIgsJavaDemo
     {
       c = 0;
 
-      for(j = 0; j < 256; j++)
+      for(j = 0; j < 256; j += 2)
       {
-        sin = sine_table[j];
-        cos = sine_table[(j + 64) & 255];
         AppleIIgs.hiresClear(0xff);
 
-//FIXME reduce this
-//FIXME one of the sin/cos is wrong here
-        int xx = ((cos * cos) >> 6);
-        int xy = -((sin * cos) >> 6);
-        int xz = -sin;
+        int sin = sine_table[j];
+        int cos = sine_table[(j + 64) & 255];
 
-        int yx = ((sin * cos) >> 6) - ((((cos * sin) >> 6) * sin) >> 6);
-        int yy = ((cos * cos) >> 6) + ((((sin * sin) >> 6) * sin) >> 6);
-        int yz = -((cos * sin) >> 6);
+        int sinsin = (sin * sin) >> 6;
+        int coscos = (cos * cos) >> 6;
+        int sincos = (sin * cos) >> 6;
 
-        int zx = ((sin * sin) >> 6) + ((((cos * sin) >> 6) * cos) >> 6);
-        int zy = ((cos * sin) >> 6) - ((((sin * sin) >> 6) * cos) >> 6);
-        int zz = ((cos * cos) >> 6);
+        int xx = coscos;
+        int xy = sincos;
+        int xz = sin;
+
+        int yx = sincos - ((sincos * sin) >> 6);
+        int yy = coscos + ((sinsin * sin) >> 6);
+        int yz = sincos;
+
+        // int zx = sinsin + ((sincos * cos) >> 6);
+        // int zy = sincos - ((sinsin * cos) >> 6);
+        // int zz = coscos;
 
         for(i = 0; i < 32; i += 4)
         {
@@ -371,14 +334,9 @@ public class AppleIIgsJavaDemo
           y = box_points[i + 1];
           z = box_points[i + 2];
 
-//FIXME eliminate nx, ny, nz
-          nx = ((x * xx) >> 6) + ((y * xy) >> 6) + ((z * xz) >> 6);
-          ny = ((x * yx) >> 6) + ((y * yy) >> 6) + ((z * yz) >> 6);
-//          nz = ((x * zx) >> 6) + ((y * zy) >> 6) + ((z * zz) >> 6);
-
-          box_buf[i + 0] = nx;
-          box_buf[i + 1] = ny;
-          // box_buf[i + 2] = nz;
+          box_buf[i + 0] = ((x * xx) >> 6) - ((y * xy) >> 6) - ((z * xz) >> 6);
+          box_buf[i + 1] = ((x * yx) >> 6) + ((y * yy) >> 6) - ((z * yz) >> 6);
+          // box_buf[i + 2] = ((x * zx) >> 6) + ((y * zy) >> 6) + ((z * zz) >> 6);
         }
 
         for(i = 0; i < 24; i += 2)
