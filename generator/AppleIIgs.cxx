@@ -152,7 +152,7 @@ int AppleIIgs::appleiigs_hiresClear_I()
   return 0;
 }
 
-int AppleIIgs::appleiigs_hiresUpdate()
+int AppleIIgs::appleiigs_hiresUpdate_II()
 {
   need_hires_update = true;
   fprintf(out, "  jsr hires_update\n");
@@ -289,14 +289,7 @@ void AppleIIgs::insert_hires_clear()
   fprintf(out, "  sta address + 2\n");
   POP();
   fprintf(out, "  sta value1\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
+  fprintf(out, "  xba\n");
   fprintf(out, "  ora value1\n");
   fprintf(out, "  ldy #31998\n");
   fprintf(out, "hires_clear_loop:\n");
@@ -311,14 +304,18 @@ void AppleIIgs::insert_hires_clear()
 void AppleIIgs::insert_hires_update()
 {
   fprintf(out, "hires_update:\n");
+  POP();
+  fprintf(out, "  sta value1\n");
+  POP();
   fprintf(out, "  phx\n");
-  fprintf(out, "  ldx #31998\n");
+  fprintf(out, "  tax\n");
   fprintf(out, "hires_update_loop:\n");
   fprintf(out, "  lda.l 0x022000,x\n");
   fprintf(out, "  sta.l 0xe12000,x\n");
-  fprintf(out, "  dex\n");
-  fprintf(out, "  dex\n");
-  fprintf(out, "  bpl hires_update_loop\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  cpx value1\n");
+  fprintf(out, "  bne hires_update_loop\n");
   fprintf(out, "  plx\n");
   fprintf(out, "  rts\n");
 }
@@ -612,30 +609,21 @@ void AppleIIgs::insert_hires_calc_address()
   fprintf(out, "hires_calc_address:\n");
   POP();
   fprintf(out, "  pha\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
+  fprintf(out, "  xba\n");
+  fprintf(out, "  lsr\n");
   fprintf(out, "  sta address\n");
   fprintf(out, "  pla\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
+  fprintf(out, "  xba\n");
+  fprintf(out, "  lsr\n");
+  fprintf(out, "  lsr\n");
+  fprintf(out, "  lsr\n");
   fprintf(out, "  clc\n");
   fprintf(out, "  adc address\n");
   fprintf(out, "  sta address\n");
   POP();
   fprintf(out, "  clc\n");
   fprintf(out, "  adc address\n");
-  fprintf(out, "  sta address\n");
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda #0x2000\n");
-  fprintf(out, "  adc address\n");
+  fprintf(out, "  adc #0x2000\n");
   fprintf(out, "  sta address\n");
   fprintf(out, "  lda _bank\n");
   fprintf(out, "  sta address + 2\n");

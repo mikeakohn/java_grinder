@@ -25,7 +25,7 @@ public:
   virtual int appleiigs_printChar_C();
   virtual int appleiigs_hiresEnable_I();
   virtual int appleiigs_hiresClear_I();
-  virtual int appleiigs_hiresUpdate();
+  virtual int appleiigs_hiresUpdate_II();
   virtual int appleiigs_hiresPlot_III();
   virtual int appleiigs_hiresLine_IIIII();
   virtual int appleiigs_hiresSpan_IIII();
