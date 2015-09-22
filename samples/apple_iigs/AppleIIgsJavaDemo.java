@@ -341,10 +341,13 @@ public class AppleIIgsJavaDemo
 
         for(i = 0; i < 24; i += 2)
         {
-          x1 = box_buf[(box_edges[i + 0] << 2)];
-          y1 = box_buf[(box_edges[i + 0] << 2) + 1];
-          x2 = box_buf[(box_edges[i + 1] << 2)];
-          y2 = box_buf[(box_edges[i + 1] << 2) + 1];
+          int temp0 = box_edges[i + 0] << 2;
+          int temp1 = box_edges[i + 1] << 2;
+
+          x1 = box_buf[temp0];
+          y1 = box_buf[temp0 + 1];
+          x2 = box_buf[temp1];
+          y2 = box_buf[temp1 + 1];
 
           x1 >>= 1;
           x2 >>= 1;
