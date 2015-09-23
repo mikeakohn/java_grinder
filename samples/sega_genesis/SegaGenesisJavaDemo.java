@@ -89,6 +89,9 @@ public class SegaGenesisJavaDemo
       SegaGenesis.setHorizontalScrollB(c, 0);
     }
 
+
+    Stars.run();
+
     SegaGenesis.setSpritePosition(0, 150, 150);
     SegaGenesis.setSpriteConfig1(0,
       SegaGenesis.SPRITE_CONFIG1_HORIZONTAL_SIZE_2_CELL |
@@ -106,8 +109,6 @@ public class SegaGenesisJavaDemo
     //SegaGenesis.plot(24, 24, 1);
     //for (a = 0; a < 8; a++) { SegaGenesis.plot(a, a, 1); }
     //wait(120);
-
-    int k = Stars.run();
 
     SegaGenesis.setCursor(3, 7);
     SegaGenesis.print("TESTING[TEXT");

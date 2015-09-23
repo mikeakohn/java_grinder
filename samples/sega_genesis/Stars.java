@@ -4,27 +4,56 @@ import net.mikekohn.java_grinder.Memory;
 
 public class Stars
 {
-/*
   public static short[] palette =
   {
-    0x000, 0x04e, 0x044, 0x040, 0x440, 0x880, 0x808, 0xe0e,
-    0xe4e, 0x02e, 0x88e, 0x444, 0xe40, 0xee0, 0x400, 0x000,
+    0x000, 0xeee, 0xaaa, 0x888,
   };
-*/
 
-  public static int run()
+  public static short[] stars_init =
   {
-    byte[] stars = Memory.allocStackBytes(10);
-    int n,total = 0;
+    // X0,  Y0,  DX,  DY   (160,112) is center
+      140, 110,  -1,  -1,
+      180,  80,   1,  -1,
+  };
 
-    stars[0] = 5;
-    stars[1] = 3;
-    stars[2] = 1;
-    stars[3] = 7;
+  public static void run()
+  {
+    int a,n;
 
-    for (n = 0; n < 4; n++) { total += stars[n]; }
+    short[] stars = Memory.allocStackShorts(stars_init.length);
 
-    return total;
+    // Need white and a few shades darker of pixels
+    SegaGenesis.setPaletteColors(palette);
+
+    // Copy stars to RAM
+    for (n = 0; n < stars.length; n++)
+    {
+      stars[n] = stars_init[n];
+    }
+
+    for (a = 0; a < 300; a++)
+    {
+      while(!SegaGenesis.inVerticalBlank());
+
+      for (n = 0; n < stars.length; n += 4)
+      {
+        SegaGenesis.plot(stars[n], stars[n + 1], 0);
+
+        stars[n] += stars[n + 2];
+        stars[n + 1] += stars[n + 3];
+
+        if (stars[n] <= 0 || stars[n] >= 320 ||
+            stars[n + 1] <= 0 || stars[n + 1] >= 320) 
+        {
+          stars[n] = stars_init[n];
+          stars[n + 1] = stars_init[n + 1];
+        }
+
+        SegaGenesis.plot(stars[n], stars[n + 1], 1);
+      }
+
+      while(SegaGenesis.inVerticalBlank());
+    }
   }
 }
 

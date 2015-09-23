@@ -268,6 +268,8 @@ int MC68000::pop()
 
 int MC68000::dup()
 {
+  fprintf(out, "  ;; dup\n");
+
   if (stack > 0)
   {
     fprintf(out, "  move.l (SP), -(SP)\n");
@@ -290,7 +292,53 @@ int MC68000::dup()
 
 int MC68000::dup2()
 {
-  return -1;
+  char reg1[8];
+  char reg2[8];
+
+  fprintf(out, "  ;; dup2\n");
+
+  if (stack == 2)
+  {
+    fprintf(out, "  move.l (4,SP), -(SP)\n");
+    fprintf(out, "  move.l (4,SP), -(SP)\n");
+    stack += 2;
+    return 0;
+  }
+
+  if (stack == 1)
+  {
+    fprintf(out, "  move.l d%d, -(SP)\n", REG_STACK(reg-1));
+    fprintf(out, "  move.l (4,SP), -(SP)\n");
+    stack += 2;
+    return 0;
+  }
+
+  sprintf(reg1, "d%d", REG_STACK(reg-2));
+  sprintf(reg2, "d%d", REG_STACK(reg-1));
+
+  if (reg < reg_max)
+  {
+    fprintf(out, "  move.l %s, d%d\n", reg1, REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  move.l %s, (SP)+\n", reg1);
+    stack++;
+  }
+
+  if (reg < reg_max)
+  {
+    fprintf(out, "  move.l %s, d%d\n", reg2, REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  move.l %s, (SP)+\n", reg2);
+    stack++;
+  }
+
+  return 0;
 }
 
 int MC68000::swap()
