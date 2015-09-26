@@ -18,12 +18,12 @@
 
 int Compiler::get_class_type(const char *filename)
 {
-FILE *in;
-uint8_t magic[4];
+  FILE *in;
+  uint8_t magic[4];
 
   in = fopen(filename, "rb");
   if (in == NULL) { return INVALID; }
-  fread(magic, 1, 4, in);
+  if (fread(magic, 1, 4, in) != 4) { return INVALID; }
   fclose(in);
 
   if (magic[0] == 0xca && magic[1] == 0xfe &&

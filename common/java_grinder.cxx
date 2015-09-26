@@ -209,9 +209,9 @@ int main(int argc, char *argv[])
 {
   Generator *generator;
   Compiler *compiler;
-  const char *java_file;
-  const char *asm_file;
-  const char *chip_type;
+  const char *java_file = "";
+  const char *asm_file = "";
+  const char *chip_type = "";
   int option = 0;
   int n;
 
@@ -225,12 +225,16 @@ int main(int argc, char *argv[])
   {
     printf("Usage: %s <class> <outfile> <platform>\n"
            "   platforms:\n"
+           "     appleiigs\n"
            "     attiny2313, atmega328, atmega328p, attiny85, attiny84, attiny13,\n"
            "     dspic,\n"
            "     msp430g2231, msp430g2553\n"
            "     m6502, c64\n"
+           "     sega_genesis\n"
            "     ti84plus\n"
-           "     ti99\n", argv[0]);
+           "     ti99\n"
+           "     w65c265sxb\n"
+           "     x86\n", argv[0]);
     exit(0);
   }
 
@@ -242,6 +246,12 @@ int main(int argc, char *argv[])
     if (strcmp(argv[n], "-O0") == 0)
     {
       compiler->disable_optimizer();
+      continue;
+    }
+      else
+    if (strcmp(argv[n], "-v") == 0)
+    {
+      compiler->set_verbose();
       continue;
     }
       else
@@ -261,6 +271,12 @@ int main(int argc, char *argv[])
     }
 
     option++;
+  }
+
+  if (chip_type[0] == 0)
+  {
+    printf("No chip selected.  Bad command line arguments.\n");
+    exit(1);
   }
 
   generator = new_generator(chip_type);

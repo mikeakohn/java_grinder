@@ -1,10 +1,9 @@
 CC?=gcc
 CXX?=g++
 DEBUG=-DDEBUG -g
-#OPTIMIZATIONS=-march=nocona -mtune=nocona
 INCLUDES=-I../common -I../generator -I../api
-#CFLAGS=-Wall -O3 $(DEBUG) $(INCLUDES) $(OPTIMIZATIONS)
-CFLAGS=-Wall $(DEBUG) $(INCLUDES) $(OPTIMIZATIONS)
+CFLAGS=-Wall -O3 $(DEBUG) $(INCLUDES)
+#CFLAGS=-Wall $(DEBUG) $(INCLUDES)
 LDFLAGS=
 VPATH=../generator:../common:../api
 

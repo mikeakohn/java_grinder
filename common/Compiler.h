@@ -17,10 +17,11 @@
 class Compiler
 {
 public:
-  Compiler() : generator(NULL), optimize(true) { }
+  Compiler() : generator(NULL), optimize(true), verbose(false) { }
   virtual ~Compiler() { }
 
   void disable_optimizer() { optimize = false; }
+  void set_verbose() { verbose = true; }
   void set_generator(Generator *generator) { this->generator = generator; }
 
   virtual int load_class(const char *filename) = 0;
@@ -42,6 +43,7 @@ public:
 protected:
   Generator *generator;
   bool optimize;
+  bool verbose;
 };
 
 #endif

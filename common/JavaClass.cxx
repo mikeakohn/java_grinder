@@ -467,7 +467,7 @@ int JavaClass::get_ref_name_type(char *name, char *type, int len, int index)
           use_full_method_name())
       {
         get_class_name(name, len, constant_fieldref->class_index);
-        printf("  class_name='%s' %d\n", name, constant_fieldref->class_index);
+        //printf("  class_name='%s' %d\n", name, constant_fieldref->class_index);
         strcat(name, "_");
       }
     }
@@ -483,7 +483,7 @@ int JavaClass::get_ref_name_type(char *name, char *type, int len, int index)
           use_full_method_name())
       {
         get_class_name(name, len, constant_methodref->class_index);
-        printf("  class_name='%s' %d\n", name, constant_methodref->class_index);
+        //printf("  class_name='%s' %d\n", name, constant_methodref->class_index);
         strcat(name, "_");
 
         // Is this needed?

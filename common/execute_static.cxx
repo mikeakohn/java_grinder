@@ -41,7 +41,7 @@
           break; \
         }
 
-int execute_static(JavaClass *java_class, int method_id, Generator *generator, bool do_arrays, JavaClass *parent_class)
+int execute_static(JavaClass *java_class, int method_id, Generator *generator, bool do_arrays, bool verbose, JavaClass *parent_class)
 {
   struct methods_t *method = java_class->get_method(method_id);
   uint8_t *bytes = method->attributes[0].info;
@@ -58,8 +58,8 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
   //int stack_ptr;
   _stack *stack;
   int32_t *array = NULL;
-  int array_len;
-  int array_type;
+  int array_len = -1;
+  int array_type = -1;
   int array_alloc_size = 0;
   char full_field_name[256];
   char *field_name;
@@ -67,7 +67,10 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
   int index;
   int ret = 0;
 
-  printf("--- Executing static code\n");
+  if (verbose)
+  {
+    printf("--- Executing static code\n");
+  }
 
   // If this isn't the parent class then well prepend the class name
   // infront of the symbol.
@@ -98,7 +101,10 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
              ((int)bytes[code_len+9])) + 8;
   pc = pc_start;
 
-  printf("max_stack=%d max_locals=%d code_len=%d\n", max_stack, max_locals, code_len);
+  if (verbose)
+  {
+    printf("max_stack=%d max_locals=%d code_len=%d\n", max_stack, max_locals, code_len);
+  }
 
   //generator->method_start(max_locals, method_name);
   stack = (_stack *)alloca(max_stack * sizeof(int32_t) + sizeof(int32_t));
@@ -108,7 +114,10 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
   {
     int address = pc - pc_start;
 #ifdef DEBUG
-    printf("pc=%d %s opcode=%d (0x%02x)\n", address, table_java_instr[bytes[pc]].name, bytes[pc], bytes[pc]);
+    if (verbose)
+    {
+      printf("pc=%d %s opcode=%d (0x%02x)\n", address, table_java_instr[bytes[pc]].name, bytes[pc], bytes[pc]);
+    }
 #endif
 
     switch(bytes[pc])
@@ -145,7 +154,11 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
         index = bytes[pc+1];
       case 19: // ldc_w (0x13)
         if (bytes[pc] == 0x13) { index = (bytes[pc+1] << 8) | bytes[pc+2]; }
-        printf("  index=%d\n", index);
+
+        if (verbose)
+        {
+          printf("  index=%d\n", index);
+        }
 
         gen32 = (generic_32bit_t *)java_class->get_constant(index);
 
@@ -187,7 +200,12 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
             ret = -1;
             break;
           }
-          printf("  String %s; // %s\n", field_name, full_field_name);
+
+          if (verbose)
+          {
+            printf("  String %s; // %s\n", field_name, full_field_name);
+          }
+
           if (do_arrays)
           {
             constant_utf8_t *constant_utf8 = (constant_utf8_t *)java_class->get_constant(constant_string->string_index);
@@ -420,7 +438,12 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
         CHECK_STACK(1);
         index = (bytes[pc+1] << 8) | bytes[pc+2];
         temp = stack->pop();
-        printf("id=%d index=%d\n", temp, index);
+
+        if (verbose)
+        {
+          printf("id=%d index=%d\n", temp, index);
+        }
+
         //stack_ptr--;  // <-- this is our made up index which here is always 0
         if (java_class->get_ref_name_type(field_name, type, sizeof(type), index) != 0)
         {
@@ -429,19 +452,29 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
           break;
         }
 
-        printf("field_name=%s type=%s len=%d\n", field_name, type, array_len);
+        if (verbose)
+        {
+          printf("field_name=%s type=%s len=%d\n", field_name, type, array_len);
+        }
+
         if (type[0] == '[')
         {
-          printf("array_type=%d\n", array_type);
+          if (verbose)
+          {
+            printf("array_type=%d\n", array_type);
+          }
 
           if (do_arrays)
           {
             // DEBUG output
-            for (int n = 0; n < array_len; n++)
+            if (verbose)
             {
-              printf(" %d", array[n]);
+              for (int n = 0; n < array_len; n++)
+              {
+                printf(" %d", array[n]);
+              }
+              printf("\n");
             }
-            printf("\n");
 
             if (array_type == ARRAY_TYPE_BOOLEAN ||
                 array_type == ARRAY_TYPE_BYTE)
@@ -527,7 +560,12 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
         array_len = temp;
         stack->push(0); // FIXME - put the new array on the stack
         array_type = bytes[pc+1];
-        printf("array_len=%d type=%d\n", array_len, array_type);
+
+        if (verbose)
+        {
+          printf("array_len=%d type=%d\n", array_len, array_type);
+        }
+
         if (array_len > array_alloc_size)
         {
           array_alloc_size = array_len < 8192 ? 8192 : array_len;
@@ -625,7 +663,10 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
     wide = 0;
   }
 
-  printf("stack->length()=%d after execute ends\n", stack->length());
+  if (verbose)
+  {
+    printf("stack->length()=%d after execute ends\n", stack->length());
+  }
 
   // printf("EXIT pc=%d ret=%d code_len=%d\n", pc, ret, code_len);
   if (array != NULL) { free(array); }

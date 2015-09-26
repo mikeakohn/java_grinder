@@ -87,7 +87,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
   char method_class[128];
   char function[256];
 
-  printf("invoke_static()\n");
+  //printf("invoke_static()\n");
 
   if (java_class->get_class_name(method_class, sizeof(method_class), method_id) != 0 ||
       java_class->get_ref_name_type(method_name, method_sig, sizeof(method_name), method_id) != 0)
@@ -96,11 +96,11 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     return -1;
   }
 
-  printf("method: '%s as %s' from %s\n", method_name, method_sig, method_class);
+  //printf("method: '%s as %s' from %s\n", method_name, method_sig, method_class);
 
   get_static_function(function, method_name, method_sig);
 
-  printf("function: %s()\n", function);
+  //printf("function: %s()\n", function);
   int ret = -1;
 
   size_t len = sizeof("net/mikekohn/java_grinder/") - 1;
@@ -169,7 +169,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, in
   char method_class[128];
   char function[256];
 
-  printf("const invoke_static() const_count=%d\n", const_count);
+  //printf("const invoke_static() const_count=%d\n", const_count);
 
   if (java_class->get_class_name(method_class, sizeof(method_class), method_id) != 0 ||
       java_class->get_ref_name_type(method_name, method_sig, sizeof(method_name), method_id) != 0)
@@ -178,11 +178,11 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, in
     return -1;
   }
 
-  printf("const method: '%s as %s' from %s\n  const_count=%d\n", method_name, method_sig, method_class, const_count);
+  //printf("const method: '%s as %s' from %s\n  const_count=%d\n", method_name, method_sig, method_class, const_count);
 
   get_static_function(function, method_name, method_sig);
 
-  printf("const function: %s()\n", function);
+  //printf("const function: %s()\n", function);
   int ret = -1;
 
   size_t len = sizeof("net/mikekohn/java_grinder/") - 1;
@@ -234,7 +234,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, in
 
   if (ret == 0) { return 0; }
 
-  printf("invoke static const (not found)\n");
+  //printf("invoke static const (not found)\n");
 
   return -1;
 }
