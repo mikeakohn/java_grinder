@@ -6,7 +6,7 @@ public class Stars
 {
   public static short[] palette =
   {
-    0x000, 0xeee, 0xaaa, 0x888,
+    0x000, 0xeee, 0x888, 0x444, 0x000
   };
 
   public static short[] stars_init =
@@ -14,6 +14,12 @@ public class Stars
     // X0,  Y0,  DX,  DY   (160,112) is center
       140, 110,  -1,  -1,
       180,  80,   1,  -1,
+      170,  120,  1,   2,
+      190,  130,  2,   1,
+      150,  130, -2,   1,
+      150,  135, -2,   2,
+      150,  90,  -1,  -2,
+      170,  91,   1,  -2,
   };
 
   public static void run()
@@ -37,19 +43,38 @@ public class Stars
 
       for (n = 0; n < stars.length; n += 4)
       {
-        SegaGenesis.plot(stars[n], stars[n + 1], 0);
+        //SegaGenesis.plot(stars[n], stars[n + 1], 0);
 
         stars[n] += stars[n + 2];
         stars[n + 1] += stars[n + 3];
 
+        // If star is beyond boundary, erase it and reset it
         if (stars[n] <= 0 || stars[n] >= 320 ||
             stars[n + 1] <= 0 || stars[n + 1] >= 224) 
         {
+          int x = stars[n], y = stars[n + 1];
+
+          for (int c = 1; c <= 4; c++)
+          {
+            SegaGenesis.plot(x, y, 0);
+            x -= stars[n + 2];
+            y -= stars[n + 3];
+          }
+
           stars[n] = stars_init[n];
           stars[n + 1] = stars_init[n + 1];
         }
 
-        SegaGenesis.plot(stars[n], stars[n + 1], 1);
+        // Draw a trail of stars
+        int x = stars[n], y = stars[n + 1];
+        //SegaGenesis.plot(stars[n], stars[n + 1], 1);
+
+        for (int c = 1; c <= 4; c++)
+        {
+          SegaGenesis.plot(x, y, c);
+          x -= stars[n + 2];
+          y -= stars[n + 3];
+        }
       }
 
       while(SegaGenesis.inVerticalBlank());
