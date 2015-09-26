@@ -118,6 +118,108 @@ JavaCompiler::~JavaCompiler()
   fclose(in);
 }
 
+int JavaCompiler::find_external_fields(JavaClass *java_class, bool is_parent)
+{
+  int index;
+  int external_field_count = 0;
+  int constant_count = java_class->get_constant_count();
+
+  // Collect list of external fields
+  for (index = 0; index < constant_count; index++)
+  {
+    constant_fieldref_t *constant_fieldref =
+      (constant_fieldref_t *)java_class->get_constant(index);
+
+    if (constant_fieldref->tag == CONSTANT_FIELDREF ||
+        constant_fieldref->tag == CONSTANT_METHODREF)
+    {
+      // Ignore fields that are in the parent class
+      if (is_parent && constant_fieldref->class_index == java_class->this_class)
+      {
+        continue;
+      }
+
+      // If this field / method is in the API, then skip it.  Only
+      // need to find all classes that have to be loaded and their
+      // fields so memory can be allocated properly.
+      if (java_class->is_ref_in_api(index)) { continue; }
+
+      char class_name[128];
+      char field_name[128];
+      char field_type[128];
+
+      java_class->get_ref_name_type(field_name, field_type, sizeof(field_name), index);
+
+#if 0
+      ptr = 0;
+      while(field_name[ptr] != 0 && field_name[ptr] != '_')
+      {
+        class_name[ptr] = field_name[ptr];
+        ptr++;
+      }
+      class_name[ptr] = 0;
+#endif
+      java_class->get_class_name(class_name, sizeof(class_name), index);
+      printf("CLASSNAME '%s' field='%s'\n", class_name, field_name);
+
+      // If this field / method exists outside of this class...
+      if (strcmp(class_name, java_class->class_name) != 0)
+      {
+        // If this reference is to something outside of this class,
+        // recursively load this class.
+        std::map<std::string,JavaClass *>::iterator iter;
+
+        iter = external_classes.find(class_name);
+        if (iter == external_classes.end())
+        {
+          char filename[1024];
+
+          // This should be safe from earlier restrictions on string sizes.
+          strcpy(filename, classpath);
+          strcat(filename, class_name);
+          strcat(filename, ".class");
+
+          printf("find_external_fields: fopen('%s')\n", filename);
+
+          FILE *in = fopen(filename, "rb");
+
+          if (in == NULL)
+          {
+            printf("Cannot open '%s'\n", filename);
+            return -1;
+          }
+
+          JavaClass *java_class_external = new JavaClass(in, false);
+          external_classes[class_name] = java_class_external;
+
+          fclose(in);
+
+          external_field_count += find_external_fields(java_class_external, false);
+        }
+      }
+        else
+      {
+        // Record this field in list of external fields.
+        if (constant_fieldref->tag == CONSTANT_FIELDREF)
+        {
+          printf("  adding: %s\n", field_name);
+          external_fields[field_name] = field_type_to_int(field_type);
+          external_field_count++;
+        }
+#if 0
+          else
+        if (constant_fieldref->tag == CONSTANT_METHODREF)
+        {
+          // Do external methods need to be kept track of?
+        }
+#endif
+      }
+    }
+  }
+
+  return external_field_count;
+}
+
 void JavaCompiler::fill_label_map(uint8_t *label_map, int label_map_len, uint8_t *bytes, int code_len, int pc_start)
 {
   int pc = pc_start;
@@ -1877,7 +1979,6 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
 
 int JavaCompiler::load_class(const char *filename)
 {
-  int index;
   int ptr;
   int last_slash = -1;
 
@@ -1906,75 +2007,9 @@ int JavaCompiler::load_class(const char *filename)
   java_class = new JavaClass(in);
   java_class->print();
 
-  int constant_count = java_class->get_constant_count();
+  int external_field_count = find_external_fields(java_class, true);
 
-  // Collect list of external fields
-  for (index = 0; index < constant_count; index++)
-  {
-    constant_fieldref_t *constant_fieldref =
-      (constant_fieldref_t *)java_class->get_constant(index);
-
-    if ((constant_fieldref->tag == CONSTANT_FIELDREF ||
-         constant_fieldref->tag == CONSTANT_METHODREF) &&
-         constant_fieldref->class_index != java_class->this_class)
-    {
-      char class_name[128];
-      char field_name[128];
-      char field_type[128];
-      int ptr;
-
-      java_class->get_ref_name_type(field_name, field_type, sizeof(field_name), index);
-
-      ptr = 0;
-      while(field_name[ptr] != 0 && field_name[ptr] != '_')
-      {
-        class_name[ptr] = field_name[ptr];
-        ptr++;
-      }
-      class_name[ptr] = 0;
-
-      if (!java_class->is_ref_external(index)) { continue; }
-      //printf("DEBUG: EXTERNAL class_name='%s' field_name='%s'\n", class_name, field_name);
-
-      std::map<std::string,JavaClass *>::iterator iter;
-
-      iter = external_classes.find(class_name);
-      if (iter == external_classes.end())
-      {
-        char filename[1024];
-
-        // This should be safe from earlier restrictions on string sizes.
-        strcpy(filename, classpath);
-        strcat(filename, class_name);
-        strcat(filename, ".class");
-
-        FILE *in = fopen(filename, "rb");
-
-        if (in == NULL)
-        {
-          printf("Cannot open '%s'\n", filename);
-          return -1;
-        }
-
-        JavaClass *java_class_external = new JavaClass(in, false);
-        external_classes[class_name] = java_class_external;
-
-        fclose(in);
-      }
-
-      if (constant_fieldref->tag == CONSTANT_FIELDREF)
-      {
-        external_fields[field_name] = field_type_to_int(field_type);
-      }
-#if 0
-        else
-      if (constant_fieldref->tag == CONSTANT_METHODREF)
-      {
-        // Do external methods need to be kept track of?
-      }
-#endif
-    }
-  }
+  printf("Total external field count: %d\n", external_field_count);
 
   // Just some debug code
   printf("external_class_count=%zu\n", external_classes.size());

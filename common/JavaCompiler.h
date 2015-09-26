@@ -45,6 +45,7 @@ public:
   virtual int add_constants();
 
 private:
+  int find_external_fields(JavaClass *java_class, bool is_parent);
   void fill_label_map(uint8_t *label_map, int label_map_len, uint8_t *bytes, int code_len, int pc_start);
   int optimize_const(JavaClass *java_class, char *method_name, uint8_t *bytes, int pc, int pc_end, int address, int const_val);
   int optimize_compare(JavaClass *java_class, char *method_name, uint8_t *bytes, int pc, int pc_end, int address, int index);

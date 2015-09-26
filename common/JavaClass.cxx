@@ -463,7 +463,8 @@ int JavaClass::get_ref_name_type(char *name, char *type, int len, int index)
 
       // If the constant doesn't exist in this class, then add the class
       // name to the field.
-      if (constant_fieldref->class_index != this_class)
+      if (constant_fieldref->class_index != this_class ||
+          use_full_method_name())
       {
         get_class_name(name, len, constant_fieldref->class_index);
         printf("  class_name='%s' %d\n", name, constant_fieldref->class_index);
@@ -478,7 +479,8 @@ int JavaClass::get_ref_name_type(char *name, char *type, int len, int index)
 
       // If the method doesn't exist in this class, then add the class
       // name to the field.
-      if (constant_methodref->class_index != this_class || use_full_method_name())
+      if (constant_methodref->class_index != this_class ||
+          use_full_method_name())
       {
         get_class_name(name, len, constant_methodref->class_index);
         printf("  class_name='%s' %d\n", name, constant_methodref->class_index);
@@ -511,20 +513,20 @@ int JavaClass::get_ref_name_type(char *name, char *type, int len, int index)
   return -1;
 }
 
-bool JavaClass::is_ref_external(int index)
+bool JavaClass::is_ref_in_api(int index)
 {
   char name[128];
 
-  if (get_class_name(name, sizeof(name), index) == -1) { return false; }
+  if (get_class_name(name, sizeof(name), index) == -1) { return true; }
 
-  if (strncmp(name, "java/", 5) == 0) { return false; }
+  if (strncmp(name, "java/", 5) == 0) { return true; }
   if (strncmp(name, "net/mikekohn/java_grinder/",
              sizeof("net/mikekohn/java_grinder/") -1) == 0)
   {
-    return false;
+    return true;
   }
 
-  return true;
+  return false;
 }
 
 int JavaClass::get_class_name(char *name, int len, int index)

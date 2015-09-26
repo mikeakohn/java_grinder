@@ -21,7 +21,7 @@
 
 // Static fields are done awfuly strange in Java.  Well, mostly it's the
 // arrays that are done oddly.  So I think the trick is to actually run
-// the Java code to create the arrays in flash.  Then need to figure out
+// the Java code to create the arrays in memory.  Then need to figure out
 // how to add the other code to the init section.  Maybe the trick is to
 // generate a brand new Java function and compile it.
 
@@ -71,6 +71,7 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
 
   // If this isn't the parent class then well prepend the class name
   // infront of the symbol.
+#if 0
   if (parent_class == NULL)
   {
     field_name = full_field_name;
@@ -81,6 +82,10 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
     strcat(full_field_name, "_");
     field_name = full_field_name + strlen(full_field_name);
   }
+#endif
+
+  // FIXME - Get rid of full_field_name ...
+  field_name = full_field_name;
 
   // bytes points to the method attributes info for the method.
   max_stack = ((int)bytes[0]<<8) | ((int)bytes[1]);

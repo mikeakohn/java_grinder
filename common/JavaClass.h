@@ -185,7 +185,7 @@ public:
   int get_field_type(char *name, int len, int index);
   const fields_t *get_field(int index);
   int get_ref_name_type(char *name, char *type, int len, int index);
-  bool is_ref_external(int index);
+  bool is_ref_in_api(int index);
   int get_class_name(char *name, int len, int index);
   void *get_constant(int index);
   struct methods_t *get_method(int index);
