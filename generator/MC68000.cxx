@@ -814,6 +814,8 @@ int MC68000::insert_string(const char *name, uint8_t *bytes, int len)
 
 int MC68000::push_array_length()
 {
+  fprintf(out, "  ;; array length\n");
+
   if (stack > 0)
   {
     fprintf(out, "  move.l (SP)+, a2\n");
@@ -822,7 +824,8 @@ int MC68000::push_array_length()
   }
     else
   {
-    fprintf(out, "  move.l (-4,d%d), d%d\n", REG_STACK(reg-1), REG_STACK(reg-1));
+    fprintf(out, "  movea.l d%d, a2\n", REG_STACK(reg-1));
+    fprintf(out, "  move.l (-4,a2), d%d\n", REG_STACK(reg-1));
   }
 
   return 0;
@@ -830,6 +833,7 @@ int MC68000::push_array_length()
 
 int MC68000::push_array_length(const char *name, int field_id)
 {
+  fprintf(out, "  ;; push array length (%s)\n", name);
   fprintf(out, "  movea.l (%s,a4), a2\n", name);
 
   if (reg < reg_max)

@@ -43,7 +43,7 @@ public class Stars
         stars[n + 1] += stars[n + 3];
 
         if (stars[n] <= 0 || stars[n] >= 320 ||
-            stars[n + 1] <= 0 || stars[n + 1] >= 320) 
+            stars[n + 1] <= 0 || stars[n + 1] >= 224) 
         {
           stars[n] = stars_init[n];
           stars[n + 1] = stars_init[n + 1];

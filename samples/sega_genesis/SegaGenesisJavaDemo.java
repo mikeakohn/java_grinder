@@ -84,11 +84,13 @@ public class SegaGenesisJavaDemo
       while(SegaGenesis.inVerticalBlank());
     }
 
+    // Clear bitmap area
+    SegaGenesis.initBitmap();
+
     for (int c = 0; c < 216; c++)
     {
       SegaGenesis.setHorizontalScrollB(c, 0);
     }
-
 
     Stars.run();
 
