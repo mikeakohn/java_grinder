@@ -886,6 +886,9 @@ int MC68000::array_read_short()
   get_values_from_stack(&index_reg);
   get_ref_from_stack();
 
+  fprintf(out, "  ;; array_read_short()\n");
+  fprintf(out, "  lsl.l #1, d%d\n", index_reg);
+
   if (reg < reg_max)
   {
     fprintf(out, "  move.w (0,a2,d%d.w), d%d\n", index_reg, REG_STACK(reg));
@@ -909,6 +912,9 @@ int MC68000::array_read_int()
 
   get_values_from_stack(&index_reg);
   get_ref_from_stack();
+
+  fprintf(out, "  ;; array_read_int()\n");
+  fprintf(out, "  lsl.l #2, d%d\n", index_reg);
 
   if (reg < reg_max)
   {
@@ -1016,6 +1022,9 @@ int MC68000::array_write_short()
   get_values_from_stack(&value_reg, &index_reg);
   get_ref_from_stack();
 
+  fprintf(out, "  ;; array_write_short()\n");
+  fprintf(out, "  lsl.l #1, d%d\n", index_reg);
+
   fprintf(out, "  move.w d%d, (0,a2,d%d.w)\n", value_reg, index_reg);
 
   return 0;
@@ -1028,6 +1037,9 @@ int MC68000::array_write_int()
 
   get_values_from_stack(&value_reg, &index_reg);
   get_ref_from_stack();
+
+  fprintf(out, "  ;; array_write_int()\n");
+  fprintf(out, "  lsl.l #2, d%d\n", index_reg);
 
   fprintf(out, "  move.l d%d, (0,a2,d%d.l)\n", value_reg, index_reg);
 
