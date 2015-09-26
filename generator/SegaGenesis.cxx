@@ -76,8 +76,8 @@ SegaGenesis::SegaGenesis() :
   // FIXME - What's this access prohibited crap?
   //ram_start = 0xe00000;
   ram_start = 0xff0000;
-  //stack_start = 0x1000000;
-  stack_start = 0xfffffe00;  // <-- dafuq?
+  stack_start = 0x00000000;
+  //stack_start = 0xfffffe00;  // <-- dafuq?
 }
 
 SegaGenesis::~SegaGenesis()
