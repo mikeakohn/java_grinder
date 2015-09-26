@@ -22,6 +22,16 @@ public class Stars
       170,  91,   1,  -2,
       165,  112,  2,   0,
       155,  110, -1,   0,
+      140, 110,  -2,  -2,
+      180,  80,   2,  -2,
+      170,  120,  2,   3,
+      190,  130,  3,   2,
+      150,  130, -3,   2,
+      150,  135, -3,   3,
+      150,  90,  -2,  -3,
+      170,  91,   2,  -3,
+      165,  112,  3,   1,
+      155,  110, -2,   1,
   };
 
   public static void run()
@@ -39,7 +49,7 @@ public class Stars
       stars[n] = stars_init[n];
     }
 
-    for (a = 0; a < 300; a++)
+    for (a = 0; a < 350; a++)
     {
       while(!SegaGenesis.inVerticalBlank());
 
