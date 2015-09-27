@@ -85,6 +85,12 @@ void get_signature(char *signature, int *params, int *is_void)
       break;
     }
       else
+    if (*signature == '[')
+    {
+      // The next char (or set of chars) should be the array type...
+      // don't think anything else really needs to be done here.
+    }
+      else
     if (*signature == 'L')
     {
       while(*signature != ';' && *signature != 0)
@@ -99,7 +105,6 @@ void get_signature(char *signature, int *params, int *is_void)
     {
       (*params)++;
     }
-
 
     signature++;
   }
