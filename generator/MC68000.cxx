@@ -657,7 +657,7 @@ int MC68000::invoke_static_method(const char *name, int params, int is_void)
   int saved_registers;
   int n;
 
-  //printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
+  fprintf(out, "  ;; invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
 
   // Push all used registers on the stack except the ones that are pulled
   // out for parameters.

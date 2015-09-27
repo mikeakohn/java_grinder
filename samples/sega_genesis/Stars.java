@@ -34,23 +34,10 @@ public class Stars
       155,  110, -2,   1,
   };
 
-  public static void run()
+  public static void moveStars(short[] stars)
   {
-    int a,n;
+    int n;
 
-    short[] stars = Memory.allocStackShorts(stars_init.length);
-
-    // Need white and a few shades darker of pixels
-    SegaGenesis.setPaletteColors(palette);
-
-    // Copy stars to RAM
-    for (n = 0; n < stars.length; n++)
-    {
-      stars[n] = stars_init[n];
-    }
-
-    for (a = 0; a < 350; a++)
-    {
       while(!SegaGenesis.inVerticalBlank());
 
       for (n = 0; n < stars.length; n += 4)
@@ -79,7 +66,6 @@ public class Stars
 
         // Draw a trail of stars
         int x = stars[n], y = stars[n + 1];
-        //SegaGenesis.plot(stars[n], stars[n + 1], 1);
 
         for (int c = 1; c <= 4; c++)
         {
@@ -90,6 +76,26 @@ public class Stars
       }
 
       while(SegaGenesis.inVerticalBlank());
+  }
+
+  public static void run()
+  {
+    int a,n;
+
+    short[] stars = Memory.allocStackShorts(stars_init.length);
+
+    // Need white and a few shades darker of pixels
+    SegaGenesis.setPaletteColors(palette);
+
+    // Copy stars to RAM
+    for (n = 0; n < stars.length; n++)
+    {
+      stars[n] = stars_init[n];
+    }
+
+    for (a = 0; a < 350; a++)
+    {
+      moveStars(stars);
     }
   }
 }
