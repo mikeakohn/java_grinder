@@ -109,8 +109,25 @@ public class Stars
         {
           SegaGenesis.setPalettePointer(49);
           SegaGenesis.setPaletteColor(text_color);
+          if (text_color == 0xeee)
+          {
+            state++;
+            delay = 150;
+          }
           text_color += 0x222;
-          if (text_color == 0xeee) { state++; }
+        }
+
+        if ((state & 0x3) == 2 && (a & 0x7) == 0)
+        {
+          text_color -= 0x222;
+          SegaGenesis.setPalettePointer(49);
+          SegaGenesis.setPaletteColor(text_color);
+          if (text_color == 0x000)
+          {
+            SegaGenesis.clearText();
+            state += 2;
+            delay = 150;
+          }
         }
 
         if (state == 0)
@@ -119,6 +136,13 @@ public class Stars
           SegaGenesis.print("THE[JAVA[GRINDER[TEAM");
           SegaGenesis.setCursor(16, 13);
           SegaGenesis.print("PRESENTS");
+          state++;
+        }
+          else
+        if (state == 4)
+        {
+          SegaGenesis.setCursor(14, 12);
+          SegaGenesis.print("SEGA[GENESIS");
           state++;
         }
       }
