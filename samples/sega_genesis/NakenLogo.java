@@ -1,4 +1,6 @@
 
+import net.mikekohn.java_grinder.SegaGenesis;
+
 public class NakenLogo
 {
   public static int[] pattern =
@@ -395,5 +397,43 @@ public class NakenLogo
     0x000, 0xe80, 0x4a0, 0x0ce, 0xace, 0x2a2, 0x2cc, 0xaaa,
     0xea4, 0xa80, 0x0ca, 0x0c4, 0xeaa, 0x4ce, 0xcac, 0x0ee,
   };
+
+  public static void run()
+  {
+    int n,c,a;
+
+    SegaGenesis.setPaletteColors(NakenLogo.palette);
+    SegaGenesis.setPatternTable(NakenLogo.pattern);
+    SegaGenesis.setImageData(NakenLogo.image);
+
+    Common.wait(120);
+
+    SegaGenesis.loadZ80(PlayLaser.z80_code);
+
+    for (n = 0; n < 200; n++)
+    {
+      while(!SegaGenesis.inVerticalBlank());
+
+      for (c = 68; c < 160; c++)
+      {
+        a = 68 - c + n;
+        if (a < 0) { a = 0; }
+        a = a << 2;
+        if (a > 253) { a = 253; }
+
+        SegaGenesis.setHorizontalScrollB(c, a);
+      }
+
+      while(SegaGenesis.inVerticalBlank());
+    }
+
+    // Clear bitmap area
+    SegaGenesis.initBitmap();
+
+    for (c = 0; c < 216; c++)
+    {
+      SegaGenesis.setHorizontalScrollB(c, 0);
+    }
+  }
 }
 
