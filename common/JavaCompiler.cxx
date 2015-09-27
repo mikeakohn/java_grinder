@@ -2324,7 +2324,7 @@ int JavaCompiler::compile_methods(bool do_main)
   return 0;
 }
 
-int JavaCompiler::add_constants()
+int JavaCompiler::add_constants(JavaClass *java_class)
 {
   std::map<int,int>::iterator iter;
 
@@ -2338,6 +2338,23 @@ int JavaCompiler::add_constants()
 
     sprintf(name, "string_%d", iter->first);
     generator->insert_string(name, constant_utf8->bytes, constant_utf8->length);
+  }
+
+  return 0;
+}
+
+int JavaCompiler::add_constants()
+{
+  // Add contants from main class.
+  add_constants(java_class);
+
+  // Add constants from external classes.
+  std::map<std::string,JavaClass *>::iterator iter;
+
+  for (iter = external_classes.begin(); iter != external_classes.end(); iter++)
+  {
+    JavaClass *java_class = iter->second;
+    add_constants(java_class);
   }
 
   return 0;

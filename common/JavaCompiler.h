@@ -42,6 +42,7 @@ public:
   virtual void init_heap();
   virtual int add_static_initializers();
   virtual int compile_methods(bool do_main);
+  virtual int add_constants(JavaClass *java_class);
   virtual int add_constants();
 
 private:

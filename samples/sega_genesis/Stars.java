@@ -80,9 +80,16 @@ public class Stars
 
   public static void run()
   {
+    int state = 0;
+    int delay = 200;
+    int text_color = 0;
     int a,n;
 
     short[] stars = Memory.allocStackShorts(stars_init.length);
+
+    // Text color starts out as black.
+    SegaGenesis.setPalettePointer(49);
+    SegaGenesis.setPaletteColor(0x000);
 
     // Need white and a few shades darker of pixels
     SegaGenesis.setPaletteColors(palette);
@@ -93,8 +100,33 @@ public class Stars
       stars[n] = stars_init[n];
     }
 
-    for (a = 0; a < 350; a++)
+    // Main part of method to animate the stars
+    for (a = 0; a < 1000; a++)
     {
+      if (delay == 0)
+      {
+        if ((state & 0x3) == 1 && (a & 0x7) == 0)
+        {
+          SegaGenesis.setPalettePointer(49);
+          SegaGenesis.setPaletteColor(text_color);
+          text_color += 0x222;
+          if (text_color == 0xeee) { state++; }
+        }
+
+        if (state == 0)
+        {
+          SegaGenesis.setCursor(10, 11);
+          SegaGenesis.print("THE[JAVA[GRINDER[TEAM");
+          SegaGenesis.setCursor(16, 13);
+          SegaGenesis.print("PRESENTS");
+          state++;
+        }
+      }
+        else
+      {
+        delay--;
+      }
+
       moveStars(stars);
     }
   }
