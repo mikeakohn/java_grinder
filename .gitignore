@@ -9,3 +9,10 @@
 tests/*.hex
 tests/*.lst
 samples/c64/c64_demo.prg
+cfg
+nvram
+*.swp
+*.mid
+snap
+*.smc
+*.dsk
