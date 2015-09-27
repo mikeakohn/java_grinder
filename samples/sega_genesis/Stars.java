@@ -38,44 +38,44 @@ public class Stars
   {
     int n;
 
-      while(!SegaGenesis.inVerticalBlank());
+    while(!SegaGenesis.inVerticalBlank());
 
-      for (n = 0; n < stars.length; n += 4)
+    for (n = 0; n < stars.length; n += 4)
+    {
+      //SegaGenesis.plot(stars[n], stars[n + 1], 0);
+
+      stars[n] += stars[n + 2];
+      stars[n + 1] += stars[n + 3];
+
+      // If star is beyond boundary, erase it and reset it
+      if (stars[n] <= 0 || stars[n] >= 320 ||
+          stars[n + 1] <= 0 || stars[n + 1] >= 224) 
       {
-        //SegaGenesis.plot(stars[n], stars[n + 1], 0);
-
-        stars[n] += stars[n + 2];
-        stars[n + 1] += stars[n + 3];
-
-        // If star is beyond boundary, erase it and reset it
-        if (stars[n] <= 0 || stars[n] >= 320 ||
-            stars[n + 1] <= 0 || stars[n + 1] >= 224) 
-        {
-          int x = stars[n], y = stars[n + 1];
-
-          for (int c = 1; c <= 4; c++)
-          {
-            SegaGenesis.plot(x, y, 0);
-            x -= stars[n + 2];
-            y -= stars[n + 3];
-          }
-
-          stars[n] = stars_init[n];
-          stars[n + 1] = stars_init[n + 1];
-        }
-
-        // Draw a trail of stars
         int x = stars[n], y = stars[n + 1];
 
         for (int c = 1; c <= 4; c++)
         {
-          SegaGenesis.plot(x, y, c);
+          SegaGenesis.plot(x, y, 0);
           x -= stars[n + 2];
           y -= stars[n + 3];
         }
+
+        stars[n] = stars_init[n];
+        stars[n + 1] = stars_init[n + 1];
       }
 
-      while(SegaGenesis.inVerticalBlank());
+      // Draw a trail of stars
+      int x = stars[n], y = stars[n + 1];
+
+      for (int c = 1; c <= 4; c++)
+      {
+        SegaGenesis.plot(x, y, c);
+        x -= stars[n + 2];
+        y -= stars[n + 3];
+      }
+    }
+
+    while(SegaGenesis.inVerticalBlank());
   }
 
   public static void run()

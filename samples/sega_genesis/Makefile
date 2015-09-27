@@ -1,7 +1,7 @@
 
-default: SegaGenesisJavaDemo.class Common.java Mandelbrots.class NakenLogo.class PlaySong.class PlayTitleSample.class Stars.class PlayLaser.class Stars.class
+default: SegaGenesisJavaDemo.class Box.class Common.class Mandelbrots.class NakenLogo.class PlaySong.class PlayTitleSample.class Stars.class PlayLaser.class Stars.class
 
-grind: SegaGenesisJavaDemo.class Common.java Mandelbrots.class NakenLogo.class PlaySong.class PlayTitleSample.class Stars.class PlayLaser.class Stars.class
+grind: SegaGenesisJavaDemo.class Box.class Common.class Mandelbrots.class NakenLogo.class PlaySong.class PlayTitleSample.class Stars.class PlayLaser.class Stars.class
 	../../java_grinder SegaGenesisJavaDemo.class sega_genesis_java_demo.asm sega_genesis
 	naken_asm -I ~ -l -b -o sega_genesis_java_demo.bin sega_genesis_java_demo.asm
 

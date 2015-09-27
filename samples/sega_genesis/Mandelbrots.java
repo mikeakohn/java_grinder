@@ -9,7 +9,7 @@ public class Mandelbrots
     0xe4e, 0x02e, 0x88e, 0x444, 0xe40, 0xee0, 0x400, 0x000,
   };
 
-  public static void draw()
+  public static void run()
   {
     final int DEC_PLACE = 10;
     int x,y;
@@ -24,6 +24,8 @@ public class Mandelbrots
     final int i1 = (1 << DEC_PLACE);
     int dx = (r1 - r0) / 320;
     int dy = (i1 - i0) / 224;
+
+    SegaGenesis.setPaletteColors(Mandelbrots.palette);
 
     is = i0;
 
@@ -62,6 +64,8 @@ public class Mandelbrots
 
       is += dy;
     }
+
+    Common.wait(60);
   }
 }
 
