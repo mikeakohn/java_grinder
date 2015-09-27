@@ -84,6 +84,7 @@ public class Stars
     int delay = 200;
     int text_color = 0;
     int a,n;
+    int dx;
 
     short[] stars = Memory.allocStackShorts(stars_init.length);
 
@@ -153,6 +154,25 @@ public class Stars
 
       moveStars(stars);
     }
+
+    SegaGenesis.setHorizontalScrollAModeFull();
+    n = 0;
+    dx = 1;
+
+    // Shift stars around
+    for (a = 0; a < 1000; a++)
+    {
+      SegaGenesis.setHorizontalScrollB(0, n);
+      SegaGenesis.setVerticalScrollB(n);
+      n += dx;
+      if (n > 8) { dx = -1; }
+      if (n < -8) { dx = 1; }
+      moveStars(stars);
+    }
+
+    SegaGenesis.setHorizontalScrollAModeLine();
+    SegaGenesis.setHorizontalScrollB(0, 0);
+    SegaGenesis.setVerticalScrollB(0);
   }
 }
 

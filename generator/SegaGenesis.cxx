@@ -531,6 +531,25 @@ int SegaGenesis::sega_genesis_setVerticalScrollB()
   return 0;
 }
 
+int SegaGenesis::sega_genesis_setHorizontalScrollAModeLine()
+{
+  fprintf(out,
+    "  ;; Swith to line by line horizontal scroll mode\n"
+    "  move.w #0x8b03, (a1)\n");
+
+  return 0;
+}
+
+int SegaGenesis::sega_genesis_setHorizontalScrollAModeFull()
+{
+  fprintf(out,
+    "  ;; Swith to full screen horizontal scroll mode\n"
+    "  move.w #0x8b00, (a1)\n");
+
+  return 0;
+}
+
+
 int SegaGenesis::sega_genesis_setPatternTable()
 {
   need_set_pattern_table = true;
