@@ -381,7 +381,7 @@ int W65816::dup()
 
 int W65816::dup2()
 {
-  fprintf(out, "  jsr dup\n");
+  fprintf(out, "  jsr dup2\n");
   stack += 2;
 
   return 0;
@@ -1353,7 +1353,7 @@ void W65816::insert_dup()
 
 void W65816::insert_dup2()
 {
-  fprintf(out, "dup:\n");
+  fprintf(out, "dup2:\n");
   POP();
   fprintf(out, "  sta value2\n");
   POP();
