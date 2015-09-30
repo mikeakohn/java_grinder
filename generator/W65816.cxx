@@ -373,6 +373,7 @@ int W65816::pop()
 
 int W65816::dup()
 {
+  need_dup = 1;
   fprintf(out, "  jsr dup\n");
   stack++;
 
@@ -381,6 +382,7 @@ int W65816::dup()
 
 int W65816::dup2()
 {
+  need_dup2 = 1;
   fprintf(out, "  jsr dup2\n");
   stack += 2;
 
