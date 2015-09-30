@@ -133,6 +133,7 @@ protected:
   bool need_xor_integer:1;
   bool need_integer_to_byte:1;
   bool need_dup:1;
+  bool need_dup2:1;
   bool need_push_array_length:1;
   bool need_push_array_length2:1;
   bool need_array_byte_support:1;
@@ -157,6 +158,7 @@ protected:
   void insert_xor_integer();
   void insert_integer_to_byte();
   void insert_dup();
+  void insert_dup2();
   void insert_push_array_length();
   void insert_push_array_length2();
   void insert_array_byte_support();

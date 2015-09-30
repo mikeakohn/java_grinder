@@ -57,6 +57,7 @@ W65816::W65816() :
   need_xor_integer(0),
   need_integer_to_byte(0),
   need_dup(0),
+  need_dup2(0),
   need_push_array_length(0),
   need_push_array_length2(0),
   need_array_byte_support(0),
@@ -84,6 +85,7 @@ W65816::~W65816()
   if(need_xor_integer) { insert_xor_integer(); }
   if(need_integer_to_byte) { insert_integer_to_byte(); }
   if(need_dup) { insert_dup(); }
+  if(need_dup2) { insert_dup2(); }
   if(need_push_array_length) { insert_push_array_length(); }
   if(need_push_array_length2) { insert_push_array_length2(); }
   if(need_array_byte_support) { insert_array_byte_support(); }
@@ -371,7 +373,7 @@ int W65816::pop()
 
 int W65816::dup()
 {
-  fprintf(out, "jsr dup\n");
+  fprintf(out, "  jsr dup\n");
   stack++;
 
   return 0;
@@ -379,13 +381,7 @@ int W65816::dup()
 
 int W65816::dup2()
 {
-  POP();
-  POP();
-  PUSH();
-  PUSH();
-  PUSH();
-  PUSH();
-
+  fprintf(out, "  jsr dup\n");
   stack += 2;
 
   return 0;
@@ -1350,6 +1346,18 @@ void W65816::insert_dup()
 {
   fprintf(out, "dup:\n");
   POP();
+  PUSH();
+  PUSH();
+  fprintf(out, "  rts\n");
+}
+
+void W65816::insert_dup2()
+{
+  fprintf(out, "dup:\n");
+  POP();
+  POP();
+  PUSH();
+  PUSH();
   PUSH();
   PUSH();
   fprintf(out, "  rts\n");
