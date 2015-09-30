@@ -1355,10 +1355,15 @@ void W65816::insert_dup2()
 {
   fprintf(out, "dup:\n");
   POP();
+  fprintf(out, "  sta value2\n");
   POP();
+  fprintf(out, "  sta value1\n");
   PUSH();
+  fprintf(out, "  lda value2\n");
   PUSH();
+  fprintf(out, "  lda value1\n");
   PUSH();
+  fprintf(out, "  lda value2\n");
   PUSH();
   fprintf(out, "  rts\n");
 }
