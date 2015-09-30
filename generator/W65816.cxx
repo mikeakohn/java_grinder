@@ -20,7 +20,7 @@
 
 // ABI is:
 // A - accumulator
-// X - java stack index register
+// X - java stack pointer
 // Y - general-purpose index register
 
 #define PUSH() \
@@ -390,7 +390,7 @@ int W65816::dup2()
 int W65816::swap()
 {
   need_swap = 1;
-  fprintf(out, "jsr swap\n");
+  fprintf(out, "  jsr swap\n");
 
   return 0;
 }
@@ -398,7 +398,7 @@ int W65816::swap()
 int W65816::add_integer()
 {
   need_add_integer = 1;
-  fprintf(out, "jsr add_integer\n");
+  fprintf(out, "  jsr add_integer\n");
   stack--;
 
   return 0;
@@ -418,7 +418,7 @@ int W65816::add_integer(int num)
 int W65816::sub_integer()
 {
   need_sub_integer = 1;
-  fprintf(out, "jsr sub_integer\n");
+  fprintf(out, "  jsr sub_integer\n");
   stack--;
 
   return 0;
@@ -471,7 +471,7 @@ int W65816::mod_integer()
 int W65816::neg_integer()
 {
   need_neg_integer = 1;
-  fprintf(out, "; jsr neg_integer\n");
+  fprintf(out, "  jsr neg_integer\n");
 
   return 0;
 }
@@ -479,7 +479,7 @@ int W65816::neg_integer()
 int W65816::shift_left_integer()
 {
   need_shift_left_integer = 1;
-  fprintf(out, "jsr shift_left_integer\n");
+  fprintf(out, "  jsr shift_left_integer\n");
   stack--;
   
   return 0;
@@ -503,7 +503,7 @@ int W65816::shift_left_integer(int num)
 int W65816::shift_right_integer()
 {
   need_shift_right_integer = 1;
-  fprintf(out, "jsr shift_right_integer\n");
+  fprintf(out, "  jsr shift_right_integer\n");
   stack--;
 
   return 0;
@@ -530,7 +530,7 @@ int W65816::shift_right_integer(int num)
 int W65816::shift_right_uinteger()
 {
   need_shift_right_uinteger = 1;
-  fprintf(out, "jsr shift_right_uinteger\n");
+  fprintf(out, "  jsr shift_right_uinteger\n");
   stack--;
 
   return 0;
@@ -554,7 +554,7 @@ int W65816::shift_right_uinteger(int num)
 int W65816::and_integer()
 {
   need_and_integer = 1;
-  fprintf(out, "jsr and_integer\n");
+  fprintf(out, "  jsr and_integer\n");
   stack--;
 
   return 0;
@@ -573,7 +573,7 @@ int W65816::and_integer(int num)
 int W65816::or_integer()
 {
   need_or_integer = 1;
-  fprintf(out, "jsr or_integer\n");
+  fprintf(out, "  jsr or_integer\n");
   stack--;
 
   return 0;
@@ -592,7 +592,7 @@ int W65816::or_integer(int num)
 int W65816::xor_integer()
 {
   need_xor_integer = 1;
-  fprintf(out, "jsr xor_integer\n");
+  fprintf(out, "  jsr xor_integer\n");
   stack--;
 
   return 0;
@@ -625,7 +625,7 @@ int W65816::inc_integer(int index, int num)
 int W65816::integer_to_byte()
 {
   need_integer_to_byte = 1;
-  fprintf(out, "jsr integer_to_byte\n");
+  fprintf(out, "  jsr integer_to_byte\n");
 
   return 0;
 }
@@ -939,12 +939,12 @@ int W65816::new_array(uint8_t type)
     if (type == TYPE_SHORT || type == TYPE_CHAR || type == TYPE_INT)
     {
       need_array_int_support = 1;
-      fprintf(out, "jsr new_array_int\n");
+      fprintf(out, "  jsr new_array_int\n");
     }
       else
     {
       need_array_byte_support = 1;
-      fprintf(out, "jsr new_array_byte\n");
+      fprintf(out, "  jsr new_array_byte\n");
     }
   }
 
@@ -983,7 +983,7 @@ int W65816::push_array_length()
   if(stack > 0)
   {
     need_push_array_length = 1;
-    fprintf(out, "jsr push_array_length\n");
+    fprintf(out, "  jsr push_array_length\n");
   }
 
   return 0;
@@ -993,7 +993,7 @@ int W65816::push_array_length(const char *name, int field_id)
 {
   need_push_array_length2 = 1;
   fprintf(out, "  lda %s\n", name);
-  fprintf(out, "jsr push_array_length2\n");
+  fprintf(out, "  jsr push_array_length2\n");
   stack++;
 
   return 0;
@@ -1003,7 +1003,7 @@ int W65816::array_read_byte()
 {
   need_array_byte_support = 1;
   get_values_from_stack(2);
-  fprintf(out, "jsr array_read_byte\n");
+  fprintf(out, "  jsr array_read_byte\n");
   stack++;
 
   return 0;
@@ -1018,7 +1018,7 @@ int W65816::array_read_int()
 {
   need_array_int_support = 1;
   get_values_from_stack(2);
-  fprintf(out, "jsr array_read_int\n");
+  fprintf(out, "  jsr array_read_int\n");
   stack++;
 
   return 0;
@@ -1031,7 +1031,7 @@ int W65816::array_read_byte(const char *name, int field_id)
     need_array_byte_support = 1;
     fprintf(out, "  lda %s\n", name);
     fprintf(out, "  sta address\n");
-    fprintf(out, "jsr array_read_byte2\n");
+    fprintf(out, "  jsr array_read_byte2\n");
   }
 
   return 0;
@@ -1049,7 +1049,7 @@ int W65816::array_read_int(const char *name, int field_id)
     need_array_int_support = 1;
     fprintf(out, "  lda %s\n", name);
     fprintf(out, "  sta address\n");
-    fprintf(out, "jsr array_read_int2\n");
+    fprintf(out, "  jsr array_read_int2\n");
   }
 
   return 0;
@@ -1059,7 +1059,7 @@ int W65816::array_write_byte()
 {
   need_array_byte_support = 1;
   get_values_from_stack(3);
-  fprintf(out, "jsr array_write_byte\n");
+  fprintf(out, "  jsr array_write_byte\n");
 
   return 0;
 }
@@ -1073,7 +1073,7 @@ int W65816::array_write_int()
 {
   need_array_int_support = 1;
   get_values_from_stack(3);
-  fprintf(out, "jsr array_write_int\n");
+  fprintf(out, "  jsr array_write_int\n");
 
   return 0;
 }
@@ -1530,7 +1530,7 @@ int W65816::memory_read8_I()
   need_memory_read8 = 1;
 
   fprintf(out, "; memory_read8\n");
-  fprintf(out, "jsr memory_read8\n");
+  fprintf(out, "  jsr memory_read8\n");
 
   return 0;
 }
@@ -1540,7 +1540,7 @@ int W65816::memory_write8_IB()
   need_memory_write8 = 1;
 
   fprintf(out, "; memory_write8\n");
-  fprintf(out, "jsr memory_write8\n");
+  fprintf(out, "  jsr memory_write8\n");
   stack -= 2;
 
   return 0;
@@ -1551,7 +1551,7 @@ int W65816::memory_read16_I()
   need_memory_read16 = 1;
 
   fprintf(out, "; memory_read16\n");
-  fprintf(out, "jsr memory_read16\n");
+  fprintf(out, "  jsr memory_read16\n");
 
   return 0;
 }
@@ -1561,7 +1561,7 @@ int W65816::memory_write16_IS()
   need_memory_write16 = 1;
 
   fprintf(out, "; memory_write16\n");
-  fprintf(out, "jsr memory_write16\n");
+  fprintf(out, "  jsr memory_write16\n");
   stack -= 2;
 
   return 0;
