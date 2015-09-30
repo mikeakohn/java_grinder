@@ -298,7 +298,6 @@ void AppleIIgs::insert_hires_clear()
   fprintf(out, "  dey\n");
   fprintf(out, "  bpl hires_clear_loop\n");
   fprintf(out, "  rts\n");
-
 }
 
 void AppleIIgs::insert_hires_update()
