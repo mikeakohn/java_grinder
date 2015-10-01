@@ -40,7 +40,7 @@ public class AppleIIgsJavaDemo
     -12, -10, -9, -7, -6, -4, -3, -1 
   };
 
-  static int box_points[] =
+  static int model_points[] =
   {
     -32, -32, -32, 0,
      32, -32, -32, 0,
@@ -50,33 +50,63 @@ public class AppleIIgsJavaDemo
      32, -32,  32, 0,
      32,  32,  32, 0,
     -32,  32,  32, 0,
+
+    -16, -16, -16, 0,
+     16, -16, -16, 0,
+     16,  16, -16, 0,
+    -16,  16, -16, 0,
+    -16, -16,  16, 0,
+     16, -16,  16, 0,
+     16,  16,  16, 0,
+    -16,  16,  16, 0,
   };
 
-  static int box_edges[] =
+  static int model_edges[] =
   {
     // top
-    0, 1,
-    1, 2,
-    2, 3,
-    3, 0,
+    0, 1, 0x11,
+    1, 2, 0x11,
+    2, 3, 0x11,
+    3, 0, 0x11,
 
     // bottom
-    4, 5,
-    5, 6,
-    6, 7,
-    7, 4,
+    4, 5, 0x11,
+    5, 6, 0x11,
+    6, 7, 0x11,
+    7, 4, 0x11,
 
     // sides
-    0, 4,
-    1, 5,
-    2, 6,
-    3, 7
+    0, 4, 0x11,
+    1, 5, 0x11,
+    2, 6, 0x11,
+    3, 7, 0x11,
+
+    // top
+    8, 9, 0x55,
+    9, 10, 0x55,
+    10, 11, 0x55,
+    11, 8, 0x55,
+
+    // bottom
+    12, 13, 0x55,
+    13, 14, 0x55,
+    14, 15, 0x55,
+    15, 12, 0x55,
+
+    // sides
+    8, 12, 0x55,
+    9, 13, 0x55,
+    10, 14, 0x55,
+    11, 15, 0x55
   };
 
+  // 0 = mask
+  // 1 - 10 colors
+  // 11 - 15 grays
   static int palette[] =
   {
-    0xf0f, 0x000, 0xf00, 0xf80, 0xff0, 0x0f0, 0x0f8, 0x0ff,
-    0x08f, 0x00f, 0xf0f, 0xf08, 0x444, 0x888, 0xccc, 0xfff
+    0xf0f, 0xf00, 0xf80, 0xff0, 0x0f0, 0x0ff, 0x08f, 0x00f,
+    0x80f, 0xf0f, 0xf08, 0x000, 0x444, 0x888, 0xccc, 0xfff
   };
 
   public static void wait(int time)
@@ -137,11 +167,11 @@ public class AppleIIgsJavaDemo
     int x;
 
     AppleIIgs.hiresEnable(0xe1);
-    AppleIIgs.hiresClear(0x11);
+    AppleIIgs.hiresClear(0xbb);
 
     for(x = 0; x < 500; x++)
     {
-      int c = AppleIIgs.rnd() & 15;
+      int c = AppleIIgs.rnd() % 10 + 1;
       AppleIIgs.hiresLine(AppleIIgs.rnd() % 160,
                           AppleIIgs.rnd() % 200,
                           AppleIIgs.rnd() % 160,
@@ -150,26 +180,24 @@ public class AppleIIgsJavaDemo
     }
   }
 
-  public static void box()
+  public static void model()
   {
-    int i, j, c;
-    int box_buf[] = new int[box_edges.length];
+    int i, j;
+    int model_buf[] = new int[model_edges.length];
 
     // clear front buffer
     AppleIIgs.hiresEnable(0xe1);
-    AppleIIgs.hiresClear(0x11);
+    AppleIIgs.hiresClear(0xbb);
 
     // this is the back buffer
     AppleIIgs.hiresEnable(0x02);
-    AppleIIgs.hiresClear(0x11);
+    AppleIIgs.hiresClear(0xbb);
 
     while(true)
     {
-      c = 0;
-
       for(j = 0; j < 256; j += 2)
       {
-        AppleIIgs.hiresClear(0x11);
+        AppleIIgs.hiresClear(0xbb);
 
         int sin = sine_table[j];
         int cos = sine_table[(j + 64) & 255];
@@ -190,26 +218,27 @@ public class AppleIIgsJavaDemo
         // int zy = sincos - ((sinsin * cos) >> 6);
         // int zz = coscos;
 
-        for(i = 0; i < box_points.length; i += 4)
+        for(i = 0; i < model_points.length; i += 4)
         {
-          int x = box_points[i + 0];
-          int y = box_points[i + 1];
-          int z = box_points[i + 2];
+          int x = model_points[i + 0];
+          int y = model_points[i + 1];
+          int z = model_points[i + 2];
 
-          box_buf[i + 0] = ((x * xx) >> 6) - ((y * xy) >> 6) - ((z * xz) >> 6);
-          box_buf[i + 1] = ((x * yx) >> 6) + ((y * yy) >> 6) - ((z * yz) >> 6);
-          // box_buf[i + 2] = ((x * zx) >> 6) + ((y * zy) >> 6) + ((z * zz) >> 6);
+          model_buf[i + 0] = ((x * xx) >> 6) - ((y * xy) >> 6) - ((z * xz) >> 6);
+          model_buf[i + 1] = ((x * yx) >> 6) + ((y * yy) >> 6) - ((z * yz) >> 6);
+          // model_buf[i + 2] = ((x * zx) >> 6) + ((y * zy) >> 6) + ((z * zz) >> 6);
         }
 
-        for(i = 0; i < box_edges.length; i += 2)
+        for(i = 0; i < model_edges.length; i += 3)
         {
-          int temp0 = box_edges[i + 0] << 2;
-          int temp1 = box_edges[i + 1] << 2;
+          int temp0 = model_edges[i + 0] << 2;
+          int temp1 = model_edges[i + 1] << 2;
+          int color = model_edges[i + 2];
 
-          int x1 = box_buf[temp0];
-          int y1 = box_buf[temp0 + 1];
-          int x2 = box_buf[temp1];
-          int y2 = box_buf[temp1 + 1];
+          int x1 = model_buf[temp0];
+          int y1 = model_buf[temp0 + 1];
+          int x2 = model_buf[temp1];
+          int y2 = model_buf[temp1 + 1];
 
           x1 >>= 1;
           x2 >>= 1;
@@ -218,13 +247,10 @@ public class AppleIIgsJavaDemo
           x2 += 80;
           y2 += 100;
 
-          AppleIIgs.hiresLine(x1, y1, x2, y2, c | (c << 4));
+          AppleIIgs.hiresLine(x1, y1, x2, y2, color);
         }
 
         AppleIIgs.hiresUpdate(160 * 46, 160 * 154);
-
-        c++;
-        c &= 0xf;
       }
     }
   }
@@ -254,8 +280,8 @@ public class AppleIIgsJavaDemo
 
         if(xx > 78 && xx < 93 && yy > 85 && yy < 115)
         {
-          AppleIIgs.hiresPlot(xx, yy, (1 | (1 << 4)));
-          AppleIIgs.hiresPlot(xx, 199 - yy, (1 | (1 << 4)));
+          AppleIIgs.hiresPlot(xx, yy, 0xbb);
+          AppleIIgs.hiresPlot(xx, 199 - yy, 0xbb);
 
           continue;
         }
@@ -269,7 +295,7 @@ public class AppleIIgsJavaDemo
         re2 = (re * re) >> 4;
         im2 = (im * im) >> 4;
 
-        for(i = 1; i < 15; i++)
+        for(i = 1; i < 11; i++)
         {
           if((re2 + im2) > 4 * 16)
             break;
@@ -283,7 +309,6 @@ public class AppleIIgsJavaDemo
           im2 = (im * im) >> 4;
         }
 
-        i = 16 - i;
         AppleIIgs.hiresPlot(xx, yy, (i | (i << 4)));
         AppleIIgs.hiresPlot(xx, 199 - yy, (i | (i << 4)));
       }
@@ -303,14 +328,14 @@ public class AppleIIgsJavaDemo
 
     // lines demo
     lines();
-    wait(2000);
+    wait(3000);
 
     // mandelbrot demo
     mandel();
-    wait(2000);
+    wait(3000);
 
-    // 3D box demo
-    box();
+    // 3D model demo
+    model();
 
     // loop forever
     while(true)
