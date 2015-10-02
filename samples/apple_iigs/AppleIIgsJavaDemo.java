@@ -319,6 +319,55 @@ public class AppleIIgsJavaDemo
   {
     int i;
 
+// test tone
+/*
+  for(i = 0; i < 128; i++)
+  {
+    Memory.write8(0xc03e, (byte)i);
+    Memory.write8(0xc03f, (byte)0);
+    Memory.write8(0xc03c, (byte)79);
+    Memory.write8(0xc03d, (byte)1);
+  }
+
+  for(i = 128; i < 256; i++)
+  {
+    Memory.write8(0xc03e, (byte)i);
+    Memory.write8(0xc03f, (byte)0);
+    Memory.write8(0xc03c, (byte)79);
+    Memory.write8(0xc03d, (byte)255);
+  }
+
+  Memory.write8(0xc03e, (byte)225);
+  Memory.write8(0xc03f, (byte)0);
+  Memory.write8(0xc03c, (byte)15);
+  Memory.write8(0xc03d, (byte)2);
+
+  Memory.write8(0xc03e, (byte)160);
+  Memory.write8(0xc03f, (byte)0);
+  Memory.write8(0xc03c, (byte)15);
+  Memory.write8(0xc03d, (byte)0);
+
+  Memory.write8(0xc03e, (byte)64);
+  Memory.write8(0xc03f, (byte)0);
+  Memory.write8(0xc03c, (byte)15);
+  Memory.write8(0xc03d, (byte)255);
+
+  Memory.write8(0xc03e, (byte)32);
+  Memory.write8(0xc03f, (byte)0);
+  Memory.write8(0xc03c, (byte)15);
+  Memory.write8(0xc03d, (byte)1);
+
+  Memory.write8(0xc03e, (byte)192);
+  Memory.write8(0xc03f, (byte)0);
+  Memory.write8(0xc03c, (byte)15);
+  Memory.write8(0xc03d, (byte)0);
+
+  Memory.write8(0xc03e, (byte)128);
+  Memory.write8(0xc03f, (byte)0);
+  Memory.write8(0xc03c, (byte)15);
+  Memory.write8(0xc03d, (byte)0);
+*/
+
     // set color palette
     AppleIIgs.hiresPalette(0, palette);
 
