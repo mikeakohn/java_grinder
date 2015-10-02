@@ -1536,7 +1536,6 @@ int W65816::memory_read8_I()
 {
   need_memory_read8 = 1;
 
-  fprintf(out, "; memory_read8\n");
   fprintf(out, "  jsr memory_read8\n");
 
   return 0;
@@ -1546,7 +1545,6 @@ int W65816::memory_write8_IB()
 {
   need_memory_write8 = 1;
 
-  fprintf(out, "; memory_write8\n");
   fprintf(out, "  jsr memory_write8\n");
   stack -= 2;
 
@@ -1557,7 +1555,6 @@ int W65816::memory_read16_I()
 {
   need_memory_read16 = 1;
 
-  fprintf(out, "; memory_read16\n");
   fprintf(out, "  jsr memory_read16\n");
 
   return 0;
@@ -1567,7 +1564,6 @@ int W65816::memory_write16_IS()
 {
   need_memory_write16 = 1;
 
-  fprintf(out, "; memory_write16\n");
   fprintf(out, "  jsr memory_write16\n");
   stack -= 2;
 
@@ -1582,7 +1578,7 @@ void W65816::insert_memory_read8()
 
 void W65816::insert_memory_write8()
 {
-  fprintf(out, "memory.write8:\n");
+  fprintf(out, "memory_write8:\n");
   POP();
   fprintf(out, "  sta value1\n");
   POP();
