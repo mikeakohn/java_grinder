@@ -22,6 +22,7 @@ public:
   virtual int sega_genesis_setPaletteColor(int color) { return -1; }
   virtual int sega_genesis_initBitmap() { return -1; }
   virtual int sega_genesis_clearBitmap() { return -1; }
+  virtual int sega_genesis_clearPatterns() { return -1; }
   virtual int sega_genesis_plot() { return -1; }
   virtual int sega_genesis_setPlotAddress() { return -1; }
   virtual int sega_genesis_fastPlot() { return -1; }

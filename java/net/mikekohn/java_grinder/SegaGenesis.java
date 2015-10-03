@@ -56,6 +56,10 @@ abstract public class SegaGenesis
       to palette color 0). */
   public static void clearBitmap() { }
 
+  /** Clear "count" patterns in the pattern table.  Call setPlotAddress()
+      first to point the VDP to the pattern to clear. */
+  public static void clearPatterns(int count) { }
+
   /** Set a pixel in the 320x224 bitmap area of Scroll B.  In order for this
       to work, initBitmap() has to be called first. */
   public static void plot(int x, int y, int color) { }

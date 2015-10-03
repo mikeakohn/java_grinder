@@ -86,7 +86,13 @@ public class Model
     for(j = 0; j < 1000; j++)
     {
       while(!SegaGenesis.inVerticalBlank());
-      SegaGenesis.clearBitmap();
+
+      //SegaGenesis.clearBitmap();
+      for (int n = (40 * 7) + 13; n < (40 * 20) + 13; n += 40)
+      {
+        SegaGenesis.setPlotAddress(n << 5);
+        SegaGenesis.clearPatterns(15);
+      }
 
       r++;
       if (r == 90) { r = 0; }

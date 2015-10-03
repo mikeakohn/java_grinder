@@ -70,6 +70,7 @@ SegaGenesis::SegaGenesis() :
   need_set_palette_colors(false),
   need_init_bitmap(false),
   need_clear_bitmap(false),
+  need_clear_pattern(false),
   need_plot(false),
   need_set_plot_address(false)
 {
@@ -93,6 +94,7 @@ SegaGenesis::~SegaGenesis()
   if (need_set_palette_colors) { add_set_palette_colors(); }
   if (need_init_bitmap) { add_init_bitmap(); }
   if (need_clear_bitmap) { add_clear_bitmap(); }
+  if (need_clear_pattern) { add_clear_pattern(); }
   if (need_plot) { add_plot(); }
   if (need_set_plot_address) { add_set_plot_address(); }
 }
@@ -281,6 +283,28 @@ int SegaGenesis::sega_genesis_clearBitmap()
   need_clear_bitmap = true;
 
   fprintf(out, "  jsr _clear_bitmap\n");
+  return 0;
+}
+
+int SegaGenesis::sega_genesis_clearPatterns()
+{
+  need_clear_pattern = true;
+
+  if (reg != 1)
+  {
+     fprintf(out, "  push.l d0\n");
+     fprintf(out, "  move.l d%d, d0\n", REG_STACK(reg - 1));
+  }
+
+  fprintf(out, "  jsr _clear_pattern\n");
+
+  if (reg != 1)
+  {
+     fprintf(out, "  pop.l d0\n");
+  }
+
+  reg--;
+
   return 0;
 }
 
@@ -1093,6 +1117,23 @@ void SegaGenesis::add_clear_bitmap()
     "_clear_bitmap_loop:\n"
     "  move.l d6, (a0)\n"
     "  dbf d5, _clear_bitmap_loop\n"
+    "  rts\n\n");
+}
+
+void SegaGenesis::add_clear_pattern()
+{
+  fprintf(out,
+    "_clear_pattern:\n"
+    //"  swap d0\n"
+    "  lsl.l #3, d0\n"
+    "  subq.l #1, d0\n"
+    //"  add.l #0x40000000, d0\n"
+    //"  move.l d0, (a1)              ; C00004 VRAM write to 0x0000\n"
+    //"  move.w #7, d5                ; Pattern len 32 bytes (8 longs)\n"
+    "  eor.l d6, d6\n"
+    "_clear_pattern_loop:\n"
+    "  move.l d6, (a0)\n"
+    "  dbf d0, _clear_pattern_loop\n"
     "  rts\n\n");
 }
 

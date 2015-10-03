@@ -29,6 +29,7 @@ public:
   virtual int sega_genesis_setPaletteColor(int color);
   virtual int sega_genesis_initBitmap();
   virtual int sega_genesis_clearBitmap();
+  virtual int sega_genesis_clearPatterns();
   virtual int sega_genesis_plot();
   virtual int sega_genesis_setPlotAddress();
   virtual int sega_genesis_fastPlot();
@@ -79,6 +80,7 @@ private:
   void add_set_palette_colors();
   void add_init_bitmap();
   void add_clear_bitmap();
+  void add_clear_pattern();
   void add_plot();
   void add_set_plot_address();
 
@@ -92,6 +94,7 @@ private:
   bool need_set_palette_colors:1;
   bool need_init_bitmap:1;
   bool need_clear_bitmap:1;
+  bool need_clear_pattern:1;
   bool need_plot:1;
   bool need_set_plot_address:1;
 };
