@@ -120,6 +120,7 @@ int W65816::open(const char *filename)
   fprintf(out, "value2 equ 0x10\n");
   fprintf(out, "value3 equ 0x12\n");
   fprintf(out, "address equ 0x14\n");
+  fprintf(out, "address2 equ 0x16\n");
 
   // start
   fprintf(out, ".org 0x%04x\n", start_org);

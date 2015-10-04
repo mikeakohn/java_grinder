@@ -35,7 +35,7 @@ public:
   virtual int appleiigs_hiresSetRow_II();
   virtual int appleiigs_rnd();
 
-  virtual int appleiigs_loadWaveTable_BA();
+  virtual int appleiigs_loadWaveTable_aB();
   virtual int appleiigs_enableOscillators_I();
   virtual int appleiigs_setMasterVolume_I();
   virtual int appleiigs_setSoundVolume_II();
@@ -54,6 +54,7 @@ private:
   void insert_hires_set_row();
   void insert_hires_calc_address();
   void insert_rnd();
+  void insert_glu();
 
   bool need_hires_enable:1;
   bool need_hires_clear:1;

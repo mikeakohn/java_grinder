@@ -45,7 +45,7 @@ int appleiigs(JavaClass *java_class, Generator *generator, char *function)
   CHECK_FUNC(hiresSetRow,_II)
   CHECK_FUNC(rnd,)
 
-  CHECK_FUNC(loadWaveTable,_BA)
+  CHECK_FUNC(loadWaveTable,_aB)
   CHECK_FUNC(enableOscillators,_I)
   CHECK_FUNC(setMasterVolume,_I)
   CHECK_FUNC(setSoundVolume,_II)

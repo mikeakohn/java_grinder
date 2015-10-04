@@ -61,6 +61,7 @@ AppleIIgs::~AppleIIgs()
   if (need_hires_set_row) { insert_hires_set_row(); }
   if (need_rnd) { insert_rnd(); }
   insert_hires_calc_address();
+  insert_glu();
 }
 
 int AppleIIgs::open(const char *filename)
@@ -240,29 +241,139 @@ int AppleIIgs::appleiigs_rnd()
 }
 
 // Sound API
-int AppleIIgs::appleiigs_loadWaveTable_BA()
+// FIXME need parameters for wavetable location/size
+int AppleIIgs::appleiigs_loadWaveTable_aB()
 {
-  return -1;
+  fprintf(out, "; load_wave_table\n");
+  // point to RAM
+  fprintf(out, "lda #0x40\n");
+  fprintf(out, "jsr set_glu_control\n");
+  // load wavetable
+  POP();
+  fprintf(out, "  sta address\n");
+  fprintf(out, "  ldy #0\n");
+  // address2 = wavetable location
+  fprintf(out, "  sty address2\n");
+  fprintf(out, "load_wave_table_%d:\n", label_count);
+  fprintf(out, "  lda address2\n");
+  fprintf(out, "  jsr set_glu_address\n");
+  fprintf(out, "  lda (address)\n");
+  fprintf(out, "  jsr set_glu_data\n");
+  fprintf(out, "  inc address\n");
+  fprintf(out, "  inc address2\n");
+  fprintf(out, "  iny\n");
+  // wavetable size
+  fprintf(out, "  cpy #256\n");
+  fprintf(out, "  bne load_wave_table_%d\n", label_count);
+  // point to DOC
+  fprintf(out, "lda #0\n");
+  fprintf(out, "jsr set_glu_control\n");
+
+  stack--;
+  label_count++;
+  return 0;
 }
 
 int AppleIIgs::appleiigs_enableOscillators_I()
 {
-  return -1;
+  fprintf(out, "; enable_oscillators\n");
+  // point to DOC
+  fprintf(out, "lda #0\n");
+  fprintf(out, "jsr set_glu_control\n");
+  // enable oscillators
+  fprintf(out, "lda #0xe1\n");
+  fprintf(out, "jsr set_glu_address\n");
+  POP();
+  fprintf(out, "asl\n");
+  fprintf(out, "jsr set_glu_data\n");
+
+  stack--;
+  return 0;
 }
 
 int AppleIIgs::appleiigs_setMasterVolume_I()
 {
-  return -1;
+  fprintf(out, "; set_master_volume\n");
+  // set DOC master volume
+  POP();
+  fprintf(out, "jsr set_glu_control\n");
+
+  stack--;
+  return 0;
 }
 
 int AppleIIgs::appleiigs_setSoundVolume_II()
 {
-  return -1;
+  fprintf(out, "; set_sound_volume\n");
+  // point to DOC
+  fprintf(out, "lda #0\n");
+  fprintf(out, "jsr set_glu_control\n");
+  // set volume
+  POP();
+  fprintf(out, "tay\n");
+  POP();
+  fprintf(out, "sta address\n");
+  fprintf(out, "clc\n");
+  fprintf(out, "adc #0x40\n");
+  fprintf(out, "jsr set_glu_address\n");
+  fprintf(out, "tya\n");
+  fprintf(out, "jsr set_glu_data\n");
+  // set control register
+  fprintf(out, "lda address\n");
+  fprintf(out, "clc\n");
+  fprintf(out, "adc #0xa0\n");
+  fprintf(out, "jsr set_glu_address\n");
+  fprintf(out, "lda #0\n");
+  fprintf(out, "jsr set_glu_data\n");
+//FIXME this doesn't belong here
+  // set wave table size
+  fprintf(out, "lda address\n");
+  fprintf(out, "clc\n");
+  fprintf(out, "adc #0xc0\n");
+  fprintf(out, "jsr set_glu_address\n");
+  fprintf(out, "lda #0\n");
+  fprintf(out, "jsr set_glu_data\n");
+//FIXME this doesn't belong here
+  // set wave table pointer
+  fprintf(out, "lda address\n");
+  fprintf(out, "clc\n");
+  fprintf(out, "adc #0x80\n");
+  fprintf(out, "jsr set_glu_address\n");
+  fprintf(out, "lda #0\n");
+  fprintf(out, "jsr set_glu_data\n");
+
+  stack -= 2;
+  return 0;
 }
 
 int AppleIIgs::appleiigs_setSoundFrequency_II()
 {
-  return -1;
+  fprintf(out, "; set_sound_frequency\n");
+  // point to DOC
+  fprintf(out, "lda #0\n");
+  fprintf(out, "jsr set_glu_control\n");
+  // set voice
+  POP();
+  fprintf(out, "tay\n");
+  POP();
+  fprintf(out, "sta address\n");
+  // freq lo
+  fprintf(out, "clc\n");
+  fprintf(out, "adc #0x00\n");
+  fprintf(out, "jsr set_glu_address\n");
+  fprintf(out, "tya\n");
+  fprintf(out, "jsr set_glu_data\n");
+  // freq hi
+  fprintf(out, "lda address\n");
+  fprintf(out, "clc\n");
+  fprintf(out, "adc #0x20\n");
+  fprintf(out, "jsr set_glu_address\n");
+  fprintf(out, "tya\n");
+  fprintf(out, "xba\n");
+  fprintf(out, "jsr set_glu_data\n");
+
+  stack -= 2;
+  return 0;
 }
 
 // subroutines
@@ -642,6 +753,27 @@ void AppleIIgs::insert_rnd()
   fprintf(out, "  adc #6927\n");
   fprintf(out, "  sta _seed\n");
   PUSH();
+  fprintf(out, "  rts\n");
+}
+
+void AppleIIgs::insert_glu()
+{
+  fprintf(out, "set_glu_control:\n");
+  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  sta 0xc03c\n");
+  fprintf(out, "  rep #0x30\n");
+  fprintf(out, "  rts\n");
+  fprintf(out, "set_glu_address:\n");
+  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  sta 0xc03e\n");
+  fprintf(out, "  xba\n");
+  fprintf(out, "  sta 0xc03f\n");
+  fprintf(out, "  rep #0x30\n");
+  fprintf(out, "  rts\n");
+  fprintf(out, "set_glu_data:\n");
+  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  sta 0xc03d\n");
+  fprintf(out, "  rep #0x30\n");
   fprintf(out, "  rts\n");
 }
 

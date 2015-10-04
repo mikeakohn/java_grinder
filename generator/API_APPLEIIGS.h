@@ -31,7 +31,7 @@ public:
   virtual int appleiigs_rnd() { return -1; }
 
   // Sound Chip
-  virtual int appleiigs_loadWaveTable_BA() { return -1; }
+  virtual int appleiigs_loadWaveTable_aB() { return -1; }
   virtual int appleiigs_enableOscillators_I() { return -1; }
   virtual int appleiigs_setMasterVolume_I() { return -1; }
   virtual int appleiigs_setSoundVolume_II() { return -1; }

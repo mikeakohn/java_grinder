@@ -100,6 +100,27 @@ public class AppleIIgsJavaDemo
     11, 15, 0x66
   };
 
+  // wave table
+  static byte square_wave[] =
+  {
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  };
+
   // 0 = mask
   // 1 - 10 colors
   // 11 - 15 grays
@@ -183,7 +204,7 @@ public class AppleIIgsJavaDemo
   public static void model()
   {
     int i, j;
-    int model_buf[] = new int[model_edges.length];
+    int model_buf[] = new int[model_points.length];
 
     // clear front buffer
     AppleIIgs.hiresEnable(0xe1);
@@ -319,58 +340,12 @@ public class AppleIIgsJavaDemo
   {
     int i;
 
-    // test tone
-    Memory.write8(0xc03f, (byte)0);
-    Memory.write8(0xc03c, (byte)79);
-
-    // fill wavetable with square wave
-    // sample values go from 1-255, use eight zeros to stop early
-    for(i = 0; i < 512; i++)
-    {
-      Memory.write8(0xc03e, (byte)(i & 0xff));
-      Memory.write8(0xc03f, (byte)(i >> 8));
-      Memory.write8(0xc03d, (byte)1);
-    }
-
-    for(i = 512; i < 1024; i++)
-    {
-      Memory.write8(0xc03e, (byte)(i & 0xff));
-      Memory.write8(0xc03f, (byte)(i >> 8));
-      Memory.write8(0xc03d, (byte)255);
-    }
-
-    // master oscillator enable
-    Memory.write8(0xc03e, (byte)0xe1);
-    Memory.write8(0xc03f, (byte)0);
-
-    // master volume
-    Memory.write8(0xc03c, (byte)15);
-    Memory.write8(0xc03d, (byte)2);
-
-    // oscillator 0 control
-    Memory.write8(0xc03e, (byte)160);
-    Memory.write8(0xc03d, (byte)0);
-
-    // oscillator 0 volume
-    Memory.write8(0xc03e, (byte)0x40);
-    Memory.write8(0xc03d, (byte)255);
-
-    // freq lo
-    Memory.write8(0xc03e, (byte)0x00);
-    Memory.write8(0xc03d, (byte)192);
-
-    // freq hi
-    Memory.write8(0xc03e, (byte)0x20);
-    Memory.write8(0xc03d, (byte)0);
-
-    // wavetable size
-    Memory.write8(0xc03e, (byte)0xc0);
-    Memory.write8(0xc03d, (byte)16);
-
-    // wavetable pointer
-    Memory.write8(0xc03e, (byte)0x80);
-    Memory.write8(0xc03d, (byte)0);
-
+    // play an annoying test tone
+    AppleIIgs.loadWaveTable(square_wave);
+    AppleIIgs.enableOscillators(1);
+    AppleIIgs.setMasterVolume(15);
+    AppleIIgs.setSoundVolume(1, 255);
+    AppleIIgs.setSoundFrequency(1, 128);
 
     // set color palette
     AppleIIgs.hiresPalette(0, palette);
