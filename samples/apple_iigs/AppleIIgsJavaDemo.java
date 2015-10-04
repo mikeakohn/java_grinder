@@ -346,13 +346,13 @@ public class AppleIIgsJavaDemo
     AppleIIgs.setMasterVolume(15);
     AppleIIgs.setWaveTable(0, 0, 0);
     AppleIIgs.setSoundVolume(0, 255);
-    AppleIIgs.setSoundFrequency(0, 1318);
+    AppleIIgs.setSoundFrequency(0, 1000);
     AppleIIgs.setWaveTable(1, 0, 0);
-    AppleIIgs.setSoundVolume(1, 192);
-    AppleIIgs.setSoundFrequency(1, 1567);
+    AppleIIgs.setSoundVolume(1, 255);
+    AppleIIgs.setSoundFrequency(1, 1200);
     AppleIIgs.setWaveTable(2, 0, 0);
-    AppleIIgs.setSoundVolume(2, 128);
-    AppleIIgs.setSoundFrequency(2, 1760);
+    AppleIIgs.setSoundVolume(2, 255);
+    AppleIIgs.setSoundFrequency(2, 1300);
 
     // set color palette
     AppleIIgs.hiresPalette(0, palette);

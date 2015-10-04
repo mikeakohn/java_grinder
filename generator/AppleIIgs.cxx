@@ -119,7 +119,7 @@ int AppleIIgs::appleiigs_printChar_C()
 
   fprintf(out, "  phx\n");
   fprintf(out, "  ora #0x80\n");
-  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  sep #0x20\n");
   fprintf(out, "  sec\n");
   fprintf(out, "  xce\n");
   fprintf(out, "  jsr 0xfded\n");
@@ -389,11 +389,11 @@ int AppleIIgs::appleiigs_setWaveTable_III()
   fprintf(out, "lda address\n");
   fprintf(out, "clc\n");
   fprintf(out, "adc #0xc0\n");
-  fprintf(out, "asl\n");
-  fprintf(out, "asl\n");
-  fprintf(out, "asl\n");
   fprintf(out, "jsr set_glu_address\n");
   fprintf(out, "lda value2\n");
+  fprintf(out, "asl\n");
+  fprintf(out, "asl\n");
+  fprintf(out, "asl\n");
   fprintf(out, "jsr set_glu_data\n");
 
   stack -= 3;
@@ -404,7 +404,7 @@ int AppleIIgs::appleiigs_setWaveTable_III()
 void AppleIIgs::insert_hires_enable()
 {
   fprintf(out, "hires_enable:\n");
-  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  sep #0x20\n");
   fprintf(out, "  lda.b #10000001b\n");
   fprintf(out, "  sta.l 0xe1c029\n");
   fprintf(out, "  lda.b #0\n");
@@ -461,7 +461,7 @@ void AppleIIgs::insert_hires_plot()
   fprintf(out, "  tay\n");
   fprintf(out, "  jsr hires_calc_address\n");
   fprintf(out, "  tya\n");
-  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  sep #0x20\n");
   fprintf(out, "  sta [address]\n");
   fprintf(out, "  rep #0x30\n");
   fprintf(out, "  rts\n");
@@ -783,19 +783,19 @@ void AppleIIgs::insert_rnd()
 void AppleIIgs::insert_glu()
 {
   fprintf(out, "set_glu_control:\n");
-  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  sep #0x20\n");
   fprintf(out, "  sta 0xc03c\n");
   fprintf(out, "  rep #0x30\n");
   fprintf(out, "  rts\n");
   fprintf(out, "set_glu_address:\n");
-  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  sep #0x20\n");
   fprintf(out, "  sta 0xc03e\n");
   fprintf(out, "  xba\n");
   fprintf(out, "  sta 0xc03f\n");
   fprintf(out, "  rep #0x30\n");
   fprintf(out, "  rts\n");
   fprintf(out, "set_glu_data:\n");
-  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  sep #0x20\n");
   fprintf(out, "  sta 0xc03d\n");
   fprintf(out, "  rep #0x30\n");
   fprintf(out, "  rts\n");

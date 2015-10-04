@@ -1091,7 +1091,7 @@ int W65816::array_write_byte(const char *name, int field_id)
   fprintf(out, "  adc %s\n", name);
   fprintf(out, "  sta address\n");
   fprintf(out, "  lda value1\n");
-  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  sep #0x20\n");
   fprintf(out, "  sta (address)\n");
   fprintf(out, "  rep #0x30\n");
 
@@ -1458,7 +1458,7 @@ void W65816::insert_array_byte_support()
   fprintf(out, "  adc value2\n");
   fprintf(out, "  sta address\n");
   fprintf(out, "  lda value1\n");
-  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  sep #0x20\n");
   fprintf(out, "  sta (address)\n");
   fprintf(out, "  rep #0x30\n");
   fprintf(out, "  rts\n");
@@ -1584,7 +1584,7 @@ void W65816::insert_memory_write8()
   fprintf(out, "  sta value1\n");
   POP();
   fprintf(out, "  sta address\n");
-  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  sep #0x20\n");
   fprintf(out, "  lda value1\n");
   fprintf(out, "  sta (address)\n");
   fprintf(out, "  rep #0x30\n");
