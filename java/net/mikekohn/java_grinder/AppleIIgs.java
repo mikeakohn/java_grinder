@@ -31,7 +31,7 @@ abstract public class AppleIIgs
   public static int rnd() { return 0; }
 
   /** Sound wave table. */
-  public static void loadWaveTable(byte[] data) { }
+  public static void loadWaveTable(byte[] data, int address) { }
 
   /** Turn on oscillators (up to 32). */
   public static void enableOscillators(int count) { }
@@ -44,5 +44,9 @@ abstract public class AppleIIgs
 
   /** Set frequency of individual voice (0 to 65535). */
   public static void setSoundFrequency(int voice, int frequency) { }
+
+  /** Set volume of individual voice (0 to 255). */
+  public static void setWaveTable(int voice, int address, int size) { }
+
 }
 

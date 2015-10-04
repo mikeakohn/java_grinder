@@ -242,18 +242,25 @@ int AppleIIgs::appleiigs_rnd()
 
 // Sound API
 // FIXME need parameters for wavetable location/size
-int AppleIIgs::appleiigs_loadWaveTable_aB()
+int AppleIIgs::appleiigs_loadWaveTable_aBI()
 {
   fprintf(out, "; load_wave_table\n");
   // point to RAM
   fprintf(out, "lda #0x40\n");
   fprintf(out, "jsr set_glu_control\n");
+  // set DOC RAM location
+  POP();
+  fprintf(out, "  sta address2\n");
   // load wavetable
   POP();
   fprintf(out, "  sta address\n");
+  fprintf(out, "  dec address\n");
+  fprintf(out, "  dec address\n");
+  fprintf(out, "  lda (address)\n");
+  fprintf(out, "  sta length\n");
+  fprintf(out, "  inc address\n");
+  fprintf(out, "  inc address\n");
   fprintf(out, "  ldy #0\n");
-  // address2 = wavetable location
-  fprintf(out, "  sty address2\n");
   fprintf(out, "load_wave_table_%d:\n", label_count);
   fprintf(out, "  lda address2\n");
   fprintf(out, "  jsr set_glu_address\n");
@@ -263,13 +270,13 @@ int AppleIIgs::appleiigs_loadWaveTable_aB()
   fprintf(out, "  inc address2\n");
   fprintf(out, "  iny\n");
   // wavetable size
-  fprintf(out, "  cpy #256\n");
+  fprintf(out, "  cpy length\n");
   fprintf(out, "  bne load_wave_table_%d\n", label_count);
   // point to DOC
   fprintf(out, "lda #0\n");
   fprintf(out, "jsr set_glu_control\n");
 
-  stack--;
+  stack -= 2;
   label_count++;
   return 0;
 }
@@ -325,22 +332,6 @@ int AppleIIgs::appleiigs_setSoundVolume_II()
   fprintf(out, "jsr set_glu_address\n");
   fprintf(out, "lda #0\n");
   fprintf(out, "jsr set_glu_data\n");
-//FIXME this doesn't belong here
-  // set wave table size
-  fprintf(out, "lda address\n");
-  fprintf(out, "clc\n");
-  fprintf(out, "adc #0xc0\n");
-  fprintf(out, "jsr set_glu_address\n");
-  fprintf(out, "lda #0\n");
-  fprintf(out, "jsr set_glu_data\n");
-//FIXME this doesn't belong here
-  // set wave table pointer
-  fprintf(out, "lda address\n");
-  fprintf(out, "clc\n");
-  fprintf(out, "adc #0x80\n");
-  fprintf(out, "jsr set_glu_address\n");
-  fprintf(out, "lda #0\n");
-  fprintf(out, "jsr set_glu_data\n");
 
   stack -= 2;
   return 0;
@@ -373,6 +364,39 @@ int AppleIIgs::appleiigs_setSoundFrequency_II()
   fprintf(out, "jsr set_glu_data\n");
 
   stack -= 2;
+  return 0;
+}
+
+int AppleIIgs::appleiigs_setWaveTable_III()
+{
+  fprintf(out, "; set_wave_table\n");
+  // point to DOC
+  fprintf(out, "lda #0\n");
+  fprintf(out, "jsr set_glu_control\n");
+  POP();
+  fprintf(out, "sta value2\n");
+  POP();
+  fprintf(out, "sta value1\n");
+  POP();
+  fprintf(out, "sta address\n");
+  // set wave table pointer
+  fprintf(out, "clc\n");
+  fprintf(out, "adc #0x80\n");
+  fprintf(out, "jsr set_glu_address\n");
+  fprintf(out, "lda value1\n");
+  fprintf(out, "jsr set_glu_data\n");
+  // set wave table size
+  fprintf(out, "lda address\n");
+  fprintf(out, "clc\n");
+  fprintf(out, "adc #0xc0\n");
+  fprintf(out, "asl\n");
+  fprintf(out, "asl\n");
+  fprintf(out, "asl\n");
+  fprintf(out, "jsr set_glu_address\n");
+  fprintf(out, "lda value2\n");
+  fprintf(out, "jsr set_glu_data\n");
+
+  stack -= 3;
   return 0;
 }
 

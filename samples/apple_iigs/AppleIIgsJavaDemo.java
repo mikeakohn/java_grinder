@@ -341,11 +341,18 @@ public class AppleIIgsJavaDemo
     int i;
 
     // play an annoying test tone
-    AppleIIgs.loadWaveTable(square_wave);
-    AppleIIgs.enableOscillators(1);
+    AppleIIgs.loadWaveTable(square_wave, 0);
+    AppleIIgs.enableOscillators(3);
     AppleIIgs.setMasterVolume(15);
-    AppleIIgs.setSoundVolume(1, 255);
-    AppleIIgs.setSoundFrequency(1, 128);
+    AppleIIgs.setWaveTable(0, 0, 0);
+    AppleIIgs.setSoundVolume(0, 255);
+    AppleIIgs.setSoundFrequency(0, 1318);
+    AppleIIgs.setWaveTable(1, 0, 0);
+    AppleIIgs.setSoundVolume(1, 192);
+    AppleIIgs.setSoundFrequency(1, 1567);
+    AppleIIgs.setWaveTable(2, 0, 0);
+    AppleIIgs.setSoundVolume(2, 128);
+    AppleIIgs.setSoundFrequency(2, 1760);
 
     // set color palette
     AppleIIgs.hiresPalette(0, palette);

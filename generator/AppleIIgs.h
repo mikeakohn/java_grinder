@@ -35,11 +35,12 @@ public:
   virtual int appleiigs_hiresSetRow_II();
   virtual int appleiigs_rnd();
 
-  virtual int appleiigs_loadWaveTable_aB();
+  virtual int appleiigs_loadWaveTable_aBI();
   virtual int appleiigs_enableOscillators_I();
   virtual int appleiigs_setMasterVolume_I();
   virtual int appleiigs_setSoundVolume_II();
   virtual int appleiigs_setSoundFrequency_II();
+  virtual int appleiigs_setWaveTable_III();
 
 private:
   void insert_hires_enable();
