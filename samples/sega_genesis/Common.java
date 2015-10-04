@@ -25,7 +25,7 @@ public class Common
     {
       if (y1 < y0) { j = -1; } else { j = 1; }
 
-      while (y0 != y1)
+      while (y0 <= y1)
       {
         SegaGenesis.plot(x0, y0, c);
         y0 += j;
@@ -38,7 +38,7 @@ public class Common
     {
       if (x1 < x0) { i = -1; } else { i = 1; }
 
-      while (x0 != x1)
+      while (x0 <= x1)
       {
         SegaGenesis.plot(x0, y0, c);
         x0 += i;
