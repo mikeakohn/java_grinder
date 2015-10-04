@@ -337,6 +337,11 @@ int AppleIIgs::appleiigs_setSoundVolume_II()
   return 0;
 }
 
+// formula is:
+// SR = 894886 / (OSC + 2)
+// value = (131072 * Hz) / SR
+//
+// where SR = scan rate, OSC = number of enabled oscillators
 int AppleIIgs::appleiigs_setSoundFrequency_II()
 {
   fprintf(out, "; set_sound_frequency\n");
