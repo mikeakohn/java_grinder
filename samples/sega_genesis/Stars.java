@@ -84,7 +84,7 @@ public class Stars
     int delay = 200;
     int text_color = 0;
     int a,n;
-    int dx;
+    //int dx;
 
     short[] stars = Memory.allocStackShorts(stars_init.length);
 
@@ -133,16 +133,16 @@ public class Stars
 
         if (state == 0)
         {
-          SegaGenesis.setCursor(10, 11);
+          SegaGenesis.setCursor(10, 12);
           SegaGenesis.print("THE[JAVA[GRINDER[TEAM");
-          SegaGenesis.setCursor(16, 13);
+          SegaGenesis.setCursor(16, 14);
           SegaGenesis.print("PRESENTS");
           state++;
         }
           else
         if (state == 4)
         {
-          SegaGenesis.setCursor(14, 12);
+          SegaGenesis.setCursor(14, 13);
           SegaGenesis.print("SEGA[GENESIS");
           state++;
         }
@@ -156,18 +156,24 @@ public class Stars
     }
 
     SegaGenesis.setHorizontalScrollAModeFull();
-    n = 0;
-    dx = 1;
 
     // Shift stars around
+    int x, y;
+    int r = 0;
+    n = 0;
+
     for (a = 0; a < 1000; a++)
     {
-      SegaGenesis.setHorizontalScrollB(0, n);
-      SegaGenesis.setVerticalScrollB(n);
-      n += dx;
-      if (n > 8) { dx = -1; }
-      if (n < -8) { dx = 1; }
+      x = (r * Common.cos[n]) >> 6;
+      y = (r * Common.sin[n]) >> 6;
+
+      SegaGenesis.setHorizontalScrollB(0, x);
+      SegaGenesis.setVerticalScrollB(y);
       moveStars(stars);
+
+      n++;
+      if (n == 90) { n = 0; }
+      if ((a & 0xf) == 0 && r < 20) { r++; }
     }
 
     SegaGenesis.setHorizontalScrollAModeLine();
