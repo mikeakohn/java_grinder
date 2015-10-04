@@ -123,7 +123,7 @@ public class AppleIIgsJavaDemo
 
   static int scale[] =
   {
-60, 63, 67, 71, 75, 80, 85, 90, 95, 101, 107, 113, 120, 127, 134, 142, 150, 159, 169, 179, 189, 201, 212, 225, 238, 252, 267, 283, 300, 318, 336, 356, 377, 400, 423, 448, 475, 503, 532, 564, 597, 632, 670, 709, 751, 796, 843, 892, 945,
+108, 115, 121, 129, 136, 144, 153, 162, 171, 181, 192, 204, 216, 228, 242, 256, 271, 287, 304, 322, 341, 362, 383, 405, 429, 455, 482, 510, 540, 572, 606, 642, 680, 720, 762, 807, 855, 905, 959, 1015, 1075, 1139, 1206, 1277, 1353, 1432, 1517, 1607, 1701,
   };
 
   // 0 = mask
@@ -347,26 +347,22 @@ public class AppleIIgsJavaDemo
 
     // play a scale
     AppleIIgs.loadWaveTable(square_wave, 0);
-    AppleIIgs.enableOscillators(8);
+    AppleIIgs.enableOscillators(16);
     AppleIIgs.setMasterVolume(15);
     AppleIIgs.setWaveTable(0, 0, 0);
     AppleIIgs.setSoundVolume(0, 255);
     AppleIIgs.setWaveTable(1, 0, 0);
     AppleIIgs.setSoundVolume(1, 255);
-    AppleIIgs.setWaveTable(2, 0, 0);
-    AppleIIgs.setSoundVolume(2, 255);
 
-    for(i = 0; i <= 24; i++)
+    for(i = 0; i <= 32; i++)
     {
       AppleIIgs.setSoundFrequency(0, scale[i]);
       AppleIIgs.setSoundFrequency(1, scale[i + 12]);
-      AppleIIgs.setSoundFrequency(2, scale[i + 12 + 5]);
-      wait(750);
+      wait(500);
     }
 
     AppleIIgs.setSoundVolume(0, 0);
     AppleIIgs.setSoundVolume(1, 0);
-    AppleIIgs.setSoundVolume(2, 0);
     AppleIIgs.setMasterVolume(0);
 
     // set color palette
