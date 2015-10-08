@@ -78,6 +78,10 @@ public class Model
     int i, j;
     int r = 0;
     short model_buf[] = Memory.allocStackShorts(model_points.length);
+    short last_buf[] = Memory.allocStackShorts(model_points.length);
+
+    for(i = 0; i < model_points.length; i++)
+      last_buf[i] = model_buf[i];
 
     SegaGenesis.initBitmap();
     SegaGenesis.setPalettePointer(0);
@@ -85,6 +89,7 @@ public class Model
 
     for(j = 0; j < 1000; j++)
     {
+/*
       while(!SegaGenesis.inVerticalBlank());
 
       //SegaGenesis.clearBitmap();
@@ -93,10 +98,7 @@ public class Model
         SegaGenesis.setPlotAddress(n << 5);
         SegaGenesis.clearPatterns(15);
       }
-
-      r++;
-      if (r == 90) { r = 0; }
-
+*/
       int sin = (int)Common.sin[r];
       int cos = (int)Common.cos[r];
 
@@ -131,22 +133,23 @@ public class Model
       {
         int temp0 = model_edges[i + 0] << 2;
         int temp1 = model_edges[i + 1] << 2;
-        int color = model_edges[i + 2];
 
-        int x1 = model_buf[temp0];
-        int y1 = model_buf[temp0 + 1];
-        int x2 = model_buf[temp1];
-        int y2 = model_buf[temp1 + 1];
-
-        x1 += 160;
-        y1 += 112;
-        x2 += 160;
-        y2 += 112;
-
-        Common.drawLine(x1, y1, x2, y2, color);
+        Common.drawLine(last_buf[temp0] + 160, last_buf[temp0 + 1] + 112,
+                        last_buf[temp1] + 160, last_buf[temp1 + 1] + 112,
+                        11);
+        Common.drawLine(model_buf[temp0] + 160, model_buf[temp0 + 1] + 112,
+                        model_buf[temp1] + 160, model_buf[temp1 + 1] + 112,
+                        model_edges[i + 2]);
       }
 
-      while(SegaGenesis.inVerticalBlank());
+      for(i = 0; i < model_points.length; i++)
+        last_buf[i] = model_buf[i];
+
+      r++;
+      if (r == 90) { r = 0; }
+
+//      while(SegaGenesis.inVerticalBlank());
+
     }
   }
 }
