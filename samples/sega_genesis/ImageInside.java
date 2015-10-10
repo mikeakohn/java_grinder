@@ -38,26 +38,57 @@ public class ImageInside
 
   public static void shiftFull()
   {
-    int dx = 3;
-    int x = 0;
-    int i;
+    int x;
+    int i,r;
 
     SegaGenesis.setHorizontalScrollModeFull();
 
+    r = 0;
     for (i = 0; i < 32 * 5; i++)
     {
+      x = Common.sin[r] >> 1;
+
       SegaGenesis.setHorizontalScrollB(0, x);
 
-      x += dx;
+      r += 3;
+      if (r >= 90) { r = 0; }
 
-      if (x <= -32) { dx = 3; }
-      if (x >= 32) { dx = -3; }
-
-      Common.wait(5);
+      Common.wait(3);
     }
 
-    SegaGenesis.setHorizontalScrollModeLine();
     SegaGenesis.setHorizontalScrollB(0, 0);
+  }
+
+  public static void shiftLines()
+  {
+    int x, y, i, r, r0;
+
+    SegaGenesis.setHorizontalScrollModeLine();
+
+    r = 0;
+    for (i = 0; i < 32 * 5; i++)
+    {
+      r0 = r;
+
+      for (y = 35; y < 190; y++)
+      {
+        x = Common.sin[r0] >> 1;
+        SegaGenesis.setHorizontalScrollB(y, x);
+
+        r0++;
+        if (r0 >= 90) { r0 = 0; }
+      }
+
+      r += 3;
+      if (r >= 90) { r = 0; }
+
+      Common.wait(3);
+    }
+
+    for (y = 35; y < 190; y++)
+    {
+      SegaGenesis.setHorizontalScrollB(y, 0);
+    }
   }
 
   public static void run()
@@ -75,9 +106,10 @@ public class ImageInside
     SegaGenesis.setImageData(image);
     fadeIn();
     SegaGenesis.setPaletteColors(ImageInside.palette);
-    Common.wait(120);
+    Common.wait(90);
 
     shiftFull();
+    shiftLines();
   }
 
   public static int[] pattern =
