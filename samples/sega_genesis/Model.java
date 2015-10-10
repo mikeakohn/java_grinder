@@ -81,13 +81,16 @@ public class Model
     short last_buf[] = Memory.allocStackShorts(model_points.length);
 
     for(i = 0; i < model_points.length; i++)
-      last_buf[i] = model_buf[i];
+    {
+      model_buf[i] = 0;
+      last_buf[i] = 0;
+    }
 
     SegaGenesis.initBitmap();
     SegaGenesis.setPalettePointer(0);
     SegaGenesis.setPaletteColors(palette);
 
-    for(j = 0; j < 300; j++)
+    for(j = 0; j < 100; j++)
     {
 /*
       while(!SegaGenesis.inVerticalBlank());
