@@ -3,6 +3,19 @@ import net.mikekohn.java_grinder.SegaGenesis;
 
 public class ImageJavaGrinder
 {
+  public static void run()
+  {
+    SegaGenesis.setPaletteColors(palette);
+    SegaGenesis.setPatternTable(pattern);
+    SegaGenesis.setImageData(image);
+    Common.wait(60);
+
+    SegaGenesis.loadZ80(PlayTitleSample.z80_code);
+    Common.wait(120);
+
+    SegaGenesis.pauseZ80();
+  }
+
   public static int[] pattern =
   {
     // Pattern 0
@@ -979,18 +992,5 @@ public class ImageJavaGrinder
     0xeee, 0x444, 0x000, 0x888, 0x222, 0xecc, 0x66e, 0x00e,
     0xaae, 0x22e, 0x88e, 0x44e, 0xeaa, 0xe00, 0xe66, 0xe22,
   };
-
-  public static void run()
-  {
-    SegaGenesis.setPaletteColors(ImageJavaGrinder.palette);
-    SegaGenesis.setPatternTable(ImageJavaGrinder.pattern);
-    SegaGenesis.setImageData(ImageJavaGrinder.image);
-    Common.wait(60);
-
-    SegaGenesis.loadZ80(PlayTitleSample.z80_code);
-    Common.wait(120);
-
-    SegaGenesis.pauseZ80();
-  }
 }
 

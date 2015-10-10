@@ -87,7 +87,7 @@ public class Model
     SegaGenesis.setPalettePointer(0);
     SegaGenesis.setPaletteColors(palette);
 
-    for(j = 0; j < 1000; j++)
+    for(j = 0; j < 300; j++)
     {
 /*
       while(!SegaGenesis.inVerticalBlank());

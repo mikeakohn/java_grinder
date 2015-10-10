@@ -26,6 +26,8 @@ public class SegaGenesisJavaDemo
     NakenLogo.run();
     Stars.run();
     Box.run();
+    ImageInside.run();
+    //Model.run();
 
     //SegaGenesis.setCursor(0, 0);
     //SegaGenesis.print("ABCD");

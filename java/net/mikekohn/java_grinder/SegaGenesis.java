@@ -116,11 +116,11 @@ abstract public class SegaGenesis
   /** Set scroll mode for Scroll A and B so each line can be shifted
       individually using setHorizontalScrollA/B().  This is the default
       mode. */
-  public static void setHorizontalScrollAModeLine() { }
+  public static void setHorizontalScrollModeLine() { }
 
-  /** Set scroll mode for Scroll B (graphics) so entired image is shifted
+  /** Set scroll mode for Scroll A and B so entire image is shifted
       left/right using setHorizontalScrollA/B() setting row to 0. */
-  public static void setHorizontalScrollAModeFull() { }
+  public static void setHorizontalScrollModeFull() { }
 
   /** Set pattern table. */
   public static void setPatternTable(int[] patterns) { }

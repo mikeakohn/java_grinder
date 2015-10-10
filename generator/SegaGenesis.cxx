@@ -274,7 +274,7 @@ int SegaGenesis::sega_genesis_initBitmap()
 {
   need_init_bitmap = true;
 
-  fprintf(out, "  jsr _init_bitmap\n");
+  fprintf(out, "  jsr (_init_bitmap).l\n");
   return 0;
 }
 
@@ -282,7 +282,7 @@ int SegaGenesis::sega_genesis_clearBitmap()
 {
   need_clear_bitmap = true;
 
-  fprintf(out, "  jsr _clear_bitmap\n");
+  fprintf(out, "  jsr (_clear_bitmap).l\n");
   return 0;
 }
 
@@ -296,7 +296,7 @@ int SegaGenesis::sega_genesis_clearPatterns()
      fprintf(out, "  move.l d%d, d0\n", REG_STACK(reg - 1));
   }
 
-  fprintf(out, "  jsr _clear_pattern\n");
+  fprintf(out, "  jsr (_clear_pattern).l\n");
 
   if (reg != 1)
   {
@@ -323,7 +323,7 @@ int SegaGenesis::sega_genesis_plot()
     fprintf(out, "  move.l d%d, d2\n", REG_STACK(reg - 1));
   }
 
-  fprintf(out, "  jsr _plot\n");
+  fprintf(out, "  jsr (_plot).l\n");
 
   if (reg != 3)
   {
@@ -342,7 +342,7 @@ int SegaGenesis::sega_genesis_setPlotAddress()
   need_set_plot_address = true;
 
   fprintf(out, "  move.l %s, d5\n", pop_reg());
-  fprintf(out, "  jsr _set_plot_address\n");
+  fprintf(out, "  jsr (_set_plot_address).l\n");
 
   return 0;
 }
@@ -414,7 +414,7 @@ int SegaGenesis::sega_genesis_loadFonts()
 {
   need_load_fonts = true;
 
-  fprintf(out, "  jsr _load_fonts\n");
+  fprintf(out, "  jsr (_load_fonts).l\n");
   return 0;
 }
 
@@ -422,7 +422,7 @@ int SegaGenesis::sega_genesis_clearText()
 {
   need_clear_text = true;
 
-  fprintf(out, "  jsr _clear_text\n");
+  fprintf(out, "  jsr (_clear_text).l\n");
   return 0;
 }
 
@@ -480,7 +480,7 @@ int SegaGenesis::sega_genesis_print()
   need_print_string = true;
 
   fprintf(out, "  movea.l %s, a2\n", pop_reg());
-  fprintf(out, "  jsr _print_string\n");
+  fprintf(out, "  jsr (_print_string).l\n");
 
   return 0;
 }
@@ -555,7 +555,7 @@ int SegaGenesis::sega_genesis_setVerticalScrollB()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setHorizontalScrollAModeLine()
+int SegaGenesis::sega_genesis_setHorizontalScrollModeLine()
 {
   fprintf(out,
     "  ;; Swith to line by line horizontal scroll mode\n"
@@ -564,7 +564,7 @@ int SegaGenesis::sega_genesis_setHorizontalScrollAModeLine()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setHorizontalScrollAModeFull()
+int SegaGenesis::sega_genesis_setHorizontalScrollModeFull()
 {
   fprintf(out,
     "  ;; Swith to full screen horizontal scroll mode\n"
@@ -580,7 +580,7 @@ int SegaGenesis::sega_genesis_setPatternTable()
 
   fprintf(out, "  movea.l %s, a3\n", pop_reg());
   fprintf(out, "  moveq.l #0, d7\n");
-  fprintf(out, "  jsr _set_pattern_table\n");
+  fprintf(out, "  jsr (_set_pattern_table).l\n");
 
   return 0;
 }
@@ -591,7 +591,7 @@ int SegaGenesis::sega_genesis_setPatternTableAtIndex()
 
   fprintf(out, "  movea.l %s, a3\n", pop_reg());
   fprintf(out, "  move.l %s, d7\n", pop_reg());
-  fprintf(out, "  jsr _set_pattern_table\n");
+  fprintf(out, "  jsr (_set_pattern_table).l\n");
 
   return 0;
 }
@@ -630,7 +630,7 @@ int SegaGenesis::sega_genesis_setImageData()
   need_set_image_data = true;
 
   fprintf(out, "  movea.l %s, a3\n", pop_reg());
-  fprintf(out, "  jsr _set_image_data\n");
+  fprintf(out, "  jsr (_set_image_data).l\n");
 
   return 0;
 }
@@ -640,7 +640,7 @@ int SegaGenesis::sega_genesis_setPaletteColors()
   need_set_palette_colors = true;
 
   fprintf(out, "  movea.l d%d, a3\n", REG_STACK(reg-1));
-  fprintf(out, "  jsr _set_palette_colors\n");
+  fprintf(out, "  jsr (_set_palette_colors).l\n");
   reg--;
 
   return 0;
@@ -708,7 +708,7 @@ int SegaGenesis::sega_genesis_loadZ80()
   need_load_z80 = true;
 
   fprintf(out, "  movea.l d%d, a3\n", REG_STACK(reg-1));
-  fprintf(out, "  jsr _load_z80\n");
+  fprintf(out, "  jsr (_load_z80).l\n");
   reg--;
 
   return 0;
@@ -1075,7 +1075,7 @@ void SegaGenesis::add_init_bitmap()
     "  ;; 3) Set the other patterns in Sroll B to a blank pattern\n"
     "_init_bitmap:\n"
     "  move.l d4, (-4,a7)         ; put d4 on stack (or really below)\n"
-    "  jsr _clear_bitmap\n"
+    "  jsr (_clear_bitmap).l\n"
 
     "  ; Set pattern table to blank pattern\n"
     "  move.l #0x40000003, (a1)   ; C00004 VRAM write to 0xC000\n"

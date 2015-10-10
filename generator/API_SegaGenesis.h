@@ -40,8 +40,8 @@ public:
   virtual int sega_genesis_setHorizontalScrollB() { return -1; }
   virtual int sega_genesis_setVerticalScrollA() { return -1; }
   virtual int sega_genesis_setVerticalScrollB() { return -1; }
-  virtual int sega_genesis_setHorizontalScrollAModeLine() { return -1; }
-  virtual int sega_genesis_setHorizontalScrollAModeFull() { return -1; }
+  virtual int sega_genesis_setHorizontalScrollModeLine() { return -1; }
+  virtual int sega_genesis_setHorizontalScrollModeFull() { return -1; }
   virtual int sega_genesis_setPatternTable() { return -1; }
   virtual int sega_genesis_setPatternTableAtIndex() { return -1; }
   virtual int sega_genesis_setPatternLocation() { return -1; }
