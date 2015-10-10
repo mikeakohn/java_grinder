@@ -2268,48 +2268,55 @@ int JavaCompiler::compile_methods(bool do_main)
       const char *class_name = iter->first.c_str();
       JavaClass *java_class = iter->second;
 
+      //int constant_count = java_class->get_constant_count();
+      int method_count = java_class->get_method_count();
+
       if (verbose)
       {
         printf("Compile Class: %s (%p)\n", class_name, this);
+        printf("  method_count=%d\n", method_count);
       }
 
-      int constant_count = java_class->get_constant_count();
-
       // For all methods in class
-      for (index = 0; index < constant_count; index++)
+      for (index = 0; index < method_count; index++)
       {
-        constant_methodref_t *constant_methodref =
-          (constant_methodref_t *)java_class->get_constant(index);
+        struct methods_t *method = java_class->get_method(index);
 
-        if (constant_methodref->tag == CONSTANT_METHODREF)
+        if (method == NULL)
         {
-          char method_name[128];
-          char alt_name[256+8]; // FIXME
+          printf("Error: get_method(%d) failed.\n", index);
+          return -1;
+        }
 
-          if (java_class->get_method_name(method_name, sizeof(method_name), index) != 0)
-          {
-            continue;
-          }
+        char method_name[128];
+        char alt_name[256+8]; // FIXME
 
-          if (strcmp(method_name, "<clinit>") == 0) { continue; }
-          if (strcmp(method_name, "<init>") == 0) { continue; }
+        if (java_class->get_method_name(method_name, sizeof(method_name), index) != 0)
+        {
+          printf("Error: get_method_name(%d) failed.\n", index);
+          return -1;
+        }
 
-          sprintf(alt_name, "%s_%s", class_name, method_name);
+        printf("  METHOD INDEX=%d (%s)\n", index, method_name);
+
+        if (strcmp(method_name, "<clinit>") == 0) { continue; }
+        if (strcmp(method_name, "<init>") == 0) { continue; }
+
+        sprintf(alt_name, "%s_%s", class_name, method_name);
 
 #if 0
-          if (external_fields.find(alt_name) == external_fields.end())
-          {
-            continue;
-          }
+        if (external_fields.find(alt_name) == external_fields.end())
+        {
+          continue;
+        }
 #endif
 
-          if (verbose)
-          {
-            printf("  compiling: %s.%s\n", class_name, method_name);
-          }
-
-          if (compile_method(java_class, index, alt_name) != 0) { return -1; }
+        if (verbose)
+        {
+          printf("  compiling: %s.%s\n", class_name, method_name);
         }
+
+        if (compile_method(java_class, index, alt_name) != 0) { return -1; }
       }
     }
 
