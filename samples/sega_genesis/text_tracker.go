@@ -317,6 +317,15 @@ func ParsePattern(tokens *Tokens, time_signature *TimeSignature, divisions int) 
     }
   }
 
+/*
+  // DEBUG: print out the pattern in text format.
+  for i := 0; i < divisions_in_measure; i++ {
+    if pattern.voices[0][i].value != 0 || pattern.voices[1][i].value != 0 {
+      fmt.Printf("%d)  %d %d\n", i, pattern.voices[0][i].value, pattern.voices[1][i].value);
+    }
+  }
+*/
+
   return pattern, name
 }
 
@@ -543,7 +552,7 @@ func CreateMidi(song *Song, time_signature *TimeSignature, divisions int, bpm in
   // Write MIDI SMF header
   file.WriteString("MThd")
   WriteInt32(file, 6)         // length (always 6)
-  WriteInt16(file, 1)         // 0=single track, 1=multiple track, 2=multiple song
+  WriteInt16(file, 1)         // 0=single track, 1=multi track, 2=multi song
   WriteInt16(file, tracks)    // number of track chunks
   WriteInt16(file, divisions) // divisions
 
@@ -571,13 +580,14 @@ func CreateMidi(song *Song, time_signature *TimeSignature, divisions int, bpm in
     for i := 0; i < len(pattern); i++ {
       if pattern[i].value != 0 {
         delay := i - last_note
-        //fmt.Printf("ON: i=%d last_note=%d delay=%d\n", i, last_note, delay)
-        if delay < 0 { fmt.Println("ERROR! @") }
+        //fmt.Printf("ON: i=%d (%d) last_note=%d delay=%d\n", i, i, last_note, delay)
+        if delay < 0 { fmt.Printf("ERROR! @ delay=%d\n", delay) }
         track_data = append(track_data, WriteNote(delay, 0, pattern[i].value, true)...)
-        last_note = i + delay
+        //last_note = i + delay
+        last_note = i
         delay = pattern[i].length
         //fmt.Printf("OFF: i=%d (%d) last_note=%d delay=%d\n", i, i + pattern[i].length, last_note, delay)
-        if delay < 0 { fmt.Printf("ERROR! %d\n", delay) }
+        if delay < 0 { fmt.Printf("ERROR! delay=%d\n", delay) }
 
         track_data = append(track_data, WriteNote(delay, 0, pattern[i].value, false)...)
         last_note += delay
