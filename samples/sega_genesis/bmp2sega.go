@@ -6,38 +6,93 @@ import "strconv"
 
 // convert -scale 320x224! -colors 16 -type truecolor -flip ~/3_billion_devices.bmp 3_billion_devices.bmp
 
-func readString(file_in *os.File) string {
+type BmpImage struct {
+  file_in *os.File
+  data []uint8
+  width int
+  height int
+  image_size uint32
+}
+
+type SegaImage struct {
+  data []uint8
+  patterns [][]uint8
+  image []uint16
+  palette []int
+  palette_map map[int]int
+  color_count int
+}
+
+func (bmp_image *BmpImage) ReadString() string {
   chars := make([]byte, 2)
-  file_in.Read(chars)
+  bmp_image.file_in.Read(chars)
 
   return string(chars)
 }
 
-func readInt32(file_in *os.File) uint32 {
+func (bmp_image *BmpImage) ReadInt32() uint32 {
   chars := make([]uint8, 4)
-  file_in.Read(chars)
+  bmp_image.file_in.Read(chars)
 
   return uint32(chars[0]) | (uint32(chars[1]) << 8) | (uint32(chars[2]) << 16) | (uint32(chars[3]) << 24)
 }
 
-func readInt16(file_in *os.File) uint32 {
+func (bmp_image *BmpImage) ReadInt16() uint32 {
   chars := make([]uint8, 2)
-  file_in.Read(chars)
+  bmp_image.file_in.Read(chars)
 
   return uint32(chars[0]) | (uint32(chars[1]) << 8)
 }
 
-func readBmpHeader(file_in *os.File) uint32 {
-  id := readString(file_in)
+func (bmp_image *BmpImage) Init(file_name string) int {
+  // Open BMP file for reading
+  fmt.Println("Reading: " + file_name)
+
+  file_in, err := os.Open(file_name)
+
+  if err != nil {
+    panic(err)
+  }
+
+  bmp_image.file_in = file_in
+
+  bmp_image.width = 0
+  bmp_image.height = 0
+
+  // Close the file if the program exits
+  //defer bmp_image.file_in.Close()
+
+  offset := bmp_image.ReadBmpHeader()
+
+  if (offset == 0) {
+    return  -1
+  }
+
+  bmp_image.image_size = bmp_image.ReadBmpInfo()
+
+  if (bmp_image.image_size == 0) {
+    return -1
+  }
+
+  bmp_image.file_in.Seek(int64(offset), os.SEEK_SET)
+
+  bmp_image.data = make([]uint8, bmp_image.image_size)
+  file_in.Read(bmp_image.data)
+
+  return 0
+}
+
+func (bmp_image *BmpImage) ReadBmpHeader() uint32 {
+  id := bmp_image.ReadString()
 
   if (id != "BM") {
     fmt.Println("Not a BMP file.\n");
     return 0
   }
 
-  bmp_size := readInt32(file_in)
-  readInt32(file_in)
-  offset := readInt32(file_in)
+  bmp_size := bmp_image.ReadInt32()
+  bmp_image.ReadInt32()
+  offset := bmp_image.ReadInt32()
 
   fmt.Println("              ID: " + id)
   fmt.Println("            Size: " + strconv.Itoa(int(bmp_size)))
@@ -46,22 +101,22 @@ func readBmpHeader(file_in *os.File) uint32 {
   return offset
 }
 
-func readBmpInfo(file_in *os.File) uint32 {
-  header_size := readInt32(file_in)
-  width := readInt32(file_in)
-  height := int32(readInt32(file_in))
-  color_planes := readInt16(file_in)
-  bits_per_pixel := readInt16(file_in)
-  compression := readInt32(file_in)
-  image_size := readInt32(file_in)
-  horizontal_resolution := readInt32(file_in)
-  vertical_resolution := readInt32(file_in)
-  palette_colors := readInt32(file_in)
-  important_colors := readInt32(file_in)
+func (bmp_image *BmpImage) ReadBmpInfo() uint32 {
+  header_size := bmp_image.ReadInt32()
+  bmp_image.width = int(bmp_image.ReadInt32())
+  bmp_image.height = int(bmp_image.ReadInt32())
+  color_planes := bmp_image.ReadInt16()
+  bits_per_pixel := bmp_image.ReadInt16()
+  compression := bmp_image.ReadInt32()
+  image_size := bmp_image.ReadInt32()
+  horizontal_resolution := bmp_image.ReadInt32()
+  vertical_resolution := bmp_image.ReadInt32()
+  palette_colors := bmp_image.ReadInt32()
+  important_colors := bmp_image.ReadInt32()
 
   fmt.Println("     Header Size: " + strconv.Itoa(int(header_size)))
-  fmt.Println("           Width: " + strconv.Itoa(int(width)))
-  fmt.Println("          Height: " + strconv.Itoa(int(height)))
+  fmt.Println("           Width: " + strconv.Itoa(int(bmp_image.width)))
+  fmt.Println("          Height: " + strconv.Itoa(int(bmp_image.height)))
   fmt.Println("    Color Planes: " + strconv.Itoa(int(color_planes)))
   fmt.Println("  Bits Per Pixel: " + strconv.Itoa(int(bits_per_pixel)))
   fmt.Println("     Compression: " + strconv.Itoa(int(compression)))
@@ -71,17 +126,17 @@ func readBmpInfo(file_in *os.File) uint32 {
   fmt.Println("  Palette Colors: " + strconv.Itoa(int(palette_colors)))
   fmt.Println("Important Colors: " + strconv.Itoa(int(important_colors)))
 
-  if (height < 0) { height = -height }
+  if (bmp_image.height < 0) { bmp_image.height = -bmp_image.height }
 
-  if (width != 320 ||
-      height != 224 ||
+  if (bmp_image.width != 320 ||
+      bmp_image.height != 224 ||
       compression != 0 ||
       bits_per_pixel != 24) {
     fmt.Println("This BMP isn't in the right format.")
     return 0
   }
 
-  return width * uint32(height) * 3
+  return uint32(bmp_image.width) * uint32(bmp_image.height) * 3
 }
 
 func writeImageArray(data []uint16) {
@@ -141,107 +196,155 @@ func doesPatternMatch(a []uint8, b []uint8) bool {
   return true
 }
 
-func readData(file_in *os.File, image_size uint32) uint32 {
+func (sega_image *SegaImage) Init (data []uint8) {
+  //sega_image.data = make([]uint8, image_size)
+  sega_image.data = data
+  sega_image.palette = make([]int, 16)
+  sega_image.palette_map = make(map[int]int)
+  sega_image.color_count = 0
+
+  //file_in.Read(sega_image.data)
+}
+
+func (sega_image *SegaImage) GetPattern (x0 int, y0 int) int {
   var loc int
   var color int
-  var palette_map map[int]int
   var pattern_nybble int
-  var patterns [][]uint8
-  var image []uint16
-
-  fmt.Println("readData: " + strconv.Itoa(int(image_size)))
-
-  data := make([]uint8, image_size)
-  palette := make([]int, 16)
-  palette_map = make(map[int]int)
-  color_count := 0
-
-  file_in.Read(data)
-
-  fmt.Println("public class ClassName\n{")
 
   // Ouch.  There's faster ways to do this, but this should be pretty
   // quick anyway, so who cares.  For each 8x8 block of the image, set up
   // an 8x8 pixel x 4 bit color, 32 byte pattern.  To save ROM space, do
   // not duplicate patterns.
-  for y0 := 0; y0 < 224; y0 = y0 + 8 {
-    for x0 := 0; x0 < 320; x0 = x0 + 8 {
 
-      pattern := make([]uint8, 32)
-      pattern_nybble = 0
+  pattern := make([]uint8, 32)
+  pattern_nybble = 0
 
-      // Get 8x8 pattern out of image
-      for y := 0; y < 8; y++ {
-        for x := 0; x < 8; x++ {
-          loc = getPixelLocation(x0 + x, y0 + y)
-          color = getPixelColor(data[loc:loc+3])
-          _, ok := palette_map[color]
+  // Get 8x8 pattern out of image
+  for y := 0; y < 8; y++ {
+    for x := 0; x < 8; x++ {
+      loc = getPixelLocation(x0 + x, y0 + y)
+      color = getPixelColor(sega_image.data[loc:loc+3])
+      _, ok := sega_image.palette_map[color]
 
-          if !ok {
-            if color_count == 16 {
-              for _, color := range(palette_map) {
-                fmt.Printf("  %03x\n", color)
-              }
-              fmt.Println("Too many colors in image")
-              return 0
-            }
-            palette_map[color] = color_count
-            palette[color_count] = color
-            color_count += 1
+      if !ok {
+        if sega_image.color_count == 16 {
+          for _, color := range(sega_image.palette_map) {
+            fmt.Printf("  %03x\n", color)
           }
-
-          color = palette_map[color]
-
-          if (pattern_nybble & 1) == 0 {
-            pattern[pattern_nybble >> 1] = uint8(color) << 4
-          } else {
-            pattern[pattern_nybble >> 1] |= uint8(color)
-          }
-
-          pattern_nybble++
+          fmt.Println("Too many colors in image")
+          return 0
         }
+        sega_image.palette_map[color] = sega_image.color_count
+        sega_image.palette[sega_image.color_count] = color
+        sega_image.color_count += 1
       }
 
-      match := false
+      color = sega_image.palette_map[color]
 
-      // Check if this pattern already exists
-      for index, element := range patterns {
-        //fmt.Printf("%q\n", element)
-        if doesPatternMatch(element, pattern) {
-          image = append(image, uint16(index))
-          match = true
-          break
-        }
+      if (pattern_nybble & 1) == 0 {
+        pattern[pattern_nybble >> 1] = uint8(color) << 4
+      } else {
+        pattern[pattern_nybble >> 1] |= uint8(color)
       }
 
-      if match == false {
-        image = append(image, uint16(len(patterns)))
-        patterns = append(patterns, pattern)
-      }
+      pattern_nybble++
+    }
+  }
+  match := false
+
+  // Check if this pattern already exists
+  for index, element := range sega_image.patterns {
+    //fmt.Printf("%q\n", element)
+    if doesPatternMatch(element, pattern) {
+      sega_image.image = append(sega_image.image, uint16(index))
+      match = true
+      break
     }
   }
 
-  if len(image) != 40 * 28 {
-    fmt.Printf("Image isn't 40x28? %d\n", len(image))
-    return 0
+  if match == false {
+    sega_image.image = append(sega_image.image, uint16(len(sega_image.patterns)))
+    sega_image.patterns = append(sega_image.patterns, pattern)
   }
 
+  return 1
+}
+
+func (sega_image *SegaImage) Print () {
   fmt.Println("  public static int[] pattern =\n  {")
-  for index, pattern := range patterns {
+  for index, pattern := range sega_image.patterns {
     fmt.Printf("    // Pattern %d", index)
     writeInt32Array(pattern)
   }
   fmt.Println("\n  };\n")
 
   fmt.Print("  public static short[] image =\n  {")
-  writeImageArray(image)
+  writeImageArray(sega_image.image)
   fmt.Println("\n  };\n")
 
   fmt.Print("  public static short[] palette =\n  {")
-  writeInt16Array(palette)
+  writeInt16Array(sega_image.palette)
   fmt.Println("\n  };")
 
   fmt.Println("}\n")
+}
+
+func readScreenData(bmp_image *BmpImage) uint32 {
+
+  fmt.Println("readScreenData: %d\n", len(bmp_image.data))
+
+  sega_image := new(SegaImage)
+  sega_image.Init(bmp_image.data)
+
+  fmt.Println("public class ClassName\n{")
+
+  for y0 := 0; y0 < 224; y0 = y0 + 8 {
+    for x0 := 0; x0 < 320; x0 = x0 + 8 {
+      if sega_image.GetPattern(x0, y0) == 0 { return 0; }
+    }
+  }
+
+  if len(sega_image.image) != 40 * 28 {
+    fmt.Printf("Image isn't 40x28? %d\n", len(sega_image.image))
+    return 0
+  }
+
+  sega_image.Print()
+
+  return 1
+}
+
+func readSpriteData(bmp_image *BmpImage) uint32 {
+
+  fmt.Println("readSpriteData: %d\n", len(bmp_image.data))
+
+  if (bmp_image.width % 8) == 0 || (bmp_image.height % 8) == 0 {
+    fmt.Println("Error: Image width/height aren't multiples of 8 pixels")
+    return 0
+  }
+
+  if (bmp_image.width / 8) == 0 {
+    fmt.Println("Error: Image width can only be 8, 16, 24, or 32 pixels\n")
+    return 0
+  }
+
+  if (bmp_image.height / 8) == 0 {
+    fmt.Println("Error: Image height can only be 8, 16, 24, or 32 pixels\n")
+    return 0
+  }
+
+  sega_image := new(SegaImage)
+  sega_image.Init(bmp_image.data)
+
+  fmt.Println("public class ClassName\n{")
+
+  for x0 := 0; x0 < 320; x0 = x0 + 8 {
+    for y0 := 0; y0 < 224; y0 = y0 + 8 {
+      if sega_image.GetPattern(x0, y0) == 0 { return 0; }
+    }
+  }
+
+  sega_image.Print()
 
   return 1
 }
@@ -249,41 +352,27 @@ func readData(file_in *os.File, image_size uint32) uint32 {
 func main() {
   fmt.Println("bmp2sega - Copyright 2015 by Michael Kohn")
 
-  if len(os.Args) != 2 {
-    fmt.Println("Usage: " + os.Args[0] + " <file.bmp>")
+  if len(os.Args) != 3 {
+    fmt.Println("Usage: " + os.Args[0] + " <file.bmp> <screen/sprite>")
     os.Exit(0)
   }
 
-  // Open wav file for reading
-  fmt.Println("Reading: " + os.Args[1])
-
-  file_in, err := os.Open(os.Args[1])
-
-  if err != nil {
-    panic(err)
-  }
-
-  // Close the file if the program exits
-  defer file_in.Close()
-
-  offset := readBmpHeader(file_in)
-
-  if (offset == 0) {
+  bmp_image := new(BmpImage)
+  if bmp_image.Init(os.Args[1]) != 0 {
     return
   }
 
-  image_size := readBmpInfo(file_in)
-
-  if (image_size == 0) {
-    return
+  if os.Args[2] == "screen" {
+    if readScreenData(bmp_image) == 0 {
+      return
+    }
+  } else if os.Args[2] == "sprite" {
+    if readSpriteData(bmp_image) == 0 {
+      return
+    }
+  } else {
+    fmt.Println("Unknown option " + os.Args[2])
   }
-
-  file_in.Seek(int64(offset), os.SEEK_SET)
-
-  if (readData(file_in, image_size) == 0) {
-    return
-  }
-
 }
 
 
