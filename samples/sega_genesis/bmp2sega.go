@@ -16,6 +16,8 @@ type BmpImage struct {
 
 type SegaImage struct {
   data []uint8
+  width int
+  height int
   patterns [][]uint8
   image []uint16
   palette []int
@@ -128,10 +130,7 @@ func (bmp_image *BmpImage) ReadBmpInfo() uint32 {
 
   if (bmp_image.height < 0) { bmp_image.height = -bmp_image.height }
 
-  if (bmp_image.width != 320 ||
-      bmp_image.height != 224 ||
-      compression != 0 ||
-      bits_per_pixel != 24) {
+  if (compression != 0 || bits_per_pixel != 24) {
     fmt.Println("This BMP isn't in the right format.")
     return 0
   }
@@ -176,14 +175,26 @@ func writeInt32Array(data []uint8) {
   fmt.Println()
 }
 
+func (sega_image *SegaImage) Init (data []uint8, width int, height int) {
+  //sega_image.data = make([]uint8, image_size)
+  sega_image.data = data
+  sega_image.width = width
+  sega_image.height = height
+  sega_image.palette = make([]int, 16)
+  sega_image.palette_map = make(map[int]int)
+  sega_image.color_count = 0
+
+  //file_in.Read(sega_image.data)
+}
+
 func getPixelColor(data []uint8) int {
   return (int(data[0] >> 5) << 9) |
          ((int(data[1] >> 5)) << 5) |
          ((int(data[2] >> 5)) << 1)
 }
 
-func getPixelLocation(x int, y int) int {
-  return (x * 3) + (y * 320 *3)
+func (sega_image *SegaImage) GetPixelLocation(x int, y int) int {
+  return (x * 3) + (y * sega_image.width *3)
 }
 
 func doesPatternMatch(a []uint8, b []uint8) bool {
@@ -194,16 +205,6 @@ func doesPatternMatch(a []uint8, b []uint8) bool {
   }
 
   return true
-}
-
-func (sega_image *SegaImage) Init (data []uint8) {
-  //sega_image.data = make([]uint8, image_size)
-  sega_image.data = data
-  sega_image.palette = make([]int, 16)
-  sega_image.palette_map = make(map[int]int)
-  sega_image.color_count = 0
-
-  //file_in.Read(sega_image.data)
 }
 
 func (sega_image *SegaImage) GetPattern (x0 int, y0 int) int {
@@ -219,10 +220,13 @@ func (sega_image *SegaImage) GetPattern (x0 int, y0 int) int {
   pattern := make([]uint8, 32)
   pattern_nybble = 0
 
+fmt.Printf("x0=%d y0=%d\n", x0, y0);
+fmt.Printf("len(data)=%d\n", len(sega_image.data))
+
   // Get 8x8 pattern out of image
   for y := 0; y < 8; y++ {
     for x := 0; x < 8; x++ {
-      loc = getPixelLocation(x0 + x, y0 + y)
+      loc = sega_image.GetPixelLocation(x0 + x, y0 + y)
       color = getPixelColor(sega_image.data[loc:loc+3])
       _, ok := sega_image.palette_map[color]
 
@@ -294,7 +298,7 @@ func readScreenData(bmp_image *BmpImage) uint32 {
   fmt.Println("readScreenData: %d\n", len(bmp_image.data))
 
   sega_image := new(SegaImage)
-  sega_image.Init(bmp_image.data)
+  sega_image.Init(bmp_image.data, bmp_image.width, bmp_image.height)
 
   fmt.Println("public class ClassName\n{")
 
@@ -318,28 +322,31 @@ func readSpriteData(bmp_image *BmpImage) uint32 {
 
   fmt.Println("readSpriteData: %d\n", len(bmp_image.data))
 
-  if (bmp_image.width % 8) == 0 || (bmp_image.height % 8) == 0 {
+  if (bmp_image.width % 8) != 0 || (bmp_image.height % 8) != 0 {
     fmt.Println("Error: Image width/height aren't multiples of 8 pixels")
     return 0
   }
 
-  if (bmp_image.width / 8) == 0 {
+  width_factor := bmp_image.width / 8
+  height_factor := bmp_image.height / 8
+
+  if width_factor < 1 || width_factor > 4 {
     fmt.Println("Error: Image width can only be 8, 16, 24, or 32 pixels\n")
     return 0
   }
 
-  if (bmp_image.height / 8) == 0 {
+  if height_factor < 1 || height_factor > 4 {
     fmt.Println("Error: Image height can only be 8, 16, 24, or 32 pixels\n")
     return 0
   }
 
   sega_image := new(SegaImage)
-  sega_image.Init(bmp_image.data)
+  sega_image.Init(bmp_image.data, bmp_image.width, bmp_image.height)
 
   fmt.Println("public class ClassName\n{")
 
-  for x0 := 0; x0 < 320; x0 = x0 + 8 {
-    for y0 := 0; y0 < 224; y0 = y0 + 8 {
+  for x0 := 0; x0 < bmp_image.width; x0 = x0 + 8 {
+    for y0 := 0; y0 < bmp_image.height; y0 = y0 + 8 {
       if sega_image.GetPattern(x0, y0) == 0 { return 0; }
     }
   }
