@@ -68,6 +68,7 @@ SegaGenesis::SegaGenesis() :
   need_set_pattern_table(false),
   need_set_image_data(false),
   need_set_palette_colors(false),
+  need_set_palette_colors_at_index(false),
   need_init_bitmap(false),
   need_clear_bitmap(false),
   need_clear_pattern(false),
@@ -92,6 +93,7 @@ SegaGenesis::~SegaGenesis()
   if (need_set_pattern_table) { add_set_pattern_table(); }
   if (need_set_image_data) { add_set_image_data(); }
   if (need_set_palette_colors) { add_set_palette_colors(); }
+  if (need_set_palette_colors_at_index) { add_set_palette_colors_at_index(); }
   if (need_init_bitmap) { add_init_bitmap(); }
   if (need_clear_bitmap) { add_clear_bitmap(); }
   if (need_clear_pattern) { add_clear_pattern(); }
@@ -646,6 +648,29 @@ int SegaGenesis::sega_genesis_setPaletteColors()
   return 0;
 }
 
+int SegaGenesis::sega_genesis_setPaletteColorsAtIndex()
+{
+  need_set_palette_colors_at_index = true;
+
+  fprintf(out, "  movea.l d%d, a3\n", REG_STACK(reg-1));
+  reg--;
+  if (reg != 1)
+  {
+    fprintf(out, "  push.l d0\n");
+    fprintf(out, "  move.l d%d, d0\n", REG_STACK(reg-1));
+  }
+
+  fprintf(out, "  jsr (_set_palette_colors_at_index).l\n");
+
+  if (reg != 1)
+  {
+    fprintf(out, "  pop.l d0\n");
+    reg--;
+  }
+
+  return 0;
+}
+
 int SegaGenesis::sega_genesis_setSpritePosition()
 {
   CHECK_STACK
@@ -1062,6 +1087,22 @@ void SegaGenesis::add_set_palette_colors()
     "_set_palette_colors_loop:\n"
     "  move.w (a3)+, (a0)\n"
     "  dbf d5, _set_palette_colors_loop\n"
+    "  rts\n\n");
+}
+
+void SegaGenesis::add_set_palette_colors_at_index()
+{
+  // a3 points to short[] array
+  fprintf(out,
+    "_set_palette_colors_at_index:\n"
+    "  lsl.w #1, d0\n"
+    "  swap d0\n"
+    "  add.l #0xc0000000, d0\n"
+    "  move.l d0, (a1)   ; C00004 write CRAM address d0 * 2\n"
+    "  move.l (-4,a3), d5         ; Code len\n"
+    "_set_palette_colors_at_index_loop:\n"
+    "  move.w (a3)+, (a0)\n"
+    "  dbf d5, _set_palette_colors_at_index_loop\n"
     "  rts\n\n");
 }
 

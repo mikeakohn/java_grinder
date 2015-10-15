@@ -27,6 +27,7 @@ public class SegaGenesisJavaDemo
     Stars.run();
     Box.run();
     ImageInside.run();
+    Sprites.run();
     //Model.run();
 
     //SegaGenesis.setCursor(0, 0);

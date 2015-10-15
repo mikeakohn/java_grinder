@@ -150,6 +150,9 @@ abstract public class SegaGenesis
   /** Set palette colors. */
   public static void setPaletteColors(short[] palette) { }
 
+  /** Set palette colors starting at an index (0 to 63).*/
+  public static void setPaletteColorsAtIndex(int index, short[] palette) { }
+
   /** Set sprite's position on the screen.  Note: (0,0) on the display
       is sprite position (128,128).  If sprites aren't showing up make
       sure that x and y are bigger than 128. */

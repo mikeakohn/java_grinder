@@ -56,6 +56,7 @@ public:
   virtual int sega_genesis_putPattern(int c);
   virtual int sega_genesis_setImageData();
   virtual int sega_genesis_setPaletteColors();
+  virtual int sega_genesis_setPaletteColorsAtIndex();
   virtual int sega_genesis_setSpritePosition();
   virtual int sega_genesis_setSpriteConfig1();
   virtual int sega_genesis_setSpriteConfig2();
@@ -78,6 +79,7 @@ private:
   void add_set_pattern_table();
   void add_set_image_data();
   void add_set_palette_colors();
+  void add_set_palette_colors_at_index();
   void add_init_bitmap();
   void add_clear_bitmap();
   void add_clear_pattern();
@@ -92,6 +94,7 @@ private:
   bool need_set_pattern_table:1;
   bool need_set_image_data:1;
   bool need_set_palette_colors:1;
+  bool need_set_palette_colors_at_index:1;
   bool need_init_bitmap:1;
   bool need_clear_bitmap:1;
   bool need_clear_pattern:1;

@@ -49,6 +49,7 @@ public:
   virtual int sega_genesis_putPattern(int c) { return -1; }
   virtual int sega_genesis_setImageData() { return -1; }
   virtual int sega_genesis_setPaletteColors() { return -1; }
+  virtual int sega_genesis_setPaletteColorsAtIndex() { return -1; }
   virtual int sega_genesis_setSpritePosition() { return -1; }
   virtual int sega_genesis_setSpriteConfig1() { return -1; }
   virtual int sega_genesis_setSpriteConfig2() { return -1; }

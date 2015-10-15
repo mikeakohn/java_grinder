@@ -2,7 +2,6 @@ package main
 
 import "fmt"
 import "os"
-import "strconv"
 
 // convert -scale 320x224! -colors 16 -type truecolor -flip ~/3_billion_devices.bmp 3_billion_devices.bmp
 
@@ -23,6 +22,7 @@ type SegaImage struct {
   palette []int
   palette_map map[int]int
   color_count int
+  is_sprite bool
 }
 
 func (bmp_image *BmpImage) ReadString() string {
@@ -96,9 +96,9 @@ func (bmp_image *BmpImage) ReadBmpHeader() uint32 {
   bmp_image.ReadInt32()
   offset := bmp_image.ReadInt32()
 
-  fmt.Println("              ID: " + id)
-  fmt.Println("            Size: " + strconv.Itoa(int(bmp_size)))
-  fmt.Println("          Offset: " + strconv.Itoa(int(offset)))
+  fmt.Println("              ID:", id)
+  fmt.Println("            Size:", bmp_size)
+  fmt.Println("          Offset:", offset)
 
   return offset
 }
@@ -116,17 +116,17 @@ func (bmp_image *BmpImage) ReadBmpInfo() uint32 {
   palette_colors := bmp_image.ReadInt32()
   important_colors := bmp_image.ReadInt32()
 
-  fmt.Println("     Header Size: " + strconv.Itoa(int(header_size)))
-  fmt.Println("           Width: " + strconv.Itoa(int(bmp_image.width)))
-  fmt.Println("          Height: " + strconv.Itoa(int(bmp_image.height)))
-  fmt.Println("    Color Planes: " + strconv.Itoa(int(color_planes)))
-  fmt.Println("  Bits Per Pixel: " + strconv.Itoa(int(bits_per_pixel)))
-  fmt.Println("     Compression: " + strconv.Itoa(int(compression)))
-  fmt.Println("      Image Size: " + strconv.Itoa(int(image_size)))
-  fmt.Println("  Horizontal Res: " + strconv.Itoa(int(horizontal_resolution)))
-  fmt.Println("    Vertical Res: " + strconv.Itoa(int(vertical_resolution)))
-  fmt.Println("  Palette Colors: " + strconv.Itoa(int(palette_colors)))
-  fmt.Println("Important Colors: " + strconv.Itoa(int(important_colors)))
+  fmt.Println("     Header Size:", header_size)
+  fmt.Println("           Width:", bmp_image.width)
+  fmt.Println("          Height:", bmp_image.height)
+  fmt.Println("    Color Planes:", color_planes)
+  fmt.Println("  Bits Per Pixel:", bits_per_pixel)
+  fmt.Println("     Compression:", compression)
+  fmt.Println("      Image Size:", image_size)
+  fmt.Println("  Horizontal Res:", horizontal_resolution)
+  fmt.Println("    Vertical Res:", vertical_resolution)
+  fmt.Println("  Palette Colors:", palette_colors)
+  fmt.Println("Important Colors:", important_colors)
 
   if (bmp_image.height < 0) { bmp_image.height = -bmp_image.height }
 
@@ -176,15 +176,13 @@ func writeInt32Array(data []uint8) {
 }
 
 func (sega_image *SegaImage) Init (data []uint8, width int, height int) {
-  //sega_image.data = make([]uint8, image_size)
   sega_image.data = data
   sega_image.width = width
   sega_image.height = height
   sega_image.palette = make([]int, 16)
   sega_image.palette_map = make(map[int]int)
   sega_image.color_count = 0
-
-  //file_in.Read(sega_image.data)
+  sega_image.is_sprite = false
 }
 
 func (sega_image *SegaImage) GetPixelColor(x int, y int) int {
@@ -247,15 +245,18 @@ func (sega_image *SegaImage) GetPattern (x0 int, y0 int) int {
       pattern_nybble++
     }
   }
+
   match := false
 
-  // Check if this pattern already exists
-  for index, element := range sega_image.patterns {
-    //fmt.Printf("%q\n", element)
-    if doesPatternMatch(element, pattern) {
-      sega_image.image = append(sega_image.image, uint16(index))
-      match = true
-      break
+  // Check if this pattern already exists if this isn't a sprite
+  if !sega_image.is_sprite {
+    for index, element := range sega_image.patterns {
+      //fmt.Printf("%q\n", element)
+      if doesPatternMatch(element, pattern) {
+        sega_image.image = append(sega_image.image, uint16(index))
+        match = true
+        break
+      }
     }
   }
 
@@ -268,6 +269,8 @@ func (sega_image *SegaImage) GetPattern (x0 int, y0 int) int {
 }
 
 func (sega_image *SegaImage) Print () {
+  fmt.Printf("sega_image.patterns=%d\n", len(sega_image.patterns))
+
   fmt.Println("  public static int[] pattern =\n  {")
   for index, pattern := range sega_image.patterns {
     fmt.Printf("    // Pattern %d", index)
@@ -288,7 +291,7 @@ func (sega_image *SegaImage) Print () {
 
 func readScreenData(bmp_image *BmpImage) uint32 {
 
-  fmt.Println("readScreenData: %d\n", len(bmp_image.data))
+  fmt.Println("readScreenData:", len(bmp_image.data))
 
   sega_image := new(SegaImage)
   sega_image.Init(bmp_image.data, bmp_image.width, bmp_image.height)
@@ -302,7 +305,7 @@ func readScreenData(bmp_image *BmpImage) uint32 {
   }
 
   if len(sega_image.image) != 40 * 28 {
-    fmt.Printf("Image isn't 40x28? %d\n", len(sega_image.image))
+    fmt.Println("Image isn't 40x28?", len(sega_image.image))
     return 0
   }
 
@@ -313,7 +316,7 @@ func readScreenData(bmp_image *BmpImage) uint32 {
 
 func readSpriteData(bmp_image *BmpImage) uint32 {
 
-  fmt.Println("readSpriteData: %d\n", len(bmp_image.data))
+  fmt.Println("readSpriteData:", len(bmp_image.data))
 
   if (bmp_image.width % 8) != 0 || (bmp_image.height % 8) != 0 {
     fmt.Println("Error: Image width/height aren't multiples of 8 pixels")
@@ -335,6 +338,7 @@ func readSpriteData(bmp_image *BmpImage) uint32 {
 
   sega_image := new(SegaImage)
   sega_image.Init(bmp_image.data, bmp_image.width, bmp_image.height)
+  sega_image.is_sprite = true
 
   fmt.Println("public class ClassName\n{")
 

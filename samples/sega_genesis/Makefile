@@ -1,7 +1,21 @@
+CLASSES= \
+  SegaGenesisJavaDemo.class \
+  Box.class \
+  Common.class \
+  ImageJavaGrinder.class \
+  ImageInside.class \
+  Mandelbrots.class \
+  NakenLogo.class \
+  PlaySong.class \
+  PlayTitleSample.class \
+  Stars.class \
+  PlayLaser.class \
+  Sprites.class \
+  Stars.class
 
-default: SegaGenesisJavaDemo.class Box.class Common.class ImageInside.class Mandelbrots.class NakenLogo.class PlaySong.class PlayTitleSample.class Stars.class PlayLaser.class Stars.class
+default: $(CLASSES)
 
-grind: SegaGenesisJavaDemo.class Box.class Common.class ImageInside.class Mandelbrots.class NakenLogo.class PlaySong.class PlayTitleSample.class Stars.class PlayLaser.class Stars.class
+grind: $(CLASSES)
 	../../java_grinder SegaGenesisJavaDemo.class sega_genesis_java_demo.asm sega_genesis
 	naken_asm -I ~ -l -b -o sega_genesis_java_demo.bin sega_genesis_java_demo.asm
 
