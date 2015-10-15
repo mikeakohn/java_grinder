@@ -2,7 +2,6 @@ package main
 
 import "fmt"
 import "os"
-import "strconv"
 
 func main() {
   fmt.Println("INFO: bin2java - Copyright 2015 by Michael Kohn")
@@ -31,7 +30,7 @@ func main() {
 
   file_size := int(stat.Size())
 
-  fmt.Println("INFO: " + strconv.Itoa(file_size))
+  fmt.Println("INFO:", file_size)
   fmt.Println()
 
   data := make([]byte, file_size)

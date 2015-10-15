@@ -2,7 +2,6 @@ package main
 
 import "fmt"
 import "os"
-import "strconv"
 
 func readString(file_in *os.File) string {
   chars := make([]byte, 4)
@@ -41,9 +40,9 @@ func readRiffHeader(file_in *os.File) uint32 {
     return 0
   }
 
-  fmt.Println("              ID: " + id)
-  fmt.Println("            Size: " + strconv.Itoa(int(wav_size)))
-  fmt.Println("          Format: " + format)
+  fmt.Println("              ID:", id)
+  fmt.Println("            Size:", wav_size)
+  fmt.Println("          Format:", format)
 
   return wav_size
 }
@@ -63,14 +62,14 @@ func readFmtHeader(file_in *os.File) uint32 {
     return 0
   }
 
-  fmt.Println("              ID: " + id)
-  fmt.Println("      Chunk Size: " + strconv.Itoa(int(chunk_size)))
-  fmt.Println("     Format Code: " + strconv.Itoa(int(format_code)))
-  fmt.Println("        Channels: " + strconv.Itoa(int(channels)))
-  fmt.Println("     Sample Rate: " + strconv.Itoa(int(sample_rate)))
-  fmt.Println("Bytes Per Second: " + strconv.Itoa(int(bytes_per_second)))
-  fmt.Println("Bytes Per Sample: " + strconv.Itoa(int(bytes_per_sample)))
-  fmt.Println(" Bits Per Sample: " + strconv.Itoa(int(bits_per_sample)))
+  fmt.Println("              ID:", id)
+  fmt.Println("      Chunk Size:", chunk_size)
+  fmt.Println("     Format Code:", format_code)
+  fmt.Println("        Channels:", channels)
+  fmt.Println("     Sample Rate:", sample_rate)
+  fmt.Println("Bytes Per Second:", bytes_per_second)
+  fmt.Println("Bytes Per Sample:", bytes_per_sample)
+  fmt.Println(" Bits Per Sample:", bits_per_sample)
 
   if (bits_per_sample != 8 || channels != 1) {
     fmt.Println("This wav isn't in the right format.")
@@ -89,8 +88,8 @@ func readDataHeader(file_in *os.File) uint32 {
     return 0
   }
 
-  fmt.Println("              ID: " + id)
-  fmt.Println("      Chunk Size: " + strconv.Itoa(int(chunk_size)))
+  fmt.Println("              ID:", id)
+  fmt.Println("      Chunk Size:", chunk_size)
 
   data := make([]uint8, chunk_size)
   file_in.Read(data)
@@ -100,7 +99,6 @@ func readDataHeader(file_in *os.File) uint32 {
       fmt.Print("\n  db")
     }
 
-    //d := strconv.Itoa(int(data[i]))
     d := fmt.Sprintf("0x%02x", int(data[i]))
 
     if i % 8 == 0 {
