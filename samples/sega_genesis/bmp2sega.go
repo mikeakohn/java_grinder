@@ -187,14 +187,12 @@ func (sega_image *SegaImage) Init (data []uint8, width int, height int) {
   //file_in.Read(sega_image.data)
 }
 
-func getPixelColor(data []uint8) int {
-  return (int(data[0] >> 5) << 9) |
-         ((int(data[1] >> 5)) << 5) |
-         ((int(data[2] >> 5)) << 1)
-}
+func (sega_image *SegaImage) GetPixelColor(x int, y int) int {
+  loc := (x * 3) + (y * sega_image.width *3)
 
-func (sega_image *SegaImage) GetPixelLocation(x int, y int) int {
-  return (x * 3) + (y * sega_image.width *3)
+  return (int(sega_image.data[loc + 0] >> 5) << 9) |
+         ((int(sega_image.data[loc + 1] >> 5)) << 5) |
+         ((int(sega_image.data[loc + 2] >> 5)) << 1)
 }
 
 func doesPatternMatch(a []uint8, b []uint8) bool {
@@ -208,7 +206,6 @@ func doesPatternMatch(a []uint8, b []uint8) bool {
 }
 
 func (sega_image *SegaImage) GetPattern (x0 int, y0 int) int {
-  var loc int
   var color int
   var pattern_nybble int
 
@@ -220,14 +217,10 @@ func (sega_image *SegaImage) GetPattern (x0 int, y0 int) int {
   pattern := make([]uint8, 32)
   pattern_nybble = 0
 
-fmt.Printf("x0=%d y0=%d\n", x0, y0);
-fmt.Printf("len(data)=%d\n", len(sega_image.data))
-
   // Get 8x8 pattern out of image
   for y := 0; y < 8; y++ {
     for x := 0; x < 8; x++ {
-      loc = sega_image.GetPixelLocation(x0 + x, y0 + y)
-      color = getPixelColor(sega_image.data[loc:loc+3])
+      color = sega_image.GetPixelColor(x0 + x, y0 + y)
       _, ok := sega_image.palette_map[color]
 
       if !ok {
