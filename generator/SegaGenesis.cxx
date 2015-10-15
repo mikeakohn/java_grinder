@@ -701,6 +701,7 @@ int SegaGenesis::sega_genesis_setSpriteConfig1()
 
   fprintf(out, "  ;; setSpriteConfig1()\n");
   fprintf(out, "  asl.w #3, d%d\n", REG_STACK(reg-2));
+  fprintf(out, "  swap d%d\n", REG_STACK(reg-2));
   fprintf(out, "  move.l #0x%08x, d5\n", CTRL_REG(CD_VRAM_WRITE, (sprite_attribute_table + 2)));
   fprintf(out, "  add.l d%d, d5\n", REG_STACK(reg-2));
   fprintf(out, "  move.l d5, (a1)\n");
@@ -717,6 +718,7 @@ int SegaGenesis::sega_genesis_setSpriteConfig2()
 
   fprintf(out, "  ;; setSpriteConfig2()\n");
   fprintf(out, "  asl.w #3, d%d\n", REG_STACK(reg-2));
+  fprintf(out, "  swap d%d\n", REG_STACK(reg-2));
   fprintf(out, "  move.l #0x%08x, d5\n", CTRL_REG(CD_VRAM_WRITE, (sprite_attribute_table + 4)));
   fprintf(out, "  add.l d%d, d5\n", REG_STACK(reg-2));
   fprintf(out, "  move.l d5, (a1)\n");

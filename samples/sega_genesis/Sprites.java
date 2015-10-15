@@ -3,6 +3,44 @@ import net.mikekohn.java_grinder.SegaGenesis;
 
 public class Sprites
 {
+  static final int CENTER_X = 270;
+  static final int CENTER_Y = 230;
+  static final int SPRITE_LOCATION = 1120;
+
+  public static void spin()
+  {
+    int t0 = 5;
+    int r = 10;
+    int x, y, i;
+    int dx, dy, dr = 1;
+
+    for (i = 0; i < 1024; i++)
+    {
+      while(!SegaGenesis.inVerticalBlank());
+
+      dx = ((Common.cos[t0] * r) >> 6);
+      dy = ((Common.sin[t0] * r) >> 6);
+
+      //x = CENTER_X + dx;
+      //y = CENTER_Y + dy;
+
+      SegaGenesis.setSpritePosition(0, CENTER_X + dx, CENTER_Y + dy);
+      SegaGenesis.setSpritePosition(1, CENTER_X - dx, CENTER_Y + dy);
+      SegaGenesis.setSpritePosition(2, CENTER_X + dx, CENTER_Y - dy);
+      SegaGenesis.setSpritePosition(3, CENTER_X - dx, CENTER_Y - dy);
+
+      while(SegaGenesis.inVerticalBlank());
+
+      t0++;
+      if (t0 == 90) { t0 = 0; }
+
+      if ((i & 0x3) == 0) { r += dr; }
+
+      if (r == 90) { dr = -1; }
+      if (r == 0) { break; }
+    }
+  }
+
   public static void run()
   {
     SegaGenesis.initBitmap();
@@ -10,14 +48,43 @@ public class Sprites
     SegaGenesis.setPaletteColor(0xeee);
 
     SegaGenesis.setPaletteColorsAtIndex(16, palette);
-    SegaGenesis.setPatternTableAtIndex(1120, pattern);
+    SegaGenesis.setPatternTableAtIndex(SPRITE_LOCATION, pattern);
 
-    SegaGenesis.setSpritePosition(0, 270, 220);
+    SegaGenesis.setSpritePosition(0, CENTER_X, CENTER_Y);
     SegaGenesis.setSpriteConfig1(0,
       SegaGenesis.SPRITE_CONFIG1_HORIZONTAL_SIZE_4_CELL |
       SegaGenesis.SPRITE_CONFIG1_VERTICAL_SIZE_4_CELL);
-    SegaGenesis.setSpriteConfig2(0, SegaGenesis.SPRITE_CONFIG2_PALETTE_1 | 1120);
+    SegaGenesis.setSpriteConfig2(0, SegaGenesis.SPRITE_CONFIG2_PALETTE_1 | SPRITE_LOCATION);
     Common.wait(80);
+
+    spin();
+
+    SegaGenesis.setSpriteConfig1(0,
+      SegaGenesis.SPRITE_CONFIG1_HORIZONTAL_SIZE_4_CELL |
+      SegaGenesis.SPRITE_CONFIG1_VERTICAL_SIZE_4_CELL | 1);
+
+    SegaGenesis.setSpriteConfig1(1,
+      SegaGenesis.SPRITE_CONFIG1_HORIZONTAL_SIZE_4_CELL |
+      SegaGenesis.SPRITE_CONFIG1_VERTICAL_SIZE_4_CELL | 2);
+    SegaGenesis.setSpriteConfig2(1, SegaGenesis.SPRITE_CONFIG2_PALETTE_1 | SPRITE_LOCATION);
+
+    SegaGenesis.setSpriteConfig1(2,
+      SegaGenesis.SPRITE_CONFIG1_HORIZONTAL_SIZE_4_CELL |
+      SegaGenesis.SPRITE_CONFIG1_VERTICAL_SIZE_4_CELL | 3);
+    SegaGenesis.setSpriteConfig2(2, SegaGenesis.SPRITE_CONFIG2_PALETTE_1 | SPRITE_LOCATION);
+
+    SegaGenesis.setSpriteConfig1(3,
+      SegaGenesis.SPRITE_CONFIG1_HORIZONTAL_SIZE_4_CELL |
+      SegaGenesis.SPRITE_CONFIG1_VERTICAL_SIZE_4_CELL);
+    SegaGenesis.setSpriteConfig2(3, SegaGenesis.SPRITE_CONFIG2_PALETTE_1 | SPRITE_LOCATION);
+
+    spin();
+
+    SegaGenesis.setSpriteConfig1(0,
+      SegaGenesis.SPRITE_CONFIG1_HORIZONTAL_SIZE_4_CELL |
+      SegaGenesis.SPRITE_CONFIG1_VERTICAL_SIZE_4_CELL);
+
+    SegaGenesis.setSpritePosition(0, 0, 0);
   }
 
   public static int[] pattern =
