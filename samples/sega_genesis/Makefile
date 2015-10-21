@@ -2,6 +2,7 @@ CLASSES= \
   SegaGenesisJavaDemo.class \
   Box.class \
   Common.class \
+  ImageJava.class \
   ImageJavaGrinder.class \
   ImageInside.class \
   Mandelbrots.class \

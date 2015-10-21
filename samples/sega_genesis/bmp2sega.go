@@ -269,7 +269,14 @@ func (sega_image *SegaImage) GetPattern (x0 int, y0 int) int {
 }
 
 func (sega_image *SegaImage) Print () {
-  fmt.Printf("sega_image.patterns=%d\n", len(sega_image.patterns))
+  //fmt.Printf("sega_image.patterns=%d\n", len(sega_image.patterns))
+
+  fmt.Println("  public static void run()")
+  fmt.Println("  {")
+  fmt.Println("    SegaGenesis.setPaletteColors(palette);")
+  fmt.Println("    SegaGenesis.setPatternTable(pattern);")
+  fmt.Println("    SegaGenesis.setImageData(image);")
+  fmt.Println("  }\n")
 
   fmt.Println("  public static int[] pattern =\n  {")
   for index, pattern := range sega_image.patterns {
@@ -296,6 +303,7 @@ func readScreenData(bmp_image *BmpImage) uint32 {
   sega_image := new(SegaImage)
   sega_image.Init(bmp_image.data, bmp_image.width, bmp_image.height)
 
+  fmt.Println("import net.mikekohn.java_grinder.SegaGenesis;\n")
   fmt.Println("public class ClassName\n{")
 
   for y0 := 0; y0 < 224; y0 = y0 + 8 {

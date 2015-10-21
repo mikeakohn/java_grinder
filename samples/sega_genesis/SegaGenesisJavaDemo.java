@@ -3,15 +3,6 @@ import net.mikekohn.java_grinder.SegaGenesis;
 
 public class SegaGenesisJavaDemo
 {
-/*
-  public static int[] pattern =
-  {
-    // Pattern 0
-    0x00000001, 0x00010000, 0x00000001, 0x00010000,
-    0x00001000, 0x00000001, 0x00001000, 0x00000001,
-  };
-*/
-
   static public void main(String args[])
   {
     // Set font screen.

@@ -43,9 +43,11 @@ public class Sprites
 
   public static void run()
   {
-    SegaGenesis.initBitmap();
-    SegaGenesis.setPalettePointer(0);
-    SegaGenesis.setPaletteColor(0xeee);
+    //SegaGenesis.initBitmap();
+    //SegaGenesis.setPalettePointer(0);
+    //SegaGenesis.setPaletteColor(0xeee);
+
+    ImageJava.run();
 
     SegaGenesis.setPaletteColorsAtIndex(16, palette);
     SegaGenesis.setPatternTableAtIndex(SPRITE_LOCATION, pattern);
