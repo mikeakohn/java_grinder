@@ -87,6 +87,9 @@ public class Sprites
       SegaGenesis.SPRITE_CONFIG1_VERTICAL_SIZE_4_CELL);
 
     SegaGenesis.setSpritePosition(0, 0, 0);
+
+    // FIXME - use a different pattern number for sprites
+    SegaGenesis.loadFonts();
   }
 
   public static int[] pattern =

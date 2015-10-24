@@ -187,8 +187,9 @@ func ConvertNote(note string) int {
   }
 
   note_num := int(note_table[note[0] - 'A'])
+fmt.Println(note, note[1])
 
-  if note[1] == 'b' || note[1] == '#' {
+  if len(note) == 3 {
     if note[1] == 'b' {
       note_num--
     } else if note[1] == '#' {
