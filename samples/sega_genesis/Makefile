@@ -28,6 +28,10 @@ synth:
 	naken_asm -l -b -o z80_play_synth.bin z80_play_synth.asm
 	go run bin2java.go z80_play_synth.bin | grep -v INFO | sed 's/ClassName/PlaySong/' | sed 's/code/z80_code/' > PlaySong.java
 
+song:
+	naken_asm -l -b -o z80_play_title_song.bin z80_play_title_song.asm
+	go run bin2java.go z80_play_title_song.bin | grep -v INFO | sed 's/ClassName/PlayTitleSong/' | sed 's/code/z80_code/' > PlayTitleSong.java
+
 laser:
 	naken_asm -l -b -o z80_play_laser.bin z80_play_laser.asm
 	go run bin2java.go z80_play_laser.bin | grep -v INFO | sed 's/ClassName/PlayLaser/' | sed 's/code/z80_code/' > PlayLaser.java

@@ -15,6 +15,8 @@ public class SegaGenesisJavaDemo
     // Run parts of demo.
     ImageJavaGrinder.run();
     NakenLogo.run();
+
+    SegaGenesis.loadZ80(PlayTitleSong.z80_code);
     Stars.run();
     Box.run();
     ImageInside.run();
