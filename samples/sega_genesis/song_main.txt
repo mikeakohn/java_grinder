@@ -2,42 +2,6 @@
 divisions 192;
 bpm 100;
 
-pattern intro
-{
-  voice 0: 0 C5 1,         2 C5 1;
-  voice 1: 0 A5 1, 1 A4 1, 2 A5 1, 3 A4 1;
-}
-
-pattern pattern_1
-{
-  voice 0: 0 C5 1,         2 C5 1;
-  voice 1: 0 A5 1, 1 A4 1, 2 A5 1, 3 A4 1;
-  voice 2: 0 A3 0.5, 0.5 B3 0.5, 1 C3 0.5, 1.5 D3 0.5, 2 E3 0.5, 2.5 F#3 0.5,
-           3 E3 0.5, 3.5 D3 0.5;
-}
-
-pattern pattern_2
-{
-  voice 0: 0 C5 1,         2 C5 1;
-  voice 1: 0 A5 1, 1 A4 1, 2 A5 1, 3 A4 1;
-  voice 2: 0 C3 0.5, 0.5 B3 0.5, 1 A3 0.5, 1.5 G2 0.5, 2 A3 0.5, 3 G2 0.5,
-           3.5 F#2 0.5;
-}
-
-pattern pattern_3
-{
-  voice 0: 0 C5 1,         2 C5 1;
-  voice 1: 0 A5 1, 1 A4 1, 2 A5 1, 3 A4 1;
-  voice 2: 0 E2 1, 1 C2 0.5, 1.5 B2 0.5, 2 A2 1, 3 G3 1;
-}
-
-pattern pattern_4
-{
-  voice 0: 0 C5 1,         2 C5 1;
-  voice 1: 0 A5 1, 1 A4 1, 2 A5 1, 3 A4 1;
-  voice 2: 0 A4 1;
-}
-
 pattern partb_1
 {
   voice 0: 0 C5 1,         2 C5 1;
@@ -58,11 +22,6 @@ pattern partb_3
 
 song
 {
-  intro * 2,
-  pattern_1,
-  pattern_2,
-  pattern_3,
-  pattern_4,
   partb_1,
   partb_2,
   partb_3* 2,
