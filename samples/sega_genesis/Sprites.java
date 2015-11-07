@@ -90,6 +90,9 @@ public class Sprites
 
     // FIXME - use a different pattern number for sprites
     SegaGenesis.loadFonts();
+
+    SegaGenesis.setPalettePointer(0);
+    SegaGenesis.setPaletteColor(0);
   }
 
   public static int[] pattern =

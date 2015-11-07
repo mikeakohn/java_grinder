@@ -1,6 +1,7 @@
 CLASSES= \
   SegaGenesisJavaDemo.class \
   Box.class \
+  ClosingPage.class \
   Common.class \
   ImageJava.class \
   ImageJavaGrinder.class \

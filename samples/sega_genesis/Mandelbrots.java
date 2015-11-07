@@ -25,6 +25,7 @@ public class Mandelbrots
     int dx = (r1 - r0) / 320;
     int dy = (i1 - i0) / 224;
 
+    SegaGenesis.initBitmap();
     SegaGenesis.setPaletteColors(Mandelbrots.palette);
 
     is = i0;
