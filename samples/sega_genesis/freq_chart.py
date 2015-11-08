@@ -5,7 +5,7 @@ freqs = [ 617, 653, 692, 733, 777, 823, 872, 924, 979, 1037, 1099, 1164 ]
 #print len(freqs)
 print "frequency:"
 
-for i in range (-2, 9):
+for i in range (-1, 10):
   count = 0
 
   for freq in freqs:

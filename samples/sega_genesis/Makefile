@@ -8,10 +8,10 @@ CLASSES= \
   ImageInside.class \
   Mandelbrots.class \
   NakenLogo.class \
+  PlayLaser.class \
   PlaySong.class \
   PlayTitleSample.class \
-  Stars.class \
-  PlayLaser.class \
+  PlayTitleSong.class \
   Sprites.class \
   Stars.class
 
