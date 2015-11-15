@@ -133,7 +133,7 @@ public class Stars
     int r = 0;
     n = 0;
 
-    for (a = 0; a < 1000; a++)
+    for (a = 0; a < 500; a++)
     {
       x = (r * Common.cos[n]) >> 6;
       y = (r * Common.sin[n]) >> 6;

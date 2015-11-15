@@ -40,7 +40,7 @@ public class Box
     t0 = 0;
     x0 = 160; y0 = 112;
 
-    for (i = 0; i < 60; i++)
+    for (i = 0; i < 90; i++)
     {
       while(!SegaGenesis.inVerticalBlank());
 
@@ -64,7 +64,7 @@ public class Box
     r0 = 10;
     color = 1;
 
-    for (i = 0; i < 1024; i++)
+    for (i = 0; i < 700; i++)
     {
       while(!SegaGenesis.inVerticalBlank());
 

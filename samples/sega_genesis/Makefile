@@ -7,6 +7,7 @@ CLASSES= \
   ImageJavaGrinder.class \
   ImageInside.class \
   Mandelbrots.class \
+  Model.class \
   NakenLogo.class \
   PlayLaser.class \
   PlaySong.class \

@@ -21,7 +21,7 @@ public class SegaGenesisJavaDemo
     Box.run();
     ImageInside.run();
     Sprites.run();
-    //Model.run();
+    Model.run();
 
     Common.wait(60);
 
