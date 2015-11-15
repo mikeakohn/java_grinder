@@ -10,7 +10,7 @@ CLASSES= \
   Model.class \
   NakenLogo.class \
   PlayLaser.class \
-  PlaySong.class \
+  PlayEndSong.class \
   PlayTitleSample.class \
   PlayTitleSong.class \
   Sprites.class \
@@ -27,8 +27,8 @@ dac:
 	go run bin2java.go z80_play_dac.bin | grep -v INFO | sed 's/ClassName/PlayTitleSample/' | sed 's/code/z80_code/' > PlayTitleSample.java
 
 synth:
-	naken_asm -l -b -o z80_play_synth.bin z80_play_synth.asm
-	go run bin2java.go z80_play_synth.bin | grep -v INFO | sed 's/ClassName/PlaySong/' | sed 's/code/z80_code/' > PlaySong.java
+	naken_asm -l -b -o z80_play_end_song.bin z80_play_end_song.asm
+	go run bin2java.go z80_play_end_song.bin | grep -v INFO | sed 's/ClassName/PlayEndSong/' | sed 's/code/z80_code/' > PlayEndSong.java
 
 song:
 	naken_asm -l -b -o z80_play_title_song.bin z80_play_title_song.asm

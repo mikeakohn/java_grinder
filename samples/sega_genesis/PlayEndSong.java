@@ -1,5 +1,5 @@
 
-public class PlaySong
+public class PlayEndSong
 {
   public static byte[] z80_code =
   {
