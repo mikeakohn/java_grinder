@@ -16,6 +16,8 @@ public class SegaGenesisJavaDemo
     ImageJavaGrinder.run();
     NakenLogo.run();
 
+    ClosingPage.run();
+
     SegaGenesis.loadZ80(PlayTitleSong.z80_code);
     Stars.run();
     Box.run();
