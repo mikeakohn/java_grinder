@@ -1,69 +1,96 @@
 
 divisions 192;
-bpm 100;
+bpm 73;
 
-pattern intro_1
+pattern base_d_1
 {
-  voice 0: 0 A3 0.5, 0.5 A3 0.5, 1 A3 0.5, 1.5 A3 0.5, 2 A3 0.5, 2.5 A3 0.5, 3 A3 0.5, 3.5 A3 0.5;
+  voice 0:          0.5 D3 1,          1.5 D3 1,          2.5 D3 1,    3.5 D3 1;
+  voice 1: 0 F#4 1,           1 F#4 1,            2 G#4 1,       3 F#4 1;
+  voice 2: 0 A4  1,           1 A4  1,            2 A4 1,        3 A4 1;
 }
 
-pattern intro_2
+pattern base_a
 {
-  voice 0: 0 A3 0.5, 0.5 A3 0.5, 1 A3 0.5, 1.5 A3 0.5, 2 A3 0.5, 2.5 A3 0.5, 3 A3 0.5, 3.5 A3 0.5;
-  voice 1: 1 G#3 1, 2.5 G#3 1;
-  voice 2: 1 E3 1, 2.5 E3 1;
+  voice 0:          0.5 A3 1,          1.5 A3 1,          2.5 A3 1,    3.5 A3 1;
+  voice 1: 0 E4  1,           1 E4  1,            2 E4 1,        3 E4 1;
+  voice 2: 0 C#4  1,          1 C#4  1,           2 C#4 1,       3 C#4 1;
 }
 
-pattern intro_3
+pattern base_d_2
 {
-  voice 0: 0 A3 0.5, 0.5 A3 0.5, 1 A3 0.5, 1.5 A3 0.5, 2 A3 0.5, 2.5 A3 0.5, 3 A3 0.5, 3.5 A3 0.5;
-  voice 1: 0 F#3 1;
-  voice 2: 0 A3 1;
+  voice 0:          0.5 D3 1,          1.5 D3 1,          2.5 D3 1,    3.5 D3 1;
+  voice 1: 0 F#4 1,           1 F#4 1,            2 A5 1,        3 G#4 1;
+  voice 2: 0 A4  1,           1 A4  1,            2 A4 1,        3 A4 1;
 }
 
-pattern intro_4
+pattern base_em
 {
-  voice 0: 0 A3 0.5, 0.5 A3 0.5, 1 A3 0.5, 1.5 A3 0.5, 2 A3 0.5, 2.5 A3 0.5, 3 A3 0.5, 3.5 A3 0.5;
-  voice 1: 0 A4 1;
-  voice 2: 0 E3 1;
+  voice 0:          0.5 E3 1,          1.5 E3 1,         2.5 E3 1,    3.5 E3 0.5;
+  voice 1: 0 G4 1,            1 G4 1,            2 G4 1,        3 G4 1;
+  voice 2: 0 E4 1,            1 E4 1,            2 E4 1,        3 E4 1;
 }
 
-pattern intro_5
+pattern base_d_3
 {
-  voice 0: 0 D3 0.5, 0.5 D3 0.5, 1 D3 0.5, 1.5 D3 0.5, 2 D3 0.5, 2.5 D3 0.5, 3 D3 0.5, 3.5 D3 0.5;
-  voice 1: 0 A3 1;
-  voice 2: 0 E3 1;
+  voice 0:          0.5 D3 1,          1.5 D3 1,         2.5 D3 1,    3.5 D3 1;
+  voice 1: 0 F#4 1,            1 F#4 1,            2 F#4 1,        3 F#4 1;
+  voice 2: 0 D4 1,             1 D4 1,             2 D4 1,         3 D4 1;
 }
 
-pattern intro_6
+pattern base_c
 {
-  voice 0: 0 D3 0.5, 0.5 D3 0.5, 1 D3 0.5, 1.5 D3 0.5, 2 D3 0.5, 2.5 D3 0.5, 3 D3 0.5, 3.5 D3 0.5;
-  voice 2: 1.5 A3 0.5, 2 D3 0.5, 2.5 F#3 0.5, 3 D3 0.5, 3.5 A3 0.5;
+  voice 0:          0.5 C3 1,          1.5 C3 1,         2.5 C3 1,    3.5 C3 1;
+  voice 1: 0 E4 1,             1 E4 1,             2 E4 1,         3 E4 1;
+  voice 2: 0 C4 1,             1 C4 1,             2 C4 1,         3 C4 1;
 }
 
-pattern part_a_1
+pattern base_g
 {
-  voice 0: 0 A3 0.5, 0.5 A3 0.5, 1 A3 0.5, 1.5 A3 0.5, 2 A3 0.5, 2.5 A3 0.5, 3 A3 0.5, 3.5 A3 0.5;
-  voice 1: 0 A3 0.5, 0.5 A3 0.5, 1 A4 0.5, 1.5 A3 0.5, 2 A3 0.5, 2.5 A4 0.5, 3 A3 0.5, 3.5 A3 0.5;
-  voice 2:                       1 E4 0.5,                       2.5 F#4 0.5;
+  voice 0:          0.5 G3 1,          1.5 G3 1,         2.5 G3 1,    3.5 G3 1;
+  voice 1: 0 D4 1,             1 D4 1,             2 D4 1,         3 D4 1;
+  voice 2: 0 B4 1,             1 B4 1,             2 B4 1,         3 B4 1;
 }
 
-pattern part_a_2
+pattern base_f
 {
-  voice 0: 0 A3 0.5, 0.5 A3 0.5, 1 A3 0.5, 1.5 A3 0.5, 2 A3 0.5, 2.5 A3 0.5, 3 A3 0.5, 3.5 A3 0.5;
-  voice 1: 0 A4 0.5, 0.5 A3 0.5, 1 A4 0.5, 1.5 A4 0.5, 2 A3 0.5, 2.5 A3 0.5, 3 A3 0.5, 3.5 A3 0.5;
-  voice 2: 0 D4 0.5,             1 D4 0.5, 1.5 E4 0.5;
+  voice 0:          0.5 F3 1,          1.5 F3 1,         2.5 F3 1,    3.5 F3 1;
+  voice 1: 0 A4 1,             1 B4 1,             2 E4 1,         3 D4 1;
+  voice 2: 0 F4 1,             1 F4 1,             2 A4 1,         3 A4 1;
+}
+
+pattern base_d
+{
+  voice 0: 0 D3 4;
+  voice 1: 0 A4 4;
+  voice 2: 0 F#4 4;
 }
 
 song
 {
-  intro_1 * 2,
-  intro_2, intro_3, intro_2, intro_4, intro_2,
-  intro_3, intro_2, intro_5, intro_6, 
-  intro_1 * 2,
-  part_a_1,
-  part_a_2,
-  part_a_1,
-  part_a_2,
+  base_d_1 * 2,
+  base_a * 2,
+  base_d_1,
+  base_d_2,
+  base_a * 2,
+  base_em,
+  base_d_3,
+  base_c,
+  base_g,
+  base_f,
+  base_em,
+  base_d,
+
+  base_d_1 * 2,
+  base_a * 2,
+  base_d_1,
+  base_d_2,
+  base_a * 2,
+  base_em,
+  base_d_3,
+  base_c,
+  base_g,
+  base_f,
+  base_em,
+  base_d,
 }
 
