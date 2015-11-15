@@ -27,52 +27,41 @@ load_setup:
   inc ix
   djnz load_setup
 
+  call wait_busy
   ld a, CH1_SOUND_ON
   ld (FM1_REG_SEL), a
   ld a, 0xc0
   ld (FM1_REG_DATA), a
 
+  call wait_busy
   ld a, CH1_SOUND_ON+1
   ld (FM1_REG_SEL), a
   ld a, 0xc0
   ld (FM1_REG_DATA), a
 
+  call wait_busy
   ld a, CH1_SOUND_ON+2
   ld (FM1_REG_SEL), a
   ld a, 0xc0
   ld (FM1_REG_DATA), a
 
+  call wait_busy
   ld a, CH1_SOUND_ON
   ld (FM2_REG_SEL), a
   ld a, 0xc0
   ld (FM2_REG_DATA), a
 
+  call wait_busy
   ld a, CH1_SOUND_ON+1
   ld (FM2_REG_SEL), a
   ld a, 0xc0
   ld (FM2_REG_DATA), a
 
+  call wait_busy
   ld a, CH1_SOUND_ON+2
   ld (FM2_REG_SEL), a
   ld a, 0xc0
   ld (FM2_REG_DATA), a
-
-.if 0
-  ld a, CH1_FREQ_MSB
-  ld (FM1_REG_SEL), a
-  ld a, 0x22
-  ld (FM1_REG_DATA), a
-
-  ld a, CH1_FREQ_LSB
-  ld (FM1_REG_SEL), a
-  ld a, 0x69
-  ld (FM1_REG_DATA), a
-
-  ld a, KEY_PRESS
-  ld (FM1_REG_SEL), a
-  ld a, 0xf0
-  ld (FM1_REG_DATA), a
-.endif
 
   ;; Turn volume off for all voices of PSG
   ld a, 0x8f | (0 << 5) | (1 << 4)
@@ -138,24 +127,28 @@ play_pattern_delay_end:
 channels012:
   ld c, a
 
+  call wait_busy
   ld a, KEY_PRESS
   ld (FM1_REG_SEL), a
   ld a, 0x00
   add a, b
   ld (FM1_REG_DATA), a
 
+  call wait_busy
   ld a, CH1_FREQ_MSB
   add a, c
   ld (FM1_REG_SEL), a
   ld a, (ix+1)
   ld (FM1_REG_DATA), a
 
+  call wait_busy
   ld a, CH1_FREQ_LSB
   add a, c
   ld (FM1_REG_SEL), a
   ld a, (ix)
   ld (FM1_REG_DATA), a
 
+  call wait_busy
   ld a, KEY_PRESS
   ld (FM1_REG_SEL), a
   ld a, 0xf0
@@ -171,24 +164,28 @@ channels345:
   sub 3
   ld c, a
 
+  call wait_busy
   ld a, KEY_PRESS
   ld (FM1_REG_SEL), a
   ld a, 0x00
   add a, b
   ld (FM1_REG_DATA), a
 
+  call wait_busy
   ld a, CH1_FREQ_MSB
   add a, c
   ld (FM2_REG_SEL), a
   ld a, (ix+1)
   ld (FM2_REG_DATA), a
 
+  call wait_busy
   ld a, CH1_FREQ_LSB
   add a, c
   ld (FM2_REG_SEL), a
   ld a, (ix)
   ld (FM2_REG_DATA), a
 
+  call wait_busy
   ld a, KEY_PRESS
   ld (FM1_REG_SEL), a
   ld a, 0xf0
@@ -238,15 +235,23 @@ while_1:
   jp while_1
 
 init_channel:
+  call wait_busy
   ld a, c
   ld (FM1_REG_SEL), a
   ld a, (ix)
   ld (FM1_REG_DATA), a
+  call wait_busy
   ld a, c
   ld (FM2_REG_SEL), a
   ld a, (ix)
   ld (FM2_REG_DATA), a
   inc c
+  ret
+
+wait_busy:
+  ld a, (FM1_REG_SEL)
+  bit 7, a
+  jp nz, wait_busy
   ret
 
 setup:

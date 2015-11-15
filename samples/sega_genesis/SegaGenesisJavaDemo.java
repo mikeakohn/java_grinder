@@ -25,7 +25,7 @@ public class SegaGenesisJavaDemo
 
     Common.wait(60);
 
-    SegaGenesis.loadZ80(PlaySong.z80_code);
+    SegaGenesis.loadZ80(PlayEndSong.z80_code);
 
     Mandelbrots.run();
 

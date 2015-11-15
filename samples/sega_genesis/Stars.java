@@ -12,8 +12,6 @@ public class Stars
 
     for (n = 0; n < stars.length; n += 4)
     {
-      //SegaGenesis.plot(stars[n], stars[n + 1], 0);
-
       stars[n] += stars[n + 2];
       stars[n + 1] += stars[n + 3];
 
@@ -25,9 +23,9 @@ public class Stars
 
         for (int c = 1; c <= 4; c++)
         {
-          SegaGenesis.plot(x, y, 0);
           x -= stars[n + 2];
           y -= stars[n + 3];
+          SegaGenesis.plot(x, y, 0);
         }
 
         stars[n] = stars_init[n];
