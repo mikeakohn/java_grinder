@@ -27,31 +27,37 @@ load_setup:
   inc ix
   djnz load_setup
 
+  call wait_busy
   ld a, CH1_SOUND_ON
   ld (FM1_REG_SEL), a
   ld a, 0xc0
   ld (FM1_REG_DATA), a
 
+  call wait_busy
   ld a, CH1_SOUND_ON+1
   ld (FM1_REG_SEL), a
   ld a, 0xc0
   ld (FM1_REG_DATA), a
 
+  call wait_busy
   ld a, CH1_SOUND_ON+2
   ld (FM1_REG_SEL), a
   ld a, 0xc0
   ld (FM1_REG_DATA), a
 
+  call wait_busy
   ld a, CH1_SOUND_ON
   ld (FM2_REG_SEL), a
   ld a, 0xc0
   ld (FM2_REG_DATA), a
 
+  call wait_busy
   ld a, CH1_SOUND_ON+1
   ld (FM2_REG_SEL), a
   ld a, 0xc0
   ld (FM2_REG_DATA), a
 
+  call wait_busy
   ld a, CH1_SOUND_ON+2
   ld (FM2_REG_SEL), a
   ld a, 0xc0
@@ -138,24 +144,28 @@ play_pattern_delay_end:
 channels012:
   ld c, a
 
+  call wait_busy
   ld a, KEY_PRESS
   ld (FM1_REG_SEL), a
   ld a, 0x00
   add a, b
   ld (FM1_REG_DATA), a
 
+  call wait_busy
   ld a, CH1_FREQ_MSB
   add a, c
   ld (FM1_REG_SEL), a
   ld a, (ix+1)
   ld (FM1_REG_DATA), a
 
+  call wait_busy
   ld a, CH1_FREQ_LSB
   add a, c
   ld (FM1_REG_SEL), a
   ld a, (ix)
   ld (FM1_REG_DATA), a
 
+  call wait_busy
   ld a, KEY_PRESS
   ld (FM1_REG_SEL), a
   ld a, 0xf0
@@ -171,24 +181,28 @@ channels345:
   sub 3
   ld c, a
 
+  call wait_busy
   ld a, KEY_PRESS
   ld (FM1_REG_SEL), a
   ld a, 0x00
   add a, b
   ld (FM1_REG_DATA), a
 
+  call wait_busy
   ld a, CH1_FREQ_MSB
   add a, c
   ld (FM2_REG_SEL), a
   ld a, (ix+1)
   ld (FM2_REG_DATA), a
 
+  call wait_busy
   ld a, CH1_FREQ_LSB
   add a, c
   ld (FM2_REG_SEL), a
   ld a, (ix)
   ld (FM2_REG_DATA), a
 
+  call wait_busy
   ld a, KEY_PRESS
   ld (FM1_REG_SEL), a
   ld a, 0xf0
@@ -238,15 +252,23 @@ while_1:
   jp while_1
 
 init_channel:
+  call wait_busy
   ld a, c
   ld (FM1_REG_SEL), a
   ld a, (ix)
   ld (FM1_REG_DATA), a
+  call wait_busy
   ld a, c
   ld (FM2_REG_SEL), a
   ld a, (ix)
   ld (FM2_REG_DATA), a
   inc c
+  ret
+
+wait_busy:
+  ld a, (FM1_REG_SEL)
+  bit 7, a
+  jp nz, wait_busy
   ret
 
 setup:
@@ -262,20 +284,19 @@ setup_end:
 .include "freq_chart.inc"
 
 intro:
-  db 0x00, 0x00, 0x59, 0x00, 0x01, 0x51, 0x00, 0x02, 0x54, 0x30, 0x00, 0x59,
-  db 0x00, 0x01, 0x51, 0x00, 0x02, 0x56, 0x30, 0x00, 0x59, 0x00, 0x01, 0x51,
-  db 0x00, 0x02, 0x58, 0x30, 0x00, 0x59, 0x00, 0x01, 0x50, 0x00, 0x02, 0x59,
+  db 0x00, 0x00, 0x41, 0x00, 0x01, 0x39, 0x00, 0x02, 0x3c, 0x30, 0x00, 0x41,
+  db 0x00, 0x01, 0x39, 0x00, 0x02, 0x3e, 0x30, 0x00, 0x41, 0x00, 0x01, 0x39,
+  db 0x00, 0x02, 0x40, 0x30, 0x00, 0x41, 0x00, 0x01, 0x38, 0x00, 0x02, 0x41,
   db 0x30, 0xff, 0xff,
 pattern_1:
-  db 0x00, 0x00, 0x51, 0x00, 0x01, 0x54, 0x00, 0x02, 0x58, 0x60, 0x00, 0x54,
-  db 0x00, 0x01, 0x58, 0x00, 0x02, 0x5b, 0x60, 0xff, 0xff,
+  db 0x00, 0x00, 0x39, 0x00, 0x01, 0x3c, 0x00, 0x02, 0x40, 0x60, 0x00, 0x3c,
+  db 0x00, 0x01, 0x40, 0x00, 0x02, 0x43, 0x60, 0xff, 0xff,
 pattern_2:
-  db 0x00, 0x00, 0x5d, 0x00, 0x01, 0x60, 0x00, 0x02, 0x64, 0xc0, 0xff, 0xff,
-
+  db 0x00, 0x00, 0x45, 0x00, 0x01, 0x48, 0x00, 0x02, 0x4c, 0xc0, 0xff, 0xff,
 song:
+
   dw intro, intro, intro, intro,
   dw pattern_1, pattern_1, pattern_1, pattern_1,
   dw pattern_2, pattern_2, pattern_2, pattern_2,
   dw 0
-
 
