@@ -770,7 +770,7 @@ void SegaGenesis::add_exception_vectors()
     "  ; exception vectors\n"
     "  ;-------------------------------:\n\n"
 
-    "  dc.l 0xfffffe00   ; startup SP\n"
+    "  dc.l 0x00000000   ; startup SP\n"
     "  dc.l start        ; startup PC\n"
     "  dc.l interrupt    ; bus\n"
     "  dc.l interrupt    ; addr\n"
@@ -1194,9 +1194,8 @@ void SegaGenesis::add_plot()
   // d1 = Y
   // d2 = color
   fprintf(out,
-    "  ;; plot(x=d0, y=d1, d2=color);\n"
+    "  ;; plot(x=d0, y=d1, color=d2);\n"
     "_plot:\n"
-    //"  move.w d4, (-8,a7) ; save register so it can be used for other stuff\n"
     "  move.w d0, d7\n"
     "  move.w d1, d6\n"
     "  lsr.w #3, d0   ; block_x = x / 8\n"
@@ -1234,7 +1233,6 @@ void SegaGenesis::add_plot()
     "  and.w d5, d0\n"
     "  or.w d0, d2\n"
     "  move.w d2, (a0)\n"
-    //"  move.w (-8,a7), d4 ; restore register\n"
     "  rts\n\n");
 }
 
