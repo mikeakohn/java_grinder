@@ -386,8 +386,7 @@ int SegaGenesis::sega_genesis_waitVerticalBlank()
   fprintf(out,
     "  ; Wait for vertical blank\n"
     "_wait_vertical_blank_%d:\n"
-    "  move.w (a1), d5      ; C00004 read VDP status\n"
-    "  btst.l #3, d5        ; test vertical blank flag\n"
+    "  btst.l #3, (a1)        ; test vertical blank flag\n"
     "  beq.s _wait_vertical_blank_%d\n",
     label_count, label_count);
 
@@ -402,8 +401,7 @@ int SegaGenesis::sega_genesis_waitHorizontalBlank()
   fprintf(out,
     "  ; Wait for horizontal blank\n"
     "_wait_horizontal_blank_%d:\n"
-    "  move.w (a1), d5      ; C00004 read VDP status\n"
-    "  btst.l #2, d5        ; test horizontal blank flag\n"
+    "  btst.l #2, (a1)      ; test horizontal blank flag\n"
     "  beq.s _wait_horizontal_blank_%d\n",
     label_count, label_count);
 
@@ -1218,6 +1216,9 @@ void SegaGenesis::add_plot()
     "  and.w #0x3ffe, d0; address &= 0xffff3ffe (write to even address)\n"
     "  swap d0        ; address <<= 16\n"
     "  or.b d5, d0    ; move upper two bits of address into lower\n"
+    //"_plot_wait_fifo_empty:\n"
+    //"  btst.l #9, (a1)\n"
+    //"  beq.s _plot_wait_fifo_empty\n"
     "  move.l d0, (a1); read word from VRAM and save in temp space\n"
     "  move.w (a0), d5\n"
     "  or.l #0x40000000, d0\n"
