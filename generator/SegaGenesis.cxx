@@ -979,7 +979,7 @@ void SegaGenesis::add_vdp_reg_init()
     "  dc.b  0x81  ; reg 12 = mode reg 4: 40 cell horiz mode, no interlace\n"
     "  dc.b  0x3f  ; reg 13 = H scroll table base: 0xfc00\n"
     "  dc.b  0x00  ; reg 14 = unused register: 0x00\n"
-    "  dc.b  0x01  ; reg 15 = auto increment: 0x01\n"
+    "  dc.b  0x02  ; reg 15 = auto increment: 0x02\n"
     "  dc.b  0x01  ; reg 16 = scroll size: V=32 cell, H=64 cell\n"
     "  dc.b  0x00  ; reg 17 = window H position: 0x00\n"
     "  dc.b  0x00  ; reg 18 = window V position: 0x00\n"
@@ -1222,17 +1222,18 @@ void SegaGenesis::add_plot()
     "  move.l d0, (a1); read word from VRAM and save in temp space\n"
     "  move.w (a0), d5\n"
     "  or.l #0x40000000, d0\n"
-    "  move.l d0, (a1)\n"
+    //"  move.l d0, (a1)\n"   // Try moving this closer to the data write
     "  move.w d7, d1\n"
     "  and.w #0x3, d1 ; x = x & 0x3\n"
     "  neg.w d1\n"
     "  addq.w #3, d1\n"
     "  lsl.w #2, d1\n"
     "  lsl.w d1, d2\n"
-    "  move.w #0xfff0, d0\n"
-    "  rol.w d1, d0\n"
-    "  and.w d5, d0\n"
-    "  or.w d0, d2\n"
+    "  move.w #0xfff0, d6\n"
+    "  rol.w d1, d6\n"
+    "  and.w d5, d6\n"
+    "  or.w d6, d2\n"
+    "  move.l d0, (a1)\n"   // MOVED
     "  move.w d2, (a0)\n"
     "  rts\n\n");
 }
