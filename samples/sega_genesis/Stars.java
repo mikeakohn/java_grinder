@@ -17,7 +17,7 @@ public class Stars
 
       // If star is beyond boundary, erase it and reset it
       if (stars[n] <= 0 || stars[n] >= 320 ||
-          stars[n + 1] <= 0 || stars[n + 1] >= 224) 
+          stars[n + 1] <= 0 || stars[n + 1] >= 224)
       {
         int x = stars[n], y = stars[n + 1];
 
