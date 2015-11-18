@@ -386,7 +386,8 @@ int SegaGenesis::sega_genesis_waitVerticalBlank()
   fprintf(out,
     "  ; Wait for vertical blank\n"
     "_wait_vertical_blank_%d:\n"
-    "  btst.l #3, (a1)        ; test vertical blank flag\n"
+    "  move.w (a1), d7\n"
+    "  btst.l #3, d7      ; test vertical blank flag\n"
     "  beq.s _wait_vertical_blank_%d\n",
     label_count, label_count);
 
@@ -401,7 +402,8 @@ int SegaGenesis::sega_genesis_waitHorizontalBlank()
   fprintf(out,
     "  ; Wait for horizontal blank\n"
     "_wait_horizontal_blank_%d:\n"
-    "  btst.l #2, (a1)      ; test horizontal blank flag\n"
+    "  move.w (a1), d7\n"
+    "  btst.l #2, d7      ; test horizontal blank flag\n"
     "  beq.s _wait_horizontal_blank_%d\n",
     label_count, label_count);
 
@@ -1222,7 +1224,6 @@ void SegaGenesis::add_plot()
     "  move.l d0, (a1); read word from VRAM and save in temp space\n"
     "  move.w (a0), d5\n"
     "  or.l #0x40000000, d0\n"
-    //"  move.l d0, (a1)\n"   // Try moving this closer to the data write
     "  move.w d7, d1\n"
     "  and.w #0x3, d1 ; x = x & 0x3\n"
     "  neg.w d1\n"
@@ -1233,7 +1234,7 @@ void SegaGenesis::add_plot()
     "  rol.w d1, d6\n"
     "  and.w d5, d6\n"
     "  or.w d6, d2\n"
-    "  move.l d0, (a1)\n"   // MOVED
+    "  move.l d0, (a1)\n"
     "  move.w d2, (a0)\n"
     "  rts\n\n");
 }
