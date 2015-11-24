@@ -9,16 +9,16 @@
  *
  */
 
-#ifndef _MIPS_H
-#define _MIPS_H
+#ifndef _MIPS32_H
+#define _MIPS32_H
 
 #include "Generator.h"
 
-class MIPS : public Generator
+class MIPS32 : public Generator
 {
 public:
-  MIPS();
-  virtual ~MIPS();
+  MIPS32();
+  virtual ~MIPS32();
 
   virtual int open(const char *filename);
   virtual int start_init();
@@ -99,26 +99,12 @@ public:
   virtual int array_write_byte(const char *name, int field_id);
   virtual int array_write_short(const char *name, int field_id);
   virtual int array_write_int(const char *name, int field_id);
-  //virtual void close();
-
-  // GPIO functions
-  virtual int ioport_setPinsAsInput(int port);
-  virtual int ioport_setPinsAsOutput(int port);
-  virtual int ioport_setPinsValue(int port);
-  virtual int ioport_setPinsHigh(int port);
-  virtual int ioport_setPinsLow(int port);
-  virtual int ioport_setPinAsOutput(int port);
-  virtual int ioport_setPinAsInput(int port);
-  virtual int ioport_setPinHigh(int port);
-  virtual int ioport_setPinLow(int port);
-  virtual int ioport_isPinInputHigh(int port);
-  virtual int ioport_getPortInputValue(int port);
-  //virtual int ioport_setPortOutputValue(int port);
 
 protected:
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 
   int stack;          // count how many things we put on the stack
+  uint32_t start_org; // .org to use for this chip
   bool is_main : 1;
 
   int stack_alu(const char *instr);

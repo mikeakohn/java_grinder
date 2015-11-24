@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "MIPS.h"
+#include "MIPS32.h"
 
 #define REG_STACK(a) (a)
 #define LOCALS(i) (i * 4)
@@ -53,21 +53,22 @@
 // r30 $fp Frame pointer (link register)
 // r31 $ra Return address
 
-MIPS::MIPS() :
+MIPS32::MIPS32() :
   reg(0),
   reg_max(8),
   stack(0),
+  start_org(0),
   is_main(0)
 {
 
 }
 
-MIPS::~MIPS()
+MIPS32::~MIPS32()
 {
 
 }
 
-int MIPS::open(const char *filename)
+int MIPS32::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 
@@ -82,7 +83,7 @@ int MIPS::open(const char *filename)
   return 0;
 }
 
-int MIPS::start_init()
+int MIPS32::start_init()
 {
   // Add any set up items (stack, registers, etc).
   //fprintf(out, ".org ???\n");
@@ -91,144 +92,144 @@ int MIPS::start_init()
   return 0;
 }
 
-int MIPS::insert_static_field_define(const char *name, const char *type, int index)
+int MIPS32::insert_static_field_define(const char *name, const char *type, int index)
 {
   fprintf(out, "%s equ ram_start+%d\n", name, (index + 1) * 4);
   return 0;
 }
 
 
-int MIPS::init_heap(int field_count)
+int MIPS32::init_heap(int field_count)
 {
   return -1;
 }
 
-int MIPS::insert_field_init_boolean(char *name, int index, int value)
+int MIPS32::insert_field_init_boolean(char *name, int index, int value)
 {
   return -1;
 }
 
-int MIPS::insert_field_init_byte(char *name, int index, int value)
+int MIPS32::insert_field_init_byte(char *name, int index, int value)
 {
   return -1;
 }
 
-int MIPS::insert_field_init_short(char *name, int index, int value)
+int MIPS32::insert_field_init_short(char *name, int index, int value)
 {
   return -1;
 }
 
-int MIPS::insert_field_init_int(char *name, int index, int value)
+int MIPS32::insert_field_init_int(char *name, int index, int value)
 {
   return -1;
 }
 
-int MIPS::insert_field_init(char *name, int index)
+int MIPS32::insert_field_init(char *name, int index)
 {
   return -1;
 }
 
-void MIPS::method_start(int local_count, int max_stack, int param_count, const char *name)
+void MIPS32::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
 }
 
-void MIPS::method_end(int local_count)
+void MIPS32::method_end(int local_count)
 {
 }
 
-int MIPS::push_integer(int32_t n)
-{
-  return -1;
-}
-
-int MIPS::push_integer_local(int index)
+int MIPS32::push_integer(int32_t n)
 {
   return -1;
 }
 
-int MIPS::push_ref_static(const char *name, int index)
+int MIPS32::push_integer_local(int index)
 {
   return -1;
 }
 
-int MIPS::push_ref_local(int index)
+int MIPS32::push_ref_static(const char *name, int index)
+{
+  return -1;
+}
+
+int MIPS32::push_ref_local(int index)
 {
   return push_integer_local(index);
 }
 
-int MIPS::push_fake()
+int MIPS32::push_fake()
 {
   if (stack != 0) { return -1; }
   reg++;
   return 0;
 }
 
-int MIPS::push_long(int64_t n)
+int MIPS32::push_long(int64_t n)
 {
   return -1;
 }
 
-int MIPS::push_float(float f)
+int MIPS32::push_float(float f)
 {
   return -1;
 }
 
-int MIPS::push_double(double f)
+int MIPS32::push_double(double f)
 {
   return -1;
 }
 
-int MIPS::push_byte(int8_t b)
+int MIPS32::push_byte(int8_t b)
 {
   return -1;
 }
 
-int MIPS::push_short(int16_t s)
+int MIPS32::push_short(int16_t s)
 {
   return -1;
 }
 
-int MIPS::push_ref(char *name)
+int MIPS32::push_ref(char *name)
 {
   return -1;
 }
 
-int MIPS::pop_integer_local(int index)
+int MIPS32::pop_integer_local(int index)
 {
   return -1;
 }
 
-int MIPS::pop_ref_local(int index)
+int MIPS32::pop_ref_local(int index)
 {
   return pop_integer_local(index);
 }
 
-int MIPS::pop()
+int MIPS32::pop()
 {
   return -1;
 }
 
-int MIPS::dup()
+int MIPS32::dup()
 {
   return -1;
 }
 
-int MIPS::dup2()
+int MIPS32::dup2()
 {
   return -1;
 }
 
-int MIPS::swap()
+int MIPS32::swap()
 {
   return -1;
 }
 
-int MIPS::add_integer()
+int MIPS32::add_integer()
 {
   return stack_alu("add"); 
 }
 
-int MIPS::add_integer(int num)
+int MIPS32::add_integer(int num)
 {
   if (stack != 0) { return -1; }
   if (num < 0 || num > 0xffff) { return -1; }
@@ -236,12 +237,12 @@ int MIPS::add_integer(int num)
   return 0;
 }
 
-int MIPS::sub_integer()
+int MIPS32::sub_integer()
 {
   return stack_alu("sub"); 
 }
 
-int MIPS::sub_integer(int num)
+int MIPS32::sub_integer(int num)
 {
   if (stack != 0) { return -1; }
   if (num < 0 || num > 0xffff) { return -1; }
@@ -249,62 +250,62 @@ int MIPS::sub_integer(int num)
   return 0;
 }
 
-int MIPS::mul_integer()
+int MIPS32::mul_integer()
 {
   return -1;
 }
 
-int MIPS::div_integer()
+int MIPS32::div_integer()
 {
   return -1;
 }
 
-int MIPS::mod_integer()
+int MIPS32::mod_integer()
 {
   return -1;
 }
 
-int MIPS::neg_integer()
+int MIPS32::neg_integer()
 {
   return -1;
 }
 
-int MIPS::shift_left_integer()
+int MIPS32::shift_left_integer()
 {
   return -1;
 }
 
-int MIPS::shift_left_integer(int num)
+int MIPS32::shift_left_integer(int num)
 {
   return -1;
 }
 
-int MIPS::shift_right_integer()
+int MIPS32::shift_right_integer()
 {
   return -1;
 }
 
-int MIPS::shift_right_integer(int num)
+int MIPS32::shift_right_integer(int num)
 {
   return -1;
 }
 
-int MIPS::shift_right_uinteger()
+int MIPS32::shift_right_uinteger()
 {
   return -1;
 }
 
-int MIPS::shift_right_uinteger(int num)
+int MIPS32::shift_right_uinteger(int num)
 {
   return -1;
 }
 
-int MIPS::and_integer()
+int MIPS32::and_integer()
 {
   return stack_alu("and"); 
 }
 
-int MIPS::and_integer(int num)
+int MIPS32::and_integer(int num)
 {
   if (stack != 0) { return -1; }
   if (num < 0 || num > 0xffff) { return -1; }
@@ -312,12 +313,12 @@ int MIPS::and_integer(int num)
   return 0;
 }
 
-int MIPS::or_integer()
+int MIPS32::or_integer()
 {
   return stack_alu("or"); 
 }
 
-int MIPS::or_integer(int num)
+int MIPS32::or_integer(int num)
 {
   if (stack != 0) { return -1; }
   if (num < 0 || num > 0xffff) { return -1; }
@@ -325,12 +326,12 @@ int MIPS::or_integer(int num)
   return 0;
 }
 
-int MIPS::xor_integer()
+int MIPS32::xor_integer()
 {
   return stack_alu("xor"); 
 }
 
-int MIPS::xor_integer(int num)
+int MIPS32::xor_integer(int num)
 {
   if (stack != 0) { return -1; }
   if (num < 0 || num > 0xffff) { return -1; }
@@ -338,82 +339,82 @@ int MIPS::xor_integer(int num)
   return 0;
 }
 
-int MIPS::inc_integer(int index, int num)
+int MIPS32::inc_integer(int index, int num)
 {
   return -1;
 }
 
-int MIPS::integer_to_byte()
+int MIPS32::integer_to_byte()
 {
   return -1;
 }
 
-int MIPS::integer_to_short()
+int MIPS32::integer_to_short()
 {
   return -1;
 }
 
-int MIPS::jump_cond(const char *label, int cond, int distance)
+int MIPS32::jump_cond(const char *label, int cond, int distance)
 {
   return -1;
 }
 
-int MIPS::jump_cond_integer(const char *label, int cond, int distance)
+int MIPS32::jump_cond_integer(const char *label, int cond, int distance)
 {
   return -1;
 }
 
-int MIPS::return_local(int index, int local_count)
+int MIPS32::return_local(int index, int local_count)
 {
   return -1;
 }
 
-int MIPS::return_integer(int local_count)
+int MIPS32::return_integer(int local_count)
 {
   return -1;
 }
 
-int MIPS::return_void(int local_count)
+int MIPS32::return_void(int local_count)
 {
   return -1;
 }
 
-int MIPS::jump(const char *name, int distance)
+int MIPS32::jump(const char *name, int distance)
 {
   return -1;
 }
 
-int MIPS::call(const char *name)
+int MIPS32::call(const char *name)
 {
   return -1;
 }
 
-int MIPS::invoke_static_method(const char *name, int params, int is_void)
+int MIPS32::invoke_static_method(const char *name, int params, int is_void)
 {
   return -1;
 }
 
-int MIPS::put_static(const char *name, int index)
+int MIPS32::put_static(const char *name, int index)
 {
   return -1;
 }
 
-int MIPS::get_static(const char *name, int index)
+int MIPS32::get_static(const char *name, int index)
 {
   return -1;
 }
 
-int MIPS::brk()
+int MIPS32::brk()
 {
   return -1;
 }
 
-int MIPS::new_array(uint8_t type)
+int MIPS32::new_array(uint8_t type)
 {
   return -1;
 }
 
-int MIPS::insert_array(const char *name, int32_t *data, int len, uint8_t type)
+int MIPS32::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 {
   fprintf(out, ".align 32\n");
   if (type == TYPE_BYTE)
@@ -428,98 +429,84 @@ int MIPS::insert_array(const char *name, int32_t *data, int len, uint8_t type)
   return -1;
 }
 
-int MIPS::insert_string(const char *name, uint8_t *bytes, int len)
+int MIPS32::insert_string(const char *name, uint8_t *bytes, int len)
 {
   fprintf(out, ".align 32\n");
   fprintf(out, "  dc32 %d\n", len);
   return insert_utf8(name, bytes, len);
 }
 
-int MIPS::push_array_length()
+int MIPS32::push_array_length()
 {
   return -1;
 }
 
-int MIPS::push_array_length(const char *name, int field_id)
+int MIPS32::push_array_length(const char *name, int field_id)
 {
   return -1;
 }
 
-int MIPS::array_read_byte()
+int MIPS32::array_read_byte()
 {
   return -1;
 }
 
-int MIPS::array_read_short()
+int MIPS32::array_read_short()
 {
   return -1;
 }
 
-int MIPS::array_read_int()
+int MIPS32::array_read_int()
 {
   return -1;
 }
 
-int MIPS::array_read_byte(const char *name, int field_id)
+int MIPS32::array_read_byte(const char *name, int field_id)
 {
   return -1;
 }
 
-int MIPS::array_read_short(const char *name, int field_id)
+int MIPS32::array_read_short(const char *name, int field_id)
 {
   return -1;
 }
 
-int MIPS::array_read_int(const char *name, int field_id)
+int MIPS32::array_read_int(const char *name, int field_id)
 {
   return -1;
 }
 
-int MIPS::array_write_byte()
+int MIPS32::array_write_byte()
 {
   return -1;
 }
 
-int MIPS::array_write_short()
+int MIPS32::array_write_short()
 {
   return -1;
 }
 
-int MIPS::array_write_int()
+int MIPS32::array_write_int()
 {
   return -1;
 }
 
-int MIPS::array_write_byte(const char *name, int field_id)
+int MIPS32::array_write_byte(const char *name, int field_id)
 {
   return -1;
 }
 
-int MIPS::array_write_short(const char *name, int field_id)
+int MIPS32::array_write_short(const char *name, int field_id)
 {
   return -1;
 }
 
-int MIPS::array_write_int(const char *name, int field_id)
+int MIPS32::array_write_int(const char *name, int field_id)
 {
   return -1;
 }
 
-// GPIO functions
-int MIPS::ioport_setPinsAsInput(int port) { return -1; }
-int MIPS::ioport_setPinsAsOutput(int port) { return -1; }
-int MIPS::ioport_setPinsValue(int port) { return -1; }
-int MIPS::ioport_setPinsHigh(int port) { return -1; }
-int MIPS::ioport_setPinsLow(int port) { return -1; }
-int MIPS::ioport_setPinAsOutput(int port) { return -1; }
-int MIPS::ioport_setPinAsInput(int port) { return -1; }
-int MIPS::ioport_setPinHigh(int port) { return -1; }
-int MIPS::ioport_setPinLow(int port) { return -1; }
-int MIPS::ioport_isPinInputHigh(int port) { return -1; }
-int MIPS::ioport_getPortInputValue(int port) { return -1; }
-//int MIPS::ioport_setPortOutputValue(int port) { return -1; }
-
-int MIPS::stack_alu(const char *instr)
+int MIPS32::stack_alu(const char *instr)
 {
   if (stack == 0)
   {

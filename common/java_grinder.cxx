@@ -17,17 +17,18 @@
 #include "Compiler.h"
 #include "JavaCompiler.h"
 #include "execute_static.h"
-#include "ARM.h"
-#include "DSPIC.h"
-#include "M6502.h"
-#include "C64.h"
 #include "AppleIIgs.h"
+#include "ARM.h"
 #include "AVR8.h"
+#include "C64.h"
+#include "DSPIC.h"
 #include "Epiphany.h"
+#include "M6502.h"
 #include "MC68000.h"
-#include "MIPS.h"
+#include "MIPS32.h"
 #include "MSP430.h"
 #include "MSP430X.h"
+#include "PIC32.h"
 #include "SegaGenesis.h"
 #include "SNES.h"
 #include "STDC.h"
@@ -117,9 +118,9 @@ static Generator *new_generator(const char *chip_type)
     generator = new MC68000();
   }
     else
-  if (strcasecmp("mips", chip_type) == 0)
+  if (strcasecmp("mips32", chip_type) == 0)
   {
-    generator = new MIPS();
+    generator = new MIPS32();
   }
     else
   if (strcasecmp("msp430g2231", chip_type) == 0)
@@ -140,6 +141,11 @@ static Generator *new_generator(const char *chip_type)
   if (strcasecmp("msp430f5529", chip_type) == 0)
   {
     generator = new MSP430X(MSP430F5529);
+  }
+    else
+  if (strcasecmp("pic32", chip_type) == 0)
+  {
+    generator = new PIC32();
   }
     else
   if (strcasecmp("sega_genesis", chip_type) == 0)
@@ -228,8 +234,8 @@ int main(int argc, char *argv[])
            "     appleiigs\n"
            "     attiny2313, atmega328, atmega328p, attiny85, attiny84, attiny13,\n"
            "     dspic,\n"
-           "     msp430g2231, msp430g2553\n"
            "     m6502, c64\n"
+           "     mips32, pic32\n"
            "     sega_genesis\n"
            "     ti84plus\n"
            "     ti99\n"
