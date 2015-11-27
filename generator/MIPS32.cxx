@@ -20,16 +20,16 @@
 #define LOCALS(i) (i * 4)
 
 // ABI is:
-// r0 $zero Always 0
-// r1 $at Return value
+// r0  $zero Always 0
+// r1  $at Return value
 // r2
 // r3
 // r4
 // r5
 // r6
 // r7
-// r8 $t0  Start of stack
-// r9 $t1
+// r8  $t0  Start of stack
+// r9  $t1
 // r10 $t2
 // r11 $t3
 // r12 $t4
@@ -57,7 +57,9 @@ MIPS32::MIPS32() :
   reg(0),
   reg_max(8),
   stack(0),
-  start_org(0),
+  org(0),
+  ram_start(0),
+  ram_end(0),
   is_main(0)
 {
 
@@ -76,9 +78,8 @@ int MIPS32::open(const char *filename)
   fprintf(out, ".mips\n");
 
   // Set where RAM starts / ends
-  // FIXME - Not sure what to set this to right now
-  fprintf(out, "ram_start equ 0\n");
-  fprintf(out, "ram_end equ 0x8000\n");
+  fprintf(out, "ram_start equ 0x%x\n", ram_start);
+  fprintf(out, "ram_end equ 0x%x\n", ram_end);
 
   return 0;
 }
@@ -86,7 +87,7 @@ int MIPS32::open(const char *filename)
 int MIPS32::start_init()
 {
   // Add any set up items (stack, registers, etc).
-  //fprintf(out, ".org ???\n");
+  fprintf(out, ".org 0%x\n", org);
   fprintf(out, "start:\n");
 
   return 0;
@@ -139,6 +140,23 @@ void MIPS32::method_end(int local_count)
 
 int MIPS32::push_integer(int32_t n)
 {
+  if (n > 0x7fffffff || n < 0x80000000)
+  {
+    printf("Error: literal value %d bigger than signed 32 bit.\n", n);
+    return -1;
+  }
+
+  if (reg < reg_max)
+  {
+    fprintf(out, "  li $t%d, %d\n", reg, n);
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  addi $sp, $sp, -4\n");
+    fprintf(out, "  sw $%d, 0($sp)\n", n);
+  }
+
   return -1;
 }
 

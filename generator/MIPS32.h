@@ -104,7 +104,9 @@ protected:
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 
   int stack;          // count how many things we put on the stack
-  uint32_t start_org; // .org to use for this chip
+  uint32_t org;       // .org to use for this chip
+  uint32_t ram_start; // start of ram
+  uint32_t ram_end;   // end of ram
   bool is_main : 1;
 
   int stack_alu(const char *instr);

@@ -17,7 +17,9 @@
 
 PIC32::PIC32()
 {
-  start_org = 0x9d000000;
+  org = 0x9d000000;
+  ram_start = 0x80000000;
+  ram_end = 0x80003fff;
 }
 
 PIC32::~PIC32()
