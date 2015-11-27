@@ -17,7 +17,7 @@
 #include "MSP430.h"
 #include "Generator.h"
 
-Generator::Generator() : label_count(0), constants_len(0)
+Generator::Generator() : label_count(0)
 {
 }
 
@@ -155,17 +155,20 @@ int Generator::insert_dc32(const char *name, int32_t *data, int len, uint8_t len
 
 int Generator::get_constant(uint32_t constant)
 {
-  int n;
+  std::vector<uint32_t>::iterator it;
+  int n = 0;
 
-  for (n = 0; n < constants_len; n++)
+  for (it = constants_pool.begin(); it != constants_pool.end(); it++)
   {
-    if (constants[n] == constant) { return n; }
+    if (*it == constant) { return n; }
+    n++;
   }
 
-  if (constants_len < (int)(sizeof(constants) / sizeof(uint32_t)))
+  if (constants_pool.size() < 16738)
   {
-    constants[constants_len++] = constant;
-    return n;
+    constants_pool.push_back(constant);
+
+    return constants_pool.size() - 1;
   }
 
   printf("Error: Constant pool exhausted.\n");
@@ -175,20 +178,20 @@ int Generator::get_constant(uint32_t constant)
 
 void Generator::write_constants()
 {
-  int n;
+  std::vector<uint32_t>::iterator it;
+  int n = 0;
 
-  if (constants_len == 0) { return; }
+  fprintf(out, "_constant_pool:\n");
 
-  fprintf(out, "_constants:\n");
-
-  for (n = 0; n < constants_len; n++)
+  for (it = constants_pool.begin(); it != constants_pool.end(); it++)
   {
     if ((n % 8) == 0) { fprintf(out, "  dc32"); }
     else { fprintf(out, ","); }
 
-    fprintf(out, " 0x%04x", constants[n]);
+    fprintf(out, " 0x%04x", *it);
 
-    if (((n + 1) % 8) == 0) { fprintf(out, "\n"); }
+    n++;
+    if ((n % 8) == 0) { fprintf(out, "\n"); }
   }
 
   fprintf(out, "\n\n");

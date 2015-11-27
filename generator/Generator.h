@@ -15,6 +15,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#include <vector>
+
 #include "API_APPLEIIGS.h"
 #include "API_C64.h"
 #include "API_DSP.h"
@@ -147,8 +149,7 @@ protected:
   FILE *out;
   int label_count;
   int instruction_count;
-  int constants_len;
-  uint32_t constants[16384];   // For ARM and maybe MIPS
+  std::vector<uint32_t> constants_pool;
 };
 
 enum

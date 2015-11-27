@@ -19,16 +19,24 @@
 #define REG_STACK(a) (a)
 #define LOCALS(i) (i * 4)
 
+#define STACK_PUSH(num) \
+  fprintf(out, "  addi $sp, $sp, -4\n"); \
+  fprintf(out, "  sw $%d, 0($sp)\n", num);
+
+#define STACK_POP() \
+  fprintf(out, "  lw $, 0($sp)\n"); \
+  fprintf(out, "  addi $sp, $sp, 4\n"); \
+
 // ABI is:
 // r0  $zero Always 0
-// r1  $at Return value
-// r2
-// r3
-// r4
-// r5
-// r6
-// r7
-// r8  $t0  Start of stack
+// r1  $at Reserved for pseudo instructions?
+// r2  $v0 Return value 0
+// r3  $v1 Return value 1
+// r4  $a0 Function Argument 0
+// r5  $a1 Function Argument 1
+// r6  $a2 Function Argument 2
+// r7  $a3 Function Argument 3
+// r8  $t0 Start of stack
 // r9  $t1
 // r10 $t2
 // r11 $t3
@@ -36,18 +44,18 @@
 // r13 $t5
 // r14 $t6
 // r15 $t7 Top Of Stack
-// r16
-// r17
-// r18
-// r19
-// r20
-// r21
-// r22
-// r23
-// r24
-// r25
-// r26
-// r27
+// r16 $s0 Saved registers 0  (point to constant pool)
+// r17 $s1 Saved registers 1
+// r18 $s2 Saved registers 2
+// r19 $s3 Saved registers 3
+// r20 $s4 Saved registers 4
+// r21 $s5 Saved registers 5
+// r22 $s6 Saved registers 6
+// r23 $s7 Saved registers 7
+// r24 $t8 Temporary
+// r25 $t9 Temporary
+// r26 $k0 kernel (do not use?)
+// r27 $k1 kernel (do not use?)
 // r28 $gp Heap pointer
 // r29 $sp Stack pointer
 // r30 $fp Frame pointer (link register)
@@ -75,7 +83,7 @@ int MIPS32::open(const char *filename)
   if (Generator::open(filename) != 0) { return -1; }
 
   // For now we only support a specific chip
-  fprintf(out, ".mips\n");
+  fprintf(out, ".mips32\n");
 
   // Set where RAM starts / ends
   fprintf(out, "ram_start equ 0x%x\n", ram_start);
@@ -89,6 +97,8 @@ int MIPS32::start_init()
   // Add any set up items (stack, registers, etc).
   fprintf(out, ".org 0%x\n", org);
   fprintf(out, "start:\n");
+
+  fprintf(out, "  la $s0, constant_pool\n");
 
   return 0;
 }
@@ -140,11 +150,13 @@ void MIPS32::method_end(int local_count)
 
 int MIPS32::push_integer(int32_t n)
 {
+#if 0
   if (n > 0x7fffffff || n < 0x80000000)
   {
     printf("Error: literal value %d bigger than signed 32 bit.\n", n);
     return -1;
   }
+#endif
 
   if (reg < reg_max)
   {
@@ -153,11 +165,10 @@ int MIPS32::push_integer(int32_t n)
   }
     else
   {
-    fprintf(out, "  addi $sp, $sp, -4\n");
-    fprintf(out, "  sw $%d, 0($sp)\n", n);
+    STACK_PUSH(n)
   }
 
-  return -1;
+  return 0;
 }
 
 int MIPS32::push_integer_local(int index)
