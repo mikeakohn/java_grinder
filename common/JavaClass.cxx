@@ -290,7 +290,7 @@ void JavaClass::read_constant_pool(FILE *in)
         break;
 
       default:
-        printf("Error: Uknown constant type %d (please email author)\n", ch);
+        printf("Error: Unknown constant type %d (please email author)\n", ch);
         exit(1);
         break;
     }
@@ -353,7 +353,7 @@ void JavaClass::read_constant_pool(FILE *in)
         break;
 
       default:
-        printf("Error: Uknown constant type\n");
+        printf("Error: Unknown constant type\n");
         break;
     }
   }
@@ -830,7 +830,7 @@ void JavaClass::print_constant_pool()
         break;
 
       default:
-        printf("Error: Uknown constant type\n");
+        printf("Error: Unknown constant type\n");
         break;
     }
   }
