@@ -56,7 +56,7 @@ ARM::ARM() :
 
 ARM::~ARM()
 {
-  write_constants();
+  insert_constants_pool();
 }
 
 int ARM::open(const char *filename)

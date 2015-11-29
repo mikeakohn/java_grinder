@@ -75,14 +75,13 @@ MIPS32::MIPS32() :
 
 MIPS32::~MIPS32()
 {
-
+  insert_constants_pool();
 }
 
 int MIPS32::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 
-  // For now we only support a specific chip
   fprintf(out, ".mips32\n");
 
   // Set where RAM starts / ends
@@ -98,7 +97,9 @@ int MIPS32::start_init()
   fprintf(out, ".org 0%x\n", org);
   fprintf(out, "start:\n");
 
-  fprintf(out, "  la $s0, constant_pool\n");
+  // REVIEW - Use li instead of real instructions?
+  fprintf(out, "  lui $s0, constant_pool >> 16\n");
+  fprintf(out, "  ori $s0, (constant_pool & 0xffff)\n");
 
   return 0;
 }
@@ -112,7 +113,9 @@ int MIPS32::insert_static_field_define(const char *name, const char *type, int i
 
 int MIPS32::init_heap(int field_count)
 {
-  return -1;
+  fprintf(out, "  ;; Set up heap and static initializers\n");
+  fprintf(out, "  li $gp, ram_start+%d\n", (field_count + 1) * 4);
+  return 0;
 }
 
 int MIPS32::insert_field_init_boolean(char *name, int index, int value)

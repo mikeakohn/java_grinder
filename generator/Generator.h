@@ -143,7 +143,7 @@ protected:
   int insert_dw(const char *name, int32_t *data, int len, uint8_t len_type);
   int insert_dc32(const char *name, int32_t *data, int len, uint8_t len_type, const char *dc32 = "dc32");
   int get_constant(uint32_t constant);
-  void write_constants();
+  void insert_constants_pool();
   int insert_utf8(const char *name, uint8_t *bytes, int len);
 
   FILE *out;

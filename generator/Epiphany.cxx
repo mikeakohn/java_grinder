@@ -56,7 +56,7 @@ Epiphany::Epiphany() :
 
 Epiphany::~Epiphany()
 {
-  write_constants();
+  insert_constants_pool();
 }
 
 int Epiphany::open(const char *filename)

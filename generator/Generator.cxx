@@ -176,7 +176,7 @@ int Generator::get_constant(uint32_t constant)
   return 0;
 }
 
-void Generator::write_constants()
+void Generator::insert_constants_pool()
 {
   std::vector<uint32_t>::iterator it;
   int n = 0;
