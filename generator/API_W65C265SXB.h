@@ -18,7 +18,12 @@ class API_W65C265SXB
 {
 public:
   // W65C265SXB
-  //virtual int w65c265sxb_setSomething() { return -1; }
+  virtual int w65c265sxb_getChar() { return -1; }
+  virtual int w65c265sxb_putChar_C() { return -1; }
+  virtual int w65c265sxb_getInt() { return -1; }
+  virtual int w65c265sxb_putInt_I() { return -1; }
+  virtual int w65c265sxb_getString() { return -1; }
+  virtual int w65c265sxb_putString() { return -1; }
 };
 
 #endif

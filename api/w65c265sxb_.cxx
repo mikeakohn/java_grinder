@@ -31,6 +31,13 @@
 
 int w65c265sxb(JavaClass *java_class, Generator *generator, char *function)
 {
+  CHECK_FUNC(getChar,)
+  CHECK_FUNC(putChar,_C)
+  CHECK_FUNC(getInt,)
+  CHECK_FUNC(putInt,_I)
+  CHECK_FUNC(getString,)
+  CHECK_FUNC(putString,)
+
   return -1;
 }
 

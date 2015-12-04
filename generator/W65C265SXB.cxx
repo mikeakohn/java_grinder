@@ -35,3 +35,34 @@ int W65C265SXB::open(const char *filename)
   return 0;
 }
 
+// terminal interface API
+int W65C265SXB::w65c265sxb_getChar()
+{
+  return -1;
+}
+
+int W65C265SXB::w65c265sxb_putChar_C()
+{
+  return -1;
+}
+
+int W65C265SXB::w65c265sxb_getInt()
+{
+  return -1;
+}
+
+int W65C265SXB::w65c265sxb_putInt_I()
+{
+  return -1;
+}
+
+int W65C265SXB::w65c265sxb_getString()
+{
+  return -1;
+}
+
+int W65C265SXB::w65c265sxb_putString()
+{
+  return -1;
+}
+

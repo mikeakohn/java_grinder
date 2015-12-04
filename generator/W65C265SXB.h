@@ -24,6 +24,14 @@ public:
 
   virtual int open(const char *filename);
 
+  // terminal interface API
+  virtual int w65c265sxb_getChar();
+  virtual int w65c265sxb_putChar_C();
+  virtual int w65c265sxb_getInt();
+  virtual int w65c265sxb_putInt_I();
+  virtual int w65c265sxb_getString();
+  virtual int w65c265sxb_putString();
+
 private:
 };
 
