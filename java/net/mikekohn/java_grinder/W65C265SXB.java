@@ -18,9 +18,9 @@ abstract public class W65C265SXB
   protected W65C265SXB() { }
 
   // terminal interface routines
-  public static char getChar() { }
+  public static char getChar() { return 0; }
   public static void putChar(char c) { }
-  public static int getInt() { }
+  public static int getInt() { return 0; }
   public static void putInt(int n) { }
   public static void getString() { }
   public static void putString(String text) { }
