@@ -15,7 +15,7 @@
 
 int16_t read_int16(FILE *in)
 {
-uint32_t i;
+  uint32_t i;
 
   i = (uint32_t)getc(in) << 8;
   i |= getc(in);
@@ -25,7 +25,7 @@ uint32_t i;
 
 int32_t read_int32(FILE *in)
 {
-uint32_t i;
+  uint32_t i;
 
   i = (uint32_t)getc(in) << 24;
   i |= (uint32_t)getc(in) << 16;
@@ -37,7 +37,7 @@ uint32_t i;
 
 int64_t read_int64(FILE *in)
 {
-uint64_t i;
+  uint64_t i;
 
   i = ((uint64_t)getc(in)) << 56;
   i |= ((uint64_t)getc(in)) << 48;

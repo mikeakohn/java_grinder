@@ -246,12 +246,13 @@ void JavaClass::read_constant_pool(FILE *in)
   int len,count;
   int ch;
 
+  // FIXME - Need to revisit this code.  There is a simpler way to do this.
   marker = ftell(in);
   len = 0;
 
   for (count = 0; count < constant_pool_count - 1; count++)
   {
-    constant_pool[count+1] = len;
+    constant_pool[count + 1] = len;
 
     ch = getc(in);
 
@@ -281,6 +282,7 @@ void JavaClass::read_constant_pool(FILE *in)
       case CONSTANT_DOUBLE:
         fseek(in, 8, SEEK_CUR);
         len += sizeof(struct constant_double_t);
+        count++;
         break;
 
       case CONSTANT_UTF8:
@@ -290,7 +292,7 @@ void JavaClass::read_constant_pool(FILE *in)
         break;
 
       default:
-        printf("Error: Unknown constant type %d (please email author)\n", ch);
+        printf("Error: Unknown constant type %d (please email author) %s:%d\n", ch, __FILE__, __LINE__);
         exit(1);
         break;
     }
@@ -308,7 +310,7 @@ void JavaClass::read_constant_pool(FILE *in)
 
   for (count = 0; count < constant_pool_count - 1; count++)
   {
-    constant = constants_heap + constant_pool[count+1];
+    constant = constants_heap + constant_pool[count + 1];
 
     ch = getc(in);
 
@@ -343,17 +345,18 @@ void JavaClass::read_constant_pool(FILE *in)
         gen64bit = (struct generic_64bit_t *)constant;
         gen64bit->tag = ch;
         gen64bit->value = read_int64(in);
+        count++;
         break;
 
       case CONSTANT_UTF8:
         utf8 = (struct constant_utf8_t *)constant;
         utf8->tag = ch;
         utf8->length = read_int16(in);
-        if (fread(utf8->bytes, 1, utf8->length, in)) {}
+        if (fread(utf8->bytes, 1, utf8->length, in)) { }
         break;
 
       default:
-        printf("Error: Unknown constant type\n");
+        printf("Error: Unknown constant type. %s:%d\n", __FILE__, __LINE__);
         break;
     }
   }
@@ -750,7 +753,7 @@ void JavaClass::print_constant_pool()
 
   printf("----- ConstantCount: %d\n", constant_pool_count);
 
-  for (count = 1; count <= constant_pool_count; count++)
+  for (count = 1; count < constant_pool_count; count++)
   {
     printf("   %d) ", count);
 
@@ -814,11 +817,13 @@ void JavaClass::print_constant_pool()
         constant_long = (constant_long_t *)heap;
         printf("Long: %" PRId64 "\n",constant_long->value);
         //printf("Long: %lld\n",constant_long->value);
+        count++;
         break;
 
       case CONSTANT_DOUBLE:
         constant_double = (constant_double_t *)heap;
         printf("Double: %f\n",constant_double->value);
+        count++;
         break;
 
       case CONSTANT_UTF8:

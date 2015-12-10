@@ -236,6 +236,7 @@ int main(int argc, char *argv[])
            "     dspic,\n"
            "     m6502, c64\n"
            "     mips32, pic32\n"
+           "     msp430g2231, msp430g2452, msp430g2553, msp430f5529\n"
            "     sega_genesis\n"
            "     ti84plus\n"
            "     ti99\n"
