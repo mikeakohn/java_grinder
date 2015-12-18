@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "API_APPLEIIGS.h"
+#include "API_Atari2600.h"
 #include "API_C64.h"
 #include "API_DSP.h"
 #include "API_Microcontroller.h"
@@ -30,6 +31,7 @@
 
 class Generator :
   public API_AppleIIgs,
+  public API_Atari2600,
   public API_C64,
   public API_DSP,
   public API_Microcontroller,

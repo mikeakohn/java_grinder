@@ -3,6 +3,7 @@ PKG_DIR=net/mikekohn/java_grinder
 SRC_DIR=net/mikekohn/java_grinder
 JAVA_SRC=\
   $(SRC_DIR)/AppleIIgs.java \
+  $(SRC_DIR)/Atari2600.java \
   $(SRC_DIR)/ADC.java \
   $(SRC_DIR)/CPU.java \
   $(SRC_DIR)/DSP.java \

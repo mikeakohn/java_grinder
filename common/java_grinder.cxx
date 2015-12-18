@@ -19,6 +19,7 @@
 #include "execute_static.h"
 #include "AppleIIgs.h"
 #include "ARM.h"
+#include "Atari2600.h"
 #include "AVR8.h"
 #include "C64.h"
 #include "DSPIC.h"
@@ -86,6 +87,11 @@ static Generator *new_generator(const char *chip_type)
   if (strcasecmp("atmega328p", chip_type) == 0)
   {
     generator = new AVR8(ATMEGA328P);
+  }
+    else
+  if (strcasecmp("atari2600", chip_type) == 0)
+  {
+    generator = new Atari2600();
   }
     else
   if (strcasecmp("c64", chip_type) == 0)
@@ -232,6 +238,7 @@ int main(int argc, char *argv[])
     printf("Usage: %s <class> <outfile> <platform>\n"
            "   platforms:\n"
            "     appleiigs\n"
+           "     atari2600\n"
            "     attiny2313, atmega328, atmega328p, attiny85, attiny84, attiny13,\n"
            "     dspic,\n"
            "     m6502, c64\n"
