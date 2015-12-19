@@ -41,6 +41,66 @@ int Atari2600::atari2600_waitHsync()
   return 0;
 }
 
+int Atari2600::atari2600_vsyncOn()
+{
+  return -1;
+}
+
+int Atari2600::atari2600_vsyncOff()
+{
+  return -1;
+}
+
+int Atari2600::atari2600_vblankOn()
+{
+  return -1;
+}
+
+int Atari2600::atari2600_vblankOff()
+{
+  return -1;
+}
+
+int Atari2600::atari2600_setColorPlayer0()
+{
+  return -1;
+}
+
+int Atari2600::atari2600_setColorPlayer0(int color)
+{
+  return -1;
+}
+
+int Atari2600::atari2600_setColorPlayer1()
+{
+  return -1;
+}
+
+int Atari2600::atari2600_setColorPlayer1(int color)
+{
+  return -1;
+}
+
+int Atari2600::atari2600_setColorPlayfield()
+{
+  return -1;
+}
+
+int Atari2600::atari2600_setColorPlayfield(int color)
+{
+  return -1;
+}
+
+int Atari2600::atari2600_setColorBackground()
+{
+  return -1;
+}
+
+int Atari2600::atari2600_setColorBackground(int color)
+{
+  return -1;
+}
+
 void Atari2600::print_tia_definitions()
 {
   fprintf(out, "  VSYNC equ 0x00\n");

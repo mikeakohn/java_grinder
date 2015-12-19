@@ -38,13 +38,24 @@
 int atari_2600(JavaClass *java_class, Generator *generator, char *method_name)
 {
   CHECK_FUNC(waitHsync,)
+  CHECK_FUNC(vsyncOn,)
+  CHECK_FUNC(vsyncOff,)
+  CHECK_FUNC(vblankOn,)
+  CHECK_FUNC(vblankOff,)
+  CHECK_FUNC(setColorPlayer0,_I)
+  CHECK_FUNC(setColorPlayer1,_I)
+  CHECK_FUNC(setColorPlayfield,_I)
+  CHECK_FUNC(setColorBackground,_I)
 
   return -1;
 }
 
 int atari_2600(JavaClass *java_class, Generator *generator, char *method_name, int const_val)
 {
-  //CHECK_FUNC_CONST(someFunction,_I)
+  CHECK_FUNC_CONST(setColorPlayer0,_I)
+  CHECK_FUNC_CONST(setColorPlayer1,_I)
+  CHECK_FUNC_CONST(setColorPlayfield,_I)
+  CHECK_FUNC_CONST(setColorBackground,_I)
 
   return -1;
 }
