@@ -42,6 +42,16 @@ int Atari2600::open(const char *filename)
 
   print_tia_definitions();
 
+  // Is this needed?
+  fprintf(out, "; clear TIA\n");
+  fprintf(out, "  sei\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  ldx #127\n");
+  fprintf(out, "_clear_tia:\n");
+  fprintf(out, "  sta 0,x\n");
+  fprintf(out, "  dex\n");
+  fprintf(out, "  bne _clear_tia\n");
+
   fprintf(out, "; set java stack pointer (x register)\n");
   fprintf(out, "  ldx #0x0F\n");
 

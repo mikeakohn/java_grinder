@@ -9,18 +9,17 @@ public class Atari2600JavaDemo
     while(true)
     {
       // 3 lines of vsync
+      Atari2600.vblankOn();
       Atari2600.vsyncOn();
 
-      for (n = 0; n < 3; n++)
-      {
-        Atari2600.waitHsync();
-      }
+      // This should be faster than a loop
+      Atari2600.waitHsync();
+      Atari2600.waitHsync();
+      Atari2600.waitHsync();
 
       Atari2600.vsyncOff();
 
       // 37 lines of blank
-      Atari2600.vblankOn();
-
       for (n = 0; n < 37; n++)
       {
         Atari2600.waitHsync();
@@ -44,6 +43,7 @@ public class Atari2600JavaDemo
       }
 
       // Overscan
+      Atari2600.vblankOn();
       for (n = 0; n < 30; n++)
       {
         Atari2600.waitHsync();
