@@ -138,6 +138,7 @@ int M6502::open(const char *filename)
 
   // start at 0x0400 when using simulator
   fprintf(out, ".org 0x%04x\n", start_org);
+  fprintf(out, "reset:\n");
   fprintf(out, "  sei\n");
   fprintf(out, "  cld\n");
   fprintf(out, "  lda #0xff\n");

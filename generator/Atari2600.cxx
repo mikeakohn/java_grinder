@@ -27,15 +27,23 @@ Atari2600::Atari2600()
 
 Atari2600::~Atari2600()
 {
+  fprintf(out, ".org 0xfffa\n");
+  fprintf(out, "; NMI\n");
+  fprintf(out, "dw reset\n");
+  fprintf(out, "; RESET\n");
+  fprintf(out, "dw reset\n");
+  fprintf(out, "; IRQ\n");
+  fprintf(out, "dw reset\n");
 }
 
 int Atari2600::open(const char *filename)
 {
   if (M6502::open(filename) != 0) { return -1; }
 
+  print_tia_definitions();
+
   fprintf(out, "; set java stack pointer (x register)\n");
   fprintf(out, "  ldx #0x0F\n");
-  print_tia_definitions();
 
   return 0;
 }
