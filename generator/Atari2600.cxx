@@ -43,22 +43,34 @@ int Atari2600::atari2600_waitHsync()
 
 int Atari2600::atari2600_vsyncOn()
 {
-  return -1;
+  fprintf(out, "  lda #0x02\n");
+  fprintf(out, "  sta VSYNC\n");
+
+  return 0;
 }
 
 int Atari2600::atari2600_vsyncOff()
 {
-  return -1;
+  fprintf(out, "  lda #0x00\n");
+  fprintf(out, "  sta VSYNC\n");
+
+  return 0;
 }
 
 int Atari2600::atari2600_vblankOn()
 {
-  return -1;
+  fprintf(out, "  lda #0x02\n");
+  fprintf(out, "  sta VBLANK\n");
+
+  return 0;
 }
 
 int Atari2600::atari2600_vblankOff()
 {
-  return -1;
+  fprintf(out, "  lda #0x00\n");
+  fprintf(out, "  sta VBLANK\n");
+
+  return 0;
 }
 
 int Atari2600::atari2600_setColorPlayer0()
@@ -68,7 +80,16 @@ int Atari2600::atari2600_setColorPlayer0()
 
 int Atari2600::atari2600_setColorPlayer0(int color)
 {
-  return -1;
+  if (color < 0 || color > 255)
+  {
+    printf("Error: Color index out of range\n");
+    return -1;
+  }
+
+  fprintf(out, "  lda #0x%02x\n", color);
+  fprintf(out, "  sta COLUP0\n");
+
+  return 0;
 }
 
 int Atari2600::atari2600_setColorPlayer1()
@@ -78,7 +99,16 @@ int Atari2600::atari2600_setColorPlayer1()
 
 int Atari2600::atari2600_setColorPlayer1(int color)
 {
-  return -1;
+  if (color < 0 || color > 255)
+  {
+    printf("Error: Color index out of range\n");
+    return -1;
+  }
+
+  fprintf(out, "  lda #0x%02x\n", color);
+  fprintf(out, "  sta COLUP1\n");
+
+  return 0;
 }
 
 int Atari2600::atari2600_setColorPlayfield()
@@ -88,7 +118,16 @@ int Atari2600::atari2600_setColorPlayfield()
 
 int Atari2600::atari2600_setColorPlayfield(int color)
 {
-  return -1;
+  if (color < 0 || color > 255)
+  {
+    printf("Error: Color index out of range\n");
+    return -1;
+  }
+
+  fprintf(out, "  lda #0x%02x\n", color);
+  fprintf(out, "  sta COLUPF\n");
+
+  return 0;
 }
 
 int Atari2600::atari2600_setColorBackground()
@@ -98,7 +137,16 @@ int Atari2600::atari2600_setColorBackground()
 
 int Atari2600::atari2600_setColorBackground(int color)
 {
-  return -1;
+  if (color < 0 || color > 255)
+  {
+    printf("Error: Color index out of range\n");
+    return -1;
+  }
+
+  fprintf(out, "  lda #0x%02x\n", color);
+  fprintf(out, "  sta COLUBK\n");
+
+  return 0;
 }
 
 void Atari2600::print_tia_definitions()
