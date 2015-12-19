@@ -16,10 +16,10 @@ class API_Atari2600
 {
 public:
   virtual int atari2600_waitHsync() { return -1; }
-  virtual int atari2600_vsyncOn() { return -1; }
-  virtual int atari2600_vsyncOff() { return -1; }
-  virtual int atari2600_vblankOn() { return -1; }
-  virtual int atari2600_vblankOff() { return -1; }
+  virtual int atari2600_startVblank() { return -1; }
+  virtual int atari2600_waitVblank() { return -1; }
+  virtual int atari2600_startOverscan() { return -1; }
+  virtual int atari2600_waitOverscan() { return -1; }
   virtual int atari2600_setColorPlayer0() { return -1; }
   virtual int atari2600_setColorPlayer0(int color) { return -1; }
   virtual int atari2600_setColorPlayer1() { return -1; }

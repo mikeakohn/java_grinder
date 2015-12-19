@@ -41,6 +41,7 @@ int Atari2600::open(const char *filename)
   if (M6502::open(filename) != 0) { return -1; }
 
   print_tia_definitions();
+  print_pia_definitions();
 
   // Is this needed?
   fprintf(out, "; clear TIA\n");
@@ -65,23 +66,38 @@ int Atari2600::atari2600_waitHsync()
   return 0;
 }
 
-int Atari2600::atari2600_vsyncOn()
+int Atari2600::atari2600_startVblank()
 {
   fprintf(out, "  lda #0x02\n");
   fprintf(out, "  sta VSYNC\n");
-
-  return 0;
-}
-
-int Atari2600::atari2600_vsyncOff()
-{
+  fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  sta WSYNC\n");
   fprintf(out, "  lda #0x00\n");
   fprintf(out, "  sta VSYNC\n");
 
+  fprintf(out, "  lda #43\n");
+  fprintf(out, "  sta TIM64T\n");
+
   return 0;
 }
 
-int Atari2600::atari2600_vblankOn()
+int Atari2600::atari2600_waitVblank()
+{
+  fprintf(out, "_vblank_wait_%d:\n", label_count);
+  fprintf(out, "  lda INTIM\n");
+  fprintf(out, "  bne _vblank_wait_%d\n", label_count);
+
+  fprintf(out, "  lda #0x00\n");
+  //fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  sta VBLANK\n");
+
+  label_count++;
+
+  return 0;
+}
+
+int Atari2600::atari2600_startOverscan()
 {
   fprintf(out, "  lda #0x02\n");
   fprintf(out, "  sta VBLANK\n");
@@ -89,10 +105,15 @@ int Atari2600::atari2600_vblankOn()
   return 0;
 }
 
-int Atari2600::atari2600_vblankOff()
+int Atari2600::atari2600_waitOverscan()
 {
-  fprintf(out, "  lda #0x00\n");
-  fprintf(out, "  sta VBLANK\n");
+  fprintf(out, "  ldx #30\n");
+  fprintf(out, "_overscan_wait_%d:\n", label_count);
+  fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  dex\n");
+  fprintf(out, "  bne _overscan_wait_%d\n", label_count);
+
+  label_count++;
 
   return 0;
 }
@@ -220,5 +241,19 @@ void Atari2600::print_tia_definitions()
   fprintf(out, "  HMOVE equ 0x2A\n");
   fprintf(out, "  HMCLR equ 0x2B\n");
   fprintf(out, "  CXCLR equ 0x2C\n");
+}
+
+void Atari2600::print_pia_definitions()
+{
+  fprintf(out, "  SWCHA equ 0x280\n");
+  fprintf(out, "  SWACNT equ 0x281\n");
+  fprintf(out, "  SWCHB equ 0x282\n");
+  fprintf(out, "  SWBCNT equ 0x283\n");
+  fprintf(out, "  INTIM equ 0x284\n");
+  fprintf(out, "  TIMINT equ 0x285\n");
+  fprintf(out, "  TIM1T equ 0x294\n");
+  fprintf(out, "  TIM8T equ 0x295\n");
+  fprintf(out, "  TIM64T equ 0x296\n");
+  fprintf(out, "  T1024T equ 0x297\n");
 }
 

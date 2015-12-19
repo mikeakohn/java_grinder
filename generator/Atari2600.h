@@ -22,10 +22,10 @@ public:
 
   virtual int open(const char *filename);
   virtual int atari2600_waitHsync();
-  virtual int atari2600_vsyncOn();
-  virtual int atari2600_vsyncOff();
-  virtual int atari2600_vblankOn();
-  virtual int atari2600_vblankOff();
+  virtual int atari2600_startVblank();
+  virtual int atari2600_waitVblank();
+  virtual int atari2600_startOverscan();
+  virtual int atari2600_waitOverscan();
   virtual int atari2600_setColorPlayer0();
   virtual int atari2600_setColorPlayer0(int color);
   virtual int atari2600_setColorPlayer1();
@@ -37,6 +37,7 @@ public:
 
 private:
   void print_tia_definitions();
+  void print_pia_definitions();
 };
 
 #endif

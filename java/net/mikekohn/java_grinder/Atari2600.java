@@ -18,10 +18,10 @@ abstract public class Atari2600
   }
 
   public static void waitHsync() { }
-  public static void vsyncOn() { }
-  public static void vsyncOff() { }
-  public static void vblankOn() { }
-  public static void vblankOff() { }
+  public static void startVblank() { }
+  public static void waitVblank() { }
+  public static void startOverscan() { }
+  public static void waitOverscan() { }
   public static void setColorPlayer0(int color) { }
   public static void setColorPlayer1(int color) { }
   public static void setColorPlayfield(int color) { }
