@@ -60,6 +60,8 @@ public:
   virtual int sega_genesis_setSpritePosition();
   virtual int sega_genesis_setSpriteConfig1();
   virtual int sega_genesis_setSpriteConfig2();
+  virtual int sega_genesis_getJoypadValuePort1();
+  virtual int sega_genesis_getJoypadValuePort2();
   virtual int sega_genesis_loadZ80();
   virtual int sega_genesis_resetZ80();
   virtual int sega_genesis_pauseZ80();

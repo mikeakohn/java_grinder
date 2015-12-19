@@ -33,6 +33,15 @@ abstract public class SegaGenesis
   public static final int SPRITE_CONFIG2_HORIZONTAL_FLIP = 0x0800;
   public static final int SPRITE_CONFIG2_VERTICAL_FLIP = 0x1000;
 
+  public static final int JOYPAD_2_DOWN = 0x80;
+  public static final int JOYPAD_2_UP = 0x40;
+  public static final int JOYPAD_FIRE_B = 0x20;
+  public static final int JOYPAD_FIRE_A = 0x10;
+  public static final int JOYPAD_RIGHT = 0x08;
+  public static final int JOYPAD_LEFT = 0x04;
+  public static final int JOYPAD_DOWN = 0x02;
+  public static final int JOYPAD_UP = 0x01;
+
   protected SegaGenesis() { }
 
   /** Set a the palette pointer.  Sets the palette pointer to the next
@@ -175,6 +184,14 @@ abstract public class SegaGenesis
       Bits  10-0: pattern start index
       */
   public static void setSpriteConfig2(int index, int value) { }
+
+  /** Read which buttons are being pushed on the joypad in port 1.
+      Use JOYPAD_ bitmask to check which puttons are down */
+  public static int getJoypadValuePort1() {}
+
+  /** Read which buttons are being pushed on the joypad in port 2.
+      Use JOYPAD_ bitmask to check which puttons are down */
+  public static int getJoypadValuePort2() {}
 
   /** Load code up to 8k in size into the Z80 process space.  Z80 will
       be reset by the API and code will start running. */

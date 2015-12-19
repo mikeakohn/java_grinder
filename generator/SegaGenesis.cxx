@@ -730,6 +730,16 @@ int SegaGenesis::sega_genesis_setSpriteConfig2()
   return 0;
 }
 
+int SegaGenesis::sega_genesis_getJoypadValuePort1()
+{
+  return -1;
+}
+
+int SegaGenesis::sega_genesis_getJoypadValuePort2()
+{
+  return -1;
+}
+
 int SegaGenesis::sega_genesis_loadZ80()
 {
   need_load_z80 = true;
