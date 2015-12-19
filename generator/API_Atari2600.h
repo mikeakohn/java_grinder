@@ -28,6 +28,15 @@ public:
   virtual int atari2600_setColorPlayfield(int color) { return -1; }
   virtual int atari2600_setColorBackground() { return -1; }
   virtual int atari2600_setColorBackground(int color) { return -1; }
+
+  virtual int atari2600_resetPlayer0() { return -1; }
+  virtual int atari2600_resetPlayer1() { return -1; }
+  virtual int atari2600_resetMissile0() { return -1; }
+  virtual int atari2600_resetMissile1() { return -1; }
+  virtual int atari2600_resetBall() { return -1; }
+  virtual int atari2600_applyHorizontalMotion() { return -1; }
+  virtual int atari2600_clearMotionRegisters() { return -1; }
+  virtual int atari2600_clearCollisionLatches() { return -1; }
 };
 
 #endif

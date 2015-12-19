@@ -35,6 +35,15 @@ public:
   virtual int atari2600_setColorBackground();
   virtual int atari2600_setColorBackground(int color);
 
+  virtual int atari2600_resetPlayer0();
+  virtual int atari2600_resetPlayer1();
+  virtual int atari2600_resetMissile0();
+  virtual int atari2600_resetMissile1();
+  virtual int atari2600_resetBall();
+  virtual int atari2600_applyHorizontalMotion();
+  virtual int atari2600_clearMotionRegisters();
+  virtual int atari2600_clearCollisionLatches();
+
 private:
   void print_tia_definitions();
   void print_pia_definitions();

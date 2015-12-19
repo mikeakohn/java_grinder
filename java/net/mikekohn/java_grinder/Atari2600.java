@@ -26,5 +26,14 @@ abstract public class Atari2600
   public static void setColorPlayer1(int color) { }
   public static void setColorPlayfield(int color) { }
   public static void setColorBackground(int color) { }
+
+  public static void resetPlayer0() { }
+  public static void resetPlayer1() { }
+  public static void resetMissile0() { }
+  public static void resetMissile1() { }
+  public static void resetBall() { }
+  public static void applyHorizontalMotion() { }
+  public static void clearMotionRegisters() { }
+  public static void clearCollisionLatches() { }
 }
 

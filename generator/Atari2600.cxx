@@ -194,6 +194,54 @@ int Atari2600::atari2600_setColorBackground(int color)
   return 0;
 }
 
+int Atari2600::atari2600_resetPlayer0()
+{
+  fprintf(out, "sta RESP0\n");
+  return 0;
+}
+
+int Atari2600::atari2600_resetPlayer1()
+{
+  fprintf(out, "sta RESP1\n");
+  return 0;
+}
+
+int Atari2600::atari2600_resetMissile0()
+{
+  fprintf(out, "sta RESM0\n");
+  return 0;
+}
+
+int Atari2600::atari2600_resetMissile1()
+{
+  fprintf(out, "sta RESM1\n");
+  return 0;
+}
+
+int Atari2600::atari2600_resetBall()
+{
+  fprintf(out, "sta RESBL\n");
+  return 0;
+}
+
+int Atari2600::atari2600_applyHorizontalMotion()
+{
+  fprintf(out, "sta HMOVE\n");
+  return 0;
+}
+
+int Atari2600::atari2600_clearMotionRegisters()
+{
+  fprintf(out, "sta HCLR\n");
+  return 0;
+}
+
+int Atari2600::atari2600_clearCollisionLatches()
+{
+  fprintf(out, "sta CXCLR\n");
+  return 0;
+}
+
 void Atari2600::print_tia_definitions()
 {
   fprintf(out, "  VSYNC equ 0x00\n");

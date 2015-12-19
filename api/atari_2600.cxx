@@ -47,6 +47,15 @@ int atari_2600(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(setColorPlayfield,_I)
   CHECK_FUNC(setColorBackground,_I)
 
+  CHECK_FUNC(resetPlayer0,)
+  CHECK_FUNC(resetPlayer1,)
+  CHECK_FUNC(resetMissile0,)
+  CHECK_FUNC(resetMissile1,)
+  CHECK_FUNC(resetBall,)
+  CHECK_FUNC(applyHorizontalMotion,)
+  CHECK_FUNC(clearMotionRegisters,)
+  CHECK_FUNC(clearCollisionLatches,)
+
   return -1;
 }
 
