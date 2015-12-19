@@ -734,15 +734,16 @@ int SegaGenesis::sega_genesis_getJoypadValuePort1()
 {
   fprintf(out, "  ;; Read from joypad 1\n");
   fprintf(out, "  move.b #0x40, (0xa10009) ; Set direction\n");
-  fprintf(out, "  move.b #0x00, (0xa10003) ; TH=0\n");
+  fprintf(out, "  move.b #0x40, (0xa10003) ; TH=1\n");
   fprintf(out, "  move.b (0xa10003), d%d\n", REG_STACK(reg));
   fprintf(out, "  and.l #0xff, d%d\n", REG_STACK(reg));
 
-  fprintf(out, "  move.b #0x40, (0xa10003) ; TH=1\n");
+  fprintf(out, "  move.b #0x00, (0xa10003) ; TH=0\n");
   fprintf(out, "  move.b (0xa10003), d5\n");
   fprintf(out, "  and.l #0xff, d5\n");
   fprintf(out, "  lsl.l #8, d5\n");
   fprintf(out, "  or.l d5, d%d\n", REG_STACK(reg));
+  fprintf(out, "  eori.w #0xffff, d%d\n", REG_STACK(reg));
 
   reg++;
 
@@ -753,15 +754,16 @@ int SegaGenesis::sega_genesis_getJoypadValuePort2()
 {
   fprintf(out, "  ;; Read from joypad 2\n");
   fprintf(out, "  move.b #0x40, (0xa1000b) ; Set direction\n");
-  fprintf(out, "  move.b #0x00, (0xa10005) ; TH=0\n");
+  fprintf(out, "  move.b #0x40, (0xa10005) ; TH=1\n");
   fprintf(out, "  move.b (0xa10005), d%d\n", REG_STACK(reg));
   fprintf(out, "  and.l #0xff, d%d\n", REG_STACK(reg));
 
-  fprintf(out, "  move.b #0x40, (0xa10005) ; TH=1\n");
+  fprintf(out, "  move.b #0x00, (0xa10005) ; TH=0\n");
   fprintf(out, "  move.b (0xa10005), d5\n");
   fprintf(out, "  and.l #0xff, d5\n");
   fprintf(out, "  lsl.l #8, d5\n");
   fprintf(out, "  or.l d5, d%d\n", REG_STACK(reg));
+  fprintf(out, "  eori.w #0xffff, d%d\n", REG_STACK(reg));
 
   reg++;
 
