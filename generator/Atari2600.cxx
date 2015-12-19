@@ -19,6 +19,10 @@
 
 Atari2600::Atari2600()
 {
+  start_org = 0xf000;
+  java_stack_lo = 128;
+  java_stack_hi = 255;
+  ram_start = 128;
 }
 
 Atari2600::~Atari2600()
