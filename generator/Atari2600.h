@@ -40,9 +40,25 @@ public:
   virtual int atari2600_resetMissile0();
   virtual int atari2600_resetMissile1();
   virtual int atari2600_resetBall();
+  virtual int atari2600_resetMissile0ToPlayer0On();
+  virtual int atari2600_resetMissile1ToPlayer1On();
+  virtual int atari2600_resetMissile0ToPlayer0Off();
+  virtual int atari2600_resetMissile1ToPlayer1Off();
   virtual int atari2600_applyHorizontalMotion();
   virtual int atari2600_clearMotionRegisters();
   virtual int atari2600_clearCollisionLatches();
+
+  virtual int atari2600_enableMissile0();
+  virtual int atari2600_enableMissile1();
+  virtual int atari2600_enableBall();
+  virtual int atari2600_disableMissile0();
+  virtual int atari2600_disableMissile1();
+  virtual int atari2600_disableBall();
+
+  virtual int atari2600_enablePlayer0Reflect();
+  virtual int atari2600_enablePlayer1Reflect();
+  virtual int atari2600_disablePlayer0Reflect();
+  virtual int atari2600_disablePlayer1Reflect();
 
 private:
   void print_tia_definitions();

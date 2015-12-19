@@ -224,6 +224,34 @@ int Atari2600::atari2600_resetBall()
   return 0;
 }
 
+int Atari2600::atari2600_resetMissile0ToPlayer0On()
+{
+  fprintf(out, "lda #0x02\n");
+  fprintf(out, "sta RESMP0\n");
+  return 0;
+}
+
+int Atari2600::atari2600_resetMissile1ToPlayer1Off()
+{
+  fprintf(out, "lda #0x00\n");
+  fprintf(out, "sta RESMP1\n");
+  return 0;
+}
+
+int Atari2600::atari2600_resetMissile0ToPlayer0Off()
+{
+  fprintf(out, "lda #0x00\n");
+  fprintf(out, "sta RESMP0\n");
+  return 0;
+}
+
+int Atari2600::atari2600_resetMissile1ToPlayer1On()
+{
+  fprintf(out, "lda #0x02\n");
+  fprintf(out, "sta RESMP1\n");
+  return 0;
+}
+
 int Atari2600::atari2600_applyHorizontalMotion()
 {
   fprintf(out, "sta HMOVE\n");
@@ -239,6 +267,76 @@ int Atari2600::atari2600_clearMotionRegisters()
 int Atari2600::atari2600_clearCollisionLatches()
 {
   fprintf(out, "sta CXCLR\n");
+  return 0;
+}
+
+int Atari2600::atari2600_enableMissile0()
+{
+  fprintf(out, "  lda #0x02\n");
+  fprintf(out, "  sta ENAM0\n");
+  return 0;
+}
+
+int Atari2600::atari2600_enableMissile1()
+{
+  fprintf(out, "  lda #0x02\n");
+  fprintf(out, "  sta ENAM1\n");
+  return 0;
+}
+
+int Atari2600::atari2600_enableBall()
+{
+  fprintf(out, "  lda #0x02\n");
+  fprintf(out, "  sta ENABL\n");
+  return 0;
+}
+
+int Atari2600::atari2600_disableMissile0()
+{
+  fprintf(out, "  lda #0x00\n");
+  fprintf(out, "  sta ENAM0\n");
+  return 0;
+}
+
+int Atari2600::atari2600_disableMissile1()
+{
+  fprintf(out, "  lda #0x00\n");
+  fprintf(out, "  sta ENAM1\n");
+  return 0;
+}
+
+int Atari2600::atari2600_disableBall()
+{
+  fprintf(out, "  lda #0x00\n");
+  fprintf(out, "  sta ENABL\n");
+  return 0;
+}
+
+int Atari2600::atari2600_enablePlayer0Reflect()
+{
+  fprintf(out, "  lda #0x08\n");
+  fprintf(out, "  sta REFP0\n");
+  return 0;
+}
+
+int Atari2600::atari2600_enablePlayer1Reflect()
+{
+  fprintf(out, "  lda #0x08\n");
+  fprintf(out, "  sta REFP1\n");
+  return 0;
+}
+
+int Atari2600::atari2600_disablePlayer0Reflect()
+{
+  fprintf(out, "  lda #0x00\n");
+  fprintf(out, "  sta REFP0\n");
+  return 0;
+}
+
+int Atari2600::atari2600_disablePlayer1Reflect()
+{
+  fprintf(out, "  lda #0x00\n");
+  fprintf(out, "  sta REFP1\n");
   return 0;
 }
 

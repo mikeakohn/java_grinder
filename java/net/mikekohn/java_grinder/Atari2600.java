@@ -32,8 +32,24 @@ abstract public class Atari2600
   public static void resetMissile0() { }
   public static void resetMissile1() { }
   public static void resetBall() { }
+  public static void resetMissile0ToPlayer0On() { }
+  public static void resetMissile1ToPlayer1On() { }
+  public static void resetMissile0ToPlayer0Off() { }
+  public static void resetMissile1ToPlayer1Off() { }
   public static void applyHorizontalMotion() { }
   public static void clearMotionRegisters() { }
   public static void clearCollisionLatches() { }
+
+  public static void enableMissile0() { }
+  public static void enableMissile1() { }
+  public static void enableBall() { }
+  public static void disableMissile0() { }
+  public static void disableMissile1() { }
+  public static void disableBall() { }
+
+  public static void enablePlayer0Reflect() { }
+  public static void enablePlayer1Reflect() { }
+  public static void disablePlayer0Reflect() { }
+  public static void disablePlayer1Reflect() { }
 }
 

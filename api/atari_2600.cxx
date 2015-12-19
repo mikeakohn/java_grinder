@@ -52,9 +52,25 @@ int atari_2600(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(resetMissile0,)
   CHECK_FUNC(resetMissile1,)
   CHECK_FUNC(resetBall,)
+  CHECK_FUNC(resetMissile0ToPlayer0On,)
+  CHECK_FUNC(resetMissile1ToPlayer1On,)
+  CHECK_FUNC(resetMissile0ToPlayer0Off,)
+  CHECK_FUNC(resetMissile1ToPlayer1Off,)
   CHECK_FUNC(applyHorizontalMotion,)
   CHECK_FUNC(clearMotionRegisters,)
   CHECK_FUNC(clearCollisionLatches,)
+
+  CHECK_FUNC(enableMissile0,)
+  CHECK_FUNC(enableMissile1,)
+  CHECK_FUNC(enableBall,)
+  CHECK_FUNC(disableMissile0,)
+  CHECK_FUNC(disableMissile1,)
+  CHECK_FUNC(disableBall,)
+
+  CHECK_FUNC(enablePlayer0Reflect,)
+  CHECK_FUNC(enablePlayer1Reflect,)
+  CHECK_FUNC(disablePlayer0Reflect,)
+  CHECK_FUNC(disablePlayer1Reflect,)
 
   return -1;
 }

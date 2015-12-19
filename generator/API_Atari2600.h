@@ -34,9 +34,25 @@ public:
   virtual int atari2600_resetMissile0() { return -1; }
   virtual int atari2600_resetMissile1() { return -1; }
   virtual int atari2600_resetBall() { return -1; }
+  virtual int atari2600_resetMissile0ToPlayer0On() { return -1; }
+  virtual int atari2600_resetMissile1ToPlayer1On() { return -1; }
+  virtual int atari2600_resetMissile0ToPlayer0Off() { return -1; }
+  virtual int atari2600_resetMissile1ToPlayer1Off() { return -1; }
   virtual int atari2600_applyHorizontalMotion() { return -1; }
   virtual int atari2600_clearMotionRegisters() { return -1; }
   virtual int atari2600_clearCollisionLatches() { return -1; }
+
+  virtual int atari2600_enableMissile0() { return -1; }
+  virtual int atari2600_enableMissile1() { return -1; }
+  virtual int atari2600_enableBall() { return -1; }
+  virtual int atari2600_disableMissile0() { return -1; }
+  virtual int atari2600_disableMissile1() { return -1; }
+  virtual int atari2600_disableBall() { return -1; }
+
+  virtual int atari2600_enablePlayer0Reflect() { return -1; }
+  virtual int atari2600_enablePlayer1Reflect() { return -1; }
+  virtual int atari2600_disablePlayer0Reflect() { return -1; }
+  virtual int atari2600_disablePlayer1Reflect() { return -1; }
 };
 
 #endif
