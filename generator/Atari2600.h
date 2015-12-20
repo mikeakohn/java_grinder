@@ -62,6 +62,13 @@ public:
   virtual int atari2600_disablePlayer0Reflect();
   virtual int atari2600_disablePlayer1Reflect();
 
+  virtual int atari2600_setPlayfield0_B();
+  virtual int atari2600_setPlayfield0_B(int value);
+  virtual int atari2600_setPlayfield1_B();
+  virtual int atari2600_setPlayfield1_B(int value);
+  virtual int atari2600_setPlayfield2_B();
+  virtual int atari2600_setPlayfield2_B(int value);
+
 private:
   void print_tia_definitions();
   void print_pia_definitions();

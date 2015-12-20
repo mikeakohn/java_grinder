@@ -361,6 +361,48 @@ int Atari2600::atari2600_disablePlayer1Reflect()
   return 0;
 }
 
+int Atari2600::atari2600_setPlayfield0_B()
+{
+  return -1;
+}
+
+int Atari2600::atari2600_setPlayfield0_B(int value)
+{
+  fprintf(out, "; setPlayfield0_B\n");
+  fprintf(out, "  lda #0x%02x\n", (uint8_t)value);
+  fprintf(out, "  sta PF0\n");
+
+  return 0;
+}
+
+int Atari2600::atari2600_setPlayfield1_B()
+{
+  return -1;
+}
+
+int Atari2600::atari2600_setPlayfield1_B(int value)
+{
+  fprintf(out, "; setPlayfield1_B\n");
+  fprintf(out, "  lda #0x%02x\n", (uint8_t)value);
+  fprintf(out, "  sta PF1\n");
+
+  return 0;
+}
+
+int Atari2600::atari2600_setPlayfield2_B()
+{
+  return -1;
+}
+
+int Atari2600::atari2600_setPlayfield2_B(int value)
+{
+  fprintf(out, "; setPlayfield2_B\n");
+  fprintf(out, "  lda #0x%02x\n", (uint8_t)value);
+  fprintf(out, "  sta PF2\n");
+
+  return 0;
+}
+
 void Atari2600::print_tia_definitions()
 {
   fprintf(out, "  VSYNC equ 0x00\n");

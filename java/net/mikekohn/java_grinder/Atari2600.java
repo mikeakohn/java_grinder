@@ -52,5 +52,9 @@ abstract public class Atari2600
   public static void enablePlayer1Reflect() { }
   public static void disablePlayer0Reflect() { }
   public static void disablePlayer1Reflect() { }
+
+  public static void setPlayfield0(byte value) { }
+  public static void setPlayfield1(byte value) { }
+  public static void setPlayfield2(byte value) { }
 }
 
