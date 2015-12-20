@@ -50,8 +50,14 @@ abstract public class Atari2600
 
   public static void enablePlayer0Reflect() { }
   public static void enablePlayer1Reflect() { }
+  public static void enablePlayfieldReflect() { }
   public static void disablePlayer0Reflect() { }
   public static void disablePlayer1Reflect() { }
+  public static void disablePlayfieldReflect() { }
+
+  /** Left side uses player 0 color, Right side uses player 1 color */
+  public static void enablePlayfieldScoreColor() { }
+  public static void disablePlayfieldScoreColor() { }
 
   public static void setPlayfield0(byte value) { }
   public static void setPlayfield1(byte value) { }

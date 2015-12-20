@@ -16,6 +16,24 @@
 
 #include "Generator.h"
 
+#define PUSH_LO() \
+  fprintf(out, "; PUSH_LO\n"); \
+  fprintf(out, "  sta stack_lo,x\n")
+
+#define PUSH_HI() \
+  fprintf(out, "; PUSH_HI\n"); \
+  fprintf(out, "  sta stack_hi,x\n"); \
+  fprintf(out, "  dex\n")
+
+#define POP_HI() \
+  fprintf(out, "; POP_HI\n"); \
+  fprintf(out, "  inx\n"); \
+  fprintf(out, "  lda stack_hi,x\n")
+
+#define POP_LO() \
+  fprintf(out, "; POP_LO\n"); \
+  fprintf(out, "  lda stack_lo,x\n")
+
 class M6502 : public Generator
 {
 public:
@@ -23,6 +41,7 @@ public:
   virtual ~M6502();
 
   virtual int open(const char *filename);
+  virtual int add_functions();
   virtual int start_init();
   virtual int insert_static_field_define(const char *name, const char *type, int index);
   virtual int init_heap(int field_count);

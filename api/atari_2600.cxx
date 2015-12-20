@@ -70,8 +70,13 @@ int atari_2600(JavaClass *java_class, Generator *generator, char *method_name)
 
   CHECK_FUNC(enablePlayer0Reflect,)
   CHECK_FUNC(enablePlayer1Reflect,)
+  CHECK_FUNC(enablePlayfieldReflect,)
   CHECK_FUNC(disablePlayer0Reflect,)
   CHECK_FUNC(disablePlayer1Reflect,)
+  CHECK_FUNC(disablePlayfieldReflect,)
+
+  CHECK_FUNC(enablePlayfieldScoreColor,)
+  CHECK_FUNC(disablePlayfieldScoreColor,)
 
   CHECK_FUNC(setPlayfield0,_B)
   CHECK_FUNC(setPlayfield1,_B)

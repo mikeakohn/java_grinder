@@ -18,24 +18,6 @@
 
 #include "C64.h"
 
-#define PUSH_LO() \
-  fprintf(out, "; PUSH_LO\n"); \
-  fprintf(out, "  sta stack_lo,x\n")
-
-#define PUSH_HI() \
-  fprintf(out, "; PUSH_HI\n"); \
-  fprintf(out, "  sta stack_hi,x\n"); \
-  fprintf(out, "  dex\n")
-
-#define POP_HI() \
-  fprintf(out, "; POP_HI\n"); \
-  fprintf(out, "  inx\n"); \
-  fprintf(out, "  lda stack_hi,x\n")
-
-#define POP_LO() \
-  fprintf(out, "; POP_LO\n"); \
-  fprintf(out, "  lda stack_lo,x\n")
-
 #define POKE(dst) \
   POP_HI(); \
   POP_LO(); \

@@ -332,6 +332,9 @@ int main(int argc, char *argv[])
     if (compiler->add_constants() == -1) { ret = -1; break; }
   } while(0);
 
+  // Add any extra hardcoded functions needed at the end.
+  generator->add_functions();
+
   delete generator;
   delete compiler;
 

@@ -59,8 +59,13 @@ public:
 
   virtual int atari2600_enablePlayer0Reflect();
   virtual int atari2600_enablePlayer1Reflect();
+  virtual int atari2600_enablePlayfieldReflect();
   virtual int atari2600_disablePlayer0Reflect();
   virtual int atari2600_disablePlayer1Reflect();
+  virtual int atari2600_disablePlayfieldReflect();
+
+  virtual int atari2600_enablePlayfieldScoreColor();
+  virtual int atari2600_disablePlayfieldScoreColor();
 
   virtual int atari2600_setPlayfield0_B();
   virtual int atari2600_setPlayfield0_B(int value);

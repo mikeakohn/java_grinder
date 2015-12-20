@@ -47,6 +47,7 @@ public:
   virtual ~Generator();
 
   virtual int open(const char *filename);
+  virtual int add_functions() { return 0; }
   virtual int get_cpu_byte_alignment() { return 2; }
   void label(char *name);
   virtual int start_init() = 0;
