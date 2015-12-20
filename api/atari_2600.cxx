@@ -20,23 +20,24 @@
 #define CHECK_FUNC(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return generator->atari2600_##funct(); \
+    return generator->atari2600_##funct##sig(); \
   }
 
 #define CHECK_FUNC_CONST(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return generator->atari2600_##funct(const_val); \
+    return generator->atari2600_##funct##sig(const_val); \
   }
 
 #define CHECK_FUNC_CONST_2(funct,sig) \
   if (strcmp(#funct#sig, function) == 0) \
   { \
-    return generator->atari2600_##funct(const_val1, const_val2); \
+    return generator->atari2600_##funct##sig(const_val1, const_val2); \
   }
 
 int atari_2600(JavaClass *java_class, Generator *generator, char *method_name)
 {
+  CHECK_FUNC(waitHsync,_I)
   CHECK_FUNC(waitHsync,)
   CHECK_FUNC(startVblank,)
   CHECK_FUNC(waitVblank,)
@@ -77,6 +78,7 @@ int atari_2600(JavaClass *java_class, Generator *generator, char *method_name)
 
 int atari_2600(JavaClass *java_class, Generator *generator, char *method_name, int const_val)
 {
+  CHECK_FUNC_CONST(waitHsync,_I)
   CHECK_FUNC_CONST(setColorPlayer0,_I)
   CHECK_FUNC_CONST(setColorPlayer1,_I)
   CHECK_FUNC_CONST(setColorPlayfield,_I)

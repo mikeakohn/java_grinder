@@ -17,6 +17,7 @@ abstract public class Atari2600
   {
   }
 
+  public static void waitHsync(int lines) { }
   public static void waitHsync() { }
   public static void startVblank() { }
   public static void waitVblank() { }

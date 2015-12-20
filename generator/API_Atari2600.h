@@ -15,19 +15,21 @@
 class API_Atari2600
 {
 public:
+  virtual int atari2600_waitHsync_I() { return -1; }
+  virtual int atari2600_waitHsync_I(int count) { return -1; }
   virtual int atari2600_waitHsync() { return -1; }
   virtual int atari2600_startVblank() { return -1; }
   virtual int atari2600_waitVblank() { return -1; }
   virtual int atari2600_startOverscan() { return -1; }
   virtual int atari2600_waitOverscan() { return -1; }
-  virtual int atari2600_setColorPlayer0() { return -1; }
-  virtual int atari2600_setColorPlayer0(int color) { return -1; }
-  virtual int atari2600_setColorPlayer1() { return -1; }
-  virtual int atari2600_setColorPlayer1(int color) { return -1; }
-  virtual int atari2600_setColorPlayfield() { return -1; }
-  virtual int atari2600_setColorPlayfield(int color) { return -1; }
-  virtual int atari2600_setColorBackground() { return -1; }
-  virtual int atari2600_setColorBackground(int color) { return -1; }
+  virtual int atari2600_setColorPlayer0_I() { return -1; }
+  virtual int atari2600_setColorPlayer0_I(int color) { return -1; }
+  virtual int atari2600_setColorPlayer1_I() { return -1; }
+  virtual int atari2600_setColorPlayer1_I(int color) { return -1; }
+  virtual int atari2600_setColorPlayfield_I() { return -1; }
+  virtual int atari2600_setColorPlayfield_I(int color) { return -1; }
+  virtual int atari2600_setColorBackground_I() { return -1; }
+  virtual int atari2600_setColorBackground_I(int color) { return -1; }
 
   virtual int atari2600_resetPlayer0() { return -1; }
   virtual int atari2600_resetPlayer1() { return -1; }

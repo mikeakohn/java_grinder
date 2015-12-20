@@ -59,6 +59,27 @@ int Atari2600::open(const char *filename)
   return 0;
 }
 
+int Atari2600::atari2600_waitHsync_I()
+{
+  return -1;
+}
+
+int Atari2600::atari2600_waitHsync_I(int lines)
+{
+  if (lines == 1) { return atari2600_waitHsync(); }
+
+  fprintf(out, "; waitLines(%d)\n", lines);
+  fprintf(out, "  ldx #0x%02x\n", lines);
+  fprintf(out, "_wait_lines_%d:\n", label_count);
+  fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  dex\n");
+  fprintf(out, "  bne _wait_lines_%d\n", label_count);
+
+  label_count++;
+
+  return 0;
+}
+
 int Atari2600::atari2600_waitHsync()
 {
   fprintf(out, "  sta WSYNC\n");
@@ -118,12 +139,12 @@ int Atari2600::atari2600_waitOverscan()
   return 0;
 }
 
-int Atari2600::atari2600_setColorPlayer0()
+int Atari2600::atari2600_setColorPlayer0_I()
 {
   return -1;
 }
 
-int Atari2600::atari2600_setColorPlayer0(int color)
+int Atari2600::atari2600_setColorPlayer0_I(int color)
 {
   if (color < 0 || color > 255)
   {
@@ -137,12 +158,12 @@ int Atari2600::atari2600_setColorPlayer0(int color)
   return 0;
 }
 
-int Atari2600::atari2600_setColorPlayer1()
+int Atari2600::atari2600_setColorPlayer1_I()
 {
   return -1;
 }
 
-int Atari2600::atari2600_setColorPlayer1(int color)
+int Atari2600::atari2600_setColorPlayer1_I(int color)
 {
   if (color < 0 || color > 255)
   {
@@ -156,12 +177,12 @@ int Atari2600::atari2600_setColorPlayer1(int color)
   return 0;
 }
 
-int Atari2600::atari2600_setColorPlayfield()
+int Atari2600::atari2600_setColorPlayfield_I()
 {
   return -1;
 }
 
-int Atari2600::atari2600_setColorPlayfield(int color)
+int Atari2600::atari2600_setColorPlayfield_I(int color)
 {
   if (color < 0 || color > 255)
   {
@@ -175,12 +196,12 @@ int Atari2600::atari2600_setColorPlayfield(int color)
   return 0;
 }
 
-int Atari2600::atari2600_setColorBackground()
+int Atari2600::atari2600_setColorBackground_I()
 {
   return -1;
 }
 
-int Atari2600::atari2600_setColorBackground(int color)
+int Atari2600::atari2600_setColorBackground_I(int color)
 {
   if (color < 0 || color > 255)
   {

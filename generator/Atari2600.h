@@ -21,19 +21,21 @@ public:
   virtual ~Atari2600();
 
   virtual int open(const char *filename);
+  virtual int atari2600_waitHsync_I();
+  virtual int atari2600_waitHsync_I(int lines);
   virtual int atari2600_waitHsync();
   virtual int atari2600_startVblank();
   virtual int atari2600_waitVblank();
   virtual int atari2600_startOverscan();
   virtual int atari2600_waitOverscan();
-  virtual int atari2600_setColorPlayer0();
-  virtual int atari2600_setColorPlayer0(int color);
-  virtual int atari2600_setColorPlayer1();
-  virtual int atari2600_setColorPlayer1(int color);
-  virtual int atari2600_setColorPlayfield();
-  virtual int atari2600_setColorPlayfield(int color);
-  virtual int atari2600_setColorBackground();
-  virtual int atari2600_setColorBackground(int color);
+  virtual int atari2600_setColorPlayer0_I();
+  virtual int atari2600_setColorPlayer0_I(int color);
+  virtual int atari2600_setColorPlayer1_I();
+  virtual int atari2600_setColorPlayer1_I(int color);
+  virtual int atari2600_setColorPlayfield_I();
+  virtual int atari2600_setColorPlayfield_I(int color);
+  virtual int atari2600_setColorBackground_I();
+  virtual int atari2600_setColorBackground_I(int color);
 
   virtual int atari2600_resetPlayer0();
   virtual int atari2600_resetPlayer1();
