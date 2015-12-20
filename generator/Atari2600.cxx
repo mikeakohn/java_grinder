@@ -355,14 +355,6 @@ int Atari2600::atari2600_enablePlayer1Reflect()
   return 0;
 }
 
-int Atari2600::atari2600_enablePlayfieldReflect()
-{
-  fprintf(out, "  lda CTRLPF\n");
-  fprintf(out, "  ora #0x01\n");
-  fprintf(out, "  sta CTRLPF\n");
-  return 0;
-}
-
 int Atari2600::atari2600_disablePlayer0Reflect()
 {
   fprintf(out, "  lda #0x00\n");
@@ -377,26 +369,19 @@ int Atari2600::atari2600_disablePlayer1Reflect()
   return 0;
 }
 
-int Atari2600::atari2600_disablePlayfieldReflect()
+int Atari2600::atari2600_setPlayfieldMode_I()
 {
-  fprintf(out, "  lda CTRLPF\n");
-  fprintf(out, "  and #0xfe\n");
+  fprintf(out, "; setPlayfieldMode_I\n");
+  POP_HI();
+  POP_LO();
   fprintf(out, "  sta CTRLPF\n");
   return 0;
 }
 
-int Atari2600::atari2600_enablePlayfieldScoreColor()
+int Atari2600::atari2600_setPlayfieldMode_I(int mode)
 {
-  fprintf(out, "  lda CTRLPF\n");
-  fprintf(out, "  ora #0x02\n");
-  fprintf(out, "  sta CTRLPF\n");
-  return 0;
-}
-
-int Atari2600::atari2600_disablePlayfieldScoreColor()
-{
-  fprintf(out, "  lda CTRLPF\n");
-  fprintf(out, "  and #0xfd\n");
+  fprintf(out, "; setPlayfieldMode_I\n");
+  fprintf(out, "  lda #0x%02x\n", (uint8_t)mode);
   fprintf(out, "  sta CTRLPF\n");
   return 0;
 }

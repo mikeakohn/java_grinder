@@ -53,13 +53,11 @@ public:
 
   virtual int atari2600_enablePlayer0Reflect() { return -1; }
   virtual int atari2600_enablePlayer1Reflect() { return -1; }
-  virtual int atari2600_enablePlayfieldReflect() { return -1; }
   virtual int atari2600_disablePlayer0Reflect() { return -1; }
   virtual int atari2600_disablePlayer1Reflect() { return -1; }
-  virtual int atari2600_disablePlayfieldReflect() { return -1; }
 
-  virtual int atari2600_enablePlayfieldScoreColor() { return -1; }
-  virtual int atari2600_disablePlayfieldScoreColor() { return -1; }
+  virtual int atari2600_setPlayfieldMode_I() { return -1; }
+  virtual int atari2600_setPlayfieldMode_I(int mode) { return -1; }
 
   virtual int atari2600_setPlayfield0_B() { return -1; }
   virtual int atari2600_setPlayfield0_B(int value) { return -1; }

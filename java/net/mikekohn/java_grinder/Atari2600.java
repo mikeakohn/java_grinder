@@ -17,6 +17,14 @@ abstract public class Atari2600
   {
   }
 
+  public static final int PLAYFIELD_BALL_SIZE_8 = 0x30;
+  public static final int PLAYFIELD_BALL_SIZE_4 = 0x20;
+  public static final int PLAYFIELD_BALL_SIZE_2 = 0x10;
+  public static final int PLAYFIELD_BALL_SIZE_1 = 0x00;
+  public static final int PLAYFIELD_HIGH_PRIORITY = 0x04;
+  public static final int PLAYFIELD_SCORE_COLOR = 0x02;
+  public static final int PLAYFIELD_REFLECT = 0x01;
+
   public static void waitHsync(int lines) { }
   public static void waitHsync() { }
   public static void startVblank() { }
@@ -50,14 +58,10 @@ abstract public class Atari2600
 
   public static void enablePlayer0Reflect() { }
   public static void enablePlayer1Reflect() { }
-  public static void enablePlayfieldReflect() { }
   public static void disablePlayer0Reflect() { }
   public static void disablePlayer1Reflect() { }
-  public static void disablePlayfieldReflect() { }
 
-  /** Left side uses player 0 color, Right side uses player 1 color */
-  public static void enablePlayfieldScoreColor() { }
-  public static void disablePlayfieldScoreColor() { }
+  public static void setPlayfieldMode(int mode) { }
 
   public static void setPlayfield0(byte value) { }
   public static void setPlayfield1(byte value) { }

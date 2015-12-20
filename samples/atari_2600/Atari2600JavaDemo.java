@@ -5,8 +5,7 @@ public class Atari2600JavaDemo
   public static void main()
   {
     Atari2600.setColorPlayfield(0x80 | 0x70 | 0x02);
-    Atari2600.disablePlayfieldScoreColor();
-    Atari2600.enablePlayfieldReflect();
+    Atari2600.setPlayfieldMode(Atari2600.PLAYFIELD_REFLECT);
 
     int n = 100;
 
