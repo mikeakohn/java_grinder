@@ -46,7 +46,7 @@ public class Atari2600JavaDemo
       Atari2600.setPlayfield2((byte)0x00);
       Atari2600.setPlayfield1((byte)0x00);
       Atari2600.setColorPlayfield(n);
-      Atari2600.waitHsync(17);
+      Atari2600.waitHsync(22);
 
       Atari2600.startOverscan();
       n = n + 1;
