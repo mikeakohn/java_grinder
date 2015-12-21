@@ -120,6 +120,8 @@ int Atari2600::atari2600_waitVblank()
 
 int Atari2600::atari2600_startOverscan()
 {
+  fprintf(out, "  lda #35\n");
+  fprintf(out, "  sta TIM64T\n");
   fprintf(out, "  lda #0x02\n");
   fprintf(out, "  sta VBLANK\n");
 
@@ -128,10 +130,8 @@ int Atari2600::atari2600_startOverscan()
 
 int Atari2600::atari2600_waitOverscan()
 {
-  fprintf(out, "  ldx #30\n");
   fprintf(out, "_overscan_wait_%d:\n", label_count);
-  fprintf(out, "  sta WSYNC\n");
-  fprintf(out, "  dex\n");
+  fprintf(out, "  lda INTIM\n");
   fprintf(out, "  bne _overscan_wait_%d\n", label_count);
 
   label_count++;
