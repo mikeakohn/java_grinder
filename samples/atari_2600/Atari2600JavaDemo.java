@@ -2,7 +2,7 @@ import net.mikekohn.java_grinder.Atari2600;
 
 public class Atari2600JavaDemo
 {
-  public static int bass_note[] =
+  static int bass_note[] =
   {
     31, 29, 26, 23, 19, 17, 15, 14, 11, 9, 8, 7, 5, 4, 3, 2, 1, 0
   };
@@ -25,7 +25,10 @@ public class Atari2600JavaDemo
     Atari2600.setAudioControl1((byte)12);
     
     Atari2600.setAudioVolume0((byte)15);
-    Atari2600.setAudioVolume1((byte)0);
+    Atari2600.setAudioVolume1((byte)8);
+
+    Atari2600.setAudioFrequency0((byte)(bass_note[0]));
+    Atari2600.setAudioFrequency1((byte)(bass_note[0]));
 
     while(true)
     {
@@ -35,9 +38,10 @@ public class Atari2600JavaDemo
       if(timer > 10)
       {
         timer = 0;
-        Atari2600.setAudioFrequency0((byte)(bass_note[note] | 32));
+        Atari2600.setAudioFrequency0((byte)(bass_note[note]));
+        Atari2600.setAudioFrequency1((byte)(bass_note[note]));
         note++;
-        if(note > 15)
+        if(note > 17)
           note = 0;
       }
 
@@ -79,7 +83,7 @@ public class Atari2600JavaDemo
 
       Atari2600.startOverscan();
 
-      n = n + 1;
+      n++;
 
       if (Atari2600.isJoystick0Left())
       {
