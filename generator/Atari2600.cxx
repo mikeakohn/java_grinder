@@ -738,6 +738,7 @@ int Atari2600::atari2600_isJoystick0Down()
   fprintf(out, "  eor #0x20\n");
   PUSH_LO();
   fprintf(out, "  lda #0x00\n");
+  PUSH_HI();
 
   return 0;
 }
