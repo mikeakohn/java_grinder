@@ -66,5 +66,50 @@ abstract public class Atari2600
   public static void setPlayfield0(byte value) { }
   public static void setPlayfield1(byte value) { }
   public static void setPlayfield2(byte value) { }
+
+  public static boolean isCollisionMissile0Player1() { return false; }
+  public static boolean isCollisionMissile0Player0() { return false; }
+  public static boolean isCollisionMissile1Player0() { return false; }
+  public static boolean isCollisionMissile1Player1() { return false; }
+  public static boolean isCollisionPlayer0PlayField() { return false; }
+  public static boolean isCollisionPlayer0Ball() { return false; }
+  public static boolean isCollisionPlayer1PlayField() { return false; }
+  public static boolean isCollisionPlayer1Ball() { return false; }
+  public static boolean isCollisionMissile0Playfield() { return false; }
+  public static boolean isCollisionMissile0Ball() { return false; }
+  public static boolean isCollisionMissile1Playfield() { return false; }
+  public static boolean isCollisionMissile1Ball() { return false; }
+  public static boolean isCollisionBallPlayfield() { return false; }
+  public static boolean isCollisionPlayer0Player1() { return false; }
+  public static boolean isCollisionMissile0Missile1() { return false; }
+
+  /** Audio sound type, 4 bit number */
+  public static void setAudioControl0(byte value) { }
+
+  /** Audio sound type, 4 bit number */
+  public static void setAudioControl1(byte value) { }
+
+  /** Audio frequency, 5 bit number */
+  public static void setAudioFrequency0(byte value) { }
+
+  /** Audio frequency, 5 bit number */
+  public static void setAudioFrequency1(byte value) { }
+
+  /** Audio volume, 4 bit number */
+  public static void setAudioVolume0(byte value) { }
+
+  /** Audio volume, 4 bit number */
+  public static void setAudioVolume1(byte value) { }
+
+  public static boolean isJoystick0Right() { return false; }
+  public static boolean isJoystick0Left() { return false; }
+  public static boolean isJoystick0Down() { return false; }
+  public static boolean isJoystick0Up() { return false; }
+  public static boolean isJoystick0ButtonDown() { return false; }
+  public static boolean isJoystick1Right() { return false; }
+  public static boolean isJoystick1Left() { return false; }
+  public static boolean isJoystick1Down() { return false; }
+  public static boolean isJoystick1Up() { return false; }
+  public static boolean isJoystick1ButtonDown() { return false; }
 }
 

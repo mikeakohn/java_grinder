@@ -15,7 +15,7 @@ public class Atari2600JavaDemo
       Atari2600.waitVblank();
 
       // Draw on screen
-      Atari2600.setColorBackground(0x80 | 0x70 | 0x04);
+      //Atari2600.setColorBackground(0x80 | 0x70 | 0x04);
       Atari2600.waitHsync(10);
       Atari2600.setColorBackground(0x80 | 0x70 | 0x02);
       Atari2600.waitHsync(10);
@@ -50,6 +50,35 @@ public class Atari2600JavaDemo
 
       Atari2600.startOverscan();
       n = n + 1;
+
+      if (Atari2600.isJoystick0Left())
+      {
+        Atari2600.setColorBackground(0x80 | 0x70 | 0x01);
+      }
+        else
+      if (Atari2600.isJoystick0Right())
+      {
+        Atari2600.setColorBackground(0x80 | 0x70 | 0x02);
+      }
+        else
+      if (Atari2600.isJoystick0Down())
+      {
+        Atari2600.setColorBackground(0x80 | 0x74 | 0x02);
+      }
+        else
+      if (Atari2600.isJoystick0Up())
+      {
+        Atari2600.setColorBackground(0x80 | 0x64 | 0x02);
+      }
+        else
+      if (Atari2600.isJoystick0ButtonDown())
+      {
+        Atari2600.setColorBackground(0x80 | 0x64 | 0x08);
+      }
+        else
+      {
+        Atari2600.setColorBackground(0x80 | 0x70 | 0x04);
+      }
       Atari2600.waitOverscan();
     }
   }

@@ -65,6 +65,40 @@ public:
   virtual int atari2600_setPlayfield1_B(int value) { return -1; }
   virtual int atari2600_setPlayfield2_B() { return -1; }
   virtual int atari2600_setPlayfield2_B(int value) { return -1; }
+
+  virtual int atari2600_isCollisionMissile0Player1() { return -1; }
+  virtual int atari2600_isCollisionMissile0Player0() { return -1; }
+  virtual int atari2600_isCollisionMissile1Player0() { return -1; }
+  virtual int atari2600_isCollisionMissile1Player1() { return -1; }
+  virtual int atari2600_isCollisionPlayer0PlayField() { return -1; }
+  virtual int atari2600_isCollisionPlayer0Ball() { return -1; }
+  virtual int atari2600_isCollisionPlayer1PlayField() { return -1; }
+  virtual int atari2600_isCollisionPlayer1Ball() { return -1; }
+  virtual int atari2600_isCollisionMissile0Playfield() { return -1; }
+  virtual int atari2600_isCollisionMissile0Ball() { return -1; }
+  virtual int atari2600_isCollisionMissile1Playfield() { return -1; }
+  virtual int atari2600_isCollisionMissile1Ball() { return -1; }
+  virtual int atari2600_isCollisionBallPlayfield() { return -1; }
+  virtual int atari2600_isCollisionPlayer0Player1() { return -1; }
+  virtual int atari2600_isCollisionMissile0Missile1() { return -1; }
+
+  virtual int atari2600_setAudioControl0_B() { return -1; }
+  virtual int atari2600_setAudioControl1_B() { return -1; }
+  virtual int atari2600_setAudioFrequency0_B() { return -1; }
+  virtual int atari2600_setAudioFrequency1_B() { return -1; }
+  virtual int atari2600_setAudioVolume0_B() { return -1; }
+  virtual int atari2600_setAudioVolume1_B() { return -1; }
+
+  virtual int atari2600_isJoystick0Right() { return -1; }
+  virtual int atari2600_isJoystick0Left() { return -1; }
+  virtual int atari2600_isJoystick0Down() { return -1; }
+  virtual int atari2600_isJoystick0Up() { return -1; }
+  virtual int atari2600_isJoystick0ButtonDown() { return -1; }
+  virtual int atari2600_isJoystick1Right() { return -1; }
+  virtual int atari2600_isJoystick1Left() { return -1; }
+  virtual int atari2600_isJoystick1Down() { return -1; }
+  virtual int atari2600_isJoystick1Up() { return -1; }
+  virtual int atari2600_isJoystick1ButtonDown() { return -1; }
 };
 
 #endif

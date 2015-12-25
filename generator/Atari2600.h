@@ -72,6 +72,40 @@ public:
   virtual int atari2600_setPlayfield2_B();
   virtual int atari2600_setPlayfield2_B(int value);
 
+  virtual int atari2600_isCollisionMissile0Player1();
+  virtual int atari2600_isCollisionMissile0Player0();
+  virtual int atari2600_isCollisionMissile1Player0();
+  virtual int atari2600_isCollisionMissile1Player1();
+  virtual int atari2600_isCollisionPlayer0PlayField();
+  virtual int atari2600_isCollisionPlayer0Ball();
+  virtual int atari2600_isCollisionPlayer1PlayField();
+  virtual int atari2600_isCollisionPlayer1Ball();
+  virtual int atari2600_isCollisionMissile0Playfield();
+  virtual int atari2600_isCollisionMissile0Ball();
+  virtual int atari2600_isCollisionMissile1Playfield();
+  virtual int atari2600_isCollisionMissile1Ball();
+  virtual int atari2600_isCollisionBallPlayfield();
+  virtual int atari2600_isCollisionPlayer0Player1();
+  virtual int atari2600_isCollisionMissile0Missile1();
+
+  virtual int atari2600_setAudioControl0_B();
+  virtual int atari2600_setAudioControl1_B();
+  virtual int atari2600_setAudioFrequency0_B();
+  virtual int atari2600_setAudioFrequency1_B();
+  virtual int atari2600_setAudioVolume0_B();
+  virtual int atari2600_setAudioVolume1_B();
+
+  virtual int atari2600_isJoystick0Right();
+  virtual int atari2600_isJoystick0Left();
+  virtual int atari2600_isJoystick0Down();
+  virtual int atari2600_isJoystick0Up();
+  virtual int atari2600_isJoystick0ButtonDown();
+  virtual int atari2600_isJoystick1Right();
+  virtual int atari2600_isJoystick1Left();
+  virtual int atari2600_isJoystick1Down();
+  virtual int atari2600_isJoystick1Up();
+  virtual int atari2600_isJoystick1ButtonDown();
+
 private:
   void print_tia_definitions();
   void print_pia_definitions();
