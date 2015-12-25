@@ -77,22 +77,22 @@ int M6502::open(const char *filename)
   fprintf(out, "heap_ptr equ ram_start\n");
 
   // for indirection (2 bytes)
-  fprintf(out, "address equ 0xfb\n");
+  fprintf(out, "address equ 0xac\n");
 
   // java stack
   fprintf(out, "stack_lo equ 0x%04x\n", java_stack_lo);
   fprintf(out, "stack_hi equ 0x%04x\n", java_stack_hi);
 
   // points to locals
-  fprintf(out, "locals equ 0xfe\n");
+  fprintf(out, "locals equ 0xae\n");
 
   // temp variables
-  fprintf(out, "result equ 0x20\n");
-  fprintf(out, "remainder equ 0x24\n");
-  fprintf(out, "length equ 0x26\n");
-  fprintf(out, "value1 equ 0x2a\n");
-  fprintf(out, "value2 equ 0x2c\n");
-  fprintf(out, "value3 equ 0x2e\n");
+  fprintf(out, "result equ 0xa2\n");
+  fprintf(out, "remainder equ 0xa4\n");
+  fprintf(out, "length equ 0xa6\n");
+  fprintf(out, "value1 equ 0xa8\n");
+  fprintf(out, "value2 equ 0xaa\n");
+  fprintf(out, "value3 equ 0xac\n");
 
   // start at 0x0400 when using simulator
   fprintf(out, ".org 0x%04x\n", start_org);

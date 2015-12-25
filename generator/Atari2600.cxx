@@ -47,6 +47,9 @@ int Atari2600::open(const char *filename)
   // Is this needed?
   fprintf(out, "; clear TIA\n");
   fprintf(out, "  sei\n");
+  fprintf(out, "  cld\n");
+  fprintf(out, "  ldx #0xff\n");
+  fprintf(out, "  txs\n");
   fprintf(out, "  lda #0\n");
   fprintf(out, "  ldx #127\n");
   fprintf(out, "_clear_tia:\n");
@@ -55,7 +58,7 @@ int Atari2600::open(const char *filename)
   fprintf(out, "  bne _clear_tia\n");
 
   fprintf(out, "; set java stack pointer (x register)\n");
-  fprintf(out, "  ldx #0x0F\n");
+  fprintf(out, "  ldx #0x0f\n");
 
   return 0;
 }
@@ -65,9 +68,10 @@ int Atari2600::atari2600_waitHsync_I()
   fprintf(out, "; waitLines_I()\n");
   POP_HI();
   POP_LO();
+  fprintf(out, "  tay\n");
   fprintf(out, "_wait_sync_%d:\n", label_count);
   fprintf(out, "  sta WSYNC\n");
-  fprintf(out, "  dec\n");
+  fprintf(out, "  dey\n");
   fprintf(out, "  bne _wait_sync_%d\n", label_count);
 
   label_count++;
@@ -80,10 +84,10 @@ int Atari2600::atari2600_waitHsync_I(int lines)
   if (lines == 1) { return atari2600_waitHsync(); }
 
   fprintf(out, "; waitHsync_I(%d)\n", lines);
-  fprintf(out, "  ldx #0x%02x\n", lines);
+  fprintf(out, "  ldy #0x%02x\n", lines);
   fprintf(out, "_wait_sync_%d:\n", label_count);
   fprintf(out, "  sta WSYNC\n");
-  fprintf(out, "  dex\n");
+  fprintf(out, "  dey\n");
   fprintf(out, "  bne _wait_sync_%d\n", label_count);
 
   label_count++;
@@ -121,7 +125,7 @@ int Atari2600::atari2600_waitVblank()
   fprintf(out, "  bne _vblank_wait_%d\n", label_count);
 
   fprintf(out, "  lda #0x00\n");
-  //fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  sta WSYNC\n");
   fprintf(out, "  sta VBLANK\n");
 
   label_count++;
@@ -131,6 +135,7 @@ int Atari2600::atari2600_waitVblank()
 
 int Atari2600::atari2600_startOverscan()
 {
+
   fprintf(out, "  lda #35\n");
   fprintf(out, "  sta TIM64T\n");
   fprintf(out, "  lda #0x02\n");
