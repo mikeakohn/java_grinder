@@ -131,6 +131,13 @@ int atari_2600(JavaClass *java_class, Generator *generator, char *method_name, i
   CHECK_FUNC_CONST(setPlayfield1,_B)
   CHECK_FUNC_CONST(setPlayfield2,_B)
 
+  CHECK_FUNC_CONST(setAudioControl0,_B)
+  CHECK_FUNC_CONST(setAudioControl1,_B)
+  CHECK_FUNC_CONST(setAudioFrequency0,_B)
+  CHECK_FUNC_CONST(setAudioFrequency1,_B)
+  CHECK_FUNC_CONST(setAudioVolume0,_B)
+  CHECK_FUNC_CONST(setAudioVolume1,_B)
+
   return -1;
 }
 

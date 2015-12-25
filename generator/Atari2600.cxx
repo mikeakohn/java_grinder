@@ -654,11 +654,29 @@ int Atari2600::atari2600_setAudioControl0_B()
   return 0;
 }
 
+int Atari2600::atari2600_setAudioControl0_B(int value)
+{
+  fprintf(out, "; setAudioControl0_B\n");
+  fprintf(out, "  lda #0x%02x\n", value & 0xff);
+  fprintf(out, "  sta AUDC0\n");
+
+  return 0;
+}
+
 int Atari2600::atari2600_setAudioControl1_B()
 {
   fprintf(out, "; setAudioControl1_B\n");
   POP_HI();
   POP_LO();
+  fprintf(out, "  sta AUDC1\n");
+
+  return 0;
+}
+
+int Atari2600::atari2600_setAudioControl1_B(int value)
+{
+  fprintf(out, "; setAudioControl1_B\n");
+  fprintf(out, "  lda #0x%02x\n", value & 0xff);
   fprintf(out, "  sta AUDC1\n");
 
   return 0;
@@ -674,11 +692,29 @@ int Atari2600::atari2600_setAudioFrequency0_B()
   return 0;
 }
 
+int Atari2600::atari2600_setAudioFrequency0_B(int value)
+{
+  fprintf(out, "; setAudioFrequency0_B\n");
+  fprintf(out, "  lda #0x%02x\n", value & 0xff);
+  fprintf(out, "  sta AUDF0\n");
+
+  return 0;
+}
+
 int Atari2600::atari2600_setAudioFrequency1_B()
 {
   fprintf(out, "; setAudioFrequency1_B\n");
   POP_HI();
   POP_LO();
+  fprintf(out, "  sta AUDF1\n");
+
+  return 0;
+}
+
+int Atari2600::atari2600_setAudioFrequency1_B(int value)
+{
+  fprintf(out, "; setAudioFrequency1_B\n");
+  fprintf(out, "  lda #0x%02x\n", value & 0xff);
   fprintf(out, "  sta AUDF1\n");
 
   return 0;
@@ -694,11 +730,29 @@ int Atari2600::atari2600_setAudioVolume0_B()
   return 0;
 }
 
+int Atari2600::atari2600_setAudioVolume0_B(int value)
+{
+  fprintf(out, "; setAudioVolume0_B\n");
+  fprintf(out, "  lda #0x%02x\n", value & 0xff);
+  fprintf(out, "  sta AUDV0\n");
+
+  return 0;
+}
+
 int Atari2600::atari2600_setAudioVolume1_B()
 {
   fprintf(out, "; setAudioVolume1_B\n");
   POP_HI();
   POP_LO();
+  fprintf(out, "  sta AUDV1\n");
+
+  return 0;
+}
+
+int Atari2600::atari2600_setAudioVolume1_B(int value)
+{
+  fprintf(out, "; setAudioVolume1_B\n");
+  fprintf(out, "  lda #0x%02x\n", value & 0xff);
   fprintf(out, "  sta AUDV1\n");
 
   return 0;

@@ -83,11 +83,17 @@ public:
   virtual int atari2600_isCollisionMissile0Missile1() { return -1; }
 
   virtual int atari2600_setAudioControl0_B() { return -1; }
+  virtual int atari2600_setAudioControl0_B(int value) { return -1; }
   virtual int atari2600_setAudioControl1_B() { return -1; }
+  virtual int atari2600_setAudioControl1_B(int value) { return -1; }
   virtual int atari2600_setAudioFrequency0_B() { return -1; }
+  virtual int atari2600_setAudioFrequency0_B(int value) { return -1; }
   virtual int atari2600_setAudioFrequency1_B() { return -1; }
+  virtual int atari2600_setAudioFrequency1_B(int value) { return -1; }
   virtual int atari2600_setAudioVolume0_B() { return -1; }
+  virtual int atari2600_setAudioVolume0_B(int value) { return -1; }
   virtual int atari2600_setAudioVolume1_B() { return -1; }
+  virtual int atari2600_setAudioVolume1_B(int value) { return -1; }
 
   virtual int atari2600_isJoystick0Right() { return -1; }
   virtual int atari2600_isJoystick0Left() { return -1; }
