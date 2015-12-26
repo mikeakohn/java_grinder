@@ -2,16 +2,16 @@ import net.mikekohn.java_grinder.Atari2600;
 
 public class Atari2600JavaDemo
 {
-  static int bass_note[] =
+  public static int bass_line[] = 
   {
-    31, 29, 26, 23, 19, 17, 15, 14, 11, 9, 8, 7, 5, 4, 3, 2, 1, 0
+    29, -1, 19, -1, 14, -1, 19, -1, 29, -1, 19, -1, 14, -1, 19 -1
   };
 
-/*  public static int bass_line[] = 
+  public static int lead_line[] = 
   {
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+    28, 25, 28, -1, 28, 25, 28, -1, 28, 28, -1, -1, 28, 28, -1, -1
   };
-*/
+
   public static void main()
   {
     Atari2600.setColorPlayfield(0x80 | 0x70 | 0x02);
@@ -20,15 +20,16 @@ public class Atari2600JavaDemo
     int n = 100;
     int timer = 0;
     int note = 0;
+    int temp0, temp1;
 
     Atari2600.setAudioControl0((byte)6);
-    Atari2600.setAudioControl1((byte)12);
+    Atari2600.setAudioControl1((byte)4);
     
-    Atari2600.setAudioVolume0((byte)15);
-    Atari2600.setAudioVolume1((byte)8);
+    Atari2600.setAudioVolume0((byte)0);
+    Atari2600.setAudioVolume1((byte)0);
 
-    Atari2600.setAudioFrequency0((byte)(bass_note[0]));
-    Atari2600.setAudioFrequency1((byte)(bass_note[0]));
+    Atari2600.setAudioFrequency0((byte)0);
+    Atari2600.setAudioFrequency1((byte)0);
 
     while(true)
     {
@@ -38,10 +39,25 @@ public class Atari2600JavaDemo
       if(timer > 10)
       {
         timer = 0;
-        Atari2600.setAudioFrequency0((byte)(bass_note[note]));
-        Atari2600.setAudioFrequency1((byte)(bass_note[note]));
+        temp0 = bass_line[note];
+
+        if(temp0 < 0)
+          Atari2600.setAudioVolume0((byte)0);
+        else
+          Atari2600.setAudioVolume0((byte)15);
+
+        temp1 = lead_line[note];
+
+        if(temp1 < 0)
+          Atari2600.setAudioVolume1((byte)0);
+        else
+          Atari2600.setAudioVolume1((byte)15);
+
+        Atari2600.setAudioFrequency0((byte)temp0);
+        Atari2600.setAudioFrequency1((byte)temp1);
+
         note++;
-        if(note > 17)
+        if(note > 15)
           note = 0;
       }
 
