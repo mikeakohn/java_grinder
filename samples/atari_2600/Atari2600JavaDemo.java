@@ -2,6 +2,14 @@ import net.mikekohn.java_grinder.Atari2600;
 
 public class Atari2600JavaDemo
 {
+  public static int bass_waveform[] = 
+  {
+    8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 8, 6,
+    8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 8, 6,
+    8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 8, 6,
+    8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 8, 6,
+  };
+
   public static int bass_line[] = 
   {
     29, -1, 19, -1, 14, -1, 19, -1, 29, -1, 19, -1, 14, -1, 19, -1,
@@ -59,6 +67,7 @@ public class Atari2600JavaDemo
         else
           Atari2600.setAudioVolume1((byte)15);
 
+        Atari2600.setAudioControl0((byte)bass_waveform[note]);
         Atari2600.setAudioFrequency0((byte)temp0);
         Atari2600.setAudioFrequency1((byte)temp1);
 
