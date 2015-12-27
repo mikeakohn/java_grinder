@@ -1,4 +1,5 @@
 import net.mikekohn.java_grinder.Atari2600;
+import net.mikekohn.java_grinder.Memory;
 
 public class Atari2600JavaDemo
 {
@@ -40,12 +41,26 @@ public class Atari2600JavaDemo
   public static byte background[] =
   {
     (byte)0b11110000, (byte)0b11111111, (byte)0b11111111,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b10000000,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b10000000,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b10000000,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b10000000,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b10000000,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b10000000,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b11111110, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b01111100, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00111000, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00011100,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00111110,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00111110,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00011100,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00111000, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b01111100, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b11111110, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b11110000, (byte)0b11111111, (byte)0b11111111,
     (byte)0b00000000, (byte)0b00000000, (byte)0b00000000,
   };
@@ -63,6 +78,20 @@ public class Atari2600JavaDemo
     int shot1_y = 100;
     int inc = 0;
     int rnd = 255;
+    int frame = 0;
+
+    final int left = 13;
+    final int right = 153;
+    final int left_adj = (left << 4);
+    final int right_adj = (right << 4);
+    final int ship0_y = 72;
+    final int ship1_y = 8;
+
+    // missle width
+    Memory.write8(0x04, (byte)16);
+    Memory.write8(0x05, (byte)16);
+    // reflect playfield
+    Memory.write8(0x0a, (byte)1);
 
     Atari2600.setPlayer0Sprite(ship0);
     Atari2600.setPlayer1Sprite(ship1);
@@ -87,14 +116,14 @@ public class Atari2600JavaDemo
       if(Atari2600.isJoystick0Right())
       {
         inc += 4;
-        if(inc > 32)
-          inc = 32;
+        if(inc > 28)
+          inc = 28;
       }
       else if(Atari2600.isJoystick0Left())
       {
         inc -= 4;
-        if(inc < -32)
-          inc = -32;
+        if(inc < -28)
+          inc = -28;
       }
       else if(inc > 0)
       {
@@ -108,35 +137,49 @@ public class Atari2600JavaDemo
       if(Atari2600.isJoystick0ButtonDown())
       {
         if(shot0_y == 100)
-        {
-          shot0_y = 86;
-        }
+          shot0_y = ship0_y;
       }
 
       ship0_x += inc;
-      if(ship0_x > 120 << 4)
-        ship0_x = 120 << 4;
-      if(ship0_x < 40 << 4)
-        ship0_x = 40 << 4;
+      if(ship0_x > right_adj)
+        ship0_x = right_adj;
+      if(ship0_x < left_adj)
+        ship0_x = left_adj;
 
-      if(ship1_x >= (ship0_x >> 4))
+      final int ship0_xadj = ship0_x >> 4;
+
+      if(ship1_x >= ship0_xadj)
       {
+        if(shot0_y < 48)
+          ship1_x++;
+        else
+          ship1_x--;
+      }
+
+      if(ship1_x <= ship0_xadj)
+      {
+        if(shot0_y < 48)
+          ship1_x--;
+        else
+          ship1_x++;
+      }
+
+      if(ship1_x > right)
+        ship1_x = right;
+      if(ship1_x < left)
+        ship1_x = left;
+
+/*
+      rnd -= 77;
+      if(((frame & 15) == 15) && ((rnd ^ ship0_x) & 255) < 128)
         ship1_x++;
-        if(ship1_x > 120)
-          ship1_x = 120;
-      }
-
-      if(ship1_x <= (ship0_x >> 4))
-      {
+      else
         ship1_x--;
-        if(ship1_x < 40)
-          ship1_x = 40;
-      }
-
+*/
       Atari2600.clearMotionRegisters();
-      Atari2600.setPlayer0Position((byte)((ship0_x >> 4) - 4), (byte)86);
-      Atari2600.setPlayer1Position((byte)(ship1_x - 4), (byte)20);
-      Atari2600.setMissile0Position((byte)(ship0_x >> 4), (byte)shot0_y);
+      Atari2600.setPlayer0Position((byte)(ship0_xadj - 4), (byte)ship0_y);
+      Atari2600.setPlayer1Position((byte)(ship1_x - 4), (byte)ship1_y);
+      Atari2600.setMissile0Position((byte)ship0_xadj, (byte)shot0_y);
       Atari2600.setMissile1Position((byte)ship1_x, (byte)shot1_y);
       Atari2600.clearCollisionLatches();
 
@@ -144,30 +187,36 @@ public class Atari2600JavaDemo
       Atari2600.drawScreen();
       Atari2600.startOverscan();
 
+      if(Atari2600.isCollisionMissile0Playfield())
+        shot0_y = 100;
+//      if(Atari2600.isCollisionMissile1Playfield())
+//        shot1_y = 100;
+
       if(shot0_y < 100)
       {
         shot0_y--;
-        if(shot0_y < 20)
+        if(shot0_y < ship1_y)
         {
           shot0_y = 100;
         }
       }
 
       rnd -= 77;
-      rnd &= 255;
-      if(rnd < 16 && shot1_y == 100)
+      if(((rnd ^ ship0_x) & 255) < ship1_y && shot1_y == 100)
       {
-        shot1_y = 20;
+        shot1_y = ship1_y;
       }
 
       if(shot1_y < 100)
       {
         shot1_y++;
-        if(shot1_y > 86)
+        if(shot1_y > ship0_y)
         {
           shot1_y = 100;
         }
       }
+
+      frame++;
 
       Atari2600.waitOverscan();
     }
