@@ -115,6 +115,9 @@ public:
 private:
   void print_tia_definitions();
   void print_pia_definitions();
+
+  void insert_atari_2600_functions();
+  void insert_atari_2600_variables();
 };
 
 #endif

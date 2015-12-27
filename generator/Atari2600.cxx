@@ -28,6 +28,8 @@ Atari2600::Atari2600()
 
 Atari2600::~Atari2600()
 {
+  insert_atari_2600_functions();
+
   fprintf(out, ".org 0xfffa\n");
   fprintf(out, "; NMI\n");
   fprintf(out, "dw reset\n");
@@ -44,11 +46,13 @@ int Atari2600::open(const char *filename)
   print_tia_definitions();
   print_pia_definitions();
 
-  // Is this needed?
+  insert_atari_2600_variables();
+
   fprintf(out, "; clear TIA\n");
   fprintf(out, "  sei\n");
   fprintf(out, "  cld\n");
   fprintf(out, "  ldx #0xff\n");
+  fprintf(out, "  stx seed\n");
   fprintf(out, "  txs\n");
   fprintf(out, "  lda #0\n");
   fprintf(out, "  ldx #127\n");
@@ -58,7 +62,7 @@ int Atari2600::open(const char *filename)
   fprintf(out, "  bne _clear_tia\n");
 
   fprintf(out, "; set java stack pointer (x register)\n");
-  fprintf(out, "  ldx #0x0f\n");
+  fprintf(out, "  ldx #0x0f\n\n");
 
   return 0;
 }
@@ -104,6 +108,8 @@ int Atari2600::atari2600_waitHsync()
 
 int Atari2600::atari2600_startVblank()
 {
+  fprintf(out, "  jsr start_vblank\n");
+/*
   fprintf(out, "  lda #0x02\n");
   fprintf(out, "  sta VSYNC\n");
   fprintf(out, "  sta WSYNC\n");
@@ -114,12 +120,15 @@ int Atari2600::atari2600_startVblank()
 
   fprintf(out, "  lda #43\n");
   fprintf(out, "  sta TIM64T\n");
-
+*/
   return 0;
 }
 
 int Atari2600::atari2600_waitVblank()
 {
+  fprintf(out, "  jsr wait_vblank\n");
+
+/*
   fprintf(out, "_vblank_wait_%d:\n", label_count);
   fprintf(out, "  lda INTIM\n");
   fprintf(out, "  bne _vblank_wait_%d\n", label_count);
@@ -129,29 +138,32 @@ int Atari2600::atari2600_waitVblank()
   fprintf(out, "  sta VBLANK\n");
 
   label_count++;
-
+*/
   return 0;
 }
 
 int Atari2600::atari2600_startOverscan()
 {
-
+  fprintf(out, "  jsr start_overscan\n");
+/*
   fprintf(out, "  lda #35\n");
   fprintf(out, "  sta TIM64T\n");
   fprintf(out, "  lda #0x02\n");
   fprintf(out, "  sta VBLANK\n");
-
+*/
   return 0;
 }
 
 int Atari2600::atari2600_waitOverscan()
 {
+  fprintf(out, "  jsr wait_overscan\n");
+/*
   fprintf(out, "_overscan_wait_%d:\n", label_count);
   fprintf(out, "  lda INTIM\n");
   fprintf(out, "  bne _overscan_wait_%d\n", label_count);
 
   label_count++;
-
+*/
   return 0;
 }
 
@@ -952,7 +964,7 @@ void Atari2600::print_tia_definitions()
   fprintf(out, "  INPT2 equ 0x0a\n");
   fprintf(out, "  INPT3 equ 0x0b\n");
   fprintf(out, "  INPT4 equ 0x0c\n");
-  fprintf(out, "  INPT5 equ 0x0d\n");
+  fprintf(out, "  INPT5 equ 0x0d\n\n");
 }
 
 void Atari2600::print_pia_definitions()
@@ -966,6 +978,174 @@ void Atari2600::print_pia_definitions()
   fprintf(out, "  TIM1T equ 0x294\n");
   fprintf(out, "  TIM8T equ 0x295\n");
   fprintf(out, "  TIM64T equ 0x296\n");
-  fprintf(out, "  T1024T equ 0x297\n");
+  fprintf(out, "  T1024T equ 0x297\n\n");
+}
+
+void Atari2600::insert_atari_2600_functions()
+{
+  fprintf(out, "draw:\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sta ENAM0\n");
+  fprintf(out, "  sta ENAM1\n");
+  fprintf(out, "  sta ENABL\n");
+  fprintf(out, "  sta player0_line\n");
+  fprintf(out, "  sta player1_line\n");
+  fprintf(out, "  sta missile0_line\n");
+  fprintf(out, "  sta missile1_line\n");
+  fprintf(out, "  sta ball_line\n");
+  fprintf(out, "  ldx #96\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "draw_player0:\n");
+  fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  cpx player0_y\n");
+  fprintf(out, "  bpl draw_player1\n");
+  fprintf(out, "  ldy player0_line\n");
+  fprintf(out, "  lda (player0_sprite),y\n");
+  fprintf(out, "  sta GRP0\n");
+  fprintf(out, "  beq draw_player1\n");
+  fprintf(out, "  inc player0_line\n");
+  fprintf(out, "draw_player1:\n");
+  fprintf(out, "  cpx player1_y\n");
+  fprintf(out, "  bpl draw_missile0\n");
+  fprintf(out, "  ldy player1_line\n");
+  fprintf(out, "  lda (player1_sprite),y\n");
+  fprintf(out, "  sta GRP1\n");
+  fprintf(out, "  beq draw_missile0\n");
+  fprintf(out, "  inc player1_line\n");
+  fprintf(out, "  draw_missile0:\n");
+  fprintf(out, "  cpx missile0_y\n");
+  fprintf(out, "  bpl draw_missile1\n");
+  fprintf(out, "  ldy missile0_line\n");
+  fprintf(out, "  lda (missile0_sprite),y\n");
+  fprintf(out, "  sta ENAM0\n");
+  fprintf(out, "  beq draw_missile1\n");
+  fprintf(out, "  inc missile0_line\n");
+  fprintf(out, "draw_missile1:\n");
+  fprintf(out, "; this WSYNC may have to be moved\n");
+  fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  cpx missile1_y\n");
+  fprintf(out, "  bpl draw_ball\n");
+  fprintf(out, "  ldy missile1_line\n");
+  fprintf(out, "  lda (missile1_sprite),y\n");
+  fprintf(out, "  sta ENAM1\n");
+  fprintf(out, "  beq draw_ball\n");
+  fprintf(out, "  inc missile1_line\n");
+  fprintf(out, "draw_ball:\n");
+  fprintf(out, "  cpx ball_y\n");
+  fprintf(out, "  bpl draw_playfield\n");
+  fprintf(out, "  ldy ball_line\n");
+  fprintf(out, "  lda (ball_sprite),y\n");
+  fprintf(out, "  sta ENABL\n");
+  fprintf(out, "  beq draw_playfield\n");
+  fprintf(out, "  inc ball_line\n");
+  fprintf(out, "draw_playfield:\n");
+  fprintf(out, "  txa\n");
+  fprintf(out, "  tay\n");
+  fprintf(out, "  lda playfield0,y\n");
+  fprintf(out, "  sta PF0\n");
+  fprintf(out, "  lda playfield1,y\n");
+  fprintf(out, "  sta PF1\n");
+  fprintf(out, "  lda playfield2,y\n");
+  fprintf(out, "  sta PF2\n");
+  fprintf(out, "  dex\n");
+  fprintf(out, "  bne draw_player0\n");
+  fprintf(out, "  rts\n\n");
+
+  fprintf(out, "div15:\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "div15_loop:\n");
+  fprintf(out, "  sbc #15\n");
+  fprintf(out, "  bcs div15_loop\n");
+  fprintf(out, "  eor #7\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  sta HMP0,x\n");
+  fprintf(out, "  sta RESP0,x\n");
+  fprintf(out, "  rts\n\n");
+
+  fprintf(out, "rand:\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  lda seed\n");
+  fprintf(out, "  sbc #77\n");
+  fprintf(out, "  sta seed\n");
+  fprintf(out, "  lda seed\n");
+  fprintf(out, "  rts\n\n");
+
+  fprintf(out, "start_vblank:\n");
+  fprintf(out, "  lda #0x02\n");
+  fprintf(out, "  sta VSYNC\n");
+  fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  lda #0x00\n");
+  fprintf(out, "  sta VSYNC\n");
+  fprintf(out, "  lda #43\n");
+  fprintf(out, "  sta TIM64T\n");
+  fprintf(out, "  rts\n\n");
+
+  fprintf(out, "wait_vblank:\n");
+  fprintf(out, "  lda INTIM\n");
+  fprintf(out, "  bne wait_vblank\n");
+  fprintf(out, "  lda #0x00\n");
+  fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  sta HMOVE\n");
+  fprintf(out, "  sta VBLANK\n");
+  fprintf(out, "  rts\n\n");
+
+  fprintf(out, "start_overscan:\n");
+  fprintf(out, "  lda #35\n");
+  fprintf(out, "  sta TIM64T\n");
+  fprintf(out, "  lda #0x02\n");
+  fprintf(out, "  sta VBLANK\n");
+  fprintf(out, "  rts\n\n");
+
+  fprintf(out, "wait_overscan:\n");
+  fprintf(out, "  lda INTIM\n");
+  fprintf(out, "  bne wait_overscan\n");
+  fprintf(out, "  rts\n\n");
+}
+
+void Atari2600::insert_atari_2600_variables()
+{
+  fprintf(out, "; variables\n");
+  fprintf(out, "  player0_x equ 0xd0\n");
+  fprintf(out, "  player0_y equ 0xd1\n");
+  fprintf(out, "  player0_line equ 0xd2\n");
+  fprintf(out, "  player0_sprite equ 0xd3\n");
+  fprintf(out, "  player0_sprite_hi equ 0xd4\n");
+
+  fprintf(out, "  player1_x equ 0xd5\n");
+  fprintf(out, "  player1_y equ 0xd6\n");
+  fprintf(out, "  player1_line equ 0xd7\n");
+  fprintf(out, "  player1_sprite equ 0xd8\n");
+  fprintf(out, "  player1_sprite_hi equ 0xd9\n");
+
+  fprintf(out, "  missile0_x equ 0xda\n");
+  fprintf(out, "  missile0_y equ 0xdb\n");
+  fprintf(out, "  missile0_line equ 0xdc\n");
+  fprintf(out, "  missile0_sprite equ 0xdd\n");
+  fprintf(out, "  missile0_sprite_hi equ 0xde\n");
+
+  fprintf(out, "  missile1_x equ 0xdf\n");
+  fprintf(out, "  missile1_y equ 0xe0\n");
+  fprintf(out, "  missile1_line equ 0xe1\n");
+  fprintf(out, "  missile1_sprite equ 0xe2\n");
+  fprintf(out, "  missile1_sprite_hi equ 0xe3\n");
+
+  fprintf(out, "  ball_x equ 0xe4\n");
+  fprintf(out, "  ball_y equ 0xe5\n");
+  fprintf(out, "  ball_line equ 0xe6\n");
+  fprintf(out, "  ball_sprite equ 0xe7\n");
+  fprintf(out, "  ball_sprite_hi equ 0xe8\n");
+
+  fprintf(out, "  playfield0 equ 0xe9\n");
+  fprintf(out, "  playfield1 equ 0xea\n");
+  fprintf(out, "  playfield2 equ 0xeb\n");
+
+  fprintf(out, "  seed equ 0xec\n");
+  fprintf(out, "\n");
 }
 
