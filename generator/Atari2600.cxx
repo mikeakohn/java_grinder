@@ -327,7 +327,7 @@ int Atari2600::atari2600_applyHorizontalMotion()
 
 int Atari2600::atari2600_clearMotionRegisters()
 {
-  fprintf(out, "sta HCLR\n");
+  fprintf(out, "sta HMCLR\n");
   return 0;
 }
 
@@ -477,6 +477,143 @@ int Atari2600::atari2600_setPlayfield2_B(int value)
   fprintf(out, "; setPlayfield2_B\n");
   fprintf(out, "  lda #0x%02x\n", (uint8_t)value);
   fprintf(out, "  sta PF2\n");
+
+  return 0;
+}
+
+int Atari2600::atari2600_setPlayer0Position_BB()
+{
+  fprintf(out, "; setPlayer0Position\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  sta player0_y\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  sta player0_x\n");
+  fprintf(out, "  ldx #0\n");
+  fprintf(out, "  jsr div15\n");
+
+  return 0;
+}
+
+int Atari2600::atari2600_setPlayer1Position_BB()
+{
+  fprintf(out, "; setPlayer1Position\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  sta player1_y\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  sta player1_x\n");
+  fprintf(out, "  ldx #1\n");
+  fprintf(out, "  jsr div15\n");
+
+  return 0;
+}
+
+int Atari2600::atari2600_setMissile0Position_BB()
+{
+  fprintf(out, "; setMissile0Position\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  sta missile0_y\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  sta missile0_x\n");
+  fprintf(out, "  ldx #2\n");
+  fprintf(out, "  jsr div15\n");
+
+  return 0;
+}
+
+int Atari2600::atari2600_setMissile1Position_BB()
+{
+  fprintf(out, "; setMissile1Position\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  sta missile1_y\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  sta missile1_x\n");
+  fprintf(out, "  ldx #3\n");
+  fprintf(out, "  jsr div15\n");
+
+  return 0;
+}
+
+int Atari2600::atari2600_setBallPosition_BB()
+{
+  fprintf(out, "; setBallPosition\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  sta ball_y\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  sta ball_x\n");
+  fprintf(out, "  ldx #4\n");
+  fprintf(out, "  jsr div15\n");
+
+  return 0;
+}
+
+int Atari2600::atari2600_setPlayer0Sprite_aB()
+{
+  fprintf(out, "; setPlayer0Sprite\n");
+  POP_HI();
+  fprintf(out, "  sta player0_sprite + 1\n");
+  POP_LO();
+  fprintf(out, "  sta player0_sprite + 0\n");
+
+  return 0;
+}
+
+int Atari2600::atari2600_setPlayer1Sprite_aB()
+{
+  fprintf(out, "; setPlayer1Sprite\n");
+  POP_HI();
+  fprintf(out, "  sta player1_sprite + 1\n");
+  POP_LO();
+  fprintf(out, "  sta player1_sprite + 0\n");
+
+  return 0;
+}
+
+int Atari2600::atari2600_setMissile0Sprite_aB()
+{
+  fprintf(out, "; setMissile0Sprite\n");
+  POP_HI();
+  fprintf(out, "  sta missile0_sprite + 1\n");
+  POP_LO();
+  fprintf(out, "  sta missile0_sprite + 0\n");
+
+  return 0;
+}
+
+int Atari2600::atari2600_setMissile1Sprite_aB()
+{
+  fprintf(out, "; setMissile1Sprite\n");
+  POP_HI();
+  fprintf(out, "  sta missile1_sprite + 1\n");
+  POP_LO();
+  fprintf(out, "  sta missile1_sprite + 0\n");
+
+  return 0;
+}
+
+int Atari2600::atari2600_setBallSprite_aB()
+{
+  fprintf(out, "; setBallSprite\n");
+  POP_HI();
+  fprintf(out, "  sta ball_sprite + 1\n");
+  POP_LO();
+  fprintf(out, "  sta ball_sprite + 0\n");
+
+  return 0;
+}
+
+int Atari2600::atari2600_drawScreen()
+{
+  fprintf(out, "  jsr draw\n");
 
   return 0;
 }

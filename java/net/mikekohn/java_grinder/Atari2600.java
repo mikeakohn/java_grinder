@@ -67,6 +67,20 @@ abstract public class Atari2600
   public static void setPlayfield1(byte value) { }
   public static void setPlayfield2(byte value) { }
 
+  public static void setPlayer0Position(byte x, byte y) { }
+  public static void setPlayer1Position(byte x, byte y) { }
+  public static void setMissile0Position(byte x, byte y) { }
+  public static void setMissile1Position(byte x, byte y) { }
+  public static void setBallPosition(byte x, byte y) { }
+
+  public static void setPlayer0Sprite(byte[] data) { }
+  public static void setPlayer1Sprite(byte[] data) { }
+  public static void setMissile0Sprite(byte[] data) { }
+  public static void setMissile1Sprite(byte[] data) { }
+  public static void setBallSprite(byte[] data) { }
+
+  public static void drawScreen() { }
+
   public static boolean isCollisionMissile0Player1() { return false; }
   public static boolean isCollisionMissile0Player0() { return false; }
   public static boolean isCollisionMissile1Player0() { return false; }

@@ -72,6 +72,20 @@ public:
   virtual int atari2600_setPlayfield2_B();
   virtual int atari2600_setPlayfield2_B(int value);
 
+  virtual int atari2600_setPlayer0Position_BB();
+  virtual int atari2600_setPlayer1Position_BB();
+  virtual int atari2600_setMissile0Position_BB();
+  virtual int atari2600_setMissile1Position_BB();
+  virtual int atari2600_setBallPosition_BB();
+
+  virtual int atari2600_setPlayer0Sprite_aB();
+  virtual int atari2600_setPlayer1Sprite_aB();
+  virtual int atari2600_setMissile0Sprite_aB();
+  virtual int atari2600_setMissile1Sprite_aB();
+  virtual int atari2600_setBallSprite_aB();
+
+  virtual int atari2600_drawScreen();
+
   virtual int atari2600_isCollisionMissile0Player1();
   virtual int atari2600_isCollisionMissile0Player0();
   virtual int atari2600_isCollisionMissile1Player0();

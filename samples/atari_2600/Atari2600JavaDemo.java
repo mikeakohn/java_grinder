@@ -2,6 +2,64 @@ import net.mikekohn.java_grinder.Atari2600;
 
 public class Atari2600JavaDemo
 {
+  public static byte ship[] =
+  {
+    (byte)0b00011000,
+    (byte)0b00011000,
+    (byte)0b00011000,
+    (byte)0b10111101,
+    (byte)0b11100111,
+    (byte)0b11100111,
+    (byte)0b11111111,
+    (byte)0b10011001,
+    (byte)0b00000000,
+  };
+
+  public static byte shot[] =
+  {
+    (byte)0b11111111,
+    (byte)0b11111111,
+    (byte)0b11111111,
+    (byte)0b11111111,
+    (byte)0b11111111,
+    (byte)0b11111111,
+    (byte)0b11111111,
+    (byte)0b11111111,
+    (byte)0b00000000,
+  };
+
+  public static void main()
+  {
+    while(true)
+    {
+      Atari2600.setPlayer0Sprite(ship);
+      Atari2600.setPlayer1Sprite(ship);
+      Atari2600.setMissile0Sprite(shot);
+      Atari2600.setMissile1Sprite(shot);
+      Atari2600.setBallSprite(shot);
+
+      Atari2600.setColorPlayer0(0x3a);
+      Atari2600.setColorPlayer1(0x5a);
+      Atari2600.setColorPlayfield(0x8a);
+
+      Atari2600.setPlayer0Position((byte)10, (byte)10);
+      Atari2600.setPlayer1Position((byte)20, (byte)10);
+      Atari2600.setMissile0Position((byte)30, (byte)10);
+      Atari2600.setMissile1Position((byte)40, (byte)10);
+      Atari2600.setBallPosition((byte)50, (byte)10);
+
+      Atari2600.startVblank();
+      Atari2600.waitVblank();
+      Atari2600.drawScreen();
+      Atari2600.startOverscan();
+      Atari2600.waitOverscan();
+    }
+  }
+}
+
+/*
+public class Atari2600JavaDemo
+{
   public static int bass_waveform[] = 
   {
     8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 8, 6,
@@ -149,4 +207,5 @@ public class Atari2600JavaDemo
     }
   }
 }
+*/
 

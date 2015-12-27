@@ -79,6 +79,20 @@ int atari_2600(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(setPlayfield1,_B)
   CHECK_FUNC(setPlayfield2,_B)
 
+  CHECK_FUNC(setPlayer0Position,_BB)
+  CHECK_FUNC(setPlayer1Position,_BB)
+  CHECK_FUNC(setMissile0Position,_BB)
+  CHECK_FUNC(setMissile1Position,_BB)
+  CHECK_FUNC(setBallPosition,_BB)
+
+  CHECK_FUNC(setPlayer0Sprite,_aB)
+  CHECK_FUNC(setPlayer1Sprite,_aB)
+  CHECK_FUNC(setMissile0Sprite,_aB)
+  CHECK_FUNC(setMissile1Sprite,_aB)
+  CHECK_FUNC(setBallSprite,_aB)
+
+  CHECK_FUNC(drawScreen,)
+
   CHECK_FUNC(isCollisionMissile0Player1,)
   CHECK_FUNC(isCollisionMissile0Player0,)
   CHECK_FUNC(isCollisionMissile1Player0,)
