@@ -1219,6 +1219,9 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  ldy #0\n");
   fprintf(out, "draw_playfield:\n");
   fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  txa\n");
+  fprintf(out, "  and #3\n");
+  fprintf(out, "  bne draw_player0\n");
   fprintf(out, "  ldy playfield_line\n");
   fprintf(out, "  cpy playfield_length\n");
   fprintf(out, "  beq draw_player0\n");
@@ -1250,7 +1253,7 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  beq draw_missile0\n");
   fprintf(out, "  inc player1_line\n");
   fprintf(out, "draw_missile0:\n");
-  fprintf(out, "  sta WSYNC\n");
+//  fprintf(out, "  sta WSYNC\n");
   fprintf(out, "  cpx missile0_y\n");
   fprintf(out, "  bmi draw_missile1\n");
   fprintf(out, "  ldy missile0_line\n");
@@ -1259,6 +1262,7 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  beq draw_missile1\n");
   fprintf(out, "  inc missile0_line\n");
   fprintf(out, "draw_missile1:\n");
+  fprintf(out, "  sta WSYNC\n");
   fprintf(out, "  cpx missile1_y\n");
   fprintf(out, "  bmi draw_ball\n");
   fprintf(out, "  ldy missile1_line\n");
