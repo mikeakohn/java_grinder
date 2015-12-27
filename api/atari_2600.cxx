@@ -79,6 +79,9 @@ int atari_2600(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(setPlayfield1,_B)
   CHECK_FUNC(setPlayfield2,_B)
 
+  CHECK_FUNC(setPlayfieldData,_aB)
+  CHECK_FUNC(setPlayfieldLength,_B)
+
   CHECK_FUNC(setPlayer0Position,_BB)
   CHECK_FUNC(setPlayer1Position,_BB)
   CHECK_FUNC(setMissile0Position,_BB)

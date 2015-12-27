@@ -88,11 +88,11 @@ int M6502::open(const char *filename)
 
   // temp variables
   fprintf(out, "result equ 0xb4\n");
-  fprintf(out, "remainder equ 0xb8\n");
-  fprintf(out, "length equ 0xba\n");
-  fprintf(out, "value1 equ 0xbc\n");
-  fprintf(out, "value2 equ 0xbe\n");
-  fprintf(out, "value3 equ 0xc0\n");
+  fprintf(out, "remainder equ 0xb6\n");
+  fprintf(out, "length equ 0xb8\n");
+  fprintf(out, "value1 equ 0xba\n");
+  fprintf(out, "value2 equ 0xbb\n");
+  fprintf(out, "value3 equ 0xbc\n");
 
   // start at 0x0400 when using simulator
   fprintf(out, ".org 0x%04x\n", start_org);

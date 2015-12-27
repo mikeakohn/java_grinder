@@ -67,6 +67,9 @@ abstract public class Atari2600
   public static void setPlayfield1(byte value) { }
   public static void setPlayfield2(byte value) { }
 
+  public static void setPlayfieldData(byte[] data) { }
+  public static void setPlayfieldLength(byte value) { }
+
   public static void setPlayer0Position(byte x, byte y) { }
   public static void setPlayer1Position(byte x, byte y) { }
   public static void setMissile0Position(byte x, byte y) { }

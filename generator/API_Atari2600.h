@@ -66,6 +66,9 @@ public:
   virtual int atari2600_setPlayfield2_B() { return -1; }
   virtual int atari2600_setPlayfield2_B(int value) { return -1; }
 
+  virtual int atari2600_setPlayfieldData_aB() { return -1; }
+  virtual int atari2600_setPlayfieldLength_B() { return -1; }
+
   virtual int atari2600_setPlayer0Position_BB() { return -1; }
   virtual int atari2600_setPlayer1Position_BB() { return -1; }
   virtual int atari2600_setMissile0Position_BB() { return -1; }
