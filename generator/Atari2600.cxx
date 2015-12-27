@@ -988,6 +988,8 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  sta ENAM0\n");
   fprintf(out, "  sta ENAM1\n");
   fprintf(out, "  sta ENABL\n");
+  fprintf(out, "  sta GRP0\n");
+  fprintf(out, "  sta GRP1\n");
   fprintf(out, "  sta player0_line\n");
   fprintf(out, "  sta player1_line\n");
   fprintf(out, "  sta missile0_line\n");
@@ -1041,11 +1043,11 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "draw_playfield:\n");
   fprintf(out, "  txa\n");
   fprintf(out, "  tay\n");
-  fprintf(out, "  lda playfield0,y\n");
+  fprintf(out, "  lda (playfield0),y\n");
   fprintf(out, "  sta PF0\n");
-  fprintf(out, "  lda playfield1,y\n");
+  fprintf(out, "  lda (playfield1),y\n");
   fprintf(out, "  sta PF1\n");
-  fprintf(out, "  lda playfield2,y\n");
+  fprintf(out, "  lda (playfield2),y\n");
   fprintf(out, "  sta PF2\n");
   fprintf(out, "  dex\n");
   fprintf(out, "  bne draw_player0\n");
@@ -1142,10 +1144,13 @@ void Atari2600::insert_atari_2600_variables()
   fprintf(out, "  ball_sprite_hi equ 0xe8\n");
 
   fprintf(out, "  playfield0 equ 0xe9\n");
-  fprintf(out, "  playfield1 equ 0xea\n");
-  fprintf(out, "  playfield2 equ 0xeb\n");
+  fprintf(out, "  playfield0_hi equ 0xea\n");
+  fprintf(out, "  playfield1 equ 0xeb\n");
+  fprintf(out, "  playfield1_hi equ 0xec\n");
+  fprintf(out, "  playfield2 equ 0xed\n");
+  fprintf(out, "  playfield2_hi equ 0xee\n");
 
-  fprintf(out, "  seed equ 0xec\n");
+  fprintf(out, "  seed equ 0xef\n");
   fprintf(out, "\n");
 }
 
