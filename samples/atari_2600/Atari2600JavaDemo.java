@@ -41,30 +41,74 @@ public class Atari2600JavaDemo
     (byte)0b00000000, (byte)0b00000000, (byte)0b00000000,
   };
 
+  public static byte nothing[] =
+  {
+    (byte)0b00000000
+  };
+
   public static void main()
   {
+    int shipx = 80;
+    int shoty = 0;
+
     while(true)
     {
       Atari2600.setPlayer0Sprite(ship);
-      Atari2600.setPlayer1Sprite(ship);
-      Atari2600.setMissile0Sprite(shot);
-      Atari2600.setMissile1Sprite(shot);
+      Atari2600.setPlayer1Sprite(nothing);
+      Atari2600.setMissile0Sprite(nothing);
+      Atari2600.setMissile1Sprite(nothing);
       Atari2600.setBallSprite(shot);
 
-      Atari2600.setColorPlayer0(0x3a);
-      Atari2600.setColorPlayer1(0x5a);
-      Atari2600.setColorPlayfield(0x06);
+      Atari2600.setColorPlayer0(0xbc);
+      Atari2600.setColorPlayfield(0x1c);
 
       Atari2600.setPlayfieldData(background);
       Atari2600.setPlayfieldLength((byte)background.length);
 
-      Atari2600.setPlayer0Position((byte)20, (byte)80);
-      Atari2600.setPlayer1Position((byte)80, (byte)80);
-      Atari2600.setMissile0Position((byte)20, (byte)60);
-      Atari2600.setMissile1Position((byte)80, (byte)60);
-      Atari2600.setBallPosition((byte)60, (byte)50);
+//      Atari2600.setPlayer0Position((byte)80, (byte)100);
+//      Atari2600.setPlayer1Position((byte)80, (byte)100);
+//      Atari2600.setMissile0Position((byte)80, (byte)100);
+//      Atari2600.setMissile1Position((byte)80, (byte)100);
+//      Atari2600.setBallPosition((byte)80, (byte)100);
 
       Atari2600.startVblank();
+
+      if(Atari2600.isJoystick0Right())
+      {
+        shipx++;
+        if(shipx > 120)
+          shipx = 120;
+      }
+
+      if(Atari2600.isJoystick0Left())
+      {
+        shipx--;
+        if(shipx < 40)
+          shipx = 40;
+      }
+
+      if(Atari2600.isJoystick0ButtonDown())
+      {
+        if(shoty == 100)
+        {
+          shoty = 86;
+        }
+      }
+
+      if(shoty < 100)
+      {
+        shoty -= 4;
+        if(shoty < 0)
+        {
+          shoty = 100;
+        }
+      }
+
+      Atari2600.clearMotionRegisters();
+      Atari2600.setPlayer0Position((byte)(shipx - 4), (byte)86);
+      Atari2600.setBallPosition((byte)shipx, (byte)shoty);
+      Atari2600.clearCollisionLatches();
+
       Atari2600.waitVblank();
       Atari2600.drawScreen();
       Atari2600.startOverscan();
