@@ -79,13 +79,16 @@ public class Atari2600JavaDemo
     int inc = 0;
     int rnd = 255;
     int frame = 0;
+    int ship0_hit = 0;
+    int ship1_hit = 0;
+    int pf_hit = 0;
 
     final int left = 13;
     final int right = 153;
     final int left_adj = (left << 4);
     final int right_adj = (right << 4);
-    final int ship0_y = 72;
-    final int ship1_y = 8;
+    final int ship0_y = 74;
+    final int ship1_y = 6;
 
     // missle width
     Memory.write8(0x04, (byte)16);
@@ -148,7 +151,7 @@ public class Atari2600JavaDemo
 
       final int ship0_xadj = ship0_x >> 4;
 
-      if(ship1_x >= ship0_xadj)
+      if(ship1_x > ship0_xadj || ship1_x == left)
       {
         if(shot0_y < 48)
           ship1_x++;
@@ -156,7 +159,7 @@ public class Atari2600JavaDemo
           ship1_x--;
       }
 
-      if(ship1_x <= ship0_xadj)
+      if(ship1_x < ship0_xadj || ship1_x == right)
       {
         if(shot0_y < 48)
           ship1_x--;
@@ -188,9 +191,46 @@ public class Atari2600JavaDemo
       Atari2600.startOverscan();
 
       if(Atari2600.isCollisionMissile0Playfield())
+      {
+        pf_hit = 11;
         shot0_y = 100;
-//      if(Atari2600.isCollisionMissile1Playfield())
-//        shot1_y = 100;
+      }
+
+      if(Atari2600.isCollisionMissile1Player0())
+      {
+        ship0_hit = 63;
+        shot0_y = 100;
+      }
+
+      if(Atari2600.isCollisionMissile0Player1())
+      {
+        ship1_hit = 63;
+        shot1_y = 100;
+      }
+
+      if(ship0_hit > 0)
+      {
+        Atari2600.setColorPlayer0(0x80 + ship0_hit);
+        ship0_hit--;
+        if(ship0_hit == 0)
+          Atari2600.setColorPlayer0(0x88);
+      }
+
+      if(ship1_hit > 0)
+      {
+        Atari2600.setColorPlayer1(0x30 + ship1_hit);
+        ship1_hit--;
+        if(ship1_hit == 0)
+          Atari2600.setColorPlayer1(0x38);
+      }
+
+      if(pf_hit > 6)
+      {
+        Atari2600.setColorPlayfield(0x00 + pf_hit);
+        pf_hit--;
+    //    if(pf_hit == 6)
+    //      Atari2600.setColorPlayfield(0x06);
+      }
 
       if(shot0_y < 100)
       {
