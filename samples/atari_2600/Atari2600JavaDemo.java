@@ -78,6 +78,7 @@ public class Atari2600JavaDemo
     int ship0_hit = 0;
     int ship1_hit = 0;
     int pf_hit = 0;
+    int wait = 0;
 
     final int left = 13;
     final int right = 153;
@@ -112,6 +113,32 @@ public class Atari2600JavaDemo
     {
       Atari2600.startVblank();
 
+      if(ship0_hit > 0)
+      {
+        Atari2600.setColorPlayer0(0x80 + ship0_hit);
+        ship0_hit--;
+        if(ship0_hit == 0)
+        {
+          Atari2600.setColorPlayer0(0x88);
+          Atari2600.setAudioVolume1((byte)0);
+        }
+      }
+
+      if(ship1_hit > 0)
+      {
+        Atari2600.setColorPlayer1(0x30 + ship1_hit);
+        ship1_hit--;
+        if(ship1_hit == 0)
+        {
+          Atari2600.setColorPlayer1(0x38);
+          Atari2600.setAudioVolume0((byte)0);
+        }
+      }
+
+      final int ship0_xadj = ship0_x >> 4;
+
+if(wait == 0)
+{
       if(Atari2600.isJoystick0Right())
       {
         inc += 4;
@@ -136,7 +163,11 @@ public class Atari2600JavaDemo
       if(Atari2600.isJoystick0ButtonDown())
       {
         if(shot0_y == 100)
+        {
           shot0_y = ship0_y;
+          Atari2600.setAudioControl0((byte)0b0001);
+          Atari2600.setAudioVolume0((byte)15);
+        }
       }
 
       ship0_x += inc;
@@ -145,11 +176,9 @@ public class Atari2600JavaDemo
       if(ship0_x < left_adj)
         ship0_x = left_adj;
 
-      final int ship0_xadj = ship0_x >> 4;
-
       if(ship1_x > ship0_xadj || ship1_x == left)
       {
-        if(shot0_y < 48)
+        if(shot0_y < 16)
           ship1_x++;
         else
           ship1_x--;
@@ -157,7 +186,7 @@ public class Atari2600JavaDemo
 
       if(ship1_x < ship0_xadj || ship1_x == right)
       {
-        if(shot0_y < 48)
+        if(shot0_y < 16)
           ship1_x--;
         else
           ship1_x++;
@@ -167,7 +196,7 @@ public class Atari2600JavaDemo
         ship1_x = right;
       if(ship1_x < left)
         ship1_x = left;
-
+}
 /*
       rnd -= 77;
       if(((frame & 15) == 15) && ((rnd ^ ship0_x) & 255) < 128)
@@ -175,12 +204,17 @@ public class Atari2600JavaDemo
       else
         ship1_x--;
 */
+
       Atari2600.clearMotionRegisters();
       Atari2600.setPlayer0Position((byte)(ship0_xadj - 4), (byte)ship0_y);
       Atari2600.setPlayer1Position((byte)(ship1_x - 4), (byte)ship1_y);
       Atari2600.setMissile0Position((byte)ship0_xadj, (byte)shot0_y);
       Atari2600.setMissile1Position((byte)ship1_x, (byte)shot1_y);
       Atari2600.clearCollisionLatches();
+
+
+if(wait > 0)
+  wait--;
 
       Atari2600.waitVblank();
       Atari2600.drawScreen();
@@ -190,50 +224,47 @@ public class Atari2600JavaDemo
       {
         pf_hit = 11;
         shot0_y = 100;
+        Atari2600.setAudioVolume0((byte)0);
       }
 
       if(Atari2600.isCollisionMissile1Player0())
       {
-        ship0_hit = 63;
+        ship0_hit = 31;
         shot0_y = 100;
+        shot1_y = 100;
+        Atari2600.setAudioControl1((byte)0b1000);
+        Atari2600.setAudioFrequency1((byte)22);
+        Atari2600.setAudioVolume0((byte)0);
+        Atari2600.setAudioVolume1((byte)15);
+        wait = 30;
       }
 
       if(Atari2600.isCollisionMissile0Player1())
       {
-        ship1_hit = 63;
+        ship1_hit = 31;
+        shot0_y = 100;
         shot1_y = 100;
-      }
-
-      if(ship0_hit > 0)
-      {
-        Atari2600.setColorPlayer0(0x80 + ship0_hit);
-        ship0_hit--;
-        if(ship0_hit == 0)
-          Atari2600.setColorPlayer0(0x88);
-      }
-
-      if(ship1_hit > 0)
-      {
-        Atari2600.setColorPlayer1(0x30 + ship1_hit);
-        ship1_hit--;
-        if(ship1_hit == 0)
-          Atari2600.setColorPlayer1(0x38);
+        Atari2600.setAudioControl0((byte)0b1000);
+        Atari2600.setAudioFrequency0((byte)18);
+        Atari2600.setAudioVolume0((byte)15);
+        Atari2600.setAudioVolume1((byte)0);
+        wait = 30;
       }
 
       if(pf_hit > 6)
       {
         Atari2600.setColorPlayfield(0x00 + pf_hit);
         pf_hit--;
-    //    if(pf_hit == 6)
-    //      Atari2600.setColorPlayfield(0x06);
       }
 
       if((frame & 1) == 1 && shot0_y < 100)
       {
+        Atari2600.setAudioFrequency0((byte)(shot0_y >> 1));
         shot0_y--;
         if(shot0_y < ship1_y)
         {
           shot0_y = 100;
+          Atari2600.setAudioVolume0((byte)0);
         }
       }
 
@@ -241,14 +272,18 @@ public class Atari2600JavaDemo
       if(((rnd ^ ship0_x) & 255) < ship1_y && shot1_y == 100)
       {
         shot1_y = ship1_y;
+        Atari2600.setAudioControl1((byte)0b0001);
+        Atari2600.setAudioVolume1((byte)15);
       }
 
       if((frame & 1) == 1 && shot1_y < 100)
       {
+        Atari2600.setAudioFrequency1((byte)(shot1_y >> 1));
         shot1_y++;
         if(shot1_y > ship0_y)
         {
           shot1_y = 100;
+          Atari2600.setAudioVolume1((byte)0);
         }
       }
 
