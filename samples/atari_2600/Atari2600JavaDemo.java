@@ -7,9 +7,7 @@ public class Atari2600JavaDemo
   {
     (byte)0b00011000,
     (byte)0b00011000,
-    (byte)0b00011000,
     (byte)0b10111101,
-    (byte)0b11100111,
     (byte)0b11100111,
     (byte)0b11111111,
     (byte)0b10011001,
@@ -21,9 +19,7 @@ public class Atari2600JavaDemo
     (byte)0b10011001,
     (byte)0b11111111,
     (byte)0b11100111,
-    (byte)0b11100111,
     (byte)0b10111101,
-    (byte)0b00011000,
     (byte)0b00011000,
     (byte)0b00011000,
     (byte)0b00000000,
@@ -31,8 +27,6 @@ public class Atari2600JavaDemo
 
   public static byte shot[] =
   {
-    (byte)0b11111111,
-    (byte)0b11111111,
     (byte)0b11111111,
     (byte)0b11111111,
     (byte)0b00000000,
@@ -45,18 +39,20 @@ public class Atari2600JavaDemo
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b11111110, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b01111100, (byte)0b00000000,
     (byte)0b00010000, (byte)0b01111100, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00111000, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00011100,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00111110,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00111110,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00011100,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00111000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b01111100, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b11111110, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b01111100, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
@@ -87,8 +83,8 @@ public class Atari2600JavaDemo
     final int right = 153;
     final int left_adj = (left << 4);
     final int right_adj = (right << 4);
-    final int ship0_y = 74;
-    final int ship1_y = 6;
+    final int ship0_y = 39;
+    final int ship1_y = 2;
 
     // missle width
     Memory.write8(0x04, (byte)16);
@@ -232,7 +228,7 @@ public class Atari2600JavaDemo
     //      Atari2600.setColorPlayfield(0x06);
       }
 
-      if(shot0_y < 100)
+      if((frame & 1) == 1 && shot0_y < 100)
       {
         shot0_y--;
         if(shot0_y < ship1_y)
@@ -247,7 +243,7 @@ public class Atari2600JavaDemo
         shot1_y = ship1_y;
       }
 
-      if(shot1_y < 100)
+      if((frame & 1) == 1 && shot1_y < 100)
       {
         shot1_y++;
         if(shot1_y > ship0_y)

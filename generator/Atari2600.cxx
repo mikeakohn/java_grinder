@@ -1202,7 +1202,7 @@ void Atari2600::print_pia_definitions()
 void Atari2600::insert_atari_2600_functions()
 {
   fprintf(out, "draw:\n");
-//  fprintf(out, "  lda #0\n");
+  fprintf(out, "  lda #0\n");
   fprintf(out, "  sta ENAM0\n");
   fprintf(out, "  sta ENAM1\n");
   fprintf(out, "  sta ENABL\n");
@@ -1220,7 +1220,7 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "draw_playfield:\n");
   fprintf(out, "  sta WSYNC\n");
   fprintf(out, "  txa\n");
-  fprintf(out, "  and #3\n");
+  fprintf(out, "  and #1\n");
   fprintf(out, "  bne draw_player0\n");
   fprintf(out, "  ldy playfield_line\n");
   fprintf(out, "  cpy playfield_length\n");
@@ -1237,6 +1237,7 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  inc playfield_line\n");
   fprintf(out, "  inc playfield_line\n");
   fprintf(out, "draw_player0:\n");
+  fprintf(out, "  sta WSYNC\n");
   fprintf(out, "  cpx player0_y\n");
   fprintf(out, "  bmi draw_player1\n");
   fprintf(out, "  ldy player0_line\n");
@@ -1270,6 +1271,7 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  beq draw_ball\n");
   fprintf(out, "  inc missile1_line\n");
   fprintf(out, "draw_ball:\n");
+  fprintf(out, "  sta WSYNC\n");
   fprintf(out, "  cpx ball_y\n");
   fprintf(out, "  bmi draw_continue\n");
   fprintf(out, "  ldy ball_line\n");
@@ -1279,7 +1281,7 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  inc ball_line\n");
   fprintf(out, "draw_continue:\n");
   fprintf(out, "  inx\n");
-  fprintf(out, "  cpx #96\n");
+  fprintf(out, "  cpx #48\n");
   fprintf(out, "  bne draw_playfield\n");
   fprintf(out, "  ldx result\n");
   fprintf(out, "  rts\n\n");
@@ -1310,6 +1312,7 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "start_vblank:\n");
   fprintf(out, "  lda #0x02\n");
   fprintf(out, "  sta VSYNC\n");
+  fprintf(out, "  sta VBLANK\n");
   fprintf(out, "  sta WSYNC\n");
   fprintf(out, "  sta WSYNC\n");
   fprintf(out, "  sta WSYNC\n");
