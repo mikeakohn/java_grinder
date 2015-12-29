@@ -1,5 +1,6 @@
 
-import net.mikekohn.java_grinder.IOPort0;
+import net.mikekohn.java_grinder.IOPort6;
+import net.mikekohn.java_grinder.IOPort7;
 
 public class LedBlink
 {
@@ -7,8 +8,10 @@ public class LedBlink
   {
     int n;
 
-    IOPort0.setPinsAsOutput(0x7f);
-    IOPort0.setPinsValue(0x01);
+    IOPort6.setPinsAsOutput(0x00);
+    IOPort7.setPinsAsOutput(0x00);
+    IOPort6.setPinsValue(0x01);
+    IOPort7.setPinsValue(0x40);
 
     while(true);
   }

@@ -54,7 +54,7 @@
 // r23 $s7 Saved registers 7
 // r24 $t8 Temporary
 // r25 $t9 Temporary
-// r26 $k0 kernel (do not use?)
+// r26 $k0 kernel (point to I/O ports or something)
 // r27 $k1 kernel (do not use?)
 // r28 $gp Heap pointer
 // r29 $sp Stack pointer
@@ -94,7 +94,7 @@ int MIPS32::open(const char *filename)
 int MIPS32::start_init()
 {
   // Add any set up items (stack, registers, etc).
-  fprintf(out, ".org 0%x\n", org);
+  fprintf(out, ".org 0x%x\n", org);
   fprintf(out, "start:\n");
 
   // REVIEW - Use li instead of real instructions?
@@ -213,12 +213,32 @@ int MIPS32::push_double(double f)
 
 int MIPS32::push_byte(int8_t b)
 {
-  return -1;
+  if (reg < reg_max)
+  {
+    fprintf(out, "  li $t%d, 0x%x\n", reg, (int32_t)b);
+    reg++;
+  }
+    else
+  {
+    STACK_PUSH(((int32_t)b))
+  }
+
+  return 0;
 }
 
 int MIPS32::push_short(int16_t s)
 {
-  return -1;
+  if (reg < reg_max)
+  {
+    fprintf(out, "  li $t%d, 0x%x\n", reg, (int32_t)s);
+    reg++;
+  }
+    else
+  {
+    STACK_PUSH(((int32_t)s))
+  }
+
+  return 0;
 }
 
 int MIPS32::push_ref(char *name)
@@ -413,7 +433,9 @@ int MIPS32::return_void(int local_count)
 
 int MIPS32::jump(const char *name, int distance)
 {
-  return -1;
+  fprintf(out, "  beq name\n");
+
+  return 0;
 }
 
 int MIPS32::call(const char *name)

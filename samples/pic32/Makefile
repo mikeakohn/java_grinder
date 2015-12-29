@@ -2,7 +2,7 @@
 defauit: LedBlink.class
 
 grind: LedBlink.class
-	../../java_grinder LedBlink.class led_blink.asm pic32
+	../../java_grinder -v LedBlink.class led_blink.asm pic32
 	naken_asm -l -I ../../../naken_asm/include -o led_blink.hex led_blink.asm
 
 %.class: %.java
