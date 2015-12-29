@@ -165,7 +165,7 @@ if(wait == 0)
         if(shot0_y == 100)
         {
           shot0_y = ship0_y;
-          Atari2600.setAudioControl0((byte)0b0001);
+          Atari2600.setAudioControl0((byte)0b0100);
           Atari2600.setAudioVolume0((byte)15);
         }
       }
@@ -245,7 +245,7 @@ if(wait > 0)
         shot0_y = 100;
         shot1_y = 100;
         Atari2600.setAudioControl0((byte)0b1000);
-        Atari2600.setAudioFrequency0((byte)18);
+        Atari2600.setAudioFrequency0((byte)16);
         Atari2600.setAudioVolume0((byte)15);
         Atari2600.setAudioVolume1((byte)0);
         wait = 30;
@@ -259,7 +259,7 @@ if(wait > 0)
 
       if((frame & 1) == 1 && shot0_y < 100)
       {
-        Atari2600.setAudioFrequency0((byte)(shot0_y >> 1));
+        Atari2600.setAudioFrequency0((byte)((shot0_y >> 1) + 8));
         shot0_y--;
         if(shot0_y < ship1_y)
         {
