@@ -176,7 +176,7 @@ if(wait == 0)
       if(ship0_x < left_adj)
         ship0_x = left_adj;
 
-      if(ship1_x > ship0_xadj || ship1_x == left)
+      if(ship1_x >= ship0_xadj || ship1_x == left)
       {
         if(shot0_y < 16)
           ship1_x++;
