@@ -25,6 +25,7 @@
 #include "DSPIC.h"
 #include "Epiphany.h"
 #include "M6502.h"
+#include "M6502_8.h"
 #include "MC68000.h"
 #include "MIPS32.h"
 #include "MSP430.h"
@@ -117,6 +118,11 @@ static Generator *new_generator(const char *chip_type)
   if (strcasecmp("m6502", chip_type) == 0)
   {
     generator = new M6502();
+  }
+    else
+  if (strcasecmp("m6502_8", chip_type) == 0)
+  {
+    generator = new M6502_8();
   }
     else
   if (strcasecmp("mc68000", chip_type) == 0)
@@ -238,10 +244,10 @@ int main(int argc, char *argv[])
     printf("Usage: %s <class> <outfile> <platform>\n"
            "   platforms:\n"
            "     appleiigs\n"
-           "     atari2600\n"
            "     attiny2313, atmega328, atmega328p, attiny85, attiny84, attiny13,\n"
            "     dspic,\n"
            "     m6502, c64\n"
+           "     m6502_8, atari2600\n"
            "     mips32, pic32\n"
            "     msp430g2231, msp430g2452, msp430g2553, msp430f5529\n"
            "     sega_genesis\n"
