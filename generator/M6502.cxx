@@ -1551,6 +1551,7 @@ void M6502::insert_integer_to_byte()
 
 void M6502::insert_dup()
 {
+//FIXME this is broken
   fprintf(out, "dup:\n");
   POP_HI();
   POP_LO();
