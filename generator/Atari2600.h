@@ -129,6 +129,9 @@ public:
   virtual int atari2600_isJoystick1Up();
   virtual int atari2600_isJoystick1ButtonDown();
 
+  virtual int atari2600_setScore0_B();
+  virtual int atari2600_setScore1_B();
+
 private:
   void print_tia_definitions();
   void print_pia_definitions();

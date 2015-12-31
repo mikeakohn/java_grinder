@@ -1120,6 +1120,34 @@ int Atari2600::atari2600_isJoystick1ButtonDown()
   return 0;
 }
 
+int Atari2600::atari2600_setScore0_B()
+{
+  fprintf(out, "; setScore0\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  sta score0\n");
+  stack--;
+
+  return 0;
+}
+
+int Atari2600::atari2600_setScore1_B()
+{
+  fprintf(out, "; setScore1\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  sta score1\n");
+  stack--;
+
+  return 0;
+}
+
 void Atari2600::print_tia_definitions()
 {
   fprintf(out, "  VSYNC equ 0x00\n");
@@ -1223,17 +1251,13 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  lda #00001010b\n");
   fprintf(out, "  sta CTRLPF\n");
 
-  fprintf(out, "  lda #(15 << 3)\n");
-  fprintf(out, "  sta score0\n");
-  fprintf(out, "  lda #(9 << 3)\n");
-  fprintf(out, "  sta score1\n");
-
   // score
   fprintf(out, "draw_score:\n");
   fprintf(out, "  sta WSYNC\n");
   fprintf(out, "  ldy score0\n");
   fprintf(out, "  lda numbers,y\n");
   fprintf(out, "  sta PF1\n");
+  fprintf(out, "  nop\n");
   fprintf(out, "  nop\n");
   fprintf(out, "  nop\n");
   fprintf(out, "  nop\n");

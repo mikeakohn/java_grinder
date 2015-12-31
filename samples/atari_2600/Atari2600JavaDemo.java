@@ -75,6 +75,8 @@ public class Atari2600JavaDemo
     int ship1_hit = 0;
     int pf_hit = 0;
     int wait = 0;
+    int score0 = 0;
+    int score1 = 0;
 
     final int left = 12;
     final int right = 122;
@@ -107,41 +109,11 @@ public class Atari2600JavaDemo
     {
       Atari2600.startVblank();
 
-      if(ship0_hit > 0)
-      {
-        Atari2600.setColorPlayer0(0x80 + ship0_hit);
-        ship0_hit--;
-        if(ship0_hit == 0)
-        {
-          Atari2600.setColorPlayer0(0x88);
-          Atari2600.setAudioVolume1((byte)0);
-        }
-      }
-
-      if(ship1_hit > 0)
-      {
-        Atari2600.setColorPlayer1(0x30 + ship1_hit);
-        ship1_hit--;
-        if(ship1_hit == 0)
-        {
-          Atari2600.setColorPlayer1(0x38);
-          Atari2600.setAudioVolume0((byte)0);
-        }
-      }
-
-      Atari2600.clearMotionRegisters();
-      Atari2600.setPlayer0Position((byte)(ship0_x - 4), (byte)ship0_y);
-      Atari2600.setPlayer1Position((byte)(ship1_x - 4), (byte)ship1_y);
-      Atari2600.setMissile0Position((byte)ship0_x, (byte)shot0_y);
-      Atari2600.setMissile1Position((byte)ship1_x, (byte)shot1_y);
-      Atari2600.clearCollisionLatches();
+      Atari2600.setScore0((byte)score0);
+      Atari2600.setScore1((byte)score1);
 
       if(wait > 0)
         wait--;
-
-      Atari2600.waitVblank();
-      Atari2600.drawScreen();
-      Atari2600.startOverscan();
 
       if(wait == 0)
       {
@@ -190,6 +162,39 @@ public class Atari2600JavaDemo
           ship1_x = left;
       }
 
+      if(ship0_hit > 0)
+      {
+        Atari2600.setColorPlayer0(0x80 + ship0_hit);
+        ship0_hit--;
+        if(ship0_hit == 0)
+        {
+          Atari2600.setColorPlayer0(0x88);
+          Atari2600.setAudioVolume1((byte)0);
+        }
+      }
+
+      if(ship1_hit > 0)
+      {
+        Atari2600.setColorPlayer1(0x30 + ship1_hit);
+        ship1_hit--;
+        if(ship1_hit == 0)
+        {
+          Atari2600.setColorPlayer1(0x38);
+          Atari2600.setAudioVolume0((byte)0);
+        }
+      }
+
+      Atari2600.clearMotionRegisters();
+      Atari2600.setPlayer0Position((byte)(ship0_x - 4), (byte)ship0_y);
+      Atari2600.setPlayer1Position((byte)(ship1_x - 4), (byte)ship1_y);
+      Atari2600.setMissile0Position((byte)ship0_x, (byte)shot0_y);
+      Atari2600.setMissile1Position((byte)ship1_x, (byte)shot1_y);
+      Atari2600.clearCollisionLatches();
+
+      Atari2600.waitVblank();
+      Atari2600.drawScreen();
+      Atari2600.startOverscan();
+
       if(Atari2600.isCollisionMissile0Playfield())
       {
         pf_hit = 11;
@@ -206,6 +211,9 @@ public class Atari2600JavaDemo
         Atari2600.setAudioFrequency1((byte)22);
         Atari2600.setAudioVolume0((byte)0);
         Atari2600.setAudioVolume1((byte)15);
+        score1++;
+        if(score1 > 20)
+          score1 = 20;
         wait = 30;
       }
 
@@ -218,6 +226,9 @@ public class Atari2600JavaDemo
         Atari2600.setAudioFrequency0((byte)16);
         Atari2600.setAudioVolume0((byte)15);
         Atari2600.setAudioVolume1((byte)0);
+        score0++;
+        if(score0 > 20)
+          score0 = 20;
         wait = 30;
       }
 
