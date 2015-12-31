@@ -74,9 +74,9 @@ public class Atari2600JavaDemo
 
   public static void main()
   {
-    int ship0_x = 64;
+    int ship0_x = 67;
     int shot0_y = 100;
-    int ship1_x = 64;
+    int ship1_x = 67;
     int shot1_y = 100;
     int rnd = 255;
     int frame = 0;
