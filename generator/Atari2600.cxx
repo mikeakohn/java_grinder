@@ -1216,6 +1216,41 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  stx result\n");
   fprintf(out, "  ldx #0\n");
   fprintf(out, "  ldy #0\n");
+
+  fprintf(out, "  lda #00001010b\n");
+  fprintf(out, "  sta CTRLPF\n");
+
+  fprintf(out, "draw_score:\n");
+  fprintf(out, "  cpx #32\n");
+  fprintf(out, "  bpl draw_playfield\n");
+  // left score
+  fprintf(out, "  sta WSYNC\n");
+
+  fprintf(out, "  lda #128\n");
+  fprintf(out, "  sta PF0\n");
+  fprintf(out, "  nop\n");
+  fprintf(out, "  nop\n");
+  fprintf(out, "  nop\n");
+  fprintf(out, "  lda #128\n");
+  fprintf(out, "  sta PF0\n");
+
+  // right score
+  fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  lda #128\n");
+  fprintf(out, "  sta PF0\n");
+  fprintf(out, "  nop\n");
+  fprintf(out, "  nop\n");
+  fprintf(out, "  nop\n");
+  fprintf(out, "  lda #128\n");
+  fprintf(out, "  sta PF0\n");
+
+  fprintf(out, "  inx\n");
+  fprintf(out, "  cpx #6\n");
+  fprintf(out, "  bne draw_score\n");
+  fprintf(out, "  lda #00001001b\n");
+  fprintf(out, "  sta CTRLPF\n");
+  fprintf(out, "  ldx #0\n");
+
   fprintf(out, "draw_playfield:\n");
   fprintf(out, "  sta WSYNC\n");
   fprintf(out, "  txa\n");
@@ -1280,7 +1315,7 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  inc ball_line\n");
   fprintf(out, "draw_continue:\n");
   fprintf(out, "  inx\n");
-  fprintf(out, "  cpx #48\n");
+  fprintf(out, "  cpx #42\n");
   fprintf(out, "  bne draw_playfield\n");
   fprintf(out, "  ldx result\n");
   fprintf(out, "  rts\n\n");
