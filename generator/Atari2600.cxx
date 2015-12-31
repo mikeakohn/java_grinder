@@ -1290,12 +1290,15 @@ void Atari2600::insert_atari_2600_functions()
   // x = (x * 5) / 4
   fprintf(out, "div15:\n");
   fprintf(out, "  sta value1 + 0\n");
+  fprintf(out, "  sta value2 + 0\n");
   fprintf(out, "  lda #0\n");
   fprintf(out, "  sta value1 + 1\n");
-  fprintf(out, "  sta value2 + 0\n");
   fprintf(out, "  sta value2 + 1\n");
   fprintf(out, "div15_mul_5:\n");
-  fprintf(out, "  ldy #5\n");
+  fprintf(out, "  asl value2 + 0\n");
+  fprintf(out, "  rol value2 + 1\n");
+  fprintf(out, "  asl value2 + 0\n");
+  fprintf(out, "  rol value2 + 1\n");
   fprintf(out, "  clc\n");
   fprintf(out, "  lda value1 + 0\n");
   fprintf(out, "  adc value2 + 0\n");
@@ -1303,8 +1306,6 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  lda value1 + 1\n");
   fprintf(out, "  adc value2 + 1\n");
   fprintf(out, "  sta value2 + 1\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bne #-16\n");
   fprintf(out, "div15_shift_right_2:\n");
   fprintf(out, "  lsr value2 + 1\n");
   fprintf(out, "  ror value2 + 0\n");
