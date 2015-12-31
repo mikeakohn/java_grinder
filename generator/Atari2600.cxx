@@ -1207,6 +1207,9 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  sta ENABL\n");
   fprintf(out, "  sta GRP0\n");
   fprintf(out, "  sta GRP1\n");
+  fprintf(out, "  sta PF0\n");
+  fprintf(out, "  sta PF1\n");
+  fprintf(out, "  sta PF2\n");
   fprintf(out, "  sta player0_line\n");
   fprintf(out, "  sta player1_line\n");
   fprintf(out, "  sta missile0_line\n");
@@ -1223,32 +1226,38 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "draw_score:\n");
   fprintf(out, "  cpx #32\n");
   fprintf(out, "  bpl draw_playfield\n");
+
   // left score
   fprintf(out, "  sta WSYNC\n");
 
-  fprintf(out, "  lda #128\n");
-  fprintf(out, "  sta PF0\n");
+  fprintf(out, "  lda #1\n");
+  fprintf(out, "  sta PF1\n");
   fprintf(out, "  nop\n");
   fprintf(out, "  nop\n");
   fprintf(out, "  nop\n");
-  fprintf(out, "  lda #128\n");
-  fprintf(out, "  sta PF0\n");
+  fprintf(out, "  lda #1\n");
+  fprintf(out, "  sta PF1\n");
 
   // right score
   fprintf(out, "  sta WSYNC\n");
-  fprintf(out, "  lda #128\n");
-  fprintf(out, "  sta PF0\n");
+  fprintf(out, "  lda #1\n");
+  fprintf(out, "  sta PF1\n");
   fprintf(out, "  nop\n");
   fprintf(out, "  nop\n");
   fprintf(out, "  nop\n");
-  fprintf(out, "  lda #128\n");
-  fprintf(out, "  sta PF0\n");
+  fprintf(out, "  lda #1\n");
+  fprintf(out, "  sta PF1\n");
 
   fprintf(out, "  inx\n");
-  fprintf(out, "  cpx #6\n");
+  fprintf(out, "  cpx #5\n");
   fprintf(out, "  bne draw_score\n");
   fprintf(out, "  lda #00001001b\n");
   fprintf(out, "  sta CTRLPF\n");
+
+  // blank line
+  fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sta PF1\n");
   fprintf(out, "  ldx #0\n");
 
   fprintf(out, "draw_playfield:\n");
