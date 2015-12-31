@@ -39,19 +39,26 @@ public class Atari2600JavaDemo
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b01111100, (byte)0b00000000,
     (byte)0b00010000, (byte)0b01111100, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b00111000, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00111000, (byte)0b10000000,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b10000000,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00011110,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b00111111,
+    (byte)0b00010000, (byte)0b00111000, (byte)0b00111111,
+    (byte)0b00010000, (byte)0b00111000, (byte)0b00111111,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00011110,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b00111000, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b10000000,
+    (byte)0b00010000, (byte)0b00111000, (byte)0b10000000,
     (byte)0b00010000, (byte)0b01111100, (byte)0b00000000,
     (byte)0b00010000, (byte)0b01111100, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
@@ -82,7 +89,7 @@ public class Atari2600JavaDemo
 
     final int left = 12;
     final int right = 122;
-    final int ship0_y = 37;
+    final int ship0_y = 51;
     final int ship1_y = 2;
 
     // missle width
