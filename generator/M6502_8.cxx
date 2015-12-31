@@ -11,13 +11,25 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 
 #include "M6502_8.h"
 
 // ABI is:
+// A - accumulator
+// X - java stack index register
+// Y - general-purpose index register
+
+#define LOCALS(a) (a)
 
 M6502_8::M6502_8() :
+  stack(0),
+  start_org(0xf000),
+  java_stack_lo(0x80),
+  java_stack_hi(0x98),
+  ram_start(0xb0),
+  label_count(0),
   is_main(0)
 {
 
@@ -33,29 +45,59 @@ int M6502_8::open(const char *filename)
 
   fprintf(out, ".65xx\n");
 
-  // Set where RAM starts / ends
+  // heap
+  fprintf(out, "ram_start equ 0x%04x\n", ram_start);
+  fprintf(out, "heap_ptr equ ram_start\n");
+
+  // for indirection (2 bytes)
+  fprintf(out, "address equ 0xc0\n");
+
+  // java stack
+  fprintf(out, "stack_lo equ 0x%04x\n", java_stack_lo);
+  fprintf(out, "stack_hi equ 0x%04x\n", java_stack_hi);
+
+  // points to locals
+  fprintf(out, "locals equ 0xc2\n");
+
+  // temp variables
+  fprintf(out, "result equ 0xc4\n");
+  fprintf(out, "remainder equ 0xc6\n");
+  fprintf(out, "length equ 0xc8\n");
+//  fprintf(out, "value1 equ 0xca\n");
+//  fprintf(out, "value2 equ 0xcc\n");
+//  fprintf(out, "value3 equ 0xce\n");
+
+  // start
+  fprintf(out, ".org 0x%04x\n", start_org);
+  fprintf(out, "reset:\n");
+  fprintf(out, "  sei\n");
+  fprintf(out, "  cld\n");
+  fprintf(out, "  lda #0xff\n");
+  fprintf(out, "  tax\n");
+  fprintf(out, "  txs\n");
 
   return 0;
 }
 
 int M6502_8::start_init()
 {
-  // Add any set up items (stack, registers, etc).
-  //fprintf(out, ".org ???\n");
-  fprintf(out, "start:\n");
-
   return 0;
 }
 
 int M6502_8::insert_static_field_define(const char *name, const char *type, int index)
 {
-  fprintf(out, "%s equ %d\n", name, (index + 1) * 4);
+  fprintf(out, "%s equ ram_start + %d\n", name, (index + 1) * 2);
+
   return 0;
 }
 
 int M6502_8::init_heap(int field_count)
 {
-  fprintf(out, "  ;; Set up heap and static initializers\n");
+  fprintf(out, "; Set up heap and static initializers\n");
+  fprintf(out, "  lda #(ram_start + %d) & 0xff\n", (field_count + 1) * 2);
+  fprintf(out, "  sta ram_start + 0\n");
+  fprintf(out, "  lda #(ram_start + %d) >> 8\n", (field_count + 1) * 2);
+  fprintf(out, "  sta ram_start + 1\n");
 
   return 0;
 }
@@ -63,6 +105,11 @@ int M6502_8::init_heap(int field_count)
 int M6502_8::insert_field_init_boolean(char *name, int index, int value)
 {
   value = (value == 0) ? 0 : 1;
+  fprintf(out, "; insert_field_init_boolean\n");
+  fprintf(out, "  lda #%d\n", value & 0xff);
+  fprintf(out, "  sta %s + 0\n", name);
+  fprintf(out, "  lda #%d\n", value >> 8);
+  fprintf(out, "  sta %s + 1\n", name);
 
   return 0;
 }
@@ -79,31 +126,90 @@ int M6502_8::insert_field_init_short(char *name, int index, int value)
 
 int M6502_8::insert_field_init_int(char *name, int index, int value)
 {
+  if (value < -32768 || value > 65535) { return -1; }
 
-  return -1;
+  fprintf(out, "; insert_field_init_short\n");
+  fprintf(out, "  lda #%d\n", value & 0xff);
+  fprintf(out, "  sta %s + 0\n", name);
+  fprintf(out, "  lda #%d\n", value >> 8);
+  fprintf(out, "  sta %s + 1\n", name);
+
+  return 0;
 }
 
 int M6502_8::insert_field_init(char *name, int index)
 {
-  return -1;
+  fprintf(out, "; insert_field_init\n");
+  fprintf(out, "  lda #_%s & 0xff\n", name);
+  fprintf(out, "  sta %s + 0\n", name);
+  fprintf(out, "  lda #_%s >> 8\n", name);
+  fprintf(out, "  sta %s + 1\n", name);
+
+  return 0;
 }
 
 void M6502_8::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
+  stack = 0;
+
+  is_main = (strcmp(name, "main") == 0) ? 1 : 0;
+
+  fprintf(out, "%s:\n", name);
+
+  // main() function goes here
+  if (!is_main)
+  {
+    fprintf(out, "  lda locals\n");
+    PUSH_LO();
+    fprintf(out, "  lda #0\n");
+    PUSH_HI();
+  }
+
+  fprintf(out, "  stx locals\n");
+  fprintf(out, "  txa\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  sbc #0x%02x\n", local_count);
+  fprintf(out, "  tax\n");
 }
 
 void M6502_8::method_end(int local_count)
 {
+  fprintf(out, "\n");
 }
 
 int M6502_8::push_integer(int32_t n)
 {
-  return -1;
+  if (n > 65535 || n < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", n);
+
+    return -1;
+  }
+
+  uint16_t value = (n & 0xffff);
+
+  fprintf(out, "; push_integer\n");
+  fprintf(out, "  lda #0x%02x\n", value & 0xff);
+  PUSH_LO();
+  fprintf(out, "  lda #0x%02x\n", value >> 8);
+  PUSH_HI();
+  stack++;
+
+  return 0;
 }
+
 
 int M6502_8::push_integer_local(int index)
 {
-  return -1;
+  fprintf(out, "; push_integer_local\n");
+  fprintf(out, "  ldy locals\n");
+  fprintf(out, "  lda stack_lo - %d,y\n", LOCALS(index));
+  PUSH_LO();
+  fprintf(out, "  lda stack_hi - %d,y\n", LOCALS(index));
+  PUSH_HI();
+  stack++;
+
+  return 0;
 }
 
 int M6502_8::push_ref_static(const char *name, int index)
@@ -118,15 +224,12 @@ int M6502_8::push_ref_local(int index)
 
 int M6502_8::push_fake()
 {
-  //if (stack != 0) { return -1; }
-
-  //reg++;
   return -1;
 }
 
 int M6502_8::push_long(int64_t n)
 {
-  return -1;
+  return push_integer((int32_t)n);
 }
 
 int M6502_8::push_float(float f)
@@ -141,27 +244,57 @@ int M6502_8::push_double(double f)
 
 int M6502_8::push_byte(int8_t b)
 {
-  int32_t value = (int32_t)b;
+  int8_t n = b;
+  uint8_t value = (n & 0xff);
 
-  return push_integer(value);
+  fprintf(out, "; push_byte\n");
+  fprintf(out, "  lda #0x%02x\n", value & 0xff);
+  PUSH_LO();
+//  fprintf(out, "  lda #0x%02x\n", value >> 8);
+  PUSH_HI();
+  stack++;
+
+  return 0;
 }
 
 int M6502_8::push_short(int16_t s)
 {
-  int32_t value = (int32_t)s;
+//  uint16_t value = (s & 0xffff);
+  uint8_t value = (s & 0xff);
 
-  return push_integer(value);
+  fprintf(out, "; push_short\n");
+  fprintf(out, "  lda #0x%02x\n", value & 0xff);
+  PUSH_LO();
+//  fprintf(out, "  lda #0x%02x\n", value >> 8);
+  PUSH_HI();
+  stack++;
+
+  return 0;
 }
 
 int M6502_8::push_ref(char *name)
 {
-  // Need to move the address of name to the top of stack
-  return -1;
+  fprintf(out, "; push_ref\n");
+  fprintf(out, "  lda %s + 0\n", name);
+  PUSH_LO();
+  fprintf(out, "  lda %s + 1\n", name);
+  PUSH_HI();
+  stack++;
+
+  return 0;
 }
 
 int M6502_8::pop_integer_local(int index)
 {
-  return -1;
+  fprintf(out, "; pop_integer_local\n");
+  fprintf(out, "  ldy locals\n");
+  POP_HI();
+  fprintf(out, "  sta stack_hi - %d,y\n", LOCALS(index));
+  POP_LO();
+  fprintf(out, "  sta stack_lo - %d,y\n", LOCALS(index));
+  stack--;
+
+  return 0;
 }
 
 int M6502_8::pop_ref_local(int index)
@@ -171,11 +304,30 @@ int M6502_8::pop_ref_local(int index)
 
 int M6502_8::pop()
 {
-  return -1;
+  fprintf(out, "; pop\n");
+  POP_HI();
+  fprintf(out, "  sta result + 1\n");
+  POP_LO();
+  fprintf(out, "  sta result + 0\n");
+  stack--;
+
+  return 0;
 }
 
 int M6502_8::dup()
 {
+//FIXME broken
+/*
+  fprintf(out, "dup:\n");
+  POP_HI();
+  POP_LO();
+  PUSH_LO();
+  PUSH_HI();
+  PUSH_LO();
+  PUSH_HI();
+  stack++;
+*/
+
   return -1;
 }
 
@@ -186,12 +338,36 @@ int M6502_8::dup2()
 
 int M6502_8::swap()
 {
-  return -1;
+  fprintf(out, "; swap\n");
+  fprintf(out, "  txa\n");
+  fprintf(out, "  tay\n");
+  fprintf(out, "  lda stack_lo,y\n");
+  fprintf(out, "  sta result + 0,y\n");
+
+  fprintf(out, "  lda stack_lo - 1,y\n");
+  fprintf(out, "  sta stack_lo - 0,y\n");
+
+  fprintf(out, "  lda result + 0\n");
+  fprintf(out, "  sta stack_lo - 1,y\n");
+
+  return 0;
 }
 
 int M6502_8::add_integer()
 {
-  return -1;
+  fprintf(out, "; add_integer\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  sta result + 0\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  clc\n");
+  fprintf(out, "  adc result + 0\n");
+  PUSH_LO();
+  PUSH_HI();
+  stack--;
+
+  return 0;
 }
 
 int M6502_8::add_integer(int num)
@@ -201,7 +377,19 @@ int M6502_8::add_integer(int num)
 
 int M6502_8::sub_integer()
 {
-  return -1;
+  fprintf(out, "; sub_integer\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  sta result + 0\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  sec\n");
+  fprintf(out, "  sbc result + 0\n");
+  PUSH_LO();
+  PUSH_HI();
+  stack--;
+
+  return 0;
 }
 
 int M6502_8::sub_integer(int num)
@@ -231,7 +419,20 @@ int M6502_8::neg_integer()
 
 int M6502_8::shift_left_integer()
 {
-  return -1;
+  fprintf(out, "; shift_left_integer\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  tay\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  asl\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bne #-4\n");
+  PUSH_LO();
+  PUSH_HI();
+  stack--;
+
+  return 0;
 }
 
 int M6502_8::shift_left_integer(int num)
@@ -241,7 +442,21 @@ int M6502_8::shift_left_integer(int num)
 
 int M6502_8::shift_right_integer()
 {
-  return -1;
+  fprintf(out, "; shift_right_integer\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  tay\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  cmp #0x80\n");
+  fprintf(out, "  ror\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bne #-6\n");
+  PUSH_LO();
+  PUSH_HI();
+  stack--;
+
+  return 0;
 }
 
 int M6502_8::shift_right_integer(int num)
@@ -251,7 +466,20 @@ int M6502_8::shift_right_integer(int num)
 
 int M6502_8::shift_right_uinteger()
 {
-  return -1;
+  fprintf(out, "; shift_right_uinteger\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  tay\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  lsr\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bne #-4\n");
+  PUSH_LO();
+  PUSH_HI();
+  stack--;
+
+  return 0;
 }
 
 int M6502_8::shift_right_uinteger(int num)
@@ -261,7 +489,18 @@ int M6502_8::shift_right_uinteger(int num)
 
 int M6502_8::and_integer()
 {
-  return -1;
+  fprintf(out, "; and_integer\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  sta result + 0\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  and result + 0\n");
+  PUSH_LO();
+  PUSH_HI();
+  stack--;
+
+  return 0;
 }
 
 int M6502_8::and_integer(int num)
@@ -271,7 +510,18 @@ int M6502_8::and_integer(int num)
 
 int M6502_8::or_integer()
 {
-  return -1;
+  fprintf(out, "; or_integer\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  sta result + 0\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  ora result + 0\n");
+  PUSH_LO();
+  PUSH_HI();
+  stack--;
+
+  return 0;
 }
 
 int M6502_8::or_integer(int num)
@@ -281,7 +531,18 @@ int M6502_8::or_integer(int num)
 
 int M6502_8::xor_integer()
 {
-  return -1;
+  fprintf(out, "; xor_integer\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  sta result + 0\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  eor result + 0\n");
+  PUSH_LO();
+  PUSH_HI();
+  stack--;
+
+  return 0;
 }
 
 int M6502_8::xor_integer(int num)
@@ -291,67 +552,334 @@ int M6502_8::xor_integer(int num)
 
 int M6502_8::inc_integer(int index, int num)
 {
-  return -1;
+  uint8_t value = num & 0xff;
+
+  fprintf(out, "; inc_integer num = %d\n", num);
+  fprintf(out, "  ldy locals\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda stack_lo - %d,y\n", LOCALS(index));
+  fprintf(out, "  adc #0x%02x\n", value & 0xff);
+  fprintf(out, "  sta stack_lo - %d,y\n", LOCALS(index));
+
+  return 0;
 }
 
 int M6502_8::integer_to_byte()
 {
-  return -1;
+  return 0;
 }
 
 int M6502_8::integer_to_short()
 {
-  return -1;
+  return 0;
 }
 
 int M6502_8::jump_cond(const char *label, int cond, int distance)
 {
-  return -1;
+  bool reverse = false;
+
+  if (stack > 0)
+  {
+    fprintf(out, "; jump_cond\n");
+    fprintf(out, "  inx\n");
+    fprintf(out, "  txa\n");
+    fprintf(out, "  tay\n");
+
+    if(cond == COND_LESS_EQUAL)
+    {
+      reverse = true;
+      cond = COND_GREATER_EQUAL;
+    }
+      else
+    if(cond == COND_GREATER)
+    {
+      reverse = true;
+      cond = COND_LESS;
+    }
+    switch(cond)
+    {
+      case COND_EQUAL:
+        fprintf(out, "  lda stack_lo - 0,y\n");
+        fprintf(out, "  cmp #0\n");
+        fprintf(out, "  bne #3\n");
+        fprintf(out, "  jmp %s\n", label);
+        break;
+      case COND_NOT_EQUAL:
+        fprintf(out, "  lda stack_lo - 0,y\n");
+        fprintf(out, "  cmp #0\n");
+        fprintf(out, "  beq #3\n");
+        fprintf(out, "  jmp %s\n", label);
+        break;
+      case COND_LESS:
+        if(reverse == false)
+        {
+          fprintf(out, "  lda stack_lo - 0,y\n");
+          fprintf(out, "  cmp #0\n");
+          fprintf(out, "  bpl #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
+          else
+        {
+          fprintf(out, "  lda #0\n");
+          fprintf(out, "  cmp stack_lo - 0,y\n");
+          fprintf(out, "  bpl #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
+        break;
+      case COND_GREATER_EQUAL:
+        if(reverse == false)
+        {
+          fprintf(out, "  lda stack_lo - 0,y\n");
+          fprintf(out, "  cmp #0\n");
+          fprintf(out, "  bmi #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
+          else
+        {
+          fprintf(out, "  lda #0\n");
+          fprintf(out, "  cmp stack_lo - 0,y\n");
+          fprintf(out, "  bmi #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
+        break;
+    }
+
+    stack--;
+  }
+
+  return 0;
 }
 
 int M6502_8::jump_cond_integer(const char *label, int cond, int distance)
 {
-  return -1;
+  bool reverse = false;
+
+  if (stack > 1)
+  {
+    fprintf(out, "; jump_cond_integer\n");
+    fprintf(out, "  inx\n");
+    fprintf(out, "  inx\n");
+    fprintf(out, "  txa\n");
+    fprintf(out, "  tay\n");
+
+    if(cond == COND_LESS_EQUAL)
+    {
+      reverse = true;
+      cond = COND_GREATER_EQUAL;
+    }
+      else
+    if(cond == COND_GREATER)
+    {
+      reverse = true;
+      cond = COND_LESS;
+    }
+    switch(cond)
+    {
+      case COND_EQUAL:
+        fprintf(out, "  lda stack_lo - 0,y\n");
+        fprintf(out, "  cmp stack_lo - 1,y\n");
+        fprintf(out, "  bne #3\n");
+        fprintf(out, "  jmp %s\n", label);
+        break;
+      case COND_NOT_EQUAL:
+        fprintf(out, "  lda stack_lo - 0,y\n");
+        fprintf(out, "  cmp stack_lo - 1,y\n");
+        fprintf(out, "  beq #3\n");
+        fprintf(out, "  jmp %s\n", label);
+        break;
+      case COND_LESS:
+        if(reverse == false)
+        {
+          fprintf(out, "  lda stack_lo - 0,y\n");
+          fprintf(out, "  cmp stack_lo - 1,y\n");
+          fprintf(out, "  bpl #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
+          else
+        {
+          fprintf(out, "  lda stack_lo - 1,y\n");
+          fprintf(out, "  cmp stack_lo - 0,y\n");
+          fprintf(out, "  bpl #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
+        break;
+      case COND_GREATER_EQUAL:
+        if(reverse == false)
+        {
+          fprintf(out, "  lda stack_lo - 0,y\n");
+          fprintf(out, "  cmp stack_lo - 1,y\n");
+          fprintf(out, "  bmi #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
+          else
+        {
+          fprintf(out, "  lda stack_lo - 1,y\n");
+          fprintf(out, "  cmp stack_lo - 0,y\n");
+          fprintf(out, "  bmi #3\n");
+          fprintf(out, "  jmp %s\n", label);
+        }
+        break;
+    }
+
+    stack -= 2;
+  }
+
+  return 0;
 }
 
 int M6502_8::return_local(int index, int local_count)
 {
-  return -1;
+  fprintf(out, "; return_local\n");
+  fprintf(out, "  ldy locals\n");
+  fprintf(out, "  lda stack_lo - %d,y\n", LOCALS(index));
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  lda stack_hi - %d,y\n", LOCALS(index));
+  fprintf(out, "  sta result + 1\n");
+
+  fprintf(out, "  ldx locals\n");
+
+  if (!is_main)
+  { 
+    POP_HI();
+    POP_LO();
+    fprintf(out, "  sta locals\n");
+  }
+
+  fprintf(out, "  rts\n");
+
+  return 0;
 }
 
 int M6502_8::return_integer(int local_count)
 {
-  return -1;
+  fprintf(out, "; return_integer\n");
+  POP_HI();
+  fprintf(out, "  sta result + 1\n");
+  POP_LO();
+  fprintf(out, "  sta result + 0\n");
+  stack--;
+
+  fprintf(out, "  ldx locals\n");
+
+  if (!is_main)
+  {
+    POP_HI();
+    POP_LO();
+    fprintf(out, "  sta locals\n");
+  }
+
+  fprintf(out, "  rts\n");
+
+  return 0;
 }
 
 int M6502_8::return_void(int local_count)
 {
-  return -1;
+  fprintf(out, "; return_void\n");
+  fprintf(out, "  ldx locals\n");
+
+  if (!is_main)
+  {
+    POP_HI();
+    POP_LO();
+    fprintf(out, "  sta locals\n");
+  }
+
+  fprintf(out, "  rts\n");
+
+  return 0;
 }
 
 int M6502_8::jump(const char *name, int distance)
 {
-  return -1;
+  fprintf(out, "  jmp %s\n", name);
+
+  return 0;
 }
 
 int M6502_8::call(const char *name)
 {
-  return -1;
+  fprintf(out, "  jsr %s\n", name);
+
+  return 0;
 }
 
 int M6502_8::invoke_static_method(const char *name, int params, int is_void)
 {
-  return -1;
+  int local;
+  int stack_vars = stack;
+
+  printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
+
+  fprintf(out, "; invoke_static_method\n");
+
+  local = -params;
+  while(local != 0)
+  {
+    if (stack_vars > 0)
+    {
+      fprintf(out, "  txa\n");
+      fprintf(out, "  tay\n");
+      fprintf(out, "  lda stack_lo + 1 + %d,y\n", (stack - stack_vars));
+      fprintf(out, "  sta stack_lo + 1 %d,y\n", local-1);
+      fprintf(out, "  lda stack_hi + 1 + %d,y\n", (stack - stack_vars));
+      fprintf(out, "  sta stack_hi + 1 %d,y\n", local-1);
+      stack_vars--;
+    }
+
+    local++;
+  }
+
+  fprintf(out, "  jsr %s\n", name);
+
+  if ((stack - stack_vars) > 0)
+  {
+    fprintf(out, "  txa\n");
+    fprintf(out, "  clc\n");
+    fprintf(out, "  adc #%d\n", (stack - stack_vars));
+    fprintf(out, "  tax\n");
+
+    params -= (stack - stack_vars);
+  }
+
+  if (!is_void)
+  {
+    fprintf(out, "  lda result + 0\n");
+    PUSH_LO();
+    fprintf(out, "  lda result + 1\n");
+    PUSH_HI();
+    stack++;
+  }
+
+  return 0;
 }
 
 int M6502_8::put_static(const char *name, int index)
 {
-  return -1;
+  if (stack > 0)
+  {
+    POP_HI();
+    fprintf(out, "  sta %s + 1\n", name);
+    POP_LO();
+    fprintf(out, "  sta %s + 0\n", name);
+    stack--;
+  }
+
+  return 0;
 }
 
 int M6502_8::get_static(const char *name, int index)
 {
-  return -1;
+  if (stack > 0)
+  {
+    POP_HI();
+    fprintf(out, "  sta %s + 1\n", name);
+    POP_LO();
+    fprintf(out, "  sta %s + 0\n", name);
+    stack--;
+  }
+
+  return 0;
 }
 
 int M6502_8::brk()
@@ -366,14 +894,25 @@ int M6502_8::new_array(uint8_t type)
 
 int M6502_8::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 {
+  fprintf(out, "; insert_array\n");
+
   if (type == TYPE_BYTE)
-  { return insert_db(name, data, len, TYPE_INT); }
+  {
+    fprintf(out, ".align 16\n");
+    return insert_db(name, data, len, TYPE_SHORT);
+  }
     else
   if (type == TYPE_SHORT)
-  { return insert_dw(name, data, len, TYPE_INT); }
+  {
+    fprintf(out, ".align 16\n");
+    return insert_dw(name, data, len, TYPE_SHORT);
+  }
     else
   if (type == TYPE_INT)
-  { return insert_dc32(name, data, len, TYPE_INT); }
+  {
+    fprintf(out, ".align 16\n");
+    return insert_dw(name, data, len, TYPE_SHORT);
+  }
 
   return -1;
 }
@@ -385,7 +924,38 @@ int M6502_8::insert_string(const char *name, uint8_t *bytes, int len)
 
 int M6502_8::push_array_length()
 {
-  return -1;
+  // push_array_length
+  fprintf(out, "; push_array_length\n");
+  POP_HI();
+  fprintf(out, "  sta result + 1\n");
+  POP_LO();
+  fprintf(out, "  sta result + 0\n");
+
+  fprintf(out, "  lda result + 0\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda result + 1\n");
+  fprintf(out, "  sta address + 1\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  lda address + 0\n");
+  fprintf(out, "  sbc #2\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda address + 1\n");
+  fprintf(out, "  sbc #0\n");
+  fprintf(out, "  sta address + 1\n");
+
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "  lda (address),y\n");
+  fprintf(out, "  sta result + 0\n");
+  fprintf(out, "  ldy #1\n");
+  fprintf(out, "  lda (address),y\n");
+  fprintf(out, "  sta result + 1\n");
+
+  fprintf(out, "  lda result + 0\n");
+  PUSH_LO();
+  fprintf(out, "  lda result + 1\n");
+  PUSH_HI();
+
+  return 0;
 }
 
 int M6502_8::push_array_length(const char *name, int field_id)
@@ -453,4 +1023,37 @@ int M6502_8::array_write_int(const char *name, int field_id)
   return -1;
 }
 
+// Memory API
+int M6502_8::memory_read8_I()
+{
+  fprintf(out, "; memory_read8\n");
+  POP_HI();
+  fprintf(out, "  sta address + 1\n");
+  POP_LO();
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "  lda (address),y\n");
+  PUSH_LO();
+  PUSH_HI();
+
+  return 0;
+}
+
+int M6502_8::memory_write8_IB()
+{
+  fprintf(out, "; memory_write8\n");
+  POP_HI();
+  POP_LO();
+  fprintf(out, "  pha\n");
+  POP_HI();
+  fprintf(out, "  sta address + 1\n");
+  POP_LO();
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta (address),y\n");
+  stack -= 2;
+
+  return 0;
+}
 

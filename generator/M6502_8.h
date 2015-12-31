@@ -14,6 +14,24 @@
 
 #include "Generator.h"
 
+#define PUSH_LO() \
+  fprintf(out, "; PUSH_LO\n"); \
+  fprintf(out, "  sta stack_lo,x\n")
+
+#define PUSH_HI() \
+  fprintf(out, "; PUSH_HI\n"); \
+  fprintf(out, "  sta stack_hi,x\n"); \
+  fprintf(out, "  dex\n")
+
+#define POP_HI() \
+  fprintf(out, "; POP_HI\n"); \
+  fprintf(out, "  inx\n"); \
+  fprintf(out, "  lda stack_hi,x\n")
+
+#define POP_LO() \
+  fprintf(out, "; POP_LO\n"); \
+  fprintf(out, "  lda stack_lo,x\n")
+
 class M6502_8 : public Generator
 {
 public:
@@ -100,7 +118,17 @@ public:
   virtual int array_write_short(const char *name, int field_id);
   virtual int array_write_int(const char *name, int field_id);
 
+  // Memory API
+  virtual int memory_read8_I();
+  virtual int memory_write8_IB();
+
 protected:
+  int stack;
+  int start_org;
+  int java_stack_lo;
+  int java_stack_hi;
+  int ram_start;
+  int label_count;
   bool is_main : 1;
 };
 

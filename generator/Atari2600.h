@@ -12,9 +12,9 @@
 #ifndef _ATARI_2600_H
 #define _ATARI_2600_H
 
-#include "M6502.h"
+#include "M6502_8.h"
 
-class Atari2600 : public M6502
+class Atari2600 : public M6502_8
 {
 public:
   Atari2600();

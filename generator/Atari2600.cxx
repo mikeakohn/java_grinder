@@ -41,7 +41,7 @@ Atari2600::~Atari2600()
 
 int Atari2600::open(const char *filename)
 {
-  if (M6502::open(filename) != 0) { return -1; }
+  if (M6502_8::open(filename) != 0) { return -1; }
 
   print_tia_definitions();
   print_pia_definitions();
@@ -52,7 +52,6 @@ int Atari2600::open(const char *filename)
   fprintf(out, "  sei\n");
   fprintf(out, "  cld\n");
   fprintf(out, "  ldx #0xff\n");
-  fprintf(out, "  stx seed\n");
   fprintf(out, "  txs\n");
   fprintf(out, "  lda #0\n");
   fprintf(out, "  ldx #127\n");
@@ -1301,14 +1300,6 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  sta RESP0,x\n");
   fprintf(out, "  rts\n\n");
 
-  fprintf(out, "rand:\n");
-  fprintf(out, "  sec\n");
-  fprintf(out, "  lda seed\n");
-  fprintf(out, "  sbc #77\n");
-  fprintf(out, "  sta seed\n");
-  fprintf(out, "  lda seed\n");
-  fprintf(out, "  rts\n\n");
-
   fprintf(out, "start_vblank:\n");
   fprintf(out, "  lda #0x02\n");
   fprintf(out, "  sta VSYNC\n");
@@ -1376,8 +1367,6 @@ void Atari2600::insert_atari_2600_variables()
   fprintf(out, "  playfield_hi equ 0xf6\n");
   fprintf(out, "  playfield_line equ 0xf7\n");
   fprintf(out, "  playfield_length equ 0xf8\n");
-
-  fprintf(out, "  seed equ 0xf9\n");
   fprintf(out, "\n");
 }
 
