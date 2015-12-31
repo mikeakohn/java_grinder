@@ -1288,73 +1288,78 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  ldx #0\n");
 
   fprintf(out, "draw_playfield:\n");
-  fprintf(out, "  txa\n");
-  fprintf(out, "  and #1\n");
-  fprintf(out, "  bne draw_playfield_skip\n");
-  fprintf(out, "  ldy playfield_line\n");
-  fprintf(out, "  cpy playfield_length\n");
-  fprintf(out, "  beq draw_playfield_skip\n");
-  fprintf(out, "  lda (playfield),y\n");
-  fprintf(out, "  sta WSYNC\n");
-  fprintf(out, "  sta PF0\n");
-  fprintf(out, "  iny\n");
-  fprintf(out, "  lda (playfield),y\n");
-  fprintf(out, "  sta PF1\n");
-  fprintf(out, "  iny\n");
-  fprintf(out, "  lda (playfield),y\n");
-  fprintf(out, "  sta PF2\n");
-  fprintf(out, "  inc playfield_line\n");
-  fprintf(out, "  inc playfield_line\n");
-  fprintf(out, "  inc playfield_line\n");
-  fprintf(out, "  db 0x2c\n");
+  fprintf(out, "  txa\n"); //2
+  fprintf(out, "  and #1\n"); //2
+  fprintf(out, "  bne draw_playfield_skip\n"); //2
+  fprintf(out, "  ldy playfield_line\n"); //3
+  fprintf(out, "  cpy playfield_length\n"); //3
+  fprintf(out, "  beq draw_playfield_skip\n"); //2
+  fprintf(out, "  lda (playfield),y\n"); //5
+  fprintf(out, "  sta WSYNC\n"); //3
+  fprintf(out, "  sta PF0\n"); //3
+  fprintf(out, "  iny\n"); //2
+  fprintf(out, "  lda (playfield),y\n"); //5
+  fprintf(out, "  sta PF1\n"); //3
+  fprintf(out, "  iny\n"); //2
+  fprintf(out, "  lda (playfield),y\n"); //5
+  fprintf(out, "  sta PF2\n"); //3
+  fprintf(out, "  inc playfield_line\n"); //5
+  fprintf(out, "  inc playfield_line\n"); //5
+  fprintf(out, "  inc playfield_line\n"); //5
+  fprintf(out, "  db 0x2c\n"); //4
+//45
   fprintf(out, "draw_playfield_skip:\n");
-  fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  sta WSYNC\n"); //3
   fprintf(out, "draw_player0:\n");
-  fprintf(out, "  sta WSYNC\n");
-  fprintf(out, "  cpx player0_y\n");
-  fprintf(out, "  bmi draw_player1\n");
-  fprintf(out, "  ldy player0_line\n");
-  fprintf(out, "  lda (player0_sprite),y\n");
-  fprintf(out, "  sta GRP0\n");
-  fprintf(out, "  beq draw_player1\n");
-  fprintf(out, "  inc player0_line\n");
+  fprintf(out, "  cpx player0_y\n"); //3
+  fprintf(out, "  bmi draw_player1\n"); //2
+  fprintf(out, "  ldy player0_line\n"); //3
+  fprintf(out, "  lda (player0_sprite),y\n"); //5
+  fprintf(out, "  sta GRP0\n"); //3
+  fprintf(out, "  beq draw_player1\n"); //2
+  fprintf(out, "  inc player0_line\n"); //5
+//26
   fprintf(out, "draw_player1:\n");
-  fprintf(out, "  cpx player1_y\n");
-  fprintf(out, "  bmi draw_missile0\n");
-  fprintf(out, "  ldy player1_line\n");
-  fprintf(out, "  lda (player1_sprite),y\n");
-  fprintf(out, "  sta GRP1\n");
-  fprintf(out, "  beq draw_missile0\n");
-  fprintf(out, "  inc player1_line\n");
+  fprintf(out, "  sta WSYNC\n");  //3
+  fprintf(out, "  cpx player1_y\n"); //3
+  fprintf(out, "  bmi draw_missile0\n"); //2
+  fprintf(out, "  ldy player1_line\n"); //3
+  fprintf(out, "  lda (player1_sprite),y\n"); //5
+  fprintf(out, "  sta GRP1\n"); //3
+  fprintf(out, "  beq draw_missile0\n"); //2
+  fprintf(out, "  inc player1_line\n"); //5
+//23
   fprintf(out, "draw_missile0:\n");
-  fprintf(out, "  sta WSYNC\n");
-  fprintf(out, "  cpx missile0_y\n");
-  fprintf(out, "  bmi draw_missile1\n");
-  fprintf(out, "  ldy missile0_line\n");
-  fprintf(out, "  lda (missile0_sprite),y\n");
-  fprintf(out, "  sta ENAM0\n");
-  fprintf(out, "  beq draw_missile1\n");
-  fprintf(out, "  inc missile0_line\n");
+  fprintf(out, "  cpx missile0_y\n"); //3
+  fprintf(out, "  bmi draw_missile1\n"); //2
+  fprintf(out, "  ldy missile0_line\n"); //3
+  fprintf(out, "  lda (missile0_sprite),y\n"); //5
+  fprintf(out, "  sta ENAM0\n"); //3
+  fprintf(out, "  beq draw_missile1\n"); //2
+  fprintf(out, "  inc missile0_line\n"); //5
+//26
   fprintf(out, "draw_missile1:\n");
-  fprintf(out, "  cpx missile1_y\n");
-  fprintf(out, "  bmi draw_ball\n");
-  fprintf(out, "  ldy missile1_line\n");
-  fprintf(out, "  lda (missile1_sprite),y\n");
-  fprintf(out, "  sta ENAM1\n");
-  fprintf(out, "  beq draw_ball\n");
-  fprintf(out, "  inc missile1_line\n");
+  fprintf(out, "  cpx missile1_y\n"); //3
+  fprintf(out, "  bmi draw_ball\n"); //2
+  fprintf(out, "  ldy missile1_line\n"); //3
+  fprintf(out, "  lda (missile1_sprite),y\n"); //5
+  fprintf(out, "  sta ENAM1\n"); //3
+  fprintf(out, "  beq draw_ball\n"); //2
+  fprintf(out, "  inc missile1_line\n"); //5
+//23
   fprintf(out, "draw_ball:\n");
-  fprintf(out, "  sta WSYNC\n");
-  fprintf(out, "  cpx ball_y\n");
-  fprintf(out, "  bmi draw_continue\n");
-  fprintf(out, "  ldy ball_line\n");
-  fprintf(out, "  lda (ball_sprite),y\n");
-  fprintf(out, "  sta ENABL\n");
-  fprintf(out, "  beq draw_continue\n");
-  fprintf(out, "  inc ball_line\n");
+  fprintf(out, "  sta WSYNC\n"); //3
+  fprintf(out, "  cpx ball_y\n"); //3
+  fprintf(out, "  bmi draw_continue\n"); //2
+  fprintf(out, "  ldy ball_line\n"); //3
+  fprintf(out, "  lda (ball_sprite),y\n"); //5
+  fprintf(out, "  sta ENABL\n"); //3
+  fprintf(out, "  beq draw_continue\n"); //2
+  fprintf(out, "  inc ball_line\n"); //5
+//26
   fprintf(out, "draw_continue:\n");
   fprintf(out, "  inx\n");
-  fprintf(out, "  cpx #46\n");
+  fprintf(out, "  cpx #60\n");
   fprintf(out, "  bne draw_playfield\n");
   fprintf(out, "  ldx result\n");
   fprintf(out, "  rts\n\n");
