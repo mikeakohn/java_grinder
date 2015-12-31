@@ -61,11 +61,9 @@ int M6502_8::open(const char *filename)
 
   // temp variables
   fprintf(out, "result equ 0xc4\n");
-  fprintf(out, "remainder equ 0xc6\n");
-  fprintf(out, "length equ 0xc8\n");
-//  fprintf(out, "value1 equ 0xca\n");
-//  fprintf(out, "value2 equ 0xcc\n");
-//  fprintf(out, "value3 equ 0xce\n");
+  fprintf(out, "length equ 0xc6\n");
+  fprintf(out, "value1 equ 0xc8\n");
+  fprintf(out, "value2 equ 0xca\n");
 
   // start
   fprintf(out, ".org 0x%04x\n", start_org);

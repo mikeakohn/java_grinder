@@ -68,9 +68,9 @@ public class Atari2600JavaDemo
 
   public static void main()
   {
-    int ship0_x = 80;
+    int ship0_x = 64;
     int shot0_y = 100;
-    int ship1_x = 80;
+    int ship1_x = 64;
     int shot1_y = 100;
     int rnd = 255;
     int frame = 0;
@@ -79,12 +79,10 @@ public class Atari2600JavaDemo
     int pf_hit = 0;
     int wait = 0;
 
-//    final int left = 13;
-//    final int right = 153;
-    final int left = 20;
-    final int right = 120;
+    final int left = 12;
+    final int right = 122;
     final int ship0_y = 39;
-    final int ship1_y = 2;
+    final int ship1_y = 3;
 
     // missle width
     Memory.write8(0x04, (byte)16);
@@ -134,60 +132,6 @@ public class Atari2600JavaDemo
         }
       }
 
-if(wait == 0)
-{
-      if(Atari2600.isJoystick0Right())
-      {
-        ship0_x += 1;
-        if(ship0_x > right)
-          ship0_x = right;
-      }
-      else if(Atari2600.isJoystick0Left())
-      {
-        ship0_x -= 1;
-        if(ship0_x < left)
-          ship0_x = left;
-      }
-
-      if(Atari2600.isJoystick0ButtonDown())
-      {
-        if(shot0_y == 100)
-        {
-          shot0_y = ship0_y;
-          Atari2600.setAudioControl0((byte)0b0100);
-          Atari2600.setAudioVolume0((byte)15);
-        }
-      }
-
-      if(((frame & 3) == 3) && (ship1_x >= ship0_x || ship1_x == left))
-      {
-        if(shot0_y < 16)
-          ship1_x++;
-        else
-          ship1_x--;
-      }
-
-      if(((frame & 3) == 3) && (ship1_x < ship0_x || ship1_x == right))
-      {
-        if(shot0_y < 16)
-          ship1_x--;
-        else
-          ship1_x++;
-      }
-
-      if(ship1_x > right)
-        ship1_x = right;
-      if(ship1_x < left)
-        ship1_x = left;
-}
-/*
-      rnd -= 77;
-      if(((frame & 15) == 15) && ((rnd ^ ship0_x) & 255) < 128)
-        ship1_x++;
-      else
-        ship1_x--;
-*/
-
       Atari2600.clearMotionRegisters();
       Atari2600.setPlayer0Position((byte)(ship0_x - 4), (byte)ship0_y);
       Atari2600.setPlayer1Position((byte)(ship1_x - 4), (byte)ship1_y);
@@ -195,13 +139,59 @@ if(wait == 0)
       Atari2600.setMissile1Position((byte)ship1_x, (byte)shot1_y);
       Atari2600.clearCollisionLatches();
 
-
-if(wait > 0)
-  wait--;
+      if(wait > 0)
+        wait--;
 
       Atari2600.waitVblank();
       Atari2600.drawScreen();
       Atari2600.startOverscan();
+
+      if(wait == 0)
+      {
+        if(Atari2600.isJoystick0Right())
+        {
+          ship0_x += 1;
+          if(ship0_x > right)
+            ship0_x = right;
+        }
+        else if(Atari2600.isJoystick0Left())
+        {
+          ship0_x -= 1;
+          if(ship0_x < left)
+            ship0_x = left;
+        }
+
+        if(Atari2600.isJoystick0ButtonDown())
+        {
+          if(shot0_y == 100)
+          {
+            shot0_y = ship0_y;
+            Atari2600.setAudioControl0((byte)0b0100);
+            Atari2600.setAudioVolume0((byte)15);
+          }
+        }
+
+        if(((frame & 3) == 3) && (ship1_x >= ship0_x || ship1_x == left))
+        {
+          if(shot0_y < 16)
+            ship1_x++;
+          else
+            ship1_x--;
+        }
+
+        if(((frame & 3) == 3) && (ship1_x < ship0_x || ship1_x == right))
+        {
+          if(shot0_y < 16)
+            ship1_x--;
+          else
+            ship1_x++;
+        }
+
+        if(ship1_x > right)
+          ship1_x = right;
+        if(ship1_x < left)
+          ship1_x = left;
+      }
 
       if(Atari2600.isCollisionMissile0Playfield())
       {
