@@ -39,6 +39,7 @@ public:
   virtual ~M6502_8();
 
   virtual int open(const char *filename);
+  virtual int add_functions();
   virtual int start_init();
   virtual int insert_static_field_define(const char *name, const char *type, int index);
   virtual int init_heap(int field_count);
@@ -130,6 +131,36 @@ protected:
   int ram_start;
   int label_count;
   bool is_main : 1;
+
+  bool need_swap:1;
+  bool need_add_integer:1;
+  bool need_sub_integer:1;
+  bool need_neg_integer:1;
+  bool need_shift_left_integer:1;
+  bool need_shift_right_integer:1;
+  bool need_shift_right_uinteger:1;
+  bool need_and_integer:1;
+  bool need_or_integer:1;
+  bool need_xor_integer:1;
+  bool need_push_array_length:1;
+
+  bool need_memory_read8:1;
+  bool need_memory_write8:1;
+
+  void insert_swap();
+  void insert_add_integer();
+  void insert_sub_integer();
+  void insert_neg_integer();
+  void insert_shift_left_integer();
+  void insert_shift_right_integer();
+  void insert_shift_right_uinteger();
+  void insert_and_integer();
+  void insert_or_integer();
+  void insert_xor_integer();
+  void insert_push_array_length();
+
+  void insert_memory_read8();
+  void insert_memory_write8();
 };
 
 #endif
