@@ -38,19 +38,21 @@ public class Atari2600JavaDemo
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b01111100, (byte)0b00000000,
     (byte)0b00010000, (byte)0b01111100, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00111000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b00011100,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b00111110,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b00011100,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00011110,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00111111,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00011110,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00111000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b01111100, (byte)0b00000000,
     (byte)0b00010000, (byte)0b01111100, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
@@ -80,8 +82,8 @@ public class Atari2600JavaDemo
 
     final int left = 12;
     final int right = 122;
-    final int ship0_y = 33;
-    final int ship1_y = 3;
+    final int ship0_y = 37;
+    final int ship1_y = 2;
 
     // missle width
     Memory.write8(0x04, (byte)16);
@@ -185,8 +187,8 @@ public class Atari2600JavaDemo
       }
 
       Atari2600.clearMotionRegisters();
-      Atari2600.setPlayer0Position((byte)(ship0_x - 4), (byte)ship0_y);
-      Atari2600.setPlayer1Position((byte)(ship1_x - 4), (byte)ship1_y);
+      Atari2600.setPlayer0Position((byte)(ship0_x - 3), (byte)ship0_y);
+      Atari2600.setPlayer1Position((byte)(ship1_x - 3), (byte)ship1_y);
       Atari2600.setMissile0Position((byte)ship0_x, (byte)shot0_y);
       Atari2600.setMissile1Position((byte)ship1_x, (byte)shot1_y);
       Atari2600.clearCollisionLatches();

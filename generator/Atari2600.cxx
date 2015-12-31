@@ -1247,11 +1247,9 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  stx result\n");
   fprintf(out, "  ldx #0\n");
   fprintf(out, "  ldy #0\n");
-
   fprintf(out, "  lda #00001010b\n");
   fprintf(out, "  sta CTRLPF\n");
 
-  // score
   fprintf(out, "draw_score:\n");
   fprintf(out, "  sta WSYNC\n");
   fprintf(out, "  ldy score0\n");
@@ -1282,21 +1280,22 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  lda #00001001b\n");
   fprintf(out, "  sta CTRLPF\n");
 
-  // blank line
   fprintf(out, "  sta WSYNC\n");
   fprintf(out, "  lda #0\n");
   fprintf(out, "  sta PF1\n");
+  fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  sta WSYNC\n");
   fprintf(out, "  ldx #0\n");
 
   fprintf(out, "draw_playfield:\n");
-  fprintf(out, "  sta WSYNC\n");
   fprintf(out, "  txa\n");
   fprintf(out, "  and #1\n");
-  fprintf(out, "  bne draw_player0\n");
+  fprintf(out, "  bne draw_playfield_skip\n");
   fprintf(out, "  ldy playfield_line\n");
   fprintf(out, "  cpy playfield_length\n");
-  fprintf(out, "  beq draw_player0\n");
+  fprintf(out, "  beq draw_playfield_skip\n");
   fprintf(out, "  lda (playfield),y\n");
+  fprintf(out, "  sta WSYNC\n");
   fprintf(out, "  sta PF0\n");
   fprintf(out, "  iny\n");
   fprintf(out, "  lda (playfield),y\n");
@@ -1307,6 +1306,9 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  inc playfield_line\n");
   fprintf(out, "  inc playfield_line\n");
   fprintf(out, "  inc playfield_line\n");
+  fprintf(out, "  db 0x2c\n");
+  fprintf(out, "draw_playfield_skip:\n");
+  fprintf(out, "  sta WSYNC\n");
   fprintf(out, "draw_player0:\n");
   fprintf(out, "  sta WSYNC\n");
   fprintf(out, "  cpx player0_y\n");
@@ -1352,7 +1354,7 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  inc ball_line\n");
   fprintf(out, "draw_continue:\n");
   fprintf(out, "  inx\n");
-  fprintf(out, "  cpx #42\n");
+  fprintf(out, "  cpx #46\n");
   fprintf(out, "  bne draw_playfield\n");
   fprintf(out, "  ldx result\n");
   fprintf(out, "  rts\n\n");
@@ -1622,7 +1624,6 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "db 00000000b\n");
   fprintf(out, "db 00000000b\n");
   fprintf(out, "db 00000000b\n");
-
 }
 
 void Atari2600::insert_atari_2600_variables()
