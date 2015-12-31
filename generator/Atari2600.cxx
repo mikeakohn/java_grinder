@@ -1224,28 +1224,40 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  sta CTRLPF\n");
 
   fprintf(out, "draw_score:\n");
-  fprintf(out, "  cpx #32\n");
-  fprintf(out, "  bpl draw_playfield\n");
 
   // left score
   fprintf(out, "  sta WSYNC\n");
 
-  fprintf(out, "  lda #1\n");
+  fprintf(out, "  txa\n");
+  fprintf(out, "  tay\n");
+  fprintf(out, "  lda number5,y\n");
+  fprintf(out, "  ora number4,y\n");
   fprintf(out, "  sta PF1\n");
   fprintf(out, "  nop\n");
   fprintf(out, "  nop\n");
   fprintf(out, "  nop\n");
-  fprintf(out, "  lda #1\n");
+  fprintf(out, "  nop\n");
+  fprintf(out, "  txa\n");
+  fprintf(out, "  tay\n");
+  fprintf(out, "  lda number5,y\n");
+  fprintf(out, "  ora number4,y\n");
   fprintf(out, "  sta PF1\n");
 
   // right score
   fprintf(out, "  sta WSYNC\n");
-  fprintf(out, "  lda #1\n");
+  fprintf(out, "  txa\n");
+  fprintf(out, "  tay\n");
+  fprintf(out, "  lda number5,y\n");
+  fprintf(out, "  ora number4,y\n");
   fprintf(out, "  sta PF1\n");
   fprintf(out, "  nop\n");
   fprintf(out, "  nop\n");
   fprintf(out, "  nop\n");
-  fprintf(out, "  lda #1\n");
+  fprintf(out, "  nop\n");
+  fprintf(out, "  txa\n");
+  fprintf(out, "  tay\n");
+  fprintf(out, "  lda number5,y\n");
+  fprintf(out, "  ora number4,y\n");
   fprintf(out, "  sta PF1\n");
 
   fprintf(out, "  inx\n");
@@ -1404,6 +1416,20 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  lda INTIM\n");
   fprintf(out, "  bne wait_overscan\n");
   fprintf(out, "  rts\n\n");
+
+  fprintf(out, "number4:\n");
+  fprintf(out, "db 00001010b\n");
+  fprintf(out, "db 00001010b\n");
+  fprintf(out, "db 00001110b\n");
+  fprintf(out, "db 00000010b\n");
+  fprintf(out, "db 00000010b\n");
+
+  fprintf(out, "number5:\n");
+  fprintf(out, "db 11100000b\n");
+  fprintf(out, "db 10000000b\n");
+  fprintf(out, "db 11100000b\n");
+  fprintf(out, "db 00100000b\n");
+  fprintf(out, "db 11100000b\n");
 }
 
 void Atari2600::insert_atari_2600_variables()
