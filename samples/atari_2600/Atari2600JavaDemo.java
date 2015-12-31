@@ -264,7 +264,7 @@ public class Atari2600JavaDemo
       {
         Atari2600.setAudioFrequency1((byte)(shot1_y >> 1));
         shot1_y++;
-        if(shot1_y > ship0_y)
+        if(shot1_y > ship0_y + 4)
         {
           shot1_y = 100;
           Atari2600.setAudioVolume1((byte)0);
