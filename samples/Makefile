@@ -30,11 +30,16 @@ default:
 	javac -classpath ../build/JavaGrinder.jar:. $*.java
 
 clean:
+	@cd apple_iigs && make clean
+	@cd atari_2600 && make clean
 	@cd c64 && make clean
 	@cd dspic && make clean
 	@cd misc && make clean
 	@cd msp430 && make clean
+	@cd pic32 && make clean
+	@cd sega_genesis && make clean
 	@cd ti84 && make clean
 	@cd ti99 && make clean
+	@cd x86 && make clean
 
 
