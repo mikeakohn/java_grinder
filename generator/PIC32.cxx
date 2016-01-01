@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -30,7 +30,14 @@ int PIC32::open(const char *filename)
 {
   if (MIPS32::open(filename) != 0) { return -1; }
 
-  fprintf(out, "  li $k0, 0xbf88\n");
+  return 0;
+}
+
+int PIC32::start_init()
+{
+  MIPS32::start_init();
+
+  fprintf(out, "  li $k0, 0xbf880000\n");
 
   return 0;
 }
@@ -43,10 +50,9 @@ int PIC32::ioport_setPinsAsInput(int port)
 
 int PIC32::ioport_setPinsAsOutput(int port)
 {
-  port *= 4;
-
-  fprintf(out, "  xori $t%d, 0xff\n", reg - 1);
-  fprintf(out, "  li $t%d, 0x6%02x0($k0)\n", reg - 1, port);
+  fprintf(out, "  ; setPinsAsOutput() port=%d TRIS%c\n", port, 'A' + port);
+  fprintf(out, "  xori $t%d, $t%d, 0xff\n", reg - 1, reg - 1);
+  fprintf(out, "  sw $t%d, 0x6%02x0($k0)\n", reg - 1, port * 4);
 
   reg--;
 
@@ -55,10 +61,8 @@ int PIC32::ioport_setPinsAsOutput(int port)
 
 int PIC32::ioport_setPinsValue(int port)
 {
-  port *= 4;
-
-  fprintf(out, "  xori $t%d, 0xff\n", reg - 1);
-  fprintf(out, "  li $t%d, 0x6%02x0($k0)\n", reg - 1, port + 2);
+  fprintf(out, "  ; setPinsValue() port=%d LAT%c\n", port, 'A' + port);
+  fprintf(out, "  sw $t%d, 0x6%02x0($k0)\n", reg - 1, (port * 4) + 2);
 
   reg--;
 

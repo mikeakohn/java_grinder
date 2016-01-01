@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -36,6 +36,7 @@ public:
   virtual int push_ref_static(const char *name, int index);
   virtual int push_ref_local(int index);
   virtual int push_fake();
+  //virtual int set_integer_local(int index, int value);
   virtual int push_long(int64_t n);
   virtual int push_float(float f);
   virtual int push_double(double f);

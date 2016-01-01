@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -21,6 +21,8 @@ public:
   virtual ~PIC32();
 
   virtual int open(const char *filename);
+
+  virtual int start_init();
 
   // GPIO functions
   virtual int ioport_setPinsAsInput(int port);
