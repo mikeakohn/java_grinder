@@ -111,6 +111,9 @@ protected:
   bool is_main : 1;
 
   int stack_alu(const char *instr);
+
+private:
+  //void push_reg(int t);
 };
 
 #endif

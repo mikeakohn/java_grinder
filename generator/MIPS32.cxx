@@ -19,13 +19,15 @@
 #define REG_STACK(a) (a)
 #define LOCALS(i) (i * 4)
 
-#define STACK_PUSH(num) \
+#define STACK_PUSH(t) \
   fprintf(out, "  addi $sp, $sp, -4\n"); \
-  fprintf(out, "  sw $%d, 0($sp)\n", num);
+  fprintf(out, "  sw $t%d, 0($sp)\n", t); \
+  stack++;
 
-#define STACK_POP() \
-  fprintf(out, "  lw $, 0($sp)\n"); \
+#define STACK_POP(t) \
+  fprintf(out, "  lw $%d, 0($sp)\n", t); \
   fprintf(out, "  addi $sp, $sp, 4\n"); \
+  stack--;
 
 // ABI is:
 // r0  $zero Always 0
@@ -163,15 +165,17 @@ int MIPS32::push_integer(int32_t n)
   }
 #endif
 
+  fprintf(out, "  ; push_integer(%d)\n", n);
+
   if (reg < reg_max)
   {
-    fprintf(out, "  ; push_integer(%d)\n", n);
     fprintf(out, "  li $t%d, %d\n", reg, n);
     reg++;
   }
     else
   {
-    STACK_PUSH(n)
+    fprintf(out, "  li $t8, %d\n", n);
+    STACK_PUSH(8)
   }
 
   return 0;
@@ -179,8 +183,16 @@ int MIPS32::push_integer(int32_t n)
 
 int MIPS32::push_integer_local(int index)
 {
-  fprintf(out, "  lw $t%d, %d($fp) ; local_%d\n", reg, LOCALS(index), index);
-  reg++;
+  if (reg < 8)
+  {
+    fprintf(out, "  lw $t%d, %d($fp) ; local_%d\n", reg, LOCALS(index), index);
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  lw $t8, %d($fp) ; local_%d\n", LOCALS(index), index);
+    STACK_PUSH(8)
+  }
 
   return 0;
 }
@@ -219,6 +231,7 @@ int MIPS32::push_double(double f)
 
 int MIPS32::push_byte(int8_t b)
 {
+#if 0
   if (reg < reg_max)
   {
     fprintf(out, "  li $t%d, 0x%x\n", reg, (int32_t)b);
@@ -226,14 +239,19 @@ int MIPS32::push_byte(int8_t b)
   }
     else
   {
+    fprintf(out, "  li $t%d, 0x%x\n", reg, (int32_t)b);
     STACK_PUSH(((int32_t)b))
   }
+#endif
+
+  push_integer((int32_t)b);
 
   return 0;
 }
 
 int MIPS32::push_short(int16_t s)
 {
+#if 0
   if (reg < reg_max)
   {
     fprintf(out, "  li $t%d, 0x%x\n", reg, (int32_t)s);
@@ -243,19 +261,44 @@ int MIPS32::push_short(int16_t s)
   {
     STACK_PUSH(((int32_t)s))
   }
+#endif
+
+  push_integer((int32_t)s);
 
   return 0;
 }
 
 int MIPS32::push_ref(char *name)
 {
-  return -1;
+  fprintf(out, "  ; push_ref(%s)\n", name);
+  fprintf(out, "  li $t8, %s\n", name);
+
+  if (reg < reg_max)
+  {
+    fprintf(out, "  lw $t%d, ($t8)\n", reg);
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  lw $t8, ($t8)\n");
+    STACK_PUSH(8);
+  }
+
+  return 0;
 }
 
 int MIPS32::pop_integer_local(int index)
 {
-  fprintf(out, "  sw $t%d, %d($fp) ; local_%d\n", reg - 1, LOCALS(index), index);
-  reg--;
+  if (stack > 0)
+  {
+    STACK_POP(8); 
+    fprintf(out, "  sw $t8, %d($fp) ; local_%d\n", LOCALS(index), index);
+  }
+    else
+  {
+    fprintf(out, "  sw $t%d, %d($fp) ; local_%d\n", reg - 1, LOCALS(index), index);
+    reg--;
+  }
 
   return 0;
 }
@@ -267,22 +310,109 @@ int MIPS32::pop_ref_local(int index)
 
 int MIPS32::pop()
 {
-  return -1;
+  fprintf(out, "  ; pop()\n");
+
+  if (stack > 0)
+  {
+    fprintf(out, "  addi $sp, $sp, 4\n"); \
+    stack--;
+  }
+    else
+  {
+    reg--;
+  }
+
+  return 0;
 }
 
 int MIPS32::dup()
 {
-  return -1;
+  fprintf(out, "  ; dup()\n");
+
+  if (stack > 0)
+  {
+    fprintf(out, "  lw $t8, 0($sp)\n"); \
+    STACK_PUSH(8);
+  }
+    else
+  {
+    if (reg < 8)
+    {
+      fprintf(out, "  move $%d, $%d\n", reg, reg - 1);
+      reg++;
+    }
+      else
+    {
+      STACK_PUSH(reg - 1);
+    }
+  }
+
+  return 0;
 }
 
 int MIPS32::dup2()
 {
-  return -1;
+  fprintf(out, "  ; dup2()\n");
+
+  if (stack >= 2)
+  {
+    fprintf(out, "  lw $t8, -4($sp)\n");
+    fprintf(out, "  lw $t9, 0($sp)\n");
+    STACK_PUSH(8);
+    STACK_PUSH(9);
+    return 0;
+  }
+    else
+  if (stack == 1)
+  {
+    //fprintf(out, "  move $t8, $t%d\n", reg - 1);
+    fprintf(out, "  lw $t9, 0($sp)\n");
+    STACK_PUSH(reg - 1);
+    STACK_PUSH(9);
+    return 0;
+  }
+    else
+  if (reg < 7)
+  {
+    fprintf(out, "  move $t%d, $t%d\n", reg, reg - 2);
+    fprintf(out, "  move $t%d, $t%d\n", reg + 1, reg - 1);
+    reg += 2;
+    return 0;
+  }
+    else
+  {
+    fprintf(out, "  move $t%d, $t%d\n", reg, reg - 2);
+    reg++;
+    STACK_PUSH(7);
+  }
+
+  return 0;
 }
 
 int MIPS32::swap()
 {
-  return -1;
+  if (stack >= 2)
+  {
+    fprintf(out, "  lw $t9, 0($sp)\n");
+    fprintf(out, "  lw $t8, -4($sp)\n");
+    fprintf(out, "  sw $t8, 0($sp)\n");
+    fprintf(out, "  sw $t9, -4($sp)\n");
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  lw $t8, 0($sp)\n");
+    fprintf(out, "  sw $t7, 0($sp)\n");
+    fprintf(out, "  move $t7, $t8\n");
+  }
+    else
+  {
+    fprintf(out, "  move $t8, $t%d\n", reg - 1);
+    fprintf(out, "  move $t%d, $t%d\n", reg - 1, reg - 2);
+    fprintf(out, "  move $t%d, $t8\n", reg - 2);
+  }
+
+  return 0;
 }
 
 int MIPS32::add_integer()
@@ -645,5 +775,21 @@ int MIPS32::stack_alu(const char *instr)
 
   return 0;
 }
+
+#if 0
+void MIPS32::push_reg(int t)
+{
+  if (reg < reg_max)
+  {
+    fprintf(out, "  lw $t%d, ($t8)\n", t);
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  lw $t8, ($t8)\n");
+    STACK_PUSH(8);
+  }
+}
+#endif
 
 
