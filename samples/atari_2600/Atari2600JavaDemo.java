@@ -86,6 +86,7 @@ public class Atari2600JavaDemo
     int wait = 0;
     int score0 = 0;
     int score1 = 0;
+    int mode = 0;
 
     final int left = 12;
     final int right = 122;
@@ -116,171 +117,191 @@ public class Atari2600JavaDemo
 
     while(true)
     {
-      Atari2600.startVblank();
-
-      Atari2600.setScore0((byte)score0);
-      Atari2600.setScore1((byte)score1);
-
-      if(wait > 0)
-        wait--;
-
-      if(wait == 0)
+      if(mode == 0)
       {
-        if(Atari2600.isJoystick0Right())
-        {
-          ship0_x += 1;
-          if(ship0_x > right)
-            ship0_x = right;
-        }
-        else if(Atari2600.isJoystick0Left())
-        {
-          ship0_x -= 1;
-          if(ship0_x < left)
-            ship0_x = left;
-        }
+        Atari2600.startVblank();
+        Atari2600.setScore0((byte)0);
+        Atari2600.setScore1((byte)0);
 
         if(Atari2600.isJoystick0ButtonDown())
         {
-          if(shot0_y == 100)
+          mode = 1;
+        }
+
+        Atari2600.clearMotionRegisters();
+        Atari2600.clearCollisionLatches();
+
+        Atari2600.waitVblank();
+        Atari2600.drawScreen();
+        Atari2600.startOverscan();
+        Atari2600.waitOverscan();
+      }
+      else
+      {
+        Atari2600.startVblank();
+        Atari2600.setScore0((byte)score0);
+        Atari2600.setScore1((byte)score1);
+
+        if(wait > 0)
+          wait--;
+
+        if(wait == 0)
+        {
+          if(Atari2600.isJoystick0Right())
           {
-            shot0_y = ship0_y;
-            Atari2600.setAudioControl0((byte)0b0100);
-            Atari2600.setAudioVolume0((byte)15);
+            ship0_x += 1;
+            if(ship0_x > right)
+              ship0_x = right;
+          }
+          else if(Atari2600.isJoystick0Left())
+          {
+            ship0_x -= 1;
+            if(ship0_x < left)
+              ship0_x = left;
+          }
+
+          if(Atari2600.isJoystick0ButtonDown())
+          {
+            if(shot0_y == 100)
+            {
+              shot0_y = ship0_y;
+              Atari2600.setAudioControl0((byte)0b0100);
+              Atari2600.setAudioVolume0((byte)15);
+            }
+          }
+
+          if(((frame & 3) == 3) && (ship1_x >= ship0_x || ship1_x == left))
+          {
+            if(shot0_y < 16)
+              ship1_x++;
+            else
+              ship1_x--;
+          }
+
+          if(((frame & 3) == 3) && (ship1_x < ship0_x || ship1_x == right))
+          {
+            if(shot0_y < 16)
+              ship1_x--;
+            else
+              ship1_x++;
+          }
+
+          if(ship1_x > right)
+            ship1_x = right;
+          if(ship1_x < left)
+            ship1_x = left;
+        }
+
+        if(ship0_hit > 0)
+        {
+          Atari2600.setColorPlayer0(0x80 + ship0_hit);
+          ship0_hit--;
+          if(ship0_hit == 0)
+          {
+            Atari2600.setColorPlayer0(0x88);
+            Atari2600.setAudioVolume1((byte)0);
           }
         }
 
-        if(((frame & 3) == 3) && (ship1_x >= ship0_x || ship1_x == left))
+        if(ship1_hit > 0)
         {
-          if(shot0_y < 16)
-            ship1_x++;
-          else
-            ship1_x--;
+          Atari2600.setColorPlayer1(0x30 + ship1_hit);
+          ship1_hit--;
+          if(ship1_hit == 0)
+          {
+            Atari2600.setColorPlayer1(0x38);
+            Atari2600.setAudioVolume0((byte)0);
+          }
         }
 
-        if(((frame & 3) == 3) && (ship1_x < ship0_x || ship1_x == right))
+        Atari2600.clearMotionRegisters();
+        Atari2600.setPlayer0Position((byte)(ship0_x - 3), (byte)ship0_y);
+        Atari2600.setPlayer1Position((byte)(ship1_x - 3), (byte)ship1_y);
+        Atari2600.setMissile0Position((byte)ship0_x, (byte)shot0_y);
+        Atari2600.setMissile1Position((byte)ship1_x, (byte)shot1_y);
+        Atari2600.clearCollisionLatches();
+
+        Atari2600.waitVblank();
+        Atari2600.drawScreen();
+        Atari2600.startOverscan();
+
+        if(Atari2600.isCollisionMissile0Playfield())
         {
-          if(shot0_y < 16)
-            ship1_x--;
-          else
-            ship1_x++;
-        }
-
-        if(ship1_x > right)
-          ship1_x = right;
-        if(ship1_x < left)
-          ship1_x = left;
-      }
-
-      if(ship0_hit > 0)
-      {
-        Atari2600.setColorPlayer0(0x80 + ship0_hit);
-        ship0_hit--;
-        if(ship0_hit == 0)
-        {
-          Atari2600.setColorPlayer0(0x88);
-          Atari2600.setAudioVolume1((byte)0);
-        }
-      }
-
-      if(ship1_hit > 0)
-      {
-        Atari2600.setColorPlayer1(0x30 + ship1_hit);
-        ship1_hit--;
-        if(ship1_hit == 0)
-        {
-          Atari2600.setColorPlayer1(0x38);
-          Atari2600.setAudioVolume0((byte)0);
-        }
-      }
-
-      Atari2600.clearMotionRegisters();
-      Atari2600.setPlayer0Position((byte)(ship0_x - 3), (byte)ship0_y);
-      Atari2600.setPlayer1Position((byte)(ship1_x - 3), (byte)ship1_y);
-      Atari2600.setMissile0Position((byte)ship0_x, (byte)shot0_y);
-      Atari2600.setMissile1Position((byte)ship1_x, (byte)shot1_y);
-      Atari2600.clearCollisionLatches();
-
-      Atari2600.waitVblank();
-      Atari2600.drawScreen();
-      Atari2600.startOverscan();
-
-      if(Atari2600.isCollisionMissile0Playfield())
-      {
-        pf_hit = 11;
-        shot0_y = 100;
-        Atari2600.setAudioVolume0((byte)0);
-      }
-
-      if(Atari2600.isCollisionMissile1Player0())
-      {
-        ship0_hit = 31;
-        shot0_y = 100;
-        shot1_y = 100;
-        Atari2600.setAudioControl1((byte)0b1000);
-        Atari2600.setAudioFrequency1((byte)22);
-        Atari2600.setAudioVolume0((byte)0);
-        Atari2600.setAudioVolume1((byte)15);
-        score1++;
-        if(score1 > 20)
-          score1 = 20;
-        wait = 30;
-      }
-
-      if(Atari2600.isCollisionMissile0Player1())
-      {
-        ship1_hit = 31;
-        shot0_y = 100;
-        shot1_y = 100;
-        Atari2600.setAudioControl0((byte)0b1000);
-        Atari2600.setAudioFrequency0((byte)16);
-        Atari2600.setAudioVolume0((byte)15);
-        Atari2600.setAudioVolume1((byte)0);
-        score0++;
-        if(score0 > 20)
-          score0 = 20;
-        wait = 30;
-      }
-
-      if(pf_hit > 6)
-      {
-        Atari2600.setColorPlayfield(0x00 + pf_hit);
-        pf_hit--;
-      }
-
-      if((frame & 1) == 1 && shot0_y < 100)
-      {
-        Atari2600.setAudioFrequency0((byte)((shot0_y >> 1) + 2));
-        shot0_y--;
-        if(shot0_y < ship1_y)
-        {
+          pf_hit = 11;
           shot0_y = 100;
           Atari2600.setAudioVolume0((byte)0);
         }
-      }
 
-      rnd -= 77;
-      rnd &= 127;
-      if(((rnd ^ ship0_x) & 127) < ship1_y && shot1_y == 100)
-      {
-        shot1_y = ship1_y;
-        Atari2600.setAudioControl1((byte)0b0001);
-        Atari2600.setAudioVolume1((byte)15);
-      }
-
-      if((frame & 1) == 1 && shot1_y < 100)
-      {
-        Atari2600.setAudioFrequency1((byte)(shot1_y >> 1));
-        shot1_y++;
-        if(shot1_y > ship0_y + 4)
+        if(Atari2600.isCollisionMissile1Player0())
         {
+          ship0_hit = 31;
+          shot0_y = 100;
           shot1_y = 100;
-          Atari2600.setAudioVolume1((byte)0);
+          Atari2600.setAudioControl1((byte)0b1000);
+          Atari2600.setAudioFrequency1((byte)22);
+          Atari2600.setAudioVolume0((byte)0);
+          Atari2600.setAudioVolume1((byte)15);
+          score1++;
+          if(score1 > 20)
+            score1 = 20;
+          wait = 30;
         }
+
+        if(Atari2600.isCollisionMissile0Player1())
+        {
+          ship1_hit = 31;
+          shot0_y = 100;
+          shot1_y = 100;
+          Atari2600.setAudioControl0((byte)0b1000);
+          Atari2600.setAudioFrequency0((byte)16);
+          Atari2600.setAudioVolume0((byte)15);
+          Atari2600.setAudioVolume1((byte)0);
+          score0++;
+          if(score0 > 20)
+            score0 = 20;
+          wait = 30;
+        }
+
+        if(pf_hit > 6)
+        {
+          Atari2600.setColorPlayfield(0x00 + pf_hit);
+          pf_hit--;
+        }
+
+        if((frame & 1) == 1 && shot0_y < 100)
+        {
+          Atari2600.setAudioFrequency0((byte)((shot0_y >> 1) + 2));
+          shot0_y--;
+          if(shot0_y < ship1_y)
+          {
+            shot0_y = 100;
+            Atari2600.setAudioVolume0((byte)0);
+          }
+        }
+
+        rnd -= 77;
+        rnd &= 127;
+        if(((rnd ^ ship0_x) & 127) < ship1_y && shot1_y == 100)
+        {
+          shot1_y = ship1_y;
+          Atari2600.setAudioControl1((byte)0b0001);
+          Atari2600.setAudioVolume1((byte)15);
+        }
+
+        if((frame & 1) == 1 && shot1_y < 100)
+        {
+          Atari2600.setAudioFrequency1((byte)(shot1_y >> 1));
+          shot1_y++;
+          if(shot1_y > ship0_y + 4)
+          {
+            shot1_y = 100;
+            Atari2600.setAudioVolume1((byte)0);
+          }
+        }
+
+        frame++;
+        Atari2600.waitOverscan();
       }
-
-      frame++;
-
-      Atari2600.waitOverscan();
     }
   }
 }
