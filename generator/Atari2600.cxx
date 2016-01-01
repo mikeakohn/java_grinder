@@ -1432,66 +1432,6 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "db 00010101b\n");
   fprintf(out, "db 00010101b\n");
   fprintf(out, "db 00010111b\n");
-
-  fprintf(out, "db 00010001b\n");
-  fprintf(out, "db 00010001b\n");
-  fprintf(out, "db 00010001b\n");
-  fprintf(out, "db 00010001b\n");
-  fprintf(out, "db 00010001b\n");
-
-  fprintf(out, "db 00010111b\n");
-  fprintf(out, "db 00010001b\n");
-  fprintf(out, "db 00010111b\n");
-  fprintf(out, "db 00010100b\n");
-  fprintf(out, "db 00010111b\n");
-
-  fprintf(out, "db 00010111b\n");
-  fprintf(out, "db 00010001b\n");
-  fprintf(out, "db 00010111b\n");
-  fprintf(out, "db 00010001b\n");
-  fprintf(out, "db 00010111b\n");
-
-  fprintf(out, "db 00010101b\n");
-  fprintf(out, "db 00010101b\n");
-  fprintf(out, "db 00010111b\n");
-  fprintf(out, "db 00010001b\n");
-  fprintf(out, "db 00010001b\n");
-
-  fprintf(out, "db 00010111b\n");
-  fprintf(out, "db 00010100b\n");
-  fprintf(out, "db 00010111b\n");
-  fprintf(out, "db 00010001b\n");
-  fprintf(out, "db 00010111b\n");
-
-  fprintf(out, "db 00010111b\n");
-  fprintf(out, "db 00010100b\n");
-  fprintf(out, "db 00010111b\n");
-  fprintf(out, "db 00010101b\n");
-  fprintf(out, "db 00010111b\n");
-
-  fprintf(out, "db 00010111b\n");
-  fprintf(out, "db 00010001b\n");
-  fprintf(out, "db 00010001b\n");
-  fprintf(out, "db 00010001b\n");
-  fprintf(out, "db 00010001b\n");
-
-  fprintf(out, "db 00010111b\n");
-  fprintf(out, "db 00010101b\n");
-  fprintf(out, "db 00010111b\n");
-  fprintf(out, "db 00010101b\n");
-  fprintf(out, "db 00010111b\n");
-
-  fprintf(out, "db 00010111b\n");
-  fprintf(out, "db 00010101b\n");
-  fprintf(out, "db 00010111b\n");
-  fprintf(out, "db 00010001b\n");
-  fprintf(out, "db 00010111b\n");
-
-  fprintf(out, "db 01110111b\n");
-  fprintf(out, "db 00010101b\n");
-  fprintf(out, "db 01110101b\n");
-  fprintf(out, "db 01000101b\n");
-  fprintf(out, "db 01110111b\n");
 }
 
 void Atari2600::insert_atari_2600_variables()
