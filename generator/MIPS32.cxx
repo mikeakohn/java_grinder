@@ -97,8 +97,8 @@ int MIPS32::start_init()
   fprintf(out, ".org 0x%x\n", org);
   fprintf(out, "start:\n");
 
-  // REVIEW - Use li instead of real instructions?
   fprintf(out, "  li $s0, _constant_pool\n");
+  fprintf(out, "  li $sp, ram_end+1\n");
 
   return 0;
 }
@@ -144,6 +144,9 @@ int MIPS32::insert_field_init(char *name, int index)
 
 void MIPS32::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
+  fprintf(out, "  ; %s(local_count=%d, max_stack=%d, param_count=%d)\n", name, local_count, max_stack, param_count);
+  fprintf(out, "  addi $sp, $sp, -%d\n", local_count * 4);
+  fprintf(out, "  move $fp, $sp\n");
 }
 
 void MIPS32::method_end(int local_count)
@@ -176,7 +179,7 @@ int MIPS32::push_integer(int32_t n)
 
 int MIPS32::push_integer_local(int index)
 {
-  fprintf(out, "  sw $t%d, %d($fp) ; local_%d\n", reg, LOCALS(index), index);
+  fprintf(out, "  lw $t%d, %d($fp) ; local_%d\n", reg, LOCALS(index), index);
   reg++;
 
   return 0;
@@ -425,21 +428,27 @@ int MIPS32::jump_cond(const char *label, int cond, int distance)
   {
     case COND_EQUAL:
       fprintf(out, "  beq $t%d, $r0, %s\n", --reg, label);
+      fprintf(out, "  nop\n");
       return 0;
     case COND_NOT_EQUAL:
       fprintf(out, "  bne $t%d, $r0, %s\n", --reg, label);
+      fprintf(out, "  nop\n");
       return 0;
     case COND_LESS:
       fprintf(out, "  bltz $t%d, %s\n", --reg, label);
+      fprintf(out, "  nop\n");
       return 0;
     case COND_LESS_EQUAL:
       fprintf(out, "  blez $t%d, %s\n", --reg, label);
+      fprintf(out, "  nop\n");
       return 0;
     case COND_GREATER:
       fprintf(out, "  bgtz $t%d, %s\n", --reg, label);
+      fprintf(out, "  nop\n");
       return 0;
     case COND_GREATER_EQUAL:
       fprintf(out, "  bgez $t%d, %s\n", --reg, label);
+      fprintf(out, "  nop\n");
       return 0;
     default:
       break;

@@ -17,11 +17,11 @@ public class LedBlink
     {
       IOPort5.setPinsValue(0x01);
       IOPort6.setPinsValue(0x00);
-      for (n = 50000; n > 0; n++);
+      for (n = 1000000; n > 0; n--);
 
       IOPort5.setPinsValue(0x00);
       IOPort6.setPinsValue(0x40);
-      for (n = 50000; n > 0; n++);
+      for (n = 1000000; n > 0; n--);
     }
   }
 }
