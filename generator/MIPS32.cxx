@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -98,8 +98,7 @@ int MIPS32::start_init()
   fprintf(out, "start:\n");
 
   // REVIEW - Use li instead of real instructions?
-  fprintf(out, "  lui $s0, constant_pool >> 16\n");
-  fprintf(out, "  ori $s0, (constant_pool & 0xffff)\n");
+  fprintf(out, "  li $s0, _constant_pool\n");
 
   return 0;
 }
@@ -163,6 +162,7 @@ int MIPS32::push_integer(int32_t n)
 
   if (reg < reg_max)
   {
+    fprintf(out, "  ; push_integer(%d)\n", n);
     fprintf(out, "  li $t%d, %d\n", reg, n);
     reg++;
   }
@@ -176,7 +176,10 @@ int MIPS32::push_integer(int32_t n)
 
 int MIPS32::push_integer_local(int index)
 {
-  return -1;
+  fprintf(out, "  sw $t%d, %d($fp) ; local_%d\n", reg, LOCALS(index), index);
+  reg++;
+
+  return 0;
 }
 
 int MIPS32::push_ref_static(const char *name, int index)
@@ -248,7 +251,10 @@ int MIPS32::push_ref(char *name)
 
 int MIPS32::pop_integer_local(int index)
 {
-  return -1;
+  fprintf(out, "  sw $t%d, %d($fp) ; local_%d\n", reg - 1, LOCALS(index), index);
+  reg--;
+
+  return 0;
 }
 
 int MIPS32::pop_ref_local(int index)
@@ -393,7 +399,12 @@ int MIPS32::xor_integer(int num)
 
 int MIPS32::inc_integer(int index, int num)
 {
-  return -1;
+  fprintf(out, "  ; inc_integer(local_%d,%d)\n", index, num);
+  fprintf(out, "  lw $t8, %d($fp)\n", LOCALS(index));
+  fprintf(out, "  addi $t8, $t8, %d\n", num);
+  fprintf(out, "  sw $t8, %d($fp)\n", LOCALS(index));
+
+  return 0;
 }
 
 int MIPS32::integer_to_byte()
@@ -408,11 +419,51 @@ int MIPS32::integer_to_short()
 
 int MIPS32::jump_cond(const char *label, int cond, int distance)
 {
+  fprintf(out, "  ; jump_cond(%s, %d, %d)\n", label, cond, distance);
+
+  switch(cond)
+  {
+    case COND_EQUAL:
+      fprintf(out, "  beq $t%d, $r0, %s\n", --reg, label);
+      return 0;
+    case COND_NOT_EQUAL:
+      fprintf(out, "  bne $t%d, $r0, %s\n", --reg, label);
+      return 0;
+    case COND_LESS:
+      fprintf(out, "  bltz $t%d, %s\n", --reg, label);
+      return 0;
+    case COND_LESS_EQUAL:
+      fprintf(out, "  blez $t%d, %s\n", --reg, label);
+      return 0;
+    case COND_GREATER:
+      fprintf(out, "  bgtz $t%d, %s\n", --reg, label);
+      return 0;
+    case COND_GREATER_EQUAL:
+      fprintf(out, "  bgez $t%d, %s\n", --reg, label);
+      return 0;
+    default:
+      break;
+  }
+
   return -1;
 }
 
 int MIPS32::jump_cond_integer(const char *label, int cond, int distance)
 {
+  fprintf(out, "  ; jump_cond_integer(%s, %d, %d)\n", label, cond, distance);
+
+  switch(cond)
+  {
+    case COND_EQUAL:
+    case COND_NOT_EQUAL:
+    case COND_LESS:
+    case COND_LESS_EQUAL:
+    case COND_GREATER:
+    case COND_GREATER_EQUAL:
+    default:
+      break;
+  }
+
   return -1;
 }
 
@@ -433,7 +484,8 @@ int MIPS32::return_void(int local_count)
 
 int MIPS32::jump(const char *name, int distance)
 {
-  fprintf(out, "  beq name\n");
+  fprintf(out, "  b %s\n", name);
+  fprintf(out, "  nop\n");
 
   return 0;
 }
