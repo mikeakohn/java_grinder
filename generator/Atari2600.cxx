@@ -1125,9 +1125,11 @@ int Atari2600::atari2600_setScore0_B()
   fprintf(out, "; setScore0\n");
   POP_HI();
   POP_LO();
+  fprintf(out, "  sta result\n");
   fprintf(out, "  asl\n");
   fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  adc result\n");
   fprintf(out, "  sta score0\n");
   stack--;
 
@@ -1139,9 +1141,11 @@ int Atari2600::atari2600_setScore1_B()
   fprintf(out, "; setScore1\n");
   POP_HI();
   POP_LO();
+  fprintf(out, "  sta result\n");
   fprintf(out, "  asl\n");
   fprintf(out, "  asl\n");
-  fprintf(out, "  asl\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  adc result\n");
   fprintf(out, "  sta score1\n");
   stack--;
 
@@ -1446,189 +1450,126 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "db 00000101b\n");
   fprintf(out, "db 00000101b\n");
   fprintf(out, "db 00000111b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
 
   fprintf(out, "db 00000001b\n");
   fprintf(out, "db 00000001b\n");
   fprintf(out, "db 00000001b\n");
   fprintf(out, "db 00000001b\n");
   fprintf(out, "db 00000001b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
 
   fprintf(out, "db 00000111b\n");
   fprintf(out, "db 00000001b\n");
   fprintf(out, "db 00000111b\n");
   fprintf(out, "db 00000100b\n");
   fprintf(out, "db 00000111b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
 
   fprintf(out, "db 00000111b\n");
   fprintf(out, "db 00000001b\n");
   fprintf(out, "db 00000111b\n");
   fprintf(out, "db 00000001b\n");
   fprintf(out, "db 00000111b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
 
   fprintf(out, "db 00000101b\n");
   fprintf(out, "db 00000101b\n");
   fprintf(out, "db 00000111b\n");
   fprintf(out, "db 00000001b\n");
   fprintf(out, "db 00000001b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
 
   fprintf(out, "db 00000111b\n");
   fprintf(out, "db 00000100b\n");
   fprintf(out, "db 00000111b\n");
   fprintf(out, "db 00000001b\n");
   fprintf(out, "db 00000111b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
 
   fprintf(out, "db 00000111b\n");
   fprintf(out, "db 00000100b\n");
   fprintf(out, "db 00000111b\n");
   fprintf(out, "db 00000101b\n");
   fprintf(out, "db 00000111b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
 
   fprintf(out, "db 00000111b\n");
   fprintf(out, "db 00000001b\n");
   fprintf(out, "db 00000001b\n");
   fprintf(out, "db 00000001b\n");
   fprintf(out, "db 00000001b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
 
   fprintf(out, "db 00000111b\n");
   fprintf(out, "db 00000101b\n");
   fprintf(out, "db 00000111b\n");
   fprintf(out, "db 00000101b\n");
   fprintf(out, "db 00000111b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
 
   fprintf(out, "db 00000111b\n");
   fprintf(out, "db 00000101b\n");
   fprintf(out, "db 00000111b\n");
   fprintf(out, "db 00000001b\n");
   fprintf(out, "db 00000111b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
 
   fprintf(out, "db 00010111b\n");
   fprintf(out, "db 00010101b\n");
   fprintf(out, "db 00010101b\n");
   fprintf(out, "db 00010101b\n");
   fprintf(out, "db 00010111b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
 
   fprintf(out, "db 00010001b\n");
   fprintf(out, "db 00010001b\n");
   fprintf(out, "db 00010001b\n");
   fprintf(out, "db 00010001b\n");
   fprintf(out, "db 00010001b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
 
   fprintf(out, "db 00010111b\n");
   fprintf(out, "db 00010001b\n");
   fprintf(out, "db 00010111b\n");
   fprintf(out, "db 00010100b\n");
   fprintf(out, "db 00010111b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
 
   fprintf(out, "db 00010111b\n");
   fprintf(out, "db 00010001b\n");
   fprintf(out, "db 00010111b\n");
   fprintf(out, "db 00010001b\n");
   fprintf(out, "db 00010111b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
 
   fprintf(out, "db 00010101b\n");
   fprintf(out, "db 00010101b\n");
   fprintf(out, "db 00010111b\n");
   fprintf(out, "db 00010001b\n");
   fprintf(out, "db 00010001b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
 
   fprintf(out, "db 00010111b\n");
   fprintf(out, "db 00010100b\n");
   fprintf(out, "db 00010111b\n");
   fprintf(out, "db 00010001b\n");
   fprintf(out, "db 00010111b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
 
   fprintf(out, "db 00010111b\n");
   fprintf(out, "db 00010100b\n");
   fprintf(out, "db 00010111b\n");
   fprintf(out, "db 00010101b\n");
   fprintf(out, "db 00010111b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
 
   fprintf(out, "db 00010111b\n");
   fprintf(out, "db 00010001b\n");
   fprintf(out, "db 00010001b\n");
   fprintf(out, "db 00010001b\n");
   fprintf(out, "db 00010001b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
 
   fprintf(out, "db 00010111b\n");
   fprintf(out, "db 00010101b\n");
   fprintf(out, "db 00010111b\n");
   fprintf(out, "db 00010101b\n");
   fprintf(out, "db 00010111b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
 
   fprintf(out, "db 00010111b\n");
   fprintf(out, "db 00010101b\n");
   fprintf(out, "db 00010111b\n");
   fprintf(out, "db 00010001b\n");
   fprintf(out, "db 00010111b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
 
   fprintf(out, "db 01110111b\n");
   fprintf(out, "db 00010101b\n");
   fprintf(out, "db 01110101b\n");
   fprintf(out, "db 01000101b\n");
   fprintf(out, "db 01110111b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
-  fprintf(out, "db 00000000b\n");
 }
 
 void Atari2600::insert_atari_2600_variables()
