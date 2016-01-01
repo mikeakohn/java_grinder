@@ -100,8 +100,8 @@ abstract public class Atari2600
   public static boolean isCollisionPlayer0Player1() { return false; }
   public static boolean isCollisionMissile0Missile1() { return false; }
 
-  public static boolean setScore0(byte value) { return false; }
-  public static boolean setScore1(byte value) { return false; }
+  public static void setScore0(byte value) { }
+  public static void setScore1(byte value) { }
 
   /** Audio sound type, 4 bit number */
   public static void setAudioControl0(byte value) { }

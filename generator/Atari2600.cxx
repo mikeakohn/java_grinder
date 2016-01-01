@@ -69,8 +69,7 @@ int Atari2600::open(const char *filename)
 int Atari2600::atari2600_waitHsync_I()
 {
   fprintf(out, "; waitLines_I()\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  tay\n");
   fprintf(out, "_wait_sync_%d:\n", label_count);
   fprintf(out, "  sta WSYNC\n");
@@ -170,8 +169,7 @@ int Atari2600::atari2600_waitOverscan()
 int Atari2600::atari2600_setColorPlayer0_I()
 {
   fprintf(out, "; setColorPlayer0_I\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta COLUP0\n");
   stack--;
 
@@ -195,8 +193,7 @@ int Atari2600::atari2600_setColorPlayer0_I(int color)
 int Atari2600::atari2600_setColorPlayer1_I()
 {
   fprintf(out, "; setColorPlayer1_I\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta COLUP1\n");
   stack--;
 
@@ -220,8 +217,7 @@ int Atari2600::atari2600_setColorPlayer1_I(int color)
 int Atari2600::atari2600_setColorPlayfield_I()
 {
   fprintf(out, "; setColorPlayfield_I\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta COLUPF\n");
   stack--;
 
@@ -245,8 +241,7 @@ int Atari2600::atari2600_setColorPlayfield_I(int color)
 int Atari2600::atari2600_setColorBackground_I()
 {
   fprintf(out, "; setColorBackground_I\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta COLUBK\n");
   stack--;
 
@@ -416,8 +411,7 @@ int Atari2600::atari2600_disablePlayer1Reflect()
 int Atari2600::atari2600_setPlayfieldMode_I()
 {
   fprintf(out, "; setPlayfieldMode_I\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta CTRLPF\n");
   stack--;
 
@@ -435,8 +429,7 @@ int Atari2600::atari2600_setPlayfieldMode_I(int mode)
 int Atari2600::atari2600_setPlayfield0_B()
 {
   fprintf(out, "; setPlayfield0_B\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta PF0\n");
   stack--;
 
@@ -455,8 +448,7 @@ int Atari2600::atari2600_setPlayfield0_B(int value)
 int Atari2600::atari2600_setPlayfield1_B()
 {
   fprintf(out, "; setPlayfield1_B\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta PF1\n");
   stack--;
 
@@ -475,8 +467,7 @@ int Atari2600::atari2600_setPlayfield1_B(int value)
 int Atari2600::atari2600_setPlayfield2_B()
 {
   fprintf(out, "; setPlayfield2_B\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta PF2\n");
   stack--;
 
@@ -507,8 +498,7 @@ int Atari2600::atari2600_setPlayfieldData_aB()
 int Atari2600::atari2600_setPlayfieldLength_B()
 {
   fprintf(out, "; setPlayfieldLength\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta playfield_length\n");
   stack--;
 
@@ -518,11 +508,9 @@ int Atari2600::atari2600_setPlayfieldLength_B()
 int Atari2600::atari2600_setPlayer0Position_BB()
 {
   fprintf(out, "; setPlayer0Position\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta player0_y\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  stx result\n");
   fprintf(out, "  ldx #0\n");
   fprintf(out, "  jsr div15\n");
@@ -535,11 +523,9 @@ int Atari2600::atari2600_setPlayer0Position_BB()
 int Atari2600::atari2600_setPlayer1Position_BB()
 {
   fprintf(out, "; setPlayer1Position\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta player1_y\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  stx result\n");
   fprintf(out, "  ldx #1\n");
   fprintf(out, "  jsr div15\n");
@@ -552,11 +538,9 @@ int Atari2600::atari2600_setPlayer1Position_BB()
 int Atari2600::atari2600_setMissile0Position_BB()
 {
   fprintf(out, "; setMissile0Position\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta missile0_y\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  stx result\n");
   fprintf(out, "  ldx #2\n");
   fprintf(out, "  jsr div15\n");
@@ -569,11 +553,9 @@ int Atari2600::atari2600_setMissile0Position_BB()
 int Atari2600::atari2600_setMissile1Position_BB()
 {
   fprintf(out, "; setMissile1Position\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta missile1_y\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  stx result\n");
   fprintf(out, "  ldx #3\n");
   fprintf(out, "  jsr div15\n");
@@ -586,11 +568,9 @@ int Atari2600::atari2600_setMissile1Position_BB()
 int Atari2600::atari2600_setBallPosition_BB()
 {
   fprintf(out, "; setBallPosition\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta ball_y\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  stx result\n");
   fprintf(out, "  ldx #4\n");
   fprintf(out, "  jsr div15\n");
@@ -865,8 +845,7 @@ int Atari2600::atari2600_isCollisionMissile0Missile1()
 int Atari2600::atari2600_setAudioControl0_B()
 {
   fprintf(out, "; setAudioControl0_B\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta AUDC0\n");
   stack--;
 
@@ -885,8 +864,7 @@ int Atari2600::atari2600_setAudioControl0_B(int value)
 int Atari2600::atari2600_setAudioControl1_B()
 {
   fprintf(out, "; setAudioControl1_B\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta AUDC1\n");
   stack--;
 
@@ -905,8 +883,7 @@ int Atari2600::atari2600_setAudioControl1_B(int value)
 int Atari2600::atari2600_setAudioFrequency0_B()
 {
   fprintf(out, "; setAudioFrequency0_B\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta AUDF0\n");
   stack--;
 
@@ -925,8 +902,7 @@ int Atari2600::atari2600_setAudioFrequency0_B(int value)
 int Atari2600::atari2600_setAudioFrequency1_B()
 {
   fprintf(out, "; setAudioFrequency1_B\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta AUDF1\n");
   stack--;
 
@@ -945,8 +921,7 @@ int Atari2600::atari2600_setAudioFrequency1_B(int value)
 int Atari2600::atari2600_setAudioVolume0_B()
 {
   fprintf(out, "; setAudioVolume0_B\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta AUDV0\n");
   stack--;
 
@@ -965,8 +940,7 @@ int Atari2600::atari2600_setAudioVolume0_B(int value)
 int Atari2600::atari2600_setAudioVolume1_B()
 {
   fprintf(out, "; setAudioVolume1_B\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta AUDV1\n");
   stack--;
 
@@ -1123,8 +1097,7 @@ int Atari2600::atari2600_isJoystick1ButtonDown()
 int Atari2600::atari2600_setScore0_B()
 {
   fprintf(out, "; setScore0\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta result\n");
   fprintf(out, "  asl\n");
   fprintf(out, "  asl\n");
@@ -1139,8 +1112,7 @@ int Atari2600::atari2600_setScore0_B()
 int Atari2600::atari2600_setScore1_B()
 {
   fprintf(out, "; setScore1\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta result\n");
   fprintf(out, "  asl\n");
   fprintf(out, "  asl\n");

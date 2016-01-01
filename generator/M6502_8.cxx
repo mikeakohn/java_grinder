@@ -333,10 +333,7 @@ int M6502_8::pop_ref_local(int index)
 int M6502_8::pop()
 {
   fprintf(out, "; pop\n");
-  POP_HI();
-  fprintf(out, "  sta result + 1\n");
-  POP_LO();
-  fprintf(out, "  sta result + 0\n");
+  POP();
   stack--;
 
   return 0;
@@ -344,18 +341,6 @@ int M6502_8::pop()
 
 int M6502_8::dup()
 {
-//FIXME broken
-/*
-  fprintf(out, "dup:\n");
-  POP_HI();
-  POP_LO();
-  PUSH_LO();
-  PUSH_HI();
-  PUSH_LO();
-  PUSH_HI();
-  stack++;
-*/
-
   return -1;
 }
 
@@ -1130,13 +1115,13 @@ void M6502_8::insert_memory_write8()
 {
   fprintf(out, "memory_write8:\n");
   POP();
-  fprintf(out, "  pha\n");
+  fprintf(out, "  sta result\n");
   POP_HI();
   fprintf(out, "  sta address + 1\n");
   POP_LO();
   fprintf(out, "  sta address + 0\n");
   fprintf(out, "  ldy #0\n");
-  fprintf(out, "  pla\n");
+  fprintf(out, "  lda result\n");
   fprintf(out, "  sta (address),y\n");
   fprintf(out, "  rts\n");
 }
