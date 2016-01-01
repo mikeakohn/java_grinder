@@ -692,8 +692,7 @@ int M6502_8::return_local(int index, int local_count)
 
   if (!is_main)
   { 
-    POP_HI();
-    POP_LO();
+    POP();
     fprintf(out, "  sta locals\n");
   }
 
@@ -715,8 +714,7 @@ int M6502_8::return_integer(int local_count)
 
   if (!is_main)
   {
-    POP_HI();
-    POP_LO();
+    POP();
     fprintf(out, "  sta locals\n");
   }
 
@@ -732,8 +730,7 @@ int M6502_8::return_void(int local_count)
 
   if (!is_main)
   {
-    POP_HI();
-    POP_LO();
+    POP();
     fprintf(out, "  sta locals\n");
   }
 
@@ -984,30 +981,24 @@ void M6502_8::insert_swap()
 void M6502_8::insert_add_integer()
 {
   fprintf(out, "add_integer:\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta result + 0\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  clc\n");
   fprintf(out, "  adc result + 0\n");
-  PUSH_LO();
-  PUSH_HI();
+  PUSH();
   fprintf(out, "  rts\n");
 }
 
 void M6502_8::insert_sub_integer()
 {
   fprintf(out, "sub_integer:\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta result + 0\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sec\n");
   fprintf(out, "  sbc result + 0\n");
-  PUSH_LO();
-  PUSH_HI();
+  PUSH();
   fprintf(out, "  rts\n");
 }
 
@@ -1018,91 +1009,73 @@ void M6502_8::insert_neg_integer()
 void M6502_8::insert_shift_left_integer()
 {
   fprintf(out, "shift_left_integer:\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  tay\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  asl\n");
   fprintf(out, "  dey\n");
   fprintf(out, "  bne #-4\n");
-  PUSH_LO();
-  PUSH_HI();
+  PUSH();
   fprintf(out, "  rts\n");
 }
 
 void M6502_8::insert_shift_right_integer()
 {
   fprintf(out, "shift_right_integer:\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  tay\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  cmp #0x80\n");
   fprintf(out, "  ror\n");
   fprintf(out, "  dey\n");
   fprintf(out, "  bne #-6\n");
-  PUSH_LO();
-  PUSH_HI();
+  PUSH();
   fprintf(out, "  rts\n");
 }
 
 void M6502_8::insert_shift_right_uinteger()
 {
   fprintf(out, "shift_right_uinteger:\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  tay\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  lsr\n");
   fprintf(out, "  dey\n");
   fprintf(out, "  bne #-4\n");
-  PUSH_LO();
-  PUSH_HI();
+  PUSH();
   fprintf(out, "  rts\n");
 }
 
 void M6502_8::insert_and_integer()
 {
   fprintf(out, "and_integer:\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta result + 0\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  and result + 0\n");
-  PUSH_LO();
-  PUSH_HI();
+  PUSH();
   fprintf(out, "  rts\n");
 }
 
 void M6502_8::insert_or_integer()
 {
   fprintf(out, "or_integer:\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta result + 0\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  ora result + 0\n");
-  PUSH_LO();
-  PUSH_HI();
+  PUSH();
   fprintf(out, "  rts\n");
 }
 
 void M6502_8::insert_xor_integer()
 {
   fprintf(out, "xor_integer:\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  sta result + 0\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  eor result + 0\n");
-  PUSH_LO();
-  PUSH_HI();
+  PUSH();
   fprintf(out, "  rts\n");
 }
 
@@ -1149,16 +1122,14 @@ void M6502_8::insert_memory_read8()
   fprintf(out, "  sta address + 0\n");
   fprintf(out, "  ldy #0\n");
   fprintf(out, "  lda (address),y\n");
-  PUSH_LO();
-  PUSH_HI();
+  PUSH();
   fprintf(out, "  rts\n");
 }
 
 void M6502_8::insert_memory_write8()
 {
   fprintf(out, "memory_write8:\n");
-  POP_HI();
-  POP_LO();
+  POP();
   fprintf(out, "  pha\n");
   POP_HI();
   fprintf(out, "  sta address + 1\n");

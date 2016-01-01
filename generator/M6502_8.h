@@ -32,6 +32,16 @@
   fprintf(out, "; POP_LO\n"); \
   fprintf(out, "  lda stack_lo,x\n")
 
+#define POP() \
+  fprintf(out, "; POP\n"); \
+  fprintf(out, "  inx\n"); \
+  fprintf(out, "  lda stack_lo,x\n")
+
+#define PUSH() \
+  fprintf(out, "; PUSH\n"); \
+  fprintf(out, "  sta stack_lo,x\n"); \
+  fprintf(out, "  dex\n"); \
+
 class M6502_8 : public Generator
 {
 public:
