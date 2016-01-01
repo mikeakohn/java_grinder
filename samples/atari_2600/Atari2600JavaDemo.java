@@ -64,27 +64,8 @@ public class Atari2600JavaDemo
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b11110000, (byte)0b11111111, (byte)0b11111111,
-    (byte)0b00000000, (byte)0b00000000, (byte)0b00000000,
   };
 
-  public static byte title[] =
-  {
-    (byte)0b11110000, (byte)0b11111111, (byte)0b11111111,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b00111100, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b00111100, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b00111100, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
-    (byte)0b00000000, (byte)0b00000000, (byte)0b00000000,
-  };
   public static byte nothing[] =
   {
     (byte)0b00000000
@@ -92,11 +73,16 @@ public class Atari2600JavaDemo
 
   public static void main()
   {
+    final int left = 12;
+    final int right = 122;
+    final int ship0_y = 51;
+    final int ship1_y = 2;
+
     int ship0_x = 67;
     int shot0_y = 100;
     int ship1_x = 67;
     int shot1_y = 100;
-    int rnd = 255;
+    int rnd = 127;
     int frame = 0;
     int ship0_hit = 0;
     int ship1_hit = 0;
@@ -105,11 +91,6 @@ public class Atari2600JavaDemo
     int score0 = 0;
     int score1 = 0;
     int mode = 0;
-
-    final int left = 12;
-    final int right = 122;
-    final int ship0_y = 51;
-    final int ship1_y = 2;
 
     // missle width
     Memory.write8(0x04, (byte)16);
@@ -123,53 +104,56 @@ public class Atari2600JavaDemo
     Atari2600.setMissile1Sprite(shot);
     Atari2600.setBallSprite(nothing);
 
-    Atari2600.setColorPlayer0(0x88);
-    Atari2600.setColorPlayer1(0x38);
-    Atari2600.setColorPlayfield(0x06);
-
-//    Atari2600.setPlayfieldData(background);
-//    Atari2600.setPlayfieldLength((byte)background.length);
+    Atari2600.setPlayfieldData(background);
+    Atari2600.setPlayfieldLength((byte)background.length);
 
     while(true)
     {
+      Atari2600.clearMotionRegisters();
+      Atari2600.clearCollisionLatches();
+
       if(mode == 0)
       {
         Atari2600.startVblank();
+
         Atari2600.setMissile0Position((byte)0, (byte)100);
         Atari2600.setMissile1Position((byte)0, (byte)100);
+        Atari2600.setColorPlayfield(0x02);
+        Atari2600.setColorPlayer0(0x08);
+        Atari2600.setColorPlayer1(0x08);
 
-        Atari2600.setColorPlayfield((frame >> 2) & 127);
-        Atari2600.setPlayfieldData(title);
-        Atari2600.setPlayfieldLength((byte)title.length);
-        Atari2600.setScore0((byte)0);
-        Atari2600.setScore1((byte)0);
+        ship0_x = 67;
+        shot0_y = 100;
+        ship1_x = 67;
+        shot1_y = 100;
 
-        if(Atari2600.isJoystick0ButtonDown())
+        Atari2600.setScore0((byte)score0);
+        Atari2600.setScore1((byte)score1);
+
+        if((Memory.read8(0x282) & 1) == 0)
         {
+          score0 = 0;
+          score1 = 0;
+          ship0_hit = 0;
+          ship1_hit = 0;
+          pf_hit = 0;
+          Atari2600.setColorPlayfield(0x06);
+          Atari2600.setColorPlayer0(0x88);
+          Atari2600.setColorPlayer1(0x38);
           mode = 1;
         }
 
-        Atari2600.clearMotionRegisters();
-        Atari2600.setPlayer0Position((byte)0, (byte)100);
-        Atari2600.setPlayer1Position((byte)0, (byte)100);
-        Atari2600.setMissile0Position((byte)0, (byte)100);
-        Atari2600.setMissile1Position((byte)0, (byte)100);
-        Atari2600.clearCollisionLatches();
-
+        Atari2600.setPlayer0Position((byte)(ship0_x - 3), (byte)ship0_y);
+        Atari2600.setPlayer1Position((byte)(ship1_x - 3), (byte)ship1_y);
         Atari2600.waitVblank();
         Atari2600.drawScreen();
         Atari2600.startOverscan();
-
-        frame++;
-
         Atari2600.waitOverscan();
       }
       else
       {
         Atari2600.startVblank();
-        Atari2600.setColorPlayfield(0x06);
-        Atari2600.setPlayfieldData(background);
-        Atari2600.setPlayfieldLength((byte)background.length);
+
         Atari2600.setScore0((byte)score0);
         Atari2600.setScore1((byte)score1);
 
@@ -180,25 +164,22 @@ public class Atari2600JavaDemo
         {
           if(Atari2600.isJoystick0Right())
           {
-            ship0_x += 1;
+            ship0_x++;
             if(ship0_x > right)
               ship0_x = right;
           }
           else if(Atari2600.isJoystick0Left())
           {
-            ship0_x -= 1;
+            ship0_x--;
             if(ship0_x < left)
               ship0_x = left;
           }
 
-          if(Atari2600.isJoystick0ButtonDown())
+          if(Atari2600.isJoystick0ButtonDown() && shot0_y == 100)
           {
-            if(shot0_y == 100)
-            {
-              shot0_y = ship0_y;
-              Atari2600.setAudioControl0((byte)0b0100);
-              Atari2600.setAudioVolume0((byte)15);
-            }
+            shot0_y = ship0_y;
+            Atari2600.setAudioControl0((byte)0b0100);
+            Atari2600.setAudioVolume0((byte)15);
           }
 
           if(((frame & 3) == 3) && (ship1_x >= ship0_x || ship1_x == left))
@@ -245,13 +226,10 @@ public class Atari2600JavaDemo
           }
         }
 
-        Atari2600.clearMotionRegisters();
         Atari2600.setPlayer0Position((byte)(ship0_x - 3), (byte)ship0_y);
         Atari2600.setPlayer1Position((byte)(ship1_x - 3), (byte)ship1_y);
         Atari2600.setMissile0Position((byte)ship0_x, (byte)shot0_y);
         Atari2600.setMissile1Position((byte)ship1_x, (byte)shot1_y);
-        Atari2600.clearCollisionLatches();
-
         Atari2600.waitVblank();
         Atari2600.drawScreen();
         Atari2600.startOverscan();
@@ -273,8 +251,6 @@ public class Atari2600JavaDemo
           Atari2600.setAudioVolume0((byte)0);
           Atari2600.setAudioVolume1((byte)15);
           score1++;
-          if(score1 > 20)
-            score1 = 20;
           wait = 30;
         }
 
@@ -288,8 +264,6 @@ public class Atari2600JavaDemo
           Atari2600.setAudioVolume0((byte)15);
           Atari2600.setAudioVolume1((byte)0);
           score0++;
-          if(score0 > 20)
-            score0 = 20;
           wait = 30;
         }
 
@@ -330,162 +304,18 @@ public class Atari2600JavaDemo
           }
         }
 
-        frame++;
+        if(score0 >= 10 || score1 >= 10)
+        {
+          Atari2600.setAudioVolume0((byte)0);
+          Atari2600.setAudioVolume1((byte)0);
+          mode = 0;
+        }
+
         Atari2600.waitOverscan();
       }
+
+      frame++;
     }
   }
 }
-
-/*
-public class Atari2600JavaDemo
-{
-  public static int bass_waveform[] = 
-  {
-    8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 8, 6,
-    8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 8, 6,
-    8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 8, 6,
-    8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 8, 6,
-  };
-
-  public static int bass_line[] = 
-  {
-    29, -1, 19, -1, 14, -1, 19, -1, 29, -1, 19, -1, 14, -1, 19, -1,
-    23, -1, 11, 11, 14, -1, 11, -1, 23, -1, 11, 11, 14, -1, 11, -1,
-    29, -1, 19, -1, 14, -1, 19, -1, 29, -1, 19, -1, 14, -1, 19, -1,
-    23, -1, 11, 11, 14, -1, 11, -1, 23, -1, 11, 11, 14, -1, 11, -1,
-  };
-
-  public static int lead_line[] = 
-  {
-    28, 25, 28, -1, 28, 25, 28, -1, 28, 28, -1, -1, 28, 28, -1, -1,
-    22, 22, 25, -1, 22, 25, -1, -1, 22, 22, 25, -1, 28, 25, 28, 28,
-    28, -1, 25, -1, 25, -1, 28, -1, 28, -1, 25, -1, 25, 28, 28, -1,
-    22, 22, 25, -1, 22, 25, -1, -1, 22, 22, 25, -1, 28, 25, 28, 28,
-  };
-
-  public static void main()
-  {
-    Atari2600.setColorPlayfield(0x80 | 0x70 | 0x02);
-    Atari2600.setPlayfieldMode(Atari2600.PLAYFIELD_REFLECT);
-
-    int n = 100;
-    int timer = 0;
-    int note = 0;
-    int temp0, temp1;
-
-    Atari2600.setAudioControl0((byte)6);
-    Atari2600.setAudioControl1((byte)4);
-    
-    Atari2600.setAudioVolume0((byte)0);
-    Atari2600.setAudioVolume1((byte)0);
-
-    Atari2600.setAudioFrequency0((byte)0);
-    Atari2600.setAudioFrequency1((byte)0);
-
-    while(true)
-    {
-      Atari2600.startVblank();
-
-      timer++;
-      if(timer > 8)
-      {
-        timer = 0;
-        temp0 = bass_line[note];
-
-        if(temp0 < 0)
-          Atari2600.setAudioVolume0((byte)0);
-        else
-          Atari2600.setAudioVolume0((byte)15);
-
-        temp1 = lead_line[note];
-
-        if(temp1 < 0)
-          Atari2600.setAudioVolume1((byte)0);
-        else
-          Atari2600.setAudioVolume1((byte)15);
-
-        Atari2600.setAudioControl0((byte)bass_waveform[note]);
-        Atari2600.setAudioFrequency0((byte)temp0);
-        Atari2600.setAudioFrequency1((byte)temp1);
-
-        note++;
-        if(note >= 64)
-          note = 0;
-      }
-
-      Atari2600.waitVblank();
-
-      // Draw on screen
-      //Atari2600.setColorBackground(0x80 | 0x70 | 0x04);
-      Atari2600.waitHsync(10);
-      Atari2600.setColorBackground(0x80 | 0x70 | 0x02);
-      Atari2600.waitHsync(10);
-      Atari2600.setColorBackground(0x80 | 0x70 | 0x01);
-      Atari2600.waitHsync(10);
-
-      Atari2600.setPlayfield2((byte)0x98);
-      Atari2600.setColorPlayfield(n);
-      Atari2600.waitHsync(70);
-
-      Atari2600.setPlayfield2((byte)0x8c);
-      Atari2600.setColorPlayfield(n);
-      Atari2600.waitHsync(25);
-
-      Atari2600.setPlayfield2((byte)0x86);
-      Atari2600.setColorPlayfield(n);
-      Atari2600.waitHsync(20);
-
-      Atari2600.setPlayfield2((byte)0x83);
-      Atari2600.setColorPlayfield(n);
-      Atari2600.waitHsync(15);
-
-      Atari2600.setPlayfield2((byte)0x81);
-      Atari2600.setPlayfield1((byte)0x01);
-      Atari2600.setColorPlayfield(n);
-      Atari2600.waitHsync(10);
-
-      Atari2600.setPlayfield2((byte)0x00);
-      Atari2600.setPlayfield1((byte)0x00);
-      Atari2600.setColorPlayfield(n);
-      Atari2600.waitHsync(22);
-
-      Atari2600.startOverscan();
-
-      n++;
-
-      if (Atari2600.isJoystick0Left())
-      {
-        Atari2600.setColorBackground(0x80 | 0x70 | 0x01);
-      }
-        else
-      if (Atari2600.isJoystick0Right())
-      {
-        Atari2600.setColorBackground(0x80 | 0x70 | 0x02);
-      }
-        else
-      if (Atari2600.isJoystick0Down())
-      {
-        Atari2600.setColorBackground(0x80 | 0x74 | 0x02);
-      }
-        else
-      if (Atari2600.isJoystick0Up())
-      {
-        Atari2600.setColorBackground(0x80 | 0x64 | 0x02);
-      }
-        else
-      if (Atari2600.isJoystick0ButtonDown())
-      {
-        Atari2600.setColorBackground(0x80 | 0x64 | 0x08);
-      }
-        else
-      {
-        Atari2600.setColorBackground(0x80 | 0x70 | 0x04);
-      }
-
-      Atari2600.waitOverscan();
-    }
-  }
-}
-*/
 
