@@ -114,8 +114,8 @@ public class Atari2600JavaDemo
     int frame = 0;
     int ship0_hit = 0;
     int ship1_hit = 0;
-    int score0 = 0;
-    int score1 = 0;
+    int score0 = 1;
+    int score1 = 11;
     int mode = 0;
     int dir = 0;
     int game = 0;
@@ -154,18 +154,20 @@ public class Atari2600JavaDemo
 
         ship0_x = 63;
         shot0_y = 100;
-        ship1_x = 63;
+        ship1_x = 65;
         shot1_y = 100;
 
         // score must be set each frame
-        Atari2600.setScore0((byte)(game + 1));
-        Atari2600.setScore1((byte)11);
+        Atari2600.setScore0((byte)score0);
+        Atari2600.setScore1((byte)score1);
 
         // choose game type
         if(((frame & 31) == 31) && ((switches & 2) == 0))
         {
           game++;
           game &= 7;
+          score0 = game + 1;
+          score1 = 11;
         }
 
         Memory.write8(0x05, (byte)game_params[game]);
@@ -183,8 +185,9 @@ public class Atari2600JavaDemo
         }
 
         // set horizontal positions
-        Atari2600.setPlayer0Position((byte)(ship0_x), (byte)ship0_y);
-        Atari2600.setPlayer1Position((byte)(ship1_x), (byte)ship1_y);
+        Atari2600.setPlayer0Position((byte)ship0_x, (byte)ship0_y);
+        Atari2600.setPlayer1Position((byte)(ship1_x - (offset[game] >> 1)),
+                                     (byte)ship1_y);
         Atari2600.waitVblank();
         Atari2600.drawScreen();
         Atari2600.startOverscan();
