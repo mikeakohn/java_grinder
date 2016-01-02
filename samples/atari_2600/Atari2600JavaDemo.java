@@ -1,3 +1,6 @@
+// demo game for java_grinder
+// "space revenge" - by Joe Davisson
+
 import net.mikekohn.java_grinder.Atari2600;
 import net.mikekohn.java_grinder.Memory;
 
@@ -73,27 +76,40 @@ public class Atari2600JavaDemo
 
   public static byte game_params[] =
   {
-    (byte)0b0010000,
-    (byte)0b0010010,
-    (byte)0b0010110,
-    (byte)0b1010000,
-    (byte)0b1010010,
-    (byte)0b1010110,
-    (byte)0b1100101,
-    (byte)0b1110111,
+    (byte)0b010000,
+    (byte)0b010010,
+    (byte)0b010110,
+    (byte)0b010100,
+    (byte)0b010001,
+    (byte)0b010011,
+    (byte)0b100101,
+    (byte)0b110111,
+  };
+
+  public static byte offset[] =
+  {
+    (byte)0,
+    (byte)28,
+    (byte)54,
+    (byte)54,
+    (byte)16,
+    (byte)28,
+    (byte)9,
+    (byte)24,
   };
 
   public static void main()
   {
-    final int left = 12;
-    final int right = 122;
+    final int left = 9;
+    final int right = 119;
     final int ship0_y = 51;
     final int ship1_y = 2;
 
-    int ship0_x = 67;
-    int shot0_y = 100;
-    int ship1_x = 67;
-    int shot1_y = 100;
+    int ship0_x = 0;
+    int shot0_y = 0;
+    int ship1_x = 0;
+    int shot1_y = 0;
+    int shot1_offset = 0;
     int rnd = 127;
     int frame = 0;
     int ship0_hit = 0;
@@ -105,7 +121,6 @@ public class Atari2600JavaDemo
     int dir = 0;
     int game = 0;
     int switches = 0;
-    int temp = 0;
 
     Memory.write8(0x04, (byte)0b010000);
     Memory.write8(0x05, (byte)0b010000);
@@ -139,9 +154,9 @@ public class Atari2600JavaDemo
         Atari2600.setColorPlayer0(0x8);
         Atari2600.setColorPlayer1(0x8);
 
-        ship0_x = 67;
+        ship0_x = 63;
         shot0_y = 100;
-        ship1_x = 67;
+        ship1_x = 63;
         shot1_y = 100;
 
         // score must be set each frame
@@ -153,9 +168,7 @@ public class Atari2600JavaDemo
         {
           game++;
           game &= 7;
-          temp = game_params[game];
-          Memory.write8(0x04, (byte)((temp > 63) ? 37 : 16));
-          Memory.write8(0x05, (byte)temp);
+          Memory.write8(0x05, (byte)game_params[game]);
         }
 
         // start game
@@ -163,9 +176,10 @@ public class Atari2600JavaDemo
         {
           score0 = 0;
           score1 = 0;
-          ship0_hit = 0;
-          ship1_hit = 0;
-          pf_hit = 0;
+          //ship0_hit = 0;
+          //ship1_hit = 0;
+          shot1_offset = (3 << (game_params[game] >> 4)) >> 1;
+          //pf_hit = 0;
           Atari2600.setColorPlayfield(0x06);
           Atari2600.setColorPlayer0(0x88);
           Atari2600.setColorPlayer1(0x38);
@@ -173,8 +187,8 @@ public class Atari2600JavaDemo
         }
 
         // set horizontal positions
-        Atari2600.setPlayer0Position((byte)(ship0_x - 3), (byte)ship0_y);
-        Atari2600.setPlayer1Position((byte)(ship1_x - 3), (byte)ship1_y);
+        Atari2600.setPlayer0Position((byte)(ship0_x), (byte)ship0_y);
+        Atari2600.setPlayer1Position((byte)(ship1_x), (byte)ship1_y);
         Atari2600.waitVblank();
         Atari2600.drawScreen();
         Atari2600.startOverscan();
@@ -217,7 +231,8 @@ public class Atari2600JavaDemo
           if((frame & 3) == 3)
           {
             dir = (ship0_x - ship1_x) >> 2;
-            ship1_x += dir;
+            if((dir < 0) || (ship1_x <= right - offset[game])) 
+              ship1_x += dir;
           }
         }
         else
@@ -241,10 +256,11 @@ public class Atari2600JavaDemo
         }
 
         // set horizontal positions
-        Atari2600.setPlayer0Position((byte)(ship0_x - 3), (byte)ship0_y);
-        Atari2600.setPlayer1Position((byte)(ship1_x - 3), (byte)ship1_y);
-        Atari2600.setMissile0Position((byte)ship0_x, (byte)shot0_y);
-        Atari2600.setMissile1Position((byte)ship1_x, (byte)shot1_y);
+        Atari2600.setPlayer0Position((byte)ship0_x, (byte)ship0_y);
+        Atari2600.setPlayer1Position((byte)ship1_x, (byte)ship1_y);
+        Atari2600.setMissile0Position((byte)(ship0_x + 3), (byte)shot0_y);
+        Atari2600.setMissile1Position((byte)(ship1_x + shot1_offset),
+                                      (byte)shot1_y);
 
         Atari2600.waitVblank();
         Atari2600.drawScreen();
@@ -310,6 +326,8 @@ public class Atari2600JavaDemo
           {
             Atari2600.setAudioFrequency1((byte)(shot1_y >> 1));
             shot1_y++;
+            if(game == 3 || game > 5)
+              shot1_y++;
             if(shot1_y > ship0_y + 4)
             {
               shot1_y = 100;
@@ -323,7 +341,7 @@ public class Atari2600JavaDemo
         rnd &= 127;
         if(((rnd ^ ship0_x) < ship1_y) && (shot1_y == 100))
         {
-          shot1_y = ship1_y;
+          shot1_y = ship1_y + 2;
           Atari2600.setAudioControl1((byte)0b0001);
           Atari2600.setAudioVolume1((byte)15);
         }
