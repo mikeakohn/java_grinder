@@ -1148,19 +1148,11 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  ldy score0\n");
   fprintf(out, "  lda numbers,y\n");
   fprintf(out, "  sta PF1\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
+  fprintf(out, "  lda (playfield),y\n"); //5
+  fprintf(out, "  lda (playfield),y\n"); //5
+  fprintf(out, "  lda (playfield),y\n"); //5
+  fprintf(out, "  lda (playfield),y\n"); //5
+  fprintf(out, "  lda (playfield),y\n"); //5
   fprintf(out, "  ldy score1\n");
   fprintf(out, "  lda numbers,y\n");
   fprintf(out, "  sta PF1\n");
@@ -1169,19 +1161,11 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  ldy score0\n");
   fprintf(out, "  lda numbers,y\n");
   fprintf(out, "  sta PF1\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  nop\n");
+  fprintf(out, "  lda (playfield),y\n"); //5
+  fprintf(out, "  lda (playfield),y\n"); //5
+  fprintf(out, "  lda (playfield),y\n"); //5
+  fprintf(out, "  lda (playfield),y\n"); //5
+  fprintf(out, "  lda (playfield),y\n"); //5
   fprintf(out, "  ldy score1\n");
   fprintf(out, "  lda numbers,y\n");
   fprintf(out, "  sta PF1\n");
