@@ -91,6 +91,7 @@ public class Atari2600JavaDemo
     int score0 = 0;
     int score1 = 0;
     int mode = 0;
+    int dir = 0;
 
     // missle width
     Memory.write8(0x04, (byte)16);
@@ -114,6 +115,7 @@ public class Atari2600JavaDemo
 
       if(mode == 0)
       {
+        // initial screen, waiting for reset
         Atari2600.startVblank();
 
         Atari2600.setMissile0Position((byte)0, (byte)100);
@@ -127,9 +129,11 @@ public class Atari2600JavaDemo
         ship1_x = 67;
         shot1_y = 100;
 
+        // score must be set each frame
         Atari2600.setScore0((byte)score0);
         Atari2600.setScore1((byte)score1);
 
+        // start game if reset switch active
         if((Memory.read8(0x282) & 1) == 0)
         {
           score0 = 0;
@@ -143,6 +147,7 @@ public class Atari2600JavaDemo
           mode = 1;
         }
 
+        // set horizontal positions
         Atari2600.setPlayer0Position((byte)(ship0_x - 3), (byte)ship0_y);
         Atari2600.setPlayer1Position((byte)(ship1_x - 3), (byte)ship1_y);
         Atari2600.waitVblank();
@@ -152,16 +157,20 @@ public class Atari2600JavaDemo
       }
       else
       {
+        // game
         Atari2600.startVblank();
 
+        // score must be set each frame
         Atari2600.setScore0((byte)score0);
         Atari2600.setScore1((byte)score1);
 
+        // pause after player hit
         if(wait > 0)
           wait--;
 
         if(wait == 0)
         {
+          // move player
           if(Atari2600.isJoystick0Right())
           {
             ship0_x++;
@@ -175,6 +184,7 @@ public class Atari2600JavaDemo
               ship0_x = left;
           }
 
+          // fire shot
           if(Atari2600.isJoystick0ButtonDown() && shot0_y == 100)
           {
             shot0_y = ship0_y;
@@ -182,28 +192,15 @@ public class Atari2600JavaDemo
             Atari2600.setAudioVolume0((byte)15);
           }
 
-          if(((frame & 3) == 3) && (ship1_x >= ship0_x || ship1_x == left))
+          // move enemy
+          if((frame & 3) == 3)
           {
-            if(shot0_y < 16)
-              ship1_x++;
-            else
-              ship1_x--;
+            dir = (ship0_x - ship1_x) >> 2;
+            ship1_x += dir;
           }
-
-          if(((frame & 3) == 3) && (ship1_x < ship0_x || ship1_x == right))
-          {
-            if(shot0_y < 16)
-              ship1_x--;
-            else
-              ship1_x++;
-          }
-
-          if(ship1_x > right)
-            ship1_x = right;
-          if(ship1_x < left)
-            ship1_x = left;
         }
 
+        // animate players when hit
         if(ship0_hit > 0)
         {
           Atari2600.setColorPlayer0(0x80 + ship0_hit);
@@ -226,14 +223,17 @@ public class Atari2600JavaDemo
           }
         }
 
+        // set horizontal positions
         Atari2600.setPlayer0Position((byte)(ship0_x - 3), (byte)ship0_y);
         Atari2600.setPlayer1Position((byte)(ship1_x - 3), (byte)ship1_y);
         Atari2600.setMissile0Position((byte)ship0_x, (byte)shot0_y);
         Atari2600.setMissile1Position((byte)ship1_x, (byte)shot1_y);
+
         Atari2600.waitVblank();
         Atari2600.drawScreen();
         Atari2600.startOverscan();
 
+        // playfield hit
         if(Atari2600.isCollisionMissile0Playfield())
         {
           pf_hit = 11;
@@ -241,6 +241,7 @@ public class Atari2600JavaDemo
           Atari2600.setAudioVolume0((byte)0);
         }
 
+        // player hit
         if(Atari2600.isCollisionMissile1Player0())
         {
           ship0_hit = 31;
@@ -254,6 +255,7 @@ public class Atari2600JavaDemo
           wait = 30;
         }
 
+        // enemy hit
         if(Atari2600.isCollisionMissile0Player1())
         {
           ship1_hit = 31;
@@ -267,43 +269,51 @@ public class Atari2600JavaDemo
           wait = 30;
         }
 
+        // animate playfield if hit
         if(pf_hit > 6)
         {
           Atari2600.setColorPlayfield(0x00 + pf_hit);
           pf_hit--;
         }
 
-        if((frame & 1) == 1 && shot0_y < 100)
+        if((frame & 1) == 1)
         {
-          Atari2600.setAudioFrequency0((byte)((shot0_y >> 1) + 2));
-          shot0_y--;
-          if(shot0_y < ship1_y)
+          // move player shot
+          if(shot0_y < 100)
           {
-            shot0_y = 100;
-            Atari2600.setAudioVolume0((byte)0);
+            Atari2600.setAudioFrequency0((byte)((shot0_y >> 1) + 2));
+            shot0_y--;
+            if(shot0_y < ship1_y)
+            {
+              shot0_y = 100;
+              Atari2600.setAudioVolume0((byte)0);
+            }
+          }
+
+          // move enemy shot
+          if(shot1_y < 100)
+          {
+            Atari2600.setAudioFrequency1((byte)(shot1_y >> 1));
+            shot1_y++;
+            if(shot1_y > ship0_y + 4)
+            {
+              shot1_y = 100;
+              Atari2600.setAudioVolume1((byte)0);
+            }
           }
         }
 
+        // enemy shoots at random
         rnd -= 77;
         rnd &= 127;
-        if(((rnd ^ ship0_x) & 127) < ship1_y && shot1_y == 100)
+        if(((rnd ^ ship0_x) < ship1_y) && (shot1_y == 100))
         {
           shot1_y = ship1_y;
           Atari2600.setAudioControl1((byte)0b0001);
           Atari2600.setAudioVolume1((byte)15);
         }
 
-        if((frame & 1) == 1 && shot1_y < 100)
-        {
-          Atari2600.setAudioFrequency1((byte)(shot1_y >> 1));
-          shot1_y++;
-          if(shot1_y > ship0_y + 4)
-          {
-            shot1_y = 100;
-            Atari2600.setAudioVolume1((byte)0);
-          }
-        }
-
+        // end game if max score reached
         if(score0 >= 10 || score1 >= 10)
         {
           Atari2600.setAudioVolume0((byte)0);
