@@ -871,7 +871,29 @@ int M6502_8::push_array_length(const char *name, int field_id)
 
 int M6502_8::array_read_byte()
 {
-  return -1;
+  fprintf(out, "; array_read_byte:\n");
+  POP_HI();
+  fprintf(out, "  sta value1 + 1\n");
+  POP_LO();
+  fprintf(out, "  sta value1 + 0\n");
+  POP_HI();
+  fprintf(out, "  sta value2 + 1\n");
+  POP_LO();
+  fprintf(out, "  sta value2 + 0\n");
+  
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda value1 + 0\n");
+  fprintf(out, "  adc value2 + 0\n");
+  fprintf(out, "  sta value2 + 0\n");
+  fprintf(out, "  lda value1 + 1\n");
+  fprintf(out, "  adc value2 + 1\n");
+  fprintf(out, "  sta value2 + 1\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "  lda (value2),y\n");
+  PUSH();
+  stack++;
+
+  return 0;
 }
 
 int M6502_8::array_read_short()
