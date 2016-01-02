@@ -43,6 +43,7 @@ M6502_8::M6502_8() :
   need_or_integer(0),
   need_xor_integer(0),
   need_push_array_length(0),
+  need_array_read_byte(0),
   need_memory_read8(0),
   need_memory_write8(0)
 {
@@ -104,6 +105,7 @@ int M6502_8::add_functions()
   if(need_or_integer) { insert_or_integer(); }
   if(need_xor_integer) { insert_xor_integer(); }
   if(need_push_array_length) { insert_push_array_length(); }
+  if(need_array_read_byte) { insert_array_read_byte(); }
   if(need_memory_read8) { insert_memory_read8(); }
   if(need_memory_write8) { insert_memory_write8(); }
 
@@ -871,26 +873,8 @@ int M6502_8::push_array_length(const char *name, int field_id)
 
 int M6502_8::array_read_byte()
 {
-  fprintf(out, "; array_read_byte:\n");
-  POP_HI();
-  fprintf(out, "  sta value1 + 1\n");
-  POP_LO();
-  fprintf(out, "  sta value1 + 0\n");
-  POP_HI();
-  fprintf(out, "  sta value2 + 1\n");
-  POP_LO();
-  fprintf(out, "  sta value2 + 0\n");
-  
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda value1 + 0\n");
-  fprintf(out, "  adc value2 + 0\n");
-  fprintf(out, "  sta value2 + 0\n");
-  fprintf(out, "  lda value1 + 1\n");
-  fprintf(out, "  adc value2 + 1\n");
-  fprintf(out, "  sta value2 + 1\n");
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda (value2),y\n");
-  PUSH();
+  need_array_read_byte = 1;
+  fprintf(out, "  jsr array_read_byte\n");
   stack++;
 
   return 0;
@@ -1117,6 +1101,31 @@ void M6502_8::insert_push_array_length()
   PUSH_LO();
   fprintf(out, "  lda result + 1\n");
   PUSH_HI();
+  fprintf(out, "  rts\n");
+}
+
+void M6502_8::insert_array_read_byte()
+{
+  fprintf(out, "array_read_byte:\n");
+  POP_HI();
+  fprintf(out, "  sta value1 + 1\n");
+  POP_LO();
+  fprintf(out, "  sta value1 + 0\n");
+  POP_HI();
+  fprintf(out, "  sta value2 + 1\n");
+  POP_LO();
+  fprintf(out, "  sta value2 + 0\n");
+  
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda value1 + 0\n");
+  fprintf(out, "  adc value2 + 0\n");
+  fprintf(out, "  sta value2 + 0\n");
+  fprintf(out, "  lda value1 + 1\n");
+  fprintf(out, "  adc value2 + 1\n");
+  fprintf(out, "  sta value2 + 1\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "  lda (value2),y\n");
+  PUSH();
   fprintf(out, "  rts\n");
 }
 
