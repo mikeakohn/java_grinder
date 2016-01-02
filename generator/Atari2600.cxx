@@ -108,18 +108,7 @@ int Atari2600::atari2600_waitHsync()
 int Atari2600::atari2600_startVblank()
 {
   fprintf(out, "  jsr start_vblank\n");
-/*
-  fprintf(out, "  lda #0x02\n");
-  fprintf(out, "  sta VSYNC\n");
-  fprintf(out, "  sta WSYNC\n");
-  fprintf(out, "  sta WSYNC\n");
-  fprintf(out, "  sta WSYNC\n");
-  fprintf(out, "  lda #0x00\n");
-  fprintf(out, "  sta VSYNC\n");
 
-  fprintf(out, "  lda #43\n");
-  fprintf(out, "  sta TIM64T\n");
-*/
   return 0;
 }
 
@@ -127,42 +116,20 @@ int Atari2600::atari2600_waitVblank()
 {
   fprintf(out, "  jsr wait_vblank\n");
 
-/*
-  fprintf(out, "_vblank_wait_%d:\n", label_count);
-  fprintf(out, "  lda INTIM\n");
-  fprintf(out, "  bne _vblank_wait_%d\n", label_count);
-
-  fprintf(out, "  lda #0x00\n");
-  fprintf(out, "  sta WSYNC\n");
-  fprintf(out, "  sta VBLANK\n");
-
-  label_count++;
-*/
   return 0;
 }
 
 int Atari2600::atari2600_startOverscan()
 {
   fprintf(out, "  jsr start_overscan\n");
-/*
-  fprintf(out, "  lda #35\n");
-  fprintf(out, "  sta TIM64T\n");
-  fprintf(out, "  lda #0x02\n");
-  fprintf(out, "  sta VBLANK\n");
-*/
+
   return 0;
 }
 
 int Atari2600::atari2600_waitOverscan()
 {
   fprintf(out, "  jsr wait_overscan\n");
-/*
-  fprintf(out, "_overscan_wait_%d:\n", label_count);
-  fprintf(out, "  lda INTIM\n");
-  fprintf(out, "  bne _overscan_wait_%d\n", label_count);
 
-  label_count++;
-*/
   return 0;
 }
 
@@ -1307,6 +1274,11 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  inx\n");
   fprintf(out, "  cpx #60\n");
   fprintf(out, "  bne draw_playfield\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sta WSYNC\n"); //3
+  fprintf(out, "  sta PF0\n");
+  fprintf(out, "  sta PF1\n");
+  fprintf(out, "  sta PF2\n");
   fprintf(out, "  ldx result\n");
   fprintf(out, "  rts\n\n");
 
@@ -1355,7 +1327,6 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "start_vblank:\n");
   fprintf(out, "  lda #0x02\n");
   fprintf(out, "  sta VSYNC\n");
-  fprintf(out, "  sta VBLANK\n");
   fprintf(out, "  sta WSYNC\n");
   fprintf(out, "  sta WSYNC\n");
   fprintf(out, "  sta WSYNC\n");
