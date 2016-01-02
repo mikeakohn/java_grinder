@@ -44,7 +44,6 @@ M6502_8::M6502_8() :
   need_xor_integer(0),
   need_push_array_length(0),
   need_array_read_byte(0),
-  need_push_integer_local(0),
   need_memory_read8(0),
   need_memory_write8(0)
 {
@@ -107,7 +106,6 @@ int M6502_8::add_functions()
   if(need_xor_integer) { insert_xor_integer(); }
   if(need_push_array_length) { insert_push_array_length(); }
   if(need_array_read_byte) { insert_array_read_byte(); }
-  if(need_push_integer_local) { insert_push_integer_local(); }
   if(need_memory_read8) { insert_memory_read8(); }
   if(need_memory_write8) { insert_memory_write8(); }
 
@@ -236,12 +234,12 @@ int M6502_8::push_integer(int32_t n)
 
 int M6502_8::push_integer_local(int index)
 {
-  need_push_integer_local = 1;
-  fprintf(out, "  lda #(stack_lo - %d) & 0xff\n", LOCALS(index));
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda #(stack_lo - %d) >> 8\n", LOCALS(index));
-  fprintf(out, "  sta address + 1\n");
-  fprintf(out, "  jsr push_integer_local\n");
+  fprintf(out, "; push_integer_local\n");
+  fprintf(out, "  ldy locals\n");
+  fprintf(out, "  lda stack_lo - %d,y\n", LOCALS(index));
+  PUSH_LO();
+  fprintf(out, "  lda stack_hi - %d,y\n", LOCALS(index));
+  PUSH_HI();
   stack++;
 
   return 0;
@@ -1119,15 +1117,6 @@ void M6502_8::insert_array_read_byte()
   fprintf(out, "  sta value2 + 1\n");
   fprintf(out, "  ldy #0\n");
   fprintf(out, "  lda (value2),y\n");
-  PUSH();
-  fprintf(out, "  rts\n");
-}
-
-void M6502_8::insert_push_integer_local()
-{
-  fprintf(out, "push_integer_local:\n");
-  fprintf(out, "  ldy locals\n");
-  fprintf(out, "  lda (address),y\n");
   PUSH();
   fprintf(out, "  rts\n");
 }

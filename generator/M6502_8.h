@@ -154,7 +154,6 @@ protected:
   bool need_xor_integer:1;
   bool need_push_array_length:1;
   bool need_array_read_byte:1;
-  bool need_push_integer_local:1;
 
   bool need_memory_read8:1;
   bool need_memory_write8:1;
@@ -170,7 +169,6 @@ protected:
   void insert_or_integer();
   void insert_xor_integer();
   void insert_push_array_length();
-  void insert_push_integer_local();
   void insert_array_read_byte();
 
   void insert_memory_read8();
