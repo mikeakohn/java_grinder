@@ -334,7 +334,7 @@ public class Atari2600JavaDemo
         rnd &= 127;
         if(((rnd ^ ship0_x) < ship1_y) && (shot1_y == 100))
         {
-          shot1_y = ship1_y + 2;
+          shot1_y = ship1_y + 4;
           Atari2600.setAudioControl1((byte)0b0001);
           Atari2600.setAudioVolume1((byte)15);
         }
