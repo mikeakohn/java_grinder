@@ -43,24 +43,24 @@ public class Atari2600JavaDemo
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b01111100, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b01111100, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b00111000, (byte)0b10000000,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b10000000,
+    (byte)0b11110000, (byte)0b11000000, (byte)0b11000000,
+    (byte)0b11110000, (byte)0b11000000, (byte)0b11000000,
+    (byte)0b01110000, (byte)0b00000000, (byte)0b00000000,
+    (byte)0b01110000, (byte)0b00000000, (byte)0b00000000,
+    (byte)0b01110000, (byte)0b00000000, (byte)0b00000000,
+    (byte)0b01110000, (byte)0b00111100, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00111100, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00111100, (byte)0b00111100,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00111100,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00111100,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00111100,
+    (byte)0b00010000, (byte)0b00000000, (byte)0b00111100,
+    (byte)0b00010000, (byte)0b00111100, (byte)0b00111100,
+    (byte)0b00010000, (byte)0b00111100, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b00111100, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b11111111, (byte)0b00000000,
+    (byte)0b00010000, (byte)0b11111111, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b00011110,
-    (byte)0b00010000, (byte)0b00111000, (byte)0b00111111,
-    (byte)0b00010000, (byte)0b00111000, (byte)0b00111111,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b00011110,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b00000000, (byte)0b10000000,
-    (byte)0b00010000, (byte)0b00111000, (byte)0b10000000,
-    (byte)0b00010000, (byte)0b01111100, (byte)0b00000000,
-    (byte)0b00010000, (byte)0b01111100, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
     (byte)0b00010000, (byte)0b00000000, (byte)0b00000000,
@@ -79,7 +79,7 @@ public class Atari2600JavaDemo
     (byte)0b010000,
     (byte)0b010010,
     (byte)0b010110,
-    (byte)0b010100,
+    (byte)0b010010,
     (byte)0b010001,
     (byte)0b010011,
     (byte)0b100101,
@@ -89,19 +89,19 @@ public class Atari2600JavaDemo
   public static byte offset[] =
   {
     (byte)0,
-    (byte)28,
-    (byte)54,
-    (byte)54,
+    (byte)32,
+    (byte)56,
+    (byte)32,
     (byte)16,
-    (byte)28,
+    (byte)32,
     (byte)9,
     (byte)24,
   };
 
   public static void main()
   {
-    final int left = 9;
-    final int right = 119;
+    final int left = 7;
+    final int right = 120;
     final int ship0_y = 51;
     final int ship1_y = 2;
 
@@ -114,7 +114,6 @@ public class Atari2600JavaDemo
     int frame = 0;
     int ship0_hit = 0;
     int ship1_hit = 0;
-    int pf_hit = 0;
     int score0 = 0;
     int score1 = 0;
     int mode = 0;
@@ -123,7 +122,6 @@ public class Atari2600JavaDemo
     int switches = 0;
 
     Memory.write8(0x04, (byte)0b010000);
-    Memory.write8(0x05, (byte)0b010000);
 
     // reflect playfield
     Memory.write8(0x0a, (byte)1);
@@ -168,18 +166,16 @@ public class Atari2600JavaDemo
         {
           game++;
           game &= 7;
-          Memory.write8(0x05, (byte)game_params[game]);
         }
+
+        Memory.write8(0x05, (byte)game_params[game]);
 
         // start game
         if((switches & 1) == 0)
         {
           score0 = 0;
           score1 = 0;
-          //ship0_hit = 0;
-          //ship1_hit = 0;
           shot1_offset = (3 << (game_params[game] >> 4)) >> 1;
-          //pf_hit = 0;
           Atari2600.setColorPlayfield(0x06);
           Atari2600.setColorPlayer0(0x88);
           Atari2600.setColorPlayer1(0x38);
@@ -208,15 +204,13 @@ public class Atari2600JavaDemo
           // move player
           if(Atari2600.isJoystick0Right())
           {
-            ship0_x++;
-            if(ship0_x > right)
-              ship0_x = right;
+            if(ship0_x < (right - 4))
+              ship0_x++;
           }
           else if(Atari2600.isJoystick0Left())
           {
-            ship0_x--;
-            if(ship0_x < left)
-              ship0_x = left;
+            if(ship0_x > (left + 4))
+              ship0_x--;
           }
 
           // fire shot
@@ -230,9 +224,13 @@ public class Atari2600JavaDemo
           // move enemy
           if((frame & 3) == 3)
           {
-            dir = (ship0_x - ship1_x) >> 2;
-            if((dir < 0) || (ship1_x <= right - offset[game])) 
+            dir = (ship0_x - (ship1_x + (offset[game] >> 1))) >> 2;
+            if((dir < 0) || (ship1_x <= (right - offset[game]))) 
+            {
               ship1_x += dir;
+              if(ship1_x < left)
+                ship1_x = left;
+            }
           }
         }
         else
@@ -269,7 +267,6 @@ public class Atari2600JavaDemo
         // playfield hit
         if(Atari2600.isCollisionMissile0Playfield())
         {
-          pf_hit = 11;
           shot0_y = 100;
           Atari2600.setAudioVolume0((byte)0);
         }
@@ -300,13 +297,6 @@ public class Atari2600JavaDemo
           score0++;
         }
 
-        // animate playfield if hit
-        if(pf_hit > 6)
-        {
-          Atari2600.setColorPlayfield(0x00 + pf_hit);
-          pf_hit--;
-        }
-
         if((frame & 1) == 1)
         {
           // move player shot
@@ -326,7 +316,7 @@ public class Atari2600JavaDemo
           {
             Atari2600.setAudioFrequency1((byte)(shot1_y >> 1));
             shot1_y++;
-            if(game == 3 || game > 5)
+            if(game > 2)
               shot1_y++;
             if(shot1_y > ship0_y + 4)
             {
