@@ -87,11 +87,11 @@ public class Atari2600JavaDemo
     int ship0_hit = 0;
     int ship1_hit = 0;
     int pf_hit = 0;
-    int wait = 0;
     int score0 = 0;
     int score1 = 0;
     int mode = 0;
     int dir = 0;
+    int temp = 0;
 
     // missle width
     Memory.write8(0x04, (byte)16);
@@ -121,8 +121,8 @@ public class Atari2600JavaDemo
         Atari2600.setMissile0Position((byte)0, (byte)100);
         Atari2600.setMissile1Position((byte)0, (byte)100);
         Atari2600.setColorPlayfield(0x02);
-        Atari2600.setColorPlayer0(0x08);
-        Atari2600.setColorPlayer1(0x08);
+        Atari2600.setColorPlayer0(0x8);
+        Atari2600.setColorPlayer1(0x8);
 
         ship0_x = 67;
         shot0_y = 100;
@@ -164,11 +164,7 @@ public class Atari2600JavaDemo
         Atari2600.setScore0((byte)score0);
         Atari2600.setScore1((byte)score1);
 
-        // pause after player hit
-        if(wait > 0)
-          wait--;
-
-        if(wait == 0)
+        if((ship0_hit == 0) && (ship1_hit == 0))
         {
           // move player
           if(Atari2600.isJoystick0Right())
@@ -199,27 +195,23 @@ public class Atari2600JavaDemo
             ship1_x += dir;
           }
         }
-
-        // animate players when hit
-        if(ship0_hit > 0)
+        else
         {
-          Atari2600.setColorPlayer0(0x80 + ship0_hit);
-          ship0_hit--;
-          if(ship0_hit == 0)
+          // animate players when hit
+          if(ship0_hit > 0)
           {
-            Atari2600.setColorPlayer0(0x88);
-            Atari2600.setAudioVolume1((byte)0);
+            Atari2600.setColorPlayer0(0x88 + ship0_hit);
+            ship0_hit--;
+            if(ship0_hit == 0)
+              Atari2600.setAudioVolume1((byte)0);
           }
-        }
 
-        if(ship1_hit > 0)
-        {
-          Atari2600.setColorPlayer1(0x30 + ship1_hit);
-          ship1_hit--;
-          if(ship1_hit == 0)
+          if(ship1_hit > 0)
           {
-            Atari2600.setColorPlayer1(0x38);
-            Atari2600.setAudioVolume0((byte)0);
+            Atari2600.setColorPlayer1(0x38 + ship1_hit);
+            ship1_hit--;
+            if(ship1_hit == 0)
+              Atari2600.setAudioVolume0((byte)0);
           }
         }
 
@@ -244,7 +236,7 @@ public class Atari2600JavaDemo
         // player hit
         if(Atari2600.isCollisionMissile1Player0())
         {
-          ship0_hit = 31;
+          ship0_hit = 40;
           shot0_y = 100;
           shot1_y = 100;
           Atari2600.setAudioControl1((byte)0b1000);
@@ -252,13 +244,12 @@ public class Atari2600JavaDemo
           Atari2600.setAudioVolume0((byte)0);
           Atari2600.setAudioVolume1((byte)15);
           score1++;
-          wait = 30;
         }
 
         // enemy hit
         if(Atari2600.isCollisionMissile0Player1())
         {
-          ship1_hit = 31;
+          ship1_hit = 40;
           shot0_y = 100;
           shot1_y = 100;
           Atari2600.setAudioControl0((byte)0b1000);
@@ -266,7 +257,6 @@ public class Atari2600JavaDemo
           Atari2600.setAudioVolume0((byte)15);
           Atari2600.setAudioVolume1((byte)0);
           score0++;
-          wait = 30;
         }
 
         // animate playfield if hit
@@ -321,10 +311,9 @@ public class Atari2600JavaDemo
           mode = 0;
         }
 
+        frame++;
         Atari2600.waitOverscan();
       }
-
-      frame++;
     }
   }
 }
