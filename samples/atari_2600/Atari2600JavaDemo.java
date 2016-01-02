@@ -68,7 +68,19 @@ public class Atari2600JavaDemo
 
   public static byte nothing[] =
   {
-    (byte)0b00000000
+    (byte)0
+  };
+
+  public static byte game_params[] =
+  {
+    (byte)0b0010000,
+    (byte)0b0010010,
+    (byte)0b0010110,
+    (byte)0b1010000,
+    (byte)0b1010010,
+    (byte)0b1010110,
+    (byte)0b1100101,
+    (byte)0b1110111,
   };
 
   public static void main()
@@ -91,20 +103,22 @@ public class Atari2600JavaDemo
     int score1 = 0;
     int mode = 0;
     int dir = 0;
+    int game = 0;
+    int switches = 0;
     int temp = 0;
 
-    // missle width
-    Memory.write8(0x04, (byte)16);
-    Memory.write8(0x05, (byte)16);
+    Memory.write8(0x04, (byte)0b010000);
+    Memory.write8(0x05, (byte)0b010000);
+
     // reflect playfield
     Memory.write8(0x0a, (byte)1);
 
+    // set graphics pointers
     Atari2600.setPlayer0Sprite(ship0);
     Atari2600.setPlayer1Sprite(ship1);
     Atari2600.setMissile0Sprite(shot);
     Atari2600.setMissile1Sprite(shot);
     Atari2600.setBallSprite(nothing);
-
     Atari2600.setPlayfieldData(background);
     Atari2600.setPlayfieldLength((byte)background.length);
 
@@ -112,6 +126,7 @@ public class Atari2600JavaDemo
     {
       Atari2600.clearMotionRegisters();
       Atari2600.clearCollisionLatches();
+      switches = Memory.read8(0x282);
 
       if(mode == 0)
       {
@@ -130,11 +145,21 @@ public class Atari2600JavaDemo
         shot1_y = 100;
 
         // score must be set each frame
-        Atari2600.setScore0((byte)score0);
-        Atari2600.setScore1((byte)score1);
+        Atari2600.setScore0((byte)(game + 1));
+        Atari2600.setScore1((byte)11);
 
-        // start game if reset switch active
-        if((Memory.read8(0x282) & 1) == 0)
+        // choose game type
+        if(((frame & 31) == 31) && ((switches & 2) == 0))
+        {
+          game++;
+          game &= 7;
+          temp = game_params[game];
+          Memory.write8(0x04, (byte)((temp > 63) ? 37 : 16));
+          Memory.write8(0x05, (byte)temp);
+        }
+
+        // start game
+        if((switches & 1) == 0)
         {
           score0 = 0;
           score1 = 0;
@@ -303,17 +328,18 @@ public class Atari2600JavaDemo
           Atari2600.setAudioVolume1((byte)15);
         }
 
-        // end game if max score reached
-        if(score0 >= 10 || score1 >= 10)
+        // end game if max score reached or switches pressed
+        if((score0 >= 10) || (score1 >= 10) || ((switches & 2) == 0))
         {
           Atari2600.setAudioVolume0((byte)0);
           Atari2600.setAudioVolume1((byte)0);
           mode = 0;
         }
 
-        frame++;
         Atari2600.waitOverscan();
       }
+
+      frame++;
     }
   }
 }
