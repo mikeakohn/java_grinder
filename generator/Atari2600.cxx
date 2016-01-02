@@ -1275,10 +1275,6 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  cpx #60\n");
   fprintf(out, "  bne draw_playfield\n");
   fprintf(out, "  lda #0\n");
-  fprintf(out, "  sta WSYNC\n"); //3
-  fprintf(out, "  sta PF0\n");
-  fprintf(out, "  sta PF1\n");
-  fprintf(out, "  sta PF2\n");
   fprintf(out, "  ldx result\n");
   fprintf(out, "  rts\n\n");
 
