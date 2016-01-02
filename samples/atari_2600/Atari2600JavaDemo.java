@@ -32,6 +32,7 @@ public class Atari2600JavaDemo
   {
     (byte)0b11111111,
     (byte)0b11111111,
+    (byte)0b11111111,
     (byte)0b00000000,
   };
 
@@ -320,6 +321,8 @@ public class Atari2600JavaDemo
             Atari2600.setAudioFrequency1((byte)(shot1_y >> 1));
             shot1_y++;
             if(game > 2)
+              shot1_y++;
+            if(game > 5)
               shot1_y++;
             if(shot1_y > ship0_y + 4)
             {
