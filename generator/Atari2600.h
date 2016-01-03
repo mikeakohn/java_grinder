@@ -132,12 +132,21 @@ public:
   virtual int atari2600_setScore0_B();
   virtual int atari2600_setScore1_B();
 
+  virtual int atari2600_setTitlePos_I();
+  virtual int atari2600_setTitleColor_I();
+  virtual int atari2600_drawTitleScreen();
+
 private:
+  bool need_game_draw:1;
+  bool need_title_draw:1;
+
   void print_tia_definitions();
   void print_pia_definitions();
 
-  void insert_atari_2600_functions();
-  void insert_atari_2600_variables();
+  void insert_game_draw();
+  void insert_title_draw();
+  void insert_functions();
+  void insert_variables();
 };
 
 #endif

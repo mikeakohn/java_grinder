@@ -133,6 +133,10 @@ int atari_2600(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(setScore0,_B)
   CHECK_FUNC(setScore1,_B)
 
+  CHECK_FUNC(setTitlePos,_I)
+  CHECK_FUNC(setTitleColor,_I)
+  CHECK_FUNC(drawTitleScreen,)
+
   return -1;
 }
 

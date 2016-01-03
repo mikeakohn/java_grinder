@@ -100,9 +100,6 @@ abstract public class Atari2600
   public static boolean isCollisionPlayer0Player1() { return false; }
   public static boolean isCollisionMissile0Missile1() { return false; }
 
-  public static void setScore0(byte value) { }
-  public static void setScore1(byte value) { }
-
   /** Audio sound type, 4 bit number */
   public static void setAudioControl0(byte value) { }
 
@@ -131,5 +128,12 @@ abstract public class Atari2600
   public static boolean isJoystick1Down() { return false; }
   public static boolean isJoystick1Up() { return false; }
   public static boolean isJoystick1ButtonDown() { return false; }
+
+  public static void setScore0(byte value) { }
+  public static void setScore1(byte value) { }
+
+  public static void setTitlePos(int value) { }
+  public static void setTitleColor(int value) { }
+  public static void drawTitleScreen() { }
 }
 

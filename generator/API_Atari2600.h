@@ -125,6 +125,10 @@ public:
 
   virtual int atari2600_setScore0_B() { return -1; }
   virtual int atari2600_setScore1_B() { return -1; }
+
+  virtual int atari2600_setTitlePos_I() { return -1; }
+  virtual int atari2600_setTitleColor_I() { return -1; }
+  virtual int atari2600_drawTitleScreen() { return -1; }
 };
 
 #endif

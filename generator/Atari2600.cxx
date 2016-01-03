@@ -18,12 +18,6 @@
 // http://www.alienbill.com/2600/101/docs/stella.html
 // http://problemkaputt.de/2k6specs.htm
 
-#define BANK0() \
-  fprintf(out, "  bit 0x1ff8\n")
-
-#define BANK1() \
-  fprintf(out, "  bit 0x1ff9\n")
-
 Atari2600::Atari2600()
 {
   start_org = 0xf000;
@@ -31,11 +25,17 @@ Atari2600::Atari2600()
   java_stack_hi = 0x98;
   // not used
   ram_start = 0;
+
+  need_game_draw = 0;
+  need_title_draw = 0;
 }
 
 Atari2600::~Atari2600()
 {
-  insert_atari_2600_functions();
+  if(need_game_draw) { insert_game_draw(); }
+  if(need_title_draw) { insert_title_draw(); }
+
+  insert_functions();
 
   fprintf(out, ".org 0xfffa\n");
   fprintf(out, "; NMI\n");
@@ -53,7 +53,7 @@ int Atari2600::open(const char *filename)
   print_tia_definitions();
   print_pia_definitions();
 
-  insert_atari_2600_variables();
+  insert_variables();
 
   fprintf(out, "; clear TIA\n");
   fprintf(out, "  sei\n");
@@ -616,6 +616,7 @@ int Atari2600::atari2600_setBallSprite_aB()
 
 int Atari2600::atari2600_drawScreen()
 {
+  need_game_draw = 1;
   fprintf(out, "  jsr draw\n");
 
   return 0;
@@ -1048,6 +1049,32 @@ int Atari2600::atari2600_setScore1_B()
   return 0;
 }
 
+int Atari2600::atari2600_setTitlePos_I()
+{
+  POP();
+  fprintf(out, "  sta title_pos\n");
+  stack--;
+
+  return 0;
+}
+
+int Atari2600::atari2600_setTitleColor_I()
+{
+  POP();
+  fprintf(out, "  sta title_color\n");
+  stack--;
+
+  return 0;
+}
+
+int Atari2600::atari2600_drawTitleScreen()
+{
+  need_title_draw = 1;
+  fprintf(out, "  jsr title_draw\n");
+
+  return 0;
+}
+
 void Atari2600::print_tia_definitions()
 {
   fprintf(out, "  VSYNC equ 0x00\n");
@@ -1126,7 +1153,7 @@ void Atari2600::print_pia_definitions()
   fprintf(out, "  T1024T equ 0x297\n\n");
 }
 
-void Atari2600::insert_atari_2600_functions()
+void Atari2600::insert_game_draw()
 {
   fprintf(out, "draw:\n");
   fprintf(out, "  lda #0\n");
@@ -1268,7 +1295,89 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "  lda #0\n");
   fprintf(out, "  ldx result\n");
   fprintf(out, "  rts\n\n");
+}
 
+void Atari2600::insert_title_draw()
+{
+  fprintf(out, "title_draw:\n");
+  fprintf(out, "  lda #0\n");
+//  fprintf(out, "  sta WSYNC\n");
+//  fprintf(out, "  sta HMOVE\n");
+//  fprintf(out, "  sta VBLANK\n");
+  fprintf(out, "  lda title_pos\n");
+//  fprintf(out, "  lda sine,y\n");
+  fprintf(out, "  lsr\n");
+  fprintf(out, "  lsr\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  adc #40\n");
+  fprintf(out, "  sta title_line_count\n");
+  fprintf(out, "  tax\n");
+  fprintf(out, "  ldy #16\n");
+  fprintf(out, "title_draw_wait:\n");
+  fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  dex\n");
+  fprintf(out, "  bne title_draw_wait\n");
+  fprintf(out, "  lda title_color\n");
+  fprintf(out, "  sta title_color_temp\n");
+  fprintf(out, "title_draw_start:\n");
+  fprintf(out, "  ldx #2\n");
+  fprintf(out, "title_draw_loop:\n");
+  fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  lda title_color_temp\n");
+  fprintf(out, "  sta COLUPF\n");
+  fprintf(out, "  lda pf_left0 - 1,y\n");
+  fprintf(out, "  sta PF0\n");
+  fprintf(out, "  lda pf_left1 - 1,y\n");
+  fprintf(out, "  sta PF1\n");
+  fprintf(out, "  lda pf_left2 - 1,y\n");
+  fprintf(out, "  sta PF2\n");
+  fprintf(out, "  dec title_color_temp\n");
+  fprintf(out, "  lda pf_right0 - 1,y\n");
+  fprintf(out, "  sta PF0\n");
+  fprintf(out, "  lda pf_right1 - 1,y\n");
+  fprintf(out, "  sta PF1\n");
+  fprintf(out, "  lda pf_right2 - 1,y\n");
+  fprintf(out, "  sta PF2\n");
+  fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  lda title_color_temp\n");
+  fprintf(out, "  sta COLUPF\n");
+  fprintf(out, "  lda pf_left0 - 1,y\n");
+  fprintf(out, "  sta PF0\n");
+  fprintf(out, "  lda pf_left1 - 1,y\n");
+  fprintf(out, "  sta PF1\n");
+  fprintf(out, "  lda pf_left2 - 1,y\n");
+  fprintf(out, "  sta PF2\n");
+  fprintf(out, "  nop\n");
+  fprintf(out, "  nop\n");
+  fprintf(out, "  lda pf_right0 - 1,y\n");
+  fprintf(out, "  sta PF0\n");
+  fprintf(out, "  lda pf_right1 - 1,y\n");
+  fprintf(out, "  sta PF1\n");
+  fprintf(out, "  lda pf_right2 - 1,y\n");
+  fprintf(out, "  sta PF2\n");
+  fprintf(out, "  dex\n");
+  fprintf(out, "  bne title_draw_loop\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  beq title_draw_finish\n");
+  fprintf(out, "  jmp title_draw_start\n");
+  fprintf(out, "title_draw_finish:\n");
+  fprintf(out, "  lda #127\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  sbc title_line_count\n");
+  fprintf(out, "  tax\n");
+  fprintf(out, "title_draw_finish_loop:\n");
+  fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  dex\n");
+  fprintf(out, "  bne title_draw_finish_loop\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sta PF2\n");
+  fprintf(out, "  sta PF0\n");
+  fprintf(out, "  sta PF1\n");
+  fprintf(out, "  rts\n");
+}
+
+void Atari2600::insert_functions()
+{
   // this scales 0-127 to 0-158
   // so that horizontal positions fit into a signed byte
   // x = (x * 5) / 4
@@ -1418,7 +1527,7 @@ void Atari2600::insert_atari_2600_functions()
   fprintf(out, "db 00000000b\n");
 }
 
-void Atari2600::insert_atari_2600_variables()
+void Atari2600::insert_variables()
 {
   fprintf(out, "; variables\n");
   fprintf(out, "  score0 equ 0xc0\n");
@@ -1453,6 +1562,20 @@ void Atari2600::insert_atari_2600_variables()
   fprintf(out, "  playfield_hi equ 0xd7\n");
   fprintf(out, "  playfield_line equ 0xd8\n");
   fprintf(out, "  playfield_length equ 0xd9\n");
+
+  fprintf(out, "  title_pos equ 0xda\n");
+  fprintf(out, "  title_line_count equ 0xdb\n");
+  fprintf(out, "  title_color equ 0xdc\n");
+  fprintf(out, "  title_color_temp equ 0xdd\n");
+
+  // title playfield uses the following array names:
+  // pf_left0
+  // pf_left1
+  // pf_left2
+  // pf_right0
+  // pf_right1
+  // pf_right2
+
   fprintf(out, "\n");
 }
 

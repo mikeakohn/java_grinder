@@ -232,6 +232,7 @@ int M6502_8::push_integer_local(int index)
 
 int M6502_8::push_ref_static(const char *name, int index)
 {
+  printf("push_ref_static not supported.\n");
   return -1;
 }
 
@@ -242,6 +243,7 @@ int M6502_8::push_ref_local(int index)
 
 int M6502_8::push_fake()
 {
+  printf("push_fake not supported.\n");
   return -1;
 }
 
@@ -252,11 +254,13 @@ int M6502_8::push_long(int64_t n)
 
 int M6502_8::push_float(float f)
 {
+  printf("push_float not supported.\n");
   return -1;
 }
 
 int M6502_8::push_double(double f)
 {
+  printf("push_double not supported.\n");
   return -1;
 }
 
@@ -332,16 +336,20 @@ int M6502_8::pop()
 
 int M6502_8::dup()
 {
+  printf("dup not supported.\n");
   return -1;
 }
 
 int M6502_8::dup2()
 {
+  printf("dup2 not supported.\n");
   return -1;
 }
 
 int M6502_8::swap()
 {
+  need_swap = 1;
+  fprintf(out, "  jsr swap\n");
 
   return 0;
 }
@@ -803,11 +811,13 @@ int M6502_8::get_static(const char *name, int index)
 
 int M6502_8::brk()
 {
+  printf("brk not supported.\n");
   return -1;
 }
 
 int M6502_8::new_array(uint8_t type)
 {
+  printf("new_array not supported.\n");
   return -1;
 }
 
@@ -838,6 +848,7 @@ int M6502_8::insert_array(const char *name, int32_t *data, int len, uint8_t type
 
 int M6502_8::insert_string(const char *name, uint8_t *bytes, int len)
 {
+  printf("insert_string not supported.\n");
   return -1;
 }
 
@@ -865,12 +876,13 @@ int M6502_8::array_read_byte()
 
 int M6502_8::array_read_short()
 {
+  printf("array_read_short not supported.\n");
   return -1;
 }
 
 int M6502_8::array_read_int()
 {
-  return -1;
+  return array_read_byte();
 }
 
 int M6502_8::array_read_byte(const char *name, int field_id)
