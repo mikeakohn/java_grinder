@@ -22,8 +22,9 @@ Atari2600::Atari2600()
 {
   start_org = 0xf000;
   java_stack_lo = 0x80;
-  java_stack_hi = 0x98;
-  ram_start = 0xb0;
+  java_stack_hi = 0xa0;
+  // not used
+  ram_start = 0;
 }
 
 Atari2600::~Atari2600()
@@ -61,7 +62,7 @@ int Atari2600::open(const char *filename)
   fprintf(out, "  bne _clear_tia\n");
 
   fprintf(out, "; set java stack pointer (x register)\n");
-  fprintf(out, "  ldx #23\n\n");
+  fprintf(out, "  ldx #31\n\n");
 
   return 0;
 }

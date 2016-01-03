@@ -119,19 +119,13 @@ int M6502_8::start_init()
 
 int M6502_8::insert_static_field_define(const char *name, const char *type, int index)
 {
-  fprintf(out, "%s equ ram_start + %d\n", name, (index + 1) * 2);
-
+  // do nothing, using equ instead of heap to save RAM
   return 0;
 }
 
 int M6502_8::init_heap(int field_count)
 {
-  fprintf(out, "; Set up heap and static initializers\n");
-  fprintf(out, "  lda #(ram_start + %d) & 0xff\n", (field_count + 1) * 2);
-  fprintf(out, "  sta ram_start + 0\n");
-  fprintf(out, "  lda #(ram_start + %d) >> 8\n", (field_count + 1) * 2);
-  fprintf(out, "  sta ram_start + 1\n");
-
+  // do nothing, using equ instead of heap to save RAM
   return 0;
 }
 
@@ -139,10 +133,7 @@ int M6502_8::insert_field_init_boolean(char *name, int index, int value)
 {
   value = (value == 0) ? 0 : 1;
   fprintf(out, "; insert_field_init_boolean\n");
-  fprintf(out, "  lda #%d\n", value & 0xff);
-  fprintf(out, "  sta %s + 0\n", name);
-  fprintf(out, "  lda #%d\n", value >> 8);
-  fprintf(out, "  sta %s + 1\n", name);
+  fprintf(out, "%s equ _%s\n", name, name);
 
   return 0;
 }
@@ -162,10 +153,7 @@ int M6502_8::insert_field_init_int(char *name, int index, int value)
   if (value < -32768 || value > 65535) { return -1; }
 
   fprintf(out, "; insert_field_init_short\n");
-  fprintf(out, "  lda #%d\n", value & 0xff);
-  fprintf(out, "  sta %s + 0\n", name);
-  fprintf(out, "  lda #%d\n", value >> 8);
-  fprintf(out, "  sta %s + 1\n", name);
+  fprintf(out, "%s equ _%s\n", name, name);
 
   return 0;
 }
@@ -173,10 +161,7 @@ int M6502_8::insert_field_init_int(char *name, int index, int value)
 int M6502_8::insert_field_init(char *name, int index)
 {
   fprintf(out, "; insert_field_init\n");
-  fprintf(out, "  lda #_%s & 0xff\n", name);
-  fprintf(out, "  sta %s + 0\n", name);
-  fprintf(out, "  lda #_%s >> 8\n", name);
-  fprintf(out, "  sta %s + 1\n", name);
+  fprintf(out, "%s equ _%s\n", name, name);
 
   return 0;
 }
@@ -305,10 +290,14 @@ int M6502_8::push_short(int16_t s)
 int M6502_8::push_ref(char *name)
 {
   fprintf(out, "; push_ref\n");
-  fprintf(out, "  lda %s + 0\n", name);
+  fprintf(out, "  lda #(%s & 0xff)\n", name);
   PUSH_LO();
-  fprintf(out, "  lda %s + 1\n", name);
+  fprintf(out, "  lda #(%s >> 8)\n", name);
   PUSH_HI();
+//  fprintf(out, "  lda %s + 0\n", name);
+//  PUSH_LO();
+//  fprintf(out, "  lda %s + 1\n", name);
+//  PUSH_HI();
   stack++;
 
   return 0;
