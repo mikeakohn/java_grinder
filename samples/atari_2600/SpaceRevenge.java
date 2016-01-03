@@ -348,6 +348,8 @@ public class SpaceRevenge
           Atari2600.setAudioVolume0((byte)0);
           Atari2600.setAudioVolume1((byte)0);
           mode = 0;
+
+          Atari2600.setBank((byte)0);
         }
 
         Atari2600.waitOverscan();

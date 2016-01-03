@@ -129,6 +129,9 @@ public:
   virtual int atari2600_setTitlePos_I() { return -1; }
   virtual int atari2600_setTitleColor_I() { return -1; }
   virtual int atari2600_drawTitleScreen() { return -1; }
+
+  virtual int atari2600_setBank_B() { return -1; }
+  virtual int atari2600_setBank_B(int value) { return -1; }
 };
 
 #endif

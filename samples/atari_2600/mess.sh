@@ -13,7 +13,7 @@ then
 fi
 
 mess a2600 -window \
-  -cart atari_2600_java_demo.bin \
+  -cart out.bin \
   ${extra}
 
 if [ "$1" = "avi" ]

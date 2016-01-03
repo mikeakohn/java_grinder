@@ -137,6 +137,8 @@ int atari_2600(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(setTitleColor,_I)
   CHECK_FUNC(drawTitleScreen,)
 
+  CHECK_FUNC(setBank,_B)
+
   return -1;
 }
 
@@ -161,6 +163,7 @@ int atari_2600(JavaClass *java_class, Generator *generator, char *method_name, i
   CHECK_FUNC_CONST(setAudioFrequency1,_B)
   CHECK_FUNC_CONST(setAudioVolume0,_B)
   CHECK_FUNC_CONST(setAudioVolume1,_B)
+  CHECK_FUNC_CONST(setBank,_B)
 
   return -1;
 }

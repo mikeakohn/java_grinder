@@ -939,6 +939,14 @@ int M6502_8::memory_read8_I()
   return 0;
 }
 
+int M6502_8::memory_read8_I(int address)
+{
+  //fprintf(out, "  lda 0x%04x\n", address);
+  //PUSH();
+
+  return -1;
+}
+
 int M6502_8::memory_write8_IB()
 {
   need_memory_write8 = 1;

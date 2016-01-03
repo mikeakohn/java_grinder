@@ -17,8 +17,10 @@ class API_System
 public:
   // Memory
   virtual int memory_read8_I() { return -1; }
+  virtual int memory_read8_I(int address) { return -1; }
   virtual int memory_write8_IB() { return -1; }
   virtual int memory_read16_I() { return -1; }
+  virtual int memory_read16_I(int address) { return -1; }
   virtual int memory_write16_IS() { return -1; }
   virtual int memory_allocStackBytes_I() { return -1; }
   virtual int memory_allocStackShorts_I() { return -1; }

@@ -131,6 +131,7 @@ public:
 
   // Memory API
   virtual int memory_read8_I();
+  virtual int memory_read8_I(int address);
   virtual int memory_write8_IB();
 
 protected:

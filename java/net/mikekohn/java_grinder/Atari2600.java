@@ -25,6 +25,12 @@ abstract public class Atari2600
   public static final int PLAYFIELD_SCORE_COLOR = 0x02;
   public static final int PLAYFIELD_REFLECT = 0x01;
 
+  public static final int SWITCH_RESET = 0x01;
+  public static final int SWITCH_SELECT = 0x02;
+  public static final int SWITCH_COLOR = 0x08;
+  public static final int SWITCH_DIFFICULTY_0 = 0x40;
+  public static final int SWITCH_DIFFICULTY_1 = 0x80;
+
   public static void waitHsync(int lines) { }
   public static void waitHsync() { }
   public static void startVblank() { }
@@ -135,5 +141,9 @@ abstract public class Atari2600
   public static void setTitlePos(int value) { }
   public static void setTitleColor(int value) { }
   public static void drawTitleScreen() { }
+
+  /** Change ROM bank.  Must be a constant and requires concatinating
+      more than 1 bin file together */
+  public static void setBank(byte index) { }
 }
 

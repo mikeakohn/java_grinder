@@ -18,7 +18,11 @@
 // http://www.alienbill.com/2600/101/docs/stella.html
 // http://problemkaputt.de/2k6specs.htm
 
-Atari2600::Atari2600()
+Atari2600::Atari2600() :
+  need_game_draw(0),
+  need_title_draw(0),
+  need_set_bank(0),
+  bank_index(-1)
 {
   start_org = 0xf000;
   java_stack_lo = 0x80;
@@ -26,8 +30,6 @@ Atari2600::Atari2600()
   // not used
   ram_start = 0;
 
-  need_game_draw = 0;
-  need_title_draw = 0;
 }
 
 Atari2600::~Atari2600()
@@ -36,6 +38,8 @@ Atari2600::~Atari2600()
   if(need_title_draw) { insert_title_draw(); }
 
   insert_functions();
+
+  if(need_set_bank) { insert_set_bank(); }
 
   fprintf(out, ".org 0xfffa\n");
   fprintf(out, "; NMI\n");
@@ -1075,6 +1079,30 @@ int Atari2600::atari2600_drawTitleScreen()
   return 0;
 }
 
+int Atari2600::atari2600_setBank_B()
+{
+  printf("Error: setBank(byte index) can only take a constant parameter\n");
+
+  return -1;
+}
+
+int Atari2600::atari2600_setBank_B(int value)
+{
+  need_set_bank = true;
+
+  if (bank_index == -1) { bank_index = value; }
+
+  if (bank_index != value)
+  {
+    printf("Error: setBank(byte index) can only be used with 1 unique constant index\n");
+    return -1;
+  }
+
+  fprintf(out, "  jmp _bank_switch\n");
+
+  return 0;
+}
+
 void Atari2600::print_tia_definitions()
 {
   fprintf(out, "  VSYNC equ 0x00\n");
@@ -1374,6 +1402,24 @@ void Atari2600::insert_title_draw()
   fprintf(out, "  sta PF0\n");
   fprintf(out, "  sta PF1\n");
   fprintf(out, "  rts\n");
+}
+
+void Atari2600::insert_set_bank()
+{
+  fprintf(out, ".org 0xfff2\n");
+  fprintf(out, "_bank_switch:\n");
+
+  if (bank_index == 0)
+  {
+    fprintf(out, "  lda 0x1ff8\n");
+  }
+    else
+  if (bank_index == 1)
+  {
+    fprintf(out, "  lda 0x1ff9\n");
+  }
+
+  fprintf(out, "  jmp reset\n");
 }
 
 void Atari2600::insert_functions()

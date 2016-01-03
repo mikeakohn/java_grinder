@@ -35,12 +35,21 @@ public class SpaceRevengeTitle
 
   public static void main()
   {
+    int switches;
+
     Atari2600.setTitlePos(0);
     Atari2600.setTitleColor(0x2e);
   
     while(true)
     {
       Atari2600.startVblank();
+
+      switches = Memory.read8(0x282);
+
+      if ((switches & Atari2600.SWITCH_RESET) == 0)
+      {
+        Atari2600.setBank((byte)1);
+      }
 
       // set horizontal positions
       Atari2600.setPlayer0Position((byte)0, (byte)100);

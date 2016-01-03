@@ -136,15 +136,21 @@ public:
   virtual int atari2600_setTitleColor_I();
   virtual int atari2600_drawTitleScreen();
 
+  virtual int atari2600_setBank_B();
+  virtual int atari2600_setBank_B(int value);
+
 private:
   bool need_game_draw:1;
   bool need_title_draw:1;
+  bool need_set_bank:1;
+  int bank_index;
 
   void print_tia_definitions();
   void print_pia_definitions();
 
   void insert_game_draw();
   void insert_title_draw();
+  void insert_set_bank();
   void insert_functions();
   void insert_variables();
 };

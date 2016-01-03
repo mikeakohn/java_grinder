@@ -23,7 +23,7 @@
     return generator->memory_##funct##sig(); \
   }
 
-#define CHECK_FUNC_CONST_1(funct,sig) \
+#define CHECK_FUNC_CONST(funct,sig) \
   if (strcmp(#funct#sig, function) == 0) \
   { \
     return generator->memory_##funct##sig(const_val); \
@@ -44,6 +44,9 @@ int memory(JavaClass *java_class, Generator *generator, char *function)
 
 int memory(JavaClass *java_class, Generator *generator, char *function, int const_val)
 {
+  CHECK_FUNC_CONST(read8,_I)
+  CHECK_FUNC_CONST(read16,_I)
+
   return -1;
 }
 
