@@ -5,32 +5,38 @@ public class SpaceRevengeTitle
 {
   public static byte pf_left0[] =
   {
-(byte)0x00, (byte)0xc0, (byte)0xe0, (byte)0xe0, (byte)0x60, (byte)0x00, (byte)0x00, (byte)0xe0, (byte)0x00, (byte)0xe0, (byte)0xe0, (byte)0xe0, (byte)0x00, (byte)0xe0, (byte)0x60, (byte)0xc0
+    0, 96, 96, 96, -32, 96, 96, -32, 
+    0, -32, -32, -32, 0, -64, 96, -64, 
   };
 
   public static byte pf_left1[] =
   {
-    (byte)0x00, (byte)0xe0, (byte)0xf1, (byte)0xf1, (byte)0x31, (byte)0x31, (byte)0x31, (byte)0xfd, (byte)0x00, (byte)0xcc, (byte)0xec, (byte)0xec, (byte)0x6c, (byte)0xcf, (byte)0x0c, (byte)0xef
+    0, -34, -34, -34, -104, -34, -40, -98, 
+    0, -52, -20, -20, 108, -49, 12, -17, 
   };
 
   public static byte pf_left2[] =
   {
-    (byte)0x00, (byte)0x3f, (byte)0x7f, (byte)0x7f, (byte)0x61, (byte)0x61, (byte)0x61, (byte)0x61, (byte)0x00, (byte)0x30, (byte)0x30, (byte)0x30, (byte)0x30, (byte)0xf3, (byte)0x66, (byte)0xc3
+    0, -60, -50, -33, -37, -37, -37, -37, 
+    0, 48, 48, 48, 48, -13, 102, -61, 
   };
 
   public static byte pf_right0[] =
   {
-    (byte)0x00, (byte)0x30, (byte)0x30, (byte)0x30, (byte)0xb0, (byte)0xf0, (byte)0xf0, (byte)0xf0, (byte)0x00, (byte)0xc0, (byte)0xc0, (byte)0xc0, (byte)0xc0, (byte)0xf0, (byte)0x60, (byte)0x30
+    0, -80, -80, -80, -128, -80, -128, -80, 
+    0, -64, -64, -64, -64, -16, 96, 48, 
   };
 
   public static byte pf_right1[] =
   {
-    (byte)0x00, (byte)0x3d, (byte)0x7d, (byte)0xfd, (byte)0xed, (byte)0xcd, (byte)0x8d, (byte)0x0d, (byte)0x00, (byte)0x1f, (byte)0x3f, (byte)0x7f, (byte)0x70, (byte)0x60, (byte)0x30, (byte)0x1f
+    0, 51, 119, 118, 86, 86, -41, -109, 
+    0, 15, 63, 127, 112, 96, 48, 31, 
   };
 
   public static byte pf_right2[] =
   {
-    (byte)0x00, (byte)0x71, (byte)0x79, (byte)0x3d, (byte)0x1f, (byte)0x1f, (byte)0x39, (byte)0x71, (byte)0x00, (byte)0x7e, (byte)0x7e, (byte)0x7e, (byte)0x06, (byte)0x7e, (byte)0x06, (byte)0x7e
+    0, 121, 123, 122, 27, 120, 27, 121, 
+    0, 126, 126, 126, 6, 126, 6, 126, 
   };
 
   public static void main()
