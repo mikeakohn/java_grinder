@@ -1034,7 +1034,7 @@ int Atari2600::atari2600_isJoystick1ButtonDown()
 
 int Atari2600::atari2600_getSwitches()
 {
-  fprintf(out, "; getSwitches_B\n");
+  fprintf(out, "; getSwitches\n");
   fprintf(out, "  lda SWCHB\n");
   PUSH();
   stack++;
