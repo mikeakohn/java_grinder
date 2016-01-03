@@ -29,7 +29,6 @@ Atari2600::Atari2600() :
   java_stack_hi = 0x98;
   // not used
   ram_start = 0;
-
 }
 
 Atari2600::~Atari2600()
@@ -1032,6 +1031,76 @@ int Atari2600::atari2600_isJoystick1ButtonDown()
 
   return 0;
 }
+
+int Atari2600::atari2600_getSwitches()
+{
+  fprintf(out, "; getSwitches_B\n");
+  fprintf(out, "  lda SWCHB\n");
+  PUSH();
+  stack++;
+
+  return 0;
+}
+
+int Atari2600::atari2600_isSwitchResetDown()
+{
+  fprintf(out, "; isSwitchResetDown\n");
+  fprintf(out, "  lda SWCHB\n");
+  fprintf(out, "  and #0x01\n");
+  fprintf(out, "  eor #0x01\n");
+  PUSH();
+  stack++;
+
+  return 0;
+}
+
+int Atari2600::atari2600_isSwitchSelectDown()
+{
+  fprintf(out, "; isSwitchSelectDown\n");
+  fprintf(out, "  lda SWCHB\n");
+  fprintf(out, "  and #0x02\n");
+  fprintf(out, "  eor #0x02\n");
+  PUSH();
+  stack++;
+
+  return 0;
+}
+
+int Atari2600::atari2600_isSwitchColorSet()
+{
+  fprintf(out, "; isSwitchColorSet\n");
+  fprintf(out, "  lda SWCHB\n");
+  fprintf(out, "  and #0x04\n");
+  PUSH();
+  stack++;
+
+  return 0;
+}
+
+int Atari2600::atari2600_isSwitchDifficultyP0Down()
+{
+  fprintf(out, "; isSwitchDifficultyP0Down\n");
+  fprintf(out, "  lda SWCHB\n");
+  fprintf(out, "  and #0x40\n");
+  fprintf(out, "  eor #0x40\n");
+  PUSH();
+  stack++;
+
+  return 0;
+}
+
+int Atari2600::atari2600_isSwitchDifficultyP1Down()
+{
+  fprintf(out, "; isSwitchDifficultyP1Down\n");
+  fprintf(out, "  lda SWCHB\n");
+  fprintf(out, "  and #0x80\n");
+  fprintf(out, "  eor #0x80\n");
+  PUSH();
+  stack++;
+
+  return 0;
+}
+
 
 int Atari2600::atari2600_setScore0_B()
 {

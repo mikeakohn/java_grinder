@@ -140,7 +140,7 @@ public class SpaceRevenge
     {
       Atari2600.clearMotionRegisters();
       Atari2600.clearCollisionLatches();
-      switches = Memory.read8(0x282);
+      switches = Atari2600.getSwitches();
 
       if(mode == 0)
       {

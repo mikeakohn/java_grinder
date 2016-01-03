@@ -129,6 +129,13 @@ public:
   virtual int atari2600_isJoystick1Up();
   virtual int atari2600_isJoystick1ButtonDown();
 
+  virtual int atari2600_getSwitches();
+  virtual int atari2600_isSwitchResetDown();
+  virtual int atari2600_isSwitchSelectDown();
+  virtual int atari2600_isSwitchColorSet();
+  virtual int atari2600_isSwitchDifficultyP0Down();
+  virtual int atari2600_isSwitchDifficultyP1Down();
+
   virtual int atari2600_setScore0_B();
   virtual int atari2600_setScore1_B();
 

@@ -130,6 +130,13 @@ int atari_2600(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(isJoystick1Up,)
   CHECK_FUNC(isJoystick1ButtonDown,)
 
+  CHECK_FUNC(getSwitches,)
+  CHECK_FUNC(isSwitchResetDown,)
+  CHECK_FUNC(isSwitchSelectDown,)
+  CHECK_FUNC(isSwitchColorSet,)
+  CHECK_FUNC(isSwitchDifficultyP0Down,)
+  CHECK_FUNC(isSwitchDifficultyP1Down,)
+
   CHECK_FUNC(setScore0,_B)
   CHECK_FUNC(setScore1,_B)
 

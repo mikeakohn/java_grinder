@@ -123,6 +123,13 @@ public:
   virtual int atari2600_isJoystick1Up() { return -1; }
   virtual int atari2600_isJoystick1ButtonDown() { return -1; }
 
+  virtual int atari2600_getSwitches() { return -1; }
+  virtual int atari2600_isSwitchResetDown() { return -1; }
+  virtual int atari2600_isSwitchSelectDown() { return -1; }
+  virtual int atari2600_isSwitchColorSet() { return -1; }
+  virtual int atari2600_isSwitchDifficultyP0Down() { return -1; }
+  virtual int atari2600_isSwitchDifficultyP1Down() { return -1; }
+
   virtual int atari2600_setScore0_B() { return -1; }
   virtual int atari2600_setScore1_B() { return -1; }
 

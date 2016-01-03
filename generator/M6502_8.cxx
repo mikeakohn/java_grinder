@@ -941,10 +941,11 @@ int M6502_8::memory_read8_I()
 
 int M6502_8::memory_read8_I(int address)
 {
-  //fprintf(out, "  lda 0x%04x\n", address);
-  //PUSH();
+  fprintf(out, "  lda 0x%04x\n", address);
+  PUSH();
+  stack++;
 
-  return -1;
+  return 0;
 }
 
 int M6502_8::memory_write8_IB()

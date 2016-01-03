@@ -135,6 +135,13 @@ abstract public class Atari2600
   public static boolean isJoystick1Up() { return false; }
   public static boolean isJoystick1ButtonDown() { return false; }
 
+  public static byte getSwitches() { return -1; }
+  public static boolean isSwitchResetDown() { return false; }
+  public static boolean isSwitchSelectDown() { return false; }
+  public static boolean isSwitchColorSet() { return false; }
+  public static boolean isSwitchDifficultyP0Down() { return false; }
+  public static boolean isSwitchDifficultyP1Down() { return false; }
+
   public static void setScore0(byte value) { }
   public static void setScore1(byte value) { }
 
