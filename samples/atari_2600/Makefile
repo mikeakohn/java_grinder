@@ -1,7 +1,9 @@
 
-default: Atari2600JavaDemo.class
+default: Atari2600JavaDemo.class SpaceRevenge.class SpaceRevengeTitle.class
 
-grind: Atari2600JavaDemo.class
+grind: demo space_revenge space_revenge_title
+
+demo:
 	../../java_grinder Atari2600JavaDemo.class atari_2600_java_demo.asm atari2600
 	naken_asm -I ~ -l -b -o atari_2600_java_demo.bin atari_2600_java_demo.asm
 
@@ -17,6 +19,7 @@ space_revenge_title: SpaceRevengeTitle.class
 	javac -classpath ../../build/JavaGrinder.jar:. $*.java
 
 clean:
-	@rm -f *.asm *.class *.bin *.lst
+	@rm -f *.asm *.class *.bin *.lst *.mp4
+	@rm -rf snap cfg
 	@echo "Clean!"
 
