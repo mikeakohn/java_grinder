@@ -13,7 +13,7 @@ then
 fi
 
 mess a2600 -window \
-  -cart out.bin \
+  -cart space_revenge.bin \
   ${extra}
 
 if [ "$1" = "avi" ]
