@@ -44,8 +44,18 @@ Atari2600::~Atari2600()
   fprintf(out, ".org 0xfffa\n");
   fprintf(out, "; NMI\n");
   fprintf(out, "dw reset\n");
-  fprintf(out, "; RESET\n");
-  fprintf(out, "dw reset\n");
+
+  if (bank_index != 0)
+  {
+    fprintf(out, "; RESET\n");
+    fprintf(out, "dw reset\n");
+  }
+    else
+  {
+    fprintf(out, "; RESET\n");
+    fprintf(out, "dw _bank_switch\n");
+  }
+
   fprintf(out, "; IRQ\n");
   fprintf(out, "dw reset\n");
 }
