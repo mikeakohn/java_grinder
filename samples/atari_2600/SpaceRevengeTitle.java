@@ -41,7 +41,7 @@ public class SpaceRevengeTitle
 
   public static void main()
   {
-    int switches;
+    //int switches;
 
     Atari2600.setTitlePos(0);
     Atari2600.setTitleColor(0x2e);
@@ -50,9 +50,10 @@ public class SpaceRevengeTitle
     {
       Atari2600.startVblank();
 
-      switches = Memory.read8(0x282);
+      //switches = Memory.read8(0x282);
 
-      if ((switches & Atari2600.SWITCH_RESET) == 0)
+      //if ((switches & Atari2600.SWITCH_RESET) == 0)
+      if (Atari2600.isJoystick0ButtonDown())
       {
         Atari2600.setBank((byte)1);
       }

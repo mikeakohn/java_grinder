@@ -1,8 +1,10 @@
 
 default: Atari2600JavaDemo.class SpaceRevenge.class SpaceRevengeTitle.class
-	cat space_revenge_title.bin space_revenge.bin > out.bin
 
 grind: demo space_revenge space_revenge_title
+
+out.bin: grind
+	cat space_revenge_title.bin space_revenge.bin > out.bin
 
 demo:
 	../../java_grinder Atari2600JavaDemo.class atari_2600_java_demo.asm atari2600
