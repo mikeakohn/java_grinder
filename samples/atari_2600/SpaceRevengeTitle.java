@@ -30,7 +30,7 @@ public class SpaceRevengeTitle
   public static byte pf_right1[] =
   {
     0, 51, 119, 118, 86, 86, -41, -109, 
-    0, 15, 63, 127, 112, 96, 48, 31, 
+    0, 31, 63, 127, 112, 96, 48, 31, 
   };
 
   public static byte pf_right2[] =

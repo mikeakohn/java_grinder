@@ -10,7 +10,7 @@ static const char *graphics =
   "     xx xx      xx    xx xxx     xx     "
   " xxxxxx xx      xx    xx xxxxxxx xxxxxx "
   " xxxxxx xx      xx    xx  xxxxxx xxxxxx "
-  " xxxxx  xx      xx    xx    xxxx xxxxxx "
+  " xxxxx  xx      xx    xx   xxxxx xxxxxx "
   "                                        "
   " xxxx  xxxx xx xx xxxx xx  x  xxx  xxxx "
   " xx xx xx   xx xx xx   xxx x xxxxx xx   "
