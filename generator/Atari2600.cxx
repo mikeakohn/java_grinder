@@ -18,11 +18,17 @@
 // http://www.alienbill.com/2600/101/docs/stella.html
 // http://problemkaputt.de/2k6specs.htm
 
+#define BANK0() \
+  fprintf(out, "  bit 0x1ff8\n")
+
+#define BANK1() \
+  fprintf(out, "  bit 0x1ff9\n")
+
 Atari2600::Atari2600()
 {
   start_org = 0xf000;
   java_stack_lo = 0x80;
-  java_stack_hi = 0xa0;
+  java_stack_hi = 0x98;
   // not used
   ram_start = 0;
 }
@@ -62,7 +68,7 @@ int Atari2600::open(const char *filename)
   fprintf(out, "  bne _clear_tia\n");
 
   fprintf(out, "; set java stack pointer (x register)\n");
-  fprintf(out, "  ldx #31\n\n");
+  fprintf(out, "  ldx #23\n\n");
 
   return 0;
 }
@@ -1415,38 +1421,38 @@ void Atari2600::insert_atari_2600_functions()
 void Atari2600::insert_atari_2600_variables()
 {
   fprintf(out, "; variables\n");
-  fprintf(out, "  score0 equ 0xcc\n");
-  fprintf(out, "  score1 equ 0xce\n");
+  fprintf(out, "  score0 equ 0xc0\n");
+  fprintf(out, "  score1 equ 0xc1\n");
 
-  fprintf(out, "  player0_y equ 0xd1\n");
-  fprintf(out, "  player0_line equ 0xd2\n");
-  fprintf(out, "  player0_sprite equ 0xd3\n");
-  fprintf(out, "  player0_sprite_hi equ 0xd4\n");
+  fprintf(out, "  player0_y equ 0xc2\n");
+  fprintf(out, "  player0_line equ 0xc3\n");
+  fprintf(out, "  player0_sprite equ 0xc4\n");
+  fprintf(out, "  player0_sprite_hi equ 0xc5\n");
 
-  fprintf(out, "  player1_y equ 0xd5\n");
-  fprintf(out, "  player1_line equ 0xd6\n");
-  fprintf(out, "  player1_sprite equ 0xd7\n");
-  fprintf(out, "  player1_sprite_hi equ 0xd8\n");
+  fprintf(out, "  player1_y equ 0xc6\n");
+  fprintf(out, "  player1_line equ 0xc7\n");
+  fprintf(out, "  player1_sprite equ 0xc8\n");
+  fprintf(out, "  player1_sprite_hi equ 0xc9\n");
 
-  fprintf(out, "  missile0_y equ 0xd9\n");
-  fprintf(out, "  missile0_line equ 0xda\n");
-  fprintf(out, "  missile0_sprite equ 0xdb\n");
-  fprintf(out, "  missile0_sprite_hi equ 0xdc\n");
+  fprintf(out, "  missile0_y equ 0xca\n");
+  fprintf(out, "  missile0_line equ 0xcb\n");
+  fprintf(out, "  missile0_sprite equ 0xcc\n");
+  fprintf(out, "  missile0_sprite_hi equ 0xcd\n");
 
-  fprintf(out, "  missile1_y equ 0xdd\n");
-  fprintf(out, "  missile1_line equ 0xde\n");
-  fprintf(out, "  missile1_sprite equ 0xdf\n");
-  fprintf(out, "  missile1_sprite_hi equ 0xf0\n");
+  fprintf(out, "  missile1_y equ 0xce\n");
+  fprintf(out, "  missile1_line equ 0xcf\n");
+  fprintf(out, "  missile1_sprite equ 0xd0\n");
+  fprintf(out, "  missile1_sprite_hi equ 0xd1\n");
 
-  fprintf(out, "  ball_y equ 0xf1\n");
-  fprintf(out, "  ball_line equ 0xf2\n");
-  fprintf(out, "  ball_sprite equ 0xf3\n");
-  fprintf(out, "  ball_sprite_hi equ 0xf4\n");
+  fprintf(out, "  ball_y equ 0xd2\n");
+  fprintf(out, "  ball_line equ 0xd3\n");
+  fprintf(out, "  ball_sprite equ 0xd4\n");
+  fprintf(out, "  ball_sprite_hi equ 0xd5\n");
 
-  fprintf(out, "  playfield equ 0xf5\n");
-  fprintf(out, "  playfield_hi equ 0xf6\n");
-  fprintf(out, "  playfield_line equ 0xf7\n");
-  fprintf(out, "  playfield_length equ 0xf8\n");
+  fprintf(out, "  playfield equ 0xd6\n");
+  fprintf(out, "  playfield_hi equ 0xd7\n");
+  fprintf(out, "  playfield_line equ 0xd8\n");
+  fprintf(out, "  playfield_length equ 0xd9\n");
   fprintf(out, "\n");
 }
 
