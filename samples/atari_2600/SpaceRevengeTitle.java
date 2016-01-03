@@ -50,6 +50,11 @@ public class SpaceRevengeTitle
 
       if (Atari2600.isSwitchResetDown())
       {
+        while(Atari2600.isSwitchResetDown())
+        {
+          // wait for release
+        }
+
         Atari2600.setBank((byte)1);
       }
 
