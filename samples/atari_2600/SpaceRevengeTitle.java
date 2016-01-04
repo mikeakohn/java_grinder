@@ -86,7 +86,7 @@ public class SpaceRevengeTitle
     while(true)
     {
       Atari2600.startVblank();
-      Atari2600.setTitleColor(color);
+      Atari2600.setTitleColor((byte)color);
 
       if (Atari2600.isSwitchResetDown())
       {
@@ -119,8 +119,8 @@ public class SpaceRevengeTitle
         if(temp1 != 0)
         {
           color += 16;
-          if(color > 127)
-            color = 48;
+//          if(color > 255)
+//            color = 48;
         }
 
         Atari2600.setAudioFrequency0((byte)temp0);
