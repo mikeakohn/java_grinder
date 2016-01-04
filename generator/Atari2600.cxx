@@ -1408,11 +1408,8 @@ void Atari2600::insert_title_draw()
 {
   fprintf(out, "title_draw:\n");
   fprintf(out, "  lda #0\n");
-//  fprintf(out, "  sta WSYNC\n");
-//  fprintf(out, "  sta HMOVE\n");
-//  fprintf(out, "  sta VBLANK\n");
   fprintf(out, "  lda title_pos\n");
-//  fprintf(out, "  lda sine,y\n");
+  fprintf(out, "  stx result\n");
   fprintf(out, "  lsr\n");
   fprintf(out, "  lsr\n");
   fprintf(out, "  clc\n");
@@ -1480,6 +1477,7 @@ void Atari2600::insert_title_draw()
   fprintf(out, "  sta PF2\n");
   fprintf(out, "  sta PF0\n");
   fprintf(out, "  sta PF1\n");
+  fprintf(out, "  ldx result\n");
   fprintf(out, "  rts\n");
 }
 
