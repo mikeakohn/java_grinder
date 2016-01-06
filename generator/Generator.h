@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include <vector>
+#include <map>
 
 #include "API_APPLEIIGS.h"
 #include "API_Atari2600.h"
@@ -152,7 +152,7 @@ protected:
   FILE *out;
   int label_count;
   int instruction_count;
-  std::vector<uint32_t> constants_pool;
+  std::map<uint32_t,int> constants_pool;
 };
 
 enum

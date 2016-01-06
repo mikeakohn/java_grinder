@@ -153,45 +153,55 @@ int Generator::insert_dc32(const char *name, int32_t *data, int len, uint8_t len
   return 0;
 }
 
-int Generator::get_constant(uint32_t constant)
+int Generator::get_constant(uint32_t value)
 {
-  std::vector<uint32_t>::iterator it;
-  int n = 0;
+  std::map<uint32_t,int>::iterator it;
 
-  for (it = constants_pool.begin(); it != constants_pool.end(); it++)
+  int index;
+
+  it = constants_pool.find(value);
+
+  if (it != constants_pool.end())
   {
-    if (*it == constant) { return n; }
-    n++;
+    return it->second;
   }
 
-  if (constants_pool.size() < 16738)
+  if (constants_pool.size() < 8192)
   {
-    constants_pool.push_back(constant);
+    index = constants_pool.size();
 
-    return constants_pool.size() - 1;
+    constants_pool[value] = index;
+
+    return index;
   }
 
-  printf("Error: Constant pool exhausted.\n");
+  //printf("Error: Constant pool exhausted.\n");
 
-  return 0;
+  return -1;
 }
 
 void Generator::insert_constants_pool()
 {
-  std::vector<uint32_t>::iterator it;
-  int n = 0;
+  uint32_t constants_ordered[8192];
+  std::map<uint32_t,int>::iterator it;
+  int length = constants_pool.size();
+  int n;
 
   fprintf(out, "_constant_pool:\n");
 
   for (it = constants_pool.begin(); it != constants_pool.end(); it++)
   {
+    constants_ordered[it->second] = it->first;
+  }
+
+  for (n = 0; n < length; n++)
+  {
     if ((n % 8) == 0) { fprintf(out, "  dc32"); }
     else { fprintf(out, ","); }
 
-    fprintf(out, " 0x%04x", *it);
+    fprintf(out, " 0x%04x", constants_ordered[n]);
 
-    n++;
-    if ((n % 8) == 0) { fprintf(out, "\n"); }
+    if (((n + 1) % 8) == 0) { fprintf(out, "\n"); }
   }
 
   fprintf(out, "\n\n");

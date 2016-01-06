@@ -157,25 +157,53 @@ void MIPS32::method_end(int local_count)
 
 int MIPS32::push_integer(int32_t n)
 {
-#if 0
-  if (n > 0x7fffffff || n < 0x80000000)
-  {
-    printf("Error: literal value %d bigger than signed 32 bit.\n", n);
-    return -1;
-  }
-#endif
+  uint32_t value = (uint32_t)n;
 
   fprintf(out, "  ; push_integer(%d)\n", n);
 
-  if (reg < reg_max)
+  if (value == 0 || value > 0xffff0000)
   {
-    fprintf(out, "  li $t%d, %d\n", reg, n);
-    reg++;
+    if (reg < reg_max)
+    {
+      fprintf(out, "  lui $t%d, 0x%04x\n", reg, value >> 16);
+      reg++;
+    }
+      else
+    {
+      fprintf(out, "  lui $t8, 0x%04x\n", value >> 16);
+      STACK_PUSH(8)
+    }
+
+    return 0;
+  }
+
+  int index = get_constant(value);
+
+  if (index == -1)
+  {
+    if (reg < reg_max)
+    {
+      fprintf(out, "  li $t%d, 0x%04x\n", reg, value);
+      reg++;
+    }
+      else
+    {
+      fprintf(out, "  li $t8, 0x%04x\n", value);
+      STACK_PUSH(8)
+    }
   }
     else
   {
-    fprintf(out, "  li $t8, %d\n", n);
-    STACK_PUSH(8)
+    if (reg < reg_max)
+    {
+      fprintf(out, "  lw $t%d, 0x%04x($s0)\n", reg, index * 4);
+      reg++;
+    }
+      else
+    {
+      fprintf(out, "  lw $t8, 0x%04x($s0)\n", index * 4);
+      STACK_PUSH(8)
+    }
   }
 
   return 0;
