@@ -39,7 +39,7 @@ int main()
 
     for(x = 3; x >= 0; x--)
     {
-      if(graphics[x + 40 * (15 - y)] != ' ')
+      if(graphics[x + 40 * y] != ' ')
         val |= 1;
       val <<= 1;
     }
@@ -63,7 +63,7 @@ int main()
 
     for(x = 4; x < 12; x++)
     {
-      if(graphics[x + 40 * (15 - y)] != ' ')
+      if(graphics[x + 40 * y] != ' ')
         val |= 1;
       val <<= 1;
     }
@@ -88,7 +88,7 @@ int main()
 
     for(x = 19; x >= 12; x--)
     {
-      if(graphics[x + 40 * (15 - y)] != ' ')
+      if(graphics[x + 40 * y] != ' ')
         val |= 1;
       val <<= 1;
     }
@@ -113,7 +113,7 @@ int main()
 
     for(x = 23; x >= 20; x--)
     {
-      if(graphics[x + 40 * (15 - y)] != ' ')
+      if(graphics[x + 40 * y] != ' ')
         val |= 1;
       val <<= 1;
     }
@@ -137,7 +137,7 @@ int main()
 
     for(x = 24; x < 32; x++)
     {
-      if(graphics[x + 40 * (15 - y)] != ' ')
+      if(graphics[x + 40 * y] != ' ')
         val |= 1;
       val <<= 1;
     }
@@ -162,7 +162,7 @@ int main()
 
     for(x = 39; x >= 32; x--)
     {
-      if(graphics[x + 40 * (15 - y)] != ' ')
+      if(graphics[x + 40 * y] != ' ')
         val |= 1;
       val <<= 1;
     }
