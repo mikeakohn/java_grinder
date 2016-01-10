@@ -1407,43 +1407,35 @@ void Atari2600::insert_game_draw()
 void Atari2600::insert_title_draw()
 {
   fprintf(out, "title_draw:\n");
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  lda title_pos\n");
   fprintf(out, "  stx result\n");
-  fprintf(out, "  lsr\n");
-  fprintf(out, "  lsr\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sta PF0\n");
+  fprintf(out, "  sta PF1\n");
+  fprintf(out, "  sta PF2\n");
+  fprintf(out, "  sta ENAM0\n");
+  fprintf(out, "  sta ENAM1\n");
+  fprintf(out, "  sta ENABL\n");
+  fprintf(out, "  sta GRP0\n");
+  fprintf(out, "  sta GRP1\n");
+  fprintf(out, "  sta player0_line\n");
+  fprintf(out, "  sta player1_line\n");
+  fprintf(out, "  lda #1\n");
+  fprintf(out, "  sta VDELP0\n");
   fprintf(out, "  clc\n");
-  fprintf(out, "  adc #40\n");
-  fprintf(out, "  sta title_line_count\n");
-  fprintf(out, "  tax\n");
-  fprintf(out, "  ldy #16\n");
+  fprintf(out, "  lda title_color\n");
+  fprintf(out, "  pha\n");
   fprintf(out, "title_draw_wait:\n");
   fprintf(out, "  sta WSYNC\n");
-  fprintf(out, "  dex\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  cpy title_pos\n");
   fprintf(out, "  bne title_draw_wait\n");
-  fprintf(out, "  lda title_color\n");
-  fprintf(out, "  sta title_color_temp\n");
-  fprintf(out, "title_draw_start:\n");
-  fprintf(out, "  ldx #2\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "title_draw_loop2:\n");
+  fprintf(out, "  ldx #3\n");
   fprintf(out, "title_draw_loop:\n");
   fprintf(out, "  sta WSYNC\n");
-  fprintf(out, "  lda title_color_temp\n");
-  fprintf(out, "  sta COLUPF\n");
-  fprintf(out, "  lda pf_left0 - 1,y\n");
-  fprintf(out, "  sta PF0\n");
-  fprintf(out, "  lda pf_left1 - 1,y\n");
-  fprintf(out, "  sta PF1\n");
-  fprintf(out, "  lda pf_left2 - 1,y\n");
-  fprintf(out, "  sta PF2\n");
-  fprintf(out, "  dec title_color_temp\n");
-  fprintf(out, "  lda pf_right0 - 1,y\n");
-  fprintf(out, "  sta PF0\n");
-  fprintf(out, "  lda pf_right1 - 1,y\n");
-  fprintf(out, "  sta PF1\n");
-  fprintf(out, "  lda pf_right2 - 1,y\n");
-  fprintf(out, "  sta PF2\n");
-  fprintf(out, "  sta WSYNC\n");
-  fprintf(out, "  lda title_color_temp\n");
+  fprintf(out, "  lda title_color\n");
+  fprintf(out, "  asl\n");
   fprintf(out, "  sta COLUPF\n");
   fprintf(out, "  lda pf_left0 - 1,y\n");
   fprintf(out, "  sta PF0\n");
@@ -1461,22 +1453,55 @@ void Atari2600::insert_title_draw()
   fprintf(out, "  sta PF2\n");
   fprintf(out, "  dex\n");
   fprintf(out, "  bne title_draw_loop\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  beq title_draw_finish\n");
-  fprintf(out, "  jmp title_draw_start\n");
-  fprintf(out, "title_draw_finish:\n");
-  fprintf(out, "  lda #127\n");
-  fprintf(out, "  sec\n");
-  fprintf(out, "  sbc title_line_count\n");
-  fprintf(out, "  tax\n");
-  fprintf(out, "title_draw_finish_loop:\n");
-  fprintf(out, "  sta WSYNC\n");
-  fprintf(out, "  dex\n");
-  fprintf(out, "  bne title_draw_finish_loop\n");
+  fprintf(out, "  dec title_color\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  cpy #16\n");
+  fprintf(out, "  bne title_draw_loop2\n");
+  fprintf(out, "  ldx #0\n");
   fprintf(out, "  lda #0\n");
-  fprintf(out, "  sta PF2\n");
   fprintf(out, "  sta PF0\n");
   fprintf(out, "  sta PF1\n");
+  fprintf(out, "  sta PF2\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda title_pos\n");
+  fprintf(out, "  adc #48\n");
+  fprintf(out, "  lsr\n");
+  fprintf(out, "  sta value1\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  lda #96\n");
+  fprintf(out, "  sbc value1\n");
+  fprintf(out, "  sta value1\n");
+//  fprintf(out, "  tax\n");
+  fprintf(out, "title_draw_player0:\n");
+  fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  cpx player0_y\n"); //3
+  fprintf(out, "  bmi title_draw_player1\n"); //2
+  fprintf(out, "  ldy player0_line\n"); //3
+  fprintf(out, "  lda (player0_sprite),y\n"); //5
+  fprintf(out, "  tay\n"); //3
+  fprintf(out, "  eor #170\n"); //3
+  fprintf(out, "  beq title_draw_player1\n"); //2
+  fprintf(out, "  tya\n"); //3
+  fprintf(out, "  sta GRP0\n"); //3
+  fprintf(out, "  inc player0_line\n"); //5
+  fprintf(out, "title_draw_player1:\n");
+  fprintf(out, "  sta WSYNC\n");
+  fprintf(out, "  cpx player1_y\n"); //3
+  fprintf(out, "  bmi title_draw_wait2\n"); //2
+  fprintf(out, "  ldy player1_line\n"); //3
+  fprintf(out, "  lda (player1_sprite),y\n"); //5
+  fprintf(out, "  tay\n"); //3
+  fprintf(out, "  eor #170\n"); //3
+  fprintf(out, "  beq title_draw_wait2\n"); //2
+  fprintf(out, "  tya\n"); //3
+  fprintf(out, "  sta GRP1\n"); //3
+  fprintf(out, "  inc player1_line\n"); //5
+  fprintf(out, "title_draw_wait2:\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  cpx value1\n");
+  fprintf(out, "  bne title_draw_player0\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  sta title_color\n");
   fprintf(out, "  ldx result\n");
   fprintf(out, "  rts\n");
 }
