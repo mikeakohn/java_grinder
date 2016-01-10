@@ -534,13 +534,11 @@ int M6502_8::jump_cond(const char *label, int cond, int distance)
     {
       case COND_EQUAL:
         fprintf(out, "  lda stack_lo - 0,x\n");
-        fprintf(out, "  cmp #0\n");
         fprintf(out, "  bne #3\n");
         fprintf(out, "  jmp %s\n", label);
         break;
       case COND_NOT_EQUAL:
         fprintf(out, "  lda stack_lo - 0,x\n");
-        fprintf(out, "  cmp #0\n");
         fprintf(out, "  beq #3\n");
         fprintf(out, "  jmp %s\n", label);
         break;
@@ -548,7 +546,6 @@ int M6502_8::jump_cond(const char *label, int cond, int distance)
         if(reverse == false)
         {
           fprintf(out, "  lda stack_lo - 0,x\n");
-          fprintf(out, "  cmp #0\n");
           fprintf(out, "  bpl #3\n");
           fprintf(out, "  jmp %s\n", label);
         }
@@ -564,7 +561,6 @@ int M6502_8::jump_cond(const char *label, int cond, int distance)
         if(reverse == false)
         {
           fprintf(out, "  lda stack_lo - 0,x\n");
-          fprintf(out, "  cmp #0\n");
           fprintf(out, "  bmi #3\n");
           fprintf(out, "  jmp %s\n", label);
         }
