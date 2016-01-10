@@ -335,6 +335,7 @@ public class SpaceRevenge
         // enemy shoots at random
         rnd -= 77;
         rnd &= 127;
+
         if(((rnd ^ ship0_x) < ship1_y) && (shot1_y == 100))
         {
           shot1_y = ship1_y + 4;
@@ -343,13 +344,11 @@ public class SpaceRevenge
         }
 
         // end game if max score reached or switches pressed
-        if((score0 >= 10) || (score1 >= 10) || ((switches & 2) == 0))
+        if((score0 >= 10) || (score1 >= 10) | ((switches & 2) == 0))
         {
           Atari2600.setAudioVolume0((byte)0);
           Atari2600.setAudioVolume1((byte)0);
           mode = 0;
-
-          Atari2600.setBank((byte)0);
         }
 
         Atari2600.waitOverscan();
