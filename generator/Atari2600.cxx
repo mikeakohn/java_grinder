@@ -1521,7 +1521,7 @@ void Atari2600::insert_set_bank()
     fprintf(out, "  lda 0x1ff9\n");
   }
 
-//  fprintf(out, "  jmp reset\n");
+  fprintf(out, "  jmp reset\n");
 }
 
 void Atari2600::insert_functions()
