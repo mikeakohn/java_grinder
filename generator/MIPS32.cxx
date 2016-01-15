@@ -47,7 +47,7 @@
 // r14 $t6
 // r15 $t7 Top Of Stack
 // r16 $s0 Saved registers 0  (point to constant pool)
-// r17 $s1 Saved registers 1
+// r17 $s1 Saved registers 1  (point to statics)
 // r18 $s2 Saved registers 2
 // r19 $s3 Saved registers 3
 // r20 $s4 Saved registers 4
@@ -62,6 +62,16 @@
 // r29 $sp Stack pointer
 // r30 $fp Frame pointer (link register)
 // r31 $ra Return address
+
+// RAM is:
+// ram_start:
+//   static 1..
+//   static 2..
+//   static 3..
+//   etc
+//   HEAP <--- $gp
+//
+//   STACK <--- $sp
 
 MIPS32::MIPS32() :
   reg(0),
@@ -99,7 +109,8 @@ int MIPS32::start_init()
   fprintf(out, ".org 0x%x\n", org);
   fprintf(out, "start:\n");
 
-  fprintf(out, "  li $s0, _constant_pool\n");
+  fprintf(out, "  li $s0, _constant_pool  ; $s0 points to constant numbers\n");
+  fprintf(out, "  li $s1, ram_start       ; $s1 points to statics\n");
   fprintf(out, "  li $sp, ram_end+1\n");
 
   return 0;
@@ -107,7 +118,7 @@ int MIPS32::start_init()
 
 int MIPS32::insert_static_field_define(const char *name, const char *type, int index)
 {
-  fprintf(out, "%s equ ram_start+%d\n", name, (index + 1) * 4);
+  fprintf(out, "%s equ ram_start+%d\n", name, index * 4);
   return 0;
 }
 
@@ -115,28 +126,50 @@ int MIPS32::insert_static_field_define(const char *name, const char *type, int i
 int MIPS32::init_heap(int field_count)
 {
   fprintf(out, "  ;; Set up heap and static initializers\n");
-  fprintf(out, "  li $gp, ram_start+%d\n", (field_count + 1) * 4);
+  fprintf(out, "  li $gp, ram_start+%d\n", field_count * 4);
   return 0;
 }
 
 int MIPS32::insert_field_init_boolean(char *name, int index, int value)
 {
-  return -1;
+  return insert_field_init_int(name, index, value);
 }
 
 int MIPS32::insert_field_init_byte(char *name, int index, int value)
 {
-  return -1;
+  return insert_field_init_int(name, index, value);
 }
 
 int MIPS32::insert_field_init_short(char *name, int index, int value)
 {
-  return -1;
+  return insert_field_init_int(name, index, value);
 }
 
 int MIPS32::insert_field_init_int(char *name, int index, int value)
 {
-  return -1;
+  uint32_t n = (uint32_t)value;
+
+  if (n == 0 || n > 0xffff0000)
+  {
+    fprintf(out, "  lui $t8, 0x%04x\n", n >> 16);
+  }
+    else
+  {
+    int const_index = get_constant(n);
+
+    if (const_index == -1)
+    {
+      fprintf(out, "  li $t8, 0x%04x\n", n);
+    }
+      else
+    {
+      fprintf(out, "  lw $t8, 0x%04x($s0)\n", const_index * 4);
+    }
+  }
+
+  fprintf(out, "  sw $t8, 0x%04x($s1)\n", index * 4);
+
+  return 0;
 }
 
 int MIPS32::insert_field_init(char *name, int index)
