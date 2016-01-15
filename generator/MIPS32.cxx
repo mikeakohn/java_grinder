@@ -149,6 +149,7 @@ int MIPS32::insert_field_init_int(char *name, int index, int value)
 {
   uint32_t n = (uint32_t)value;
 
+#if 0
   if (n == 0 || n > 0xffff0000)
   {
     fprintf(out, "  lui $t8, 0x%04x\n", n >> 16);
@@ -166,15 +167,34 @@ int MIPS32::insert_field_init_int(char *name, int index, int value)
       fprintf(out, "  lw $t8, 0x%04x($s0)\n", const_index * 4);
     }
   }
+#endif
 
-  fprintf(out, "  sw $t8, 0x%04x($s1)\n", index * 4);
+  if (n == 0)
+  {
+    fprintf(out, "  sw $0, 0x%04x($s1)\n", index * 4);
+    return 0;
+  }
+    else
+  if (n > 0xffff0000)
+  {
+    fprintf(out, "  lui $t8, 0x%04x\n", n >> 16);
+  }
+    else
+  {
+    fprintf(out, "  li $t8, 0x%04x\n", n);
+  }
+
+  fprintf(out, "  sw $t8, 0x%04x($s1) ; static %s\n", index * 4, name);
 
   return 0;
 }
 
 int MIPS32::insert_field_init(char *name, int index)
 {
-  return -1;
+  fprintf(out, "  li $t8, %s\n", name);
+  fprintf(out, "  sw $t8, 0x%04x($s1)\n", index * 4);
+
+  return 0;
 }
 
 void MIPS32::method_start(int local_count, int max_stack, int param_count, const char *name)
@@ -194,7 +214,22 @@ int MIPS32::push_integer(int32_t n)
 
   fprintf(out, "  ; push_integer(%d)\n", n);
 
-  if (value == 0 || value > 0xffff0000)
+  if (value == 0)
+  {
+    if (reg < reg_max)
+    {
+      fprintf(out, "  move $t%d, $t0\n", reg);
+      reg++;
+    }
+      else
+    {
+      STACK_PUSH(0)
+    }
+
+    return 0;
+  }
+    else
+  if (value > 0xffff0000)
   {
     if (reg < reg_max)
     {
@@ -260,6 +295,17 @@ int MIPS32::push_integer_local(int index)
 
 int MIPS32::push_ref_static(const char *name, int index)
 {
+  if (reg < reg_max)
+  {
+    fprintf(out, "  addiu $t%d, $s1, %d\n", reg, index * 4);
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  addiu $t8, $s1, %d\n", index * 4);
+    STACK_PUSH(8);
+  }
+
   return -1;
 }
 
