@@ -33,6 +33,9 @@ public:
   virtual int w65c265sxb_putString();
 
 private:
+  bool need_put_string:1;
+
+  void insert_put_string();
 };
 
 #endif

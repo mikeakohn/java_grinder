@@ -292,7 +292,8 @@ int W65816::push_ref_local(int index)
 
 int W65816::push_fake()
 {
-  return -1;
+  stack++;
+  return 0;
 }
 
 int W65816::push_long(int64_t n)
@@ -956,7 +957,7 @@ int W65816::new_array(uint8_t type)
 
 int W65816::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 {
-  fprintf(out, ".align 16\n");
+//  fprintf(out, ".align 16\n");
 
   if (type == TYPE_BYTE)
   {
@@ -973,12 +974,13 @@ int W65816::insert_array(const char *name, int32_t *data, int len, uint8_t type)
     return insert_dw(name, data, len, TYPE_SHORT);
   }
 
-  return -1;
+  return 0;
 }
 
 int W65816::insert_string(const char *name, uint8_t *bytes, int len)
 {
-  return -1;
+  fprintf(out, "dw %d\n", len);
+  return insert_utf8(name, bytes, len);
 }
 
 int W65816::push_array_length()
