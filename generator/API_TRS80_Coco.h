@@ -17,6 +17,7 @@ class API_TRS80_Coco
 public:
   virtual int trs80_coco_setBackgroundColor_I() { return -1; }
   virtual int trs80_coco_setBackgroundColor_I(int value) { return -1; }
+  virtual int trs80_coco_setText_II() { return -1; }
 };
 
 #endif

@@ -17,7 +17,10 @@
 
 TRS80Coco::TRS80Coco()
 {
-  start_org = 0x8000;
+  // Cartridge ROM starts at 0xc0000.  RAM would start at 0x0600.
+  start_org = 0xc000;
+  ram_start = 0x0600;
+  ram_end = 0x1fff;
 }
 
 TRS80Coco::~TRS80Coco()
@@ -42,4 +45,15 @@ int TRS80Coco::trs80_coco_setBackgroundColor_I(int value)
 
   return -1;
 }
+
+int TRS80Coco::trs80_coco_setText_II()
+{
+  fprintf(out, "  ;; setText_II();\n");
+  fprintf(out, "  puls y\n");
+  fprintf(out, "  puls a,b\n");
+  fprintf(out, "  std ,y\n");
+  return 0;
+}
+
+
 

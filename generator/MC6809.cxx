@@ -22,6 +22,8 @@
 
 MC6809::MC6809() :
   start_org(0),
+  ram_start(0x0600),
+  ram_end(0x06ff),
   reg(0),
   reg_max(9),
   stack(0),
@@ -42,8 +44,8 @@ int MC6809::open(const char *filename)
   fprintf(out, ".6809\n");
 
   // Set where RAM starts / ends
-  //fprintf(out, "ram_start equ 0\n");
-  //fprintf(out, "ram_end equ 0x8000\n");
+  fprintf(out, "ram_start equ 0x%04x\n", ram_start);
+  fprintf(out, "ram_end equ 0x0x%04x\n", ram_end);
 
   return 0;
 }
@@ -53,6 +55,7 @@ int MC6809::start_init()
   // Add any set up items (stack, registers, etc).
   fprintf(out, ".org 0x%04x\n", start_org);
   fprintf(out, "start:\n");
+  fprintf(out, "  lds #0x%04x ; Set SP stack pointer\n", ram_end + 1);
 
   return 0;
 }

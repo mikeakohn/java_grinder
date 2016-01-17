@@ -23,6 +23,7 @@ public:
   virtual int open(const char *filename);
   virtual int trs80_coco_setBackgroundColor_I();
   virtual int trs80_coco_setBackgroundColor_I(int value);
+  virtual int trs80_coco_setText_II();
 
 private:
 };

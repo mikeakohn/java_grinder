@@ -16,5 +16,6 @@ abstract public class TRS80Coco
   protected TRS80Coco() { }
 
   public static void setBackgroundColor(int color) { }
+  public static void setText(int address, int value) { }
 }
 

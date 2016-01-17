@@ -101,7 +101,9 @@ public:
   virtual int array_write_int(const char *name, int field_id);
 
 protected:
-  uint32_t start_org;
+  uint16_t start_org;
+  uint16_t ram_start;
+  uint16_t ram_end;
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 
   int stack;          // count how many things we put on the stack
