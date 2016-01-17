@@ -40,6 +40,7 @@ clean:
 	@cd sega_genesis && make clean
 	@cd ti84 && make clean
 	@cd ti99 && make clean
+	@cd trs80_coco && make clean
 	@cd x86 && make clean
 
 
