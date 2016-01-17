@@ -36,13 +36,15 @@ MC6809::MC6809() :
   reg(0),
   reg_max(9),
   stack(0),
-  is_main(0)
+  is_main(0),
+  need_multiply(0)
 {
 
 }
 
 MC6809::~MC6809()
 {
+  if (need_multiply) { add_multiply(); }
 }
 
 int MC6809::open(const char *filename)
@@ -113,9 +115,16 @@ void MC6809::method_start(int local_count, int max_stack, int param_count, const
 
   fprintf(out, "%s:\n", name);
 
-  fprintf(out, "  tfr s,d\n");
-  fprintf(out, "  subd #%d\n", local_count * 2);
-  fprintf(out, "  tfr d,s\n");
+  if (local_count != 0)
+  {
+    fprintf(out, "  leas -%d,s\n", local_count * 2);
+#if 0
+    fprintf(out, "  tfr s,d\n");
+    fprintf(out, "  subd #%d\n", local_count * 2);
+    fprintf(out, "  tfr d,s\n");
+#endif
+  }
+
   fprintf(out, "  pshs u\n");    // really only needed when not main()
   fprintf(out, "  tfr s,u\n");
 }
@@ -123,9 +132,15 @@ void MC6809::method_start(int local_count, int max_stack, int param_count, const
 void MC6809::method_end(int local_count)
 {
   fprintf(out, "  puls u\n");    // really only needed when not main()
-  fprintf(out, "  tfr s,d\n");
-  fprintf(out, "  addd #%d\n", local_count * 2);
-  fprintf(out, "  tfr d,s\n");
+  if (local_count != 0)
+  {
+    fprintf(out, "  leas %d,s\n", local_count * 2);
+#if 0
+    fprintf(out, "  tfr s,d\n");
+    fprintf(out, "  addd #%d\n", local_count * 2);
+    fprintf(out, "  tfr d,s\n");
+#endif
+  }
   fprintf(out, "\n");
 }
 
@@ -288,7 +303,13 @@ int MC6809::sub_integer(int num)
 
 int MC6809::mul_integer()
 {
-  return -1;
+  need_multiply = 1;
+
+  fprintf(out, "  ; mul_integer()\n");
+  fprintf(out, "  jsr _multiply\n");
+  fprintf(out, "  leas 2,s\n");
+
+  return 0;
 }
 
 int MC6809::div_integer()
@@ -567,5 +588,40 @@ int MC6809::array_write_short(const char *name, int field_id)
 int MC6809::array_write_int(const char *name, int field_id)
 {
   return -1;
+}
+
+void MC6809::add_multiply()
+{
+  // HH2 LL3
+  // HH4 LL5
+  //
+  //   A           B
+  // x C           D
+  // ------------------
+  //  AD(L)+BD(H) BD(L)
+  //  CB          0
+  // +
+
+  fprintf(out, "_multiply:\n");
+  fprintf(out, "  lda 3,s\n");
+  fprintf(out, "  ldb 5,s\n");
+  fprintf(out, "  mul\n");
+  fprintf(out, "  tfr d,x\n");
+  fprintf(out, "  lda 2,s\n");
+  fprintf(out, "  ldb 5,s\n");
+  fprintf(out, "  mul\n");
+  fprintf(out, "  tfr d,y\n");
+  fprintf(out, "  lda 3,s\n");
+  fprintf(out, "  ldb 4,s\n");
+  fprintf(out, "  mul\n");
+  fprintf(out, "  stb 4,s\n");
+  fprintf(out, "  tfr x,d\n");
+  fprintf(out, "  stb 5,s\n");
+  fprintf(out, "  adda 4,s\n");
+  fprintf(out, "  sta 4,s\n");
+  fprintf(out, "  tfr y,d\n");
+  fprintf(out, "  addb 4,s\n");
+  fprintf(out, "  stb 4,s\n");
+  fprintf(out, "  rts\n");
 }
 

@@ -63,7 +63,8 @@ int TRS80Coco::trs80_coco_plot_III()
 
   fprintf(out, "  ;; plot_III();\n");
   fprintf(out, "  jsr _plot\n");
-  fprintf(out, "  puls x,y,a,b\n");
+  fprintf(out, "  leas 6,s\n");
+  //fprintf(out, "  puls x,y,a,b\n");
   //fprintf(out, "  tfr s,d\n");
   //fprintf(out, "  addd #6\n");
   //fprintf(out, "  tfr d,s\n");

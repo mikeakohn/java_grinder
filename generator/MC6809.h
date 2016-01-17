@@ -101,6 +101,8 @@ public:
   virtual int array_write_int(const char *name, int field_id);
 
 protected:
+  void add_multiply();
+
   uint16_t start_org;
   uint16_t ram_start;
   uint16_t ram_end;
@@ -108,6 +110,7 @@ protected:
   int reg_max;        // size of register stack 
   int stack;          // count how many things we put on the stack
   bool is_main : 1;
+  bool need_multiply : 1;
 };
 
 #endif

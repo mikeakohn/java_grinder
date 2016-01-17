@@ -23,6 +23,8 @@ public class JavaTrs80Demo
       TRS80Coco.plot(a, a, TRS80Coco.COLOR_ORANGE);
     }
 
+    TRS80Coco.setText(a * 32 + 20, TRS80Coco.COLOR_RED);
+
     while(true);
   }
 }
