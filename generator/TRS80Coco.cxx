@@ -49,9 +49,9 @@ int TRS80Coco::trs80_coco_setBackgroundColor_I(int value)
 int TRS80Coco::trs80_coco_setText_II()
 {
   fprintf(out, "  ;; setText_II();\n");
-  fprintf(out, "  puls y\n");
   fprintf(out, "  puls a,b\n");
-  fprintf(out, "  std ,y\n");
+  fprintf(out, "  puls y\n");
+  fprintf(out, "  stb ,y\n");
   return 0;
 }
 

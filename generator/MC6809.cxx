@@ -109,7 +109,16 @@ void MC6809::method_end(int local_count)
 
 int MC6809::push_integer(int32_t n)
 {
-  return -1;
+  if (n > 65535 || n < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", n);
+    return -1;
+  }
+
+  fprintf(out, "  ldd #0x%04x\n", n & 0xffff);
+  fprintf(out, "  pshs a,b\n");
+
+  return 0;
 }
 
 int MC6809::push_integer_local(int index)
@@ -339,7 +348,16 @@ int MC6809::return_void(int local_count)
 
 int MC6809::jump(const char *name, int distance)
 {
-  return -1;
+  if (distance < 20)
+  {
+    fprintf(out, "  bra %s\n", name);
+  }
+    else
+  {
+    fprintf(out, "  jmp %s\n", name);
+  }
+
+  return 0;
 }
 
 int MC6809::call(const char *name)
