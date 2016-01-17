@@ -15,10 +15,19 @@
 
 #include "MC6809.h"
 
-#define REG_STACK(a) (a)
-#define LOCALS(i) (i * 4)
+#define LOCALS(i) (i * 2)
+
+#define CHECK_INT16(a) \
+  if (a > 65535 || a < -32768) \
+  { \
+    printf("Error: literal value %d bigger than 16 bit.\n", a); \
+    return -1; \
+  }
 
 // ABI is:
+
+//                        ==     !=     yum    <=      >     >=
+const char *branch[] = { "beq", "bne", "blt", "ble", "bgt", "bge" };
 
 MC6809::MC6809() :
   start_org(0),
@@ -100,19 +109,29 @@ int MC6809::insert_field_init(char *name, int index)
 
 void MC6809::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
+  //is_main = (strcmp(name, "main") == 0) ? 1 : 0;
+
+  fprintf(out, "%s:\n", name);
+
+  fprintf(out, "  tfr s,d\n");
+  fprintf(out, "  subd #%d\n", local_count * 2);
+  fprintf(out, "  tfr d,s\n");
+  fprintf(out, "  pshs u\n");    // really only needed when not main()
+  fprintf(out, "  tfr s,u\n");
 }
 
 void MC6809::method_end(int local_count)
 {
+  fprintf(out, "  puls u\n");    // really only needed when not main()
+  fprintf(out, "  tfr s,d\n");
+  fprintf(out, "  addd #%d\n", local_count * 2);
+  fprintf(out, "  tfr d,s\n");
+  fprintf(out, "\n");
 }
 
 int MC6809::push_integer(int32_t n)
 {
-  if (n > 65535 || n < -32768)
-  {
-    printf("Error: literal value %d bigger than 16 bit.\n", n);
-    return -1;
-  }
+  CHECK_INT16(n);
 
   fprintf(out, "  ldd #0x%04x\n", n & 0xffff);
   fprintf(out, "  pshs a,b\n");
@@ -122,7 +141,9 @@ int MC6809::push_integer(int32_t n)
 
 int MC6809::push_integer_local(int index)
 {
-  return -1;
+  fprintf(out, "  ldd %d,u\n", LOCALS(index));
+  fprintf(out, "  pshs a,b\n");
+  return 0;
 }
 
 int MC6809::push_ref_static(const char *name, int index)
@@ -137,7 +158,8 @@ int MC6809::push_ref_local(int index)
 
 int MC6809::push_fake()
 {
-  return -1;
+  fprintf(out, "  pshs x\n");
+  return 0;
 }
 
 int MC6809::push_long(int64_t n)
@@ -177,7 +199,10 @@ int MC6809::push_ref(char *name)
 
 int MC6809::pop_integer_local(int index)
 {
-  return -1;
+  fprintf(out, "  ; pop_integer_local()\n");
+  fprintf(out, "  puls a,b\n");
+  fprintf(out, "  std %d,u\n", LOCALS(index));
+  return 0;
 }
 
 int MC6809::pop_ref_local(int index)
@@ -187,42 +212,78 @@ int MC6809::pop_ref_local(int index)
 
 int MC6809::pop()
 {
-  return -1;
+  fprintf(out, "  ; pop()\n");
+  fprintf(out, "  puls x\n");
+  return 0;
 }
 
 int MC6809::dup()
 {
-  return -1;
+  fprintf(out, "  ; dup()\n");
+  fprintf(out, "  puls x\n");
+  fprintf(out, "  pshs x\n");
+  fprintf(out, "  pshs x\n");
+  return 0;
 }
 
 int MC6809::dup2()
 {
-  return -1;
+  fprintf(out, "  ; dup2()\n");
+  fprintf(out, "  puls x\n");
+  fprintf(out, "  puls y\n");
+  fprintf(out, "  pshs x\n");
+  fprintf(out, "  pshs y\n");
+  fprintf(out, "  pshs x\n");
+  fprintf(out, "  pshs y\n");
+  return 0;
 }
 
 int MC6809::swap()
 {
-  return -1;
+  fprintf(out, "  ; swap()\n");
+  fprintf(out, "  puls x\n");
+  fprintf(out, "  puls y\n");
+  fprintf(out, "  pshs y\n");
+  fprintf(out, "  pshs x\n");
+  return 0;
 }
 
 int MC6809::add_integer()
 {
-  return -1;
+  fprintf(out, "  ; add_integer()\n");
+  fprintf(out, "  puls a,b\n");
+  fprintf(out, "  addd ,s\n");
+  fprintf(out, "  std ,s\n");
+  return 0;
 }
 
 int MC6809::add_integer(int num)
 {
-  return -1;
+  CHECK_INT16(num);
+  fprintf(out, "  ; add_integer()\n");
+  fprintf(out, "  ldd #0x%04x\n", num & 0xffff);
+  fprintf(out, "  addd ,s\n");
+  fprintf(out, "  std ,s\n");
+  return 0;
 }
 
 int MC6809::sub_integer()
 {
-  return -1;
+  fprintf(out, "  ; sub_integer()\n");
+  fprintf(out, "  puls a,b\n");
+  fprintf(out, "  subd ,s\n");
+  fprintf(out, "  std ,s\n");
+  return 0;
 }
 
 int MC6809::sub_integer(int num)
 {
-  return -1;
+  CHECK_INT16(num);
+  fprintf(out, "  ; sub_integer()\n");
+  fprintf(out, "  ldd #0x%04x\n", num & 0xffff);
+  fprintf(out, "  subd ,s\n");
+  fprintf(out, "  std ,s\n");
+  return 0;
 }
 
 int MC6809::mul_integer()
@@ -242,7 +303,12 @@ int MC6809::mod_integer()
 
 int MC6809::neg_integer()
 {
-  return -1;
+  fprintf(out, "  ; neg_integer()\n");
+  fprintf(out, "  neg ,s\n");
+  //fprintf(out, "  puls a,b\n");
+  //fprintf(out, "  neg d\n");
+  //fprintf(out, "  pshs a,b\n");
+  return 0;
 }
 
 int MC6809::shift_left_integer()
@@ -307,27 +373,50 @@ int MC6809::xor_integer(int num)
 
 int MC6809::inc_integer(int index, int num)
 {
-  return -1;
+  fprintf(out, "  ; inc_integer() index=%d\n", index);
+  fprintf(out, "  ldd %d,u\n", LOCALS(index));
+
+  return 0;
 }
 
 int MC6809::integer_to_byte()
 {
-  return -1;
+  fprintf(out, "  ; integer_to_byte()\n");
+  fprintf(out, "  puls a,b\n");
+  fprintf(out, "  sex ; (oh yeah, harder!)\n");
+  fprintf(out, "  pshs a,b\n");
+  return 0;
 }
 
 int MC6809::integer_to_short()
 {
-  return -1;
+  fprintf(out, "  ; integer_to_short() - do nothing\n");
+  return 0;
 }
 
 int MC6809::jump_cond(const char *label, int cond, int distance)
 {
-  return -1;
+  bool use_long = distance > 5;
+
+  fprintf(out, "  ; jump_cond()\n");
+  fprintf(out, "  puls a,b\n");
+  fprintf(out, "  cmpd #0\n");
+  fprintf(out, "  %s%s %s\n", use_long ? "l":"", branch[cond], label);
+
+  return 0;
 }
 
 int MC6809::jump_cond_integer(const char *label, int cond, int distance)
 {
-  return -1;
+  bool use_long = distance > 5;
+
+  fprintf(out, "  ; jump_cond()\n");
+  fprintf(out, "  puls a,b\n");
+  fprintf(out, "  puls y\n");
+  fprintf(out, "  cmpd -2,s\n");
+  fprintf(out, "  %s%s %s\n", use_long ? "l":"", branch[cond], label);
+
+  return 0;
 }
 
 int MC6809::return_local(int index, int local_count)

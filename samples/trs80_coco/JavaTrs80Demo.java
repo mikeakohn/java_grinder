@@ -5,6 +5,8 @@ public class JavaTrs80Demo
 {
   static public void main(String args[])
   {
+    int a;
+
     //TRS80Coco.setBackgroundColor(5);
     TRS80Coco.setText(1024, 0x8f);
     TRS80Coco.setText(1025, 0x9f);
@@ -16,7 +18,10 @@ public class JavaTrs80Demo
     TRS80Coco.setText(1031, 0xff);
     TRS80Coco.setText(1032, 0x80);
 
-    TRS80Coco.plot(10, 10, TRS80Coco.COLOR_BLACK);
+    for (a = 1; a < 10; a++)
+    {
+      TRS80Coco.plot(a, a, TRS80Coco.COLOR_ORANGE);
+    }
 
     while(true);
   }
