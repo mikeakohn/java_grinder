@@ -375,6 +375,8 @@ int MC6809::inc_integer(int index, int num)
 {
   fprintf(out, "  ; inc_integer() index=%d\n", index);
   fprintf(out, "  ldd %d,u\n", LOCALS(index));
+  fprintf(out, "  addd #%d\n", (uint16_t)num);
+  fprintf(out, "  std %d,u\n", LOCALS(index));
 
   return 0;
 }
@@ -411,9 +413,9 @@ int MC6809::jump_cond_integer(const char *label, int cond, int distance)
   bool use_long = distance > 5;
 
   fprintf(out, "  ; jump_cond()\n");
-  fprintf(out, "  puls a,b\n");
   fprintf(out, "  puls y\n");
-  fprintf(out, "  cmpd -2,s\n");
+  fprintf(out, "  puls a,b\n");
+  fprintf(out, "  cmpd -4,s\n");
   fprintf(out, "  %s%s %s\n", use_long ? "l":"", branch[cond], label);
 
   return 0;
