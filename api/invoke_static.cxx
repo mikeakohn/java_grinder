@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -33,6 +33,7 @@
 #include "ti84_.h"
 #include "ti99_.h"
 #include "timer.h"
+#include "trs80_coco.h"
 #include "uart.h"
 #include "w65c265sxb_.h"
 
@@ -142,6 +143,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     CHECK(SNES, snes)
     CHECK(TI84, ti84)
     CHECK(TI99, ti99)
+    CHECK(TRS80Coco, trs80_coco)
     CHECK(W65C265SXB, w65c265sxb)
       else
     {}
@@ -215,6 +217,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, in
     CHECK_CONST(CPU, cpu)
     CHECK_CONST(SegaGenesis, sega_genesis)
     CHECK_CONST(SNES, snes)
+    CHECK_CONST(TRS80Coco, trs80_coco)
     CHECK_CONST(W65C265SXB, w65c265sxb)
     CHECK_WITH_PORT_CONST(SPI, spi, 0)
     CHECK_WITH_PORT_CONST(SPI, spi, 1)

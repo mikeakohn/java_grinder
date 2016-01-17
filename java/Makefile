@@ -5,6 +5,8 @@ JAVA_SRC=\
   $(SRC_DIR)/AppleIIgs.java \
   $(SRC_DIR)/Atari2600.java \
   $(SRC_DIR)/ADC.java \
+  $(SRC_DIR)/C64/SID.java \
+  $(SRC_DIR)/C64/VIC.java \
   $(SRC_DIR)/CPU.java \
   $(SRC_DIR)/DSP.java \
   $(SRC_DIR)/IOPort.java \
@@ -26,11 +28,10 @@ JAVA_SRC=\
   $(SRC_DIR)/TI99.java \
   $(SRC_DIR)/Timer.java \
   $(SRC_DIR)/TimerListener.java \
+  $(SRC_DIR)/TRS80Coco.java \
   $(SRC_DIR)/UART.java \
   $(SRC_DIR)/UART0.java \
   $(SRC_DIR)/UART1.java \
-  $(SRC_DIR)/C64/SID.java \
-  $(SRC_DIR)/C64/VIC.java \
   $(SRC_DIR)/W65C265SXB.java
 
 default:

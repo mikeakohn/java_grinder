@@ -37,6 +37,7 @@
 #include "TI84.h"
 #include "TI99.h"
 #include "TMS9900.h"
+#include "TRS80Coco.h"
 #include "W65816.h"
 #include "W65C265SXB.h"
 #include "X86.h"
@@ -193,6 +194,11 @@ static Generator *new_generator(const char *chip_type)
   if (strcasecmp("tms9900", chip_type) == 0)
   {
     generator = new TMS9900();
+  }
+    else
+  if (strcasecmp("trs80_coco", chip_type) == 0)
+  {
+    generator = new TRS80Coco();
   }
     else
   if (strcasecmp("w65816", chip_type) == 0)

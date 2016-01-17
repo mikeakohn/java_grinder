@@ -21,6 +21,7 @@
 // ABI is:
 
 MC6809::MC6809() :
+  start_org(0),
   reg(0),
   reg_max(9),
   stack(0),
@@ -50,7 +51,7 @@ int MC6809::open(const char *filename)
 int MC6809::start_init()
 {
   // Add any set up items (stack, registers, etc).
-  //fprintf(out, ".org ???\n");
+  fprintf(out, ".org 0x%04x\n", start_org);
   fprintf(out, "start:\n");
 
   return 0;

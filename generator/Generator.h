@@ -27,6 +27,7 @@
 #include "API_System.h"
 #include "API_TI84.h"
 #include "API_TI99.h"
+#include "API_TRS80_Coco.h"
 #include "API_W65C265SXB.h"
 
 class Generator :
@@ -40,6 +41,7 @@ class Generator :
   public API_System,
   public API_TI84,
   public API_TI99,
+  public API_TRS80_Coco,
   public API_W65C265SXB
 {
 public:
