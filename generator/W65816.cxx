@@ -18,11 +18,6 @@
 
 #include "W65816.h"
 
-// ABI is:
-// A - accumulator
-// X - java stack pointer
-// Y - general-purpose index register
-
 #define PUSH() \
   fprintf(out, "; PUSH\n"); \
   fprintf(out, "  sta stack,x\n"); \
@@ -36,6 +31,11 @@
   fprintf(out, "  lda stack,x\n")
 
 #define LOCALS(a) (a * 2)
+
+// ABI is:
+// A - accumulator
+// X - java stack pointer
+// Y - general-purpose index register
 
 W65816::W65816() :
   stack(0),
