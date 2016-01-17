@@ -33,8 +33,8 @@
 
 W65C265SXB::W65C265SXB()
 {
-  start_org = 0x300;
-  java_stack = 0x200;
+  start_org = 0x1000;
+  java_stack = 0x900;
   ram_start = 0x7000;
 }
 
@@ -53,7 +53,9 @@ int W65C265SXB::open(const char *filename)
 int W65C265SXB::w65c265sxb_getChar()
 {
   fprintf(out, "; getChar\n");
-  fprintf(out, "  jsr 0xe03c\n");
+  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  jsr.l 0xe036\n");
+  fprintf(out, "  rep #0x30\n");
   PUSH();
   stack++;
 
@@ -64,7 +66,9 @@ int W65C265SXB::w65c265sxb_putChar_C()
 {
   POP();
   fprintf(out, "; putChar\n");
-  fprintf(out, "  jsr 0xe04b\n");
+  fprintf(out, "  sep #0x30\n");
+  fprintf(out, "  jsr.l 0xe04b\n");
+  fprintf(out, "  rep #0x30\n");
   stack--;
 
   return 0;

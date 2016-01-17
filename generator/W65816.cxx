@@ -110,17 +110,17 @@ int W65816::open(const char *filename)
   fprintf(out, "heap_ptr equ ram_start\n");
 
   // points to locals
-  fprintf(out, "locals equ 0x00\n");
+  fprintf(out, "locals equ 0xc0\n");
 
   // temp variables
-  fprintf(out, "result equ 0x02\n");
-  fprintf(out, "remainder equ 0x04\n");
-  fprintf(out, "length equ 0x06\n");
-  fprintf(out, "value1 equ 0x08\n");
-  fprintf(out, "value2 equ 0x10\n");
-  fprintf(out, "value3 equ 0x12\n");
-  fprintf(out, "address equ 0x14\n");
-  fprintf(out, "address2 equ 0x16\n");
+  fprintf(out, "result equ 0xc2\n");
+  fprintf(out, "remainder equ 0xc4\n");
+  fprintf(out, "length equ 0xc6\n");
+  fprintf(out, "value1 equ 0xc8\n");
+  fprintf(out, "value2 equ 0xca\n");
+  fprintf(out, "value3 equ 0xcc\n");
+  fprintf(out, "address equ 0xce\n");
+  fprintf(out, "address2 equ 0xd0\n");
 
   // start
   fprintf(out, ".org 0x%04x\n", start_org);
@@ -131,7 +131,7 @@ int W65816::open(const char *filename)
   fprintf(out, "; all 16-bit registers\n");
   fprintf(out, "  rep #0x30\n");
   fprintf(out, "; set up processor stack\n");
-  fprintf(out, "  lda #0x1ff\n");
+  fprintf(out, "  lda #0x8ff\n");
   fprintf(out, "  tcs\n");
   fprintf(out, "; clear java stack\n");
   fprintf(out, "  lda #0\n");
