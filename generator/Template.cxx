@@ -31,7 +31,6 @@ Template::Template() :
 
 Template::~Template()
 {
-  insert_constants_pool();
 }
 
 int Template::open(const char *filename)

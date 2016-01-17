@@ -139,7 +139,7 @@ public class SpaceRevenge
     while(true)
     {
       // won't execute
-      if(dir == 32)
+      //if(dir == 32)
         Atari2600.setBank((byte)0);
 
       Atari2600.clearMotionRegisters();

@@ -39,6 +39,7 @@ int trs80_coco(JavaClass *java_class, Generator *generator, char *method_name)
 {
   CHECK_FUNC(setBackgroundColor,_I)
   CHECK_FUNC(setText,_II)
+  CHECK_FUNC(plot,_III)
 
   return -1;
 }

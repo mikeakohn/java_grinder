@@ -24,8 +24,11 @@ public:
   virtual int trs80_coco_setBackgroundColor_I();
   virtual int trs80_coco_setBackgroundColor_I(int value);
   virtual int trs80_coco_setText_II();
+  virtual int trs80_coco_plot_III();
 
 private:
+  uint32_t need_plot : 1;
+  void add_plot();
 };
 
 #endif

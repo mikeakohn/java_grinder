@@ -34,7 +34,6 @@ MC6809::MC6809() :
 
 MC6809::~MC6809()
 {
-  insert_constants_pool();
 }
 
 int MC6809::open(const char *filename)
