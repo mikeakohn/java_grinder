@@ -73,7 +73,9 @@ int MC6809::start_init()
 
 int MC6809::insert_static_field_define(const char *name, const char *type, int index)
 {
-  return -1;
+  fprintf(out, "%s equ ram_start+%d\n", name, index * 2);
+
+  return 0;
 }
 
 int MC6809::init_heap(int field_count)
@@ -86,8 +88,7 @@ int MC6809::init_heap(int field_count)
 
 int MC6809::insert_field_init_boolean(char *name, int index, int value)
 {
-
-  return -1;
+  return insert_field_init_int(name, index, value == 0 ? 0 : 1);
 }
 
 int MC6809::insert_field_init_byte(char *name, int index, int value)
@@ -102,12 +103,18 @@ int MC6809::insert_field_init_short(char *name, int index, int value)
 
 int MC6809::insert_field_init_int(char *name, int index, int value)
 {
-  return -1;
+  CHECK_INT16(value);
+
+  fprintf(out, "  ldd #0x%04x\n", (uint16_t)value);
+  fprintf(out, "  std [%s]\n", name);
+  return 0;
 }
 
 int MC6809::insert_field_init(char *name, int index)
 {
-  return -1;
+  fprintf(out, "  ldd #_%s\n", name);
+  fprintf(out, "  std [%s]\n", name);
+  return 0;
 }
 
 void MC6809::method_start(int local_count, int max_stack, int param_count, const char *name)
@@ -166,7 +173,10 @@ int MC6809::push_integer_local(int index)
 
 int MC6809::push_ref_static(const char *name, int index)
 {
-  return -1;
+  fprintf(out, "  ; put_static()\n");
+  fprintf(out, "  puls a,b\n");
+  fprintf(out, "  std [%s]\n", name);
+  return 0;
 }
 
 int MC6809::push_ref_local(int index)
@@ -212,8 +222,10 @@ int MC6809::push_short(int16_t s)
 
 int MC6809::push_ref(char *name)
 {
-  // Need to move the address of name to the top of stack
-  return -1;
+  fprintf(out, "  ; push_ref()\n");
+  fprintf(out, "  ldd [%s]\n", name);
+  fprintf(out, "  pshs a,b\n");
+  return 0;
 }
 
 int MC6809::pop_integer_local(int index)
@@ -641,12 +653,18 @@ int MC6809::invoke_static_method(const char *name, int params, int is_void)
 
 int MC6809::put_static(const char *name, int index)
 {
-  return -1;
+  fprintf(out, "  ; put_static()\n");
+  fprintf(out, "  puls a,b\n");
+  fprintf(out, "  std [%s]\n", name);
+  return 0;
 }
 
 int MC6809::get_static(const char *name, int index)
 {
-  return -1;
+  fprintf(out, "  ; get_static()\n");
+  fprintf(out, "  ldd [%s]\n", name);
+  fprintf(out, "  pshs a,b\n");
+  return 0;
 }
 
 int MC6809::brk()

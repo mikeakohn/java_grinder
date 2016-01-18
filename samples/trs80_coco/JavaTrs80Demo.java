@@ -3,11 +3,15 @@ import net.mikekohn.java_grinder.TRS80Coco;
 
 public class JavaTrs80Demo
 {
+  static public int extra = 4;
+
   static public int sub(int a, int b)
   {
     int c;
 
     c = a - b;
+
+    c = c + extra;
 
     return c;
   }
@@ -118,6 +122,8 @@ public class JavaTrs80Demo
 
     drawMandelbrot();
 
+    y = sub(5, 3);
+    extra = 7;
     y = sub(5, 3);
 
     while(true);
