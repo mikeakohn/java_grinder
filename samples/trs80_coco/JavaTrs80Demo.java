@@ -3,48 +3,17 @@ import net.mikekohn.java_grinder.TRS80Coco;
 
 public class JavaTrs80Demo
 {
-  static public void main(String args[])
+  static public int sub(int a, int b)
   {
-    int a,n,x,y;
-    int dx,dy;
+    int c;
 
-    //TRS80Coco.setBackgroundColor(5);
-    TRS80Coco.setText(1024, 0x8f);
-    TRS80Coco.setText(1025, 0x9f);
-    TRS80Coco.setText(1026, 0xaf);
-    TRS80Coco.setText(1027, 0xbf);
-    TRS80Coco.setText(1028, 0xcf);
-    TRS80Coco.setText(1029, 0xdf);
-    TRS80Coco.setText(1030, 0xef);
-    TRS80Coco.setText(1031, 0xff);
-    TRS80Coco.setText(1032, 0x80);
+    c = a - b;
 
-    for (a = 1; a < 10; a++)
-    {
-      TRS80Coco.plot(a, a, TRS80Coco.COLOR_ORANGE);
-    }
+    return c;
+  }
 
-    //a = 0xff00;
-    //dx = a >> 3;
-
-    dx = 1; dy = 1;
-    x = 20; y = 10;
-
-    for (a = 1; a < 25; a++)
-    {
-      TRS80Coco.setText(y * 32 + x + 1024, TRS80Coco.COLOR_RED);
-      for (n = 0; n < 5000; n++);
-      TRS80Coco.setText(y * 32 + x + 1024, TRS80Coco.COLOR_GREEN);
-
-      x += dx;
-      y += dy;
-
-      if (x <= 20) { dx = 1; }
-      if (y <= 10) { dy = 1; }
-      if (x >= 31) { dx = -1; }
-      if (y >= 15) { dy = -1; }
-    }
-
+  static public void drawMandelbrot()
+  {
     // Time to try a Mandelbrot
     final int DEC_PLACE = 4;
     int cursor = 1024;
@@ -54,6 +23,7 @@ public class JavaTrs80Demo
     int zr2,zi2;
     int count;
     int color;
+    int x,y;
 
     for (y = 0; y < 16; y++)
     {
@@ -102,6 +72,53 @@ public class JavaTrs80Demo
         cursor++;
       }
     }
+  }
+
+  static public void main(String args[])
+  {
+    int a,n,x,y;
+    int dx,dy;
+
+    //TRS80Coco.setBackgroundColor(5);
+    TRS80Coco.setText(1024, 0x8f);
+    TRS80Coco.setText(1025, 0x9f);
+    TRS80Coco.setText(1026, 0xaf);
+    TRS80Coco.setText(1027, 0xbf);
+    TRS80Coco.setText(1028, 0xcf);
+    TRS80Coco.setText(1029, 0xdf);
+    TRS80Coco.setText(1030, 0xef);
+    TRS80Coco.setText(1031, 0xff);
+    TRS80Coco.setText(1032, 0x80);
+
+    for (a = 1; a < 10; a++)
+    {
+      TRS80Coco.plot(a, a, TRS80Coco.COLOR_ORANGE);
+    }
+
+    //a = 0xff00;
+    //dx = a >> 3;
+
+    dx = 1; dy = 1;
+    x = 20; y = 10;
+
+    for (a = 1; a < 25; a++)
+    {
+      TRS80Coco.setText(y * 32 + x + 1024, TRS80Coco.COLOR_RED);
+      for (n = 0; n < 5000; n++);
+      TRS80Coco.setText(y * 32 + x + 1024, TRS80Coco.COLOR_GREEN);
+
+      x += dx;
+      y += dy;
+
+      if (x <= 20) { dx = 1; }
+      if (y <= 10) { dy = 1; }
+      if (x >= 31) { dx = -1; }
+      if (y >= 15) { dy = -1; }
+    }
+
+    drawMandelbrot();
+
+    y = sub(5, 3);
 
     while(true);
   }

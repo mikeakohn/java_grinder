@@ -129,10 +129,13 @@ void MC6809::method_start(int local_count, int max_stack, int param_count, const
 
   if (!is_main)
   {
+    int index = (local_count + param_count + 1) * 2;
+
     for (n = 0; n < param_count; n++)
     {
-      fprintf(out, "  ldd %d,s\n", n * 2);
-      fprintf(out, "  ldd %d,s\n", (n + param_count + 2) * 2);
+      fprintf(out, "  ldd %d,s\n", index);
+      fprintf(out, "  std %d,s\n", n * 2);
+      index -= 2;
     }
   }
 }
@@ -628,7 +631,7 @@ int MC6809::invoke_static_method(const char *name, int params, int is_void)
     fprintf(out, "  leas %d,s\n", params * 2);
   }
 
-  if (is_void != 0)
+  if (is_void == 0)
   {
     fprintf(out, "  pshs a,b\n");
   }
