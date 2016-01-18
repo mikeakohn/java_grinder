@@ -334,32 +334,117 @@ int MC6809::neg_integer()
 
 int MC6809::shift_left_integer()
 {
+  fprintf(out, "  ; shift_left_integer()\n");
   return -1;
 }
 
 int MC6809::shift_left_integer(int num)
 {
-  return -1;
+  int n;
+
+  fprintf(out, "  ; shift_left_integer()\n");
+
+  fprintf(out, "  ldd ,u\n");
+
+  if (num < 8)
+  {
+    for (n = 0; n < num; n++)
+    {
+      fprintf(out, "  aslb \n");
+      fprintf(out, "  rola \n");
+    }
+  }
+    else
+  {
+    fprintf(out, "  tfr b,a\n");
+    fprintf(out, "  clr b\n");
+    num -= 8;
+
+    for (n = 0; n < num; n++)
+    {
+      fprintf(out, "  asla \n");
+    }
+  }
+
+  fprintf(out, "  std ,u\n");
+
+  return 0;
 }
 
 int MC6809::shift_right_integer()
 {
+  fprintf(out, "  ; shift_right_integer()\n");
   return -1;
 }
 
 int MC6809::shift_right_integer(int num)
 {
-  return -1;
+  int n;
+
+  fprintf(out, "  ; shift_right_integer()\n");
+  fprintf(out, "  ldd ,u\n");
+
+  if (num < 8)
+  {
+    for (n = 0; n < num; n++)
+    {
+      fprintf(out, "  asra \n");
+      fprintf(out, "  rorb \n");
+    }
+  }
+    else
+  {
+    fprintf(out, "  tfr a,b\n");
+    fprintf(out, "  clr a\n");
+    num -= 8;
+
+    for (n = 0; n < num; n++)
+    {
+      fprintf(out, "  lsrb \n");
+    }
+  }
+
+  fprintf(out, "  std ,u\n");
+
+  return 0;
 }
 
 int MC6809::shift_right_uinteger()
 {
+  fprintf(out, "  ; shift_right_uinteger()\n");
   return -1;
 }
 
 int MC6809::shift_right_uinteger(int num)
 {
-  return -1;
+  int n;
+
+  fprintf(out, "  ; shift_right_uinteger()\n");
+  fprintf(out, "  ldd ,u\n");
+
+  if (num < 8)
+  {
+    for (n = 0; n < num; n++)
+    {
+      fprintf(out, "  lsra \n");
+      fprintf(out, "  rorb \n");
+    }
+  }
+    else
+  {
+    fprintf(out, "  tfr a,b\n");
+    fprintf(out, "  clr a\n");
+    num -= 8;
+
+    for (n = 0; n < num; n++)
+    {
+      fprintf(out, "  lsrb \n");
+    }
+  }
+
+  fprintf(out, "  std ,u\n");
+
+  return 0;
 }
 
 int MC6809::and_integer()
@@ -419,7 +504,7 @@ int MC6809::integer_to_short()
 
 int MC6809::jump_cond(const char *label, int cond, int distance)
 {
-  bool use_long = distance > 5;
+  bool use_long = distance > 30;
 
   fprintf(out, "  ; jump_cond()\n");
   fprintf(out, "  puls a,b\n");
@@ -431,7 +516,7 @@ int MC6809::jump_cond(const char *label, int cond, int distance)
 
 int MC6809::jump_cond_integer(const char *label, int cond, int distance)
 {
-  bool use_long = distance > 5;
+  bool use_long = distance > 30;
 
   fprintf(out, "  ; jump_cond()\n");
   fprintf(out, "  puls y\n");

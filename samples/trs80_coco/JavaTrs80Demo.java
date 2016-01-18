@@ -5,7 +5,8 @@ public class JavaTrs80Demo
 {
   static public void main(String args[])
   {
-    int a;
+    int a,n,x,y;
+    int dx,dy;
 
     //TRS80Coco.setBackgroundColor(5);
     TRS80Coco.setText(1024, 0x8f);
@@ -23,7 +24,63 @@ public class JavaTrs80Demo
       TRS80Coco.plot(a, a, TRS80Coco.COLOR_ORANGE);
     }
 
-    TRS80Coco.setText(a * 32 + 20, TRS80Coco.COLOR_RED);
+    dx = 1; dy = 1;
+    x = 20; y = 10;
+
+    for (a = 1; a < 50; a++)
+    {
+      TRS80Coco.setText(y * 32 + x + 1024, TRS80Coco.COLOR_RED);
+      for (n = 0; n < 5000; n++);
+      TRS80Coco.setText(y * 32 + x + 1024, TRS80Coco.COLOR_GREEN);
+
+      x += dx;
+      y += dy;
+
+      if (x <= 20) { dx = 1; }
+      if (y <= 10) { dy = 1; }
+      if (x >= 31) { dx = -1; }
+      if (y >= 15) { dy = -1; }
+    }
+
+    // Time to try a Mandelbrot
+    final int DEC_PLACE = 4;
+    int cursor = 1024;
+    int rs,is;
+    int zi,zr;
+    int tr,ti;
+    int zr2,zi2;
+    int count;
+
+    for (y = 0; y < 16; y++)
+    {
+      is = (((2 << DEC_PLACE) * y) >> 4) - (1 << DEC_PLACE);
+
+      for (x = 0; x < 32; x++)
+      {
+        rs = (((3 << DEC_PLACE) * x) >> 5) - (2 << DEC_PLACE);
+
+        zr = 0;
+        zi = 0;
+
+        for (count = 0; count < 16; count++)
+        {
+          zr2 = (zr * zr) >> DEC_PLACE;
+          zi2 = (zi * zi) >> DEC_PLACE;
+
+          if (zr2 + zi2 > (4 << DEC_PLACE)) { break; }
+
+          tr = zr2 - zi2;
+          ti = 2 * ((zr * zi) >> DEC_PLACE);
+
+          zr = tr + rs;
+          zi = ti + is;
+        }
+
+        // Change this to a lookup table.
+        if (count == 0) { TRS80Coco.setText(cursor, TRS80Coco.COLOR_BLACK); }
+        else { TRS80Coco.setText(cursor, (((count >> 1) + 7) << 4) | 0xf); }
+      }
+    }
 
     while(true);
   }
