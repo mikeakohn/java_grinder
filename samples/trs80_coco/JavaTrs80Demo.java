@@ -24,10 +24,13 @@ public class JavaTrs80Demo
       TRS80Coco.plot(a, a, TRS80Coco.COLOR_ORANGE);
     }
 
+    //a = 0xff00;
+    //dx = a >> 3;
+
     dx = 1; dy = 1;
     x = 20; y = 10;
 
-    for (a = 1; a < 50; a++)
+    for (a = 1; a < 25; a++)
     {
       TRS80Coco.setText(y * 32 + x + 1024, TRS80Coco.COLOR_RED);
       for (n = 0; n < 5000; n++);
@@ -54,10 +57,12 @@ public class JavaTrs80Demo
 
     for (y = 0; y < 16; y++)
     {
+      // (y1 - y0) / 16 * y
       is = (((2 << DEC_PLACE) * y) >> 4) - (1 << DEC_PLACE);
 
       for (x = 0; x < 32; x++)
       {
+        // (x1 - x0) / 32 * x
         rs = (((3 << DEC_PLACE) * x) >> 5) - (2 << DEC_PLACE);
 
         zr = 0;

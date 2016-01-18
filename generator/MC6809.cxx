@@ -148,6 +148,7 @@ int MC6809::push_integer(int32_t n)
 {
   CHECK_INT16(n);
 
+  fprintf(out, "  ; push_integer\n");
   fprintf(out, "  ldd #0x%04x\n", n & 0xffff);
   fprintf(out, "  pshs a,b\n");
 
@@ -156,6 +157,7 @@ int MC6809::push_integer(int32_t n)
 
 int MC6809::push_integer_local(int index)
 {
+  fprintf(out, "  ; push_integer_local() index=%d\n", index);
   fprintf(out, "  ldd %d,u\n", LOCALS(index));
   fprintf(out, "  pshs a,b\n");
   return 0;
@@ -173,7 +175,8 @@ int MC6809::push_ref_local(int index)
 
 int MC6809::push_fake()
 {
-  fprintf(out, "  pshs x\n");
+  fprintf(out, "  ; push_fake\n");
+  fprintf(out, "  leas -2,s\n");
   return 0;
 }
 
@@ -214,7 +217,7 @@ int MC6809::push_ref(char *name)
 
 int MC6809::pop_integer_local(int index)
 {
-  fprintf(out, "  ; pop_integer_local()\n");
+  fprintf(out, "  ; pop_integer_local() index=%d\n", index);
   fprintf(out, "  puls a,b\n");
   fprintf(out, "  std %d,u\n", LOCALS(index));
   return 0;
@@ -285,9 +288,10 @@ int MC6809::add_integer(int num)
 int MC6809::sub_integer()
 {
   fprintf(out, "  ; sub_integer()\n");
-  fprintf(out, "  puls a,b\n");
+  fprintf(out, "  ldd 2,s\n");
   fprintf(out, "  subd ,s\n");
-  fprintf(out, "  std ,s\n");
+  fprintf(out, "  std 2,s\n");
+  fprintf(out, "  leas 2,s\n");
   return 0;
 }
 
@@ -295,8 +299,11 @@ int MC6809::sub_integer(int num)
 {
   CHECK_INT16(num);
   fprintf(out, "  ; sub_integer()\n");
-  fprintf(out, "  ldd #0x%04x\n", num & 0xffff);
-  fprintf(out, "  subd ,s\n");
+  //fprintf(out, "  ldd #0x%04x\n", num & 0xffff);
+  //fprintf(out, "  subd ,s\n");
+  fprintf(out, "  ldd ,s\n");
+  fprintf(out, "  subb #0x%02x\n", num & 0xff);
+  fprintf(out, "  sbca #0x%02x\n", (num & 0xff00) >> 8);
   fprintf(out, "  std ,s\n");
   return 0;
 }
