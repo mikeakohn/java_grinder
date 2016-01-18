@@ -344,7 +344,7 @@ int MC6809::shift_left_integer(int num)
 
   fprintf(out, "  ; shift_left_integer()\n");
 
-  fprintf(out, "  ldd ,u\n");
+  fprintf(out, "  ldd ,s\n");
 
   if (num < 8)
   {
@@ -366,7 +366,7 @@ int MC6809::shift_left_integer(int num)
     }
   }
 
-  fprintf(out, "  std ,u\n");
+  fprintf(out, "  std ,s\n");
 
   return 0;
 }
@@ -382,7 +382,7 @@ int MC6809::shift_right_integer(int num)
   int n;
 
   fprintf(out, "  ; shift_right_integer()\n");
-  fprintf(out, "  ldd ,u\n");
+  fprintf(out, "  ldd ,s\n");
 
   if (num < 8)
   {
@@ -404,7 +404,7 @@ int MC6809::shift_right_integer(int num)
     }
   }
 
-  fprintf(out, "  std ,u\n");
+  fprintf(out, "  std ,s\n");
 
   return 0;
 }
@@ -420,7 +420,7 @@ int MC6809::shift_right_uinteger(int num)
   int n;
 
   fprintf(out, "  ; shift_right_uinteger()\n");
-  fprintf(out, "  ldd ,u\n");
+  fprintf(out, "  ldd ,s\n");
 
   if (num < 8)
   {
@@ -442,7 +442,7 @@ int MC6809::shift_right_uinteger(int num)
     }
   }
 
-  fprintf(out, "  std ,u\n");
+  fprintf(out, "  std ,s\n");
 
   return 0;
 }
