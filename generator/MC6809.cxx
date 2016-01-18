@@ -454,7 +454,15 @@ int MC6809::and_integer()
 
 int MC6809::and_integer(int num)
 {
-  return -1;
+  uint16_t value = (uint16_t)num;
+
+  fprintf(out, "  ; and_integer()\n");
+  fprintf(out, "  ldd ,s\n");
+  fprintf(out, "  anda #0x%02x\n", value >> 8);
+  fprintf(out, "  andb #0x%02x\n", value & 0xff);
+  fprintf(out, "  std ,s\n");
+
+  return 0;
 }
 
 int MC6809::or_integer()
@@ -464,7 +472,15 @@ int MC6809::or_integer()
 
 int MC6809::or_integer(int num)
 {
-  return -1;
+  uint16_t value = (uint16_t)num;
+
+  fprintf(out, "  ; or_integer()\n");
+  fprintf(out, "  ldd ,s\n");
+  fprintf(out, "  ora #0x%02x\n", value >> 8);
+  fprintf(out, "  orb #0x%02x\n", value & 0xff);
+  fprintf(out, "  std ,s\n");
+
+  return 0;
 }
 
 int MC6809::xor_integer()
@@ -474,7 +490,15 @@ int MC6809::xor_integer()
 
 int MC6809::xor_integer(int num)
 {
-  return -1;
+  uint16_t value = (uint16_t)num;
+
+  fprintf(out, "  ; xor_integer()\n");
+  fprintf(out, "  ldd ,s\n");
+  fprintf(out, "  eora #0x%02x\n", value >> 8);
+  fprintf(out, "  eorb #0x%02x\n", value & 0xff);
+  fprintf(out, "  std ,s\n");
+
+  return 0;
 }
 
 int MC6809::inc_integer(int index, int num)
