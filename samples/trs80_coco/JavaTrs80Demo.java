@@ -4,6 +4,10 @@ import net.mikekohn.java_grinder.TRS80Coco;
 public class JavaTrs80Demo
 {
   static public int extra = 4;
+  static int[] color_table =
+  {
+    0x80, 0x8f, 0x9f, 0xaf, 0xbf, 0xcf, 0xdf, 0xef, 0xff
+  };
 
   static public int sub(int a, int b)
   {
@@ -61,6 +65,8 @@ public class JavaTrs80Demo
         //else { TRS80Coco.setText(cursor, (((count >> 1) + 7) << 4) | 0xf); }
         count >>= 1;
 
+        color = color_table[count];
+/*
         if (count == 0) { color = TRS80Coco.COLOR_BLACK; }
         else if (count == 1) { color = TRS80Coco.COLOR_GREEN; }
         else if (count == 2) { color = TRS80Coco.COLOR_YELLOW; }
@@ -70,6 +76,7 @@ public class JavaTrs80Demo
         else if (count == 6) { color = TRS80Coco.COLOR_CYAN; }
         else if (count == 7) { color = TRS80Coco.COLOR_PURPLE; }
         else { color = TRS80Coco.COLOR_ORANGE; }
+*/
 
         TRS80Coco.setText(cursor, color);
 

@@ -366,8 +366,8 @@ int MC6809::shift_left_integer(int num)
   {
     for (n = 0; n < num; n++)
     {
-      fprintf(out, "  aslb \n");
-      fprintf(out, "  rola \n");
+      fprintf(out, "  lslb\n");
+      fprintf(out, "  rola\n");
     }
   }
     else
@@ -680,13 +680,13 @@ int MC6809::new_array(uint8_t type)
 int MC6809::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 {
   if (type == TYPE_BYTE)
-  { return insert_db(name, data, len, TYPE_INT); }
+  { return insert_db(name, data, len, TYPE_SHORT); }
     else
   if (type == TYPE_SHORT)
-  { return insert_dw(name, data, len, TYPE_INT); }
+  { return insert_dw(name, data, len, TYPE_SHORT); }
     else
   if (type == TYPE_INT)
-  { return insert_dc32(name, data, len, TYPE_INT); }
+  { return insert_dw(name, data, len, TYPE_SHORT); }
 
   return -1;
 }
@@ -698,42 +698,82 @@ int MC6809::insert_string(const char *name, uint8_t *bytes, int len)
 
 int MC6809::push_array_length()
 {
-  return -1;
+  fprintf(out, "  ; push_array_length()\n");
+  fprintf(out, "  ldy ,s\n");
+  fprintf(out, "  ldd -2,y\n");
+  fprintf(out, "  std ,s\n");
+
+  return 0;
 }
 
 int MC6809::push_array_length(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  ; push_array_length()\n");
+  fprintf(out, "  ldy [name]\n");
+  fprintf(out, "  ldd -2,y\n");
+  fprintf(out, "  pshs a,b\n");
+
+  return 0;
 }
 
 int MC6809::array_read_byte()
 {
-  return -1;
+  fprintf(out, "  ; array_read_byte()\n");
+  fprintf(out, "  puls a,b\n");
+  fprintf(out, "  addd ,s\n");
+  fprintf(out, "  tfr d,x\n");
+  fprintf(out, "  ldb ,x\n");
+  fprintf(out, "  sex\n");
+  fprintf(out, "  std ,s\n");
+  return 0;
 }
 
 int MC6809::array_read_short()
 {
-  return -1;
+  fprintf(out, "  ; array_read_short()\n");
+  fprintf(out, "  puls a,b\n");
+  fprintf(out, "  lslb\n");
+  fprintf(out, "  rola\n");
+  fprintf(out, "  addd ,s\n");
+  fprintf(out, "  tfr d,x\n");
+  fprintf(out, "  ldd ,x\n");
+  fprintf(out, "  std ,s\n");
+  return 0;
 }
 
 int MC6809::array_read_int()
 {
-  return -1;
+  return array_read_short();
 }
 
 int MC6809::array_read_byte(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  ; array_read_byte()\n");
+  fprintf(out, "  ldy [name]\n");
+  fprintf(out, "  addd ,s\n");
+  fprintf(out, "  tfr d,x\n");
+  fprintf(out, "  ldb ,x\n");
+  fprintf(out, "  sex\n");
+  fprintf(out, "  std ,s\n");
+  return 0;
 }
 
 int MC6809::array_read_short(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  ; array_read_short()\n");
+  fprintf(out, "  puls a,b\n");
+  fprintf(out, "  lslb\n");
+  fprintf(out, "  rola\n");
+  fprintf(out, "  addd ,s\n");
+  fprintf(out, "  tfr d,x\n");
+  fprintf(out, "  ldd ,x\n");
+  fprintf(out, "  std ,s\n");
+  return 0;
 }
 
 int MC6809::array_read_int(const char *name, int field_id)
 {
-  return -1;
+  return array_read_short(name, field_id);
 }
 
 int MC6809::array_write_byte()
@@ -748,7 +788,7 @@ int MC6809::array_write_short()
 
 int MC6809::array_write_int()
 {
-  return -1;
+  return array_write_short();
 }
 
 int MC6809::array_write_byte(const char *name, int field_id)
@@ -763,7 +803,7 @@ int MC6809::array_write_short(const char *name, int field_id)
 
 int MC6809::array_write_int(const char *name, int field_id)
 {
-  return -1;
+  return array_write_short();
 }
 
 void MC6809::add_multiply()
