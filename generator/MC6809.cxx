@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 
 #include "MC6809.h"
@@ -111,36 +112,33 @@ int MC6809::insert_field_init(char *name, int index)
 
 void MC6809::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
-  //is_main = (strcmp(name, "main") == 0) ? 1 : 0;
+  int n;
+
+  is_main = (strcmp(name, "main") == 0) ? 1 : 0;
 
   fprintf(out, "%s:\n", name);
+
+  fprintf(out, "  pshs u\n");    // really only needed when not main()
 
   if (local_count != 0)
   {
     fprintf(out, "  leas -%d,s\n", local_count * 2);
-#if 0
-    fprintf(out, "  tfr s,d\n");
-    fprintf(out, "  subd #%d\n", local_count * 2);
-    fprintf(out, "  tfr d,s\n");
-#endif
   }
 
-  fprintf(out, "  pshs u\n");    // really only needed when not main()
   fprintf(out, "  tfr s,u\n");
+
+  if (!is_main)
+  {
+    for (n = 0; n < param_count; n++)
+    {
+      fprintf(out, "  ldd %d,s\n", n * 2);
+      fprintf(out, "  ldd %d,s\n", (n + param_count + 2) * 2);
+    }
+  }
 }
 
 void MC6809::method_end(int local_count)
 {
-  fprintf(out, "  puls u\n");    // really only needed when not main()
-  if (local_count != 0)
-  {
-    fprintf(out, "  leas %d,s\n", local_count * 2);
-#if 0
-    fprintf(out, "  tfr s,d\n");
-    fprintf(out, "  addd #%d\n", local_count * 2);
-    fprintf(out, "  tfr d,s\n");
-#endif
-  }
   fprintf(out, "\n");
 }
 
@@ -238,8 +236,7 @@ int MC6809::pop()
 int MC6809::dup()
 {
   fprintf(out, "  ; dup()\n");
-  fprintf(out, "  puls x\n");
-  fprintf(out, "  pshs x\n");
+  fprintf(out, "  ldx ,s\n");
   fprintf(out, "  pshs x\n");
   return 0;
 }
@@ -247,22 +244,18 @@ int MC6809::dup()
 int MC6809::dup2()
 {
   fprintf(out, "  ; dup2()\n");
-  fprintf(out, "  puls x\n");
-  fprintf(out, "  puls y\n");
-  fprintf(out, "  pshs x\n");
-  fprintf(out, "  pshs y\n");
-  fprintf(out, "  pshs x\n");
-  fprintf(out, "  pshs y\n");
+  fprintf(out, "  ldx ,s\n");
+  fprintf(out, "  ldy 2,s\n");
+  fprintf(out, "  pshs x,y\n");
   return 0;
 }
 
 int MC6809::swap()
 {
   fprintf(out, "  ; swap()\n");
-  fprintf(out, "  puls x\n");
-  fprintf(out, "  puls y\n");
-  fprintf(out, "  pshs y\n");
-  fprintf(out, "  pshs x\n");
+  fprintf(out, "  puls x,y\n");
+  fprintf(out, "  exg x,y\n");
+  fprintf(out, "  pshs x,y\n");
   return 0;
 }
 
@@ -332,10 +325,11 @@ int MC6809::mod_integer()
 int MC6809::neg_integer()
 {
   fprintf(out, "  ; neg_integer()\n");
-  fprintf(out, "  neg ,s\n");
-  //fprintf(out, "  puls a,b\n");
-  //fprintf(out, "  neg d\n");
-  //fprintf(out, "  pshs a,b\n");
+  fprintf(out, "  ldd ,s\n");
+  fprintf(out, "  coma\n");
+  fprintf(out, "  comb\n");
+  fprintf(out, "  subd #-1\n");
+  fprintf(out, "  std ,s\n");
   return 0;
 }
 
@@ -492,7 +486,12 @@ int MC6809::or_integer(int num)
 
 int MC6809::xor_integer()
 {
-  return -1;
+  fprintf(out, "  ; xor_integer()\n");
+  fprintf(out, "  puls a,b\n");
+  fprintf(out, "  eora ,s\n");
+  fprintf(out, "  eorb 1,s\n");
+  fprintf(out, "  std ,s\n");
+  return 0;
 }
 
 int MC6809::xor_integer(int num)
@@ -560,17 +559,42 @@ int MC6809::jump_cond_integer(const char *label, int cond, int distance)
 
 int MC6809::return_local(int index, int local_count)
 {
-  return -1;
+  fprintf(out, "  std %d,u\n", LOCALS(index));
+
+  if (local_count != 0)
+  {
+    fprintf(out, "  leas %d,s\n", local_count * 2);
+  }
+
+  fprintf(out, "  puls u\n");
+  fprintf(out, "  rts\n");
+  return 0;
 }
 
 int MC6809::return_integer(int local_count)
 {
-  return -1;
+  fprintf(out, "  puls a,b\n");
+
+  if (local_count != 0)
+  {
+    fprintf(out, "  leas %d,s\n", local_count * 2);
+  }
+
+  fprintf(out, "  puls u\n");
+  fprintf(out, "  rts\n");
+  return 0;
 }
 
 int MC6809::return_void(int local_count)
 {
-  return -1;
+  if (local_count != 0)
+  {
+    fprintf(out, "  leas %d,s\n", local_count * 2);
+  }
+
+  fprintf(out, "  puls u\n");
+  fprintf(out, "  rts\n");
+  return 0;
 }
 
 int MC6809::jump(const char *name, int distance)
@@ -594,7 +618,22 @@ int MC6809::call(const char *name)
 
 int MC6809::invoke_static_method(const char *name, int params, int is_void)
 {
-  return -1;
+  printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
+
+  fprintf(out, "  ; invoke_static_method() params=%d\n", params);
+  fprintf(out, "  jsr %s\n", name);
+
+  if (params != 0)
+  {
+    fprintf(out, "  leas %d,s\n", params * 2);
+  }
+
+  if (is_void != 0)
+  {
+    fprintf(out, "  pshs a,b\n");
+  }
+
+  return 0;
 }
 
 int MC6809::put_static(const char *name, int index)
