@@ -50,6 +50,7 @@ public class JavaTrs80Demo
     int tr,ti;
     int zr2,zi2;
     int count;
+    int color;
 
     for (y = 0; y < 16; y++)
     {
@@ -77,8 +78,23 @@ public class JavaTrs80Demo
         }
 
         // Change this to a lookup table.
-        if (count == 0) { TRS80Coco.setText(cursor, TRS80Coco.COLOR_BLACK); }
-        else { TRS80Coco.setText(cursor, (((count >> 1) + 7) << 4) | 0xf); }
+        //if (count == 0) { TRS80Coco.setText(cursor, TRS80Coco.COLOR_BLACK); }
+        //else { TRS80Coco.setText(cursor, (((count >> 1) + 7) << 4) | 0xf); }
+        count >>= 1;
+
+        if (count == 0) { color = TRS80Coco.COLOR_BLACK; }
+        else if (count == 1) { color = TRS80Coco.COLOR_GREEN; }
+        else if (count == 2) { color = TRS80Coco.COLOR_YELLOW; }
+        else if (count == 3) { color = TRS80Coco.COLOR_BLUE; }
+        else if (count == 4) { color = TRS80Coco.COLOR_RED; }
+        else if (count == 5) { color = TRS80Coco.COLOR_WHITE; }
+        else if (count == 6) { color = TRS80Coco.COLOR_CYAN; }
+        else if (count == 7) { color = TRS80Coco.COLOR_PURPLE; }
+        else { color = TRS80Coco.COLOR_ORANGE; }
+
+        TRS80Coco.setText(cursor, color);
+
+        cursor++;
       }
     }
 
