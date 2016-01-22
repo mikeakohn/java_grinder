@@ -42,5 +42,6 @@ clean:
 	@cd ti99 && make clean
 	@cd trs80_coco && make clean
 	@cd x86 && make clean
+	@cd w65c265sxb && make clean
 
 
