@@ -174,7 +174,15 @@ int X86::push_integer(int32_t n)
 
   if (reg < REG_MAX)
   {
-    fprintf(out, "  mov %s, %d\n", REG_STACK(reg++), n);
+    if (n == 0)
+    {
+      fprintf(out, "  xor %s, %s\n", REG_STACK(reg), REG_STACK(reg));
+      reg++;
+    }
+      else
+    {
+      fprintf(out, "  mov %s, %d\n", REG_STACK(reg++), n);
+    }
   }
     else
   {
@@ -339,7 +347,7 @@ int X86::dup()
     stack++;
   }
 
-  return -1;
+  return 0;
 }
 
 int X86::dup2()
