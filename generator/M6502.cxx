@@ -614,8 +614,6 @@ int M6502::jump_cond(const char *label, int cond, int distance)
   {
     fprintf(out, "; jump_cond\n");
     fprintf(out, "  inx\n");
-    fprintf(out, "  txa\n");
-    fprintf(out, "  tay\n");
 
     if(cond == COND_LESS_EQUAL)
     {
@@ -632,19 +630,19 @@ int M6502::jump_cond(const char *label, int cond, int distance)
     switch(cond)
     {
       case COND_EQUAL:
-        fprintf(out, "  lda stack_lo - 0,y\n");
+        fprintf(out, "  lda stack_lo - 0,x\n");
         fprintf(out, "  cmp #0\n");
         fprintf(out, "  bne #10\n");
-        fprintf(out, "  lda stack_hi - 0,y\n");
+        fprintf(out, "  lda stack_hi - 0,x\n");
         fprintf(out, "  cmp #0\n");
         fprintf(out, "  bne #3\n");
         fprintf(out, "  jmp %s\n", label);
         break;
       case COND_NOT_EQUAL:
-        fprintf(out, "  lda stack_lo - 0,y\n");
+        fprintf(out, "  lda stack_lo - 0,x\n");
         fprintf(out, "  cmp #0\n");
         fprintf(out, "  bne #7\n");
-        fprintf(out, "  lda stack_hi - 0,y\n");
+        fprintf(out, "  lda stack_hi - 0,x\n");
         fprintf(out, "  cmp #0\n");
         fprintf(out, "  beq #3\n");
         fprintf(out, "  jmp %s\n", label);
@@ -652,9 +650,9 @@ int M6502::jump_cond(const char *label, int cond, int distance)
       case COND_LESS:
         if(reverse == false)
         {
-          fprintf(out, "  lda stack_lo - 0,y\n");
+          fprintf(out, "  lda stack_lo - 0,x\n");
           fprintf(out, "  cmp #0\n");
-          fprintf(out, "  lda stack_hi - 0,y\n");
+          fprintf(out, "  lda stack_hi - 0,x\n");
           fprintf(out, "  sbc #0\n");
           fprintf(out, "  bvc #2\n");
           fprintf(out, "  eor #0x80\n");
@@ -664,9 +662,9 @@ int M6502::jump_cond(const char *label, int cond, int distance)
           else
         {
           fprintf(out, "  lda #0\n");
-          fprintf(out, "  cmp stack_lo - 0,y\n");
+          fprintf(out, "  cmp stack_lo - 0,x\n");
           fprintf(out, "  lda #0\n");
-          fprintf(out, "  sbc stack_hi - 0,y\n");
+          fprintf(out, "  sbc stack_hi - 0,x\n");
           fprintf(out, "  bvc #2\n");
           fprintf(out, "  eor #0x80\n");
           fprintf(out, "  bpl #3\n");
@@ -676,9 +674,9 @@ int M6502::jump_cond(const char *label, int cond, int distance)
       case COND_GREATER_EQUAL:
         if(reverse == false)
         {
-          fprintf(out, "  lda stack_lo - 0,y\n");
+          fprintf(out, "  lda stack_lo - 0,x\n");
           fprintf(out, "  cmp #0\n");
-          fprintf(out, "  lda stack_hi - 0,y\n");
+          fprintf(out, "  lda stack_hi - 0,x\n");
           fprintf(out, "  sbc #0\n");
           fprintf(out, "  bvc #2\n");
           fprintf(out, "  eor #0x80\n");
@@ -688,9 +686,9 @@ int M6502::jump_cond(const char *label, int cond, int distance)
           else
         {
           fprintf(out, "  lda #0\n");
-          fprintf(out, "  cmp stack_lo - 0,y\n");
+          fprintf(out, "  cmp stack_lo - 0,x\n");
           fprintf(out, "  lda #0\n");
-          fprintf(out, "  sbc stack_hi - 0,y\n");
+          fprintf(out, "  sbc stack_hi - 0,x\n");
           fprintf(out, "  bvc #2\n");
           fprintf(out, "  eor #0x80\n");
           fprintf(out, "  bmi #3\n");
@@ -714,8 +712,6 @@ int M6502::jump_cond_integer(const char *label, int cond, int distance)
     fprintf(out, "; jump_cond_integer\n");
     fprintf(out, "  inx\n");
     fprintf(out, "  inx\n");
-    fprintf(out, "  txa\n");
-    fprintf(out, "  tay\n");
 
     if(cond == COND_LESS_EQUAL)
     {
@@ -732,30 +728,30 @@ int M6502::jump_cond_integer(const char *label, int cond, int distance)
     switch(cond)
     {
       case COND_EQUAL:
-        fprintf(out, "  lda stack_lo - 0,y\n");
-        fprintf(out, "  cmp stack_lo - 1,y\n");
+        fprintf(out, "  lda stack_lo - 0,x\n");
+        fprintf(out, "  cmp stack_lo - 1,x\n");
         fprintf(out, "  bne #11\n");
-        fprintf(out, "  lda stack_hi - 0,y\n");
-        fprintf(out, "  cmp stack_hi - 1,y\n");
+        fprintf(out, "  lda stack_hi - 0,x\n");
+        fprintf(out, "  cmp stack_hi - 1,x\n");
         fprintf(out, "  bne #3\n");
         fprintf(out, "  jmp %s\n", label);
         break;
       case COND_NOT_EQUAL:
-        fprintf(out, "  lda stack_lo - 0,y\n");
-        fprintf(out, "  cmp stack_lo - 1,y\n");
+        fprintf(out, "  lda stack_lo - 0,x\n");
+        fprintf(out, "  cmp stack_lo - 1,x\n");
         fprintf(out, "  bne #8\n");
-        fprintf(out, "  lda stack_hi - 0,y\n");
-        fprintf(out, "  cmp stack_hi - 1,y\n");
+        fprintf(out, "  lda stack_hi - 0,x\n");
+        fprintf(out, "  cmp stack_hi - 1,x\n");
         fprintf(out, "  beq #3\n");
         fprintf(out, "  jmp %s\n", label);
         break;
       case COND_LESS:
         if(reverse == false)
         {
-          fprintf(out, "  lda stack_lo - 0,y\n");
-          fprintf(out, "  cmp stack_lo - 1,y\n");
-          fprintf(out, "  lda stack_hi - 0,y\n");
-          fprintf(out, "  sbc stack_hi - 1,y\n");
+          fprintf(out, "  lda stack_lo - 0,x\n");
+          fprintf(out, "  cmp stack_lo - 1,x\n");
+          fprintf(out, "  lda stack_hi - 0,x\n");
+          fprintf(out, "  sbc stack_hi - 1,x\n");
           fprintf(out, "  bvc #2\n");
           fprintf(out, "  eor #0x80\n");
           fprintf(out, "  bpl #3\n");
@@ -763,10 +759,10 @@ int M6502::jump_cond_integer(const char *label, int cond, int distance)
         }
           else
         {
-          fprintf(out, "  lda stack_lo - 1,y\n");
-          fprintf(out, "  cmp stack_lo - 0,y\n");
-          fprintf(out, "  lda stack_hi - 1,y\n");
-          fprintf(out, "  sbc stack_hi - 0,y\n");
+          fprintf(out, "  lda stack_lo - 1,x\n");
+          fprintf(out, "  cmp stack_lo - 0,x\n");
+          fprintf(out, "  lda stack_hi - 1,x\n");
+          fprintf(out, "  sbc stack_hi - 0,x\n");
           fprintf(out, "  bvc #2\n");
           fprintf(out, "  eor #0x80\n");
           fprintf(out, "  bpl #3\n");
@@ -776,10 +772,10 @@ int M6502::jump_cond_integer(const char *label, int cond, int distance)
       case COND_GREATER_EQUAL:
         if(reverse == false)
         {
-          fprintf(out, "  lda stack_lo - 0,y\n");
-          fprintf(out, "  cmp stack_lo - 1,y\n");
-          fprintf(out, "  lda stack_hi - 0,y\n");
-          fprintf(out, "  sbc stack_hi - 1,y\n");
+          fprintf(out, "  lda stack_lo - 0,x\n");
+          fprintf(out, "  cmp stack_lo - 1,x\n");
+          fprintf(out, "  lda stack_hi - 0,x\n");
+          fprintf(out, "  sbc stack_hi - 1,x\n");
           fprintf(out, "  bvc #2\n");
           fprintf(out, "  eor #0x80\n");
           fprintf(out, "  bmi #3\n");
@@ -787,10 +783,10 @@ int M6502::jump_cond_integer(const char *label, int cond, int distance)
         }
           else
         {
-          fprintf(out, "  lda stack_lo - 1,y\n");
-          fprintf(out, "  cmp stack_lo - 0,y\n");
-          fprintf(out, "  lda stack_hi - 1,y\n");
-          fprintf(out, "  sbc stack_hi - 0,y\n");
+          fprintf(out, "  lda stack_lo - 1,x\n");
+          fprintf(out, "  cmp stack_lo - 0,x\n");
+          fprintf(out, "  lda stack_hi - 1,x\n");
+          fprintf(out, "  sbc stack_hi - 0,x\n");
           fprintf(out, "  bvc #2\n");
           fprintf(out, "  eor #0x80\n");
           fprintf(out, "  bmi #3\n");
@@ -896,12 +892,10 @@ int stack_vars = stack;
   {
     if (stack_vars > 0)
     {
-      fprintf(out, "  txa\n");
-      fprintf(out, "  tay\n");
-      fprintf(out, "  lda stack_lo + 1 + %d,y\n", (stack - stack_vars));
-      fprintf(out, "  sta stack_lo + 1 %d,y\n", local-1);
-      fprintf(out, "  lda stack_hi + 1 + %d,y\n", (stack - stack_vars));
-      fprintf(out, "  sta stack_hi + 1 %d,y\n", local-1);
+      fprintf(out, "  lda stack_lo + 1 + %d,x\n", (stack - stack_vars));
+      fprintf(out, "  sta stack_lo + 1 %d,x\n", local-1);
+      fprintf(out, "  lda stack_hi + 1 + %d,x\n", (stack - stack_vars));
+      fprintf(out, "  sta stack_hi + 1 %d,x\n", local-1);
       stack_vars--;
     }
 
@@ -987,19 +981,16 @@ int M6502::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 
   if (type == TYPE_BYTE)
   {
-    fprintf(out, ".align 16\n");
     return insert_db(name, data, len, TYPE_SHORT);
   }
     else
   if (type == TYPE_SHORT)
   {
-    fprintf(out, ".align 16\n");
     return insert_dw(name, data, len, TYPE_SHORT);
   }
     else
   if (type == TYPE_INT)
   {
-    fprintf(out, ".align 16\n");
     return insert_dw(name, data, len, TYPE_SHORT);
   }
 
@@ -1200,22 +1191,20 @@ int M6502::get_values_from_stack(int num)
 void M6502::insert_swap()
 {
   fprintf(out, "swap:\n");
-  fprintf(out, "  txa\n");
-  fprintf(out, "  tay\n");
-  fprintf(out, "  lda stack_lo,y\n");
-  fprintf(out, "  sta value1 + 0,y\n");
-  fprintf(out, "  lda stack_hi,y\n");
-  fprintf(out, "  sta value1 + 1,y\n");
+  fprintf(out, "  lda stack_lo,x\n");
+  fprintf(out, "  sta value1 + 0,x\n");
+  fprintf(out, "  lda stack_hi,x\n");
+  fprintf(out, "  sta value1 + 1,x\n");
 
-  fprintf(out, "  lda stack_lo - 1,y\n");
-  fprintf(out, "  sta stack_lo,y\n");
-  fprintf(out, "  lda stack_hi - 1,y\n");
-  fprintf(out, "  sta stack_hi,y\n");
+  fprintf(out, "  lda stack_lo - 1,x\n");
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  lda stack_hi - 1,x\n");
+  fprintf(out, "  sta stack_hi,x\n");
 
   fprintf(out, "  lda value1 + 0\n");
-  fprintf(out, "  sta stack_lo - 1,y\n");
+  fprintf(out, "  sta stack_lo - 1,x\n");
   fprintf(out, "  lda value1 + 1\n");
-  fprintf(out, "  sta stack_hi - 1,y\n");
+  fprintf(out, "  sta stack_hi - 1,x\n");
   fprintf(out, "  rts\n");
 }
 
@@ -1551,13 +1540,17 @@ void M6502::insert_integer_to_byte()
 
 void M6502::insert_dup()
 {
-//FIXME this is broken
   fprintf(out, "dup:\n");
   POP_HI();
+  fprintf(out, "  sta result + 1\n");
   POP_LO();
+  fprintf(out, "  sta result + 0\n");
   PUSH_LO();
+  fprintf(out, "  lda result + 1\n");
   PUSH_HI();
+  fprintf(out, "  lda result + 0\n");
   PUSH_LO();
+  fprintf(out, "  lda result + 1\n");
   PUSH_HI();
   fprintf(out, "  rts\n");
 }
