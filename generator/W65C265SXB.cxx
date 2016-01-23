@@ -145,3 +145,204 @@ void W65C265SXB::insert_put_string()
   fprintf(out, "  rts\n");
 }
 
+// 0xdf24 - port 4 direction
+// 0xdf25 - port 5 direction
+// 0xdf26 - port 6 direction
+// 0xdf20 - port 4 data
+// 0xdf21 - port 5 data
+// 0xdf22 - port 6 data
+
+// GPIO
+int W65C265SXB::ioport_setPinsAsInput(int port)
+{
+  if(port < 4 || port > 6)
+    return -1;
+
+  fprintf(out, "; ioport_setPinsAsInput\n");
+  POP();
+  fprintf(out, "  sep #0x20\n");
+  fprintf(out, "  eor #0xff\n");
+  fprintf(out, "  and 0xdf24 + %d\n", port - 4);
+  fprintf(out, "  sta 0xdf24 + %d\n", port - 4);
+  fprintf(out, "  rep #0x30\n");
+  stack--;
+
+  return 0;
+}
+
+int W65C265SXB::ioport_setPinsAsInput(int port, int const_val)
+{
+  if(port < 4 || port > 6)
+    return -1;
+
+  fprintf(out, "; ioport_setPinsAsInput (optimized)\n");
+  fprintf(out, "  sep #0x20\n");
+  fprintf(out, "  lda #%d\n", const_val);
+  fprintf(out, "  eor #0xff\n");
+  fprintf(out, "  and 0xdf24 + %d\n", port - 4);
+  fprintf(out, "  sta 0xdf24 + %d\n", port - 4);
+  fprintf(out, "  rep #0x30\n");
+
+  return 0;
+}
+
+int W65C265SXB::ioport_setPinsAsOutput(int port)
+{
+  if(port < 4 || port > 6)
+    return -1;
+
+  fprintf(out, "; ioport_setPinsAsOutput\n");
+  POP();
+  fprintf(out, "  sep #0x20\n");
+  fprintf(out, "  ora 0xdf24 + %d\n", port - 4);
+  fprintf(out, "  sta 0xdf24 + %d\n", port - 4);
+  fprintf(out, "  rep #0x30\n");
+  stack--;
+
+  return 0;
+}
+
+int W65C265SXB::ioport_setPinsAsOutput(int port, int const_val)
+{
+  if(port < 4 || port > 6)
+    return -1;
+
+  fprintf(out, "; ioport_setPinsAsOutput (optimized)\n");
+  fprintf(out, "  sep #0x20\n");
+  fprintf(out, "  lda #%d\n", const_val);
+  fprintf(out, "  ora 0xdf24 + %d\n", port - 4);
+  fprintf(out, "  sta 0xdf24 + %d\n", port - 4);
+  fprintf(out, "  rep #0x30\n");
+
+  return 0;
+}
+
+int W65C265SXB::ioport_setPinsValue(int port)
+{
+  if(port < 4 || port > 6)
+    return -1;
+
+  fprintf(out, "; ioport_setPinsValue\n");
+  POP();
+  fprintf(out, "  sep #0x20\n");
+  fprintf(out, "  sta 0xdf20 + %d\n", port - 4);
+  fprintf(out, "  rep #0x30\n");
+  stack--;
+
+  return 0;
+}
+
+int W65C265SXB::ioport_setPinsValue(int port, int const_val)
+{
+  if(port < 4 || port > 6)
+    return -1;
+
+  fprintf(out, "; ioport_setPinsValue (optimized)\n");
+  fprintf(out, "  sep #0x20\n");
+  fprintf(out, "  lda #%d\n", const_val);
+  fprintf(out, "  sta 0xdf20 + %d\n", port - 4);
+  fprintf(out, "  rep #0x30\n");
+
+
+  return 0;
+}
+
+int W65C265SXB::ioport_setPinsHigh(int port)
+{
+  if(port < 4 || port > 6)
+    return -1;
+
+  fprintf(out, "; ioport_setPinsHigh\n");
+  POP();
+  fprintf(out, "  sep #0x20\n");
+  fprintf(out, "  ora 0xdf20 + %d\n", port - 4);
+  fprintf(out, "  sta 0xdf20 + %d\n", port - 4);
+  fprintf(out, "  rep #0x30\n");
+  stack--;
+
+  return 0;
+}
+
+int W65C265SXB::ioport_setPinsLow(int port)
+{
+  if(port < 4 || port > 6)
+    return -1;
+
+  fprintf(out, "; ioport_setPinsLow\n");
+  POP();
+  fprintf(out, "  sep #0x20\n");
+  fprintf(out, "  eor #0xff\n");
+  fprintf(out, "  and 0xdf20 + %d\n", port - 4);
+  fprintf(out, "  sta 0xdf20 + %d\n", port - 4);
+  fprintf(out, "  rep #0x30\n");
+  stack--;
+
+
+  return 0;
+}
+
+int W65C265SXB::ioport_setPinAsOutput(int port)
+{
+  return -1;
+}
+
+int W65C265SXB::ioport_setPinAsInput(int port)
+{
+  return -1;
+}
+
+int W65C265SXB::ioport_setPinHigh(int port)
+{
+  return -1;
+}
+
+int W65C265SXB::ioport_setPinHigh(int port, int const_val)
+{
+  if(port < 4 || port > 6)
+    return -1;
+
+  if(const_val < 0 || const_val > 7) { return -1; }
+
+  fprintf(out, "; ioport_setPinHigh (optimized)\n");
+  fprintf(out, "  sep #0x20\n");
+  fprintf(out, "  lda #%d\n", (1 << const_val));
+  fprintf(out, "  ora 0xdf20 + %d\n", port - 4);
+  fprintf(out, "  sta 0xdf20 + %d\n", port - 4);
+  fprintf(out, "  rep #0x30\n");
+
+  return 0;
+}
+
+int W65C265SXB::ioport_setPinLow(int port)
+{
+  return -1;
+}
+
+int W65C265SXB::ioport_setPinLow(int port, int const_val)
+{
+  if(port < 4 || port > 6)
+    return -1;
+
+  if(const_val < 0 || const_val > 7) { return -1; }
+
+  fprintf(out, "; ioport_setPinLow (optimized)\n");
+  fprintf(out, "  sep #0x20\n");
+  fprintf(out, "  lda #%d\n", (1 << const_val));
+  fprintf(out, "  eor #0xff\n");
+  fprintf(out, "  and 0xdf20 + %d\n", port - 4);
+  fprintf(out, "  sta 0xdf20 + %d\n", port - 4);
+  fprintf(out, "  rep #0x30\n");
+
+  return 0;
+}
+
+int W65C265SXB::ioport_isPinInputHigh(int port)
+{
+  return -1;
+}
+
+int W65C265SXB::ioport_getPortInputValue(int port)
+{
+  return -1;
+}
+
