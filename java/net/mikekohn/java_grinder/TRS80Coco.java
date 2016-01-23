@@ -32,5 +32,10 @@ abstract public class TRS80Coco
 
   /** Plot a colored block.  x can be between 0 and 31, y between 0 and 15 */
   public static void plot(int x, int y, int color) { }
+
+  public static void enableVsyncListener();
+  public static void disableVsyncListener();
+  public static void enableHsyncListener();
+  public static void disableHsyncListener();
 }
 

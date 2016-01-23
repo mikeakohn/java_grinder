@@ -25,6 +25,10 @@ public:
   virtual int trs80_coco_setBackgroundColor_I(int value);
   virtual int trs80_coco_setText_II();
   virtual int trs80_coco_plot_III();
+  virtual int trs80_coco_enableVsyncListener();
+  virtual int trs80_coco_disableVsyncListener();
+  virtual int trs80_coco_enableHsyncListener();
+  virtual int trs80_coco_disableHsyncListener();
 
 private:
   uint32_t need_plot : 1;

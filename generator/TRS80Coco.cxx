@@ -71,6 +71,48 @@ int TRS80Coco::trs80_coco_plot_III()
   return 0;
 }
 
+int TRS80Coco::trs80_coco_enableVsyncListener()
+{
+  fprintf(out, "  ; enableVsyncListener()\n");
+  fprintf(out, "  lda 0xff92\n");
+  fprintf(out, "  ora #0x08\n");
+  fprintf(out, "  sta 0xff92\n");
+
+  return 0;
+}
+
+int TRS80Coco::trs80_coco_disableVsyncListener()
+{
+  fprintf(out, "  ; disableVsyncListener()\n");
+  fprintf(out, "  lda 0xff92\n");
+  fprintf(out, "  and #0xf7\n");
+  fprintf(out, "  sta 0xff92\n");
+
+  return 0;
+}
+
+int TRS80Coco::trs80_coco_enableHsyncListener()
+{
+  fprintf(out, "  ; enableVsyncListener()\n");
+  fprintf(out, "  lda 0xff92\n");
+  fprintf(out, "  ora #0x10\n");
+  fprintf(out, "  sta 0xff92\n");
+
+  return 0;
+}
+
+int TRS80Coco::trs80_coco_disableHsyncListener()
+{
+  fprintf(out, "  ; disableVsyncListener()\n");
+  fprintf(out, "  lda 0xff92\n");
+  fprintf(out, "  ora #0xef\n");
+  fprintf(out, "  sta 0xff92\n");
+
+  return 0;
+}
+
+
+
 void TRS80Coco::add_plot()
 {
   // RET    0 1
