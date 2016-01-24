@@ -71,8 +71,9 @@ int W65C265SXB::open(const char *filename)
 int W65C265SXB::w65c265sxb_getChar()
 {
   fprintf(out, "; getChar\n");
+  fprintf(out, "  lda #0\n");
   fprintf(out, "  sep #0x20\n");
-  fprintf(out, "  jsr.l 0xe036\n");
+  fprintf(out, "  jsr.l 0xe033\n");
   fprintf(out, "  rep #0x30\n");
   PUSH();
   stack++;
@@ -164,6 +165,13 @@ void W65C265SXB::insert_put_int()
   fprintf(out, "  sta put_int_result + 6\n");
   fprintf(out, "  sta put_int_result + 8\n");
   POP();
+  fprintf(out, "  bne put_int_check_sign\n");
+  fprintf(out, "  lda #'0'\n");
+  fprintf(out, "  sep #0x20\n");
+  fprintf(out, "  jsr.l 0xe04b\n");
+  fprintf(out, "  rep #0x30\n");
+  fprintf(out, "  rts\n");
+  fprintf(out, "put_int_check_sign:\n");
   fprintf(out, "  stx result\n");
   fprintf(out, "  bpl put_int_start\n");
   fprintf(out, "  eor #0xffff\n");
@@ -314,7 +322,6 @@ int W65C265SXB::ioport_setPinsValue(int port, int const_val)
   fprintf(out, "  sta 0xdf20 + %d\n", port - 4);
   fprintf(out, "  rep #0x30\n");
 
-
   return 0;
 }
 
@@ -414,6 +421,17 @@ int W65C265SXB::ioport_isPinInputHigh(int port)
 
 int W65C265SXB::ioport_getPortInputValue(int port)
 {
-  return -1;
+  if(port < 4 || port > 6)
+    return -1;
+
+  fprintf(out, "; ioport_getPortInputValue\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sep #0x20\n");
+  fprintf(out, "  lda 0xdf20 + %d\n", port - 4);
+  fprintf(out, "  rep #0x30\n");
+  PUSH();
+  stack++;
+
+  return 0;
 }
 
