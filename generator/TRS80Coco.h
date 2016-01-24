@@ -21,9 +21,12 @@ public:
   virtual ~TRS80Coco();
 
   virtual int open(const char *filename);
-  virtual int trs80_coco_setBackgroundColor_I();
-  virtual int trs80_coco_setBackgroundColor_I(int value);
+  virtual int trs80_coco_clearScreen();
+  //virtual int trs80_coco_setBackgroundColor_I();
+  //virtual int trs80_coco_setBackgroundColor_I(int value);
   virtual int trs80_coco_setText_II();
+  virtual int trs80_coco_setGraphicsMode();
+  virtual int trs80_coco_setTextMode();
   virtual int trs80_coco_plot_III();
   virtual int trs80_coco_enableVsyncListener();
   virtual int trs80_coco_disableVsyncListener();

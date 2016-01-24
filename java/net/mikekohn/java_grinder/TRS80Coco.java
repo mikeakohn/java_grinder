@@ -27,8 +27,11 @@ abstract public class TRS80Coco
 
   protected TRS80Coco() { }
 
-  public static void setBackgroundColor(int color) { }
+  public static void clearScreen() { }
+  //public static void setBackgroundColor(int color) { }
   public static void setText(int address, int value) { }
+  public static void setGraphicsMode() {}
+  public static void setTextMode() {}
 
   /** Plot a colored block.  x can be between 0 and 31, y between 0 and 15 */
   public static void plot(int x, int y, int color) { }

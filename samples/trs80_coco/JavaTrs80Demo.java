@@ -127,11 +127,21 @@ public class JavaTrs80Demo
       if (y >= 15) { dy = -1; }
     }
 
+    for (a = 0x90; a < 0x9f; a++)
+    {
+      TRS80Coco.setText(1024, a);
+      for (n = 0; n < 1000; n++);
+    }
+
+    TRS80Coco.clearScreen();
+
     drawMandelbrot();
 
     y = sub(5, 3);
     extra = 7;
     y = sub(5, 3);
+
+    TRS80Coco.setGraphicsMode();
 
     while(true);
   }

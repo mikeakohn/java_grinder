@@ -37,8 +37,11 @@
 
 int trs80_coco(JavaClass *java_class, Generator *generator, char *method_name)
 {
-  CHECK_FUNC(setBackgroundColor,_I)
+  CHECK_FUNC(clearScreen,)
+  //CHECK_FUNC(setBackgroundColor,_I)
   CHECK_FUNC(setText,_II)
+  CHECK_FUNC(setGraphicsMode,)
+  CHECK_FUNC(setTextMode,)
   CHECK_FUNC(plot,_III)
 
   CHECK_FUNC(enableVsyncListener,)
@@ -51,7 +54,7 @@ int trs80_coco(JavaClass *java_class, Generator *generator, char *method_name)
 
 int trs80_coco(JavaClass *java_class, Generator *generator, char *method_name, int const_val)
 {
-  CHECK_FUNC_CONST(setBackgroundColor,_I)
+  //CHECK_FUNC_CONST(setBackgroundColor,_I)
 
   return -1;
 }
