@@ -8,6 +8,14 @@ public class BlinkLED
     int i;
 
     W65C265SXB.putChar('\n');
+    W65C265SXB.putInt(-32767);
+    W65C265SXB.putChar('\n');
+    W65C265SXB.putInt(367);
+    W65C265SXB.putChar('\n');
+    W65C265SXB.putInt(12345);
+    W65C265SXB.putChar('\n');
+
+    W65C265SXB.putChar('\n');
     IOPort4.setPinsAsOutput(255);
 
     while(true)

@@ -54,8 +54,10 @@ public:
 
 private:
   bool need_put_string:1;
+  bool need_put_int:1;
 
   void insert_put_string();
+  void insert_put_int();
 };
 
 #endif

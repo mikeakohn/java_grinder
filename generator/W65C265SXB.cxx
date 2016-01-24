@@ -38,16 +38,31 @@ W65C265SXB::W65C265SXB()
   ram_start = 0x7000;
 
   need_put_string = 0;
+  need_put_int = 0;
 }
 
 W65C265SXB::~W65C265SXB()
 {
   if(need_put_string) { insert_put_string(); }
+  if(need_put_int) { insert_put_int(); }
 }
 
 int W65C265SXB::open(const char *filename)
 {
   if(W65816::open(filename) != 0) { return -1; }
+
+  fprintf(out, "put_int_result equ 0xe0\n");
+  fprintf(out, "put_int_table equ 0xf0\n");
+  fprintf(out, "lda #10000\n");
+  fprintf(out, "sta put_int_table + 0\n");
+  fprintf(out, "lda #1000\n");
+  fprintf(out, "sta put_int_table + 2\n");
+  fprintf(out, "lda #100\n");
+  fprintf(out, "sta put_int_table + 4\n");
+  fprintf(out, "lda #10\n");
+  fprintf(out, "sta put_int_table + 6\n");
+  fprintf(out, "lda #1\n");
+  fprintf(out, "sta put_int_table + 8\n");
 
   return 0;
 }
@@ -85,8 +100,12 @@ int W65C265SXB::w65c265sxb_getInt()
 
 int W65C265SXB::w65c265sxb_putInt_I()
 {
+  need_put_int = 1;
   fprintf(out, "; putInt\n");
-  return -1;
+  fprintf(out, "  jsr put_int\n");
+  stack--;
+
+  return 0;
 }
 
 int W65C265SXB::w65c265sxb_getString()
@@ -102,19 +121,6 @@ int W65C265SXB::w65c265sxb_putString()
   stack--;
 
   return 0;
-
-/*
-  fprintf(out, "; putString\n");
-  POP();
-  fprintf(out, "  stx result\n");
-  fprintf(out, "  tax\n");
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  sep #0x20\n");
-  fprintf(out, "  jsr.l 0xe04e\n");
-  fprintf(out, "  rep #0x30\n");
-  fprintf(out, "  ldx result\n");
-  stack--;
-*/
 }
 
 void W65C265SXB::insert_put_string()
@@ -142,6 +148,71 @@ void W65C265SXB::insert_put_string()
   fprintf(out, "  dey\n");
   fprintf(out, "  bne put_string_loop\n");
   fprintf(out, "put_string_end:\n");
+  fprintf(out, "  rts\n");
+}
+
+void W65C265SXB::insert_put_int()
+{
+  fprintf(out, "put_int:\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sta value1\n");
+  fprintf(out, "  sta value2\n");
+  fprintf(out, "  lda #'0'\n");
+  fprintf(out, "  sta put_int_result + 0\n");
+  fprintf(out, "  sta put_int_result + 2\n");
+  fprintf(out, "  sta put_int_result + 4\n");
+  fprintf(out, "  sta put_int_result + 6\n");
+  fprintf(out, "  sta put_int_result + 8\n");
+  POP();
+  fprintf(out, "  stx result\n");
+  fprintf(out, "  bpl put_int_start\n");
+  fprintf(out, "  eor #0xffff\n");
+  fprintf(out, "  inc\n");
+  fprintf(out, "  ldx #1\n");
+  fprintf(out, "  stx value1\n");
+  fprintf(out, "put_int_start:\n");
+  fprintf(out, "  ldx #0\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "put_int_loop:\n");
+  fprintf(out, "  cmp put_int_table,x\n");
+  fprintf(out, "  bmi put_int_loop2\n");
+  fprintf(out, "  inc value2\n");
+  fprintf(out, "put_int_loop2:\n");
+  fprintf(out, "  cmp put_int_table,x\n");
+  fprintf(out, "  bmi put_int_continue\n");
+  fprintf(out, "  sbc put_int_table,x\n");
+  fprintf(out, "  inc put_int_result,x\n");
+  fprintf(out, "  bra put_int_loop2\n");
+  fprintf(out, "put_int_continue:\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  cpx #10\n");
+  fprintf(out, "  bne put_int_loop\n");
+  fprintf(out, "  lda value1\n");
+  fprintf(out, "  beq put_int_skip_minus\n");
+  fprintf(out, "  lda #'-'\n");
+  fprintf(out, "  sep #0x20\n");
+  fprintf(out, "  jsr.l 0xe04b\n");
+  fprintf(out, "  rep #0x30\n");
+  fprintf(out, "put_int_skip_minus:\n");
+  fprintf(out, "  lda #5\n");
+  fprintf(out, "  sta value1\n");
+  fprintf(out, "  ldx #0\n");
+  fprintf(out, "put_int_print_loop:\n");
+  fprintf(out, "  lda value2\n");
+  fprintf(out, "  cmp value1\n");
+  fprintf(out, "  bmi put_int_print_continue\n");
+  fprintf(out, "  lda put_int_result,x\n");
+  fprintf(out, "  sep #0x20\n");
+  fprintf(out, "  jsr.l 0xe04b\n");
+  fprintf(out, "  rep #0x30\n");
+  fprintf(out, "put_int_print_continue:\n");
+  fprintf(out, "  dec value1\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  cpx #10\n");
+  fprintf(out, "  bne put_int_print_loop\n");
+  fprintf(out, "  ldx result\n");
   fprintf(out, "  rts\n");
 }
 
