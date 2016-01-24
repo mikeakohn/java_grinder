@@ -34,7 +34,11 @@ abstract public class TRS80Coco
   public static void setTextMode() {}
 
   /** Plot a colored block.  x can be between 0 and 31, y between 0 and 15 */
-  public static void plot(int x, int y, int color) { }
+  public static void plotLores(int x, int y, int color) { }
+
+  /** Plot a mid-res block (text mode).  x can be between 0 and 63 and y
+      can be between 0 and 31 */
+  public static void plotMidres(int x, int y, int color) { }
 
   public static void enableVsyncListener() {}
   public static void disableVsyncListener() {}

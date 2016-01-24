@@ -27,15 +27,19 @@ public:
   virtual int trs80_coco_setText_II();
   virtual int trs80_coco_setGraphicsMode();
   virtual int trs80_coco_setTextMode();
-  virtual int trs80_coco_plot_III();
+  virtual int trs80_coco_plotLores_III();
+  virtual int trs80_coco_plotMidres_III();
   virtual int trs80_coco_enableVsyncListener();
   virtual int trs80_coco_disableVsyncListener();
   virtual int trs80_coco_enableHsyncListener();
   virtual int trs80_coco_disableHsyncListener();
 
 private:
-  uint32_t need_plot : 1;
-  void add_plot();
+  void add_plot_lores();
+  void add_plot_midres();
+
+  uint32_t need_plot_lores : 1;
+  uint32_t need_plot_midres : 1;
 };
 
 #endif

@@ -21,7 +21,8 @@ public:
   virtual int trs80_coco_setText_II() { return -1; }
   virtual int trs80_coco_setGraphicsMode() { return -1; }
   virtual int trs80_coco_setTextMode() { return -1; }
-  virtual int trs80_coco_plot_III() { return -1; }
+  virtual int trs80_coco_plotLores_III() { return -1; }
+  virtual int trs80_coco_plotMidres_III() { return -1; }
   virtual int trs80_coco_enableVsyncListener() { return -1; }
   virtual int trs80_coco_disableVsyncListener() { return -1; }
   virtual int trs80_coco_enableHsyncListener() { return -1; }

@@ -16,7 +16,8 @@
 #include "TRS80Coco.h"
 
 TRS80Coco::TRS80Coco() :
-  need_plot(0)
+  need_plot_lores(0),
+  need_plot_midres(0)
 {
   // Cartridge ROM starts at 0xc0000.  RAM would start at 0x0600.
   start_org = 0xc000;
@@ -26,7 +27,8 @@ TRS80Coco::TRS80Coco() :
 
 TRS80Coco::~TRS80Coco()
 {
-  if (need_plot) { add_plot(); }
+  if (need_plot_lores) { add_plot_lores(); }
+  if (need_plot_midres) { add_plot_midres(); }
 }
 
 int TRS80Coco::open(const char *filename)
@@ -97,17 +99,23 @@ int TRS80Coco::trs80_coco_setTextMode()
 }
 
 
-int TRS80Coco::trs80_coco_plot_III()
+int TRS80Coco::trs80_coco_plotLores_III()
 {
-  need_plot = 1;
+  need_plot_lores = 1;
 
-  fprintf(out, "  ;; plot_III();\n");
-  fprintf(out, "  jsr _plot\n");
+  fprintf(out, "  ;; plotLores_III();\n");
+  fprintf(out, "  jsr _plot_lores\n");
   fprintf(out, "  leas 6,s\n");
-  //fprintf(out, "  puls x,y,a,b\n");
-  //fprintf(out, "  tfr s,d\n");
-  //fprintf(out, "  addd #6\n");
-  //fprintf(out, "  tfr d,s\n");
+  return 0;
+}
+
+int TRS80Coco::trs80_coco_plotMidres_III()
+{
+  need_plot_midres = 1;
+
+  fprintf(out, "  ;; plotMidres_III();\n");
+  fprintf(out, "  jsr _plot_midres\n");
+  fprintf(out, "  leas 6,s\n");
   return 0;
 }
 
@@ -151,13 +159,14 @@ int TRS80Coco::trs80_coco_disableHsyncListener()
   return 0;
 }
 
-void TRS80Coco::add_plot()
+void TRS80Coco::add_plot_lores()
 {
   // RET    0 1
   // 00 CC  2 3
   // 00 YY  4 5
   // 00 XX  6 7
-  fprintf(out, "_plot:\n");
+  // address = ((y / 2) * 32) +  (x / 2)
+  fprintf(out, "_plot_lores:\n");
   fprintf(out, "  lda 5,s\n");
   fprintf(out, "  ldb #32\n");
   fprintf(out, "  mul\n");
@@ -166,6 +175,56 @@ void TRS80Coco::add_plot()
   fprintf(out, "  tfr d,y\n");
   fprintf(out, "  ldb 3,s\n");
   fprintf(out, "  stb ,y\n");
+  fprintf(out, "  rts\n\n");
+}
+
+void TRS80Coco::add_plot_midres()
+{
+  // RET    0 1
+  // 00 CC  2 3
+  // 00 YY  4 5
+  // 00 XX  6 7
+  // address = ((y / 2) * 32) +  (x / 2)
+  // data = (color & 0xf0)
+  // if (x & 1) == 0: data |= 0x01
+  // if (x & 1) == 1: data |= 0x02
+  // Above is equivalent to: data = (x & 1) + 1
+  // if (y & 1) == 0: data <<= 4
+  fprintf(out, "_plot_midres:\n");
+  fprintf(out, "  lda 5,s\n");
+  fprintf(out, "  ldb #32\n");
+  fprintf(out, "  lsra\n");
+  fprintf(out, "  lsrb\n");
+  fprintf(out, "  mul\n");
+  fprintf(out, "  addd 6,s\n");
+  fprintf(out, "  addd #1024\n");
+  fprintf(out, "  tfr d,y      ; y now holds address where to write pixel\n");
+  fprintf(out, "  lda 3,s\n");
+  fprintf(out, "  anda #0x01\n");
+  fprintf(out, "  adda #0x01   ; a now holds 1 or 2 / if x is odd/even\n");
+  fprintf(out, "  ldb 5,s\n");
+  fprintf(out, "  bitb #0x01\n");
+  fprintf(out, "  bne _plot_midres_odd_y\n"); 
+  fprintf(out, "  lsla\n");
+  fprintf(out, "  lsla\n");
+  fprintf(out, "  lsla\n");
+  fprintf(out, "  lsla\n");
+  fprintf(out, "_plot_midres_odd_y:\n");
+  fprintf(out, "  ldb 3,s     ; b holds the color to plot\n");
+  fprintf(out, "  cmpb #0\n");
+  fprintf(out, "  beq _plot_midres_del_pixel\n");
+  fprintf(out, "  andb #0xf0  ; b holds the color to plot\n");
+  fprintf(out, "  sta 3,s\n");
+  fprintf(out, "  orb 3,s     ; b now holds the color and the pixel\n");
+  fprintf(out, "  lda ,y\n");
+  fprintf(out, "  anda #0x0f  ; a now holds the current 2x2 pixel value\n");
+  fprintf(out, "  sta ,y      ; This might cause a little flicker :(\n");
+  fprintf(out, "  orb ,y\n");
+  fprintf(out, "  rts\n");
+  fprintf(out, "_plot_midres_del_pixel:\n");
+  fprintf(out, "  eora #0xff  ; if color was 0, then erase the pixel\n");
+  fprintf(out, "  anda ,y\n");
+  fprintf(out, "  sta ,y\n");
   fprintf(out, "  rts\n\n");
 }
 

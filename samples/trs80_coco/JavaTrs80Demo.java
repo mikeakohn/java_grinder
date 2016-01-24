@@ -103,8 +103,10 @@ public class JavaTrs80Demo
 
     for (a = 1; a < 10; a++)
     {
-      TRS80Coco.plot(a, a, TRS80Coco.COLOR_ORANGE);
+      TRS80Coco.plotLores(a, a, TRS80Coco.COLOR_ORANGE);
     }
+
+    TRS80Coco.plotMidres(20, 20, TRS80Coco.COLOR_ORANGE);
 
     //a = 0xff00;
     //dx = a >> 3;
