@@ -29,25 +29,33 @@ TRS80Coco::~TRS80Coco()
 {
   if (need_plot_lores) { add_plot_lores(); }
   if (need_plot_midres) { add_plot_midres(); }
+  if (need_clear_screen_lores) { add_clear_screen_lores(); }
+  if (need_clear_screen_midres) { add_clear_screen_midres(); }
 }
 
 int TRS80Coco::open(const char *filename)
 {
   if (MC6809::open(filename) != 0) { return -1; }
 
+  fprintf(out, "  ldd 0xff02\n");
+  fprintf(out, "  orb #0x06\n");
+  fprintf(out, "  std 0xff02\n");
+
   return 0;
 }
 
-int TRS80Coco::trs80_coco_clearScreen()
+int TRS80Coco::trs80_coco_clearScreenLores()
 {
-  fprintf(out, "  ; clearScreen()\n");
-  fprintf(out, "  ldx #1024\n");
-  fprintf(out, "  ldd #0x8080\n");
-  fprintf(out, "_clear_screen_%d:\n", label_count);
-  fprintf(out, "  std ,x++\n");
-  fprintf(out, "  cmpx #1024+(32*16)\n");
-  fprintf(out, "  bne _clear_screen_%d\n", label_count);
-  label_count++;
+  fprintf(out, "  ; clearScreenLores()\n");
+  fprintf(out, "  jsr clear_screen_lores\n");
+
+  return 0;
+}
+
+int TRS80Coco::trs80_coco_clearScreenMidres()
+{
+  fprintf(out, "  ; clearScreenMidres()\n");
+  fprintf(out, "  jsr clear_screen_midres\n");
 
   return 0;
 }
@@ -142,9 +150,29 @@ int TRS80Coco::trs80_coco_disableVsyncListener()
 int TRS80Coco::trs80_coco_enableHsyncListener()
 {
   fprintf(out, "  ; enableVsyncListener()\n");
-  fprintf(out, "  lda 0xff92\n");
-  fprintf(out, "  ora #0x10\n");
-  fprintf(out, "  sta 0xff92\n");
+  //fprintf(out, "  lda 0xff92\n");
+  //fprintf(out, "  ora #0x10\n");
+  //fprintf(out, "  sta 0xff92\n");
+#if 0
+  fprintf(out, "_wait_vsync_off_%d:\n", label_count);
+  fprintf(out, "  ldd 0xff02\n");
+  fprintf(out, "  andb #0x7f\n");
+  fprintf(out, "  std 0xff02\n");
+  fprintf(out, "  ldd 0xff02\n");
+  fprintf(out, "  bitb #0x80\n");
+  fprintf(out, "  bne _wait_vsync_off_%d\n", label_count);
+#endif
+
+  fprintf(out, "_wait_vsync_off_%d:\n", label_count);
+  fprintf(out, "  ldb 0xff03\n");
+  fprintf(out, "  andb #0x7f\n");
+  fprintf(out, "  stb 0xff03\n");
+  fprintf(out, "  ldb 0xff03\n");
+  fprintf(out, "  bitb #0x80\n");
+  fprintf(out, "  bne _wait_vsync_off_%d\n", label_count);
+
+
+  label_count++;
 
   return 0;
 }
@@ -152,9 +180,23 @@ int TRS80Coco::trs80_coco_enableHsyncListener()
 int TRS80Coco::trs80_coco_disableHsyncListener()
 {
   fprintf(out, "  ; disableVsyncListener()\n");
-  fprintf(out, "  lda 0xff92\n");
-  fprintf(out, "  anda #0xef\n");
-  fprintf(out, "  sta 0xff92\n");
+#if 0
+  fprintf(out, "_wait_vsync_%d:\n", label_count);
+  fprintf(out, "  ldd 0xff02\n");
+  fprintf(out, "  bitb #0x80\n");
+  fprintf(out, "  beq _wait_vsync_%d\n", label_count);
+  fprintf(out, "  andb #0x7f\n");
+  fprintf(out, "  std 0xff02\n");
+#endif
+
+  fprintf(out, "_wait_vsync_%d:\n", label_count);
+  fprintf(out, "  ldd 0xff02\n");
+  fprintf(out, "  bitb #0x80\n");
+  fprintf(out, "  beq _wait_vsync_%d\n", label_count);
+  //fprintf(out, "  andb #0x7f\n");
+  //fprintf(out, "  std 0xff03\n");
+
+  label_count++;
 
   return 0;
 }
@@ -228,4 +270,27 @@ void TRS80Coco::add_plot_midres()
   fprintf(out, "  rts\n\n");
 }
 
+void TRS80Coco::add_clear_screen_lores()
+{
+  fprintf(out, "clear_screen_midres:\n");
+  fprintf(out, "  ldx #1024\n");
+  fprintf(out, "  ldd #0x8f8f\n");
+  fprintf(out, "_clear_screen_lores:\n");
+  fprintf(out, "  std ,x++\n");
+  fprintf(out, "  cmpx #1024+(32*16)\n");
+  fprintf(out, "  bne _clear_screen_lores\n");
+  fprintf(out, "  rts\n\n");
+}
+
+void TRS80Coco::add_clear_screen_midres()
+{
+  fprintf(out, "clear_screen_midres:\n");
+  fprintf(out, "  ldx #1024\n");
+  fprintf(out, "  ldd #0x8080\n");
+  fprintf(out, "_clear_screen_midres:\n");
+  fprintf(out, "  std ,x++\n");
+  fprintf(out, "  cmpx #1024+(32*16)\n");
+  fprintf(out, "  bne _clear_screen_midres\n");
+  fprintf(out, "  rts\n\n");
+}
 

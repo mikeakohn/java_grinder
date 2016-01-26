@@ -30,8 +30,9 @@ abstract public class TRS80Coco
   public static void clearScreen() { }
   //public static void setBackgroundColor(int color) { }
   public static void setText(int address, int value) { }
-  public static void setGraphicsMode() {}
-  public static void setTextMode() {}
+  public static void setGraphicsMode() { }
+  public static void setTextMode() { }
+  public static void print(String text) { }
 
   /** Plot a colored block.  x can be between 0 and 31, y between 0 and 15 */
   public static void plotLores(int x, int y, int color) { }
@@ -40,9 +41,9 @@ abstract public class TRS80Coco
       can be between 0 and 31 */
   public static void plotMidres(int x, int y, int color) { }
 
-  public static void enableVsyncListener() {}
-  public static void disableVsyncListener() {}
-  public static void enableHsyncListener() {}
-  public static void disableHsyncListener() {}
+  public static void enableVsyncListener() { }
+  public static void disableVsyncListener() { }
+  public static void enableHsyncListener() { }
+  public static void disableHsyncListener() { }
 }
 

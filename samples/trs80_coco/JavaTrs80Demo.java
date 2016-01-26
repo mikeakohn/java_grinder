@@ -4,10 +4,6 @@ import net.mikekohn.java_grinder.TRS80Coco;
 public class JavaTrs80Demo
 {
   static public int extra = 4;
-  static int[] color_table =
-  {
-    0x80, 0x8f, 0x9f, 0xaf, 0xbf, 0xcf, 0xdf, 0xef, 0xff
-  };
 
   static public int sub(int a, int b)
   {
@@ -18,71 +14,6 @@ public class JavaTrs80Demo
     c = c + extra;
 
     return c;
-  }
-
-  static public void drawMandelbrot()
-  {
-    // Time to try a Mandelbrot
-    final int DEC_PLACE = 4;
-    int cursor = 1024;
-    int rs,is;
-    int zi,zr;
-    int tr,ti;
-    int zr2,zi2;
-    int count;
-    int color;
-    int x,y;
-
-    for (y = 0; y < 16; y++)
-    {
-      // (y1 - y0) / 16 * y
-      is = (((2 << DEC_PLACE) * y) >> 4) - (1 << DEC_PLACE);
-
-      for (x = 0; x < 32; x++)
-      {
-        // (x1 - x0) / 32 * x
-        rs = (((3 << DEC_PLACE) * x) >> 5) - (2 << DEC_PLACE);
-
-        zr = 0;
-        zi = 0;
-
-        for (count = 0; count < 16; count++)
-        {
-          zr2 = (zr * zr) >> DEC_PLACE;
-          zi2 = (zi * zi) >> DEC_PLACE;
-
-          if (zr2 + zi2 > (4 << DEC_PLACE)) { break; }
-
-          tr = zr2 - zi2;
-          ti = 2 * ((zr * zi) >> DEC_PLACE);
-
-          zr = tr + rs;
-          zi = ti + is;
-        }
-
-        // Change this to a lookup table.
-        //if (count == 0) { TRS80Coco.setText(cursor, TRS80Coco.COLOR_BLACK); }
-        //else { TRS80Coco.setText(cursor, (((count >> 1) + 7) << 4) | 0xf); }
-        count >>= 1;
-
-        color = color_table[count];
-/*
-        if (count == 0) { color = TRS80Coco.COLOR_BLACK; }
-        else if (count == 1) { color = TRS80Coco.COLOR_GREEN; }
-        else if (count == 2) { color = TRS80Coco.COLOR_YELLOW; }
-        else if (count == 3) { color = TRS80Coco.COLOR_BLUE; }
-        else if (count == 4) { color = TRS80Coco.COLOR_RED; }
-        else if (count == 5) { color = TRS80Coco.COLOR_WHITE; }
-        else if (count == 6) { color = TRS80Coco.COLOR_CYAN; }
-        else if (count == 7) { color = TRS80Coco.COLOR_PURPLE; }
-        else { color = TRS80Coco.COLOR_ORANGE; }
-*/
-
-        TRS80Coco.setText(cursor, color);
-
-        cursor++;
-      }
-    }
   }
 
   static public void main(String args[])
@@ -117,7 +48,13 @@ public class JavaTrs80Demo
     for (a = 1; a < 25; a++)
     {
       TRS80Coco.setText(y * 32 + x + 1024, TRS80Coco.COLOR_RED);
-      for (n = 0; n < 5000; n++);
+      //for (n = 0; n < 5000; n++);
+      for (n = 0; n < 60; n++)
+      {
+        TRS80Coco.disableHsyncListener();
+        //TRS80Coco.enableHsyncListener();
+      }
+
       TRS80Coco.setText(y * 32 + x + 1024, TRS80Coco.COLOR_GREEN);
 
       x += dx;
@@ -137,7 +74,7 @@ public class JavaTrs80Demo
 
     TRS80Coco.clearScreen();
 
-    drawMandelbrot();
+    Mandelbrot.run();
 
     y = sub(5, 3);
     extra = 7;

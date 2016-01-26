@@ -21,7 +21,8 @@ public:
   virtual ~TRS80Coco();
 
   virtual int open(const char *filename);
-  virtual int trs80_coco_clearScreen();
+  virtual int trs80_coco_clearScreenLores();
+  virtual int trs80_coco_clearScreenMidres();
   //virtual int trs80_coco_setBackgroundColor_I();
   //virtual int trs80_coco_setBackgroundColor_I(int value);
   virtual int trs80_coco_setText_II();
@@ -37,9 +38,13 @@ public:
 private:
   void add_plot_lores();
   void add_plot_midres();
+  void add_clear_screen_lores();
+  void add_clear_screen_midres();
 
   uint32_t need_plot_lores : 1;
   uint32_t need_plot_midres : 1;
+  uint32_t need_clear_screen_lores : 1;
+  uint32_t need_clear_screen_midres : 1;
 };
 
 #endif
