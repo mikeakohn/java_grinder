@@ -23,14 +23,6 @@
     return generator->w65c265sxb_##funct##sig(); \
   }
 
-/*
-#define CHECK_STRING_FUNC(funct,sig) \
-  if (strcmp(#funct#sig, method_name) == 0) \
-  { \
-    return generator->w65c265sxb_##funct(); \
-  }
-*/
-
 #define CHECK_FUNC_CONST_1(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \
   { \
@@ -44,7 +36,6 @@ int w65c265sxb(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(getInt,)
   CHECK_FUNC(putInt,_I)
   CHECK_FUNC(getString,)
-//  CHECK_STRING_FUNC(putString,_Ljava/lang/String;)
   CHECK_FUNC(putString,_X)
 
   return -1;
