@@ -43,7 +43,7 @@ int trs80_coco(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(setText,_II)
   CHECK_FUNC(setGraphicsMode,)
   CHECK_FUNC(setTextMode,)
-  CHECK_FUNC(print,_)
+  CHECK_FUNC(print,_X)
 
   CHECK_FUNC(plotLores,_III)
   CHECK_FUNC(plotMidres,_III)

@@ -72,7 +72,7 @@ public class JavaTrs80Demo
       for (n = 0; n < 1000; n++);
     }
 
-    TRS80Coco.clearScreen();
+    TRS80Coco.clearScreenMidres();
 
     Mandelbrot.run();
 

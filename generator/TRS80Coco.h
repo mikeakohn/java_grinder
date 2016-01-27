@@ -28,6 +28,7 @@ public:
   virtual int trs80_coco_setText_II();
   virtual int trs80_coco_setGraphicsMode();
   virtual int trs80_coco_setTextMode();
+  virtual int trs80_coco_print_X();
   virtual int trs80_coco_plotLores_III();
   virtual int trs80_coco_plotMidres_III();
   virtual int trs80_coco_enableVsyncListener();

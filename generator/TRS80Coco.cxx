@@ -46,6 +46,8 @@ int TRS80Coco::open(const char *filename)
 
 int TRS80Coco::trs80_coco_clearScreenLores()
 {
+  need_clear_screen_lores = 1;
+
   fprintf(out, "  ; clearScreenLores()\n");
   fprintf(out, "  jsr clear_screen_lores\n");
 
@@ -54,6 +56,8 @@ int TRS80Coco::trs80_coco_clearScreenLores()
 
 int TRS80Coco::trs80_coco_clearScreenMidres()
 {
+  need_clear_screen_midres = 1;
+
   fprintf(out, "  ; clearScreenMidres()\n");
   fprintf(out, "  jsr clear_screen_midres\n");
 
@@ -104,6 +108,11 @@ int TRS80Coco::trs80_coco_setTextMode()
   fprintf(out, "  sta 0xff22\n");
 
   return 0;
+}
+
+int TRS80Coco::trs80_coco_print_X()
+{
+  return -1;
 }
 
 
@@ -272,7 +281,7 @@ void TRS80Coco::add_plot_midres()
 
 void TRS80Coco::add_clear_screen_lores()
 {
-  fprintf(out, "clear_screen_midres:\n");
+  fprintf(out, "clear_screen_lores:\n");
   fprintf(out, "  ldx #1024\n");
   fprintf(out, "  ldd #0x8f8f\n");
   fprintf(out, "_clear_screen_lores:\n");

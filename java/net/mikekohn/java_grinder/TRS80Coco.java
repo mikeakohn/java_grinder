@@ -27,7 +27,8 @@ abstract public class TRS80Coco
 
   protected TRS80Coco() { }
 
-  public static void clearScreen() { }
+  public static void clearScreenLores() { }
+  public static void clearScreenMidres() { }
   //public static void setBackgroundColor(int color) { }
   public static void setText(int address, int value) { }
   public static void setGraphicsMode() { }
