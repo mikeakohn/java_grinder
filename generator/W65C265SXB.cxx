@@ -115,7 +115,7 @@ int W65C265SXB::w65c265sxb_getString()
   return -1;
 }
 
-int W65C265SXB::w65c265sxb_putString()
+int W65C265SXB::w65c265sxb_putString_X()
 {
   need_put_string = 1;
   fprintf(out, "  jsr put_string\n");

@@ -30,7 +30,7 @@ public:
   virtual int w65c265sxb_getInt();
   virtual int w65c265sxb_putInt_I();
   virtual int w65c265sxb_getString();
-  virtual int w65c265sxb_putString();
+  virtual int w65c265sxb_putString_X();
 
   // GPIO functions
   virtual int ioport_setPinsAsInput(int port);

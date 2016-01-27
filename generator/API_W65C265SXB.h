@@ -23,7 +23,7 @@ public:
   virtual int w65c265sxb_getInt() { return -1; }
   virtual int w65c265sxb_putInt_I() { return -1; }
   virtual int w65c265sxb_getString() { return -1; }
-  virtual int w65c265sxb_putString() { return -1; }
+  virtual int w65c265sxb_putString_X() { return -1; }
 };
 
 #endif
