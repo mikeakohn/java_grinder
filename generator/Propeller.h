@@ -100,6 +100,12 @@ public:
   virtual int array_write_short(const char *name, int field_id);
   virtual int array_write_int(const char *name, int field_id);
 
+  // Math
+  virtual int math_abs_I();
+  virtual int math_xor_I();
+  virtual int math_min_II();
+  virtual int math_max_II();
+
   // Propeller specific
   virtual int propeller_setClock_I();
   virtual int propeller_getCogId();

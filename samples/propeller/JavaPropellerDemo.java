@@ -5,7 +5,12 @@ public class JavaPropellerDemo
 {
   static public void main(String args[])
   {
-    Propeller.stopCog(5);
+    int n;
+
+    for (n = 0; n < 5; n++)
+    {
+      Propeller.stopCog(n);
+    }
 
     while(true);
   }

@@ -479,6 +479,32 @@ int Propeller::array_write_int(const char *name, int field_id)
   return -1;
 }
 
+int Propeller::math_abs_I()
+{
+  fprintf(out, "  abs reg_%d, reg_%d\n", reg - 1, reg - 1);
+  return 0;
+}
+
+int Propeller::math_xor_I()
+{
+  fprintf(out, "  xor reg_%d, reg_%d\n", reg - 1, reg - 1);
+  return 0;
+}
+
+int Propeller::math_min_II()
+{
+  fprintf(out, "  min reg_%d, reg_%d\n", reg - 2, reg - 1);
+  reg--;
+  return 0;
+}
+
+int Propeller::math_max_II()
+{
+  fprintf(out, "  max reg_%d, reg_%d\n", reg - 2, reg - 1);
+  reg--;
+  return 0;
+}
+
 int Propeller::propeller_setClock_I()
 {
   return -1;

@@ -21,6 +21,7 @@ API= \
   ioport.o \
   java_lang_system.o \
   java_lang_string.o \
+  math_.o \
   memory.o \
   propeller_.o \
   sega_genesis.o \

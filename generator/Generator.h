@@ -21,6 +21,7 @@
 #include "API_Atari2600.h"
 #include "API_C64.h"
 #include "API_DSP.h"
+#include "API_Math.h"
 #include "API_Microcontroller.h"
 #include "API_Propeller.h"
 #include "API_SegaGenesis.h"
@@ -36,6 +37,7 @@ class Generator :
   public API_Atari2600,
   public API_C64,
   public API_DSP,
+  public API_Math,
   public API_Microcontroller,
   public API_Propeller,
   public API_SegaGenesis,
