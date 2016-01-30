@@ -31,7 +31,8 @@ public:
   virtual int cpu_setClock25() { return -1; }
   virtual int cpu_setClockExternal2() { return -1; }
   virtual int cpu_nop() { return -1; }
-  virtual int cpu_asm(const char *code, int len) { return -1; }
+  virtual int cpu_asm_X(const char *code, int len) { return -1; }
+  virtual int cpu_getCycleCount() { return -1; }
 };
 
 #endif

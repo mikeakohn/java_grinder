@@ -31,6 +31,10 @@
   if (a < 0 || a > 511) { PUSH_CONST(a); } \
   else { PUSH_IMMEDIATE(a); } \
 
+#define PUSH_TEMP() \
+  reg++; \
+  if (reg > reg_max) { reg_max = reg; }
+
 // ABI is:
 
 Propeller::Propeller() :
@@ -59,14 +63,32 @@ Propeller::~Propeller()
     fprintf(out, "reg_%d:\n", n);
     fprintf(out, "  dc32 0\n");
   }
-
 }
 
 int Propeller::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 
-  fprintf(out, ".propeller\n");
+  fprintf(out, ".propeller\n\n");
+
+  fprintf(out,
+    "  _par equ 496\n"
+    "  _cnt equ 497\n"
+    "  _ina equ 498\n"
+    "  _inb equ 499\n"
+    "  _outa equ 500\n"
+    "  _outb equ 501\n"
+    "  _dira equ 502\n"
+    "  _dirb equ 503\n"
+    "  _ctra equ 504\n"
+    "  _ctrb equ 505\n"
+    "  _frqa equ 506\n"
+    "  _frqb equ 507\n"
+    "  _phsa equ 508\n"
+    "  _phsb equ 509\n"
+    "  _vcfg equ 510\n"
+    "  _vscl equ 511\n\n"
+    );
 
   // Set where RAM starts / ends
   //fprintf(out, "ram_start equ 0\n");
@@ -589,7 +611,9 @@ int Propeller::propeller_setClock_I()
 
 int Propeller::propeller_getCogId()
 {
-  return -1;
+  fprintf(out, "  cogid reg_%d\n", reg++);
+  if (reg > reg_max) { reg_max = reg; }
+  return 0;
 }
 
 int Propeller::propeller_stopCog_I()
@@ -598,19 +622,52 @@ int Propeller::propeller_stopCog_I()
   return 0;
 }
 
-#if 0
-int Propeller::propeller_stopCog_I(int value)
+int Propeller::propeller_waitPinsEqual_II()
 {
-  if (value < 0 || value > 7)
-  {
-    printf("Error: Cog value must be between 0 and 7\n");
-    return -1;
-  }
-
-  fprintf(out, "  cogstop #%d\n", value);
+  fprintf(out, "  waitpeq reg_%d, reg_%d\n", reg - 2, reg - 1);
+  reg -= 2;
   return 0;
 }
-#endif
 
+int Propeller::propeller_waitPinsEqual_II(int mask)
+{
+  fprintf(out, "  waitpeq reg_%d, #0x%08x\n", reg - 1, (uint32_t)mask);
+  reg--;
+  return 0;
+}
+
+int Propeller::propeller_waitPinsNotEqual_II()
+{
+  fprintf(out, "  waitpne reg_%d, reg_%d\n", reg - 2, reg - 1);
+  reg -= 2;
+  return 0;
+}
+
+int Propeller::propeller_waitPinsNotEqual_II(int mask)
+{
+  fprintf(out, "  waitpne reg_%d, #0x%08x\n", reg - 1, (uint32_t)mask);
+  reg--;
+  return 0;
+}
+
+int Propeller::propeller_waitCount_II()
+{
+  fprintf(out, "  waitcnt reg_%d, reg_%d\n", reg - 2, reg - 1);
+  reg--;
+  return 0;
+}
+
+int Propeller::propeller_waitCount_II(int delay)
+{
+  fprintf(out, "  waitcnt reg_%d, #0x%08x\n", reg - 1, (uint32_t)delay);
+  return 0;
+}
+
+int Propeller::cpu_getCycleCount()
+{
+  fprintf(out, "  mov reg_%d, _cnt\n", reg++);
+  if (reg > reg_max) { reg_max = reg; }
+  return 0;
+}
 
 

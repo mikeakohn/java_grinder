@@ -141,7 +141,7 @@ public:
   //virtual void close() = 0;
 
   // CPU
-  virtual int cpu_asm(const char *code, int len);
+  virtual int cpu_asm_X(const char *code, int len);
 
   void add_newline();
   void instruction_count_clear() { instruction_count = 0; }

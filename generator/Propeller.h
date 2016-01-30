@@ -113,7 +113,15 @@ public:
   virtual int propeller_setClock_I();
   virtual int propeller_getCogId();
   virtual int propeller_stopCog_I();
-  //virtual int propeller_stopCog_I(int value);
+  virtual int propeller_waitPinsEqual_II();
+  virtual int propeller_waitPinsEqual_II(int mask);
+  virtual int propeller_waitPinsNotEqual_II();
+  virtual int propeller_waitPinsNotEqual_II(int mask);
+  virtual int propeller_waitCount_II();
+  virtual int propeller_waitCount_II(int delay);
+
+  // CPU
+  virtual int cpu_getCycleCount();
 
 protected:
   int reg;            // count number of registers are are using as stack

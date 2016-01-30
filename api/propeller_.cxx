@@ -40,13 +40,18 @@ int propeller(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(setClock_I,)
   CHECK_FUNC(getCogId,)
   CHECK_FUNC(stopCog_I,)
+  CHECK_FUNC(waitCount,_II)
+  CHECK_FUNC(waitPinsEqual,_II)
+  CHECK_FUNC(waitPinsNotEqual,_II)
 
   return -1;
 }
 
 int propeller(JavaClass *java_class, Generator *generator, char *method_name, int const_val)
 {
-  //CHECK_FUNC_CONST(stopCog,_I)
+  CHECK_FUNC_CONST(waitCount,_II)
+  CHECK_FUNC_CONST(waitPinsEqual,_II)
+  CHECK_FUNC_CONST(waitPinsNotEqual,_II)
 
   return -1;
 }

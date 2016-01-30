@@ -33,5 +33,8 @@ public class CPU
 
   /** Insert inline assembly */
   public static void asm(String code) { }
+
+  /** Get cycle counter from CPU (if available) { } */
+  public static int getCycleCount() { return 0; }
 }
 

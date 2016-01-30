@@ -236,7 +236,7 @@ int Generator::insert_utf8(const char *name, uint8_t *bytes, int len)
   return 0;
 }
 
-int Generator::cpu_asm(const char *code, int len)
+int Generator::cpu_asm_X(const char *code, int len)
 {
   int n;
 
