@@ -12,6 +12,9 @@
 #ifndef _PROPELLER_H
 #define _PROPELLER_H
 
+#include <vector>
+#include <string>
+
 #include "Generator.h"
 
 class Propeller : public Generator
@@ -115,6 +118,7 @@ public:
 protected:
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 
+  std::vector<std::string> statics;
   bool is_main : 1;
 };
 

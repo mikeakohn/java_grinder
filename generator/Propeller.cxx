@@ -43,8 +43,17 @@ Propeller::Propeller() :
 
 Propeller::~Propeller()
 {
+  std::vector<std::string>::iterator it;
   int n;
 
+  fprintf(out, "  ;; Static variables\n");
+  for (it = statics.begin(); it != statics.end(); it++)
+  {
+    fprintf(out, "_static_%s:\n", it->c_str());
+    fprintf(out, "  dc32 0\n");
+  }
+
+  fprintf(out, "  ;; Register stack\n");
   for (n = 0; n < reg_max; n++)
   {
     fprintf(out, "reg_%d:\n", n);
@@ -76,7 +85,9 @@ int Propeller::start_init()
 
 int Propeller::insert_static_field_define(const char *name, const char *type, int index)
 {
-  return -1;
+  statics.push_back(name);
+
+  return 0;
 }
 
 int Propeller::init_heap(int field_count)
@@ -136,6 +147,8 @@ int Propeller::push_integer_local(int index)
 
 int Propeller::push_ref_static(const char *name, int index)
 {
+  //fprintf(out, "  mov reg_%d, _static_%s\n", reg++, name);
+  //if (reg > reg_max) { reg_max = reg; }
   return -1;
 }
 
@@ -181,7 +194,9 @@ int Propeller::push_short(int16_t s)
 int Propeller::push_ref(char *name)
 {
   // Need to move the address of name to the top of stack
-  return -1;
+  fprintf(out, "  mov reg_%d, #_static_%s\n", reg++, name);
+  if (reg > reg_max) { reg_max = reg; }
+  return 0;
 }
 
 int Propeller::pop_integer_local(int index)
@@ -216,22 +231,32 @@ int Propeller::swap()
 
 int Propeller::add_integer()
 {
-  return -1;
+  fprintf(out, "  adds reg_%d, reg_%d\n", reg - 2, reg - 1);
+  reg--;
+  return 0;
 }
 
 int Propeller::add_integer(int num)
 {
-  return -1;
+  if (num < -256 || num > 255) { return -1; }
+
+  fprintf(out, "  adds reg_%d, #%d\n", reg - 1, num);
+  return 0;
 }
 
 int Propeller::sub_integer()
 {
-  return -1;
+  fprintf(out, "  subs reg_%d, reg_%d\n", reg - 2, reg - 1);
+  reg--;
+  return 0;
 }
 
 int Propeller::sub_integer(int num)
 {
-  return -1;
+  if (num < -256 || num > 255) { return -1; }
+
+  fprintf(out, "  subs reg_%d, #%d\n", reg - 1, num);
+  return 0;
 }
 
 int Propeller::mul_integer()
@@ -251,72 +276,104 @@ int Propeller::mod_integer()
 
 int Propeller::neg_integer()
 {
-  return -1;
+  fprintf(out, "  neg reg_%d, reg_%d\n", reg - 1, reg - 1);
+  return 0;
 }
 
 int Propeller::shift_left_integer()
 {
-  return -1;
+  fprintf(out, "  shl reg_%d, reg_%d\n", reg - 2, reg - 1);
+  reg--;
+  return 0;
 }
 
 int Propeller::shift_left_integer(int num)
 {
-  return -1;
+  if (num < -256 || num > 255) { return -1; }
+
+  fprintf(out, "  shl reg_%d, #%d\n", reg - 1, num);
+  return 0;
 }
 
 int Propeller::shift_right_integer()
 {
-  return -1;
+  fprintf(out, "  sar reg_%d, reg_%d\n", reg - 2, reg - 1);
+  reg--;
+  return 0;
 }
 
 int Propeller::shift_right_integer(int num)
 {
-  return -1;
+  if (num < -256 || num > 255) { return -1; }
+
+  fprintf(out, "  sar reg_%d, #%d\n", reg - 1, num);
+  return 0;
 }
 
 int Propeller::shift_right_uinteger()
 {
-  return -1;
+  fprintf(out, "  shr reg_%d, reg_%d\n", reg - 2, reg - 1);
+  reg--;
+  return 0;
 }
 
 int Propeller::shift_right_uinteger(int num)
 {
-  return -1;
+  if (num < -256 || num > 255) { return -1; }
+
+  fprintf(out, "  shr reg_%d, #%d\n", reg - 1, num);
+  return 0;
 }
 
 int Propeller::and_integer()
 {
-  return -1;
+  fprintf(out, "  and reg_%d, reg_%d\n", reg - 2, reg - 1);
+  reg--;
+  return 0;
 }
 
 int Propeller::and_integer(int num)
 {
-  return -1;
+  if (num < -256 || num > 255) { return -1; }
+
+  fprintf(out, "  and reg_%d, #%d\n", reg - 1, num);
+  return 0;
 }
 
 int Propeller::or_integer()
 {
-  return -1;
+  fprintf(out, "  or reg_%d, reg_%d\n", reg - 2, reg - 1);
+  reg--;
+  return 0;
 }
 
 int Propeller::or_integer(int num)
 {
-  return -1;
+  if (num < -256 || num > 255) { return -1; }
+
+  fprintf(out, "  or reg_%d, #%d\n", reg - 1, num);
+  return 0;
 }
 
 int Propeller::xor_integer()
 {
-  return -1;
+  fprintf(out, "  xor reg_%d, reg_%d\n", reg - 2, reg - 1);
+  reg--;
+  return 0;
 }
 
 int Propeller::xor_integer(int num)
 {
-  return -1;
+  if (num < -256 || num > 255) { return -1; }
+
+  fprintf(out, "  xor reg_%d, #%d\n", reg - 1, num);
+  return 0;
 }
 
 int Propeller::inc_integer(int index, int num)
 {
-  return -1;
+  fprintf(out, "  add reg_%d, #%d\n", reg - 1, num);
+  return 0;
 }
 
 int Propeller::integer_to_byte()
@@ -331,11 +388,28 @@ int Propeller::integer_to_short()
 
 int Propeller::jump_cond(const char *label, int cond, int distance)
 {
+  if (cond == COND_EQUAL)
+  {
+    fprintf(out, "  tjz reg_%d, %s\n", --reg, label);
+    return 0;
+  }
+
+  if (cond == COND_NOT_EQUAL)
+  {
+    fprintf(out, "  tjnz reg_%d, %s\n", --reg, label);
+    return 0;
+  }
+
+  fprintf(out, "  cmps reg_%d, #0\n", --reg);
+
   return -1;
 }
 
 int Propeller::jump_cond_integer(const char *label, int cond, int distance)
 {
+  fprintf(out, "  cmps reg_%d, reg_%d\n", reg - 2, reg - 1);
+  reg -= 2;
+
   return -1;
 }
 
@@ -372,12 +446,15 @@ int Propeller::invoke_static_method(const char *name, int params, int is_void)
 
 int Propeller::put_static(const char *name, int index)
 {
-  return -1;
+  fprintf(out, "  mov _static_%s, reg_%d\n", name, --reg);
+  return 0;
 }
 
 int Propeller::get_static(const char *name, int index)
 {
-  return -1;
+  fprintf(out, "  mov reg_%d, _static_%s\n", reg++, name);
+  if (reg > reg_max) { reg_max = reg; }
+  return 0;
 }
 
 int Propeller::brk()
