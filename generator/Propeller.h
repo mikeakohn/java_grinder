@@ -123,6 +123,19 @@ public:
   // CPU
   virtual int cpu_getCycleCount();
 
+  // I/O
+  virtual int ioport_setPinsAsInput(int port);
+  virtual int ioport_setPinsAsOutput(int port);
+  virtual int ioport_setPinsValue(int port);
+  virtual int ioport_setPinsHigh(int port);
+  virtual int ioport_setPinsLow(int port);
+  //virtual int ioport_setPinAsOutput(int port);
+  //virtual int ioport_setPinAsInput(int port);
+  //virtual int ioport_setPinHigh(int port);
+  //virtual int ioport_setPinLow(int port);
+  virtual int ioport_isPinInputHigh(int port);
+  virtual int ioport_getPortInputValue(int port);
+
 protected:
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 

@@ -20,6 +20,7 @@
   if (reg > reg_max) { reg_max = reg; }
 
 #define PUSH_CONST(a) \
+  get_constant(a); \
   fprintf(out, "  mov reg_%d, _const_%d\n", reg++, a); \
   if (reg > reg_max) { reg_max = reg; }
 
@@ -35,6 +36,10 @@
   reg++; \
   if (reg > reg_max) { reg_max = reg; }
 
+#define CHECK_PORT() \
+  if (port > 1) { printf("Port out of range\n"); return -1; } \
+  char p = 'a' + port;
+
 // ABI is:
 
 Propeller::Propeller() :
@@ -47,11 +52,21 @@ Propeller::Propeller() :
 
 Propeller::~Propeller()
 {
-  std::vector<std::string>::iterator it;
   int n;
 
+  fprintf(out, "  ;; Constants\n");
+  for (std::map<uint32_t,int>::iterator it = constants_pool.begin();
+       it != constants_pool.end();
+       it++)
+  {
+    fprintf(out, "_const_%d:\n", it->first);
+    fprintf(out, "  dc32 0x%x\n", it->first);
+  }
+
   fprintf(out, "  ;; Static variables\n");
-  for (it = statics.begin(); it != statics.end(); it++)
+  for (std::vector<std::string>::iterator it = statics.begin();
+       it != statics.end();
+       it++)
   {
     fprintf(out, "_static_%s:\n", it->c_str());
     fprintf(out, "  dc32 0\n");
@@ -670,4 +685,68 @@ int Propeller::cpu_getCycleCount()
   return 0;
 }
 
+int Propeller::ioport_setPinsAsInput(int port)
+{
+  CHECK_PORT();
+  fprintf(out, "  neg reg_%d, reg_%d\n", reg - 1, reg - 1);
+  fprintf(out, "  and _dir%c, reg_%d\n", p, reg - 1);
+  reg--;
+
+  return 0;
+}
+
+int Propeller::ioport_setPinsAsOutput(int port)
+{
+  CHECK_PORT();
+  fprintf(out, "  or _dir%c, reg_%d\n", p, reg - 1);
+  reg--;
+
+  return 0;
+}
+
+int Propeller::ioport_setPinsValue(int port)
+{
+  CHECK_PORT();
+  fprintf(out, "  mov _dir%c, reg_%d\n", p, reg - 1);
+  reg--;
+
+  return 0;
+}
+
+int Propeller::ioport_setPinsHigh(int port)
+{
+  CHECK_PORT();
+  fprintf(out, "  or _out%c, reg_%d\n", p, reg - 1);
+  reg--;
+
+  return 0;
+}
+
+int Propeller::ioport_setPinsLow(int port)
+{
+  CHECK_PORT();
+  fprintf(out, "  neg reg_%d, reg_%d\n", reg - 1, reg - 1);
+  fprintf(out, "  and _out%c, reg_%d\n", p, reg - 1);
+  reg--;
+
+  return 0;
+}
+
+//int Propeller::ioport_setPinAsOutput(int port)
+//int Propeller::ioport_setPinAsInput(int port)
+//int Propeller::ioport_setPinHigh(int port)
+//int Propeller::ioport_setPinLow(int port)
+
+int Propeller::ioport_isPinInputHigh(int port)
+{
+  return -1;
+}
+
+int Propeller::ioport_getPortInputValue(int port)
+{
+  CHECK_PORT();
+  fprintf(out, "  mov reg_%d, _out%c\n", reg++, p);
+
+  return 0;
+}
 

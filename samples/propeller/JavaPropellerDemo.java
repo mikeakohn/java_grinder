@@ -1,5 +1,6 @@
 
 import net.mikekohn.java_grinder.CPU;
+import net.mikekohn.java_grinder.IOPort0;
 import net.mikekohn.java_grinder.Propeller;
 
 public class JavaPropellerDemo
@@ -15,10 +16,15 @@ public class JavaPropellerDemo
     }
 */
 
+    IOPort0.setPinsAsOutput(1 << 21);
+
     count = CPU.getCycleCount();
  
     while(true)
     {
+      IOPort0.setPinsHigh(1 << 21);
+      count = Propeller.waitCount(count, 1000);
+      IOPort0.setPinsLow(1 << 21);
       count = Propeller.waitCount(count, 1000);
     }
   }
