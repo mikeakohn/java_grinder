@@ -22,6 +22,7 @@ API= \
   java_lang_system.o \
   java_lang_string.o \
   memory.o \
+  propeller_.o \
   sega_genesis.o \
   snes_.o \
   spi.o \

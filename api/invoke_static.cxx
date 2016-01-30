@@ -27,6 +27,7 @@
 #include "dsp.h"
 #include "ioport.h"
 #include "memory.h"
+#include "propeller_.h"
 #include "sega_genesis.h"
 #include "spi.h"
 #include "snes_.h"
@@ -139,6 +140,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     CHECK_WITH_PORT(SPI, spi, 1)
     CHECK_WITH_PORT(UART, uart, 0)
     CHECK_WITH_PORT(UART, uart, 1)
+    CHECK(Propeller, propeller)
     CHECK(SegaGenesis, sega_genesis)
     CHECK(SNES, snes)
     CHECK(TI84, ti84)
@@ -215,6 +217,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, in
     CHECK_CONST(Atari2600, atari_2600)
     CHECK_CONST(Timer, timer)
     CHECK_CONST(CPU, cpu)
+    CHECK_CONST(Propeller, propeller)
     CHECK_CONST(SegaGenesis, sega_genesis)
     CHECK_CONST(SNES, snes)
     CHECK_CONST(TRS80Coco, trs80_coco)

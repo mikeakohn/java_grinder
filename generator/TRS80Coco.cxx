@@ -37,9 +37,9 @@ int TRS80Coco::open(const char *filename)
 {
   if (MC6809::open(filename) != 0) { return -1; }
 
-  fprintf(out, "  ldd 0xff02\n");
-  fprintf(out, "  orb #0x06\n");
-  fprintf(out, "  std 0xff02\n");
+  //fprintf(out, "  ldd 0xff02\n");
+  //fprintf(out, "  orb #0x06\n");
+  //fprintf(out, "  std 0xff02\n");
 
   return 0;
 }

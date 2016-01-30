@@ -22,6 +22,7 @@
 #include "API_C64.h"
 #include "API_DSP.h"
 #include "API_Microcontroller.h"
+#include "API_Propeller.h"
 #include "API_SegaGenesis.h"
 #include "API_SNES.h"
 #include "API_System.h"
@@ -36,6 +37,7 @@ class Generator :
   public API_C64,
   public API_DSP,
   public API_Microcontroller,
+  public API_Propeller,
   public API_SegaGenesis,
   public API_SNES,
   public API_System,
