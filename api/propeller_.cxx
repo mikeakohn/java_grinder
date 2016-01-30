@@ -46,7 +46,7 @@ int propeller(JavaClass *java_class, Generator *generator, char *method_name)
 
 int propeller(JavaClass *java_class, Generator *generator, char *method_name, int const_val)
 {
-  CHECK_FUNC_CONST(stopCog,_I)
+  //CHECK_FUNC_CONST(stopCog,_I)
 
   return -1;
 }

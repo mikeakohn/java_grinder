@@ -15,14 +15,27 @@
 
 #include "Propeller.h"
 
-#define REG_STACK(a) (a)
+#define PUSH_IMMEDIATE(a) \
+  fprintf(out, "  mov reg_%d, #%d\n", reg++, a & 0x1ff); \
+  if (reg > reg_max) { reg_max = reg; }
+
+#define PUSH_CONST(a) \
+  fprintf(out, "  mov reg_%d, _const_%d\n", reg++, a); \
+  if (reg > reg_max) { reg_max = reg; }
+
+#define PUSH_SIGNED(a) \
+  if (a < -256 || a > 255) { PUSH_CONST(a); } \
+  else { PUSH_IMMEDIATE(a); } \
+
+#define PUSH_UNSIGNED(a) \
+  if (a < 0 || a > 511) { PUSH_CONST(a); } \
+  else { PUSH_IMMEDIATE(a); } \
 
 // ABI is:
 
 Propeller::Propeller() :
   reg(0),
   reg_max(0),
-  stack(0),
   is_main(0)
 {
 
@@ -30,6 +43,14 @@ Propeller::Propeller() :
 
 Propeller::~Propeller()
 {
+  int n;
+
+  for (n = 0; n < reg_max; n++)
+  {
+    fprintf(out, "reg_%d:\n", n);
+    fprintf(out, "  dc32 0\n");
+  }
+
 }
 
 int Propeller::open(const char *filename)
@@ -48,7 +69,6 @@ int Propeller::open(const char *filename)
 int Propeller::start_init()
 {
   // Add any set up items (stack, registers, etc).
-  //fprintf(out, ".org ???\n");
   fprintf(out, "start:\n");
 
   return 0;
@@ -64,7 +84,7 @@ int Propeller::init_heap(int field_count)
   fprintf(out, "  ;; Set up heap and static initializers\n");
   //fprintf(out, "  mov #ram_start+%d, &ram_start\n", (field_count + 1) * 2);
 
-  return -1;
+  return 0;
 }
 
 int Propeller::insert_field_init_boolean(char *name, int index, int value)
@@ -95,15 +115,18 @@ int Propeller::insert_field_init(char *name, int index)
 
 void Propeller::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
+  fprintf(out, "%s:\n", name);
 }
 
 void Propeller::method_end(int local_count)
 {
+  fprintf(out, "\n");
 }
 
 int Propeller::push_integer(int32_t n)
 {
-  return -1;
+  PUSH_SIGNED(n);
+  return 0;
 }
 
 int Propeller::push_integer_local(int index)
@@ -333,7 +356,8 @@ int Propeller::return_void(int local_count)
 
 int Propeller::jump(const char *name, int distance)
 {
-  return -1;
+  fprintf(out, "  jmp %s\n", name);
+  return 0;
 }
 
 int Propeller::call(const char *name)
@@ -455,26 +479,35 @@ int Propeller::array_write_int(const char *name, int field_id)
   return -1;
 }
 
-int propeller_setClock_I()
+int Propeller::propeller_setClock_I()
 {
   return -1;
 }
 
-int propeller_getCogId()
+int Propeller::propeller_getCogId()
 {
   return -1;
 }
 
-int propeller_stopCog_I()
+int Propeller::propeller_stopCog_I()
 {
-  return -1;
-}
-
-int propeller_stopCog_I(int value)
-{
-  fprintf(out, "  cogstop #%d\n");
+  fprintf(out, "  cogstop reg_%d\n", --reg);
   return 0;
 }
+
+#if 0
+int Propeller::propeller_stopCog_I(int value)
+{
+  if (value < 0 || value > 7)
+  {
+    printf("Error: Cog value must be between 0 and 7\n");
+    return -1;
+  }
+
+  fprintf(out, "  cogstop #%d\n", value);
+  return 0;
+}
+#endif
 
 
 

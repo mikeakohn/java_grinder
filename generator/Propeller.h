@@ -104,7 +104,7 @@ public:
   virtual int propeller_setClock_I();
   virtual int propeller_getCogId();
   virtual int propeller_stopCog_I();
-  virtual int propeller_stopCog_I(int value);
+  //virtual int propeller_stopCog_I(int value);
 
 protected:
   int reg;            // count number of registers are are using as stack

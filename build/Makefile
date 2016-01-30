@@ -45,6 +45,7 @@ CPUS= \
   MIPS32.o \
   MSP430.o \
   MSP430X.o \
+  Propeller.o \
   STDC.o \
   TMS9900.o \
   W65816.o \

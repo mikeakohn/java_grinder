@@ -1,5 +1,5 @@
 
-import net.mikekohn.java_grinder.TRS80Coco;
+import net.mikekohn.java_grinder.Propeller;
 
 public class JavaPropellerDemo
 {

@@ -31,6 +31,7 @@
 #include "MSP430.h"
 #include "MSP430X.h"
 #include "PIC32.h"
+#include "Propeller.h"
 #include "SegaGenesis.h"
 #include "SNES.h"
 #include "STDC.h"
@@ -161,6 +162,11 @@ static Generator *new_generator(const char *chip_type)
     generator = new PIC32();
   }
     else
+  if (strcasecmp("propeller", chip_type) == 0)
+  {
+    generator = new Propeller();
+  }
+    else
   if (strcasecmp("sega_genesis", chip_type) == 0)
   {
     generator = new SegaGenesis();
@@ -256,6 +262,7 @@ int main(int argc, char *argv[])
            "     m6502_8, atari2600\n"
            "     mips32, pic32\n"
            "     msp430g2231, msp430g2452, msp430g2553, msp430f5529\n"
+           "     propeller\n"
            "     sega_genesis\n"
            "     ti84plus\n"
            "     ti99\n"
