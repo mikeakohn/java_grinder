@@ -219,7 +219,7 @@ int TRS80Coco::trs80_coco_disableHsyncListener()
   return 0;
 }
 
-int TRS80Coco::trs80_coco_setSound_L()
+int TRS80Coco::trs80_coco_setSound_aB()
 {
   return -1;
 }

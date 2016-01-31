@@ -127,15 +127,23 @@ int ptr = 0;
   while(*s != 0)
   {
     if (*s == ')') { break; }
-    if (*s == '[') { function[ptr++] = 'a'; }
+
+    if (*s == '[')
+    {
+      function[ptr++] = 'a';
+    }
+      else
     if (*s == 'L' &&
         strncmp(s, "Ljava/lang/String;", sizeof("Ljava/lang/String;") - 1) == 0)
     {
       function[ptr++] = 'X';
       s += sizeof("Ljava/lang/String;") - 2;
     }
-    else { function[ptr++] = *s; }
-    //function[ptr++] = *s;
+      else
+    {
+      function[ptr++] = *s;
+    }
+
     s++;
   }
 

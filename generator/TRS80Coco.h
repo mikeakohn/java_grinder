@@ -35,7 +35,7 @@ public:
   virtual int trs80_coco_disableVsyncListener();
   virtual int trs80_coco_enableHsyncListener();
   virtual int trs80_coco_disableHsyncListener();
-  virtual int trs80_coco_setSound_L();
+  virtual int trs80_coco_setSound_aB();
 
 private:
   void add_plot_lores();
