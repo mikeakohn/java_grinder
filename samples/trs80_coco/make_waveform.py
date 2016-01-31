@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-import sys
+import sys, math
 
 rate = 8000
 samples = []
 
 if len(sys.argv) != 3:
-  print "Usage " + sys.argv[0] + " <freq> <sin/square/sawtooth>"
+  print "Usage " + sys.argv[0] + " <freq> <sine/square/sawtooth>"
   sys.exit(0)
 
 print "Rate is " + str(rate) + " samples a second"
@@ -24,10 +24,17 @@ elif sys.argv[2] == "sawtooth":
   for i in range(0, size):
     samples.append(int(sample))
     sample -= dx
+elif sys.argv[2] == "sine":
+  dx = float(3.14 * 2) / float(size)
+  x = 0
+
+  for i in range(0, size):
+    samples.append(int(31 * math.sin(x) + 32))
+    x += dx
 
 print "  public static byte[] waveform = {",
 for i in range(0, len(samples)):
   if (i % 8) == 0: print "\n    ",
-  print " 0x%02x," % samples[i],
+  print " 0x%02x," % (samples[i] << 2),
 print "  };"
 
