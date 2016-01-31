@@ -46,5 +46,9 @@ abstract public class TRS80Coco
   public static void disableVsyncListener() { }
   public static void enableHsyncListener() { }
   public static void disableHsyncListener() { }
+
+  /** Play the passed-in waveform through the 6 bit DAC or if NULL
+      turn off sound */
+  public static void setSound(byte[] waveform) { }
 }
 

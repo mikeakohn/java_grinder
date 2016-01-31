@@ -35,17 +35,20 @@ public:
   virtual int trs80_coco_disableVsyncListener();
   virtual int trs80_coco_enableHsyncListener();
   virtual int trs80_coco_disableHsyncListener();
+  virtual int trs80_coco_setSound_L();
 
 private:
   void add_plot_lores();
   void add_plot_midres();
   void add_clear_screen_lores();
   void add_clear_screen_midres();
+  void add_print();
 
   uint32_t need_plot_lores : 1;
   uint32_t need_plot_midres : 1;
   uint32_t need_clear_screen_lores : 1;
   uint32_t need_clear_screen_midres : 1;
+  uint32_t need_print : 1;
 };
 
 #endif

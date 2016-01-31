@@ -32,9 +32,18 @@ elif sys.argv[2] == "sine":
     samples.append(int(31 * math.sin(x) + 32))
     x += dx
 
-print "  public static byte[] waveform = {",
+#for i in range(0, len(samples)):
+#  if (i % 8) == 0: print "\n    ",
+#  print " %d," % (samples[i] << 2),
+#print
+
+print "  public static byte[] waveform ="
+print "  {",
 for i in range(0, len(samples)):
   if (i % 8) == 0: print "\n    ",
-  print " 0x%02x," % (samples[i] << 2),
-print "  };"
+  samples[i] = samples[i] << 2
+  if (samples[i] & 0x80) != 0: samples[i] = - ((samples[i] ^ 0xff) + 1)
+  print " %d," % samples[i],
+print "\n  };"
+
 

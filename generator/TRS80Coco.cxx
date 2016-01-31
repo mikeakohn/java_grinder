@@ -17,7 +17,10 @@
 
 TRS80Coco::TRS80Coco() :
   need_plot_lores(0),
-  need_plot_midres(0)
+  need_plot_midres(0),
+  need_clear_screen_lores(0),
+  need_clear_screen_midres(0),
+  need_print(0)
 {
   // Cartridge ROM starts at 0xc0000.  RAM would start at 0x0600.
   start_org = 0xc000;
@@ -31,6 +34,7 @@ TRS80Coco::~TRS80Coco()
   if (need_plot_midres) { add_plot_midres(); }
   if (need_clear_screen_lores) { add_clear_screen_lores(); }
   if (need_clear_screen_midres) { add_clear_screen_midres(); }
+  if (need_print) { add_print(); }
 }
 
 int TRS80Coco::open(const char *filename)
@@ -112,7 +116,12 @@ int TRS80Coco::trs80_coco_setTextMode()
 
 int TRS80Coco::trs80_coco_print_X()
 {
-  return -1;
+  need_print = 1;
+
+  fprintf(out, "  ; print_X()\n");
+  fprintf(out, "  puls x\n");
+  fprintf(out, "  jsr _print\n");
+  return 0;
 }
 
 
@@ -210,6 +219,11 @@ int TRS80Coco::trs80_coco_disableHsyncListener()
   return 0;
 }
 
+int TRS80Coco::trs80_coco_setSound_L()
+{
+  return -1;
+}
+
 void TRS80Coco::add_plot_lores()
 {
   // RET    0 1
@@ -301,5 +315,18 @@ void TRS80Coco::add_clear_screen_midres()
   fprintf(out, "  cmpx #1024+(32*16)\n");
   fprintf(out, "  bne _clear_screen_midres\n");
   fprintf(out, "  rts\n\n");
+}
+
+void TRS80Coco::add_print()
+{
+  fprintf(out, "  ; print()\n");
+  fprintf(out, "_print:\n");
+  fprintf(out, "  lda ,x\n");
+  fprintf(out, "  tsta\n");
+  fprintf(out, "  beq _print_exit\n");
+  fprintf(out, "  jsr $a002\n");
+  fprintf(out, "  bra _print\n");
+  fprintf(out, "_print_exit:\n");
+  fprintf(out, "  rts\n");
 }
 

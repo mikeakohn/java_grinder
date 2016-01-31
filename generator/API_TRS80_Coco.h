@@ -29,6 +29,7 @@ public:
   virtual int trs80_coco_disableVsyncListener() { return -1; }
   virtual int trs80_coco_enableHsyncListener() { return -1; }
   virtual int trs80_coco_disableHsyncListener() { return -1; }
+  virtual int trs80_coco_setSound_L() { return -1; }
 };
 
 #endif
