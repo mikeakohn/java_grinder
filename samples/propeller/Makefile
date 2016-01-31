@@ -8,7 +8,16 @@ grind: JavaPropellerDemo.class
 %.class: %.java
 	javac -classpath ../../build/JavaGrinder.jar:. $*.java
 
+program:
+	go run bin2spin.go java_propeller_demo.bin > out.spin
+	openspin out.spin
+	propeller-load -r -p /dev/ttyUSB0 out.binary
+
+test:
+	openspin new.spin
+	propeller-load -r -p /dev/ttyUSB0 new.binary
+
 clean:
-	@rm -f *.hex *.lst *.class *.asm *.bin
+	@rm -f *.hex *.lst *.class *.asm *.bin *.spin *.binary
 	@echo "Clean!"
 

@@ -5,27 +5,44 @@ import net.mikekohn.java_grinder.Propeller;
 
 public class JavaPropellerDemo
 {
-  static int count;
+  static int count,delay;
+  static int led;
+  static int n;
 
   static public void main(String args[])
   {
-/*
-    for (n = 5; n != 0; n--)
-    {
-      Propeller.stopCog(n);
-    }
-*/
+    led = 1 << 16;
 
-    IOPort0.setPinsAsOutput(1 << 21);
+    IOPort0.setPinsAsOutput(0xff << 16);
+    //IOPort0.setPinsHigh(1 << 21);
+    IOPort0.setPinsHigh(1 << 21);
+    IOPort0.setPinsHigh(1 << 18);
 
-    count = CPU.getCycleCount();
- 
+    count = CPU.getCycleCount() + 0xffff;
+
     while(true)
     {
-      IOPort0.setPinsHigh(1 << 21);
-      count = Propeller.waitCount(count, 1000);
-      IOPort0.setPinsLow(1 << 21);
-      count = Propeller.waitCount(count, 1000);
+      for (n = 7; n != 0; n--)
+      {
+        for (delay = 0xffff; delay != 0; delay--);
+        IOPort0.setPinsValue(led);
+        led = led << 1;
+      }
+
+      for (n = 7; n != 0; n--)
+      {
+        for (delay = 0xffff; delay != 0; delay--);
+        IOPort0.setPinsValue(led);
+        led = led >> 1;
+      }
+/*
+      IOPort0.setPinsLow(1 << 22);
+      for (delay = 0xffff; delay != 0; delay--);
+      //count = Propeller.waitCount(count, 0xffff);
+      IOPort0.setPinsHigh(1 << 22);
+      for (delay = 0xffff; delay != 0; delay--);
+      //count = Propeller.waitCount(count, 0xffff);
+*/
     }
   }
 }

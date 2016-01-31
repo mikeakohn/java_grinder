@@ -4,7 +4,7 @@ import "fmt"
 import "os"
 
 func main() {
-  fmt.Println("INFO: bin2spin - Copyright 2016 by Michael Kohn")
+  //fmt.Println("INFO: bin2spin - Copyright 2016 by Michael Kohn")
 
   if len(os.Args) != 2 {
     fmt.Println("Usage: " + os.Args[0] + " <binfile>")
@@ -33,9 +33,14 @@ func main() {
   fmt.Println("Pub Main")
   fmt.Println("  cognew(@code, 0)\n")
   fmt.Println("DAT")
-  fmt.Print("code byte ")
+  fmt.Print("  code byte ")
 
   for i :=0; i < len(data); i++ {
+    if i != 0 && (i % 8) == 0 {
+      fmt.Print("\n       byte")
+    }
+
+    if (i % 8) != 0 { fmt.Print(",") }
     fmt.Printf(" %d", data[i])
   }
 }

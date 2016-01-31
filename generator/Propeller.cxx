@@ -231,7 +231,8 @@ int Propeller::push_short(int16_t s)
 int Propeller::push_ref(char *name)
 {
   // Need to move the address of name to the top of stack
-  fprintf(out, "  mov reg_%d, #_static_%s\n", reg++, name);
+  //fprintf(out, "  mov reg_%d, #_static_%s\n", reg++, name);
+  fprintf(out, "  mov reg_%d, _static_%s\n", reg++, name);
   if (reg > reg_max) { reg_max = reg; }
   return 0;
 }
@@ -427,13 +428,13 @@ int Propeller::jump_cond(const char *label, int cond, int distance)
 {
   if (cond == COND_EQUAL)
   {
-    fprintf(out, "  tjz reg_%d, %s\n", --reg, label);
+    fprintf(out, "  tjz reg_%d, #%s\n", --reg, label);
     return 0;
   }
 
   if (cond == COND_NOT_EQUAL)
   {
-    fprintf(out, "  tjnz reg_%d, %s\n", --reg, label);
+    fprintf(out, "  tjnz reg_%d, #%s\n", --reg, label);
     return 0;
   }
 
@@ -467,7 +468,7 @@ int Propeller::return_void(int local_count)
 
 int Propeller::jump(const char *name, int distance)
 {
-  fprintf(out, "  jmp %s\n", name);
+  fprintf(out, "  jmp #%s\n", name);
   return 0;
 }
 
@@ -667,6 +668,7 @@ int Propeller::propeller_waitPinsNotEqual_II(int mask)
 
 int Propeller::propeller_waitCount_II()
 {
+  //fprintf(out, "  add reg_%d, reg_%d\n", reg - 2, reg - 1);
   fprintf(out, "  waitcnt reg_%d, reg_%d\n", reg - 2, reg - 1);
   reg--;
   return 0;
@@ -674,7 +676,9 @@ int Propeller::propeller_waitCount_II()
 
 int Propeller::propeller_waitCount_II(int delay)
 {
-  fprintf(out, "  waitcnt reg_%d, #0x%08x\n", reg - 1, (uint32_t)delay);
+  if (delay < 0 || delay > 255) { return -1; }
+  //fprintf(out, "  add reg_%d, #0x%02x\n", reg - 1, (uint32_t)delay);
+  fprintf(out, "  waitcnt reg_%d, #0x%02x\n", reg - 1, (uint32_t)delay);
   return 0;
 }
 
@@ -688,8 +692,7 @@ int Propeller::cpu_getCycleCount()
 int Propeller::ioport_setPinsAsInput(int port)
 {
   CHECK_PORT();
-  fprintf(out, "  neg reg_%d, reg_%d\n", reg - 1, reg - 1);
-  fprintf(out, "  and _dir%c, reg_%d\n", p, reg - 1);
+  fprintf(out, "  andn _dir%c, reg_%d\n", p, reg - 1);
   reg--;
 
   return 0;
@@ -704,11 +707,43 @@ int Propeller::ioport_setPinsAsOutput(int port)
   return 0;
 }
 
+int Propeller::ioport_setPinsAsOutput(int port, int value)
+{
+  CHECK_PORT();
+  if (value >= 0 && value <= 255)
+  {
+    fprintf(out, "  or _dir%c, #0x%02x\n", p, value);
+  }
+    else
+  {
+    get_constant(value);
+    fprintf(out, "  or _dir%c, _const_%d\n", p, value);
+  }
+
+  return 0;
+}
+
 int Propeller::ioport_setPinsValue(int port)
 {
   CHECK_PORT();
-  fprintf(out, "  mov _dir%c, reg_%d\n", p, reg - 1);
+  fprintf(out, "  mov _out%c, reg_%d\n", p, reg - 1);
   reg--;
+
+  return 0;
+}
+
+int Propeller::ioport_setPinsValue(int port, int value)
+{
+  CHECK_PORT();
+  if (value >= 0 && value <= 255)
+  {
+    fprintf(out, "  mov _out%c, #0x%02x\n", p, value);
+  }
+    else
+  {
+    get_constant(value);
+    fprintf(out, "  mov _out%c, _const_%d\n", p, value);
+  }
 
   return 0;
 }
@@ -722,11 +757,26 @@ int Propeller::ioport_setPinsHigh(int port)
   return 0;
 }
 
+int Propeller::ioport_setPinsHigh(int port, int value)
+{
+  CHECK_PORT();
+  if (value >= 0 && value <= 255)
+  {
+    fprintf(out, "  or _out%c, #0x%02x\n", p, value);
+  }
+    else
+  {
+    get_constant(value);
+    fprintf(out, "  or _out%c, _const_%d\n", p, value);
+  }
+
+  return 0;
+}
+
 int Propeller::ioport_setPinsLow(int port)
 {
   CHECK_PORT();
-  fprintf(out, "  neg reg_%d, reg_%d\n", reg - 1, reg - 1);
-  fprintf(out, "  and _out%c, reg_%d\n", p, reg - 1);
+  fprintf(out, "  andn _out%c, reg_%d\n", p, reg - 1);
   reg--;
 
   return 0;

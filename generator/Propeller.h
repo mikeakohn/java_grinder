@@ -126,8 +126,11 @@ public:
   // I/O
   virtual int ioport_setPinsAsInput(int port);
   virtual int ioport_setPinsAsOutput(int port);
+  virtual int ioport_setPinsAsOutput(int port, int value);
   virtual int ioport_setPinsValue(int port);
+  virtual int ioport_setPinsValue(int port, int value);
   virtual int ioport_setPinsHigh(int port);
+  virtual int ioport_setPinsHigh(int port, int value);
   virtual int ioport_setPinsLow(int port);
   //virtual int ioport_setPinAsOutput(int port);
   //virtual int ioport_setPinAsInput(int port);
