@@ -21,6 +21,8 @@ public class JavaTrs80Demo
     int a,n,x,y;
     int dx,dy;
 
+    TRS80Coco.initSound();
+
     //TRS80Coco.setBackgroundColor(5);
     TRS80Coco.setText(1024, 0x8f);
     TRS80Coco.setText(1025, 0x9f);

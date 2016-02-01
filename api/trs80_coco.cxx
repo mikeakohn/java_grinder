@@ -53,6 +53,7 @@ int trs80_coco(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(enableHsyncListener,)
   CHECK_FUNC(disableHsyncListener,)
 
+  CHECK_FUNC(initSound,)
   CHECK_FUNC(setSound,_aB)
 
   return -1;

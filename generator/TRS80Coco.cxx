@@ -20,7 +20,8 @@ TRS80Coco::TRS80Coco() :
   need_plot_midres(0),
   need_clear_screen_lores(0),
   need_clear_screen_midres(0),
-  need_print(0)
+  need_print(0),
+  need_set_sound(0)
 {
   // Cartridge ROM starts at 0xc0000.  RAM would start at 0x0600.
   start_org = 0xc000;
@@ -35,11 +36,16 @@ TRS80Coco::~TRS80Coco()
   if (need_clear_screen_lores) { add_clear_screen_lores(); }
   if (need_clear_screen_midres) { add_clear_screen_midres(); }
   if (need_print) { add_print(); }
+  if (need_set_sound) { add_set_sound(); }
 }
 
 int TRS80Coco::open(const char *filename)
 {
   if (MC6809::open(filename) != 0) { return -1; }
+
+  fprintf(out, "  _sound_waveform_start equ 0\n");
+  fprintf(out, "  _sound_waveform_end equ 2\n");
+  fprintf(out, "  _sound_waveform_ptr equ 4\n");
 
   //fprintf(out, "  ldd 0xff02\n");
   //fprintf(out, "  orb #0x06\n");
@@ -219,9 +225,25 @@ int TRS80Coco::trs80_coco_disableHsyncListener()
   return 0;
 }
 
+int TRS80Coco::trs80_coco_initSound()
+{
+  fprintf(out, "  ;; initSound()\n");
+  fprintf(out, "  ldd 0xff22\n");
+  fprintf(out, "  orb #0x08\n");
+  fprintf(out, "  std 0xff22\n");
+
+  return 0;
+}
+
 int TRS80Coco::trs80_coco_setSound_aB()
 {
-  return -1;
+  need_set_sound = 1;
+
+  fprintf(out, "  ;; setSound_aB()\n");
+  fprintf(out, "  puls a,b\n");
+  fprintf(out, "  jsr _set_sound\n");
+
+  return 0;
 }
 
 void TRS80Coco::add_plot_lores()
@@ -231,16 +253,17 @@ void TRS80Coco::add_plot_lores()
   // 00 YY  4 5
   // 00 XX  6 7
   // address = ((y / 2) * 32) +  (x / 2)
-  fprintf(out, "_plot_lores:\n");
-  fprintf(out, "  lda 5,s\n");
-  fprintf(out, "  ldb #32\n");
-  fprintf(out, "  mul\n");
-  fprintf(out, "  addd 6,s\n");
-  fprintf(out, "  addd #1024\n");
-  fprintf(out, "  tfr d,y\n");
-  fprintf(out, "  ldb 3,s\n");
-  fprintf(out, "  stb ,y\n");
-  fprintf(out, "  rts\n\n");
+  fprintf(out,
+    "_plot_lores:\n"
+    "  lda 5,s\n"
+    "  ldb #32\n"
+    "  mul\n"
+    "  addd 6,s\n"
+    "  addd #1024\n"
+    "  tfr d,y\n"
+    "  ldb 3,s\n"
+    "  stb ,y\n"
+    "  rts\n\n");
 }
 
 void TRS80Coco::add_plot_midres()
@@ -255,78 +278,116 @@ void TRS80Coco::add_plot_midres()
   // if (x & 1) == 1: data |= 0x02
   // Above is equivalent to: data = (x & 1) + 1
   // if (y & 1) == 0: data <<= 4
-  fprintf(out, "_plot_midres:\n");
-  fprintf(out, "  lda 5,s\n");
-  fprintf(out, "  ldb #32\n");
-  fprintf(out, "  mul\n");
-  fprintf(out, "  addd 6,s\n");
-  fprintf(out, "  lsra\n");
-  fprintf(out, "  rorb\n");
-  fprintf(out, "  addd #1024\n");
-  fprintf(out, "  tfr d,y      ; y now holds address where to write pixel\n");
-  fprintf(out, "  lda 7,s\n");
-  fprintf(out, "  eora #0x01\n");
-  fprintf(out, "  anda #0x01\n");
-  fprintf(out, "  adda #0x01   ; a now holds 1 or 2 / if x is odd/even\n");
-  fprintf(out, "  ldb 5,s\n");
-  fprintf(out, "  bitb #0x01\n");
-  fprintf(out, "  bne _plot_midres_odd_y\n"); 
-  fprintf(out, "  lsla\n");
-  fprintf(out, "  lsla\n");
-  fprintf(out, "_plot_midres_odd_y:\n");
-  fprintf(out, "  ldb 3,s     ; b holds the color to plot\n");
-  fprintf(out, "  cmpb #0\n");
-  fprintf(out, "  beq _plot_midres_del_pixel\n");
-  fprintf(out, "  andb #0xf0  ; b holds the color to plot\n");
-  fprintf(out, "  sta 2,s\n");
-  fprintf(out, "  orb 2,s     ; b now holds the color and the pixel\n");
-  fprintf(out, "  lda ,y\n");
-  fprintf(out, "  anda #0x0f  ; a now holds the current 2x2 pixel value\n");
-  fprintf(out, "  sta ,y      ; This might cause a little flicker :(\n");
-  fprintf(out, "  orb ,y\n");
-  fprintf(out, "  stb ,y\n");
-  fprintf(out, "  rts\n");
-  fprintf(out, "_plot_midres_del_pixel:\n");
-  fprintf(out, "  eora #0xff  ; if color was 0, then erase the pixel\n");
-  fprintf(out, "  anda ,y\n");
-  fprintf(out, "  sta ,y\n");
-  fprintf(out, "  rts\n\n");
+  fprintf(out,
+    "_plot_midres:\n"
+    "  lda 5,s\n"
+    "  ldb #32\n"
+    "  mul\n"
+    "  addd 6,s\n"
+    "  lsra\n"
+    "  rorb\n"
+    "  addd #1024\n"
+    "  tfr d,y      ; y now holds address where to write pixel\n"
+    "  lda 7,s\n"
+    "  eora #0x01\n"
+    "  anda #0x01\n"
+    "  adda #0x01   ; a now holds 1 or 2 / if x is odd/even\n"
+    "  ldb 5,s\n"
+    "  bitb #0x01\n"
+    "  bne _plot_midres_odd_y\n"
+    "  lsla\n"
+    "  lsla\n"
+    "_plot_midres_odd_y:\n"
+    "  ldb 3,s     ; b holds the color to plot\n"
+    "  cmpb #0\n"
+    "  beq _plot_midres_del_pixel\n"
+    "  andb #0xf0  ; b holds the color to plot\n"
+    "  sta 2,s\n"
+    "  orb 2,s     ; b now holds the color and the pixel\n"
+    "  lda ,y\n"
+    "  anda #0x0f  ; a now holds the current 2x2 pixel value\n"
+    "  sta ,y      ; This might cause a little flicker :(\n"
+    "  orb ,y\n"
+    "  stb ,y\n"
+    "  rts\n"
+    "_plot_midres_del_pixel:\n"
+    "  eora #0xff  ; if color was 0, then erase the pixel\n"
+    "  anda ,y\n"
+    "  sta ,y\n"
+    "  rts\n\n");
 }
 
 void TRS80Coco::add_clear_screen_lores()
 {
-  fprintf(out, "clear_screen_lores:\n");
-  fprintf(out, "  ldx #1024\n");
-  fprintf(out, "  ldd #0x8f8f\n");
-  fprintf(out, "_clear_screen_lores:\n");
-  fprintf(out, "  std ,x++\n");
-  fprintf(out, "  cmpx #1024+(32*16)\n");
-  fprintf(out, "  bne _clear_screen_lores\n");
-  fprintf(out, "  rts\n\n");
+  fprintf(out,
+    "clear_screen_lores:\n"
+    "  ldx #1024\n"
+    "  ldd #0x8f8f\n"
+    "_clear_screen_lores:\n"
+    "  std ,x++\n"
+    "  cmpx #1024+(32*16)\n"
+    "  bne _clear_screen_lores\n"
+    "  rts\n\n");
 }
 
 void TRS80Coco::add_clear_screen_midres()
 {
-  fprintf(out, "clear_screen_midres:\n");
-  fprintf(out, "  ldx #1024\n");
-  fprintf(out, "  ldd #0x8080\n");
-  fprintf(out, "_clear_screen_midres:\n");
-  fprintf(out, "  std ,x++\n");
-  fprintf(out, "  cmpx #1024+(32*16)\n");
-  fprintf(out, "  bne _clear_screen_midres\n");
-  fprintf(out, "  rts\n\n");
+  fprintf(out,
+    "clear_screen_midres:\n"
+    "  ldx #1024\n"
+    "  ldd #0x8080\n"
+    "_clear_screen_midres:\n"
+    "  std ,x++\n"
+    "  cmpx #1024+(32*16)\n"
+    "  bne _clear_screen_midres\n"
+    "  rts\n\n");
 }
 
 void TRS80Coco::add_print()
 {
-  fprintf(out, "  ; print()\n");
-  fprintf(out, "_print:\n");
-  fprintf(out, "  lda ,x\n");
-  fprintf(out, "  tsta\n");
-  fprintf(out, "  beq _print_exit\n");
-  fprintf(out, "  jsr $a002\n");
-  fprintf(out, "  bra _print\n");
-  fprintf(out, "_print_exit:\n");
-  fprintf(out, "  rts\n");
+  fprintf(out,
+    "_print:\n"
+    "  lda ,x\n"
+    "  tsta\n"
+    "  beq _print_exit\n"
+    "  jsr $a002\n"
+    "  bra _print\n"
+    "_print_exit:\n"
+    "  rts\n");
+}
+
+void TRS80Coco::add_set_sound()
+{
+  fprintf(out,
+    "_set_sound:\n"
+    "  orcc #0x10\n"
+    "  tsta\n"
+    "  bne _set_sound_on\n"
+    "  tstb\n"
+    "  bne _set_sound_on\n"
+    "  rts\n"
+    "_set_sound_on:\n"
+    "  std >_sound_waveform_start\n"
+    "  std >_sound_waveform_ptr\n"
+    "  tfr d, x\n"
+    "  addd -2,x\n"
+    "  std >_sound_waveform_end\n"
+    "  ldd #_timer_interrupt\n"
+    "  sta 0x010d\n"
+    "  stb 0x010e\n"
+    "  andcc #0xef\n"
+    "  rts\n\n");
+
+  fprintf(out,
+    "_timer_interrupt:\n"
+    "  ldx >_sound_waveform_ptr\n"
+    "  lda ,x++\n"
+    "  sta 0xff20\n"
+    "  cmpx >_sound_waveform_end\n"
+    "  bne _timer_interrupt_exit\n"
+    "  ldd >_sound_waveform_start\n"
+    "  std >_sound_waveform_ptr\n"
+    "_timer_interrupt_exit:\n"
+    "  rti\n\n");
 }
 

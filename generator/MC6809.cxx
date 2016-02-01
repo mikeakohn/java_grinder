@@ -106,14 +106,14 @@ int MC6809::insert_field_init_int(char *name, int index, int value)
   CHECK_INT16(value);
 
   fprintf(out, "  ldd #0x%04x\n", (uint16_t)value);
-  fprintf(out, "  std [%s]\n", name);
+  fprintf(out, "  std %s\n", name);
   return 0;
 }
 
 int MC6809::insert_field_init(char *name, int index)
 {
   fprintf(out, "  ldd #_%s\n", name);
-  fprintf(out, "  std [%s]\n", name);
+  fprintf(out, "  std %s\n", name);
   return 0;
 }
 
@@ -175,7 +175,7 @@ int MC6809::push_ref_static(const char *name, int index)
 {
   fprintf(out, "  ; put_static()\n");
   fprintf(out, "  puls a,b\n");
-  fprintf(out, "  std [%s]\n", name);
+  fprintf(out, "  std %s\n", name);
   return 0;
 }
 
@@ -223,7 +223,7 @@ int MC6809::push_short(int16_t s)
 int MC6809::push_ref(char *name)
 {
   fprintf(out, "  ; push_ref()\n");
-  fprintf(out, "  ldd [%s]\n", name);
+  fprintf(out, "  ldd %s\n", name);
   fprintf(out, "  pshs a,b\n");
   return 0;
 }
@@ -655,14 +655,14 @@ int MC6809::put_static(const char *name, int index)
 {
   fprintf(out, "  ; put_static()\n");
   fprintf(out, "  puls a,b\n");
-  fprintf(out, "  std [%s]\n", name);
+  fprintf(out, "  std %s\n", name);
   return 0;
 }
 
 int MC6809::get_static(const char *name, int index)
 {
   fprintf(out, "  ; get_static()\n");
-  fprintf(out, "  ldd [%s]\n", name);
+  fprintf(out, "  ldd %s\n", name);
   fprintf(out, "  pshs a,b\n");
   return 0;
 }
