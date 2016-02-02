@@ -151,75 +151,40 @@ int TRS80Coco::trs80_coco_plotMidres_III()
   return 0;
 }
 
-int TRS80Coco::trs80_coco_enableVsyncListener()
+int TRS80Coco::trs80_coco_initVideoFlags()
 {
-  fprintf(out, "  ; enableVsyncListener()\n");
-  fprintf(out, "  lda 0xff92\n");
-  fprintf(out, "  ora #0x08\n");
-  fprintf(out, "  sta 0xff92\n");
-
-  return 0;
-}
-
-int TRS80Coco::trs80_coco_disableVsyncListener()
-{
-  fprintf(out, "  ; disableVsyncListener()\n");
-  fprintf(out, "  lda 0xff92\n");
-  fprintf(out, "  anda #0xf7\n");
-  fprintf(out, "  sta 0xff92\n");
-
-  return 0;
-}
-
-int TRS80Coco::trs80_coco_enableHsyncListener()
-{
-  fprintf(out, "  ; enableVsyncListener()\n");
-  //fprintf(out, "  lda 0xff92\n");
-  //fprintf(out, "  ora #0x10\n");
-  //fprintf(out, "  sta 0xff92\n");
-#if 0
-  fprintf(out, "_wait_vsync_off_%d:\n", label_count);
+  // FIXME - Can this be 8 bit?  This changed the IRQ to be on the rising
+  // edge.  Is this right?
+  fprintf(out, "  ; initVideoFlags()\n");
+  fprintf(out, "  orcc #0x10\n");
   fprintf(out, "  ldd 0xff02\n");
-  fprintf(out, "  andb #0x7f\n");
+  fprintf(out, "  orb #0x01\n");
   fprintf(out, "  std 0xff02\n");
+
+  return 0;
+}
+
+int TRS80Coco::trs80_coco_waitForHsync()
+{
+  fprintf(out, "  ; waitForHsync()\n");
+  fprintf(out, "_wait_hsync_%d:\n", label_count);
   fprintf(out, "  ldd 0xff02\n");
-  fprintf(out, "  bitb #0x80\n");
-  fprintf(out, "  bne _wait_vsync_off_%d\n", label_count);
-#endif
-
-  fprintf(out, "_wait_vsync_off_%d:\n", label_count);
-  fprintf(out, "  ldb 0xff03\n");
-  fprintf(out, "  andb #0x7f\n");
-  fprintf(out, "  stb 0xff03\n");
-  fprintf(out, "  ldb 0xff03\n");
-  fprintf(out, "  bitb #0x80\n");
-  fprintf(out, "  bne _wait_vsync_off_%d\n", label_count);
-
-
+  fprintf(out, "  bita #0x80\n");
+  fprintf(out, "  beq _wait_hsync_%d\n", label_count);
   label_count++;
 
-  return 0;
+  // Force this to fail for now.
+
+  return -1;
 }
 
-int TRS80Coco::trs80_coco_disableHsyncListener()
+int TRS80Coco::trs80_coco_waitForVsync()
 {
-  fprintf(out, "  ; disableVsyncListener()\n");
-#if 0
-  fprintf(out, "_wait_vsync_%d:\n", label_count);
+  fprintf(out, "  ; waitForVsync()\n");
+  fprintf(out, "  sync\n");
   fprintf(out, "  ldd 0xff02\n");
-  fprintf(out, "  bitb #0x80\n");
-  fprintf(out, "  beq _wait_vsync_%d\n", label_count);
   fprintf(out, "  andb #0x7f\n");
   fprintf(out, "  std 0xff02\n");
-#endif
-
-  fprintf(out, "_wait_vsync_%d:\n", label_count);
-  fprintf(out, "  ldd 0xff02\n");
-  fprintf(out, "  bitb #0x80\n");
-  fprintf(out, "  beq _wait_vsync_%d\n", label_count);
-  //fprintf(out, "  andb #0x7f\n");
-  //fprintf(out, "  std 0xff03\n");
-
   label_count++;
 
   return 0;

@@ -21,7 +21,8 @@ public class JavaTrs80Demo
     int a,n,x,y;
     int dx,dy;
 
-    TRS80Coco.initSound();
+    //TRS80Coco.initSound();
+    TRS80Coco.initVideoFlags();
 
     //TRS80Coco.setBackgroundColor(5);
     TRS80Coco.setText(1024, 0x8f);
@@ -50,16 +51,11 @@ public class JavaTrs80Demo
     for (a = 1; a < 25; a++)
     {
       TRS80Coco.setText(y * 32 + x + 1024, TRS80Coco.COLOR_RED);
-      for (n = 0; n < 5000; n++);
-/*
+      //for (n = 0; n < 5000; n++);
       for (n = 0; n < 60; n++)
       {
-        TRS80Coco.disableHsyncListener();
-        //TRS80Coco.enableHsyncListener();
+        TRS80Coco.waitForVsync();
       }
-*/
-
-      TRS80Coco.setSound(Waveforms.a440);
 
       TRS80Coco.setText(y * 32 + x + 1024, TRS80Coco.COLOR_GREEN);
 
@@ -77,6 +73,8 @@ public class JavaTrs80Demo
       TRS80Coco.setText(1024, a);
       for (n = 0; n < 1000; n++);
     }
+
+    //TRS80Coco.setSound(Waveforms.a440);
 
     //TRS80Coco.clearScreenLores();
     //TRS80Coco.print("JAVA GRINDER");

@@ -42,10 +42,10 @@ abstract public class TRS80Coco
       can be between 0 and 31 */
   public static void plotMidres(int x, int y, int color) { }
 
-  public static void enableVsyncListener() { }
-  public static void disableVsyncListener() { }
-  public static void enableHsyncListener() { }
-  public static void disableHsyncListener() { }
+  public static void initVideoFlags() { }
+  //public static void disableVsyncListener() { }
+  public static void waitForHsync() { }
+  public static void waitForVsync() { }
 
   /** Must be called before sound is used. */
   public static void initSound() { }
