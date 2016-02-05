@@ -1634,7 +1634,7 @@ void AVR8::insert_integer_to_byte()
   PUSH_LO("result0");
   fprintf(out, "  lsl result0\n");
   fprintf(out, "  mov result1, zero\n");
-  fprintf(out, "  add result1, ff\n");
+  fprintf(out, "  adc result1, ff\n");
   fprintf(out, "  eor result1, ff\n");
   PUSH_HI("result1");
   fprintf(out, "  ret\n\n");
@@ -1792,7 +1792,7 @@ void AVR8::insert_array_byte_support()
   PUSH_LO("result0");
   fprintf(out, "  lsl\n");
   fprintf(out, "  mov result1, zero\n");
-  fprintf(out, "  add result1, ff\n");
+  fprintf(out, "  adc result1, ff\n");
   fprintf(out, "  eor result1, ff\n");
   PUSH_HI("result1");
   fprintf(out, "  ret\n\n");
@@ -1807,7 +1807,7 @@ void AVR8::insert_array_byte_support()
   PUSH_LO("result0");
   fprintf(out, "  lsl\n");
   fprintf(out, "  mov result1, zero\n");
-  fprintf(out, "  add result1, ff\n");
+  fprintf(out, "  adc result1, ff\n");
   fprintf(out, "  eor result1, ff\n");
   PUSH_HI("result1");
   fprintf(out, "  ret\n\n");
@@ -1919,7 +1919,7 @@ int AVR8::memory_read8_I()
   PUSH_LO("result0");
   fprintf(out, "  lsl result0\n");
   fprintf(out, "  mov result1, zero\n");
-  fprintf(out, "  add result1, ff\n");
+  fprintf(out, "  adc result1, ff\n");
   fprintf(out, "  eor result1, ff\n");
   PUSH_HI("result1");
 
