@@ -1689,18 +1689,13 @@ void M6502::insert_array_byte_support()
   fprintf(out, "  lda result + 0\n");
   PUSH_LO();
   // sign-extend
-  fprintf(out, "  lda result + 0\n");
-  fprintf(out, "  bpl array_read_byte_skip\n");
-  fprintf(out, "  lda #0xff\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  adc #0xff\n");
+  fprintf(out, "  eor #0xff\n");
   fprintf(out, "  sta result + 1\n");
   PUSH_HI();
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  beq array_read_byte_end\n");
-  fprintf(out, "array_read_byte_skip:\n");
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  sta result + 1\n");
-  PUSH_HI();
-  fprintf(out, "array_read_byte_end:\n");
   fprintf(out, "  rts\n");
 
   // array_read_byte2
@@ -1721,11 +1716,11 @@ void M6502::insert_array_byte_support()
   fprintf(out, "  ldy #0\n");
   fprintf(out, "  lda (address),y\n");
   fprintf(out, "  sta result + 0\n");
-  fprintf(out, "  bmi #6\n");
-  fprintf(out, "  sty result + 1\n");
+  fprintf(out, "  asl\n");
   fprintf(out, "  lda #0\n");
-  fprintf(out, "  beq #4\n");
-  fprintf(out, "  lda #0xff\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  adc #0xff\n");
+  fprintf(out, "  eor #0xff\n");
   fprintf(out, "  sta result + 1\n");
 
   fprintf(out, "  lda result + 0\n");
@@ -1976,19 +1971,13 @@ void M6502::insert_memory_read8()
   PUSH_LO();
 
   // sign-extend
-  fprintf(out, "  lda result + 0\n");
-  fprintf(out, "  bpl memory_read8_skip\n");
-  fprintf(out, "  lda #0xff\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  adc #0xff\n");
+  fprintf(out, "  eor #0xff\n");
   fprintf(out, "  sta result + 1\n");
   PUSH_HI();
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  beq memory_read8_end\n");
-
-  fprintf(out, "memory_read8_skip:\n");
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  sta result + 1\n");
-  PUSH_HI();
-  fprintf(out, "memory_read8_end:\n");
   fprintf(out, "  rts\n");
 }
 
