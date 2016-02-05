@@ -1632,13 +1632,10 @@ void AVR8::insert_integer_to_byte()
   POP_HI("result1");
   POP_LO("result0");
   PUSH_LO("result0");
-  fprintf(out, "  cp result0, zero\n");
-  fprintf(out, "  brpl integer_to_byte_skip\n");
-  fprintf(out, "  mov result1, ff\n");
-  PUSH_HI("result1");
-  fprintf(out, "  ret\n\n");
-  fprintf(out, "integer_to_byte_skip:\n");
+  fprintf(out, "  lsl result0\n");
   fprintf(out, "  mov result1, zero\n");
+  fprintf(out, "  add result1, ff\n");
+  fprintf(out, "  eor result1, ff\n");
   PUSH_HI("result1");
   fprintf(out, "  ret\n\n");
 }
@@ -1793,13 +1790,10 @@ void AVR8::insert_array_byte_support()
   fprintf(out, "  mov XH, value21\n");
   fprintf(out, "  ld result0, X\n");
   PUSH_LO("result0");
-  fprintf(out, "  cp result0, zero\n");
-  fprintf(out, "  brpl array_read_byte_skip\n");
-  fprintf(out, "  mov result1, ff\n");
-  PUSH_HI("result1");
-  fprintf(out, "  ret\n\n");
-  fprintf(out, "array_read_byte_skip:\n");
+  fprintf(out, "  lsl\n");
   fprintf(out, "  mov result1, zero\n");
+  fprintf(out, "  add result1, ff\n");
+  fprintf(out, "  eor result1, ff\n");
   PUSH_HI("result1");
   fprintf(out, "  ret\n\n");
 
@@ -1811,13 +1805,10 @@ void AVR8::insert_array_byte_support()
   fprintf(out, "  adc ZH, result1\n");
   fprintf(out, "  lpm result0, Z\n");
   PUSH_LO("result0");
-  fprintf(out, "  cp result0, zero\n");
-  fprintf(out, "  brpl array_read_byte2_skip\n");
-  fprintf(out, "  mov result1, ff\n");
-  PUSH_HI("result1");
-  fprintf(out, "  ret\n");
-  fprintf(out, "array_read_byte2_skip:\n");
+  fprintf(out, "  lsl\n");
   fprintf(out, "  mov result1, zero\n");
+  fprintf(out, "  add result1, ff\n");
+  fprintf(out, "  eor result1, ff\n");
   PUSH_HI("result1");
   fprintf(out, "  ret\n\n");
 
@@ -1926,13 +1917,10 @@ int AVR8::memory_read8_I()
   POP_LO("XL");
   fprintf(out, "  ld result0, X\n");
   PUSH_LO("result0");
-  fprintf(out, "  cp result0, zero\n");
-  fprintf(out, "  brpl memory_read8_zero_%d\n", label_count);
-  fprintf(out, "  mov result1, ff\n");
-  fprintf(out, "  rjmp memory_read8_end_%d\n", label_count);
-  fprintf(out, "memory_read8_zero_%d:\n", label_count);
+  fprintf(out, "  lsl result0\n");
   fprintf(out, "  mov result1, zero\n");
-  fprintf(out, "memory_read8_end_%d:\n", label_count++);
+  fprintf(out, "  add result1, ff\n");
+  fprintf(out, "  eor result1, ff\n");
   PUSH_HI("result1");
 
   return 0;
