@@ -108,12 +108,14 @@ protected:
   uint32_t org;       // .org to use for this chip
   uint32_t ram_start; // start of ram
   uint32_t ram_end;   // end of ram
-  bool is_main : 1;
-
-  int stack_alu(const char *instr);
 
 private:
-  //void push_reg(int t);
+  int stack_alu(const char *instr);
+  int get_values_from_stack(int *value1);
+  int get_values_from_stack(int *value1, int *value2);
+  int get_ref_from_stack(int *value1);
+
+  bool is_main : 1;
 };
 
 #endif

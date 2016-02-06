@@ -649,12 +649,34 @@ int MIPS32::inc_integer(int index, int num)
 
 int MIPS32::integer_to_byte()
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  lw $t8, 0($sp)\n");
+    fprintf(out, "  seb $t8, $t8\n");
+    fprintf(out, "  sw $t8, 0($sp)\n");
+  }
+    else
+  {
+    fprintf(out, "  seb $t%d, $t%d\n", REG_STACK(reg - 1), REG_STACK(reg - 1));
+  }
+
+  return 0;
 }
 
 int MIPS32::integer_to_short()
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  lw $t8, 0($sp)\n");
+    fprintf(out, "  seh $t8, $t8\n");
+    fprintf(out, "  sw $t8, 0($sp)\n");
+  }
+    else
+  {
+    fprintf(out, "  seh $t%d, $t%d\n", REG_STACK(reg - 1), REG_STACK(reg - 1));
+  }
+
+  return 0;
 }
 
 int MIPS32::jump_cond(const char *label, int cond, int distance)
@@ -790,72 +812,292 @@ int MIPS32::insert_string(const char *name, uint8_t *bytes, int len)
 
 int MIPS32::push_array_length()
 {
-  return -1;
+  if (stack > 0)
+  {
+    fprintf(out, "  lw $t8, 0($sp)\n"); \
+    fprintf(out, "  lw $t8, -4($t8)\n");
+    fprintf(out, "  sw $t8, 0($sp)\n"); \
+    STACK_PUSH(8); 
+  }
+    else
+  {
+    fprintf(out, "  lw $t%d, -4($t%d)\n", REG_STACK(reg-1), REG_STACK(reg-1));
+  }
+
+  return 0;
 }
 
 int MIPS32::push_array_length(const char *name, int field_id)
 {
-  return -1;
+  fprintf(out, "  lw $t8, 0x%04x($s1) ; static %s\n", field_id * 4, name);
+
+  if (reg >= reg_max)
+  {
+    STACK_PUSH(8); 
+  }
+    else
+  {
+    fprintf(out, "  lw $t%d, -4($t8)\n", REG_STACK(reg));
+    reg++;
+  }
+
+  return 0;
 }
 
 int MIPS32::array_read_byte()
 {
-  return -1;
+  int index_reg;
+  int ref_reg;
+
+  get_values_from_stack(&index_reg, &ref_reg);
+
+  fprintf(out, "  add t%d, $t%d, $t%d\n", ref_reg, ref_reg, index_reg);
+
+  if (reg < reg_max)
+  {
+    fprintf(out, "  lb $t%d, 0($t%d)\n", REG_STACK(reg), ref_reg);
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  lb $t8, 0($t%d)\n", ref_reg);
+    STACK_PUSH(8);
+  }
+
+  return 0;
 }
 
 int MIPS32::array_read_short()
 {
-  return -1;
+  int index_reg;
+  int ref_reg;
+
+  get_values_from_stack(&index_reg, &ref_reg);
+
+  fprintf(out, "  sll $t%d, $t%d, 1\n", index_reg, index_reg);
+  fprintf(out, "  add $t%d, $t%d, $t%d\n", ref_reg, ref_reg, index_reg);
+
+  if (reg < reg_max)
+  {
+    fprintf(out, "  lh $t%d, 0($t%d)\n", REG_STACK(reg), ref_reg);
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  lh $t8, 0($t%d)\n", ref_reg);
+    STACK_PUSH(8);
+  }
+
+  return 0;
 }
 
 int MIPS32::array_read_int()
 {
-  return -1;
+  int index_reg;
+  int ref_reg;
+
+  get_values_from_stack(&index_reg, &ref_reg);
+
+  fprintf(out, "  sll $t%d, $t%d, 2\n", index_reg, index_reg);
+  fprintf(out, "  add $t%d, $t%d, $t%d\n", ref_reg, ref_reg, index_reg);
+
+  if (reg < reg_max)
+  {
+    fprintf(out, "  lw $t%d, 0($t%d)\n", REG_STACK(reg), ref_reg);
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  lw $t8, 0($t%d)\n", ref_reg);
+    STACK_PUSH(8);
+  }
+
+  return 0;
 }
 
 int MIPS32::array_read_byte(const char *name, int field_id)
 {
-  return -1;
+  int index_reg;
+
+  get_values_from_stack(&index_reg);
+
+  fprintf(out, "  lw $at, %d($s1)\n", field_id * 4);
+  fprintf(out, "  add $at, $at, $t%d\n", index_reg);
+
+  if (reg < reg_max)
+  {
+    fprintf(out, "  lb $t%d, 0($at)\n", REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  lb $t8, 0($at)\n");
+    STACK_PUSH(8);
+  }
+
+  return 0;
 }
 
 int MIPS32::array_read_short(const char *name, int field_id)
 {
-  return -1;
+  int index_reg;
+
+  get_values_from_stack(&index_reg);
+
+  fprintf(out, "  lw $at, %d($s1)\n", field_id * 4);
+  fprintf(out, "  sll $t%d, $t%d, 1\n", index_reg, index_reg);
+  fprintf(out, "  add $at, $at, $t%d\n", index_reg);
+
+  if (reg < reg_max)
+  {
+    fprintf(out, "  lh $t%d, 0($at)\n", REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  lh $t8, 0($at)\n");
+    STACK_PUSH(8);
+  }
+
+  return 0;
 }
 
 int MIPS32::array_read_int(const char *name, int field_id)
 {
-  return -1;
+  int index_reg;
+
+  get_values_from_stack(&index_reg);
+
+  fprintf(out, "  lw $at, %d($s1)\n", field_id * 4);
+  fprintf(out, "  sll $t%d, $t%d, 2\n", index_reg, index_reg);
+  fprintf(out, "  add $at, $at, $t%d\n", index_reg);
+
+  if (reg < reg_max)
+  {
+    fprintf(out, "  lw $t%d, 0($at)\n", REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  lw $t8, 0($at)\n");
+    STACK_PUSH(8);
+  }
+
+  return 0;
 }
 
 int MIPS32::array_write_byte()
 {
-  return -1;
+  int value_reg;
+  int index_reg;
+  int ref_reg;
+
+  get_values_from_stack(&value_reg, &index_reg);
+
+  if (get_ref_from_stack(&ref_reg) == -1)
+  {
+    fprintf(out, "  add $at, $at, $t%d\n", index_reg);
+    fprintf(out, "  sb $t%d, 0($at)\n", value_reg);
+  }
+    else
+  {
+    fprintf(out, "  add $t%d, $t%d, $t%d\n", ref_reg, ref_reg, index_reg);
+    fprintf(out, "  sb $t%d, 0($t%d)\n", value_reg, ref_reg);
+  }
+
+  return 0;
 }
 
 int MIPS32::array_write_short()
 {
-  return -1;
+  int value_reg;
+  int index_reg;
+  int ref_reg;
+
+  get_values_from_stack(&value_reg, &index_reg);
+
+  if (get_ref_from_stack(&ref_reg) == -1)
+  {
+    fprintf(out, "  sll $t%d, $t%d, 1\n", index_reg, index_reg);
+    fprintf(out, "  add $at, $at, $t%d\n", index_reg);
+    fprintf(out, "  sh $t%d, 0($at)\n", value_reg);
+  }
+    else
+  {
+    fprintf(out, "  sll $t%d, $t%d, 1\n", index_reg, index_reg);
+    fprintf(out, "  add $t%d, $t%d, $t%d\n", ref_reg, ref_reg, index_reg);
+    fprintf(out, "  sh $t%d, 0($t%d)\n", value_reg, ref_reg);
+  }
+
+  return 0;
 }
 
 int MIPS32::array_write_int()
 {
-  return -1;
+  int value_reg;
+  int index_reg;
+  int ref_reg;
+
+  get_values_from_stack(&value_reg, &index_reg);
+
+  if (get_ref_from_stack(&ref_reg) == -1)
+  {
+    fprintf(out, "  sll $t%d, $t%d, 2\n", index_reg, index_reg);
+    fprintf(out, "  add $at, $at, $t%d\n", index_reg);
+    fprintf(out, "  sw $t%d, 0($at)\n", value_reg);
+  }
+    else
+  {
+    fprintf(out, "  sll $t%d, $t%d, 2\n", index_reg, index_reg);
+    fprintf(out, "  add $t%d, $t%d, $t%d\n", ref_reg, ref_reg, index_reg);
+    fprintf(out, "  sw $t%d, 0($t%d)\n", value_reg, ref_reg);
+  }
+
+  return 0;
 }
 
 int MIPS32::array_write_byte(const char *name, int field_id)
 {
-  return -1;
+  int value_reg;
+  int index_reg;
+
+  get_values_from_stack(&value_reg, &index_reg);
+
+  fprintf(out, "  lw $at, %d($s1)\n", field_id * 4);
+  fprintf(out, "  add $at, $at, $t%d\n", index_reg);
+  fprintf(out, "  sb $t%d, 0($at)\n", value_reg);
+
+  return 0;
 }
 
 int MIPS32::array_write_short(const char *name, int field_id)
 {
-  return -1;
+  int value_reg;
+  int index_reg;
+
+  get_values_from_stack(&value_reg, &index_reg);
+
+  fprintf(out, "  lw $at, %d($s1)\n", field_id * 4);
+  fprintf(out, "  sll $t%d, $t%d, 1\n", index_reg, index_reg);
+  fprintf(out, "  add $at, $at, $t%d\n", index_reg);
+  fprintf(out, "  sh $t%d, 0($at)\n", value_reg);
+
+  return 0;
 }
 
 int MIPS32::array_write_int(const char *name, int field_id)
 {
-  return -1;
+  int value_reg;
+  int index_reg;
+
+  get_values_from_stack(&value_reg, &index_reg);
+
+  fprintf(out, "  lw $at, %d($s1)\n", field_id * 4);
+  fprintf(out, "  sll $t%d, $t%d, 2\n", index_reg, index_reg);
+  fprintf(out, "  add $at, $at, $t%d\n", index_reg);
+  fprintf(out, "  sw $t%d, 0($at)\n", value_reg);
+
+  return 0;
 }
 
 int MIPS32::stack_alu(const char *instr)
@@ -883,20 +1125,64 @@ int MIPS32::stack_alu(const char *instr)
   return 0;
 }
 
-#if 0
-void MIPS32::push_reg(int t)
+int MIPS32::get_values_from_stack(int *value)
 {
-  if (reg < reg_max)
+  if (stack > 0)
   {
-    fprintf(out, "  lw $t%d, ($t8)\n", t);
-    reg++;
+    STACK_POP(8);
+    *value = 8;
   }
     else
   {
-    fprintf(out, "  lw $t8, ($t8)\n");
-    STACK_PUSH(8);
+    *value = REG_STACK(reg - 1);
+    reg--;
+  }
+
+  return 0;
+}
+
+int MIPS32::get_values_from_stack(int *value1, int *value2)
+{
+  if (stack > 0)
+  {
+    STACK_POP(8);
+    *value1 = 8;
+  }
+    else
+  {
+    *value1 = REG_STACK(reg - 1);
+    reg--;
+  }
+
+  if (stack > 0)
+  {
+    STACK_POP(9);
+    *value2 = 8;
+  }
+    else
+  {
+    *value2 = REG_STACK(reg - 1);
+    reg--;
+  }
+
+  return 0;
+}
+
+int MIPS32::get_ref_from_stack(int *value1)
+{
+  if (stack > 0)
+  {
+    fprintf(out, "  lw $at, 0($sp)\n"); \
+    fprintf(out, "  addi $sp, $sp, 4\n"); \
+    return -1;
+  }
+    else
+  {
+    *value1 = REG_STACK(reg - 1);
+    reg--;
+
+    return 0;
   }
 }
-#endif
 
 
