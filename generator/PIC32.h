@@ -38,7 +38,21 @@ public:
   virtual int ioport_getPortInputValue(int port);
   //virtual int ioport_setPortOutputValue(int port);
 
+  // SPI functions
+  virtual int spi_init(int port);
+  virtual int spi_init(int port, int clock_divisor, int mode);
+  virtual int spi_send(int port);
+  virtual int spi_read(int port);
+  virtual int spi_isDataAvailable(int port);
+  virtual int spi_isBusy(int port);
+  virtual int spi_disable(int port);
+  virtual int spi_enable(int port);
+
 private:
+  //void add_spi_send();
+
+  //uint32_t need_spi_send : 1;
+
 };
 
 #endif

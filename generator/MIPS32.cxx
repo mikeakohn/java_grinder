@@ -524,7 +524,7 @@ int MIPS32::swap()
 
 int MIPS32::add_integer()
 {
-  return stack_alu("add"); 
+  return stack_alu("add");
 }
 
 int MIPS32::add_integer(int num)
@@ -537,7 +537,7 @@ int MIPS32::add_integer(int num)
 
 int MIPS32::sub_integer()
 {
-  return stack_alu("sub"); 
+  return stack_alu("sub");
 }
 
 int MIPS32::sub_integer(int num)
@@ -550,57 +550,138 @@ int MIPS32::sub_integer(int num)
 
 int MIPS32::mul_integer()
 {
-  return -1;
+  return stack_alu("mul");
 }
 
 int MIPS32::div_integer()
 {
-  return -1;
+  stack_alu("div");
+
+  if (stack > 0)
+  {
+    // OUCH.  This is probably very rare anyway
+    STACK_POP(8);
+    fprintf(out, "  mflo $t8\n");
+    STACK_PUSH(8);
+  }
+    else
+  {
+    fprintf(out, "  mflo $t%d\n", REG_STACK(reg - 1));
+  }
+
+  return 0;
 }
 
 int MIPS32::mod_integer()
 {
-  return -1;
+  stack_alu("div");
+
+  if (stack > 0)
+  {
+    // OUCH.  This is probably very rare anyway
+    STACK_POP(8);
+    fprintf(out, "  mfhi $t8\n");
+    STACK_PUSH(8);
+  }
+    else
+  {
+    fprintf(out, "  mfhi $t%d\n", REG_STACK(reg - 1));
+  }
+
+  return 0;
 }
 
 int MIPS32::neg_integer()
 {
-  return -1;
+  if (stack > 0)
+  {
+    STACK_POP(8);
+    fprintf(out, "  negu $t8, $t8\n");
+    STACK_PUSH(8);
+  }
+    else
+  {
+    fprintf(out, "  negu $t%d, $t%d\n", REG_STACK(reg - 1), REG_STACK(reg - 1));
+  }
+
+  return 0;
 }
 
 int MIPS32::shift_left_integer()
 {
-  return -1;
+  return stack_alu("sll");
+  return 0;
 }
 
 int MIPS32::shift_left_integer(int num)
 {
-  return -1;
+  if (num < 0 || num > 31) { printf("Shift out of range\n"); return -1; }
+
+  if (stack > 0)
+  {
+    STACK_POP(8);
+    fprintf(out, "  sll $t8, $t8, %d\n", num);
+    STACK_PUSH(8);
+  }
+    else
+  {
+    fprintf(out, "  sll $t%d, $t%d, %d\n", REG_STACK(reg - 1), REG_STACK(reg - 1), num);
+  }
+
+  return 0;
 }
 
 int MIPS32::shift_right_integer()
 {
-  return -1;
+  return stack_alu("sra");
+  return 0;
 }
 
 int MIPS32::shift_right_integer(int num)
 {
-  return -1;
+  if (num < 0 || num > 31) { printf("Shift out of range\n"); return -1; }
+
+  if (stack > 0)
+  {
+    STACK_POP(8);
+    fprintf(out, "  sra $t8, $t8, %d\n", num);
+    STACK_PUSH(8);
+  }
+    else
+  {
+    fprintf(out, "  sra $t%d, $t%d, %d\n", REG_STACK(reg - 1), REG_STACK(reg - 1), num);
+  }
+
+  return 0;
 }
 
 int MIPS32::shift_right_uinteger()
 {
-  return -1;
+  return stack_alu("srl");
+  return 0;
 }
 
 int MIPS32::shift_right_uinteger(int num)
 {
-  return -1;
+  if (num < 0 || num > 31) { printf("Shift out of range\n"); return -1; }
+
+  if (stack > 0)
+  {
+    STACK_POP(8);
+    fprintf(out, "  srl $t8, $t8, %d\n", num);
+    STACK_PUSH(8);
+  }
+    else
+  {
+    fprintf(out, "  srl $t%d, $t%d, %d\n", REG_STACK(reg - 1), REG_STACK(reg - 1), num);
+  }
+
+  return 0;
 }
 
 int MIPS32::and_integer()
 {
-  return stack_alu("and"); 
+  return stack_alu("and");
 }
 
 int MIPS32::and_integer(int num)
@@ -613,7 +694,7 @@ int MIPS32::and_integer(int num)
 
 int MIPS32::or_integer()
 {
-  return stack_alu("or"); 
+  return stack_alu("or");
 }
 
 int MIPS32::or_integer(int num)
@@ -626,7 +707,7 @@ int MIPS32::or_integer(int num)
 
 int MIPS32::xor_integer()
 {
-  return stack_alu("xor"); 
+  return stack_alu("xor");
 }
 
 int MIPS32::xor_integer(int num)
@@ -1110,16 +1191,15 @@ int MIPS32::stack_alu(const char *instr)
     else
   if (stack == 1)
   {
-    // FIXME
-    fprintf(out, "  error r15\n");
-    fprintf(out, "  %s.w r15, r%d\n", instr, REG_STACK(reg-1));
-    stack--;
+    STACK_POP(8);
+    fprintf(out, "  %s $t%d, $t%d, $t8\n", instr, REG_STACK(reg-1), REG_STACK(reg-1));
   }
     else
   {
-    // FIXME
-    fprintf(out, "  error r15\n");
-    fprintf(out, "  %s.w r15, @SP\n", instr);
+    STACK_POP(8);
+    STACK_POP(9);
+    fprintf(out, "  %s $t9, $t9, $t8\n", instr);
+    STACK_PUSH(9);
   }
 
   return 0;
