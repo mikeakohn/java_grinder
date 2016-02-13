@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -16,6 +16,7 @@
 #include "JavaClass.h"
 
 int invoke_virtual(JavaClass *java_class, int method_id, int field_id, Generator *generator);
+int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator);
 
 #endif
 

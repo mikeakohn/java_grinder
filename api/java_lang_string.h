@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -16,6 +16,7 @@
 #include "JavaClass.h"
 
 int java_lang_string(JavaClass *java_class, Generator *generator, char *function, char *field_name, int field_id);
+int java_lang_string(JavaClass *java_class, Generator *generator, char *method_name);
 
 #endif
 

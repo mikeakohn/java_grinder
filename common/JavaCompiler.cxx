@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -676,13 +676,32 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
     {
       if (*s == 'L')
       {
-        while(*s != ';' && *s != 0)
+        const int len = sizeof("Ljava/lang/String;") - 1;
+        if (strncmp(s, "Ljava/lang/String;", len) == 0)
         {
-          if (*s == '/') { *s = '_'; }
+          char *end = s + len;
+          char *start = s + 1;
+          *s = 'X';
           s++;
+          while(true)
+          {
+            *start = *end;
+            if (*end == 0) { break; }
+            start++;
+            end++;
+          }
+          continue;
         }
-        if (*s == ';') { *s = '_'; }
-        else if (*s == 0) { s--; }
+          else
+        {
+          while(*s != ';' && *s != 0)
+          {
+            if (*s == '/') { *s = '_'; }
+            s++;
+          }
+          if (*s == ';') { *s = '_'; }
+          else if (*s == 0) { s--; }
+        }
       }
         else
       if (*s == '[')
@@ -1793,14 +1812,16 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
 
       case 182: // invokevirtual (0xb6)
         ref = GET_PC_UINT16(1);
+
         if (stack->length() == 0)
         {
-          printf("Error: empty stack\n");
-          ret = -1;
-          break;
+          ret = invoke_virtual(java_class, ref, generator);
         }
-        
-        ret = invoke_virtual(java_class, ref, stack->pop(), generator);
+          else
+        {
+          ret = invoke_virtual(java_class, ref, stack->pop(), generator);
+        }
+
         break;
 
       case 183: // invokespecial (0xb7)
