@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -221,7 +221,7 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
             else
           {
             //index = java_class->get_field_index(field_name);
-            generator->insert_field_init(full_field_name, index);
+            generator->insert_field_init_ref(full_field_name, index);
           }
 
           //printf("Can't do a string yet.. :( %d\n", constant_string->string_index);
@@ -501,7 +501,7 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
             else
           {
             index = java_class->get_field_index(field_name);
-            generator->insert_field_init(full_field_name, index);
+            generator->insert_field_init_ref(full_field_name, index);
           }
         }
           else

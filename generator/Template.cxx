@@ -89,7 +89,7 @@ int Template::insert_field_init_int(char *name, int index, int value)
   return -1;
 }
 
-int Template::insert_field_init(char *name, int index)
+int Template::insert_field_init_ref(char *name, int index)
 {
   return -1;
 }

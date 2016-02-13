@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -178,7 +178,7 @@ int DSPIC::insert_field_init_int(char *name, int index, int value)
   return insert_field_init_short(name, index, value);
 }
 
-int DSPIC::insert_field_init(char *name, int index)
+int DSPIC::insert_field_init_ref(char *name, int index)
 {
   fprintf(out, "  mov #_%s, w0\n", name);
   fprintf(out, "  mov w0, %s\n", name);

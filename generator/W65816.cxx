@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  * W65816 written by Joe Davisson
  *
@@ -209,9 +209,9 @@ int W65816::insert_field_init_int(char *name, int index, int value)
   return insert_field_init_short(name, index, value);
 }
 
-int W65816::insert_field_init(char *name, int index)
+int W65816::insert_field_init_ref(char *name, int index)
 {
-  fprintf(out, "; insert_field_init\n");
+  fprintf(out, "; insert_field_init_ref\n");
   fprintf(out, "  lda #_%s\n", name);
   fprintf(out, "  sta %s\n", name);
 

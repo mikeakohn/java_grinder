@@ -156,7 +156,7 @@ int Propeller::insert_field_init_int(char *name, int index, int value)
   return -1;
 }
 
-int Propeller::insert_field_init(char *name, int index)
+int Propeller::insert_field_init_ref(char *name, int index)
 {
   return -1;
 }

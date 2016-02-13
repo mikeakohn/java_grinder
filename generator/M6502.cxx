@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  * M6502 written by Joe Davisson
  *
@@ -205,9 +205,9 @@ int M6502::insert_field_init_int(char *name, int index, int value)
   return insert_field_init_short(name, index, value);
 }
 
-int M6502::insert_field_init(char *name, int index)
+int M6502::insert_field_init_ref(char *name, int index)
 {
-  fprintf(out, "; insert_field_init\n");
+  fprintf(out, "; insert_field_init_ref\n");
   fprintf(out, "  lda #_%s & 0xff\n", name);
   fprintf(out, "  sta %s + 0\n", name);
   fprintf(out, "  lda #_%s >> 8\n", name);

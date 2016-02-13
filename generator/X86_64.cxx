@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -93,7 +93,7 @@ int X86_64::insert_field_init_int(char *name, int index, int value)
   return -1;
 }
 
-int X86_64::insert_field_init(char *name, int index)
+int X86_64::insert_field_init_ref(char *name, int index)
 {
   return -1;
 }

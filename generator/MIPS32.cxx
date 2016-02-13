@@ -189,7 +189,7 @@ int MIPS32::insert_field_init_int(char *name, int index, int value)
   return 0;
 }
 
-int MIPS32::insert_field_init(char *name, int index)
+int MIPS32::insert_field_init_ref(char *name, int index)
 {
   fprintf(out, "  li $t8, %s\n", name);
   fprintf(out, "  sw $t8, 0x%04x($s1)\n", index * 4);

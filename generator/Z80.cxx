@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -117,7 +117,7 @@ int Z80::insert_field_init_int(char *name, int index, int value)
   return insert_field_init_short(name, index, value);
 }
 
-int Z80::insert_field_init(char *name, int index)
+int Z80::insert_field_init_ref(char *name, int index)
 {
   fprintf(out, "  ld hl, _%s\n", name);
   fprintf(out, "  ld (%s), hl\n", name);

@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  * AVR8 written by Joe Davisson
  *
@@ -347,9 +347,9 @@ int AVR8::insert_field_init_int(char *name, int index, int value)
   return insert_field_init_short(name, index, value);
 }
 
-int AVR8::insert_field_init(char *name, int index)
+int AVR8::insert_field_init_ref(char *name, int index)
 {
-  fprintf(out, "; insert_field_init\n");
+  fprintf(out, "; insert_field_init_ref\n");
   fprintf(out, "  ldi temp, (_%s * 2) & 0xff\n", name);
   fprintf(out, "  sts %s + 0, temp\n", name);
   fprintf(out, "  ldi temp, (_%s * 2) >> 8\n", name);

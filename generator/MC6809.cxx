@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -110,7 +110,7 @@ int MC6809::insert_field_init_int(char *name, int index, int value)
   return 0;
 }
 
-int MC6809::insert_field_init(char *name, int index)
+int MC6809::insert_field_init_ref(char *name, int index)
 {
   fprintf(out, "  ldd #_%s\n", name);
   fprintf(out, "  std %s\n", name);

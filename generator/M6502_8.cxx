@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -158,9 +158,9 @@ int M6502_8::insert_field_init_int(char *name, int index, int value)
   return 0;
 }
 
-int M6502_8::insert_field_init(char *name, int index)
+int M6502_8::insert_field_init_ref(char *name, int index)
 {
-  fprintf(out, "; insert_field_init\n");
+  fprintf(out, "; insert_field_init_ref\n");
   fprintf(out, "%s equ _%s\n", name, name);
 
   return 0;
