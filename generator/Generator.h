@@ -59,11 +59,11 @@ public:
   virtual int start_init() = 0;
   virtual int insert_static_field_define(const char *name, const char *type, int index) = 0;
   virtual int init_heap(int field_count) = 0;
-  virtual int insert_field_init_boolean(char *name, int index, int value) = 0;
-  virtual int insert_field_init_byte(char *name, int index, int value) = 0;
-  virtual int insert_field_init_short(char *name, int index, int value) = 0;
-  virtual int insert_field_init_int(char *name, int index, int value) = 0;
-  virtual int insert_field_init_ref(char *name, int index) = 0;
+  //virtual int field_init_boolean(char *name, int index, int value) = 0;
+  //virtual int field_init_byte(char *name, int index, int value) = 0;
+  //virtual int field_init_short(char *name, int index, int value) = 0;
+  virtual int field_init_int(char *name, int index, int value) = 0;
+  virtual int field_init_ref(char *name, int index) = 0;
   virtual void method_start(int local_count, int max_stack, int param_count, const char *name) = 0;
   virtual void method_end(int local_count) = 0;
   virtual int push_integer(int32_t n) = 0;

@@ -97,26 +97,7 @@ int ARM::init_heap(int field_count)
   return 0;
 }
 
-int ARM::insert_field_init_boolean(char *name, int index, int value)
-{
-  value = (value == 0) ? 0 : 1;
-
-  fprintf(out, "  mov r10, #%d\n", value);
-  fprintf(out, "  str r10, [r11,#%s]\n", name);
-  return 0;
-}
-
-int ARM::insert_field_init_byte(char *name, int index, int value)
-{
-  return insert_field_init_int(name, index, value);
-}
-
-int ARM::insert_field_init_short(char *name, int index, int value)
-{
-  return insert_field_init_int(name, index, value);
-}
-
-int ARM::insert_field_init_int(char *name, int index, int value)
+int ARM::field_init_int(char *name, int index, int value)
 {
   if (immediate_is_possible(value))
   {
@@ -133,7 +114,7 @@ int ARM::insert_field_init_int(char *name, int index, int value)
   return 0;
 }
 
-int ARM::insert_field_init_ref(char *name, int index)
+int ARM::field_init_ref(char *name, int index)
 {
   return -1;
 }

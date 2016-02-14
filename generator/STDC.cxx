@@ -79,35 +79,14 @@ int n;
   return 0;
 }
 
-int STDC::insert_field_init_boolean(char *name, int index, int value)
+int STDC::field_init_int(char *name, int index, int value)
 {
   fprintf(out, "  %s = %d;\n", name, value);
 
   return 0;
 }
 
-int STDC::insert_field_init_byte(char *name, int index, int value)
-{
-  fprintf(out, "  %s = %d;\n", name, value);
-
-  return 0;
-}
-
-int STDC::insert_field_init_short(char *name, int index, int value)
-{
-  fprintf(out, "  %s = %d;\n", name, value);
-
-  return 0;
-}
-
-int STDC::insert_field_init_int(char *name, int index, int value)
-{
-  fprintf(out, "  %s = %d;\n", name, value);
-
-  return 0;
-}
-
-int STDC::insert_field_init_ref(char *name, int index)
+int STDC::field_init_ref(char *name, int index)
 {
   fprintf(out, "  %s = (int)_%s;\n", name, name);
 

@@ -130,22 +130,7 @@ int MIPS32::init_heap(int field_count)
   return 0;
 }
 
-int MIPS32::insert_field_init_boolean(char *name, int index, int value)
-{
-  return insert_field_init_int(name, index, value);
-}
-
-int MIPS32::insert_field_init_byte(char *name, int index, int value)
-{
-  return insert_field_init_int(name, index, value);
-}
-
-int MIPS32::insert_field_init_short(char *name, int index, int value)
-{
-  return insert_field_init_int(name, index, value);
-}
-
-int MIPS32::insert_field_init_int(char *name, int index, int value)
+int MIPS32::field_init_int(char *name, int index, int value)
 {
   uint32_t n = (uint32_t)value;
 
@@ -189,7 +174,7 @@ int MIPS32::insert_field_init_int(char *name, int index, int value)
   return 0;
 }
 
-int MIPS32::insert_field_init_ref(char *name, int index)
+int MIPS32::field_init_ref(char *name, int index)
 {
   fprintf(out, "  li $t8, %s\n", name);
   fprintf(out, "  sw $t8, 0x%04x($s1)\n", index * 4);

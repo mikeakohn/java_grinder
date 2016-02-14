@@ -94,33 +94,13 @@ int MC68000::init_heap(int field_count)
   return 0;
 }
 
-int MC68000::insert_field_init_boolean(char *name, int index, int value)
-{
-  value = (value == 0) ? 0 : 1;
-
-  fprintf(out, "  move.l #%d, (%s)\n", value, name);
-  return 0;
-}
-
-int MC68000::insert_field_init_byte(char *name, int index, int value)
+int MC68000::field_init_int(char *name, int index, int value)
 {
   fprintf(out, "  move.l #%d, (%s)\n", value, name);
   return 0;
 }
 
-int MC68000::insert_field_init_short(char *name, int index, int value)
-{
-  fprintf(out, "  move.l #%d, (%s)\n", value, name);
-  return 0;
-}
-
-int MC68000::insert_field_init_int(char *name, int index, int value)
-{
-  fprintf(out, "  move.l #%d, (%s)\n", value, name);
-  return 0;
-}
-
-int MC68000::insert_field_init_ref(char *name, int index)
+int MC68000::field_init_ref(char *name, int index)
 {
   fprintf(out, "  move.l #_%s, (%s)\n", name, name);
   return 0;

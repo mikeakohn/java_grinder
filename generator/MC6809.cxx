@@ -86,22 +86,7 @@ int MC6809::init_heap(int field_count)
   return -1;
 }
 
-int MC6809::insert_field_init_boolean(char *name, int index, int value)
-{
-  return insert_field_init_int(name, index, value == 0 ? 0 : 1);
-}
-
-int MC6809::insert_field_init_byte(char *name, int index, int value)
-{
-  return insert_field_init_int(name, index, value);
-}
-
-int MC6809::insert_field_init_short(char *name, int index, int value)
-{
-  return insert_field_init_int(name, index, value);
-}
-
-int MC6809::insert_field_init_int(char *name, int index, int value)
+int MC6809::field_init_int(char *name, int index, int value)
 {
   CHECK_INT16(value);
 
@@ -110,7 +95,7 @@ int MC6809::insert_field_init_int(char *name, int index, int value)
   return 0;
 }
 
-int MC6809::insert_field_init_ref(char *name, int index)
+int MC6809::field_init_ref(char *name, int index)
 {
   fprintf(out, "  ldd #_%s\n", name);
   fprintf(out, "  std %s\n", name);

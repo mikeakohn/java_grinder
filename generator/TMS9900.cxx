@@ -99,26 +99,7 @@ int TMS9900::init_heap(int field_count)
   return 0;
 }
 
-int TMS9900::insert_field_init_boolean(char *name, int index, int value)
-{
-  value = (value == 0) ? 0 : 1;
-
-  fprintf(out, "  li r0, %d\n", value);
-  fprintf(out, "  mov r0, @%s\n", name);
-
-  return 0;
-}
-
-int TMS9900::insert_field_init_byte(char *name, int index, int value)
-{
-  if (value < -128 || value > 255) { return -1; }
-  fprintf(out, "  li r0, %d\n", (int8_t)value);
-  fprintf(out, "  mov r0, @%s\n", name);
-
-  return 0;
-}
-
-int TMS9900::insert_field_init_short(char *name, int index, int value)
+int TMS9900::field_init_int(char *name, int index, int value)
 {
   if (value < -32768 || value > 65535) { return -1; }
   fprintf(out, "  li r0, %d\n", (int8_t)value);
@@ -127,12 +108,7 @@ int TMS9900::insert_field_init_short(char *name, int index, int value)
   return 0;
 }
 
-int TMS9900::insert_field_init_int(char *name, int index, int value)
-{
-  return insert_field_init_short(name, index, value);
-}
-
-int TMS9900::insert_field_init_ref(char *name, int index)
+int TMS9900::field_init_ref(char *name, int index)
 {
   fprintf(out, "  li r0, _%s\n", name);
   fprintf(out, "  mov r0, @%s\n", name);

@@ -221,7 +221,7 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
             else
           {
             //index = java_class->get_field_index(field_name);
-            generator->insert_field_init_ref(full_field_name, index);
+            generator->field_init_ref(full_field_name, index);
           }
 
           //printf("Can't do a string yet.. :( %d\n", constant_string->string_index);
@@ -501,7 +501,7 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
             else
           {
             index = java_class->get_field_index(field_name);
-            generator->insert_field_init_ref(full_field_name, index);
+            generator->field_init_ref(full_field_name, index);
           }
         }
           else
@@ -518,30 +518,33 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
 
           if (strcmp(type, "Z") == 0) // boolean
           {
-            ret = generator->insert_field_init_boolean(full_field_name, index, value);
+            value = value == 0 ? 0 : 1;
+            ret = generator->field_init_int(full_field_name, index, value);
           }
             else
-          if (strcmp(type, "B") == 0)
+          if (strcmp(type, "B") == 0) // byte
           {
-            ret = generator->insert_field_init_byte(full_field_name, index, value);
+            ret = generator->field_init_int(full_field_name, index, value);
           }
             else
-          if (strcmp(type, "S") == 0)
+          if (strcmp(type, "S") == 0) // short
           {
-            ret = generator->insert_field_init_short(full_field_name, index, value);
+            ret = generator->field_init_int(full_field_name, index, value);
           }
             else
-          if (strcmp(type, "C") == 0)
+          if (strcmp(type, "C") == 0) // char (unsigned short)
           {
-            ret = generator->insert_field_init_short(full_field_name, index, value);
+            ret = generator->field_init_int(full_field_name, index, value);
           }
             else
-          if (strcmp(type, "I") == 0)
+          if (strcmp(type, "I") == 0) // int
           {
-            ret = generator->insert_field_init_int(full_field_name, index, value);
+            ret = generator->field_init_int(full_field_name, index, value);
           }
             else
-          { ret = -1; }
+          {
+            ret = -1;
+          }
         }
         break;
       case 180: // getfield (0xb4)

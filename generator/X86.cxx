@@ -79,37 +79,14 @@ int X86::init_heap(int field_count)
   return 0;
 }
 
-int X86::insert_field_init_boolean(char *name, int index, int value)
+int X86::field_init_int(char *name, int index, int value)
 {
   fprintf(out, "  mov eax, %d\n", value);
   fprintf(out, "  mov [%s], eax\n", name);
   return 0;
 }
 
-int X86::insert_field_init_byte(char *name, int index, int value)
-{
-  //fprintf(out, "  mov eax, %d\n", ((uint32_t)((uint8_t)value)));
-  fprintf(out, "  mov eax, %d\n", value);
-  fprintf(out, "  mov [%s], eax\n", name);
-  return 0;
-}
-
-int X86::insert_field_init_short(char *name, int index, int value)
-{
-  //fprintf(out, "  mov eax, %d\n", ((uint32_t)((uint16_t)value)));
-  fprintf(out, "  mov eax, %d\n", value);
-  fprintf(out, "  mov [%s], eax\n", name);
-  return 0;
-}
-
-int X86::insert_field_init_int(char *name, int index, int value)
-{
-  fprintf(out, "  mov eax, %d\n", value);
-  fprintf(out, "  mov [%s], eax\n", name);
-  return 0;
-}
-
-int X86::insert_field_init_ref(char *name, int index)
+int X86::field_init_ref(char *name, int index)
 {
   fprintf(out, "  mov eax, _%s\n", name);
   fprintf(out, "  mov [%s], eax\n", name);

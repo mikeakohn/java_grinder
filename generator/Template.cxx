@@ -68,28 +68,12 @@ int Template::init_heap(int field_count)
   return -1;
 }
 
-int Template::insert_field_init_boolean(char *name, int index, int value)
-{
-
-  return -1;
-}
-
-int Template::insert_field_init_byte(char *name, int index, int value)
-{
-  return insert_field_init_int(name, index, value);
-}
-
-int Template::insert_field_init_short(char *name, int index, int value)
-{
-  return insert_field_init_int(name, index, value);
-}
-
-int Template::insert_field_init_int(char *name, int index, int value)
+int Template::field_init_int(char *name, int index, int value)
 {
   return -1;
 }
 
-int Template::insert_field_init_ref(char *name, int index)
+int Template::field_init_ref(char *name, int index)
 {
   return -1;
 }

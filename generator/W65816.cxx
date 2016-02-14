@@ -170,48 +170,56 @@ int W65816::init_heap(int field_count)
   return 0;
 }
 
-int W65816::insert_field_init_boolean(char *name, int index, int value)
+#if 0
+int W65816::field_init_boolean(char *name, int index, int value)
 {
   value = (value == 0) ? 0 : 1;
-  fprintf(out, "; insert_field_init_boolean\n");
+  fprintf(out, "; field_init_boolean\n");
   fprintf(out, "  lda #%d\n", value);
   fprintf(out, "  sta #%s\n", name);
 
   return 0;
 }
 
-int W65816::insert_field_init_byte(char *name, int index, int value)
+int W65816::field_init_byte(char *name, int index, int value)
 {
   if (value < -128 || value > 255) { return -1; }
   int16_t n = value;
   uint16_t v = (n & 0xffff);
 
-  fprintf(out, "; insert_field_init_byte\n");
+  fprintf(out, "; field_init_byte\n");
   fprintf(out, "  lda #%d\n", (uint8_t)v);
   fprintf(out, "  sta %s\n", name);
 
   return 0;
 }
 
-int W65816::insert_field_init_short(char *name, int index, int value)
+int W65816::field_init_short(char *name, int index, int value)
 {
   if (value < -32768 || value > 65535) { return -1; }
 
-  fprintf(out, "; insert_field_init_short\n");
+  fprintf(out, "; field_init_short\n");
+  fprintf(out, "  lda #%d\n", (uint16_t)value);
+  fprintf(out, "  sta %s\n", name);
+
+  return 0;
+}
+#endif
+
+int W65816::field_init_int(char *name, int index, int value)
+{
+  if (value < -32768 || value > 65535) { return -1; }
+
+  fprintf(out, "; field_init_short\n");
   fprintf(out, "  lda #%d\n", (uint16_t)value);
   fprintf(out, "  sta %s\n", name);
 
   return 0;
 }
 
-int W65816::insert_field_init_int(char *name, int index, int value)
+int W65816::field_init_ref(char *name, int index)
 {
-  return insert_field_init_short(name, index, value);
-}
-
-int W65816::insert_field_init_ref(char *name, int index)
-{
-  fprintf(out, "; insert_field_init_ref\n");
+  fprintf(out, "; field_init_ref\n");
   fprintf(out, "  lda #_%s\n", name);
   fprintf(out, "  sta %s\n", name);
 

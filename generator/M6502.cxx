@@ -159,10 +159,11 @@ int M6502::init_heap(int field_count)
   return 0;
 }
 
-int M6502::insert_field_init_boolean(char *name, int index, int value)
+#if 0
+int M6502::field_init_boolean(char *name, int index, int value)
 {
   value = (value == 0) ? 0 : 1;
-  fprintf(out, "; insert_field_init_boolean\n");
+  fprintf(out, "; field_init_boolean\n");
   fprintf(out, "  lda #%d\n", value & 0xff);
   fprintf(out, "  sta %s + 0\n", name);
   fprintf(out, "  lda #%d\n", value >> 8);
@@ -171,14 +172,14 @@ int M6502::insert_field_init_boolean(char *name, int index, int value)
   return 0;
 }
 
-int M6502::insert_field_init_byte(char *name, int index, int value)
+int M6502::field_init_byte(char *name, int index, int value)
 {
   if (value < -128 || value > 255) { return -1; }
   int16_t n = value;
   uint16_t v = (n & 0xffff);
 
 
-  fprintf(out, "; insert_field_init_byte\n");
+  fprintf(out, "; field_init_byte\n");
   fprintf(out, "  lda #%d\n", (uint8_t)v & 0xff);
   fprintf(out, "  sta %s + 0\n", name);
   fprintf(out, "  lda #%d\n", (uint8_t)v >> 8);
@@ -187,11 +188,25 @@ int M6502::insert_field_init_byte(char *name, int index, int value)
   return 0;
 }
 
-int M6502::insert_field_init_short(char *name, int index, int value)
+int M6502::field_init_short(char *name, int index, int value)
 {
   if (value < -32768 || value > 65535) { return -1; }
 
-  fprintf(out, "; insert_field_init_short\n");
+  fprintf(out, "; field_init_short\n");
+  fprintf(out, "  lda #%d\n", value & 0xff);
+  fprintf(out, "  sta %s + 0\n", name);
+  fprintf(out, "  lda #%d\n", value >> 8);
+  fprintf(out, "  sta %s + 1\n", name);
+
+  return 0;
+}
+#endif
+
+int M6502::field_init_int(char *name, int index, int value)
+{
+  if (value < -32768 || value > 65535) { return -1; }
+
+  fprintf(out, "; field_init_int\n");
   fprintf(out, "  lda #%d\n", value & 0xff);
   fprintf(out, "  sta %s + 0\n", name);
   fprintf(out, "  lda #%d\n", value >> 8);
@@ -200,14 +215,9 @@ int M6502::insert_field_init_short(char *name, int index, int value)
   return 0;
 }
 
-int M6502::insert_field_init_int(char *name, int index, int value)
+int M6502::field_init_ref(char *name, int index)
 {
-  return insert_field_init_short(name, index, value);
-}
-
-int M6502::insert_field_init_ref(char *name, int index)
-{
-  fprintf(out, "; insert_field_init_ref\n");
+  fprintf(out, "; field_init_ref\n");
   fprintf(out, "  lda #_%s & 0xff\n", name);
   fprintf(out, "  sta %s + 0\n", name);
   fprintf(out, "  lda #_%s >> 8\n", name);

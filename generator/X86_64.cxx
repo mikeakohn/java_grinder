@@ -73,27 +73,12 @@ int X86_64::init_heap(int field_count)
   return 0;
 }
 
-int X86_64::insert_field_init_boolean(char *name, int index, int value)
+int X86_64::field_init_int(char *name, int index, int value)
 {
   return -1;
 }
 
-int X86_64::insert_field_init_byte(char *name, int index, int value)
-{
-  return -1;
-}
-
-int X86_64::insert_field_init_short(char *name, int index, int value)
-{
-  return -1;
-}
-
-int X86_64::insert_field_init_int(char *name, int index, int value)
-{
-  return -1;
-}
-
-int X86_64::insert_field_init_ref(char *name, int index)
+int X86_64::field_init_ref(char *name, int index)
 {
   return -1;
 }

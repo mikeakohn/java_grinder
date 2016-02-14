@@ -87,24 +87,7 @@ int Z80::init_heap(int field_count)
   return 0;
 }
 
-int Z80::insert_field_init_boolean(char *name, int index, int value)
-{
-  value = (value == 0) ? 0 : 1;
-  fprintf(out, "  ld hl, %d\n", value);
-  fprintf(out, "  ld (%s), hl\n", name);
-  return 0;
-}
-
-int Z80::insert_field_init_byte(char *name, int index, int value)
-{
-  if (value < -128 || value > 255) { return -1; }
-  fprintf(out, "  ld hl, %d\n", (int8_t)value);
-  fprintf(out, "  ld (%s), hl\n", name);
-
-  return 0;
-}
-
-int Z80::insert_field_init_short(char *name, int index, int value)
+int Z80::field_init_int(char *name, int index, int value)
 {
   if (value < -32768 || value > 65535) { return -1; }
   fprintf(out, "  ld hl, %d\n", value);
@@ -112,12 +95,7 @@ int Z80::insert_field_init_short(char *name, int index, int value)
   return 0;
 }
 
-int Z80::insert_field_init_int(char *name, int index, int value)
-{
-  return insert_field_init_short(name, index, value);
-}
-
-int Z80::insert_field_init_ref(char *name, int index)
+int Z80::field_init_ref(char *name, int index)
 {
   fprintf(out, "  ld hl, _%s\n", name);
   fprintf(out, "  ld (%s), hl\n", name);

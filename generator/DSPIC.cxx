@@ -127,38 +127,7 @@ int DSPIC::init_heap(int field_count)
   return 0;
 }
 
-int DSPIC::insert_field_init_boolean(char *name, int index, int value)
-{
-  //value = (value == 0) ? 0 : 1;
-  if (value == 0)
-  {
-    fprintf(out, "  clr %s\n", name);
-  }
-    else
-  {
-    fprintf(out, "  mov #1, w0\n");
-    fprintf(out, "  mov w0, %s\n", name);
-  }
-  return 0;
-}
-
-int DSPIC::insert_field_init_byte(char *name, int index, int value)
-{
-  if (value < -128 || value > 255) { return -1; }
-  if (value == 0)
-  {
-    fprintf(out, "  clr %s\n", name);
-  }
-    else
-  {
-    fprintf(out, "  mov #%d, w0\n", (int8_t)value);
-    fprintf(out, "  mov w0, %s\n", name);
-  }
-
-  return 0;
-}
-
-int DSPIC::insert_field_init_short(char *name, int index, int value)
+int DSPIC::field_init_int(char *name, int index, int value)
 {
   if (value < -32768 || value > 65535) { return -1; }
   if (value == 0)
@@ -173,12 +142,7 @@ int DSPIC::insert_field_init_short(char *name, int index, int value)
   return 0;
 }
 
-int DSPIC::insert_field_init_int(char *name, int index, int value)
-{
-  return insert_field_init_short(name, index, value);
-}
-
-int DSPIC::insert_field_init_ref(char *name, int index)
+int DSPIC::field_init_ref(char *name, int index)
 {
   fprintf(out, "  mov #_%s, w0\n", name);
   fprintf(out, "  mov w0, %s\n", name);

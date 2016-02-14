@@ -151,34 +151,14 @@ int MSP430::init_heap(int field_count)
   return 0;
 }
 
-int MSP430::insert_field_init_boolean(char *name, int index, int value)
-{
-  value = (value == 0) ? 0 : 1;
-  //fprintf(out, "  mov #%d, &ram_start+%d ; %s\n", value, (index + 1) * 2, name);
-  fprintf(out, "  mov.w #%d, &%s\n", value, name);
-  return 0;
-}
-
-int MSP430::insert_field_init_byte(char *name, int index, int value)
-{
-  if (value < -128 || value > 255) { return -1; }
-  fprintf(out, "  mov.w #%d, &%s\n", (int8_t)value, name);
-  return 0;
-}
-
-int MSP430::insert_field_init_short(char *name, int index, int value)
+int MSP430::field_init_int(char *name, int index, int value)
 {
   if (value < -32768 || value > 65535) { return -1; }
   fprintf(out, "  mov.w #%d, &%s\n", value, name);
   return 0;
 }
 
-int MSP430::insert_field_init_int(char *name, int index, int value)
-{
-  return insert_field_init_short(name, index, value);
-}
-
-int MSP430::insert_field_init_ref(char *name, int index)
+int MSP430::field_init_ref(char *name, int index)
 {
   fprintf(out, "  mov.w #_%s, &%s\n", name, name);
   return 0;
