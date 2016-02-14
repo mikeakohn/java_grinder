@@ -179,7 +179,44 @@ void DSPIC::method_end(int local_count)
   fprintf(out, "\n");
 }
 
-int DSPIC::push_integer(int32_t n)
+int DSPIC::push_local_var_int(int index)
+{
+  if (reg < reg_max)
+  {
+    //fprintf(out, "  mov [w14+%d], w0\n", LOCALS(index));
+    //fprintf(out, "  mov w0, w%d\n", REG_STACK(reg));
+    fprintf(out, "  mov [w14+%d], w%d\n", LOCALS(index), REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    //fprintf(out, "  mov [w14+%d], w0\n", LOCALS(index));
+    //fprintf(out, "  push w0\n");
+    fprintf(out, "  push [w14+%d]\n", LOCALS(index));
+    stack++;
+  }
+
+  return 0;
+}
+
+int DSPIC::push_local_var_ref(int index)
+{
+  return push_local_var_int(index);
+}
+
+int DSPIC::push_ref_static(const char *name, int index)
+{
+  return -1;
+}
+
+int DSPIC::push_fake()
+{
+  if (stack != 0) { return -1; }
+  reg++;
+  return 0;
+}
+
+int DSPIC::push_int(int32_t n)
 {
   if (n > 65535 || n < -32768)
   {
@@ -201,43 +238,6 @@ int DSPIC::push_integer(int32_t n)
     stack++;
   }
 
-  return 0;
-}
-
-int DSPIC::push_integer_local(int index)
-{
-  if (reg < reg_max)
-  {
-    //fprintf(out, "  mov [w14+%d], w0\n", LOCALS(index));
-    //fprintf(out, "  mov w0, w%d\n", REG_STACK(reg));
-    fprintf(out, "  mov [w14+%d], w%d\n", LOCALS(index), REG_STACK(reg));
-    reg++;
-  }
-    else
-  {
-    //fprintf(out, "  mov [w14+%d], w0\n", LOCALS(index));
-    //fprintf(out, "  push w0\n");
-    fprintf(out, "  push [w14+%d]\n", LOCALS(index));
-    stack++;
-  }
-
-  return 0;
-}
-
-int DSPIC::push_ref_static(const char *name, int index)
-{
-  return -1;
-}
-
-int DSPIC::push_ref_local(int index)
-{
-  return push_integer_local(index);
-}
-
-int DSPIC::push_fake()
-{
-  if (stack != 0) { return -1; }
-  reg++;
   return 0;
 }
 
@@ -312,7 +312,7 @@ int DSPIC::push_ref(char *name)
   return 0;
 }
 
-int DSPIC::pop_integer_local(int index)
+int DSPIC::pop_local_var_int(int index)
 {
   if (stack > 0)
   {
@@ -330,9 +330,9 @@ int DSPIC::pop_integer_local(int index)
   return 0;
 }
 
-int DSPIC::pop_ref_local(int index)
+int DSPIC::pop_local_var_ref(int index)
 {
-  return pop_integer_local(index);
+  return pop_local_var_int(index);
 }
 
 int DSPIC::pop()

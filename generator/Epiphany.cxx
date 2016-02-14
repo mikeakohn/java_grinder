@@ -126,24 +126,19 @@ void Epiphany::method_end(int local_count)
 {
 }
 
-int Epiphany::push_integer(int32_t n)
+int Epiphany::push_local_var_int(int index)
 {
   return -1;
 }
 
-int Epiphany::push_integer_local(int index)
+int Epiphany::push_local_var_ref(int index)
 {
-  return -1;
+  return push_local_var_int(index);
 }
 
 int Epiphany::push_ref_static(const char *name, int index)
 {
   return -1;
-}
-
-int Epiphany::push_ref_local(int index)
-{
-  return push_integer_local(index);
 }
 
 int Epiphany::push_fake()
@@ -152,6 +147,11 @@ int Epiphany::push_fake()
 
   reg++;
   return 0;
+}
+
+int Epiphany::push_int(int32_t n)
+{
+  return -1;
 }
 
 int Epiphany::push_long(int64_t n)
@@ -173,14 +173,14 @@ int Epiphany::push_byte(int8_t b)
 {
   int32_t value = (int32_t)b;
 
-  return push_integer(value);
+  return push_int(value);
 }
 
 int Epiphany::push_short(int16_t s)
 {
   int32_t value = (int32_t)s;
 
-  return push_integer(value);
+  return push_int(value);
 }
 
 int Epiphany::push_ref(char *name)
@@ -189,14 +189,14 @@ int Epiphany::push_ref(char *name)
   return -1;
 }
 
-int Epiphany::pop_integer_local(int index)
+int Epiphany::pop_local_var_int(int index)
 {
   return -1;
 }
 
-int Epiphany::pop_ref_local(int index)
+int Epiphany::pop_local_var_ref(int index)
 {
-  return pop_integer_local(index);
+  return pop_local_var_int(index);
 }
 
 int Epiphany::pop()

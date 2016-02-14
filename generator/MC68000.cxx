@@ -139,7 +139,31 @@ void MC68000::method_end(int local_count)
   fprintf(out, "\n");
 }
 
-int MC68000::push_integer(int32_t n)
+int MC68000::push_local_var_int(int index)
+{
+  fprintf(out, "  move.l (-%d,a6), %s\n", LOCALS(index), push_reg());
+  return 0;
+}
+
+int MC68000::push_local_var_ref(int index)
+{
+  return push_local_var_int(index);
+}
+
+int MC68000::push_ref_static(const char *name, int index)
+{
+  fprintf(out, "  move.l #_%s, %s\n", name, push_reg());
+  return 0;
+}
+
+int MC68000::push_fake()
+{
+  if (stack != -1) { return -1; }
+  reg++;
+  return 0;
+}
+
+int MC68000::push_int(int32_t n)
 {
   if (reg < reg_max)
   {
@@ -162,30 +186,6 @@ int MC68000::push_integer(int32_t n)
   return 0;
 }
 
-int MC68000::push_integer_local(int index)
-{
-  fprintf(out, "  move.l (-%d,a6), %s\n", LOCALS(index), push_reg());
-  return 0;
-}
-
-int MC68000::push_ref_static(const char *name, int index)
-{
-  fprintf(out, "  move.l #_%s, %s\n", name, push_reg());
-  return 0;
-}
-
-int MC68000::push_ref_local(int index)
-{
-  return push_integer_local(index);
-}
-
-int MC68000::push_fake()
-{
-  if (stack != -1) { return -1; }
-  reg++;
-  return 0;
-}
-
 int MC68000::push_long(int64_t n)
 {
   return -1;
@@ -205,14 +205,14 @@ int MC68000::push_byte(int8_t b)
 {
   int32_t value = (int32_t)b;
 
-  return push_integer(value);
+  return push_int(value);
 }
 
 int MC68000::push_short(int16_t s)
 {
   int32_t value = (int32_t)s;
 
-  return push_integer(value);
+  return push_int(value);
 }
 
 int MC68000::push_ref(char *name)
@@ -222,15 +222,15 @@ int MC68000::push_ref(char *name)
   return 0;
 }
 
-int MC68000::pop_integer_local(int index)
+int MC68000::pop_local_var_int(int index)
 {
   fprintf(out, "  move.l %s, (-%d,a6)\n", pop_reg(), LOCALS(index));
   return 0;
 }
 
-int MC68000::pop_ref_local(int index)
+int MC68000::pop_local_var_ref(int index)
 {
-  return pop_integer_local(index);
+  return pop_local_var_int(index);
 }
 
 int MC68000::pop()

@@ -86,14 +86,14 @@ void Template::method_end(int local_count)
 {
 }
 
-int Template::push_integer(int32_t n)
+int Template::push_local_var_int(int index)
 {
   return -1;
 }
 
-int Template::push_integer_local(int index)
+int Template::push_local_var_ref(int index)
 {
-  return -1;
+  return push_local_var_int(index);
 }
 
 int Template::push_ref_static(const char *name, int index)
@@ -101,12 +101,12 @@ int Template::push_ref_static(const char *name, int index)
   return -1;
 }
 
-int Template::push_ref_local(int index)
+int Template::push_fake()
 {
-  return push_integer_local(index);
+  return -1;
 }
 
-int Template::push_fake()
+int Template::push_int(int32_t n)
 {
   return -1;
 }
@@ -130,14 +130,14 @@ int Template::push_byte(int8_t b)
 {
   int32_t value = (int32_t)b;
 
-  return push_integer(value);
+  return push_int(value);
 }
 
 int Template::push_short(int16_t s)
 {
   int32_t value = (int32_t)s;
 
-  return push_integer(value);
+  return push_int(value);
 }
 
 int Template::push_ref(char *name)
@@ -146,14 +146,14 @@ int Template::push_ref(char *name)
   return -1;
 }
 
-int Template::pop_integer_local(int index)
+int Template::pop_local_var_int(int index)
 {
   return -1;
 }
 
-int Template::pop_ref_local(int index)
+int Template::pop_local_var_ref(int index)
 {
-  return pop_integer_local(index);
+  return pop_local_var_int(index);
 }
 
 int Template::pop()

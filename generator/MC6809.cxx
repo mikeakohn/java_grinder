@@ -137,23 +137,17 @@ void MC6809::method_end(int local_count)
   fprintf(out, "\n");
 }
 
-int MC6809::push_integer(int32_t n)
+int MC6809::push_local_var_int(int index)
 {
-  CHECK_INT16(n);
-
-  fprintf(out, "  ; push_integer\n");
-  fprintf(out, "  ldd #0x%04x\n", n & 0xffff);
-  fprintf(out, "  pshs a,b\n");
-
-  return 0;
-}
-
-int MC6809::push_integer_local(int index)
-{
-  fprintf(out, "  ; push_integer_local() index=%d\n", index);
+  fprintf(out, "  ; push_local_var_int() index=%d\n", index);
   fprintf(out, "  ldd %d,u\n", LOCALS(index));
   fprintf(out, "  pshs a,b\n");
   return 0;
+}
+
+int MC6809::push_local_var_ref(int index)
+{
+  return push_local_var_int(index);
 }
 
 int MC6809::push_ref_static(const char *name, int index)
@@ -164,15 +158,21 @@ int MC6809::push_ref_static(const char *name, int index)
   return 0;
 }
 
-int MC6809::push_ref_local(int index)
-{
-  return push_integer_local(index);
-}
-
 int MC6809::push_fake()
 {
   fprintf(out, "  ; push_fake\n");
   fprintf(out, "  leas -2,s\n");
+  return 0;
+}
+
+int MC6809::push_int(int32_t n)
+{
+  CHECK_INT16(n);
+
+  fprintf(out, "  ; push_int\n");
+  fprintf(out, "  ldd #0x%04x\n", n & 0xffff);
+  fprintf(out, "  pshs a,b\n");
+
   return 0;
 }
 
@@ -195,14 +195,14 @@ int MC6809::push_byte(int8_t b)
 {
   int32_t value = (int32_t)b;
 
-  return push_integer(value);
+  return push_int(value);
 }
 
 int MC6809::push_short(int16_t s)
 {
   int32_t value = (int32_t)s;
 
-  return push_integer(value);
+  return push_int(value);
 }
 
 int MC6809::push_ref(char *name)
@@ -213,17 +213,17 @@ int MC6809::push_ref(char *name)
   return 0;
 }
 
-int MC6809::pop_integer_local(int index)
+int MC6809::pop_local_var_int(int index)
 {
-  fprintf(out, "  ; pop_integer_local() index=%d\n", index);
+  fprintf(out, "  ; pop_local_var_int() index=%d\n", index);
   fprintf(out, "  puls a,b\n");
   fprintf(out, "  std %d,u\n", LOCALS(index));
   return 0;
 }
 
-int MC6809::pop_ref_local(int index)
+int MC6809::pop_local_var_ref(int index)
 {
-  return pop_integer_local(index);
+  return pop_local_var_int(index);
 }
 
 int MC6809::pop()

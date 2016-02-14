@@ -193,11 +193,55 @@ void MIPS32::method_end(int local_count)
 {
 }
 
-int MIPS32::push_integer(int32_t n)
+int MIPS32::push_local_var_int(int index)
+{
+  if (reg < 8)
+  {
+    fprintf(out, "  lw $t%d, %d($fp) ; local_%d\n", reg, LOCALS(index), index);
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  lw $t8, %d($fp) ; local_%d\n", LOCALS(index), index);
+    STACK_PUSH(8)
+  }
+
+  return 0;
+}
+
+int MIPS32::push_local_var_ref(int index)
+{
+  return push_local_var_int(index);
+}
+
+int MIPS32::push_ref_static(const char *name, int index)
+{
+  if (reg < reg_max)
+  {
+    fprintf(out, "  addiu $t%d, $s1, %d\n", reg, index * 4);
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  addiu $t8, $s1, %d\n", index * 4);
+    STACK_PUSH(8);
+  }
+
+  return -1;
+}
+
+int MIPS32::push_fake()
+{
+  if (stack != 0) { return -1; }
+  reg++;
+  return 0;
+}
+
+int MIPS32::push_int(int32_t n)
 {
   uint32_t value = (uint32_t)n;
 
-  fprintf(out, "  ; push_integer(%d)\n", n);
+  fprintf(out, "  ; push_int(%d)\n", n);
 
   if (value == 0)
   {
@@ -262,50 +306,6 @@ int MIPS32::push_integer(int32_t n)
   return 0;
 }
 
-int MIPS32::push_integer_local(int index)
-{
-  if (reg < 8)
-  {
-    fprintf(out, "  lw $t%d, %d($fp) ; local_%d\n", reg, LOCALS(index), index);
-    reg++;
-  }
-    else
-  {
-    fprintf(out, "  lw $t8, %d($fp) ; local_%d\n", LOCALS(index), index);
-    STACK_PUSH(8)
-  }
-
-  return 0;
-}
-
-int MIPS32::push_ref_static(const char *name, int index)
-{
-  if (reg < reg_max)
-  {
-    fprintf(out, "  addiu $t%d, $s1, %d\n", reg, index * 4);
-    reg++;
-  }
-    else
-  {
-    fprintf(out, "  addiu $t8, $s1, %d\n", index * 4);
-    STACK_PUSH(8);
-  }
-
-  return -1;
-}
-
-int MIPS32::push_ref_local(int index)
-{
-  return push_integer_local(index);
-}
-
-int MIPS32::push_fake()
-{
-  if (stack != 0) { return -1; }
-  reg++;
-  return 0;
-}
-
 int MIPS32::push_long(int64_t n)
 {
   return -1;
@@ -336,7 +336,7 @@ int MIPS32::push_byte(int8_t b)
   }
 #endif
 
-  push_integer((int32_t)b);
+  push_int((int32_t)b);
 
   return 0;
 }
@@ -355,7 +355,7 @@ int MIPS32::push_short(int16_t s)
   }
 #endif
 
-  push_integer((int32_t)s);
+  push_int((int32_t)s);
 
   return 0;
 }
@@ -379,7 +379,7 @@ int MIPS32::push_ref(char *name)
   return 0;
 }
 
-int MIPS32::pop_integer_local(int index)
+int MIPS32::pop_local_var_int(int index)
 {
   if (stack > 0)
   {
@@ -395,9 +395,9 @@ int MIPS32::pop_integer_local(int index)
   return 0;
 }
 
-int MIPS32::pop_ref_local(int index)
+int MIPS32::pop_local_var_ref(int index)
 {
-  return pop_integer_local(index);
+  return pop_local_var_int(index);
 }
 
 int MIPS32::pop()

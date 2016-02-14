@@ -127,7 +127,30 @@ void ARM::method_end(int local_count)
 {
 }
 
-int ARM::push_integer(int32_t n)
+int ARM::push_local_var_int(int index)
+{
+  return -1;
+}
+
+int ARM::push_local_var_ref(int index)
+{
+  return push_local_var_int(index);
+}
+
+int ARM::push_ref_static(const char *name, int index)
+{
+  return -1;
+}
+
+int ARM::push_fake()
+{
+  if (stack != 0) { return -1; }
+
+  reg++;
+  return 0;
+}
+
+int ARM::push_int(int32_t n)
 {
 #if 0
 int temp_reg;
@@ -161,29 +184,6 @@ int temp_reg;
   return -1;
 }
 
-int ARM::push_integer_local(int index)
-{
-  return -1;
-}
-
-int ARM::push_ref_local(int index)
-{
-  return push_integer_local(index);
-}
-
-int ARM::push_ref_static(const char *name, int index)
-{
-  return -1;
-}
-
-int ARM::push_fake()
-{
-  if (stack != 0) { return -1; }
-
-  reg++;
-  return 0;
-}
-
 int ARM::push_long(int64_t n)
 {
   return -1;
@@ -203,14 +203,14 @@ int ARM::push_byte(int8_t b)
 {
   int32_t value = (int32_t)b;
 
-  return push_integer(value);
+  return push_int(value);
 }
 
 int ARM::push_short(int16_t s)
 {
   int32_t value = (int32_t)s;
 
-  return push_integer(value);
+  return push_int(value);
 }
 
 int ARM::push_ref(char *name)
@@ -219,7 +219,7 @@ int ARM::push_ref(char *name)
   return -1;
 }
 
-int ARM::pop_integer_local(int index)
+int ARM::pop_local_var_int(int index)
 {
   // FIXME - This is NOT right
   if (stack > 0)
@@ -238,9 +238,9 @@ int ARM::pop_integer_local(int index)
   return 0;
 }
 
-int ARM::pop_ref_local(int index)
+int ARM::pop_local_var_ref(int index)
 {
-  return pop_integer_local(index);
+  return pop_local_var_int(index);
 }
 
 int ARM::pop()

@@ -255,30 +255,9 @@ void M6502::method_end(int local_count)
   fprintf(out, "\n");
 }
 
-int M6502::push_integer(int32_t n)
+int M6502::push_local_var_int(int index)
 {
-  if (n > 65535 || n < -32768)
-  {
-    printf("Error: literal value %d bigger than 16 bit.\n", n);
-
-    return -1;
-  }
-
-  uint16_t value = (n & 0xffff);
-
-  fprintf(out, "; push_integer\n");
-  fprintf(out, "  lda #0x%02x\n", value & 0xff);
-  PUSH_LO();
-  fprintf(out, "  lda #0x%02x\n", value >> 8);
-  PUSH_HI();
-  stack++;
-
-  return 0;
-}
-
-int M6502::push_integer_local(int index)
-{
-  fprintf(out, "; push_integer_local\n");
+  fprintf(out, "; push_local_var_int\n");
   fprintf(out, "  ldy locals\n");
   fprintf(out, "  lda stack_lo - %d,y\n", LOCALS(index));
   PUSH_LO();
@@ -289,14 +268,14 @@ int M6502::push_integer_local(int index)
   return 0;
 }
 
+int M6502::push_local_var_ref(int index)
+{
+  return push_local_var_int(index);
+}
+
 int M6502::push_ref_static(const char *name, int index)
 {
   return -1;
-}
-
-int M6502::push_ref_local(int index)
-{
-  return push_integer_local(index);
 }
 
 int M6502::push_fake()
@@ -304,9 +283,30 @@ int M6502::push_fake()
   return -1;
 }
 
+int M6502::push_int(int32_t n)
+{
+  if (n > 65535 || n < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", n);
+
+    return -1;
+  }
+
+  uint16_t value = (n & 0xffff);
+
+  fprintf(out, "; push_int\n");
+  fprintf(out, "  lda #0x%02x\n", value & 0xff);
+  PUSH_LO();
+  fprintf(out, "  lda #0x%02x\n", value >> 8);
+  PUSH_HI();
+  stack++;
+
+  return 0;
+}
+
 int M6502::push_long(int64_t n)
 {
-  return push_integer((int32_t)n);
+  return push_int((int32_t)n);
 }
 
 int M6502::push_float(float f)
@@ -365,9 +365,9 @@ int M6502::push_ref(char *name)
   return 0;
 }
 
-int M6502::pop_integer_local(int index)
+int M6502::pop_local_var_int(int index)
 {
-  fprintf(out, "; pop_integer_local\n");
+  fprintf(out, "; pop_local_var_int\n");
   fprintf(out, "  ldy locals\n");
   POP_HI();
   fprintf(out, "  sta stack_hi - %d,y\n", LOCALS(index));
@@ -378,9 +378,9 @@ int M6502::pop_integer_local(int index)
   return 0;
 }
 
-int M6502::pop_ref_local(int index)
+int M6502::pop_local_var_ref(int index)
 {
-  return pop_integer_local(index);
+  return pop_local_var_int(index);
 }
 
 int M6502::pop()

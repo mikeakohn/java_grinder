@@ -155,15 +155,14 @@ void Propeller::method_end(int local_count)
   fprintf(out, "\n");
 }
 
-int Propeller::push_integer(int32_t n)
-{
-  PUSH_SIGNED(n);
-  return 0;
-}
-
-int Propeller::push_integer_local(int index)
+int Propeller::push_local_var_int(int index)
 {
   return -1;
+}
+
+int Propeller::push_local_var_ref(int index)
+{
+  return push_local_var_int(index);
 }
 
 int Propeller::push_ref_static(const char *name, int index)
@@ -173,14 +172,15 @@ int Propeller::push_ref_static(const char *name, int index)
   return -1;
 }
 
-int Propeller::push_ref_local(int index)
-{
-  return push_integer_local(index);
-}
-
 int Propeller::push_fake()
 {
   return -1;
+}
+
+int Propeller::push_int(int32_t n)
+{
+  PUSH_SIGNED(n);
+  return 0;
 }
 
 int Propeller::push_long(int64_t n)
@@ -202,14 +202,14 @@ int Propeller::push_byte(int8_t b)
 {
   int32_t value = (int32_t)b;
 
-  return push_integer(value);
+  return push_int(value);
 }
 
 int Propeller::push_short(int16_t s)
 {
   int32_t value = (int32_t)s;
 
-  return push_integer(value);
+  return push_int(value);
 }
 
 int Propeller::push_ref(char *name)
@@ -221,14 +221,14 @@ int Propeller::push_ref(char *name)
   return 0;
 }
 
-int Propeller::pop_integer_local(int index)
+int Propeller::pop_local_var_int(int index)
 {
   return -1;
 }
 
-int Propeller::pop_ref_local(int index)
+int Propeller::pop_local_var_ref(int index)
 {
-  return pop_integer_local(index);
+  return pop_local_var_int(index);
 }
 
 int Propeller::pop()

@@ -140,32 +140,7 @@ void TMS9900::method_end(int local_count)
   fprintf(out, "\n");
 }
 
-int TMS9900::push_integer(int32_t n)
-{
-  if (n > 65535 || n < -32768)
-  {
-    printf("Error: literal value %d bigger than 16 bit.\n", n);
-    return -1;
-  }
-
-  uint16_t value = (n & 0xffff);
-
-  CHECK_STACK();
-
-  if (n == 0)
-  {
-    fprintf(out, "  clr r%d     ; push_integer(%d)\n", REG_STACK(reg), n);
-  }
-    else
-  {
-    fprintf(out, "  li r%d, %d  ; push_integer(%d)\n", REG_STACK(reg), value, n);
-  }
-  reg++;
-
-  return 0;
-}
-
-int TMS9900::push_integer_local(int index)
+int TMS9900::push_local_var_int(int index)
 {
   if (reg < reg_max)
   {
@@ -191,6 +166,11 @@ int TMS9900::push_integer_local(int index)
   return 0;
 }
 
+int TMS9900::push_local_var_ref(int index)
+{
+  return push_local_var_int(index);
+}
+
 int TMS9900::push_ref_static(const char *name, int index)
 {
   CHECK_STACK();
@@ -201,14 +181,34 @@ int TMS9900::push_ref_static(const char *name, int index)
   return 0;
 }
 
-int TMS9900::push_ref_local(int index)
-{
-  return push_integer_local(index);
-}
-
 int TMS9900::push_fake()
 {
   reg++;
+  return 0;
+}
+
+int TMS9900::push_int(int32_t n)
+{
+  if (n > 65535 || n < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", n);
+    return -1;
+  }
+
+  uint16_t value = (n & 0xffff);
+
+  CHECK_STACK();
+
+  if (n == 0)
+  {
+    fprintf(out, "  clr r%d     ; push_int(%d)\n", REG_STACK(reg), n);
+  }
+    else
+  {
+    fprintf(out, "  li r%d, %d  ; push_int(%d)\n", REG_STACK(reg), value, n);
+  }
+  reg++;
+
   return 0;
 }
 
@@ -265,7 +265,7 @@ int TMS9900::push_ref(char *name)
   return 0;
 }
 
-int TMS9900::pop_integer_local(int index)
+int TMS9900::pop_local_var_int(int index)
 {
 #if 0
   if (stack > 0)
@@ -296,9 +296,9 @@ int TMS9900::pop_integer_local(int index)
   return 0;
 }
 
-int TMS9900::pop_ref_local(int index)
+int TMS9900::pop_local_var_ref(int index)
 {
-  return pop_integer_local(index);
+  return pop_local_var_int(index);
 }
 
 int TMS9900::pop()

@@ -601,7 +601,7 @@ int JavaCompiler::push_ref(int index, _stack *stack)
   if (ret == -1)
   {
     ret = generator->push_ref(field_name);
-    ret |= generator->pop_ref_local(index);
+    ret |= generator->pop_local_var_ref(index);
   }
 
   return ret;
@@ -803,7 +803,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
                              pc_start + code_len, address + 1, const_val);
         if (ret == 0)
         {
-          ret = generator->push_integer(const_val);
+          ret = generator->push_int(const_val);
         }
           else
         {
@@ -844,7 +844,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         if (ret == 0)
         {
           // FIXME - I don't think push_byte() is really needed.
-          // push_integer() is probably more correct.
+          // push_int() is probably more correct.
           ret = generator->push_byte(const_val);
         }
           else
@@ -861,7 +861,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         if (ret == 0)
         {
           // FIXME - I don't think push_short() is really needed.
-          // push_integer() is probably more correct.
+          // push_int() is probably more correct.
           ret = generator->push_short(const_val);
         }
           else
@@ -896,7 +896,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
                                address + instruction_length, const_val);
           if (ret == 0)
           {
-            ret = generator->push_integer(const_val);
+            ret = generator->push_int(const_val);
           }
             else
           {
@@ -921,7 +921,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
                                address + instruction_length, const_val);
           if (ret == 0)
           {
-            //ret = generator->push_integer(const_val);
+            //ret = generator->push_int(const_val);
             char name[128];
             sprintf(name, "string_%d", const_val);
             ret = generator->push_ref_static(name, const_val);
@@ -949,12 +949,12 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         if (wide == 1)
         {
           //PUSH_INTEGER(local_vars[GET_PC_UINT16(1)]);
-          ret = generator->push_integer_local(GET_PC_UINT16(1));
+          ret = generator->push_local_var_int(GET_PC_UINT16(1));
         }
           else
         {
           //PUSH_INTEGER(local_vars[bytes[pc+1]]);
-          ret = generator->push_integer_local(bytes[pc+1]);
+          ret = generator->push_local_var_int(bytes[pc+1]);
         }
         break;
 
@@ -982,7 +982,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
           index = bytes[pc+1];
         }
 
-        ret = generator->push_ref_local(index);
+        ret = generator->push_local_var_ref(index);
         break;
       }
       case 26: // iload_0 (0x1a)
@@ -990,7 +990,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
       case 28: // iload_2 (0x1c)
       case 29: // iload_3 (0x1d)
         // Push a local integer variable on the stack
-        ret = generator->push_integer_local(bytes[pc]-26);
+        ret = generator->push_local_var_int(bytes[pc]-26);
         break;
 
       case 30: // lload_0 (0x1e)
@@ -1042,7 +1042,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
       case 43: // aload_1 (0x2b)
       case 44: // aload_2 (0x2c)
       case 45: // aload_3 (0x2d)
-        ret = generator->push_ref_local(bytes[pc]-42);
+        ret = generator->push_local_var_ref(bytes[pc]-42);
         break;
 
       case 46: // iaload (0x2e)
@@ -1092,11 +1092,11 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
       case 54: // istore (0x36)
         if (wide == 1)
         {
-          ret = generator->pop_integer_local(GET_PC_UINT16(1));
+          ret = generator->pop_local_var_int(GET_PC_UINT16(1));
         }
           else
         {
-          ret = generator->pop_integer_local(bytes[pc+1]);
+          ret = generator->pop_local_var_int(bytes[pc+1]);
         }
 
         break;
@@ -1124,7 +1124,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         }
 
         if (stack->length() == 0)
-        { ret = generator->pop_ref_local(index); }
+        { ret = generator->pop_local_var_ref(index); }
           else
         { ret = push_ref(index, stack); }
         break;
@@ -1134,7 +1134,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
       case 61: // istore_2 (0x3d)
       case 62: // istore_3 (0x3e)
         // Pop integer off stack and store in local variable
-        ret = generator->pop_integer_local(bytes[pc]-59);
+        ret = generator->pop_local_var_int(bytes[pc]-59);
 
         if (optimize == 1 && !needs_label(label_map, pc+1, pc_start) &&
             bytes[pc+1] == 26 + (bytes[pc]-59))
@@ -1199,7 +1199,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         // Pop ref off stack and store in local variable
         index = bytes[pc] - 75;
         if (stack->length() == 0)
-        { ret = generator->pop_ref_local(index); }
+        { ret = generator->pop_local_var_ref(index); }
           else
         { ret = push_ref(index, stack); }
         break;

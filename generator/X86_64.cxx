@@ -91,14 +91,14 @@ void X86_64::method_end(int local_count)
 {
 }
 
-int X86_64::push_integer(int32_t n)
+int X86_64::push_local_var_int(int index)
 {
   return -1;
 }
 
-int X86_64::push_integer_local(int index)
+int X86_64::push_local_var_ref(int index)
 {
-  return -1;
+  return push_local_var_int(index);
 }
 
 int X86_64::push_ref_static(const char *name, int index)
@@ -106,12 +106,12 @@ int X86_64::push_ref_static(const char *name, int index)
   return -1;
 }
 
-int X86_64::push_ref_local(int index)
+int X86_64::push_fake()
 {
-  return push_integer_local(index);
+  return -1;
 }
 
-int X86_64::push_fake()
+int X86_64::push_int(int32_t n)
 {
   return -1;
 }
@@ -146,14 +146,14 @@ int X86_64::push_ref(char *name)
   return -1;
 }
 
-int X86_64::pop_integer_local(int index)
+int X86_64::pop_local_var_int(int index)
 {
   return -1;
 }
 
-int X86_64::pop_ref_local(int index)
+int X86_64::pop_local_var_ref(int index)
 {
-  return pop_integer_local(index);
+  return pop_local_var_int(index);
 }
 
 int X86_64::pop()

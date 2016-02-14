@@ -135,14 +135,14 @@ void STDC::method_end(int local_count)
   fprintf(out, "}\n\n");
 }
 
-int STDC::push_integer(int32_t n)
+int STDC::push_local_var_int(int index)
 {
-  fprintf(out, "  stack_%d = %d;\n", stack++, n);
+  fprintf(out, "  stack_%d = local_%d;\n", stack++, index);
 
   return 0;
 }
 
-int STDC::push_integer_local(int index)
+int STDC::push_local_var_ref(int index)
 {
   fprintf(out, "  stack_%d = local_%d;\n", stack++, index);
 
@@ -154,16 +154,16 @@ int STDC::push_ref_static(const char *name, int index)
   return -1;
 }
 
-int STDC::push_ref_local(int index)
-{
-  fprintf(out, "  stack_%d = local_%d;\n", stack++, index);
-
-  return 0;
-}
-
 int STDC::push_fake()
 {
   stack++;
+  return 0;
+}
+
+int STDC::push_int(int32_t n)
+{
+  fprintf(out, "  stack_%d = %d;\n", stack++, n);
+
   return 0;
 }
 
@@ -210,14 +210,14 @@ int STDC::push_ref(char *name)
   return 0;
 }
 
-int STDC::pop_integer_local(int index)
+int STDC::pop_local_var_int(int index)
 {
   fprintf(out, "  local_%d = stack_%d;\n", index, --stack);
 
   return 0;
 }
 
-int STDC::pop_ref_local(int index)
+int STDC::pop_local_var_ref(int index)
 {
   fprintf(out, "  local_%d = stack_%d;\n", index, --stack);
 

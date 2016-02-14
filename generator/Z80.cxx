@@ -128,32 +128,19 @@ void Z80::method_end(int local_count)
   fprintf(out, "\n");
 }
 
-int Z80::push_integer(int32_t n)
+int Z80::push_local_var_int(int index)
 {
-  if (n > 65535 || n < -32768)
-  {
-    printf("Error: literal value %d bigger than 16 bit.\n", n);
-    return -1;
-  }
-
-  uint16_t value = (n & 0xffff);
-
-  fprintf(out, "  ;; push_integer(%d)\n", n);
-  fprintf(out, "  ld hl, 0x%04x\n", value);
-  fprintf(out, "  push hl\n");
-  stack++;
-
-  return 0;
-}
-
-int Z80::push_integer_local(int index)
-{
-  fprintf(out, "  ;; push_integer_local(%d)\n", index);
+  fprintf(out, "  ;; push_local_var_int(%d)\n", index);
   fprintf(out, "  ld e, (iy+%d)\n", (index * 2));
   fprintf(out, "  ld d, (iy+%d)\n", (index * 2) + 1);
   fprintf(out, "  push de\n");
   stack++;
   return 0;
+}
+
+int Z80::push_local_var_ref(int index)
+{
+  return push_local_var_int(index);
 }
 
 int Z80::push_ref_static(const char *name, int index)
@@ -164,11 +151,6 @@ int Z80::push_ref_static(const char *name, int index)
   stack++;
 
   return 0;
-}
-
-int Z80::push_ref_local(int index)
-{
-  return push_integer_local(index);
 }
 
 int Z80::push_fake()
@@ -188,6 +170,23 @@ int Z80::set_integer_local(int index, int value)
   return 0;
 }
 
+int Z80::push_int(int32_t n)
+{
+  if (n > 65535 || n < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", n);
+    return -1;
+  }
+
+  uint16_t value = (n & 0xffff);
+
+  fprintf(out, "  ;; push_int(%d)\n", n);
+  fprintf(out, "  ld hl, 0x%04x\n", value);
+  fprintf(out, "  push hl\n");
+  stack++;
+
+  return 0;
+}
 
 int Z80::push_long(int64_t n)
 {
@@ -236,9 +235,9 @@ int Z80::push_ref(char *name)
   return 0;
 }
 
-int Z80::pop_integer_local(int index)
+int Z80::pop_local_var_int(int index)
 {
-  fprintf(out, "  ;; pop_integer_local(%d)\n", index);
+  fprintf(out, "  ;; pop_local_var_int(%d)\n", index);
   fprintf(out, "  pop hl\n");
   fprintf(out, "  ld l, (iy+%d)\n", (index * 2));
   fprintf(out, "  ld h, (iy+%d)\n", (index * 2) + 1);
@@ -247,9 +246,9 @@ int Z80::pop_integer_local(int index)
   return 0;
 }
 
-int Z80::pop_ref_local(int index)
+int Z80::pop_local_var_ref(int index)
 {
-  return pop_integer_local(index);
+  return pop_local_var_int(index);
 }
 
 int Z80::pop()

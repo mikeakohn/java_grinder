@@ -145,34 +145,9 @@ void X86::method_end(int local_count)
   fprintf(out, "\n");
 }
 
-int X86::push_integer(int32_t n)
+int X86::push_local_var_int(int index)
 {
-  fprintf(out, "  ; push_integer(%d)\n", n);
-
-  if (reg < REG_MAX)
-  {
-    if (n == 0)
-    {
-      fprintf(out, "  xor %s, %s\n", REG_STACK(reg), REG_STACK(reg));
-      reg++;
-    }
-      else
-    {
-      fprintf(out, "  mov %s, %d\n", REG_STACK(reg++), n);
-    }
-  }
-    else
-  {
-    fprintf(out, "  push %d\n", n);
-    stack++;
-  }
-
-  return 0;
-}
-
-int X86::push_integer_local(int index)
-{
-  fprintf(out, "  ; push_integer_local(%d)\n", index);
+  fprintf(out, "  ; push_local_var_int(%d)\n", index);
 
   if (reg < REG_MAX)
   {
@@ -186,6 +161,11 @@ int X86::push_integer_local(int index)
   }
 
   return 0;
+}
+
+int X86::push_local_var_ref(int index)
+{
+  return push_local_var_int(index);
 }
 
 int X86::push_ref_static(const char *name, int index)
@@ -205,11 +185,6 @@ int X86::push_ref_static(const char *name, int index)
   return 0;
 }
 
-int X86::push_ref_local(int index)
-{
-  return push_integer_local(index);
-}
-
 int X86::push_fake()
 {
   if (reg < REG_MAX)
@@ -219,6 +194,31 @@ int X86::push_fake()
     else
   {
     fprintf(out, "  push eax\n");
+    stack++;
+  }
+
+  return 0;
+}
+
+int X86::push_int(int32_t n)
+{
+  fprintf(out, "  ; push_int(%d)\n", n);
+
+  if (reg < REG_MAX)
+  {
+    if (n == 0)
+    {
+      fprintf(out, "  xor %s, %s\n", REG_STACK(reg), REG_STACK(reg));
+      reg++;
+    }
+      else
+    {
+      fprintf(out, "  mov %s, %d\n", REG_STACK(reg++), n);
+    }
+  }
+    else
+  {
+    fprintf(out, "  push %d\n", n);
     stack++;
   }
 
@@ -242,12 +242,12 @@ int X86::push_double(double f)
 
 int X86::push_byte(int8_t b)
 {
-  return push_integer((int32_t)b);
+  return push_int((int32_t)b);
 }
 
 int X86::push_short(int16_t s)
 {
-  return push_integer((int32_t)s);
+  return push_int((int32_t)s);
 }
 
 int X86::push_ref(char *name)
@@ -267,7 +267,7 @@ int X86::push_ref(char *name)
   return 0;
 }
 
-int X86::pop_integer_local(int index)
+int X86::pop_local_var_int(int index)
 {
   if (reg < REG_MAX)
   {
@@ -283,9 +283,9 @@ int X86::pop_integer_local(int index)
   return 0;
 }
 
-int X86::pop_ref_local(int index)
+int X86::pop_local_var_ref(int index)
 {
-  return pop_integer_local(index);
+  return pop_local_var_int(index);
 }
 
 int X86::pop()

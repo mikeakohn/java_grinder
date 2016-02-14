@@ -206,31 +206,7 @@ void MSP430::method_end(int local_count)
   fprintf(out, "\n");
 }
 
-int MSP430::push_integer(int32_t n)
-{
-  if (n > 65535 || n < -32768)
-  {
-    printf("Error: literal value %d bigger than 16 bit.\n", n);
-    return -1;
-  }
-
-  uint16_t value = (n & 0xffff);
-
-  if (reg < reg_max)
-  {
-    fprintf(out, "  mov.w #0x%02x, r%d\n", value, REG_STACK(reg));
-    reg++;
-  }
-    else
-  {
-    fprintf(out, "  push #0x%02x\n", value);
-    stack++;
-  }
-
-  return 0;
-}
-
-int MSP430::push_integer_local(int index)
+int MSP430::push_local_var_int(int index)
 {
   //fprintf(out, "  mov.w r12, r15\n");
   //fprintf(out, "  sub.w #0x%02x, r15\n", LOCALS(index));
@@ -251,6 +227,11 @@ int MSP430::push_integer_local(int index)
   return 0;
 }
 
+int MSP430::push_local_var_ref(int index)
+{
+  return push_local_var_int(index);
+}
+
 int MSP430::push_ref_static(const char *name, int index)
 {
   if (reg < reg_max)
@@ -267,15 +248,34 @@ int MSP430::push_ref_static(const char *name, int index)
   return 0;
 }
 
-int MSP430::push_ref_local(int index)
-{
-  return push_integer_local(index);
-}
-
 int MSP430::push_fake()
 {
   if (stack != 0) { return -1; }
   reg++;
+  return 0;
+}
+
+int MSP430::push_int(int32_t n)
+{
+  if (n > 65535 || n < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", n);
+    return -1;
+  }
+
+  uint16_t value = (n & 0xffff);
+
+  if (reg < reg_max)
+  {
+    fprintf(out, "  mov.w #0x%02x, r%d\n", value, REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  push #0x%02x\n", value);
+    stack++;
+  }
+
   return 0;
 }
 
@@ -350,7 +350,7 @@ int MSP430::push_ref(char *name)
   return 0;
 }
 
-int MSP430::pop_integer_local(int index)
+int MSP430::pop_local_var_int(int index)
 {
   if (stack > 0)
   {
@@ -372,9 +372,9 @@ int MSP430::pop_integer_local(int index)
   return 0;
 }
 
-int MSP430::pop_ref_local(int index)
+int MSP430::pop_local_var_ref(int index)
 {
-  return pop_integer_local(index);
+  return pop_local_var_int(index);
 }
 
 int MSP430::set_integer_local(int index, int value)

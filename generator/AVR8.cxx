@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2016 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn, Joe Davisson
  *
  * AVR8 written by Joe Davisson
  *
@@ -120,8 +120,8 @@ AVR8::AVR8(uint8_t chip_type) :
   need_integer_to_byte(0),
   need_jump_cond(0),
   need_jump_cond_integer(0),
-  need_push_integer_local(0),
-  need_pop_integer_local(0),
+  need_push_local_var_int(0),
+  need_pop_local_var_int(0),
   need_dup(0),
   need_push_array_length(0),
   need_push_array_length2(0),
@@ -190,8 +190,8 @@ AVR8::~AVR8()
   if(need_integer_to_byte) { insert_integer_to_byte(); }
   if(need_jump_cond) { insert_jump_cond(); }
   if(need_jump_cond_integer) { insert_jump_cond_integer(); }
-  if(need_push_integer_local) { insert_push_integer_local(); }
-  if(need_pop_integer_local) { insert_pop_integer_local(); }
+  if(need_push_local_var_int) { insert_push_local_var_int(); }
+  if(need_pop_local_var_int) { insert_pop_local_var_int(); }
   if(need_dup) { insert_dup(); }
   if(need_push_array_length) { insert_push_array_length(); }
   if(need_push_array_length2) { insert_push_array_length2(); }
@@ -393,7 +393,33 @@ void AVR8::method_end(int local_count)
   fprintf(out, "\n");
 }
 
-int AVR8::push_integer(int32_t n)
+int AVR8::push_local_var_int(int index)
+{
+  need_push_local_var_int = 1;
+
+  fprintf(out, "  ldi temp2, %d\n", LOCALS(index));
+  CALL("push_local_var_int");
+  stack++;
+
+  return 0;
+}
+
+int AVR8::push_local_var_ref(int index)
+{
+  return push_local_var_int(index);
+}
+
+int AVR8::push_ref_static(const char *name, int index)
+{
+  return -1;
+}
+
+int AVR8::push_fake()
+{
+  return -1;
+}
+
+int AVR8::push_int(int32_t n)
 {
   if (n > 65535 || n < -32768)
   {
@@ -404,7 +430,7 @@ int AVR8::push_integer(int32_t n)
 
   uint16_t value = (n & 0xffff);
 
-  fprintf(out, "; push_integer\n");
+  fprintf(out, "; push_int\n");
   fprintf(out, "  ldi temp, 0x%02x\n", value & 0xff);
   PUSH_LO("temp");
   fprintf(out, "  ldi temp, 0x%02x\n", value >> 8);
@@ -414,35 +440,9 @@ int AVR8::push_integer(int32_t n)
   return 0;
 }
 
-int AVR8::push_integer_local(int index)
-{
-  need_push_integer_local = 1;
-
-  fprintf(out, "  ldi temp2, %d\n", LOCALS(index));
-  CALL("push_integer_local");
-  stack++;
-
-  return 0;
-}
-
-int AVR8::push_ref_static(const char *name, int index)
-{
-  return -1;
-}
-
-int AVR8::push_ref_local(int index)
-{
-  return push_integer_local(index);
-}
-
-int AVR8::push_fake()
-{
-  return -1;
-}
-
 int AVR8::push_long(int64_t n)
 {
-  return push_integer((int32_t)n);
+  return push_int((int32_t)n);
 }
 
 int AVR8::push_float(float f)
@@ -500,20 +500,20 @@ int AVR8::push_ref(char *name)
   return 0;
 }
 
-int AVR8::pop_integer_local(int index)
+int AVR8::pop_local_var_int(int index)
 {
-  need_pop_integer_local = 1;
+  need_pop_local_var_int = 1;
 
   fprintf(out, "  ldi temp2, %d\n", LOCALS(index));
-  CALL("pop_integer_local");
+  CALL("pop_local_var_int");
   stack--;
 
   return 0;
 }
 
-int AVR8::pop_ref_local(int index)
+int AVR8::pop_local_var_ref(int index)
 {
-  return pop_integer_local(index);
+  return pop_local_var_int(index);
 }
 
 int AVR8::pop()
@@ -1691,9 +1691,9 @@ void AVR8::insert_jump_cond_integer()
   fprintf(out, "  ret\n\n");
 }
 
-void AVR8::insert_push_integer_local()
+void AVR8::insert_push_local_var_int()
 {
-  fprintf(out, "push_integer_local:\n");
+  fprintf(out, "push_local_var_int:\n");
   fprintf(out, "  ldi YL, stack_lo\n");
   fprintf(out, "  sub YL, temp2\n");
   fprintf(out, "  add YL, locals\n");
@@ -1707,9 +1707,9 @@ void AVR8::insert_push_integer_local()
   fprintf(out, "  ret\n\n");
 }
 
-void AVR8::insert_pop_integer_local()
+void AVR8::insert_pop_local_var_int()
 {
-  fprintf(out, "pop_integer_local:\n");
+  fprintf(out, "pop_local_var_int:\n");
   POP_HI("temp");
   fprintf(out, "  ldi YL, stack_hi\n");
   fprintf(out, "  sub YL, temp2\n");
