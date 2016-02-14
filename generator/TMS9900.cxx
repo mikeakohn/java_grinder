@@ -230,31 +230,6 @@ int TMS9900::push_double(double f)
   return -1;
 }
 
-int TMS9900::push_byte(int8_t b)
-{
-  int16_t n = b;
-  uint16_t value = (n & 0xffff);
-
-  CHECK_STACK();
-
-  fprintf(out, "  li r%d, 0x%02x\n", REG_STACK(reg), value);
-  reg++;
-
-  return 0;
-}
-
-int TMS9900::push_short(int16_t s)
-{
-  uint16_t value = (s & 0xffff);
-
-  CHECK_STACK();
-
-  fprintf(out, "  li r%d, 0x%02x\n", REG_STACK(reg), value);
-  reg++;
-
-  return 0;
-}
-
 int TMS9900::push_ref(char *name)
 {
   CHECK_STACK();

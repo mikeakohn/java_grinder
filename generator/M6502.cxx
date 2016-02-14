@@ -323,6 +323,7 @@ int M6502::push_double(double f)
   return -1;
 }
 
+#if 0
 int M6502::push_byte(int8_t b)
 {
   int16_t n = b;
@@ -351,6 +352,7 @@ int M6502::push_short(int16_t s)
 
   return 0;
 }
+#endif
 
 int M6502::push_ref(char *name)
 {

@@ -259,42 +259,6 @@ int DSPIC::push_double(double f)
   return -1;
 }
 
-int DSPIC::push_byte(int8_t b)
-{
-  uint16_t value = ((int32_t)b)&0xffff;
-
-  if (reg < reg_max)
-  {
-    fprintf(out, "  mov #0x%02x, w%d\n", value, REG_STACK(reg));
-    reg++;
-  }
-    else
-  {
-    fprintf(out, "  mov #0x%02x, w0\n", value);
-    fprintf(out, "  push w0\n");
-    stack++;
-  }
-  return 0;
-}
-
-int DSPIC::push_short(int16_t s)
-{
-  uint16_t value = s;
-
-  if (reg < reg_max)
-  {
-    fprintf(out, "  mov #0x%02x, w%d\n", value, REG_STACK(reg));
-    reg++;
-  }
-    else
-  {
-    fprintf(out, "  mov #0x%02x, w0\n", value);
-    fprintf(out, "  push w0\n");
-    stack++;
-  }
-  return 0;
-}
-
 int DSPIC::push_ref(char *name)
 {
   if (reg < reg_max)

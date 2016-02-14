@@ -189,20 +189,6 @@ int STDC::push_double(double f)
   return -1;
 }
 
-int STDC::push_byte(int8_t b)
-{
-  fprintf(out, "  stack_%d = %d;\n", stack++, b);
-
-  return 0;
-}
-
-int STDC::push_short(int16_t s)
-{
-  fprintf(out, "  stack_%d = %d;\n", stack++, s);
-
-  return 0;
-}
-
 int STDC::push_ref(char *name)
 {
   fprintf(out, "  stack_%d = *%s;\n", stack++, name);

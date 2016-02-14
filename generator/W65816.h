@@ -41,8 +41,8 @@ public:
   virtual int push_long(int64_t n);
   virtual int push_float(float f);
   virtual int push_double(double f);
-  virtual int push_byte(int8_t b);
-  virtual int push_short(int16_t s);
+  //virtual int push_byte(int8_t b);
+  //virtual int push_short(int16_t s);
   virtual int push_ref(char *name);
   virtual int pop_local_var_int(int index);
   virtual int pop_local_var_ref(int index);

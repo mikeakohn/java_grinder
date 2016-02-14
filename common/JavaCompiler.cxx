@@ -843,9 +843,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
                              pc_start + code_len, address + 2, const_val);
         if (ret == 0)
         {
-          // FIXME - I don't think push_byte() is really needed.
-          // push_int() is probably more correct.
-          ret = generator->push_byte(const_val);
+          ret = generator->push_int(const_val);
         }
           else
         {
@@ -860,9 +858,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
                              pc_start + code_len, address + 3, const_val);
         if (ret == 0)
         {
-          // FIXME - I don't think push_short() is really needed.
-          // push_int() is probably more correct.
-          ret = generator->push_short(const_val);
+          ret = generator->push_int(const_val);
         }
           else
         {

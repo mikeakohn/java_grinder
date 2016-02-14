@@ -199,20 +199,6 @@ int ARM::push_double(double f)
   return -1;
 }
 
-int ARM::push_byte(int8_t b)
-{
-  int32_t value = (int32_t)b;
-
-  return push_int(value);
-}
-
-int ARM::push_short(int16_t s)
-{
-  int32_t value = (int32_t)s;
-
-  return push_int(value);
-}
-
 int ARM::push_ref(char *name)
 {
   // Need to move the address of name to the top of stack

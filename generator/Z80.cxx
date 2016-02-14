@@ -203,28 +203,6 @@ int Z80::push_double(double f)
   return -1;
 }
 
-int Z80::push_byte(int8_t b)
-{
-  uint16_t value = (((int16_t)b) & 0xffff);
-
-  fprintf(out, "  ;; push_byte(%d)\n", b);
-  fprintf(out, "  ld hl, 0x%04x\n", value);
-  fprintf(out, "  push hl\n");
-  stack++;
-
-  return 0;
-}
-
-int Z80::push_short(int16_t s)
-{
-  fprintf(out, "  ;; push_short(%d)\n", s);
-  fprintf(out, "  ld hl, 0x%04x\n", s);
-  fprintf(out, "  push hl\n");
-  stack++;
-
-  return 0;
-}
-
 int Z80::push_ref(char *name)
 {
   fprintf(out, "  ;; push_short(%s)\n", name);

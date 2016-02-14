@@ -321,45 +321,6 @@ int MIPS32::push_double(double f)
   return -1;
 }
 
-int MIPS32::push_byte(int8_t b)
-{
-#if 0
-  if (reg < reg_max)
-  {
-    fprintf(out, "  li $t%d, 0x%x\n", reg, (int32_t)b);
-    reg++;
-  }
-    else
-  {
-    fprintf(out, "  li $t%d, 0x%x\n", reg, (int32_t)b);
-    STACK_PUSH(((int32_t)b))
-  }
-#endif
-
-  push_int((int32_t)b);
-
-  return 0;
-}
-
-int MIPS32::push_short(int16_t s)
-{
-#if 0
-  if (reg < reg_max)
-  {
-    fprintf(out, "  li $t%d, 0x%x\n", reg, (int32_t)s);
-    reg++;
-  }
-    else
-  {
-    STACK_PUSH(((int32_t)s))
-  }
-#endif
-
-  push_int((int32_t)s);
-
-  return 0;
-}
-
 int MIPS32::push_ref(char *name)
 {
   fprintf(out, "  ; push_ref(%s)\n", name);

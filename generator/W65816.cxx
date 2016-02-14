@@ -321,6 +321,7 @@ int W65816::push_double(double f)
   return -1;
 }
 
+#if 0
 int W65816::push_byte(int8_t b)
 {
   int16_t n = b;
@@ -345,6 +346,7 @@ int W65816::push_short(int16_t s)
 
   return 0;
 }
+#endif
 
 int W65816::push_ref(char *name)
 {

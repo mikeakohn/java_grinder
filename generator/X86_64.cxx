@@ -131,16 +131,6 @@ int X86_64::push_double(double f)
   return -1;
 }
 
-int X86_64::push_byte(int8_t b)
-{
-  return -1;
-}
-
-int X86_64::push_short(int16_t s)
-{
-  return -1;
-}
-
 int X86_64::push_ref(char *name)
 {
   return -1;

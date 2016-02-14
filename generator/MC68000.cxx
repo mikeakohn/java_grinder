@@ -201,20 +201,6 @@ int MC68000::push_double(double f)
   return -1;
 }
 
-int MC68000::push_byte(int8_t b)
-{
-  int32_t value = (int32_t)b;
-
-  return push_int(value);
-}
-
-int MC68000::push_short(int16_t s)
-{
-  int32_t value = (int32_t)s;
-
-  return push_int(value);
-}
-
 int MC68000::push_ref(char *name)
 {
   fprintf(out, "  movea.l #%s, a2\n", name);

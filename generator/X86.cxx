@@ -240,16 +240,6 @@ int X86::push_double(double f)
   return -1;
 }
 
-int X86::push_byte(int8_t b)
-{
-  return push_int((int32_t)b);
-}
-
-int X86::push_short(int16_t s)
-{
-  return push_int((int32_t)s);
-}
-
 int X86::push_ref(char *name)
 {
   fprintf(out, "  ; push_ref(%s)\n", name);

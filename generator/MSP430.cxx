@@ -297,43 +297,6 @@ int MSP430::push_double(double f)
   return -1;
 }
 
-int MSP430::push_byte(int8_t b)
-{
-  int16_t n = b;
-  uint16_t value = (n & 0xffff);
-
-  if (reg < reg_max)
-  {
-    fprintf(out, "  mov #0x%02x, r%d\n", value, REG_STACK(reg));
-    reg++;
-  }
-    else
-  {
-    fprintf(out, "  push #0x%02x\n", value);
-    stack++;
-  }
-
-  return 0;
-}
-
-int MSP430::push_short(int16_t s)
-{
-  uint16_t value = (s & 0xffff);
-
-  if (reg < reg_max)
-  {
-    fprintf(out, "  mov #0x%02x, r%d\n", value, REG_STACK(reg));
-    reg++;
-  }
-    else
-  {
-    fprintf(out, "  push #0x%02x\n", value);
-    stack++;
-  }
-
-  return 0;
-}
-
 int MSP430::push_ref(char *name)
 {
   if (reg < reg_max)
