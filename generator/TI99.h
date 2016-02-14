@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -22,24 +22,23 @@ public:
 
   virtual int open(const char *filename);
   virtual int start_init();
-  virtual int ti99_print();
-  virtual int ti99_printChar();
-  virtual int ti99_printChar(int c);
-  virtual int ti99_setCursor();
-  virtual int ti99_setCursor(int x, int y);
-  //virtual int ti99_setTextColor();
-  virtual int ti99_setGraphicsMode();
-  virtual int ti99_setGraphicsMode(int mode);
+  virtual int ti99_print_X();
+  virtual int ti99_printChar_C();
+  virtual int ti99_printChar_C(int c);
+  virtual int ti99_setCursor_II();
+  virtual int ti99_setCursor_II(int x, int y);
+  virtual int ti99_setGraphicsMode_I();
+  virtual int ti99_setGraphicsMode_I(int mode);
   virtual int ti99_clearScreen();
-  virtual int ti99_plot();
+  virtual int ti99_plot_III();
   virtual int ti99_setColors();
-  virtual int ti99_setSoundFreq();
-  virtual int ti99_setSoundVolume();
-  virtual int ti99_setSpriteVisible();
-  virtual int ti99_setSpriteImage();
-  virtual int ti99_setSpritePos();
-  virtual int ti99_setSpriteColor();
-  virtual int ti99_setSpriteSize();
+  virtual int ti99_setSoundFreq_II();
+  virtual int ti99_setSoundVolume_II();
+  virtual int ti99_setSpriteVisible_IZ();
+  virtual int ti99_setSpriteImage_IaB();
+  virtual int ti99_setSpritePos_III();
+  virtual int ti99_setSpriteColor_II();
+  virtual int ti99_setSpriteSize_I();
 
 private:
   void insert_print_string();

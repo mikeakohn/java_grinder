@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -101,7 +101,7 @@ int TI99::start_init()
   return 0;
 }
 
-int TI99::ti99_print()
+int TI99::ti99_print_X()
 {
   need_print_string = true;
 
@@ -115,7 +115,7 @@ int TI99::ti99_print()
   return 0;
 }
 
-int TI99::ti99_printChar()
+int TI99::ti99_printChar_C()
 {
   fprintf(out, "  swpb r%d\n", REG_STACK(reg-1));
   fprintf(out, "  movb r%d, @VDP_WRITE\n", REG_STACK(reg-1));
@@ -124,7 +124,7 @@ int TI99::ti99_printChar()
   return 0;
 }
 
-int TI99::ti99_printChar(int c)
+int TI99::ti99_printChar_C(int c)
 {
   fprintf(out, "  li r0, 0x%02x\n", c << 8);
   fprintf(out, "  movb r0, @VDP_WRITE\n");
@@ -132,7 +132,7 @@ int TI99::ti99_printChar(int c)
   return 0;
 }
 
-int TI99::ti99_setCursor()
+int TI99::ti99_setCursor_II()
 {
   //mov @-24(r10), r3  ; push local_11
   //mov @-24(r10), r4  ; push local_11
@@ -154,7 +154,7 @@ int TI99::ti99_setCursor()
   return 0;
 }
 
-int TI99::ti99_setCursor(int x, int y)
+int TI99::ti99_setCursor_II(int x, int y)
 {
   need_vdp_command = true;
   int offset = (y * 32) + x;
@@ -170,12 +170,12 @@ int TI99::ti99_setCursor(int x, int y)
   return 0;
 }
 
-int TI99::ti99_setGraphicsMode()
+int TI99::ti99_setGraphicsMode_I()
 {
   return -1;
 }
 
-int TI99::ti99_setGraphicsMode(int mode)
+int TI99::ti99_setGraphicsMode_I(int mode)
 {
   need_vdp_command = true;
 
@@ -227,7 +227,7 @@ int TI99::ti99_clearScreen()
   return 0;
 }
 
-int TI99::ti99_plot()
+int TI99::ti99_plot_III()
 {
   need_plot = true;
 
@@ -256,7 +256,7 @@ int TI99::ti99_setColors()
   return 0;
 }
 
-int TI99::ti99_setSoundFreq()
+int TI99::ti99_setSoundFreq_II()
 {
   need_set_sound_freq = true;
 
@@ -272,7 +272,7 @@ int TI99::ti99_setSoundFreq()
   return 0;
 }
 
-int TI99::ti99_setSoundVolume()
+int TI99::ti99_setSoundVolume_II()
 {
   need_set_sound_volume = true;
 
@@ -288,7 +288,7 @@ int TI99::ti99_setSoundVolume()
   return 0;
 }
 
-int TI99::ti99_setSpriteVisible()
+int TI99::ti99_setSpriteVisible_IZ()
 {
   need_set_sprite_visible = true;
 
@@ -304,7 +304,7 @@ int TI99::ti99_setSpriteVisible()
   return 0;
 }
 
-int TI99::ti99_setSpriteImage()
+int TI99::ti99_setSpriteImage_IaB()
 {
   need_set_sprite_image = true;
 
@@ -326,7 +326,7 @@ int TI99::ti99_setSpriteImage()
   return 0;
 }
 
-int TI99::ti99_setSpritePos()
+int TI99::ti99_setSpritePos_III()
 {
   need_set_sprite_pos = true;
 
@@ -343,7 +343,7 @@ int TI99::ti99_setSpritePos()
   return 0;
 }
 
-int TI99::ti99_setSpriteColor()
+int TI99::ti99_setSpriteColor_II()
 {
   need_set_sprite_color = true;
 
@@ -359,7 +359,7 @@ int TI99::ti99_setSpriteColor()
   return 0;
 }
 
-int TI99::ti99_setSpriteSize()
+int TI99::ti99_setSpriteSize_I()
 {
   fprintf(out, "  sla r%d, 8\n", REG_STACK(reg-1));
   fprintf(out, "  ori r%d, 0xe081\n", REG_STACK(reg-1));

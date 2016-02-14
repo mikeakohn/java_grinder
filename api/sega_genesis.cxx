@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -20,19 +20,19 @@
 #define CHECK_FUNC(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return generator->sega_genesis_##funct(); \
+    return generator->sega_genesis_##funct##sig(); \
   }
 
 #define CHECK_FUNC_CONST(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return generator->sega_genesis_##funct(const_val); \
+    return generator->sega_genesis_##funct##sig(const_val); \
   }
 
 #define CHECK_FUNC_CONST_2(funct,sig) \
   if (strcmp(#funct#sig, function) == 0) \
   { \
-    return generator->sega_genesis_##funct(const_val1, const_val2); \
+    return generator->sega_genesis_##funct##sig(const_val1, const_val2); \
   }
 
 int sega_genesis(JavaClass *java_class, Generator *generator, char *method_name)

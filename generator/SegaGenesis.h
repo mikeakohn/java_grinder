@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -23,46 +23,46 @@ public:
   virtual int open(const char *filename);
   virtual int start_init();
 
-  virtual int sega_genesis_setPalettePointer();
-  virtual int sega_genesis_setPalettePointer(int index);
-  virtual int sega_genesis_setPaletteColor();
-  virtual int sega_genesis_setPaletteColor(int color);
+  virtual int sega_genesis_setPalettePointer_I();
+  virtual int sega_genesis_setPalettePointer_I(int index);
+  virtual int sega_genesis_setPaletteColor_I();
+  virtual int sega_genesis_setPaletteColor_I(int color);
   virtual int sega_genesis_initBitmap();
   virtual int sega_genesis_clearBitmap();
-  virtual int sega_genesis_clearPatterns();
-  virtual int sega_genesis_plot();
-  virtual int sega_genesis_setPlotAddress();
-  virtual int sega_genesis_fastPlot();
+  virtual int sega_genesis_clearPatterns_I();
+  virtual int sega_genesis_plot_III();
+  virtual int sega_genesis_setPlotAddress_I();
+  virtual int sega_genesis_fastPlot_IIII();
   virtual int sega_genesis_inVerticalBlank();
   virtual int sega_genesis_waitVerticalBlank();
   virtual int sega_genesis_waitHorizontalBlank();
   virtual int sega_genesis_loadFonts();
   virtual int sega_genesis_clearText();
-  virtual int sega_genesis_setCursor();
-  virtual int sega_genesis_setCursor(int x, int y);
-  virtual int sega_genesis_printChar();
-  virtual int sega_genesis_printChar(int c);
-  virtual int sega_genesis_print();
-  virtual int sega_genesis_setHorizontalScrollA();
-  virtual int sega_genesis_setHorizontalScrollB();
-  virtual int sega_genesis_setVerticalScrollA();
-  virtual int sega_genesis_setVerticalScrollB();
+  virtual int sega_genesis_setCursor_II();
+  virtual int sega_genesis_setCursor_II(int x, int y);
+  virtual int sega_genesis_printChar_C();
+  virtual int sega_genesis_printChar_C(int c);
+  virtual int sega_genesis_print_X();
+  virtual int sega_genesis_setHorizontalScrollA_II();
+  virtual int sega_genesis_setHorizontalScrollB_II();
+  virtual int sega_genesis_setVerticalScrollA_I();
+  virtual int sega_genesis_setVerticalScrollB_I();
   virtual int sega_genesis_setHorizontalScrollModeLine();
   virtual int sega_genesis_setHorizontalScrollModeFull();
-  virtual int sega_genesis_setPatternTable();
-  virtual int sega_genesis_setPatternTableAtIndex();
-  virtual int sega_genesis_setPatternLocation();
-  virtual int sega_genesis_putPattern();
-  virtual int sega_genesis_putPattern(int c);
-  virtual int sega_genesis_setImageData();
-  virtual int sega_genesis_setPaletteColors();
-  virtual int sega_genesis_setPaletteColorsAtIndex();
-  virtual int sega_genesis_setSpritePosition();
-  virtual int sega_genesis_setSpriteConfig1();
-  virtual int sega_genesis_setSpriteConfig2();
+  virtual int sega_genesis_setPatternTable_aI();
+  virtual int sega_genesis_setPatternTableAtIndex_IaI();
+  virtual int sega_genesis_setPatternLocation_II();
+  virtual int sega_genesis_putPattern_I();
+  virtual int sega_genesis_putPattern_I(int c);
+  virtual int sega_genesis_setImageData_aS();
+  virtual int sega_genesis_setPaletteColors_aS();
+  virtual int sega_genesis_setPaletteColorsAtIndex_IaS();
+  virtual int sega_genesis_setSpritePosition_III();
+  virtual int sega_genesis_setSpriteConfig1_II();
+  virtual int sega_genesis_setSpriteConfig2_II();
   virtual int sega_genesis_getJoypadValuePort1();
   virtual int sega_genesis_getJoypadValuePort2();
-  virtual int sega_genesis_loadZ80();
+  virtual int sega_genesis_loadZ80_aB();
   virtual int sega_genesis_resetZ80();
   virtual int sega_genesis_pauseZ80();
   virtual int sega_genesis_startZ80();

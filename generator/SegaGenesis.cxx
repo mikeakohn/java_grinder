@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  * Sega Genesis initialization code is based on Bruce Tomlin's hello.asm:
  * http://atariage.com/forums/topic/98540-sega-genesis-programming/
@@ -211,7 +211,7 @@ int SegaGenesis::start_init()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setPalettePointer()
+int SegaGenesis::sega_genesis_setPalettePointer_I()
 {
   int d;
 
@@ -238,7 +238,7 @@ int SegaGenesis::sega_genesis_setPalettePointer()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setPalettePointer(int index)
+int SegaGenesis::sega_genesis_setPalettePointer_I(int index)
 {
   if (index < 0 || index > 63)
   {
@@ -252,14 +252,14 @@ int SegaGenesis::sega_genesis_setPalettePointer(int index)
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setPaletteColor()
+int SegaGenesis::sega_genesis_setPaletteColor_I()
 {
   fprintf(out, "  move.w %s, (a0)\n", pop_reg());
 
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setPaletteColor(int color)
+int SegaGenesis::sega_genesis_setPaletteColor_I(int color)
 {
   if (color < 0 || color > 4095)
   {
@@ -288,7 +288,7 @@ int SegaGenesis::sega_genesis_clearBitmap()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_clearPatterns()
+int SegaGenesis::sega_genesis_clearPatterns_I()
 {
   need_clear_pattern = true;
 
@@ -310,7 +310,7 @@ int SegaGenesis::sega_genesis_clearPatterns()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_plot()
+int SegaGenesis::sega_genesis_plot_III()
 {
   need_plot = true;
 
@@ -339,7 +339,7 @@ int SegaGenesis::sega_genesis_plot()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setPlotAddress()
+int SegaGenesis::sega_genesis_setPlotAddress_I()
 {
   need_set_plot_address = true;
 
@@ -349,7 +349,7 @@ int SegaGenesis::sega_genesis_setPlotAddress()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_fastPlot()
+int SegaGenesis::sega_genesis_fastPlot_IIII()
 {
   // FIXME
   CHECK_STACK
@@ -428,7 +428,7 @@ int SegaGenesis::sega_genesis_clearText()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setCursor()
+int SegaGenesis::sega_genesis_setCursor_II()
 {
   // FIXME - Holy crap.  This is fugly.  Should this just be a function?
   fprintf(out, "  ; setCursor() - Set cursor position in VDP\n");
@@ -445,7 +445,7 @@ int SegaGenesis::sega_genesis_setCursor()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setCursor(int x, int y)
+int SegaGenesis::sega_genesis_setCursor_II(int x, int y)
 {
   // FIXME - This function isn't getting called when it should.
   // 0100 0101 1001 0100 0000 0000 0000 0011
@@ -460,7 +460,7 @@ int SegaGenesis::sega_genesis_setCursor(int x, int y)
   return 0;
 }
 
-int SegaGenesis::sega_genesis_printChar()
+int SegaGenesis::sega_genesis_printChar_C()
 {
   fprintf(out, "  add.w #(1120 - 'A'), %s; printChar()\n", pop_reg());
   fprintf(out, "  or.w #0x6000, %s\n", pop_reg());
@@ -469,7 +469,7 @@ int SegaGenesis::sega_genesis_printChar()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_printChar(int c)
+int SegaGenesis::sega_genesis_printChar_C(int c)
 {
   int pattern = 0x6000 | ((c - 'A') + 1120);
   fprintf(out, "  move.w #0x%02x, (a0) ; printChar(0x%02x)\n", pattern, c);
@@ -477,7 +477,7 @@ int SegaGenesis::sega_genesis_printChar(int c)
   return 0;
 }
 
-int SegaGenesis::sega_genesis_print()
+int SegaGenesis::sega_genesis_print_X()
 {
   need_print_string = true;
 
@@ -487,7 +487,7 @@ int SegaGenesis::sega_genesis_print()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setHorizontalScrollA()
+int SegaGenesis::sega_genesis_setHorizontalScrollA_II()
 {
   fprintf(out,
     "  ;; Update horizontal scroll A (text)\n"
@@ -508,7 +508,7 @@ int SegaGenesis::sega_genesis_setHorizontalScrollA()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setHorizontalScrollB()
+int SegaGenesis::sega_genesis_setHorizontalScrollB_II()
 {
   fprintf(out,
     "  ;; Update horizontal scroll B (bitmap)\n"
@@ -529,7 +529,7 @@ int SegaGenesis::sega_genesis_setHorizontalScrollB()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setVerticalScrollA()
+int SegaGenesis::sega_genesis_setVerticalScrollA_I()
 {
   fprintf(out,
     "  ;; Update vertical scroll A\n"
@@ -543,7 +543,7 @@ int SegaGenesis::sega_genesis_setVerticalScrollA()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setVerticalScrollB()
+int SegaGenesis::sega_genesis_setVerticalScrollB_I()
 {
   fprintf(out,
     "  ;; Update vertical scroll B\n"
@@ -576,7 +576,7 @@ int SegaGenesis::sega_genesis_setHorizontalScrollModeFull()
 }
 
 
-int SegaGenesis::sega_genesis_setPatternTable()
+int SegaGenesis::sega_genesis_setPatternTable_aI()
 {
   need_set_pattern_table = true;
 
@@ -587,7 +587,7 @@ int SegaGenesis::sega_genesis_setPatternTable()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setPatternTableAtIndex()
+int SegaGenesis::sega_genesis_setPatternTableAtIndex_IaI()
 {
   need_set_pattern_table = true;
 
@@ -598,7 +598,7 @@ int SegaGenesis::sega_genesis_setPatternTableAtIndex()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setPatternLocation()
+int SegaGenesis::sega_genesis_setPatternLocation_II()
 {
   fprintf(out, "  ; setPatternLocation()\n");
   fprintf(out, "  lsl.w #7, d%d\n", REG_STACK(reg-1));
@@ -613,21 +613,21 @@ int SegaGenesis::sega_genesis_setPatternLocation()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_putPattern()
+int SegaGenesis::sega_genesis_putPattern_I()
 {
   fprintf(out, "  move.w %s, (a0) ; putPattern()\n", pop_reg());
 
   return 0;
 }
 
-int SegaGenesis::sega_genesis_putPattern(int c)
+int SegaGenesis::sega_genesis_putPattern_I(int c)
 {
   fprintf(out, "  move.w #0x%04x, (a0) ; putPattern(0x%04x)\n", c, c);
 
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setImageData()
+int SegaGenesis::sega_genesis_setImageData_aS()
 {
   need_set_image_data = true;
 
@@ -637,7 +637,7 @@ int SegaGenesis::sega_genesis_setImageData()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setPaletteColors()
+int SegaGenesis::sega_genesis_setPaletteColors_aS()
 {
   need_set_palette_colors = true;
 
@@ -648,7 +648,7 @@ int SegaGenesis::sega_genesis_setPaletteColors()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setPaletteColorsAtIndex()
+int SegaGenesis::sega_genesis_setPaletteColorsAtIndex_IaS()
 {
   need_set_palette_colors_at_index = true;
 
@@ -671,7 +671,7 @@ int SegaGenesis::sega_genesis_setPaletteColorsAtIndex()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setSpritePosition()
+int SegaGenesis::sega_genesis_setSpritePosition_III()
 {
   CHECK_STACK
 
@@ -695,7 +695,7 @@ int SegaGenesis::sega_genesis_setSpritePosition()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setSpriteConfig1()
+int SegaGenesis::sega_genesis_setSpriteConfig1_II()
 {
   CHECK_STACK
 
@@ -712,7 +712,7 @@ int SegaGenesis::sega_genesis_setSpriteConfig1()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_setSpriteConfig2()
+int SegaGenesis::sega_genesis_setSpriteConfig2_II()
 {
   CHECK_STACK
 
@@ -772,7 +772,7 @@ int SegaGenesis::sega_genesis_getJoypadValuePort2()
   return 0;
 }
 
-int SegaGenesis::sega_genesis_loadZ80()
+int SegaGenesis::sega_genesis_loadZ80_aB()
 {
   need_load_z80 = true;
 

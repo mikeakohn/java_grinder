@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -20,24 +20,24 @@
 #define CHECK_FUNC(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return generator->ti99_##funct(); \
+    return generator->ti99_##funct##sig(); \
   }
 
 #define CHECK_FUNC_CONST(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return generator->ti99_##funct(const_val); \
+    return generator->ti99_##funct##sig(const_val); \
   }
 
 #define CHECK_FUNC_CONST_2(funct,sig) \
   if (strcmp(#funct#sig, function) == 0) \
   { \
-    return generator->ti99_##funct(const_val1, const_val2); \
+    return generator->ti99_##funct##sig(const_val1, const_val2); \
   }
 
 int ti99(JavaClass *java_class, Generator *generator, char *method_name)
 {
-  CHECK_FUNC(print,_Ljava/lang/String;)
+  CHECK_FUNC(print,_X)
   CHECK_FUNC(printChar,_C)
   CHECK_FUNC(setCursor,_II)
   CHECK_FUNC(setGraphicsMode,_I)

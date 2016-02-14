@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -16,24 +16,23 @@ class API_TI99
 {
 public:
   // TI99/4A
-  virtual int ti99_print() { return -1; }
-  virtual int ti99_printChar() { return -1; }
-  virtual int ti99_printChar(int c) { return -1; }
-  virtual int ti99_setCursor() { return -1; }
-  virtual int ti99_setCursor(int x, int y) { return -1; }
-  //virtual int ti99_setTextColor() { return -1; }
-  virtual int ti99_setGraphicsMode() { return -1; }
-  virtual int ti99_setGraphicsMode(int mode) { return -1; }
+  virtual int ti99_print_X() { return -1; }
+  virtual int ti99_printChar_C() { return -1; }
+  virtual int ti99_printChar_C(int c) { return -1; }
+  virtual int ti99_setCursor_II() { return -1; }
+  virtual int ti99_setCursor_II(int x, int y) { return -1; }
+  virtual int ti99_setGraphicsMode_I() { return -1; }
+  virtual int ti99_setGraphicsMode_I(int mode) { return -1; }
   virtual int ti99_clearScreen() { return -1; }
-  virtual int ti99_plot() { return -1; }
+  virtual int ti99_plot_III() { return -1; }
   virtual int ti99_setColors() { return -1; }
-  virtual int ti99_setSoundFreq() { return -1; }
-  virtual int ti99_setSoundVolume() { return -1; }
-  virtual int ti99_setSpriteVisible() { return -1; }
-  virtual int ti99_setSpriteImage() { return -1; }
-  virtual int ti99_setSpritePos() { return -1; }
-  virtual int ti99_setSpriteColor() { return -1; }
-  virtual int ti99_setSpriteSize() { return -1; }
+  virtual int ti99_setSoundFreq_II() { return -1; }
+  virtual int ti99_setSoundVolume_II() { return -1; }
+  virtual int ti99_setSpriteVisible_IZ() { return -1; }
+  virtual int ti99_setSpriteImage_IaB() { return -1; }
+  virtual int ti99_setSpritePos_III() { return -1; }
+  virtual int ti99_setSpriteColor_II() { return -1; }
+  virtual int ti99_setSpriteSize_I() { return -1; }
 };
 
 #endif
