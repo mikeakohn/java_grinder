@@ -1571,17 +1571,17 @@ int MSP430::ioport_setPinsResistorEnable_I(int port, int const_val)
 }
 
 // UART functions
-int MSP430::uart_init(int port)
+int MSP430::uart_init_I(int port)
 {
   return -1;
 }
 
-int MSP430::uart_init(int port, int baud_rate)
+int MSP430::uart_init_I(int port, int baud_rate)
 {
   return -1;
 }
 
-int MSP430::uart_send(int port)
+int MSP430::uart_send_I(int port)
 {
   return -1;
 }
@@ -1809,12 +1809,12 @@ int MSP430::adc_read()
 }
 
 // Timer functions
-int MSP430::timer_setInterval()
+int MSP430::timer_setInterval_II()
 {
   return -1;
 }
 
-int MSP430::timer_setInterval(int cycles, int divider)
+int MSP430::timer_setInterval_II(int cycles, int divider)
 {
   if (cycles > 0xffff)
   {
@@ -1835,13 +1835,13 @@ int MSP430::timer_setInterval(int cycles, int divider)
   return 0;
 }
 
-int MSP430::timer_setListener()
+int MSP430::timer_setListener_Z()
 {
   need_timer_interrupt = true;
   return -1;
 }
 
-int MSP430::timer_setListener(int const_value)
+int MSP430::timer_setListener_Z(int const_value)
 {
   if (const_value != 0)
   {
@@ -1873,7 +1873,7 @@ int MSP430::timer_getValue()
   return 0;
 }
 
-int MSP430::timer_setValue()
+int MSP430::timer_setValue_I()
 {
   if (stack != 0)
   {
@@ -1890,7 +1890,7 @@ int MSP430::timer_setValue()
   return 0;
 }
 
-int MSP430::timer_setValue(int const_value)
+int MSP430::timer_setValue_I(int const_value)
 {
   fprintf(out, "  mov.w #%d, &TAR\n", const_value);
   return 0;

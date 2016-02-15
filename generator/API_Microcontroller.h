@@ -41,9 +41,9 @@ public:
   virtual int ioport_setPinsResistorEnable_I(int port, int const_val) { return -1; }
 
   // UART functions
-  virtual int uart_init(int port) { return -1; }
-  virtual int uart_init(int port, int baud_rate) { return -1; }
-  virtual int uart_send(int port) { return -1; }
+  virtual int uart_init_I(int port) { return -1; }
+  virtual int uart_init_I(int port, int baud_rate) { return -1; }
+  virtual int uart_send_I(int port) { return -1; }
   virtual int uart_read(int port) { return -1; }
   virtual int uart_isDataAvailable(int port) { return -1; }
   virtual int uart_isSendReady(int port) { return -1; }
@@ -69,13 +69,13 @@ public:
   virtual int adc_read() { return -1; }
 
   // Timer functions
-  virtual int timer_setInterval() { return -1; }
-  virtual int timer_setInterval(int cycles, int divider) { return -1; }
-  virtual int timer_setListener() { return -1; }
-  virtual int timer_setListener(int const_value) { return -1; }
+  virtual int timer_setInterval_II() { return -1; }
+  virtual int timer_setInterval_II(int cycles, int divider) { return -1; }
+  virtual int timer_setListener_Z() { return -1; }
+  virtual int timer_setListener_Z(int const_value) { return -1; }
   virtual int timer_getValue() { return -1; }
-  virtual int timer_setValue() { return -1; }
-  virtual int timer_setValue(int const_value) { return -1; }
+  virtual int timer_setValue_I() { return -1; }
+  virtual int timer_setValue_I(int const_value) { return -1; }
 };
 
 #endif

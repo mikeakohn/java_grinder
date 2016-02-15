@@ -262,7 +262,7 @@ int MSP430X::cpu_setClockExternal2()
 }
 
 // Timer functions
-int MSP430X::timer_setInterval(int cycles, int divider)
+int MSP430X::timer_setInterval_II(int cycles, int divider)
 {
   if (cycles > 0xffff)
   {
@@ -283,7 +283,7 @@ int MSP430X::timer_setInterval(int cycles, int divider)
   return 0;
 }
 
-int MSP430X::timer_setListener(int const_value)
+int MSP430X::timer_setListener_II(int const_value)
 {
   if (const_value != 0)
   {
@@ -315,7 +315,7 @@ int MSP430X::timer_getValue()
   return 0;
 }
 
-int MSP430X::timer_setValue()
+int MSP430X::timer_setValue_I()
 {
   if (stack != 0)
   {
@@ -332,7 +332,7 @@ int MSP430X::timer_setValue()
   return 0;
 }
 
-int MSP430X::timer_setValue(int const_value)
+int MSP430X::timer_setValue_I(int const_value)
 {
   fprintf(out, "  mov.w #%d, &TA0R\n", const_value);
   return 0;

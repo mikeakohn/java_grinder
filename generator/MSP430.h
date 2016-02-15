@@ -132,9 +132,9 @@ public:
   virtual int ioport_setPinsResistorEnable_I(int port, int const_val);
 
   // UART functions
-  virtual int uart_init(int port);
-  virtual int uart_init(int port, int baud_rate);
-  virtual int uart_send(int port);
+  virtual int uart_init_I(int port);
+  virtual int uart_init_I(int port, int baud_rate);
+  virtual int uart_send_I(int port);
   virtual int uart_read(int port);
   virtual int uart_isDataAvailable(int port);
   virtual int uart_isSendReady(int port);
@@ -160,13 +160,13 @@ public:
   virtual int adc_read();
 
   // Timer functions
-  virtual int timer_setInterval();
-  virtual int timer_setInterval(int cycles, int divider);
-  virtual int timer_setListener();
-  virtual int timer_setListener(int const_value);
+  virtual int timer_setInterval_II();
+  virtual int timer_setInterval_II(int cycles, int divider);
+  virtual int timer_setListener_Z();
+  virtual int timer_setListener_Z(int const_value);
   virtual int timer_getValue();
-  virtual int timer_setValue();
-  virtual int timer_setValue(int const_value);
+  virtual int timer_setValue_I();
+  virtual int timer_setValue_I(int const_value);
 
   // CPU functions
   virtual int cpu_setClock16();

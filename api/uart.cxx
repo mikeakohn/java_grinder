@@ -20,13 +20,13 @@
 #define CHECK_FUNC(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return generator->uart_##funct(port); \
+    return generator->uart_##funct##sig(port); \
   }
 
 #define CHECK_FUNC_CONST(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return generator->uart_##funct(port, const_val); \
+    return generator->uart_##funct##sig(port, const_val); \
   }
 
 int uart(JavaClass *java_class, Generator *generator, char *method_name, int port)

@@ -29,11 +29,11 @@ public:
   virtual int shift_right_uinteger(int count);
 
   // Timer functions
-  virtual int timer_setInterval(int cycles, int divider);
-  virtual int timer_setListener(int const_value);
+  virtual int timer_setInterval_II(int cycles, int divider);
+  virtual int timer_setListener_II(int const_value);
   virtual int timer_getValue();
-  virtual int timer_setValue();
-  virtual int timer_setValue(int const_value);
+  virtual int timer_setValue_I();
+  virtual int timer_setValue_I(int const_value);
 
   // CPU functions
   virtual int cpu_setClock25();
