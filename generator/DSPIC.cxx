@@ -950,14 +950,14 @@ void DSPIC::close()
 #endif
 
 // GPIO functions
-int DSPIC::ioport_setPinsAsInput(int port)
+int DSPIC::ioport_setPinsAsInput_I(int port)
 {
   char periph[32];
   sprintf(periph, "TRIS%c", port+'A');
   return set_periph("ior", periph);
 }
 
-int DSPIC::ioport_setPinsAsInput(int port, int const_val)
+int DSPIC::ioport_setPinsAsInput_I(int port, int const_val)
 {
   char periph[32];
   sprintf(periph, "TRIS%c", port+'A');
@@ -975,14 +975,14 @@ int DSPIC::ioport_setPinsAsInput(int port, int const_val)
   return 0;
 }
 
-int DSPIC::ioport_setPinsAsOutput(int port)
+int DSPIC::ioport_setPinsAsOutput_I(int port)
 {
   char periph[32];
   sprintf(periph, "TRIS%c", port+'A');
   return set_periph("and", periph, true);
 }
 
-int DSPIC::ioport_setPinsAsOutput(int port, int const_val)
+int DSPIC::ioport_setPinsAsOutput_I(int port, int const_val)
 {
   char periph[32];
   sprintf(periph, "TRIS%c", port+'A');
@@ -1000,7 +1000,7 @@ int DSPIC::ioport_setPinsAsOutput(int port, int const_val)
   return 0;
 }
 
-int DSPIC::ioport_setPinsValue(int port)
+int DSPIC::ioport_setPinsValue_I(int port)
 {
   char periph[32];
   sprintf(periph, "LAT%c", port+'A');
@@ -1020,14 +1020,14 @@ int DSPIC::ioport_setPinsValue(int port)
   return 0;
 }
 
-int DSPIC::ioport_setPinsHigh(int port)
+int DSPIC::ioport_setPinsHigh_I(int port)
 {
   char periph[32];
   sprintf(periph, "LAT%c", port+'A');
   return set_periph("ior", periph);
 }
 
-int DSPIC::ioport_setPinsHigh(int port, int const_val)
+int DSPIC::ioport_setPinsHigh_I(int port, int const_val)
 {
   char periph[32];
   sprintf(periph, "LAT%c", port+'A');
@@ -1045,14 +1045,14 @@ int DSPIC::ioport_setPinsHigh(int port, int const_val)
   return 0;
 }
 
-int DSPIC::ioport_setPinsLow(int port)
+int DSPIC::ioport_setPinsLow_I(int port)
 {
   char periph[32];
   sprintf(periph, "LAT%c", port+'A');
   return set_periph("and", periph, true);
 }
 
-int DSPIC::ioport_setPinsLow(int port, int const_val)
+int DSPIC::ioport_setPinsLow_I(int port, int const_val)
 {
   char periph[32];
   sprintf(periph, "LAT%c", port+'A');
@@ -1070,55 +1070,55 @@ int DSPIC::ioport_setPinsLow(int port, int const_val)
   return 0;
 }
 
-int DSPIC::ioport_setPinAsOutput(int port)
+int DSPIC::ioport_setPinAsOutput_I(int port)
 {
   return -1;
 }
 
-int DSPIC::ioport_setPinAsOutput(int port, int const_val)
+int DSPIC::ioport_setPinAsOutput_I(int port, int const_val)
 {
   if (const_val < 0 || const_val > 15) { return -1; }
   fprintf(out, "  bclr TRIS%c, #%d\n", port+'A', const_val);
   return 0;
 }
 
-int DSPIC::ioport_setPinAsInput(int port)
+int DSPIC::ioport_setPinAsInput_I(int port)
 {
   return -1;
 }
 
-int DSPIC::ioport_setPinAsInput(int port, int const_val)
+int DSPIC::ioport_setPinAsInput_I(int port, int const_val)
 {
   if (const_val < 0 || const_val > 15) { return -1; }
   fprintf(out, "  bset TRIS%c, #%d\n", port+'A', const_val);
   return 0;
 }
 
-int DSPIC::ioport_setPinHigh(int port)
+int DSPIC::ioport_setPinHigh_I(int port)
 {
   return -1;
 }
 
-int DSPIC::ioport_setPinHigh(int port, int const_val)
+int DSPIC::ioport_setPinHigh_I(int port, int const_val)
 {
   if (const_val < 0 || const_val > 15) { return -1; }
   fprintf(out, "  bset LAT%c, #%d\n", port+'A', const_val);
   return 0;
 }
 
-int DSPIC::ioport_setPinLow(int port)
+int DSPIC::ioport_setPinLow_I(int port)
 {
   return -1;
 }
 
-int DSPIC::ioport_setPinLow(int port, int const_val)
+int DSPIC::ioport_setPinLow_I(int port, int const_val)
 {
   if (const_val < 0 || const_val > 15) { return -1; }
   fprintf(out, "  bclr LAT%c, #%d\n", port+'A', const_val);
   return 0;
 }
 
-int DSPIC::ioport_isPinInputHigh(int port)
+int DSPIC::ioport_isPinInputHigh_I(int port)
 {
   return -1;
 }

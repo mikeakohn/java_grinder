@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -20,13 +20,13 @@
 #define CHECK_FUNC(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return generator->ioport_##funct(port); \
+    return generator->ioport_##funct##sig(port); \
   }
 
 #define CHECK_FUNC_CONST(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return generator->ioport_##funct(port, const_val); \
+    return generator->ioport_##funct##sig(port, const_val); \
   }
 
 int ioport(JavaClass *java_class, Generator *generator, char *method_name, int port)

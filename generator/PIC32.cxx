@@ -53,12 +53,12 @@ int PIC32::start_init()
 }
 
 // GPIO functions
-int PIC32::ioport_setPinsAsInput(int port)
+int PIC32::ioport_setPinsAsInput_I(int port)
 {
   return -1;
 }
 
-int PIC32::ioport_setPinsAsOutput(int port)
+int PIC32::ioport_setPinsAsOutput_I(int port)
 {
   fprintf(out, "  ; setPinsAsOutput() port=%d TRIS%c\n", port, 'A' + port);
   fprintf(out, "  xori $t%d, $t%d, 0xff\n", reg - 1, reg - 1);
@@ -69,7 +69,7 @@ int PIC32::ioport_setPinsAsOutput(int port)
   return 0;
 }
 
-int PIC32::ioport_setPinsValue(int port)
+int PIC32::ioport_setPinsValue_I(int port)
 {
   fprintf(out, "  ; setPinsValue() port=%d LAT%c\n", port, 'A' + port);
   fprintf(out, "  sw $t%d, 0x6%02x0($k0)\n", reg - 1, (port * 4) + 2);
@@ -79,37 +79,37 @@ int PIC32::ioport_setPinsValue(int port)
   return 0;
 }
 
-int PIC32::ioport_setPinsHigh(int port)
+int PIC32::ioport_setPinsHigh_I(int port)
 {
   return -1;
 }
 
-int PIC32::ioport_setPinsLow(int port)
+int PIC32::ioport_setPinsLow_I(int port)
 {
   return -1;
 }
 
-int PIC32::ioport_setPinAsOutput(int port)
+int PIC32::ioport_setPinAsOutput_I(int port)
 {
   return -1;
 }
 
-int PIC32::ioport_setPinAsInput(int port)
+int PIC32::ioport_setPinAsInput_I(int port)
 {
   return -1;
 }
 
-int PIC32::ioport_setPinHigh(int port)
+int PIC32::ioport_setPinHigh_I(int port)
 {
   return -1;
 }
 
-int PIC32::ioport_setPinLow(int port)
+int PIC32::ioport_setPinLow_I(int port)
 {
   return -1;
 }
 
-int PIC32::ioport_isPinInputHigh(int port)
+int PIC32::ioport_isPinInputHigh_I(int port)
 {
   return -1;
 }

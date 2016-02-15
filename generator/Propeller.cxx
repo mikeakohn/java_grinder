@@ -659,7 +659,7 @@ int Propeller::cpu_getCycleCount()
   return 0;
 }
 
-int Propeller::ioport_setPinsAsInput(int port)
+int Propeller::ioport_setPinsAsInput_I(int port)
 {
   CHECK_PORT();
   fprintf(out, "  andn _dir%c, reg_%d\n", p, reg - 1);
@@ -668,7 +668,7 @@ int Propeller::ioport_setPinsAsInput(int port)
   return 0;
 }
 
-int Propeller::ioport_setPinsAsOutput(int port)
+int Propeller::ioport_setPinsAsOutput_I(int port)
 {
   CHECK_PORT();
   fprintf(out, "  or _dir%c, reg_%d\n", p, reg - 1);
@@ -677,7 +677,7 @@ int Propeller::ioport_setPinsAsOutput(int port)
   return 0;
 }
 
-int Propeller::ioport_setPinsAsOutput(int port, int value)
+int Propeller::ioport_setPinsAsOutput_I(int port, int value)
 {
   CHECK_PORT();
   if (value >= 0 && value <= 255)
@@ -693,7 +693,7 @@ int Propeller::ioport_setPinsAsOutput(int port, int value)
   return 0;
 }
 
-int Propeller::ioport_setPinsValue(int port)
+int Propeller::ioport_setPinsValue_I(int port)
 {
   CHECK_PORT();
   fprintf(out, "  mov _out%c, reg_%d\n", p, reg - 1);
@@ -702,7 +702,7 @@ int Propeller::ioport_setPinsValue(int port)
   return 0;
 }
 
-int Propeller::ioport_setPinsValue(int port, int value)
+int Propeller::ioport_setPinsValue_I(int port, int value)
 {
   CHECK_PORT();
   if (value >= 0 && value <= 255)
@@ -718,7 +718,7 @@ int Propeller::ioport_setPinsValue(int port, int value)
   return 0;
 }
 
-int Propeller::ioport_setPinsHigh(int port)
+int Propeller::ioport_setPinsHigh_I(int port)
 {
   CHECK_PORT();
   fprintf(out, "  or _out%c, reg_%d\n", p, reg - 1);
@@ -727,7 +727,7 @@ int Propeller::ioport_setPinsHigh(int port)
   return 0;
 }
 
-int Propeller::ioport_setPinsHigh(int port, int value)
+int Propeller::ioport_setPinsHigh_I(int port, int value)
 {
   CHECK_PORT();
   if (value >= 0 && value <= 255)
@@ -743,7 +743,7 @@ int Propeller::ioport_setPinsHigh(int port, int value)
   return 0;
 }
 
-int Propeller::ioport_setPinsLow(int port)
+int Propeller::ioport_setPinsLow_I(int port)
 {
   CHECK_PORT();
   fprintf(out, "  andn _out%c, reg_%d\n", p, reg - 1);
@@ -757,7 +757,7 @@ int Propeller::ioport_setPinsLow(int port)
 //int Propeller::ioport_setPinHigh(int port)
 //int Propeller::ioport_setPinLow(int port)
 
-int Propeller::ioport_isPinInputHigh(int port)
+int Propeller::ioport_isPinInputHigh_I(int port)
 {
   return -1;
 }

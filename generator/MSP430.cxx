@@ -1407,14 +1407,14 @@ void MSP430::close()
 #endif
 
 // GPIO functions
-int MSP430::ioport_setPinsAsInput(int port)
+int MSP430::ioport_setPinsAsInput_I(int port)
 {
   char periph[32];
   sprintf(periph, "P%dDIR", port+1);
   return set_periph("bic", periph);
 }
 
-int MSP430::ioport_setPinsAsInput(int port, int const_val)
+int MSP430::ioport_setPinsAsInput_I(int port, int const_val)
 {
   char periph[32];
   sprintf(periph, "P%dDIR", port+1);
@@ -1422,14 +1422,14 @@ int MSP430::ioport_setPinsAsInput(int port, int const_val)
   return 0;
 }
 
-int MSP430::ioport_setPinsAsOutput(int port)
+int MSP430::ioport_setPinsAsOutput_I(int port)
 {
   char periph[32];
   sprintf(periph, "P%dDIR", port+1);
   return set_periph("bis", periph);
 }
 
-int MSP430::ioport_setPinsAsOutput(int port, int const_val)
+int MSP430::ioport_setPinsAsOutput_I(int port, int const_val)
 {
   char periph[32];
   sprintf(periph, "P%dDIR", port+1);
@@ -1437,14 +1437,14 @@ int MSP430::ioport_setPinsAsOutput(int port, int const_val)
   return 0;
 }
 
-int MSP430::ioport_setPinsValue(int port)
+int MSP430::ioport_setPinsValue_I(int port)
 {
   char periph[32];
   sprintf(periph, "P%dOUT", port+1);
   return set_periph("mov", periph);
 }
 
-int MSP430::ioport_setPinsValue(int port, int const_val)
+int MSP430::ioport_setPinsValue_I(int port, int const_val)
 {
   char periph[32];
   sprintf(periph, "P%dOUT", port+1);
@@ -1452,69 +1452,69 @@ int MSP430::ioport_setPinsValue(int port, int const_val)
   return 0;
 }
 
-int MSP430::ioport_setPinsHigh(int port)
+int MSP430::ioport_setPinsHigh_I(int port)
 {
   char periph[32];
   sprintf(periph, "P%dOUT", port+1);
   return set_periph("bis", periph);
 }
 
-int MSP430::ioport_setPinsLow(int port)
+int MSP430::ioport_setPinsLow_I(int port)
 {
   char periph[32];
   sprintf(periph, "P%dOUT", port+1);
   return set_periph("bic", periph);
 }
 
-int MSP430::ioport_setPinAsOutput(int port)
+int MSP430::ioport_setPinAsOutput_I(int port)
 {
   return -1;
 }
 
-int MSP430::ioport_setPinAsOutput(int port, int const_val)
+int MSP430::ioport_setPinAsOutput_I(int port, int const_val)
 {
   if (const_val < 0 || const_val > 7) { return -1; }
   fprintf(out, "  bis.b #0x%02x, &P%dDIR\n", (1<<const_val), port+1);
   return 0;
 }
 
-int MSP430::ioport_setPinAsInput(int port)
+int MSP430::ioport_setPinAsInput_I(int port)
 {
   return -1;
 }
 
-int MSP430::ioport_setPinAsInput(int port, int const_val)
+int MSP430::ioport_setPinAsInput_I(int port, int const_val)
 {
   if (const_val < 0 || const_val > 7) { return -1; }
   fprintf(out, "  bic.b #0x%02x, &P%dDIR\n", (1<<const_val), port+1);
   return 0;
 }
 
-int MSP430::ioport_setPinHigh(int port)
+int MSP430::ioport_setPinHigh_I(int port)
 {
   return -1;
 }
 
-int MSP430::ioport_setPinHigh(int port, int const_val)
+int MSP430::ioport_setPinHigh_I(int port, int const_val)
 {
   if (const_val < 0 || const_val > 7) { return -1; }
   fprintf(out, "  bis.b #0x%02x, &P%dOUT\n", (1<<const_val), port+1);
   return 0;
 }
 
-int MSP430::ioport_setPinLow(int port)
+int MSP430::ioport_setPinLow_I(int port)
 {
   return -1;
 }
 
-int MSP430::ioport_setPinLow(int port, int const_val)
+int MSP430::ioport_setPinLow_I(int port, int const_val)
 {
   if (const_val < 0 || const_val > 7) { return -1; }
   fprintf(out, "  bic.b #0x%02x, &P%dOUT\n", (1<<const_val), port+1);
   return 0;
 }
 
-int MSP430::ioport_isPinInputHigh(int port)
+int MSP430::ioport_isPinInputHigh_I(int port)
 {
   return -1;
 }
@@ -1537,7 +1537,7 @@ int MSP430::ioport_getPortInputValue(int port)
 }
 
 #if 0
-int MSP430::ioport_setPortOutputValue(int port)
+int MSP430::ioport_setPortOutputValue_I(int port)
 {
   if (stack == 0)
   {
@@ -1555,14 +1555,14 @@ int MSP430::ioport_setPortOutputValue(int port)
 }
 #endif
 
-int MSP430::ioport_setPinsResistorEnable(int port)
+int MSP430::ioport_setPinsResistorEnable_I(int port)
 {
   char periph[32];
   sprintf(periph, "P%dREN", port+1);
   return set_periph("mov", periph);
 }
 
-int MSP430::ioport_setPinsResistorEnable(int port, int const_val)
+int MSP430::ioport_setPinsResistorEnable_I(int port, int const_val)
 {
   char periph[32];
   sprintf(periph, "P%dREN", port+1);
