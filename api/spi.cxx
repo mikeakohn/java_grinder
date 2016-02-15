@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -17,79 +17,48 @@
 #include "JavaClass.h"
 #include "spi.h"
 
-#define CHECK_FUNC(funct) \
-  if (strncmp(#funct, function, sizeof(#funct)-1) == 0) \
+#define CHECK_FUNC(funct,sig) \
+  if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return spi_##funct(java_class, generator, port); \
+    return generator->spi_##funct##sig(port); \
   }
 
-#define CHECK_FUNC_CONST_2(funct) \
-  if (strncmp(#funct, function, sizeof(#funct)-1) == 0) \
+#define CHECK_FUNC_CONST(funct,sig) \
+  if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return spi_##funct(java_class, generator, port, const_val1, const_val2); \
+    return generator->spi_##funct##sig(port, const_val); \
   }
 
-static int spi_init_II(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->spi_init(port);
-}
+#define CHECK_FUNC_CONST_2(funct,sig) \
+  if (strcmp(#funct, method_name) == 0) \
+  { \
+    return generator->spi_##funct##sig(port, const_val1, const_val2); \
+  }
 
-static int spi_init_II(JavaClass *java_class, Generator *generator, int port, int const_val1, int const_val2)
+int spi(JavaClass *java_class, Generator *generator, char *method_name, int port)
 {
-  return generator->spi_init(port, const_val1, const_val2);
-}
-
-static int spi_send_I(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->spi_send(port);
-}
-
-static int spi_read(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->spi_read(port);
-}
-
-static int spi_isDataAvailable(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->spi_isDataAvailable(port);
-}
-
-static int spi_isBusy(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->spi_isBusy(port);
-}
-
-static int spi_disable(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->spi_disable(port);
-}
-
-static int spi_enable(JavaClass *java_class, Generator *generator, int port)
-{
-  return generator->spi_enable(port);
-}
-
-int spi(JavaClass *java_class, Generator *generator, char *function, int port)
-{
-  CHECK_FUNC(init_II)
-  CHECK_FUNC(send_I)
-  CHECK_FUNC(read)
-  CHECK_FUNC(isDataAvailable)
-  CHECK_FUNC(isBusy)
-  CHECK_FUNC(disable)
-  CHECK_FUNC(enable)
+  CHECK_FUNC(init,_II)
+  CHECK_FUNC(init16,_II)
+  CHECK_FUNC(send,_I)
+  CHECK_FUNC(send16,_I)
+  CHECK_FUNC(read,)
+  CHECK_FUNC(isDataAvailable,)
+  CHECK_FUNC(isBusy,)
+  CHECK_FUNC(disable,)
+  CHECK_FUNC(enable,)
 
   return -1;
 }
 
-int spi(JavaClass *java_class, Generator *generator, char *function, int port, int const_val)
+int spi(JavaClass *java_class, Generator *generator, char *method_name, int port, int const_val)
 {
   return -1;
 }
 
-int spi(JavaClass *java_class, Generator *generator, char *function, int port, int const_val1, int const_val2)
+int spi(JavaClass *java_class, Generator *generator, char *method_name, int port, int const_val1, int const_val2)
 {
-  CHECK_FUNC_CONST_2(init_II)
+  CHECK_FUNC_CONST_2(init,_II)
+  CHECK_FUNC_CONST_2(init16,_II)
   return -1;
 }
 

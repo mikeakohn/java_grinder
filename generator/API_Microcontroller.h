@@ -49,9 +49,12 @@ public:
   virtual int uart_isSendReady(int port) { return -1; }
 
   // SPI functions
-  virtual int spi_init(int port) { return -1; }
-  virtual int spi_init(int port, int clock_divisor, int mode) { return -1; }
-  virtual int spi_send(int port) { return -1; }
+  virtual int spi_init_II(int port) { return -1; }
+  virtual int spi_init_II(int port, int clock_divisor, int mode) { return -1; }
+  virtual int spi_init16_II(int port) { return -1; }
+  virtual int spi_init16_II(int port, int clock_divisor, int mode) { return -1; }
+  virtual int spi_send_I(int port) { return -1; }
+  virtual int spi_send16_I(int port) { return -1; }
   virtual int spi_read(int port) { return -1; }
   virtual int spi_isDataAvailable(int port) { return -1; }
   virtual int spi_isBusy(int port) { return -1; }

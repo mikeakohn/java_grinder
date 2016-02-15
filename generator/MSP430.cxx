@@ -1602,7 +1602,7 @@ int MSP430::uart_isSendReady(int port)
 }
 
 // SPI functions
-int MSP430::spi_init(int port)
+int MSP430::spi_init_II(int port)
 {
   if (port != 0) { return -1; }
 
@@ -1640,7 +1640,7 @@ int MSP430::spi_init(int port)
   return 0;
 }
 
-int MSP430::spi_init(int port, int clock_divisor, int mode)
+int MSP430::spi_init_II(int port, int clock_divisor, int mode)
 {
   fprintf(out, "  ;; Set up SPI\n");
   fprintf(out, "  mov.b #(USIPE7|USIPE6|USIPE5|USIMST|USIOE|USISWRST), &USICTL0\n");
@@ -1654,7 +1654,17 @@ int MSP430::spi_init(int port, int clock_divisor, int mode)
   return 0;
 }
 
-int MSP430::spi_send(int port)
+int MSP430::spi_init16_II(int port)
+{
+  return -1;
+}
+
+int MSP430::spi_init16_II(int port, int clock_divisor, int mode)
+{
+  return -1;
+}
+
+int MSP430::spi_send_I(int port)
 {
   if (port != 0) { return -1; }
 
@@ -1668,6 +1678,11 @@ int MSP430::spi_send(int port)
   need_read_spi = 1;
 
   return 0;
+}
+
+int MSP430::spi_send16_I(int port)
+{
+  return -1;
 }
 
 int MSP430::spi_read(int port)

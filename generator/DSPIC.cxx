@@ -1129,7 +1129,7 @@ int DSPIC::ioport_getPortInputValue(int port)
 }
 
 // SPI functions
-int DSPIC::spi_init(int port)
+int DSPIC::spi_init_II(int port)
 {
 char dst[16];
 
@@ -1199,7 +1199,7 @@ char dst[16];
   return 0;
 }
 
-int DSPIC::spi_init(int port, int clock_divisor, int mode)
+int DSPIC::spi_init_II(int port, int clock_divisor, int mode)
 {
   int spre = (clock_divisor & 1) ^ 0x7;
   int ppre = (clock_divisor >> 1) ^ 0x3;
@@ -1231,7 +1231,17 @@ int DSPIC::spi_init(int port, int clock_divisor, int mode)
   return 0;
 }
 
-int DSPIC::spi_send(int port)
+int DSPIC::spi_init16_II(int port)
+{
+  return -1;
+}
+
+int DSPIC::spi_init16_II(int port, int clock_divisor, int mode)
+{
+  return -1;
+}
+
+int DSPIC::spi_send_I(int port)
 {
 char dst[16];
 
@@ -1239,6 +1249,11 @@ char dst[16];
   fprintf(out, "  mov %s, SPI1BUF\n", dst);
 
   return 0;
+}
+
+int DSPIC::spi_send16_I(int port)
+{
+  return -1;
 }
 
 int DSPIC::spi_read(int port)

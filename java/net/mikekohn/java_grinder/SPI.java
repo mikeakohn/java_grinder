@@ -36,43 +36,30 @@ abstract public class SPI
       mode 2: CPOL=1, CPHA=0
       mode 3: CPOL=1, CPHA=1
    */
-  public static void init(int clock_divisor, int mode)
-  {
-  }
+  public static void init(int clock_divisor, int mode) { }
 
-  /** send and receive a byte */
-  public static int send(int c)
-  {
-    //System.out.println("Sent char " + c);
-    return 0;
-  }
+  /** Initialize SPI in 16 bit mode if supported. */
+  public static void init16(int clock_divisor, int mode) { }
 
-  /** receive a byte */
-  public static int read()
-  {
-    return 0;
-  }
+  /** send and receive a byte. */
+  public static int send(int c) { return 0; }
+
+  /** send and receive a 16 bit data. */
+  public static int send16(int c) { return 0; }
+
+  /** receive a byte. */
+  public static int read() { return 0; }
 
   /** Returns true if data is available on the SPI bus. */
-  public static boolean isDataAvailable()
-  {
-    return true;
-  }
+  public static boolean isDataAvailable() { return true; }
 
   /** Returns true if data is being transfered on the SPI bus. */
-  public static boolean isBusy()
-  {
-    return false;
-  }
+  public static boolean isBusy() { return false; }
 
   /** Turn off SPI so alternate peripherals can use pins. */
-  public static void disable()
-  {
-  }
+  public static void disable() { }
 
   /** Turn on SPI after disable() was called (not needed after init()). */
-  public static void enable()
-  {
-  }
+  public static void enable() { }
 }
 

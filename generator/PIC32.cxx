@@ -120,13 +120,13 @@ int PIC32::ioport_getPortInputValue(int port)
 }
 
 // SPI functions
-int PIC32::spi_init(int port)
+int PIC32::spi_init_II(int port)
 {
   CHECK_PORT_SPI();
   return -1;
 }
 
-int PIC32::spi_init(int port, int clock_divisor, int mode)
+int PIC32::spi_init_II(int port, int clock_divisor, int mode)
 {
   CHECK_PORT_SPI();
 
@@ -156,7 +156,66 @@ int PIC32::spi_init(int port, int clock_divisor, int mode)
   return 0;
 }
 
-int PIC32::spi_send(int port)
+int PIC32::spi_init16_II(int port)
+{
+  CHECK_PORT_SPI();
+  return -1;
+}
+
+int PIC32::spi_init16_II(int port, int clock_divisor, int mode)
+{
+  CHECK_PORT_SPI();
+
+  if (clock_divisor > 3) { printf("Clock divisor out of range\n"); }
+
+  int mode_table[] = { 0, 4, 1, 5 };
+  if (mode > 3) { mode = 0; }
+  mode = mode_table[mode];
+
+  // bit 15 = ENABLE
+  // bit 10-11: 0=8 bit, 1=16 bit, 2=32 bit
+  // bit 8 = CKE (clock edge select)
+  // bit 6 = CKP (clock polarity select)
+  // bit 5 = MSTEN
+
+  fprintf(out, "  ;; spit_init(%d, %d %d)\n", port, clock_divisor, mode);
+  fprintf(out, "  li $t8, 0x%x\n", (1 << 15) | (1 << 10) | (1 << 5) | (mode << 8));
+  fprintf(out, "  sw $t8, SPI1CON($k1)\n");
+
+  fprintf(out, "  li $at, 0xbfc02ff8 ; DEVCFG1\n");
+  fprintf(out, "  lw $t9, ~(3 << 12)\n");
+  fprintf(out, "  lw $t8, 0($at)\n");
+  fprintf(out, "  and $t8, $t8, $t9\n");
+  fprintf(out, "  lw $t9, %d << 12\n", clock_divisor);
+  fprintf(out, "  or $t8, $t8, $t9\n");
+  fprintf(out, "  sw $t8, 0($at)\n");
+
+  return 0;
+}
+
+int PIC32::spi_send_I(int port)
+{
+  CHECK_PORT_SPI();
+
+#if 0
+  add_spi_send = 1;
+
+  fprintf(out, "  addi $sp, $sp, -4\n");
+  fprintf(out, "  sw $ra, 0($sp)\n", t);
+  fprintf(out, "  jal _spi_send\n");
+  fprintf(out, "  nop\n");
+  fprintf(out, "  lw $ra, 0($sp)\n", t);
+  fprintf(out, "  addi $sp, $sp, 4\n");
+#endif
+
+  fprintf(out, "  lw $t8, SPI1STAT($k1)\n");
+  fprintf(out, "  andi $t9, $t8, (1 << 11) | (1 << 1)\n");
+  fprintf(out, "  bne _spi_send\n");
+
+  return -1;
+}
+
+int PIC32::spi_send16_I(int port)
 {
   CHECK_PORT_SPI();
 
