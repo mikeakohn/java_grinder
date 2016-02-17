@@ -30,6 +30,7 @@
 #include "MIPS32.h"
 #include "MSP430.h"
 #include "MSP430X.h"
+#include "MSX.h"
 #include "PIC32.h"
 #include "Propeller.h"
 #include "SegaGenesis.h"
@@ -157,6 +158,11 @@ static Generator *new_generator(const char *chip_type)
     generator = new MSP430X(MSP430F5529);
   }
     else
+  if (strcasecmp("msx", chip_type) == 0)
+  {
+    generator = new MSX();
+  }
+    else
   if (strcasecmp("pic32", chip_type) == 0)
   {
     generator = new PIC32();
@@ -264,10 +270,10 @@ int main(int argc, char *argv[])
            "     msp430g2231, msp430g2452, msp430g2553, msp430f5529\n"
            "     propeller\n"
            "     sega_genesis\n"
-           "     ti84plus\n"
            "     ti99\n"
            "     w65c265sxb\n"
-           "     x86\n", argv[0]);
+           "     x86\n"
+           "     z80, msx, ti84plus\n", argv[0]);
     exit(0);
   }
 
