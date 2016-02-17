@@ -20,4 +20,3 @@ int msx(JavaClass *java_class, Generator *generator, char *method_name, int cons
 int msx(JavaClass *java_class, Generator *generator, char *method_name, int const_val1, int const_val2);
 
 #endif
-
