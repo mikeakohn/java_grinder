@@ -9,6 +9,10 @@
  *
  */
 
+/*
+ *   MSX support by Giovanni Nunes - https://github.com/plainspooky
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -37,7 +41,17 @@
 
 int msx(JavaClass *java_class, Generator *generator, char *method_name)
 {
-  CHECK_FUNC(someFunction,_I)
+  //CHECK_FUNC(someFunction,_I)
+  CHECK_FUNC(beep,_I)
+  CHECK_FUNC(color,_I)
+  CHECK_FUNC(cls,_I)
+  CHECK_FUNC(screen,_I)
+  CHECK_FUNC(keyOn,_I)
+  CHECK_FUNC(keyOff,_I)
+  CHECK_FUNC(fillVRAM,_I)
+  CHECK_FUNC(copyVRAM,_I)
+  CHECK_FUNC(putChar,_C)
+  CHECK_FUNC(setCursor,_I)
 
   return -1;
 }
@@ -55,4 +69,3 @@ int msx(JavaClass *java_class, Generator *generator, char *function, int const_v
 
   return -1;
 }
-
