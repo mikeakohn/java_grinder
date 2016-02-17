@@ -20,6 +20,7 @@ JAVA_SRC=\
   $(SRC_DIR)/IOPort7.java \
   $(SRC_DIR)/Math.java \
   $(SRC_DIR)/Memory.java \
+  $(SRC_DIR)/MSX.java \
   $(SRC_DIR)/Propeller.java \
   $(SRC_DIR)/SegaGenesis.java \
   $(SRC_DIR)/SNES.java \

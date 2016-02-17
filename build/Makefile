@@ -23,6 +23,7 @@ API= \
   java_lang_string.o \
   math_.o \
   memory.o \
+  msx_.o \
   propeller_.o \
   sega_genesis.o \
   snes_.o \
@@ -46,6 +47,7 @@ CPUS= \
   MIPS32.o \
   MSP430.o \
   MSP430X.o \
+  MSX.o \
   Propeller.o \
   STDC.o \
   TMS9900.o \
