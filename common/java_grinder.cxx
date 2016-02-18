@@ -9,6 +9,11 @@
  *
  */
 
+/*
+ *   MSX support by Giovanni Nunes - https://github.com/plainspooky
+ *                  Emiliano Fraga - https://github.com/efraga-msx
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -268,12 +273,13 @@ int main(int argc, char *argv[])
            "     m6502_8, atari2600\n"
            "     mips32, pic32\n"
            "     msp430g2231, msp430g2452, msp430g2553, msp430f5529\n"
+           "     msx\n"
            "     propeller\n"
            "     sega_genesis\n"
+           "     ti84plus\n"
            "     ti99\n"
            "     w65c265sxb\n"
-           "     x86\n"
-           "     z80, msx, ti84plus\n", argv[0]);
+           "     x86\n", argv[0]);
     exit(0);
   }
 

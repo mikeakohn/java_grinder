@@ -9,6 +9,11 @@
  *
  */
 
+/*
+ *   MSX support by Giovanni Nunes - https://github.com/plainspooky
+ *                  Emiliano Fraga - https://github.com/efraga-msx
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -100,6 +105,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     return -1;
   }
 
+	// trace Mike
   //printf("method: '%s as %s' from %s\n", method_name, method_sig, method_class);
 
   get_static_function(function, method_name, method_sig);
@@ -121,6 +127,9 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
   if (strncmp("net/mikekohn/java_grinder/", method_class, len) == 0)
   {
     char *cls = method_class + len;
+
+	// trace Emiliano
+    //printf("invoke_static cls: %s\n", cls);
 
     CHECK(CPU, cpu)
     CHECK_WITH_PORT(IOPort, ioport, 0)
@@ -205,6 +214,9 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, in
 
   if (const_count == 1)
   {
+	 // trace Emiliano
+    //printf("invoke_static CONST Java Class: %s\tMethod Name:%s\n", method_class, method_name);
+
     CHECK_WITH_PORT_CONST(IOPort, ioport, 0)
     CHECK_WITH_PORT_CONST(IOPort, ioport, 1)
     CHECK_WITH_PORT_CONST(IOPort, ioport, 2)
@@ -219,7 +231,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, in
     CHECK_CONST(Atari2600, atari_2600)
     CHECK_CONST(Timer, timer)
     CHECK_CONST(CPU, cpu)
-    CHECK_CONST(MSX, msx)
+//    CHECK_CONST(MSX, msx)
     CHECK_CONST(Propeller, propeller)
     CHECK_CONST(SegaGenesis, sega_genesis)
     CHECK_CONST(SNES, snes)
@@ -240,7 +252,6 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, in
     CHECK_WITH_PORT_CONST_2(SPI, spi, 1)
     CHECK_CONST_2(Timer, timer)
     CHECK_CONST_2(Atari2600, atari_2600)
-    CHECK_CONST_2(MSX, msx)
     CHECK_CONST_2(TI99, ti99)
     CHECK_CONST_2(SegaGenesis, sega_genesis)
     CHECK_CONST_2(SNES, snes)
