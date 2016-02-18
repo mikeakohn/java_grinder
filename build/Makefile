@@ -47,7 +47,6 @@ CPUS= \
   MIPS32.o \
   MSP430.o \
   MSP430X.o \
-  MSX.o \
   Propeller.o \
   STDC.o \
   TMS9900.o \
@@ -59,6 +58,7 @@ SYSTEMS= \
   AppleIIgs.o \
   Atari2600.o \
   C64.o \
+  MSX.o \
   PIC32.o \
   SegaGenesis.o \
   SNES.o \
