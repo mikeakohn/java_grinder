@@ -9,10 +9,11 @@
  *
  */
 
+
 /*
  *   MSX support by Giovanni Nunes - https://github.com/plainspooky
+ *                  Emiliano Fraga - https://github.com/efraga-msx
  */
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,6 +44,10 @@ int MSX::open(const char *filename)
 {
   if (Z80::open(filename) != 0) { return -1; }
   fprintf(out, ".include \"msx.inc\"\n\n");
+  fprintf(out, "ram_start equ 0xc000\n");
+  fprintf(out, "heap_ptr equ ram_start\n");
+  fprintf(out, "save_iy equ heap_ptr\n");
+  
   //fprintf(out, "  _sound_waveform_start equ 0\n");
   //fprintf(out, "  _sound_waveform_end equ 2\n");
   //fprintf(out, "  _sound_waveform_ptr equ 4\n");
@@ -50,75 +55,78 @@ int MSX::open(const char *filename)
   return 0;
 }
 
-int MSX::start_init(void)
+int MSX::start_init()
 {
   fprintf(out, "\n");
   fprintf(out, ".org 0x4000\n");
+  
+  fprintf(out, "db\t\"AB\"\t; ROM cartridge\n");
+  fprintf(out, "dw\tAPP_START\t; start address\n");
+  fprintf(out, "dw\t0x0\t\t; statement\n");
+  fprintf(out, "dw\t0x0\t\t; device\n");
+  fprintf(out, "dw\t0x0\t\t; text\n");
+  fprintf(out, "ds\t6\t\t; reserved 6 x 0h\n");
 
+  fprintf(out, "APP_START:\n");
   return 0;
 }
 
 /*
  *  just like MSX-BASIC syntax
  */
-int MSX::msx_beep_I(void)
+int MSX::msx_beep()
 {
   fprintf(out,"call BEEP\n");
   return 0;
 }
 
-int MSX::msx_color_I(int foreground=-1,int background=-1,int border=-1)
+int MSX::msx_color_BBB(uint8_t foreground, uint8_t background, uint8_t border)
 {
-  if ( foreground !=-1 )
-  {
     foreground = foreground & 15;
-    fprintf(out,"ld a,0x%20x\n",foreground);
-    fprintf(out,"ld (FORCLR),a\n");
-  }
-  if ( background !=-1 )
-  {
+    fprintf(out, "ld a,0x%20x\n", foreground);
+    fprintf(out, "ld (FORCLR),a\n");
+  
     background = background & 15;
-    fprintf(out,"ld a,0x%20x\n",background);
+    fprintf(out,"ld a,0x%20x\n", background);
     fprintf(out,"ld (BAKCLR),a\n");
-  }
-  if ( border != -1 )
-  {
+  
     border = border & 15;
-    fprintf(out,"ld a,0x%20x\n",border);
-    fprintf(out,"ld (BDRCLR),a\n");
-  }
-  fprintf(out,"call CHGCLR\n");
-  return 0;
+    fprintf(out,"ld a,0x%20x\n", border);
+	fprintf(out,"ld (BDRCLR),a\n");
+  
+	fprintf(out,"call CHGCLR\n");
+	return 0;
 }
 
-int MSX::msx_screen_I(int mode)
+int MSX::msx_screen_B(uint8_t mode)
 {
-  mode = mode & 3;
-  fprintf(out,"ld a,0x%02x\n",mode);
-  fprintf(out,"call CHGMOD\n");
-  // adjust text modes to maximun width
-  if ( mode<2 )
-  {
-    if ( mode==0 ) { fprintf(out,"ld a,40\n"); }
-    else { fprintf(out,"ld a,32\n"); }
-    fprintf(out,"ld (LINLEN),a\n");
-  }
-  return 0;
+	mode = mode & 3;
+	fprintf(out,"ld a,0x%02x\n", mode);
+
+	fprintf(out,"call CHGMOD\n");
+	// adjust text modes to maximun width
+	if ( mode < 2 )
+	{
+		if ( mode==0 ) { fprintf(out,"ld a,40\n"); }
+		else { fprintf(out,"ld a,32\n"); }
+		fprintf(out,"ld (LINLEN),a\n");
+	}
+	return 0;
 }
 
-int MSX::msx_cls_I(void)
+int MSX::msx_cls()
 {
   fprintf(out,"call CLS\n");
   return 0;
 }
 
-int MSX::msx_keyOn_I(void)
+int MSX::msx_keyOn()
 {
   fprintf(out,"call DSPFNK\n");
   return 0;
 }
 
-int MSX::msx_keyOff_I(void)
+int MSX::msx_keyOff()
 {
   fprintf(out,"call ERAFNK\n");
   return 0;
@@ -127,7 +135,7 @@ int MSX::msx_keyOff_I(void)
 /*
  *  VRAM manipulation
  */
-int MSX::msx_copyVRAM_I(int len,int source,int dest)
+int MSX::msx_copyVRAM_III(int len, int source, int dest)
 {
   need_ldirvv = true;
   len = len & 65535;
@@ -141,7 +149,7 @@ int MSX::msx_copyVRAM_I(int len,int source,int dest)
   return 0;
 }
 
-int MSX::msx_fillVRAM_I(int c,int len,int addr)
+int MSX::msx_fillVRAM_III(int c, int len, int addr)
 {
   c = c & 255;
   len = len & 65535;
@@ -156,32 +164,24 @@ int MSX::msx_fillVRAM_I(int c,int len,int addr)
 /*
  *  Text console
  */
-int MSX::msx_setCursor_I(int column=-1,int line=-1)
+int MSX::msx_setCursor_BB(uint8_t column, uint8_t line)
 {
-  if ( column==-1 )
-  {
-    // adjust only line position, column is untouched!
-    line = line & 255;
-    fprintf(out,"ld a,0x%20x\n",++line);
+    fprintf(out,"ld a,0x%20x\n", ++line);
     fprintf(out,"ld (CSRY),a\n");
-  }
-  if ( line==-1 )
-  {
-    // adjust onlu column position, line is untouched!
-    column = column & 255;
-    fprintf(out,"ld a,0x%20x\n",++column);
+
+    fprintf(out,"ld a,0x%20x\n", ++column);
     fprintf(out,"ld (CSRX),a\n");
-  }
   return 0;
 }
 
-int MSX::msx_putChar_C(char byte)
+
+int MSX::msx_putChar_C()
 {
-  byte = byte & 255;
-  fprintf(out,"ld a,0x%02x\n",byte);
-  fprintf(out,"call CHPUT\n");
+  fprintf(out, "ld a, 0x%02x\n", 'A');
+  fprintf(out, "call CHPUT\n");
   return 0;
 }
+
 
 /*
  *  Support routines
