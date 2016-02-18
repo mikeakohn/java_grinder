@@ -29,12 +29,16 @@ public:
   virtual int start_init();
   virtual int msx_cls();
   virtual int msx_beep();
-  virtual int msx_color_BBB(uint8_t foreground, uint8_t background, uint8_t border);
-  virtual int msx_screen_B(uint8_t mode);
+  //virtual int msx_color_BBB(uint8_t foreground, uint8_t background, uint8_t border);
+  virtual int msx_color_BBB();
+  //virtual int msx_screen_B(uint8_t mode);
+  virtual int msx_screen_B();
   virtual int msx_keyOn();
   virtual int msx_keyOff();
-  virtual int msx_fillVRAM_III(int c, int len, int addr);
-  virtual int msx_copyVRAM_III(int len, int source, int dest);
+  //virtual int msx_fillVRAM_III(int c, int len, int addr);
+  virtual int msx_fillVRAM_III();
+  //virtual int msx_copyVRAM_III(int len, int source, int dest);
+  virtual int msx_copyVRAM_III();
   virtual int msx_putChar_C();
   virtual int msx_setCursor_BB();
 

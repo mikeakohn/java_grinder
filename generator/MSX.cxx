@@ -80,8 +80,10 @@ int MSX::msx_beep()
   return 0;
 }
 
-int MSX::msx_color_BBB(uint8_t foreground, uint8_t background, uint8_t border)
+//int MSX::msx_color_BBB(uint8_t foreground, uint8_t background, uint8_t border)
+int MSX::msx_color_BBB()
 {
+#if 0
     foreground = foreground & 15;
     fprintf(out, "ld a,0x%20x\n", foreground);
     fprintf(out, "ld (FORCLR),a\n");
@@ -92,14 +94,17 @@ int MSX::msx_color_BBB(uint8_t foreground, uint8_t background, uint8_t border)
   
     border = border & 15;
     fprintf(out,"ld a,0x%20x\n", border);
+#endif
 	fprintf(out,"ld (BDRCLR),a\n");
   
 	fprintf(out,"call CHGCLR\n");
 	return 0;
 }
 
-int MSX::msx_screen_B(uint8_t mode)
+//int MSX::msx_screen_B(uint8_t mode)
+int MSX::msx_screen_B()
 {
+#if 0
 	mode = mode & 3;
 	fprintf(out,"ld a,0x%02x\n", mode);
 
@@ -111,6 +116,7 @@ int MSX::msx_screen_B(uint8_t mode)
 		else { fprintf(out,"ld a,32\n"); }
 		fprintf(out,"ld (LINLEN),a\n");
 	}
+#endif
 	return 0;
 }
 
@@ -135,8 +141,10 @@ int MSX::msx_keyOff()
 /*
  *  VRAM manipulation
  */
-int MSX::msx_copyVRAM_III(int len, int source, int dest)
+//int MSX::msx_copyVRAM_III(int len, int source, int dest)
+int MSX::msx_copyVRAM_III()
 {
+#if 0
   need_ldirvv = true;
   len = len & 65535;
   source = source & 65535;
@@ -144,19 +152,23 @@ int MSX::msx_copyVRAM_III(int len, int source, int dest)
   fprintf(out,"ld bc,0x%02x\n",len);
   fprintf(out,"ld de,0x%02x\n",dest);
   fprintf(out,"ld hl,0x%02x\n",source);
+#endif
   fprintf(out,"call FILVRM\n");
   fprintf(out,"call LDIRVV");
   return 0;
 }
 
-int MSX::msx_fillVRAM_III(int c, int len, int addr)
+//int MSX::msx_fillVRAM_III(int c, int len, int addr)
+int MSX::msx_fillVRAM_III()
 {
+#if 0
   c = c & 255;
   len = len & 65535;
   addr = addr & 65535;
   fprintf(out,"ld a,0x%02x\n",c);
   fprintf(out,"ld bc,0x%02x\n",len);
   fprintf(out,"ld hl,0x%02x\n",addr);
+#endif
   fprintf(out,"call FILVRM\n");
   return 0;
 }
