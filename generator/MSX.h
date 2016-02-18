@@ -36,7 +36,7 @@ public:
   virtual int msx_fillVRAM_III(int c, int len, int addr);
   virtual int msx_copyVRAM_III(int len, int source, int dest);
   virtual int msx_putChar_C();
-  virtual int msx_setCursor_BB(uint8_t column, uint8_t line);
+  virtual int msx_setCursor_BB();
 
 private:
   void insert_ldirvv(void);
