@@ -177,7 +177,7 @@ int MSX::msx_setCursor_BB(uint8_t column, uint8_t line)
 
 int MSX::msx_putChar_C()
 {
-  fprintf(out, "ld a, 0x%02x\n", 'A');
+  fprintf(out, "ld a, c\n");
   fprintf(out, "call CHPUT\n");
   return 0;
 }
