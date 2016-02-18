@@ -30,6 +30,7 @@
     return generator->msx_##funct##sig(); \
   }
 
+/*
 // Trace Emiliano
 #define CHECK_FUNC_CONST(funct,sig) \
   printf("msx_ CHECK_FUNC_CONST funct: %s\tsig: %s\n", #funct, #sig); \
@@ -37,6 +38,7 @@
   { \
     return generator->msx_##funct##sig(const_val); \
   }
+*/
 
 /*
 #define CHECK_FUNC_CONST_2(funct,sig) \

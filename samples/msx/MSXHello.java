@@ -16,20 +16,19 @@
 
 import net.mikekohn.java_grinder.MSX;
 
-public class MSXHello
-{
-  public static String strMsg = "Hello World";
+public class MSXHello {
+	public static String strMsg = "Hello MSX from JAVA";
 
-  public static void main(String args[])
-  {
-	MSX.cls();
-	
-	for (int i = 0; i < strMsg.length(); i++) {
-		MSX.putChar(strMsg.charAt(i));
+	public static void main(String args[]) {
+		char c;
+		
+		MSX.cls();
+
+		for (int i = 0; i < strMsg.length(); i++) {
+			c = strMsg.charAt(i);
+			MSX.putChar(c);
+		}
+
+		while (true);
 	}
-	
-	while(true);
-  }
 }
-
-

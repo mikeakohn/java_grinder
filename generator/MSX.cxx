@@ -164,21 +164,24 @@ int MSX::msx_fillVRAM_III(int c, int len, int addr)
 /*
  *  Text console
  */
-int MSX::msx_setCursor_BB(uint8_t column, uint8_t line)
+int MSX::msx_setCursor_BB()
 {
-    fprintf(out,"ld a,0x%20x\n", ++line);
-    fprintf(out,"ld (CSRY),a\n");
+    fprintf(out,"\tpop de\n");
+    fprintf(out,"\tld a, e\n");
+    fprintf(out,"\tld (CSRY),a\n");
 
-    fprintf(out,"ld a,0x%20x\n", ++column);
-    fprintf(out,"ld (CSRX),a\n");
+    fprintf(out,"\tpop de\n");
+    fprintf(out,"\tld a, e\n");
+    fprintf(out,"\tld (CSRX),a\n");
   return 0;
 }
 
 
 int MSX::msx_putChar_C()
 {
-  fprintf(out, "ld a, c\n");
-  fprintf(out, "call CHPUT\n");
+  fprintf(out,"\tpop de\n");
+  fprintf(out,"\tld a, e\n");
+  fprintf(out, "\tcall CHPUT\n");
   return 0;
 }
 
