@@ -1981,7 +1981,7 @@ int AVR8::memory_write16_IS()
 }
 
 // IOPort API
-int AVR8::ioport_setPinsAsInput(int port)
+int AVR8::ioport_setPinsAsInput_I(int port)
 {
   if(port < 0 || port > 3)
     return -1;
@@ -1998,7 +1998,7 @@ int AVR8::ioport_setPinsAsInput(int port)
   return 0;
 }
 
-int AVR8::ioport_setPinsAsInput(int port, int const_val)
+int AVR8::ioport_setPinsAsInput_I(int port, int const_val)
 {
   if(port < 0 || port > 3)
     return -1;
@@ -2013,7 +2013,7 @@ int AVR8::ioport_setPinsAsInput(int port, int const_val)
   return 0;
 }
 
-int AVR8::ioport_setPinsAsOutput(int port)
+int AVR8::ioport_setPinsAsOutput_I(int port)
 {
   if(port < 0 || port > 3)
     return -1;
@@ -2029,7 +2029,7 @@ int AVR8::ioport_setPinsAsOutput(int port)
   return 0;
 }
 
-int AVR8::ioport_setPinsAsOutput(int port, int const_val)
+int AVR8::ioport_setPinsAsOutput_I(int port, int const_val)
 {
   if(port < 0 || port > 3)
     return -1;
@@ -2043,7 +2043,7 @@ int AVR8::ioport_setPinsAsOutput(int port, int const_val)
   return 0;
 }
 
-int AVR8::ioport_setPinsValue(int port)
+int AVR8::ioport_setPinsValue_I(int port)
 {
   if(port < 0 || port > 3)
     return -1;
@@ -2057,7 +2057,7 @@ int AVR8::ioport_setPinsValue(int port)
   return 0;
 }
 
-int AVR8::ioport_setPinsValue(int port, int const_val)
+int AVR8::ioport_setPinsValue_I(int port, int const_val)
 {
   if(port < 0 || port > 3)
     return -1;
@@ -2069,7 +2069,7 @@ int AVR8::ioport_setPinsValue(int port, int const_val)
   return 0;
 }
 
-int AVR8::ioport_setPinsHigh(int port)
+int AVR8::ioport_setPinsHigh_I(int port)
 {
   if(port < 0 || port > 3)
     return -1;
@@ -2085,7 +2085,7 @@ int AVR8::ioport_setPinsHigh(int port)
   return 0;
 }
 
-int AVR8::ioport_setPinsLow(int port)
+int AVR8::ioport_setPinsLow_I(int port)
 {
   if(port < 0 || port > 3)
     return -1;
@@ -2102,22 +2102,22 @@ int AVR8::ioport_setPinsLow(int port)
   return 0;
 }
 
-int AVR8::ioport_setPinAsOutput(int port)
+int AVR8::ioport_setPinAsOutput_I(int port)
 {
   return -1;
 }
 
-int AVR8::ioport_setPinAsInput(int port)
+int AVR8::ioport_setPinAsInput_I(int port)
 {
   return -1;
 }
 
-int AVR8::ioport_setPinHigh(int port)
+int AVR8::ioport_setPinHigh_I(int port)
 {
   return -1;
 }
 
-int AVR8::ioport_setPinHigh(int port, int const_val)
+int AVR8::ioport_setPinHigh_I(int port, int const_val)
 {
   if(port < 0 || port > 3)
     return -1;
@@ -2135,12 +2135,12 @@ int AVR8::ioport_setPinHigh(int port, int const_val)
   return 0;
 }
 
-int AVR8::ioport_setPinLow(int port)
+int AVR8::ioport_setPinLow_I(int port)
 {
   return -1;
 }
 
-int AVR8::ioport_setPinLow(int port, int const_val)
+int AVR8::ioport_setPinLow_I(int port, int const_val)
 {
   if(port < 0 || port > 3)
     return -1;
@@ -2160,7 +2160,7 @@ int AVR8::ioport_setPinLow(int port, int const_val)
   return 0;
 }
 
-int AVR8::ioport_isPinInputHigh(int port)
+int AVR8::ioport_isPinInputHigh_I(int port)
 {
   // Uncomment pin_string at the top of the file for this function.
   return -1;
