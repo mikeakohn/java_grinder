@@ -2164,12 +2164,12 @@ int AVR8::adc_read()
 }
 
 // UART functions
-int AVR8::uart_init(int port)
+int AVR8::uart_init_I(int port)
 {
   return -1;
 }
 
-int AVR8::uart_init(int port, int baud_rate)
+int AVR8::uart_init_I(int port, int baud_rate)
 {
   // UBRR = (fosc / (16 * BAUD) - 1)
   int rate_table[] = { 832,   415,  103,    51,    25,    16 };
@@ -2201,7 +2201,7 @@ int AVR8::uart_init(int port, int baud_rate)
   return 0;
 }
 
-int AVR8::uart_send(int port)
+int AVR8::uart_send_I(int port)
 {
   POP_HI("temp");
   POP_LO("temp");
