@@ -217,8 +217,8 @@ int Z80::pop_local_var_int(int index)
 {
   fprintf(out, "  ;; pop_local_var_int(%d)\n", index);
   fprintf(out, "  pop hl\n");
-  fprintf(out, "  ld l, (iy+%d)\n", (index * 2));
-  fprintf(out, "  ld h, (iy+%d)\n", (index * 2) + 1);
+  fprintf(out, "  ld (iy+%d), l\n", (index * 2));
+  fprintf(out, "  ld (iy+%d), h\n", (index * 2) + 1);
   stack--;
 
   return 0;
@@ -231,7 +231,8 @@ int Z80::pop_local_var_ref(int index)
 
 int Z80::pop()
 {
-  fprintf(out, "  pop bc    ; pop()\n");
+  fprintf(out, "  ; pop()\n");
+  fprintf(out, "  pop bc\n");
   stack--;
 
   return 0;
@@ -239,7 +240,8 @@ int Z80::pop()
 
 int Z80::dup()
 {
-  fprintf(out, "  pop hl     ; dup()\n");
+  fprintf(out, "  ; dup()\n");
+  fprintf(out, "  pop hl\n");
   fprintf(out, "  push hl\n");
   fprintf(out, "  push hl\n");
   stack++;
@@ -249,7 +251,8 @@ int Z80::dup()
 
 int Z80::dup2()
 {
-  fprintf(out, "  pop bc    ; dup2()\n");
+  fprintf(out, "  ; dup2()\n");
+  fprintf(out, "  pop bc\n");
   fprintf(out, "  pop de\n");
   fprintf(out, "  push bc\n");
   fprintf(out, "  push de\n");
@@ -262,7 +265,8 @@ int Z80::dup2()
 
 int Z80::swap()
 {
-  fprintf(out, "  pop bc    ; swap()\n");
+  fprintf(out, "  ; swap()\n");
+  fprintf(out, "  pop bc\n");
   fprintf(out, "  pop de\n");
   fprintf(out, "  push de\n");
   fprintf(out, "  push bc\n");
@@ -451,7 +455,7 @@ int Z80::inc_integer(int index, int num)
   fprintf(out, "  ;; inc_integer(%d,%d)\n", index, num);
   fprintf(out, "  ld h, (iy+%d)\n", (index * 2) + 1);
   fprintf(out, "  ld l, (iy+%d)\n", (index * 2));
-  fprintf(out, "  ld bc, 0x%02x\n", num);
+  fprintf(out, "  ld bc, %d\n", num);
   fprintf(out, "  add hl, bc\n");
   fprintf(out, "  ld (iy+%d), h\n", (index * 2) + 1);
   fprintf(out, "  ld (iy+%d), l\n", (index * 2));
@@ -462,8 +466,6 @@ int Z80::integer_to_byte()
 {
   fprintf(out, "  ;; integer_to_byte() (sign extend byte)\n");
   fprintf(out, "  pop hl\n");
-  //fprintf(out, "  ld a, l\n");
-  //fprintf(out, "  and a, 0x80\n");
   fprintf(out, "  bit 7, l\n");
   fprintf(out, "  jr z, label_%d\n", label_count);
   fprintf(out, "  ld h, 0xff\n");
@@ -818,7 +820,7 @@ int Z80::array_read_byte()
   fprintf(out, "  jr z, label_%d\n", label_count);
   fprintf(out, "  ld b, 0xff\n");
   fprintf(out, "label_%d:\n", label_count);
-  fprintf(out, "  push hl\n");
+  fprintf(out, "  push bc\n");
   label_count++;
   return 0;
 }
@@ -856,7 +858,7 @@ int Z80::array_read_byte(const char *name, int field_id)
   fprintf(out, "  jr z, label_%d\n", label_count);
   fprintf(out, "  ld b, 0xff\n");
   fprintf(out, "label_%d:\n", label_count);
-  fprintf(out, "  push hl\n");
+  fprintf(out, "  push bc\n");
   label_count++;
   return 0;
 }
