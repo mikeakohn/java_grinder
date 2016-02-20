@@ -232,7 +232,7 @@ void W65C265SXB::insert_put_int()
 // 0xdf22 - port 6 data
 
 // GPIO
-int W65C265SXB::ioport_setPinsAsInput(int port)
+int W65C265SXB::ioport_setPinsAsInput_I(int port)
 {
   if(port < 4 || port > 6)
     return -1;
@@ -249,7 +249,7 @@ int W65C265SXB::ioport_setPinsAsInput(int port)
   return 0;
 }
 
-int W65C265SXB::ioport_setPinsAsInput(int port, int const_val)
+int W65C265SXB::ioport_setPinsAsInput_I(int port, int const_val)
 {
   if(port < 4 || port > 6)
     return -1;
@@ -265,7 +265,7 @@ int W65C265SXB::ioport_setPinsAsInput(int port, int const_val)
   return 0;
 }
 
-int W65C265SXB::ioport_setPinsAsOutput(int port)
+int W65C265SXB::ioport_setPinsAsOutput_I(int port)
 {
   if(port < 4 || port > 6)
     return -1;
@@ -281,7 +281,7 @@ int W65C265SXB::ioport_setPinsAsOutput(int port)
   return 0;
 }
 
-int W65C265SXB::ioport_setPinsAsOutput(int port, int const_val)
+int W65C265SXB::ioport_setPinsAsOutput_I(int port, int const_val)
 {
   if(port < 4 || port > 6)
     return -1;
@@ -296,7 +296,7 @@ int W65C265SXB::ioport_setPinsAsOutput(int port, int const_val)
   return 0;
 }
 
-int W65C265SXB::ioport_setPinsValue(int port)
+int W65C265SXB::ioport_setPinsValue_I(int port)
 {
   if(port < 4 || port > 6)
     return -1;
@@ -311,7 +311,7 @@ int W65C265SXB::ioport_setPinsValue(int port)
   return 0;
 }
 
-int W65C265SXB::ioport_setPinsValue(int port, int const_val)
+int W65C265SXB::ioport_setPinsValue_I(int port, int const_val)
 {
   if(port < 4 || port > 6)
     return -1;
@@ -325,7 +325,7 @@ int W65C265SXB::ioport_setPinsValue(int port, int const_val)
   return 0;
 }
 
-int W65C265SXB::ioport_setPinsHigh(int port)
+int W65C265SXB::ioport_setPinsHigh_I(int port)
 {
   if(port < 4 || port > 6)
     return -1;
@@ -341,7 +341,7 @@ int W65C265SXB::ioport_setPinsHigh(int port)
   return 0;
 }
 
-int W65C265SXB::ioport_setPinsLow(int port)
+int W65C265SXB::ioport_setPinsLow_I(int port)
 {
   if(port < 4 || port > 6)
     return -1;
@@ -359,22 +359,22 @@ int W65C265SXB::ioport_setPinsLow(int port)
   return 0;
 }
 
-int W65C265SXB::ioport_setPinAsOutput(int port)
+int W65C265SXB::ioport_setPinAsOutput_I(int port)
 {
   return -1;
 }
 
-int W65C265SXB::ioport_setPinAsInput(int port)
+int W65C265SXB::ioport_setPinAsInput_I(int port)
 {
   return -1;
 }
 
-int W65C265SXB::ioport_setPinHigh(int port)
+int W65C265SXB::ioport_setPinHigh_I(int port)
 {
   return -1;
 }
 
-int W65C265SXB::ioport_setPinHigh(int port, int const_val)
+int W65C265SXB::ioport_setPinHigh_I(int port, int const_val)
 {
   if(port < 4 || port > 6)
     return -1;
@@ -391,12 +391,12 @@ int W65C265SXB::ioport_setPinHigh(int port, int const_val)
   return 0;
 }
 
-int W65C265SXB::ioport_setPinLow(int port)
+int W65C265SXB::ioport_setPinLow_I(int port)
 {
   return -1;
 }
 
-int W65C265SXB::ioport_setPinLow(int port, int const_val)
+int W65C265SXB::ioport_setPinLow_I(int port, int const_val)
 {
   if(port < 4 || port > 6)
     return -1;
@@ -414,7 +414,7 @@ int W65C265SXB::ioport_setPinLow(int port, int const_val)
   return 0;
 }
 
-int W65C265SXB::ioport_isPinInputHigh(int port)
+int W65C265SXB::ioport_isPinInputHigh_I(int port)
 {
   return -1;
 }
