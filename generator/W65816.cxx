@@ -170,42 +170,6 @@ int W65816::init_heap(int field_count)
   return 0;
 }
 
-#if 0
-int W65816::field_init_boolean(char *name, int index, int value)
-{
-  value = (value == 0) ? 0 : 1;
-  fprintf(out, "; field_init_boolean\n");
-  fprintf(out, "  lda #%d\n", value);
-  fprintf(out, "  sta #%s\n", name);
-
-  return 0;
-}
-
-int W65816::field_init_byte(char *name, int index, int value)
-{
-  if (value < -128 || value > 255) { return -1; }
-  int16_t n = value;
-  uint16_t v = (n & 0xffff);
-
-  fprintf(out, "; field_init_byte\n");
-  fprintf(out, "  lda #%d\n", (uint8_t)v);
-  fprintf(out, "  sta %s\n", name);
-
-  return 0;
-}
-
-int W65816::field_init_short(char *name, int index, int value)
-{
-  if (value < -32768 || value > 65535) { return -1; }
-
-  fprintf(out, "; field_init_short\n");
-  fprintf(out, "  lda #%d\n", (uint16_t)value);
-  fprintf(out, "  sta %s\n", name);
-
-  return 0;
-}
-#endif
-
 int W65816::field_init_int(char *name, int index, int value)
 {
   if (value < -32768 || value > 65535) { return -1; }
@@ -320,33 +284,6 @@ int W65816::push_double(double f)
   printf("Double is not supported right now.\n");
   return -1;
 }
-
-#if 0
-int W65816::push_byte(int8_t b)
-{
-  int16_t n = b;
-  uint16_t value = (n & 0xffff);
-
-  fprintf(out, "; push_byte\n");
-  fprintf(out, "  lda #0x%04x\n", value);
-  PUSH();
-  stack++;
-
-  return 0;
-}
-
-int W65816::push_short(int16_t s)
-{
-  uint16_t value = (s & 0xffff);
-
-  fprintf(out, "; push_short\n");
-  fprintf(out, "  lda #0x%04x\n", value);
-  PUSH();
-  stack++;
-
-  return 0;
-}
-#endif
 
 int W65816::push_ref(char *name)
 {
@@ -967,8 +904,6 @@ int W65816::new_array(uint8_t type)
 
 int W65816::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 {
-//  fprintf(out, ".align 16\n");
-
   if (type == TYPE_BYTE)
   {
     return insert_db(name, data, len, TYPE_SHORT);

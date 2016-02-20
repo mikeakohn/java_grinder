@@ -36,9 +36,6 @@ public:
   virtual int start_init();
   virtual int insert_static_field_define(const char *name, const char *type, int index);
   virtual int init_heap(int field_count);
-  //virtual int field_init_boolean(char *name, int index, int value);
-  //virtual int field_init_byte(char *name, int index, int value);
-  //virtual int field_init_short(char *name, int index, int value);
   virtual int field_init_int(char *name, int index, int value);
   virtual int field_init_ref(char *name, int index);
   virtual void method_start(int local_count, int max_stack, int param_count, const char *name);
@@ -51,8 +48,6 @@ public:
   virtual int push_long(int64_t n);
   virtual int push_float(float f);
   virtual int push_double(double f);
-  //virtual int push_byte(int8_t b);
-  //virtual int push_short(int16_t s);
   virtual int push_ref(char *name);
   virtual int pop_local_var_int(int index);
   virtual int pop_local_var_ref(int index);

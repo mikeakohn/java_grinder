@@ -300,50 +300,6 @@ int AVR8::init_heap(int field_count)
   return 0;
 }
 
-#if 0
-int AVR8::insert_field_init_boolean(char *name, int index, int value)
-{
-  value = (value == 0) ? 0 : 1;
-
-  fprintf(out, "; insert_field_init_boolean\n");
-  fprintf(out, "  ldi temp, %d\n", value & 0xff);
-  fprintf(out, "  sts %s + 0, temp\n", name);
-  fprintf(out, "  ldi temp, %d\n", value >> 8);
-  fprintf(out, "  sts %s + 1, temp\n", name);
-
-  return 0;
-}
-
-int AVR8::insert_field_init_byte(char *name, int index, int value)
-{
-  if (value < -128 || value > 255) { return -1; }
-
-  int16_t n = value;
-  uint16_t v = (n & 0xffff);
-
-  fprintf(out, "; insert_field_init_byte\n");
-  fprintf(out, "  ldi temp, %d\n", (uint8_t)v & 0xff);
-  fprintf(out, "  sts %s + 0, temp\n", name);
-  fprintf(out, "  ldi temp, %d\n", (uint8_t)v >> 8);
-  fprintf(out, "  sts %s + 1, temp\n", name);
-
-  return 0;
-}
-
-int AVR8::insert_field_init_short(char *name, int index, int value)
-{
-  if (value < -32768 || value > 65535) { return -1; }
-
-  fprintf(out, "; insert_field_init_short\n");
-  fprintf(out, "  ldi temp, %d\n", value & 0xff);
-  fprintf(out, "  sts %s + 0, temp\n", name);
-  fprintf(out, "  ldi temp, %d\n", value >> 8);
-  fprintf(out, "  sts %s + 1, temp\n", name);
-
-  return 0;
-}
-#endif
-
 int AVR8::field_init_int(char *name, int index, int value)
 {
   if (value < -32768 || value > 65535) { return -1; }
@@ -458,37 +414,6 @@ int AVR8::push_double(double f)
 
   return -1;
 }
-
-#if 0
-int AVR8::push_byte(int8_t b)
-{
-  int16_t n = b;
-  uint16_t value = (n & 0xffff);
-
-  fprintf(out, "; push_byte\n");
-  fprintf(out, "  ldi temp, 0x%02x\n", value & 0xff);
-  PUSH_LO("temp");
-  fprintf(out, "  ldi temp, 0x%02x\n", value >> 8);
-  PUSH_HI("temp");
-  stack++;
-
-  return 0;
-}
-
-int AVR8::push_short(int16_t s)
-{
-  uint16_t value = (s & 0xffff);
-
-  fprintf(out, "; push_short\n");
-  fprintf(out, "  ldi temp, 0x%02x\n", value & 0xff);
-  PUSH_LO("temp");
-  fprintf(out, "  ldi temp, 0x%02x\n", value >> 8);
-  PUSH_HI("temp");
-  stack++;
-
-  return 0;
-}
-#endif
 
 int AVR8::push_ref(char *name)
 {
@@ -2125,11 +2050,6 @@ int AVR8::ioport_setPinHigh_I(int port, int const_val)
   if(const_val < 0 || const_val > 7) { return -1; }
 
   fprintf(out, "; ioport_setPinHigh (optimized)\n");
-#if 0
-  fprintf(out, "  in temp, %s\n", port_string[port]);
-  fprintf(out, "  ori temp, 0x%02x\n", (1 << const_val));
-  fprintf(out, "  out %s, temp\n", port_string[port]);
-#endif
   fprintf(out, "  sbi %s, %d\n", port_string[port], const_val);
 
   return 0;
@@ -2148,13 +2068,6 @@ int AVR8::ioport_setPinLow_I(int port, int const_val)
   if(const_val < 0 || const_val > 7) { return -1; }
 
   fprintf(out, "; ioport_setPinLow (optimized)\n");
-#if 0
-  fprintf(out, "  in temp, %s\n", port_string[port]);
-  fprintf(out, "  ldi temp2, 0x%02x\n", (1 << const_val));
-  fprintf(out, "  eor temp2, ff\n");
-  fprintf(out, "  and temp, temp2\n");
-  fprintf(out, "  out %s, temp\n", port_string[port]);
-#endif
   fprintf(out, "  cbi %s, %d\n", port_string[port], const_val);
 
   return 0;
