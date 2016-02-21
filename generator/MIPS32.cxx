@@ -17,7 +17,7 @@
 #include "MIPS32.h"
 
 #define REG_STACK(a) (a)
-#define LOCALS(i) (i * 4)
+#define LOCALS(i) (-(i * 4))
 
 #define STACK_PUSH(t) \
   fprintf(out, "  addi $sp, $sp, -4\n"); \
@@ -38,7 +38,7 @@
 // r5  $a1 Function Argument 1
 // r6  $a2 Function Argument 2
 // r7  $a3 Function Argument 3
-// r8  $t0 Start of stack
+// r8  $t0 Start of register stack
 // r9  $t1
 // r10 $t2
 // r11 $t3
@@ -184,13 +184,20 @@ int MIPS32::field_init_ref(char *name, int index)
 
 void MIPS32::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
+  is_main = (strcmp(name, "main") == 0) ? 1 : 0;
+
   fprintf(out, "  ; %s(local_count=%d, max_stack=%d, param_count=%d)\n", name, local_count, max_stack, param_count);
+  fprintf(out, "  addi $fp, $sp, -4\n");
   fprintf(out, "  addi $sp, $sp, -%d\n", local_count * 4);
-  fprintf(out, "  move $fp, $sp\n");
 }
 
 void MIPS32::method_end(int local_count)
 {
+  if (!is_main)
+  {
+    // If this isn't main() restore stack pointer.
+    fprintf(out, "  addi $sp, $sp, %d\n", local_count * 4);
+  }
 }
 
 int MIPS32::push_local_var_int(int index)
@@ -764,17 +771,40 @@ int MIPS32::jump_cond_integer(const char *label, int cond, int distance)
 
 int MIPS32::return_local(int index, int local_count)
 {
-  return -1;
+  if (reg != 0)
+  {
+    printf("Internal Error: Reg stack not empty %s:%d\n", __FILE__, __LINE__);
+  }
+
+  fprintf(out, "  lw $v0, %d($fp) ; local_%d\n", LOCALS(index), index);
+  fprintf(out, "  addi $sp, $sp, %d\n", local_count * 4);
+
+  return 0;
 }
 
 int MIPS32::return_integer(int local_count)
 {
-  return -1;
+  if (reg != 1)
+  {
+    printf("Internal Error: Reg stack not empty %s:%d\n", __FILE__, __LINE__);
+  }
+
+  fprintf(out, "  move $v0, $t0\n");
+  fprintf(out, "  addi $sp, $sp, %d\n", local_count * 4);
+  reg--;
+
+  return 0;
 }
 
 int MIPS32::return_void(int local_count)
 {
-  return -1;
+  if (reg != 0)
+  {
+    printf("Internal Error: Reg stack not empty %s:%d\n", __FILE__, __LINE__);
+  }
+
+  fprintf(out, "  addi $sp, $sp, %d\n", local_count * 4);
+  return 0;
 }
 
 int MIPS32::jump(const char *name, int distance)
@@ -792,7 +822,88 @@ int MIPS32::call(const char *name)
 
 int MIPS32::invoke_static_method(const char *name, int params, int is_void)
 {
-  return -1;
+  int save_space;
+  int save_regs;
+  //int local_index = 0;
+  int n;
+  int param_sp = 0;
+
+  printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
+
+  save_regs = reg - params;
+  save_space = ((save_regs) * 4) + 8;
+
+  // Save ra and fp
+  fprintf(out, "  addi $sp, $sp, -%d\n", save_space);
+  fprintf(out, "  sw $ra, %d($sp)\n", save_space - 4);
+  fprintf(out, "  sw $fp, %d($sp)\n", save_space - 0);
+
+  // Save temp registers and parameter registers.
+  for (n = 0; n < save_regs; n++)
+  {
+    fprintf(out, "  sw $t%d, %d($sp)\n", n, save_space - (n * 4) + 8);
+  }
+
+  param_sp = 0;
+
+  // Push registers that are parameters.
+  // Parameters are pushed left to right.
+  for (n = save_regs; n < reg; n++)
+  {
+    fprintf(out, "  sw $t%d, %d($sp)\n", n, param_sp);
+    param_sp -= 4;
+  }
+
+  // Setup parameters that are on the stack.
+  for (n = 0; n < stack; n++)
+  {
+    fprintf(out, "  lw $at, %d($sp)\n", save_space + (n * 4) + 4);
+    fprintf(out, "  sw $at, %d($sp)\n", param_sp);
+    param_sp -= 4;
+  }
+
+  fprintf(out, "  jal %s\n", name);
+  fprintf(out, "  nop ; Delay slot :(\n");
+
+  // Restore temp registers
+  for (n = 0; n < save_regs; n++)
+  {
+    fprintf(out, "  lw $t%d, %d($sp)\n", n, save_space - (n * 4) + 8);
+  }
+
+  // Restore ra and fp
+  fprintf(out, "  lw $ra, %d($sp)\n", save_space - 4);
+  fprintf(out, "  lw $fp, %d($sp)\n", save_space - 0);
+  fprintf(out, "  addi $sp, $sp, %d\n", save_space);
+
+  // Decrease count on reg stack.
+  if (stack > 0)
+  {
+    // Pick the min between stack and params.
+    n = (stack > params) ? params : stack;
+    fprintf(out, "  addi $sp, $sp, %d\n", n * 4);
+    params -= n;
+  }
+
+  reg -= params;
+
+  // If this isn't a void, push return value onto register stack.
+  if (!is_void)
+  {
+    if (reg < reg_max)
+    {
+      fprintf(out, "  move $t%d, $v0\n", REG_STACK(reg));
+      reg++;
+    }
+      else
+    {
+      fprintf(out, "  addi $sp, $sp, -%d\n", 4);
+      fprintf(out, "  sw $v0, 0($sp)\n");
+      stack++;
+    }
+  }
+
+  return 0;
 }
 
 int MIPS32::put_static(const char *name, int index)
