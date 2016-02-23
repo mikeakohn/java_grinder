@@ -701,7 +701,7 @@ int n;
     fprintf(out, "  ld (ix+%d), e", (n * 2));
   }
 
-  // Params are removed from the stack 
+  // Params are removed from the stack
   stack -= params;
 
   // Make the call
@@ -739,7 +739,9 @@ int Z80::new_array(uint8_t type)
   fprintf(out, "  ;; new_array() size=bc\n");
   fprintf(out, "  pop bc\n");
   fprintf(out, "  ld hl, (heap_ptr)\n");
-  fprintf(out, "  ld (hl), bc\n");
+  fprintf(out, "  ld (hl), c\n");
+  fprintf(out, "  inc hl\n");
+  fprintf(out, "  ld (hl), b\n");
 
   if (type == TYPE_SHORT || type == TYPE_CHAR || type == TYPE_INT)
   {
@@ -751,9 +753,9 @@ int Z80::new_array(uint8_t type)
   {
     // Align heap by 2 bytes
     fprintf(out, "  bit 0, c\n");
-    fprintf(out, "  jr z label_%d\n", label_count);
+    fprintf(out, "  jr z, label_%d\n", label_count);
     fprintf(out, "  inc bc\n");
-    fprintf(out, "label_%d\n", label_count);
+    fprintf(out, "label_%d:\n", label_count);
     label_count++;
   }
 
@@ -772,10 +774,10 @@ int Z80::insert_array(const char *name, int32_t *data, int len, uint8_t type)
   { return insert_db(name, data, len, TYPE_INT); }
     else
   if (type == TYPE_SHORT)
-  { return insert_dw(name, data, len, TYPE_INT); } 
+  { return insert_dw(name, data, len, TYPE_INT); }
     else
   if (type == TYPE_INT)
-  { return insert_dc32(name, data, len, TYPE_INT); } 
+  { return insert_dc32(name, data, len, TYPE_INT); }
 
   return -1;
 }
@@ -835,7 +837,8 @@ int Z80::array_read_short()
   fprintf(out, "  and a\n");
   fprintf(out, "  adc hl, bc\n");
   fprintf(out, "  ld c, (hl)\n");
-  fprintf(out, "  ld b, (hl+1)\n");
+  fprintf(out, "  inc hl\n");
+  fprintf(out, "  ld b, (hl)\n");
   fprintf(out, "  push bc\n");
   return 0;
 }
@@ -873,7 +876,8 @@ int Z80::array_read_short(const char *name, int field_id)
   fprintf(out, "  and a\n");
   fprintf(out, "  adc hl, bc\n");
   fprintf(out, "  ld c, (hl)\n");
-  fprintf(out, "  ld b, (hl+1)\n");
+  fprintf(out, "  inc hl\n");
+  fprintf(out, "  ld b, (hl)\n");
   fprintf(out, "  push bc\n");
   return 0;
 }
@@ -906,7 +910,8 @@ int Z80::array_write_short()
   fprintf(out, "  and a\n");
   fprintf(out, "  adc hl, bc\n");
   fprintf(out, "  ld (hl), e\n");
-  fprintf(out, "  ld (hl+1), d\n");
+  fprintf(out, "  inc hl\n");
+  fprintf(out, "  ld (hl), d\n");
   return 0;
 }
 
@@ -936,7 +941,8 @@ int Z80::array_write_short(const char *name, int field_id)
   fprintf(out, "  and a\n");
   fprintf(out, "  adc hl, bc\n");
   fprintf(out, "  ld (hl), e\n");
-  fprintf(out, "  ld (hl+1), d\n");
+  fprintf(out, "  inc hl\n");
+  fprintf(out, "  ld (hl), d\n");
   return 0;
 }
 
@@ -955,7 +961,7 @@ int Z80::stack_alu(int alu_op)
     fprintf(out, "  pop hl\n");
     //fprintf(out, "  scf\n");   // set carry
     //fprintf(out, "  ccf\n");   // carry = not carry
-    fprintf(out, "  and a   ; clear carry\n");   
+    fprintf(out, "  and a   ; clear carry\n");
     fprintf(out, "  %s hl, bc\n", alu_str[alu_op]);
     fprintf(out, "  push hl\n");
 #endif
@@ -964,7 +970,7 @@ int Z80::stack_alu(int alu_op)
     fprintf(out, "  pop bc\n");
     if (alu_op == ALU_SUB)
     {
-      fprintf(out, "  and a   ; clear carry\n");   
+      fprintf(out, "  and a   ; clear carry\n");
     }
     fprintf(out, "  %s hl, bc\n", alu_str[alu_op]);
     fprintf(out, "  push hl\n");
@@ -1022,7 +1028,7 @@ int Z80::stack_alu_const(int alu_op, int num)
     fprintf(out, "  ld bc, %04x\n", value);
     //fprintf(out, "  scf\n");   // set carry
     //fprintf(out, "  ccf\n");   // carry = not carry
-    fprintf(out, "  and a   ; clear carry\n");   
+    fprintf(out, "  and a   ; clear carry\n");
     fprintf(out, "  %s hl, bc\n", alu_str[alu_op]);
     fprintf(out, "  push hl\n");
 #endif
@@ -1031,7 +1037,7 @@ int Z80::stack_alu_const(int alu_op, int num)
     fprintf(out, "  ld c, %04x\n", value & 0xff);
     if (alu_op == ALU_SUB)
     {
-      fprintf(out, "  and a   ; clear carry\n");   
+      fprintf(out, "  and a   ; clear carry\n");
     }
     //fprintf(out, "  %s ix, bc\n", alu_str[alu_op]);
     fprintf(out, "  %s hl, bc\n", alu_str[alu_op]);
