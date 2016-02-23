@@ -25,6 +25,7 @@ public:
   virtual int msx_beep() { return -1; }
   virtual int msx_color_BBB() { return -1; }
   virtual int msx_screen_B( ) { return -1; }
+  virtual int msx_width_B( ) { return -1; }
   virtual int msx_keyOn() { return -1; }
   virtual int msx_keyOff() { return -1; }
   virtual int msx_fillVRAM_III() { return -1; }

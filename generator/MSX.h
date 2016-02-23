@@ -33,6 +33,7 @@ public:
   virtual int msx_color_BBB();
   //virtual int msx_screen_B(uint8_t mode);
   virtual int msx_screen_B();
+  virtual int msx_width_B();
   virtual int msx_keyOn();
   virtual int msx_keyOff();
   //virtual int msx_fillVRAM_III(int c, int len, int addr);
