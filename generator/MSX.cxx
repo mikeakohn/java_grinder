@@ -188,7 +188,6 @@ int MSX::msx_copyVRAM_III()
   fprintf(out,"  ld de,0x%02x\n",dest);
   fprintf(out,"  ld hl,0x%02x\n",source);
 #endif
-  fprintf(out,"  call FILVRM\n");
   fprintf(out,"  call LDIRVV");
   return 0;
 }
