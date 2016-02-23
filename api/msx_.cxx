@@ -51,6 +51,7 @@ int msx(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(beep,)
   CHECK_FUNC(color,_BBB)
   CHECK_FUNC(screen,_B)
+  CHECK_FUNC(width,_B)
   CHECK_FUNC(keyOn,)
   CHECK_FUNC(keyOff,)
   CHECK_FUNC(fillVRAM,_III)
@@ -74,7 +75,7 @@ int msx(JavaClass *java_class, Generator *generator, char *method_name, char con
 int msx(JavaClass *java_class, Generator *generator, char *method_name, int const_val)
 {
   //CHECK_FUNC_CONST(someFunction,_I)
-  
+
   return -1;
 }
 

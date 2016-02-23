@@ -221,7 +221,7 @@ USRTAB6        equ 0xF3A6
 USRTAB7        equ 0xF3A8
 USRTAB8        equ 0xF3AA
 USRTAB9        equ 0xF3AC
-LINL40         equ 0xF3AD
+LINL40         equ 0xF3AE
 LINL32         equ 0xF3AF
 LINLEN         equ 0xF3B0
 CRTCNT         equ 0xF3B1
