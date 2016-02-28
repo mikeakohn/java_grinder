@@ -784,7 +784,7 @@ int MIPS32::return_local(int index, int local_count)
   }
 
   fprintf(out, "  lw $v0, %d($fp) ; local_%d\n", LOCALS(index), index);
-  fprintf(out, "  addi $sp, $sp, %d\n", local_count * 4);
+  fprintf(out, "  addi $sp, $sp, %d\n", (local_count * 4) + 4);
   fprintf(out, "  jr $ra\n");
   fprintf(out, "  nop\n");
 
@@ -799,7 +799,7 @@ int MIPS32::return_integer(int local_count)
   }
 
   fprintf(out, "  move $v0, $t0\n");
-  fprintf(out, "  addi $sp, $sp, %d\n", local_count * 4);
+  fprintf(out, "  addi $sp, $sp, %d\n", (local_count * 4) + 4);
   fprintf(out, "  jr $ra\n");
   fprintf(out, "  nop ; Delay slot :(\n");
   reg--;
@@ -814,7 +814,7 @@ int MIPS32::return_void(int local_count)
     printf("Internal Error: Reg stack not empty %s:%d\n", __FILE__, __LINE__);
   }
 
-  fprintf(out, "  addi $sp, $sp, %d\n", local_count * 4);
+  fprintf(out, "  addi $sp, $sp, %d\n", (local_count * 4) + 4);
   fprintf(out, "  jr $ra\n");
   fprintf(out, "  nop ; Delay slot :(\n");
   return 0;
