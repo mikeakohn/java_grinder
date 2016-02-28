@@ -103,6 +103,8 @@ protected:
   uint32_t org;       // .org to use for this chip
   uint32_t ram_start; // start of ram
   uint32_t ram_end;   // end of ram
+  uint32_t virtual_address;  // start of code space virtual address
+  uint32_t physical_address; // start of code space physical address
 
 private:
   int stack_alu(const char *instr);

@@ -8,6 +8,9 @@ grind: LedBlink.class
 %.class: %.java
 	javac -classpath ../../build/JavaGrinder.jar:. $*.java
 
+prog:
+	pic32prog -d /dev/ttyUSB0 led_blink.hex
+
 clean:
 	@rm -f *.class *.hex *.asm *.lst
 

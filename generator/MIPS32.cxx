@@ -17,7 +17,7 @@
 #include "MIPS32.h"
 
 #define REG_STACK(a) (a)
-#define LOCALS(i) (-(i * 4))
+#define LOCALS(i) ((i * 4))
 
 #define STACK_PUSH(t) \
   fprintf(out, "  addi $sp, $sp, -4\n"); \
@@ -80,6 +80,8 @@ MIPS32::MIPS32() :
   org(0),
   ram_start(0),
   ram_end(0),
+  virtual_address(0),
+  physical_address(0),
   is_main(0)
 {
 
@@ -99,6 +101,8 @@ int MIPS32::open(const char *filename)
   // Set where RAM starts / ends
   fprintf(out, "ram_start equ 0x%x\n", ram_start);
   fprintf(out, "ram_end equ 0x%x\n", ram_end);
+  fprintf(out, "virtual_address equ 0x%x\n", virtual_address);
+  fprintf(out, "physical_address equ 0x%x\n", physical_address);
 
   return 0;
 }
@@ -109,7 +113,7 @@ int MIPS32::start_init()
   fprintf(out, ".org 0x%x\n", org);
   fprintf(out, "start:\n");
 
-  fprintf(out, "  li $s0, _constant_pool  ; $s0 points to constant numbers\n");
+  fprintf(out, "  li $s0, _constant_pool - physical_address + virtual_address  ; $s0 points to constant numbers\n");
   fprintf(out, "  li $s1, ram_start       ; $s1 points to statics\n");
   fprintf(out, "  li $sp, ram_end+1\n");
 
@@ -186,9 +190,10 @@ void MIPS32::method_start(int local_count, int max_stack, int param_count, const
 {
   is_main = (strcmp(name, "main") == 0) ? 1 : 0;
 
+  fprintf(out, "%s:\n", name);
   fprintf(out, "  ; %s(local_count=%d, max_stack=%d, param_count=%d)\n", name, local_count, max_stack, param_count);
-  fprintf(out, "  addi $fp, $sp, -4\n");
-  fprintf(out, "  addi $sp, $sp, -%d\n", local_count * 4);
+  fprintf(out, "  addi $fp, $sp, -%d\n", local_count * 4);
+  fprintf(out, "  addi $sp, $sp, -%d\n", (local_count * 4) + 4);
 }
 
 void MIPS32::method_end(int local_count)
@@ -196,8 +201,10 @@ void MIPS32::method_end(int local_count)
   if (!is_main)
   {
     // If this isn't main() restore stack pointer.
-    fprintf(out, "  addi $sp, $sp, %d\n", local_count * 4);
+    //fprintf(out, "  addi $sp, $sp, %d\n", local_count * 4);
   }
+
+  fprintf(out, "\n");
 }
 
 int MIPS32::push_local_var_int(int index)
@@ -254,7 +261,7 @@ int MIPS32::push_int(int32_t n)
   {
     if (reg < reg_max)
     {
-      fprintf(out, "  move $t%d, $t0\n", reg);
+      fprintf(out, "  move $t%d, $0\n", reg);
       reg++;
     }
       else
@@ -398,7 +405,7 @@ int MIPS32::dup()
   {
     if (reg < 8)
     {
-      fprintf(out, "  move $%d, $%d\n", reg, reg - 1);
+      fprintf(out, "  move $t%d, $t%d\n", reg, reg - 1);
       reg++;
     }
       else
@@ -778,6 +785,8 @@ int MIPS32::return_local(int index, int local_count)
 
   fprintf(out, "  lw $v0, %d($fp) ; local_%d\n", LOCALS(index), index);
   fprintf(out, "  addi $sp, $sp, %d\n", local_count * 4);
+  fprintf(out, "  jr $ra\n");
+  fprintf(out, "  nop\n");
 
   return 0;
 }
@@ -791,6 +800,8 @@ int MIPS32::return_integer(int local_count)
 
   fprintf(out, "  move $v0, $t0\n");
   fprintf(out, "  addi $sp, $sp, %d\n", local_count * 4);
+  fprintf(out, "  jr $ra\n");
+  fprintf(out, "  nop ; Delay slot :(\n");
   reg--;
 
   return 0;
@@ -804,13 +815,15 @@ int MIPS32::return_void(int local_count)
   }
 
   fprintf(out, "  addi $sp, $sp, %d\n", local_count * 4);
+  fprintf(out, "  jr $ra\n");
+  fprintf(out, "  nop ; Delay slot :(\n");
   return 0;
 }
 
 int MIPS32::jump(const char *name, int distance)
 {
   fprintf(out, "  b %s\n", name);
-  fprintf(out, "  nop\n");
+  fprintf(out, "  nop ; Delay slot :(\n");
 
   return 0;
 }

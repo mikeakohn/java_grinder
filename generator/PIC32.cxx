@@ -23,6 +23,8 @@ PIC32::PIC32()
   org = 0x1d001000;
   ram_start = 0x80000000;
   ram_end = 0x80003fff;
+  virtual_address = 0x9d000000;
+  physical_address = 0x1d000000;
 }
 
 PIC32::~PIC32()
