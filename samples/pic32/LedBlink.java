@@ -8,7 +8,8 @@ public class LedBlink
   {
     int n;
 
-    for (n = 1000000; n > 0; n--);
+    //for (n = 1000000; n > 0; n--);
+    for (n = 0; n < 1000000; n++);
   }
 
   public static int sub(int a, int b)

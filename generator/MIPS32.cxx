@@ -761,14 +761,49 @@ int MIPS32::jump_cond_integer(const char *label, int cond, int distance)
 {
   fprintf(out, "  ; jump_cond_integer(%s, %d, %d)\n", label, cond, distance);
 
+  // I think this should never happen
+  if (stack != 0)
+  {
+    printf("Internal Error: Stack not empty\n");
+    return -1;
+  }
+
   switch(cond)
   {
     case COND_EQUAL:
+      fprintf(out, "  beq $t%d, $t%d, %s\n", reg - 2, reg - 1, label);
+      fprintf(out, "  nop\n");
+      reg -= 2;
+      return 0;
     case COND_NOT_EQUAL:
+      fprintf(out, "  bne $t%d, $t%d, %s\n", reg - 2, reg - 1, label);
+      fprintf(out, "  nop\n");
+      reg -= 2;
+      return 0;
     case COND_LESS:
+      fprintf(out, "  sub $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
+      fprintf(out, "  bltz $t%d, %s\n", reg - 2, label);
+      fprintf(out, "  nop\n");
+      reg -= 2;
+      return 0;
     case COND_LESS_EQUAL:
+      fprintf(out, "  sub $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
+      fprintf(out, "  blez $t%d, %s\n", reg - 2, label);
+      fprintf(out, "  nop\n");
+      reg -= 2;
+      return 0;
     case COND_GREATER:
+      fprintf(out, "  sub $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
+      fprintf(out, "  bgtz $t%d, %s\n", reg - 2, label);
+      fprintf(out, "  nop\n");
+      reg -= 2;
+      return 0;
     case COND_GREATER_EQUAL:
+      fprintf(out, "  sub $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
+      fprintf(out, "  bgez $t%d, %s\n", reg - 2, label);
+      fprintf(out, "  nop\n");
+      reg -= 2;
+      return 0;
     default:
       break;
   }
