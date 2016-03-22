@@ -24,7 +24,7 @@ abstract public class W65C265SXB
   public static void putInt(int n) { }
   public static void getString() { }
   public static void putString(String text) { }
-  public static void setToneEnable(boolean channel1, boolean channel2) { }
-  public static void setToneFreq(int freq1, int freq2) { }
+  public static void controlTones(int freq1, int freq2,
+                                  boolean enable1, boolean enable2) { }
 }
 

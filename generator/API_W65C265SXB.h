@@ -24,8 +24,7 @@ public:
   virtual int w65c265sxb_putInt_I() { return -1; }
   virtual int w65c265sxb_getString() { return -1; }
   virtual int w65c265sxb_putString_X() { return -1; }
-  virtual int w65c265sxb_setToneEnable_ZZ() { return -1; }
-  virtual int w65c265sxb_setToneFreq_II() { return -1; }
+  virtual int w65c265sxb_controlTones_IIZZ() { return -1; }
 };
 
 #endif

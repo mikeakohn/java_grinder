@@ -52,8 +52,7 @@ public:
   //virtual int ioport_setPortOutputValue_I(int port);
 
   // tone generator API
-  virtual int w65c265sxb_setToneEnable_ZZ();
-  virtual int w65c265sxb_setToneFreq_II();
+  virtual int w65c265sxb_controlTones_IIZZ();
 
 private:
   bool need_put_string:1;

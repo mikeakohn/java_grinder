@@ -37,8 +37,7 @@ int w65c265sxb(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(putInt,_I)
   CHECK_FUNC(getString,)
   CHECK_FUNC(putString,_X)
-  CHECK_FUNC(setToneEnable,_ZZ)
-  CHECK_FUNC(setToneFreq,_II)
+  CHECK_FUNC(controlTones,_IIZZ)
 
   return -1;
 }
