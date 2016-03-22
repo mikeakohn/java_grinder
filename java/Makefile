@@ -7,6 +7,7 @@ JAVA_SRC=\
   $(SRC_DIR)/ADC.java \
   $(SRC_DIR)/C64/SID.java \
   $(SRC_DIR)/C64/VIC.java \
+  $(SRC_DIR)/CPC.java \
   $(SRC_DIR)/CPU.java \
   $(SRC_DIR)/DSP.java \
   $(SRC_DIR)/IOPort.java \

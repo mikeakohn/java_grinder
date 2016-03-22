@@ -22,6 +22,7 @@
 #include "Atari2600.h"
 #include "AVR8.h"
 #include "C64.h"
+#include "CPC.h"
 #include "DSPIC.h"
 #include "Epiphany.h"
 #include "M6502.h"
@@ -101,6 +102,11 @@ static Generator *new_generator(const char *chip_type)
   if (strcasecmp("c64", chip_type) == 0)
   {
     generator = new C64();
+  }
+    else
+  if (strcasecmp("cpc", chip_type) == 0)
+  {
+    generator = new CPC();
   }
     else
   if (strcasecmp("dspic30f3012", chip_type) == 0)
@@ -273,7 +279,7 @@ int main(int argc, char *argv[])
            "     ti99\n"
            "     w65c265sxb\n"
            "     x86\n"
-           "     z80, msx, ti84plus\n", argv[0]);
+           "     z80, cpc, msx, ti84plus\n", argv[0]);
     exit(0);
   }
 

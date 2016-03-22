@@ -13,6 +13,7 @@ API= \
   atari_2600.o \
   c64_sid.o \
   c64_vic.o \
+  cpc_.o \
   cpu.o \
   dsp.o \
   invoke.o \
@@ -58,6 +59,7 @@ SYSTEMS= \
   AppleIIgs.o \
   Atari2600.o \
   C64.o \
+  CPC.o \
   MSX.o \
   PIC32.o \
   SegaGenesis.o \
