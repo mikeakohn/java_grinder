@@ -23,6 +23,7 @@
 #include "atari_2600.h"
 #include "c64_sid.h"
 #include "c64_vic.h"
+#include "cpc_.h"
 #include "cpu.h"
 #include "dsp.h"
 #include "ioport.h"
@@ -136,6 +137,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     CHECK(AppleIIgs, appleiigs)
     CHECK(Atari2600, atari_2600)
     CHECK(ADC, adc)
+    CHECK(CPC, cpc)
     CHECK(Timer, timer)
     CHECK_WITH_PORT(SPI, spi, 0)
     CHECK_WITH_PORT(SPI, spi, 1)
@@ -219,6 +221,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, in
     CHECK_CONST(Atari2600, atari_2600)
     CHECK_CONST(Timer, timer)
     CHECK_CONST(CPU, cpu)
+    CHECK_CONST(CPC, cpc)
     CHECK_CONST(MSX, msx)
     CHECK_CONST(Propeller, propeller)
     CHECK_CONST(SegaGenesis, sega_genesis)
@@ -240,6 +243,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, in
     CHECK_WITH_PORT_CONST_2(SPI, spi, 1)
     CHECK_CONST_2(Timer, timer)
     CHECK_CONST_2(Atari2600, atari_2600)
+    CHECK_CONST_2(CPC, cpc)
     CHECK_CONST_2(MSX, msx)
     CHECK_CONST_2(TI99, ti99)
     CHECK_CONST_2(SegaGenesis, sega_genesis)
