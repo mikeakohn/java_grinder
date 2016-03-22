@@ -436,9 +436,21 @@ int W65C265SXB::ioport_getPortInputValue(int port)
 }
 
 // tone generator API
-int W65C265SXB::w65c265sxb_controlTones_IIZZ()
+int W65C265SXB::w65c265sxb_controlTones_IIZZ(int freq1, int freq2,
+                                       int enable1, int enable2)
 {
+  int control = (enable2 & 1) | ((enable2 & 1) << 1);
+
   fprintf(out, "; controlTones\n");
-  return -1;
+  fprintf(out, "  phx\n");
+  fprintf(out, "  sep #0x20\n");
+  fprintf(out, "  lda #0x%04x\n", control);
+  fprintf(out, "  ldx #0x%04x\n", freq1 & 0xffff);
+  fprintf(out, "  ldy #0x%04x\n", freq2 & 0xffff);
+  fprintf(out, "  jsr.l 0xe009\n");
+  fprintf(out, "  rep #0x30\n");
+  fprintf(out, "  plx\n");
+
+  return 0;
 }
 

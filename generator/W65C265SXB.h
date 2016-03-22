@@ -52,7 +52,7 @@ public:
   //virtual int ioport_setPortOutputValue_I(int port);
 
   // tone generator API
-  virtual int w65c265sxb_controlTones_IIZZ();
+  virtual int w65c265sxb_controlTones_IIZZ(int, int, int, int);
 
 private:
   bool need_put_string:1;
