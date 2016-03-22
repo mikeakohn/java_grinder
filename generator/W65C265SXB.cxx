@@ -435,3 +435,14 @@ int W65C265SXB::ioport_getPortInputValue(int port)
   return 0;
 }
 
+// tone generator API
+int W65C265SXB::w65c265sxb_setToneEnable_ZZ()
+{
+  return -1;
+}
+
+int W65C265SXB::w65c265sxb_setToneFreq_II()
+{
+  return -1;
+}
+
