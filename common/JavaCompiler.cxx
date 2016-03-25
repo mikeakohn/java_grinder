@@ -2269,7 +2269,7 @@ int JavaCompiler::compile_methods(bool do_main)
 
   if (verbose)
   {
-    printf("external_classes.size()=%ld did_execute_statics=%d do_main=%d\n",
+    printf("external_classes.size()=%zu did_execute_statics=%d do_main=%d\n",
            external_classes.size(), did_execute_statics, do_main);
   }
 
