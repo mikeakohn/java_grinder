@@ -51,11 +51,16 @@ ti84: samples
 	naken_asm -l -I include -o ti84_demo.hex ti84_demo.asm
 	rabbitsign -p -g -k include/0104.key -t 8xk -f -vv ti84_demo.hex
 
+.PHONY: javadoc
+javadoc:
+	javadoc -d javadoc java/net/mikekohn/java_grinder/*.java java/net/mikekohn/java_grinder/C64/*
+
 clean:
 	@rm -f *.o java_grinder build/*.o *.asm *.lst *.hex *.prg
 	@rm -f java/*.class samples/*.class build/*.jar
 	@cd samples && make clean
 	@rm -rf build/net
+	@rm -rf javadoc
 	@echo "Clean!"
 
 distclean: clean
