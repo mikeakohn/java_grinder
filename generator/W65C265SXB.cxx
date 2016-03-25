@@ -73,9 +73,12 @@ int W65C265SXB::w65c265sxb_getChar()
   fprintf(out, "; getChar\n");
   fprintf(out, "  lda #0\n");
   fprintf(out, "  sep #0x20\n");
+  fprintf(out, "getChar_again_%d:\n", label_count);
   fprintf(out, "  jsr.l 0xe033\n");
+  fprintf(out, "  bcs getChar_again_%d\n", label_count);
   fprintf(out, "  rep #0x30\n");
   PUSH();
+  label_count++;
   stack++;
 
   return 0;
