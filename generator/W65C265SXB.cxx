@@ -72,11 +72,13 @@ int W65C265SXB::w65c265sxb_getChar()
 {
   fprintf(out, "; getChar\n");
   fprintf(out, "  lda #0\n");
+  fprintf(out, "  phx\n");
   fprintf(out, "  sep #0x20\n");
   fprintf(out, "getChar_again_%d:\n", label_count);
   fprintf(out, "  jsr.l 0xe033\n");
   fprintf(out, "  bcs getChar_again_%d\n", label_count);
   fprintf(out, "  rep #0x30\n");
+  fprintf(out, "  plx\n");
   PUSH();
   label_count++;
   stack++;
@@ -88,9 +90,11 @@ int W65C265SXB::w65c265sxb_putChar_C()
 {
   POP();
   fprintf(out, "; putChar\n");
+  fprintf(out, "  phx\n");
   fprintf(out, "  sep #0x20\n");
   fprintf(out, "  jsr.l 0xe04b\n");
   fprintf(out, "  rep #0x30\n");
+  fprintf(out, "  plx\n");
   stack--;
 
   return 0;
@@ -145,9 +149,11 @@ void W65C265SXB::insert_put_string()
   fprintf(out, "  bne put_string_skip\n");
   fprintf(out, "  lda #13\n");
   fprintf(out, "put_string_skip:\n");
+  fprintf(out, "  phx\n");
   fprintf(out, "  sep #0x20\n");
   fprintf(out, "  jsr.l 0xe04b\n");
   fprintf(out, "  rep #0x30\n");
+  fprintf(out, "  plx\n");
   fprintf(out, "  inc address\n");
   fprintf(out, "  dey\n");
   fprintf(out, "  bne put_string_loop\n");
@@ -444,7 +450,6 @@ int W65C265SXB::w65c265sxb_controlTones_IIZZ()
 //  int control = (enable2 & 1) | ((enable2 & 1) << 1);
 
   fprintf(out, "; controlTones\n");
-  fprintf(out, "  phx\n");
   POP();
   fprintf(out, "  asl\n");
   fprintf(out, "  sta value1\n");
@@ -454,6 +459,7 @@ int W65C265SXB::w65c265sxb_controlTones_IIZZ()
   POP();
   fprintf(out, "  tay\n");
   POP();
+  fprintf(out, "  phx\n");
   fprintf(out, "  tax\n");
   fprintf(out, "  sep #0x20\n");
   fprintf(out, "  lda value1\n");
