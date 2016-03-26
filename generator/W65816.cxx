@@ -245,6 +245,9 @@ int W65816::push_ref_static(const char *name, int index)
 
 int W65816::push_fake()
 {
+  fprintf(out, "; push_fake()\n");
+  fprintf(out, "  dex\n");
+  fprintf(out, "  dex\n");
   stack++;
   return 0;
 }
