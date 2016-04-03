@@ -39,7 +39,14 @@
 
 int cpc(JavaClass *java_class, Generator *generator, char *method_name)
 {
-  //CHECK_FUNC(someFunction,_I)
+  CHECK_FUNC(beep,)
+  CHECK_FUNC(color,_III)
+  CHECK_FUNC(cls,)
+  CHECK_FUNC(screen,_I)
+  CHECK_FUNC(putChar,_C)
+  CHECK_FUNC(setCursor,_II)
+  CHECK_FUNC(plot,_III)
+  CHECK_FUNC(draw,_III)
 
   return -1;
 }

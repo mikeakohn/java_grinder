@@ -22,7 +22,14 @@ public:
   CPC();
   virtual ~CPC();
   virtual int open(const char *filename);
-  virtual int cpc_getFunction_IC();
+  virtual int cpc_beep();
+  virtual int cpc_color_III();
+  virtual int cpc_cls();
+  virtual int cpc_screen_I();
+  virtual int cpc_putChar_C();
+  virtual int cpc_setCursor_II();
+  virtual int cpc_plot_III();
+  virtual int cpc_draw_III();
 
 private:
   //void insert_ldirvv(void);
