@@ -17,13 +17,16 @@
 #include "MIPS32.h"
 
 #define REG_STACK(a) (a)
-#define LOCALS(i) ((i * 4))
+#define LOCALS(i) (-(i * 4))
 
+// Stack points to the last used slot.
+// push = subtract 4, then place value
 #define STACK_PUSH(t) \
   fprintf(out, "  addi $sp, $sp, -4\n"); \
   fprintf(out, "  sw $t%d, 0($sp)\n", t); \
   stack++;
 
+// pop = read value, then subtract 4
 #define STACK_POP(t) \
   fprintf(out, "  lw $%d, 0($sp)\n", t); \
   fprintf(out, "  addi $sp, $sp, 4\n"); \
@@ -192,7 +195,8 @@ void MIPS32::method_start(int local_count, int max_stack, int param_count, const
 
   fprintf(out, "%s:\n", name);
   fprintf(out, "  ; %s(local_count=%d, max_stack=%d, param_count=%d)\n", name, local_count, max_stack, param_count);
-  fprintf(out, "  addi $fp, $sp, -%d\n", local_count * 4);
+  //fprintf(out, "  addi $fp, $sp, -%d\n", local_count * 4);
+  fprintf(out, "  addi $fp, $sp, -4\n");
   fprintf(out, "  addi $sp, $sp, -%d\n", (local_count * 4) + 4);
 }
 
@@ -876,7 +880,7 @@ int MIPS32::invoke_static_method(const char *name, int params, int is_void)
   int n;
   int param_sp = 0;
 
-  printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
+  fprintf(out, "  ; invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
 
   save_regs = reg - params;
   save_space = ((save_regs) * 4) + 8;
@@ -884,15 +888,15 @@ int MIPS32::invoke_static_method(const char *name, int params, int is_void)
   // Save ra and fp
   fprintf(out, "  addi $sp, $sp, -%d\n", save_space);
   fprintf(out, "  sw $ra, %d($sp)\n", save_space - 4);
-  fprintf(out, "  sw $fp, %d($sp)\n", save_space - 0);
+  fprintf(out, "  sw $fp, %d($sp)\n", save_space - 8);
 
   // Save temp registers and parameter registers.
   for (n = 0; n < save_regs; n++)
   {
-    fprintf(out, "  sw $t%d, %d($sp)\n", n, save_space - (n * 4) + 8);
+    fprintf(out, "  sw $t%d, %d($sp)\n", n, save_space - ((n + 3) * 4));
   }
 
-  param_sp = 0;
+  param_sp = -4;
 
   // Push registers that are parameters.
   // Parameters are pushed left to right.

@@ -29,6 +29,24 @@ public class LedBlink
     //IOPort5.setPinsValue(0x01);
     //IOPort6.setPinsValue(0x40);
 
+/*
+    if (sub(5, 3) == 2)
+    {
+      IOPort5.setPinsValue(0x01);
+      IOPort6.setPinsValue(0x00);
+    }
+      else
+    {
+      IOPort5.setPinsValue(0x00);
+      IOPort6.setPinsValue(0x00);
+    }
+*/
+
+    //IOPort5.setPinsValue(0x01);
+    //IOPort6.setPinsValue(0x00);
+
+    //while(true);
+
     while(true)
     {
       IOPort5.setPinsValue(0x01);
