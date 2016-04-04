@@ -54,7 +54,6 @@ int CPC::open(const char *filename)
     "SCR_SET_MODE equ 0xbc0e\n"
     "SCR_CLEAR    equ 0xbc14\n");
 
-
   fprintf(out, "\n");
   fprintf(out, ".org 0x0170\n");
 
@@ -69,37 +68,40 @@ int CPC::cpc_beep()
   return 0;
 }
 
-int CPC::cpc_color_III()
+int CPC::cpc_setPenColor_I()
 {
-#if 0
-  if ( foreground !=-1 )
-  {
-    foreground = foreground & 15;
-    fprintf(out, "ld a,0x%02x\n",foreground);
-    fprintf(out, "call TXT_SET_PEN\n");
-  }
+  fprintf(out, "  ; setPenColor()\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "  call TXT_SET_PEN\n");
 
-  if ( background !=-1 )
-  {
-    background = background & 15;
-    fprintf(out, "ld a,0x%02x\n",background);
-    fprintf(out, "call TXT_SET_PAPER\n");
-  }
+  return 0;
+}
 
-  if ( border != -1 )
-  {
-    border = border & 15;
-    fprintf(out, "ld b,0x%02x\n",border);
-    fprintf(out, "ld c,b\n");
-    fprintf(out, "call SCR_SET_BORDER\n");
-  }
-#endif
+int CPC::cpc_setPaperColor_I()
+{
+  fprintf(out, "  ; setPaperColor()\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "  call TXT_SET_PAPER\n");
+
+  return 0;
+}
+
+int CPC::cpc_setBorderColor_I()
+{
+  fprintf(out, "  ; setBorderColor()\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "  call SCR_SET_BORDER\n");
 
   return 0;
 }
 
 int CPC::cpc_screen_I()
 {
+  fprintf(out, "  ; screen()\n");
+
 #if 0
   mode = mode & 2;
   fprintf(out, "ld a, 0x%02x\n",mode);
@@ -119,6 +121,7 @@ int CPC::cpc_cls()
   //fprintf(out, "  ld (hl), a\n");
   //fprintf(out, "  call LDIR\n");
   fprintf(out, "  call SCR_CLEAR\n");
+
   return 0;
 }
 
@@ -148,11 +151,9 @@ int CPC::cpc_setCursor_II()
 int CPC::cpc_putChar_C()
 {
   fprintf(out, "  ; putChar_C()\n");
-#if 0
-  byte = byte & 255;
-  fprintf(out, "  ld a, 0x%02x\n",byte);
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld a,l\n");
   fprintf(out, "  call TXT_WR_CHAR\n");
-#endif
 
   return 0;
 }

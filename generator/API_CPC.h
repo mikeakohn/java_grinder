@@ -19,7 +19,9 @@ class API_CPC
 public:
   // CPC
   virtual int cpc_beep() { return -1; }
-  virtual int cpc_color_III() { return -1; }
+  virtual int cpc_setPenColor_I() { return -1; }
+  virtual int cpc_setPaperColor_I() { return -1; }
+  virtual int cpc_setBorderColor_I() { return -1; }
   virtual int cpc_cls() { return -1; }
   virtual int cpc_screen_I() { return -1; }
   virtual int cpc_putChar_C() { return -1; }

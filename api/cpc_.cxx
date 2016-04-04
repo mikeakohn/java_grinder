@@ -40,7 +40,9 @@
 int cpc(JavaClass *java_class, Generator *generator, char *method_name)
 {
   CHECK_FUNC(beep,)
-  CHECK_FUNC(color,_III)
+  CHECK_FUNC(setPenColor,_I)
+  CHECK_FUNC(setPaperColor,_I)
+  CHECK_FUNC(setBorderColor,_I)
   CHECK_FUNC(cls,)
   CHECK_FUNC(screen,_I)
   CHECK_FUNC(putChar,_C)

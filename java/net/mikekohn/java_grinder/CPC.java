@@ -19,13 +19,15 @@ abstract public class CPC
   protected CPC() { }
 
   public static void beep() { }
-  public static void color(int foreground,int background,int border) { }
+  public static void setPenColor(int color) { }
+  public static void setPaperColor(int color) { }
+  public static void setBorderColor(int color) { }
   public static void cls() { }
   public static void screen(int mode) { }
   public static void putChar(char c) { }
   public static void setCursor(int column,int line) { }
-  public static void plot(int x,int y,int foreground) { }
-  public static void draw(int x,int y,int foreground) { }
+  public static void plot(int x, int y, int foreground) { }
+  public static void draw(int x, int y, int foreground) { }
 }
 
 

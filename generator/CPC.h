@@ -23,7 +23,9 @@ public:
   virtual ~CPC();
   virtual int open(const char *filename);
   virtual int cpc_beep();
-  virtual int cpc_color_III();
+  virtual int cpc_setPenColor_I();
+  virtual int cpc_setPaperColor_I();
+  virtual int cpc_setBorderColor_I();
   virtual int cpc_cls();
   virtual int cpc_screen_I();
   virtual int cpc_putChar_C();
