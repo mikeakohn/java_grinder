@@ -36,7 +36,7 @@ int CPC::open(const char *filename)
   if (Z80::open(filename) != 0) { return -1; }
 
   fprintf(out, "ram_start equ 0x0138\n");
-  fprintf(out, "heap_ptr equ ram_start\n");
+  fprintf(out, "heap_ptr equ 0xA000\n");
   fprintf(out, "save_iy equ heap_ptr\n");
 
     fprintf(out,
@@ -309,12 +309,39 @@ int CPC::cpc_setTxtPen_I()
   return 0;
 }
 
+int CPC::cpc_setTxtPaper_I(int c)
+{
+ if (c < 0 || c > 15)
+  {
+    printf("Error: Color index out of range\n");
+    return -1;
+  }
+  fprintf(out, "  ld a, 0x%02x\n", c);
+  fprintf(out, "  call TXT_SET_PAPER\n");
+
+  return 0;
+}
+
 int CPC::cpc_setTxtPaper_I()
 {
   fprintf(out, "  ; setTxtPaper()\n");
   fprintf(out, "  pop hl\n");
   fprintf(out, "  ld a,l\n");
   fprintf(out, "  call TXT_SET_PAPER\n");
+
+  return 0;
+}
+
+int CPC::cpc_setGraPen_I(int c)
+{
+  if (c < 0 || c > 15)
+  {
+    printf("Error: Color index out of range\n");
+    return -1;
+  }
+  fprintf(out, "  ld a, 0x%02x\n", c);
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "  call GRA_SET_PEN\n");
 
   return 0;
 }
@@ -329,6 +356,20 @@ int CPC::cpc_setGraPen_I()
   return 0;
 }
 
+int CPC::cpc_setGraPaper_I(int c)
+{
+   if (c < 0 || c > 15)
+  {
+    printf("Error: Color index out of range\n");
+    return -1;
+  }
+  fprintf(out, "  ld a, 0x%02x\n", c);
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "  call GRA_SET_PAPER\n");
+
+  return 0;
+}
+
 int CPC::cpc_setGraPaper_I()
 {
   fprintf(out, "  ; setGraPaper()\n");
@@ -338,8 +379,6 @@ int CPC::cpc_setGraPaper_I()
 
   return 0;
 }
-
-
 
 int CPC::cpc_setBorderColor_I()
 {
@@ -351,10 +390,38 @@ int CPC::cpc_setBorderColor_I()
   return 0;
 }
 
+int CPC::cpc_setBorderColor_I(int c)
+{
+   if (c < 0 || c > 15)
+  {
+    printf("Error: Color index out of range\n");
+    return -1;
+  }
+  fprintf(out, "  ld c, 0x%02x\n", c);
+  fprintf(out, "  ld b,c\n");
+  fprintf(out, "  call SCR_SET_BORDER\n");
+
+  return 0;
+}
+
 int CPC::cpc_screen_I()
 {
   fprintf(out, "  ; screen()\n");
   fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "call SCR_SET_MODE\n");
+
+  return 0;
+}
+
+int CPC::cpc_screen_I(int c)
+{
+  if (c < 0 || c > 2)
+  {
+    printf("Error: Color index out of range\n");
+    return -1;
+  }
+  fprintf(out, "  ld a, 0x%02x\n", c);
   fprintf(out, "  ld a,l\n");
   fprintf(out, "call SCR_SET_MODE\n");
 
@@ -381,12 +448,21 @@ int CPC::cpc_setCursor_II()
   return 0;
 }
 
+int CPC::cpc_putChar_C(char c)
+{
+  fprintf(out, "  ld a, 0x%02x\n", c);
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "  call TXT_OUTPUT\n");
+
+  return 0;
+}
+
 int CPC::cpc_putChar_C()
 {
   fprintf(out, "  ; putChar_C()\n");
   fprintf(out, "  pop hl\n");
   fprintf(out, "  ld a,l\n");
-  fprintf(out, "  call TXT_WR_CHAR\n");
+  fprintf(out, "  call TXT_OUTPUT\n");
 
   return 0;
 }
