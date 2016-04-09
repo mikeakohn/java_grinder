@@ -9,19 +9,19 @@ public class TestCPC
     String message = "Hello CPC from JAVA";
  
     int i,j;
-	char c;
+char c;
 
     CPC.screen(1);
     CPC.setTxtPen(3);
-	
-	for (i = 0; i < message.length(); i++)
+
+for (i = 0; i < message.length(); i++)
     {
       c = message.charAt(i);
 
       CPC.putChar(c);
     }
     // Wait for Keypress and exit to BASIC
-	c=CPC.readChar();
+c=CPC.readChar();
 
   }
 }

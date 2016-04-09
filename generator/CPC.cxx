@@ -40,7 +40,7 @@ int CPC::open(const char *filename)
   fprintf(out, "save_iy equ heap_ptr\n");
 
     fprintf(out,
-	    "KL_CHOKE_OFF    EQU 0xBCC8\n"
+    "KL_CHOKE_OFF    EQU 0xBCC8\n"
         "KL_ROM_WALK     EQU 0xBCCB\n"
         "KL_INIT_BACK    EQU 0xBCCE\n"
         "KL_LOG_EXT      EQU 0xBCD1\n"
@@ -93,7 +93,7 @@ int CPC::open(const char *filename)
         "KM_ARM_BREAK    EQU 0xBB45\n"
         "KM_DISARM_BREAK EQU 0xBB48\n"
         "KM_BREAK_EVENT  EQU 0xBB4B\n");
-		
+
     fprintf(out,
        "TXT_INITIALISE  EQU 0xBB4E\n"
        "TXT_RESET       EQU 0xBB51\n"
@@ -131,9 +131,9 @@ int CPC::open(const char *filename)
        "TXT_GET_CONTROLS EQU 0xBBB1\n"
        "TXT_STR_SELECT  EQU 0xBBB4\n"
        "TXT_SWAP_STREAMS EQU 0xBBB7\n");  
-	   
+   
   fprintf(out,        
-		"GRA_INITIALISE  EQU 0xBBBA\n"
+"GRA_INITIALISE  EQU 0xBBBA\n"
         "GRA_RESET       EQU 0xBBBD\n"
         "GRA_MOVE_ABSOLUTE EQU 0xBBC0\n"
         "GRA_MOVE_RELATIVE EQU 0xBBC3\n"
@@ -199,17 +199,17 @@ fprintf(out,
         "CAS_START_MOTOR EQU 0xBC6E\n"
         "CAS_STOP_MOTOR  EQU 0xBC71\n"
         "CAS_RESTORE_MOTOR EQU 0xBC74\n"
-		"CAS_IN_OPEN	    EQU 0xBC77\n"
-		"CAS_IN_CLOSE	EQU 0xBC7A\n"
+"CAS_IN_OPEN    EQU 0xBC77\n"
+"CAS_IN_CLOSEEQU 0xBC7A\n"
         "CAS_IN_ABANDON  EQU 0xBC7D\n"
-		"CAS_IN_CHAR	    EQU 0xBC80\n"
+"CAS_IN_CHAR    EQU 0xBC80\n"
         "CAS_IN_DIRECT   EQU 0xBC83\n"
         "CAS_RETURN      EQU 0xBC86\n"
         "CAS_TEST_EOF    EQU 0xBC89\n"
-		"CAS_OUT_OPEN	EQU 0xBC8C\n"
-		"CAS_OUT_CLOSE	EQU 0xBC8F\n"
+"CAS_OUT_OPENEQU 0xBC8C\n"
+"CAS_OUT_CLOSEEQU 0xBC8F\n"
         "CAS_OUT_ABANDON EQU 0xBC92\n"
-		"CAS_OUT_CHAR	EQU 0xBC95\n"
+"CAS_OUT_CHAREQU 0xBC95\n"
         "CAS_OUT_DIRECT  EQU 0xBC98\n"
         "CAS_CATALOG     EQU 0xBC9B\n"
         "CAS_WRITE       EQU 0xBC9E\n"
@@ -268,8 +268,8 @@ fprintf(out,
      "GRA_FILL        EQU 0xBD52\n"
      "SCR_SET_POSITION EQU 0xBD55\n"
      "MC_PRINT_TRANSLATION EQU 0xBD58\n"
-	"; 6128 ONLY\n"	
-     "KL_BANK_SWITCH  EQU 0xBD5B\n");		
+"; 6128 ONLY\n"
+     "KL_BANK_SWITCH  EQU 0xBD5B\n");
 
 
   fprintf(out, "\n");
