@@ -807,7 +807,6 @@ int MSP430::jump_cond_zero(const char *label, int cond, int distance)
   if (cond == COND_NOT_EQUAL)
   {
     fprintf(out, "  jne %s\n", label);
-    reg--;
     return 0;
   }
 
