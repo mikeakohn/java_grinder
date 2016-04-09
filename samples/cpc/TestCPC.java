@@ -5,19 +5,24 @@ public class TestCPC
 {
   public static void main(String args[])
   {
-    int i;
 
     String message = "Hello CPC from JAVA";
-    CPC.cls();
+ 
+    int i,j;
+char c;
 
-    for (i = 0; i < message.length(); i++)
+    CPC.screen(1);
+    CPC.setTxtPen(3);
+
+for (i = 0; i < message.length(); i++)
     {
-      char c = message.charAt(i);
+      c = message.charAt(i);
 
       CPC.putChar(c);
     }
+    // Wait for Keypress and exit to BASIC
+c=CPC.readChar();
 
-    while (true);
   }
 }
 
