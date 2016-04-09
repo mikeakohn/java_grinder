@@ -787,6 +787,17 @@ int MSP430::jump_cond(const char *label, int cond, int distance)
 
 int MSP430::jump_cond_zero(const char *label, int cond, int distance)
 {
+  if (stack > 0)
+  {
+    fprintf(out, "  add.w #2, SP\n");
+    fprintf(out, "  cmp.w #0, -2(SP)\n");
+  }
+    else
+  {
+    fprintf(out, "  cmp.w #0, r%d\n", REG_STACK(reg-1));
+    reg--;
+  }
+
   if (cond == COND_EQUAL)
   {
     fprintf(out, "  jeq %s\n", label);
@@ -796,6 +807,7 @@ int MSP430::jump_cond_zero(const char *label, int cond, int distance)
   if (cond == COND_NOT_EQUAL)
   {
     fprintf(out, "  jne %s\n", label);
+    reg--;
     return 0;
   }
 
