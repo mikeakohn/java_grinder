@@ -72,6 +72,7 @@ public:
   virtual int integer_to_short();
   virtual int jump_cond(const char *label, int cond, int distance);
   virtual int jump_cond_integer(const char *label, int cond, int distance);
+  virtual int ternary(int cond, int value_true, int value_false);
   virtual int return_local(int index, int local_count);
   virtual int return_integer(int local_count);
   virtual int return_void(int local_count);

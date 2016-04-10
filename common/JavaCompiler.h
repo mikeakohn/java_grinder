@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -57,6 +57,9 @@ private:
   int field_type_to_int(char *field_type);
   const char *field_type_from_int(int type);
   int execute_statics(int index);
+  int get_const(uint8_t *bytes, int len, int pc, int *value);
+  int get_cond(uint8_t *bytes, int len, int pc, int *cond, int *label);
+  int try_ternary(uint8_t *bytes, int len, int pc);
 
   JavaClass *java_class;  // FIXME - Why is this here?
   char classpath[128];

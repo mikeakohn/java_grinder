@@ -291,6 +291,11 @@ int X86_64::jump_cond_integer(const char *label, int cond, int distance)
   return -1;
 }
 
+int X86_64::ternary(int cond, int value_true, int value_false)
+{
+  return -1;
+}
+
 int X86_64::return_local(int index, int local_count)
 {
   return -1;

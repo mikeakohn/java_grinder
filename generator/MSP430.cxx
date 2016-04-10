@@ -911,6 +911,56 @@ int MSP430::jump_cond_integer(const char *label, int cond, int const_val, int di
   return 0;
 }
 
+int MSP430::ternary(int cond, int value_true, int value_false)
+{
+  fprintf(out, "  ;; ternary(cond=%d ? %d : %d\n", cond, value_true, value_false);
+
+  if (stack != 0)
+  {
+    fprintf(out, "  cmp.w #0, 0(SP)\n");
+    fprintf(out, "  mov.w #%d, 0(SP)\n", value_true);
+
+    switch(cond)
+    {
+      case COND_EQUAL:
+        fprintf(out, " jeq ternary_%d\n", label_count);
+        break;
+      case COND_NOT_EQUAL:
+        fprintf(out, " jne ternary_%d\n", label_count);
+        break;
+      default:
+        return -1;
+    }
+
+    fprintf(out, "  mov.w #%d, 0(SP)\n", value_false);
+  }
+    else
+  {
+    fprintf(out, "  cmp.w #0, r%d\n", REG_STACK(reg - 1));
+    fprintf(out, "  mov.w #%d, r%d\n", value_true, REG_STACK(reg - 1));
+
+    switch(cond)
+    {
+      case COND_EQUAL:
+        fprintf(out, " jeq ternary_%d\n", label_count);
+        break;
+      case COND_NOT_EQUAL:
+        fprintf(out, " jne ternary_%d\n", label_count);
+        break;
+      default:
+        return -1;
+    }
+
+    fprintf(out, "  mov.w #%d, r%d\n", value_false, REG_STACK(reg - 1));
+  }
+
+  fprintf(out, "ternary_%d:\n", label_count);
+
+  label_count++;
+
+  return 0;
+}
+
 int MSP430::return_local(int index, int local_count)
 {
   fprintf(out, "  mov.w -%d(w12), r15\n", LOCALS(index));

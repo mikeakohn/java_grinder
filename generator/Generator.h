@@ -116,6 +116,7 @@ public:
   virtual int jump_cond_zero(const char *label, int cond, int distance) { return -1; }
   virtual int jump_cond_integer(const char *label, int cond, int distance) = 0;
   virtual int jump_cond_integer(const char *label, int cond, int const_val, int distance) { return -1; } 
+  virtual int ternary(int cond, int value_true, int value_false) = 0;
   virtual int return_local(int index, int local_count) = 0;
   virtual int return_integer(int local_count) = 0;
   virtual int return_void(int local_count) = 0;
