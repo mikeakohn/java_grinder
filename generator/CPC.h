@@ -18,8 +18,8 @@
 
 class CPC : public Z80
 {
-public:
-PC();
+public: 
+CPC();
 virtual ~CPC();
 virtual int open(const char *filename);
 virtual int cpc_beep();
