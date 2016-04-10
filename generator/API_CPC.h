@@ -36,5 +36,7 @@ virtual int cpc_setCursor_II() { return -1; }
 virtual int cpc_plot_III() { return -1; }
 virtual int cpc_draw_III() { return -1; }
 virtual char cpc_readChar() { return -1; }
+virtual int cpc_poke8_IC() { return -1; }
+virtual int cpc_poke8_IC(int w, char c) { return -1; }
 };
 #endif

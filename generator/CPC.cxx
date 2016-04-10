@@ -506,3 +506,21 @@ fprintf(out, "  call GRA_LINE_ABSOLUTE\n");
 return 0;
 }
 
+int CPC::cpc_poke8_IC(int where,char c)
+{
+fprintf(out, "  ld hl, 0x%02x\n", where);
+fprintf(out, "  ld a, 0x%02x\n", c);
+fprintf(out, "  ld (hl),a\n");
+
+return 0;
+}
+
+int CPC::cpc_poke8_IC()
+{
+fprintf(out, "  pop hl\n");
+fprintf(out, "  ld a,l\n");
+fprintf(out, "  pop hl\n");
+fprintf(out, "  ld (hl),a\n");
+
+return 0;
+}

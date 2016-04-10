@@ -31,6 +31,7 @@ public static char readChar() { return 0; }
 public static void setCursor(int column,int line) { }
 public static void plot(int x, int y, int foreground) { }
 public static void draw(int x, int y, int foreground) { }
+public static void poke8(int w, char c) { }
 
 }
 

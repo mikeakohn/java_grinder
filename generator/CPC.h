@@ -35,6 +35,7 @@ virtual int cpc_setCursor_II();
 virtual int cpc_plot_III();
 virtual int cpc_draw_III();
 virtual char cpc_readChar();
+virtual int cpc_poke8_IC();
 
 virtual int cpc_setTxtPen_I(int c);
 virtual int cpc_setTxtPaper_I(int c);
@@ -43,7 +44,7 @@ virtual int cpc_setGraPaper_I(int c);
 virtual int cpc_setBorderColor_I(int c);
 virtual int cpc_screen_I(int c);
 virtual int cpc_putChar_C(char c);
-
+virtual int cpc_poke8_IC(int w, char c);
 
 private:
 //void insert_ldirvv(void);
