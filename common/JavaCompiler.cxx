@@ -1931,6 +1931,8 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
 
         sprintf(label, "%s_%d", method_name, jump_to);
 
+        //printf("try_ternary()=%d\n", try_ternary(bytes, code_len + pc_start, pc));
+
         ret = generator->jump_cond_zero(label, COND_EQUAL, calc_distance(bytes, pc, pc + byte_count));
         break;
       }
@@ -1941,6 +1943,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
 
         sprintf(label, "%s_%d", method_name, jump_to);
 
+        //printf("try_ternary()=%d\n", try_ternary(bytes, code_len + pc_start, pc));
         ret = generator->jump_cond_zero(label, COND_NOT_EQUAL, calc_distance(bytes, pc, pc + byte_count));
         break;
       }
@@ -2424,5 +2427,110 @@ const char *JavaCompiler::field_type_from_int(int type)
 
   return field_type;
 }
+
+int JavaCompiler::get_const(uint8_t *bytes, int len, int address, int *value)
+{
+  if (bytes[address] == 0xc4)
+  {
+#if 0
+    if (table_java_instr[bytes[address + 1]].op_type != OP_TYPE_CONST)
+    {
+      return -1;
+    }
+
+    switch(bytes[address + 1])
+    {
+    }
+
+    return table_java_instr[bytes[address + 1]].wide + 1;
+#endif
+    return -1;
+  }
+    else
+  {
+    if (table_java_instr[bytes[address]].op_type != OP_TYPE_CONST)
+    {
+      return -1;
+    }
+
+    switch(bytes[address])
+    {
+      case 1: // aconst_null (0x01)
+        *value = 0;
+        break;
+      case 2: // iconst_m1 (0x02)
+      case 3: // iconst_0 (0x03)
+      case 4: // iconst_1 (0x04)
+      case 5: // iconst_2 (0x05)
+      case 6: // iconst_3 (0x06)
+      case 7: // iconst_4 (0x07)
+      case 8: // iconst_5 (0x08)
+        *value = ((uint8_t)bytes[address]) - 3;;
+        break;
+      default:
+        return -1;
+    }
+
+    return table_java_instr[bytes[address]].normal;
+  }
+}
+
+int JavaCompiler::get_cond(uint8_t *bytes, int len, int address, int *cond, int *label)
+{
+  if (table_java_instr[bytes[address]].op_type != OP_TYPE_IF) { return -1; }
+
+  switch(bytes[address])
+  {
+    case 198: // ifnull (0xc6)
+      *cond = COND_EQUAL;
+      break;
+    case 199: // ifnonnull (0xc7)
+      *cond = COND_NOT_EQUAL;
+      break;
+    default:
+      return -1;
+  }
+
+  *label = address;
+  *label += ((uint16_t)bytes[address + 1]) << 8 | bytes[address + 2];
+
+  return 3;
+}
+
+int JavaCompiler::try_ternary(uint8_t *bytes, int len, int pc)
+{
+  int offset = pc;
+  int value_true, value_false;
+  int cond, label;
+  int skip;
+
+  skip = get_cond(bytes, len, offset, &cond, &label);
+
+  if (skip == -1) { return -1; }
+  offset += skip;
+  if (offset >= len) { return -1; }
+
+  skip = get_const(bytes, len, offset, &value_false);
+
+  if (skip == -1) { return -1; }
+  offset += skip;
+  if (offset >= len) { return -1; }
+
+  // goto 0xa7
+  if (bytes[offset] != 0xa7) { return -1; }
+
+  offset += table_java_instr[bytes[offset]].normal;
+
+  if (label != offset) { return -1; }
+
+  skip = get_const(bytes, len, offset, &value_true);
+  if (skip == -1) { return -1; }
+
+  // printf(">> Ternary values (%d) ? %d : %d\n", cond, value_true, value_false);
+
+  return 0;
+}
+
+
 
 
