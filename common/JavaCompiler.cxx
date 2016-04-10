@@ -788,7 +788,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         break;
 
       case 1: // aconst_null (0x01)
-        UNIMPL()
+        ret = generator->push_int(0);
         break;
 
       case 2: // iconst_m1 (0x02)
@@ -1925,13 +1925,25 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         break;
 
       case 198: // ifnull (0xc6)
-        UNIMPL()
-        break;
+      {
+        int byte_count = GET_PC_INT16(1);
+        int jump_to = address + byte_count;
 
+        sprintf(label, "%s_%d", method_name, jump_to);
+
+        ret = generator->jump_cond_zero(label, COND_EQUAL, calc_distance(bytes, pc, pc + byte_count));
+        break;
+      }
       case 199: // ifnonnull (0xc7)
-        UNIMPL()
-        break;
+      {
+        int byte_count = GET_PC_INT16(1);
+        int jump_to = address + byte_count;
 
+        sprintf(label, "%s_%d", method_name, jump_to);
+
+        ret = generator->jump_cond_zero(label, COND_NOT_EQUAL, calc_distance(bytes, pc, pc + byte_count));
+        break;
+      }
       case 200: // goto_w (0xc8)
       {
         int byte_count = GET_PC_INT32(1);

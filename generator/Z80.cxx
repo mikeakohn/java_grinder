@@ -697,8 +697,8 @@ int n;
 
   for (n = 0; n < params; n++)
   {
-    fprintf(out, "  ld e, (ix+%d)", (params * 2) + (n * 2));
-    fprintf(out, "  ld (ix+%d), e", (n * 2));
+    fprintf(out, "  ld e, (ix+%d)\n", (params * 2) + (n * 2));
+    fprintf(out, "  ld (ix+%d), e\n", (n * 2));
   }
 
   // Params are removed from the stack

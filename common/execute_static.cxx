@@ -124,7 +124,8 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
     {
       case 0: // nop (0x00)
       case 1: // aconst_null (0x01)
-        UNIMPL();
+        stack->push(0);
+        break;
       case 2: // iconst_m1 (0x02)
       case 3: // iconst_0 (0x03)
       case 4: // iconst_1 (0x04)
