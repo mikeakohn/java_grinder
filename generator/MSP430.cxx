@@ -911,6 +911,11 @@ int MSP430::jump_cond_integer(const char *label, int cond, int const_val, int di
   return 0;
 }
 
+int MSP430::ternary(int cond, int value_true, int value_false)
+{
+  return -1;
+}
+
 int MSP430::return_local(int index, int local_count)
 {
   fprintf(out, "  mov.w -%d(w12), r15\n", LOCALS(index));
