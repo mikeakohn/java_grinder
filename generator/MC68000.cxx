@@ -583,6 +583,11 @@ int MC68000::ternary(int cond, int value_true, int value_false)
   return -1;
 }
 
+int MC68000::ternary(int cond, int compare, int value_true, int value_false)
+{
+  return -1;
+}
+
 int MC68000::return_local(int index, int local_count)
 {
   return -1;

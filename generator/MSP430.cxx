@@ -913,11 +913,16 @@ int MSP430::jump_cond_integer(const char *label, int cond, int const_val, int di
 
 int MSP430::ternary(int cond, int value_true, int value_false)
 {
-  fprintf(out, "  ;; ternary(cond=%d ? %d : %d\n", cond, value_true, value_false);
+  return -1;
+}
+
+int MSP430::ternary(int cond, int compare, int value_true, int value_false)
+{
+  fprintf(out, "  ;; ternary(cond=%d #%d ? %d : %d\n", cond, compare, value_true, value_false);
 
   if (stack != 0)
   {
-    fprintf(out, "  cmp.w #0, 0(SP)\n");
+    fprintf(out, "  cmp.w #%d, 0(SP)\n", compare);
     fprintf(out, "  mov.w #%d, 0(SP)\n", value_true);
 
     switch(cond)
@@ -936,7 +941,7 @@ int MSP430::ternary(int cond, int value_true, int value_false)
   }
     else
   {
-    fprintf(out, "  cmp.w #0, r%d\n", REG_STACK(reg - 1));
+    fprintf(out, "  cmp.w #%d, r%d\n", compare, REG_STACK(reg - 1));
     fprintf(out, "  mov.w #%d, r%d\n", value_true, REG_STACK(reg - 1));
 
     switch(cond)

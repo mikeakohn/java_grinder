@@ -2546,7 +2546,7 @@ int JavaCompiler::try_ternary(uint8_t *bytes, int len, int pc)
 
   // printf(">> Ternary values (%d) ? %d : %d\n", cond, value_true, value_false);
 
-  if (generator->ternary(cond, value_true, value_false) == -1)
+  if (generator->ternary(cond, 0, value_true, value_false) == -1)
   {
     return -1;
   }
