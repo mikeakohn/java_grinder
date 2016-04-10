@@ -1926,24 +1926,39 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
 
       case 198: // ifnull (0xc6)
       {
+        ret = try_ternary(bytes, code_len + pc_start, pc);
+
+        if (ret != -1)
+        {
+          skip_bytes = ret;
+          ret = 0;
+          break;
+        }
+
         int byte_count = GET_PC_INT16(1);
         int jump_to = address + byte_count;
 
         sprintf(label, "%s_%d", method_name, jump_to);
-
-        //printf("try_ternary()=%d\n", try_ternary(bytes, code_len + pc_start, pc));
 
         ret = generator->jump_cond_zero(label, COND_EQUAL, calc_distance(bytes, pc, pc + byte_count));
         break;
       }
       case 199: // ifnonnull (0xc7)
       {
+        ret = try_ternary(bytes, code_len + pc_start, pc);
+
+        if (ret != -1)
+        {
+          skip_bytes = ret;
+          ret = 0;
+          break;
+        }
+
         int byte_count = GET_PC_INT16(1);
         int jump_to = address + byte_count;
 
         sprintf(label, "%s_%d", method_name, jump_to);
 
-        //printf("try_ternary()=%d\n", try_ternary(bytes, code_len + pc_start, pc));
         ret = generator->jump_cond_zero(label, COND_NOT_EQUAL, calc_distance(bytes, pc, pc + byte_count));
         break;
       }
@@ -2502,13 +2517,15 @@ int JavaCompiler::try_ternary(uint8_t *bytes, int len, int pc)
   int offset = pc;
   int value_true, value_false;
   int cond, label;
-  int skip;
+  int skip, if_len;
 
   skip = get_cond(bytes, len, offset, &cond, &label);
 
   if (skip == -1) { return -1; }
   offset += skip;
   if (offset >= len) { return -1; }
+
+  if_len = skip;
 
   skip = get_const(bytes, len, offset, &value_false);
 
@@ -2525,12 +2542,17 @@ int JavaCompiler::try_ternary(uint8_t *bytes, int len, int pc)
 
   skip = get_const(bytes, len, offset, &value_true);
   if (skip == -1) { return -1; }
+  offset += skip;
 
   // printf(">> Ternary values (%d) ? %d : %d\n", cond, value_true, value_false);
 
-  return 0;
+  if (generator->ternary(cond, value_true, value_false) == -1)
+  {
+    return -1;
+  }
+
+  // printf(">>> offset=%d %d   %d\n", offset, offset - pc, if_len);
+
+  return offset - pc - if_len;
 }
-
-
-
 
