@@ -59,7 +59,7 @@ private:
   int execute_statics(int index);
   int get_const(uint8_t *bytes, int len, int pc, int *value);
   int get_cond(uint8_t *bytes, int len, int pc, int *cond, int *label);
-  int try_ternary(uint8_t *bytes, int len, int pc);
+  int try_ternary(uint8_t *bytes, int len, int pc, bool compare_with_value, int compare);
 
   JavaClass *java_class;  // FIXME - Why is this here?
   char classpath[128];
