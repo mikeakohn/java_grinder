@@ -559,12 +559,15 @@ int MSP430::mod_integer()
 
 int MSP430::neg_integer()
 {
+  fprintf(out, "  ;; neg_integer()\n");
   fprintf(out, "  neg.w %s\n", top_reg());
   return 0;
 }
 
 int MSP430::shift_left_integer()
 {
+  fprintf(out, "  ;; shift_left_integer()\n");
+
   // FIXME - for MSP430x, this can be sped up
   if (stack > 0)
   {
@@ -601,6 +604,8 @@ int MSP430::shift_left_integer(int count)
 {
   int n;
 
+  fprintf(out, "  ;; shift_left_integer(%d)\n", count);
+
   if (stack != 0) { return -1; }
 
   if (count >= 8)
@@ -620,6 +625,8 @@ int MSP430::shift_left_integer(int count)
 
 int MSP430::shift_right_integer()
 {
+  fprintf(out, "  ;; shift_right_integer()\n");
+
   // FIXME - for MSP430x, this can be sped up
   fprintf(out, "  mov.w %s, r15\n", pop_reg());
 
@@ -636,6 +643,8 @@ int MSP430::shift_right_integer()
 int MSP430::shift_right_integer(int count)
 {
   int n;
+
+  fprintf(out, "  ;; shift_right_integer(%d)\n", count);
 
   if (stack != 0) { return -1; }
   if (count >= 8) { return -1; }
@@ -659,6 +668,8 @@ int MSP430::shift_right_integer(int count)
 
 int MSP430::shift_right_uinteger()
 {
+  fprintf(out, "  ;; shift_right_uinteger()\n");
+
   // FIXME - for MSP430x, this can be sped up
   fprintf(out, "  mov.w %s, r15\n", pop_reg());
 
@@ -674,7 +685,9 @@ int MSP430::shift_right_uinteger()
 
 int MSP430::shift_right_uinteger(int count)
 {
-int n;
+  int n;
+
+  fprintf(out, "  ;; shift_right_uinteger(%d)\n", count);
 
   if (stack != 0) { return -1; }
 
@@ -696,45 +709,53 @@ int n;
 
 int MSP430::and_integer()
 {
+  fprintf(out, "  ;; and_integer()\n");
   return stack_alu("and");
 }
 
 int MSP430::and_integer(int num)
 {
+  fprintf(out, "  ;; and_integer(num=%d)\n", num);
   fprintf(out, "  and.w #%d, %s\n", num, top_reg());
   return 0;
 }
 
 int MSP430::or_integer()
 {
+  fprintf(out, "  ;; or_integer()\n");
   return stack_alu("bis");
 }
 
 int MSP430::or_integer(int num)
 {
+  fprintf(out, "  ;; or_integer(num=%d)\n", num);
   fprintf(out, "  bis.w #%d, %s\n", num, top_reg());
   return 0;
 }
 
 int MSP430::xor_integer()
 {
+  fprintf(out, "  ;; xor_integer()\n");
   return stack_alu("xor");
 }
 
 int MSP430::xor_integer(int num)
 {
+  fprintf(out, "  ;; xor_integer(num=%d)\n", num);
   fprintf(out, "  xor.w #%d, %s\n", num, top_reg());
   return 0;
 }
 
 int MSP430::inc_integer(int index, int num)
 {
+  fprintf(out, "  ;; inc_integer(index=%d,num=%d)\n", index, num);
   fprintf(out, "  add.w #%d, -%d(r12)\n", num, LOCALS(index));
   return 0;
 }
 
 int MSP430::integer_to_byte()
 {
+  fprintf(out, "  ;; integer_to_byte()\n");
   fprintf(out, "  sxt %s\n", top_reg());
   return 0;
 }
@@ -748,6 +769,8 @@ int MSP430::integer_to_short()
 int MSP430::jump_cond(const char *label, int cond, int distance)
 {
   bool reverse = false;
+
+  fprintf(out, "  ;; jump_cond(%s, cond=%d, distance=%d)\n", label, cond, distance);
 
   // MSP430 doesn't have LESS_EQUAL or GREATER so change them
   if (cond == COND_LESS_EQUAL)
@@ -787,6 +810,8 @@ int MSP430::jump_cond(const char *label, int cond, int distance)
 
 int MSP430::jump_cond_zero(const char *label, int cond, int distance)
 {
+  fprintf(out, "  ;; jump_cond_zero(%s, cond=%d, distance=%d)\n", label, cond, distance);
+
   if (stack > 0)
   {
     fprintf(out, "  add.w #2, SP\n");
@@ -816,6 +841,8 @@ int MSP430::jump_cond_zero(const char *label, int cond, int distance)
 int MSP430::jump_cond_integer(const char *label, int cond, int distance)
 {
   bool reverse = false;
+
+  fprintf(out, "  ;; jump_cond_integer(%s, cond=%d, distance=%d)\n", label, cond, distance);
 
   // MSP430 doesn't have LESS_EQUAL or GREATER so change them
   if (cond == COND_LESS_EQUAL)
@@ -874,6 +901,8 @@ int MSP430::jump_cond_integer(const char *label, int cond, int const_val, int di
 {
   bool reverse = false;
 
+  fprintf(out, "  ;; jump_cond_integer(%s, cond=%d, const_val=%d, distance=%d)\n", label, cond, const_val, distance);
+
   // MSP430 doesn't have LESS_EQUAL or GREATER so change them
   if (cond == COND_LESS_EQUAL)
   {
@@ -913,47 +942,117 @@ int MSP430::jump_cond_integer(const char *label, int cond, int const_val, int di
 
 int MSP430::ternary(int cond, int value_true, int value_false)
 {
+  bool reverse = false;
+  char source[16];
+  char dest[16];
+
   fprintf(out, "  ;; ternary(cond=%d ? %d : %d\n", cond, value_true, value_false);
 
-  if (stack != 0)
+  // MSP430 doesn't have LESS_EQUAL or GREATER so change them
+  if (cond == COND_LESS_EQUAL)
   {
-    fprintf(out, "  cmp.w #0, 0(SP)\n");
-    fprintf(out, "  mov.w #%d, 0(SP)\n", value_true);
+    reverse = true;
+    cond = COND_GREATER_EQUAL;
+  }
+    else
+  if (cond == COND_GREATER)
+  {
+    reverse = true;
+    cond = COND_LESS;
+  }
 
-    switch(cond)
-    {
-      case COND_EQUAL:
-        fprintf(out, " jeq ternary_%d\n", label_count);
-        break;
-      case COND_NOT_EQUAL:
-        fprintf(out, " jne ternary_%d\n", label_count);
-        break;
-      default:
-        return -1;
-    }
+  if (stack > 1)
+  {
+    fprintf(out, "  add.w #2, SP\n");
 
-    fprintf(out, "  mov.w #%d, 0(SP)\n", value_false);
+    strcpy(source, "-2(SP)");
+    strcpy(dest, "0(SP)");
+
+    stack -= 1;
+  }
+    else
+  if (stack == 1)
+  {
+    fprintf(out, "  add.w #2, SP\n");
+
+    strcpy(source, "-2(SP)");
+    sprintf(dest, "r%d", REG_STACK(reg-2));
+
+    stack--;
   }
     else
   {
-    fprintf(out, "  cmp.w #0, r%d\n", REG_STACK(reg - 1));
-    fprintf(out, "  mov.w #%d, r%d\n", value_true, REG_STACK(reg - 1));
+    sprintf(source, "r%d", REG_STACK(reg-1));
+    sprintf(dest, "r%d", REG_STACK(reg-2));
 
-    switch(cond)
-    {
-      case COND_EQUAL:
-        fprintf(out, " jeq ternary_%d\n", label_count);
-        break;
-      case COND_NOT_EQUAL:
-        fprintf(out, " jne ternary_%d\n", label_count);
-        break;
-      default:
-        return -1;
-    }
-
-    fprintf(out, "  mov.w #%d, r%d\n", value_false, REG_STACK(reg - 1));
+    reg -= 1;
   }
 
+  if (reverse == false)
+  {
+    fprintf(out, "  cmp.w %s, %s\n", source, dest);
+  }
+    else
+  {
+    fprintf(out, "  cmp.w %s, %s\n", dest, source);
+  }
+
+  fprintf(out, "  mov.w #%d, %s\n", value_true, dest);
+
+  fprintf(out, "  %s ternary_%d\n", cond_str[cond], label_count);
+
+  fprintf(out, "  mov.w #%d, %s\n", value_false, dest);
+  fprintf(out, "ternary_%d:\n", label_count);
+
+  label_count++;
+
+  return 0;
+}
+
+int MSP430::ternary(int cond, int compare, int value_true, int value_false)
+{
+  char dest[16];
+  bool reverse = false;
+
+  // MSP430 doesn't have LESS_EQUAL or GREATER so change them
+  if (cond == COND_LESS_EQUAL)
+  {
+    reverse = true;
+    cond = COND_GREATER_EQUAL;
+  }
+    else
+  if (cond == COND_GREATER)
+  {
+    reverse = true;
+    cond = COND_LESS;
+  }
+
+  fprintf(out, "  ;; ternary(cond=%d #%d ? %d : %d\n", cond, compare, value_true, value_false);
+
+  if (stack != 0)
+  {
+    strcpy(dest, "0(SP)");
+  }
+    else
+  {
+    sprintf(dest, "r%d", REG_STACK(reg - 1));
+  }
+
+  if (reverse == false)
+  {
+    fprintf(out, "  cmp.w #%d, %s\n", compare, dest);
+  }
+    else
+  {
+    fprintf(out, "  mov.w #%d, r15\n", compare);
+    fprintf(out, "  cmp.w %s, r15\n", dest);
+  }
+
+  fprintf(out, "  mov.w #%d, %s\n", value_true, dest);
+
+  fprintf(out, "  %s ternary_%d\n", cond_str[cond], label_count);
+
+  fprintf(out, "  mov.w #%d, %s\n", value_false, dest);
   fprintf(out, "ternary_%d:\n", label_count);
 
   label_count++;

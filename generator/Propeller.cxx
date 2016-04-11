@@ -426,6 +426,11 @@ int Propeller::ternary(int cond, int value_true, int value_false)
   return -1;
 }
 
+int Propeller::ternary(int cond, int compare, int value_true, int value_false)
+{
+  return -1;
+}
+
 int Propeller::return_local(int index, int local_count)
 {
   return -1;

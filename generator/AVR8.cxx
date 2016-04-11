@@ -959,6 +959,11 @@ int AVR8::ternary(int cond, int value_true, int value_false)
   return -1;
 }
 
+int AVR8::ternary(int cond, int compare, int value_true, int value_false)
+{
+  return -1;
+}
+
 int AVR8::return_local(int index, int local_count)
 {
   fprintf(out, "; return_local\n");

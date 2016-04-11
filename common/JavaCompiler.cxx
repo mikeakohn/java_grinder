@@ -352,6 +352,14 @@ int JavaCompiler::optimize_const(JavaClass *java_class, char *method_name, uint8
     case 163: // if_icmpgt (0xa3)
     case 164: // if_icmple (0xa4)
     {
+      //int start = pc - address;
+      int ret = try_ternary(bytes, pc_end, pc, true, const_val);
+
+      if (ret != -1)
+      {
+        return ret + 3;
+      }
+
       char label[128];
       int byte_count = GET_PC_INT16(1);
       int jump_to = address + byte_count;
@@ -1602,6 +1610,15 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
       case 157: // ifgt (0x9d)
       case 158: // ifle (0x9e)
       {
+        ret = try_ternary(bytes, code_len + pc_start, pc, true, 0);
+
+        if (ret != -1)
+        {
+          skip_bytes = ret;
+          ret = 0;
+          break;
+        }
+
         int byte_count = GET_PC_INT16(1);
         int jump_to = address + byte_count;
         sprintf(label, "%s_%d", method_name, jump_to);
@@ -1615,6 +1632,15 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
       case 163: // if_icmpgt (0xa3)
       case 164: // if_icmple (0xa4)
       {
+        ret = try_ternary(bytes, code_len + pc_start, pc, false, 0);
+
+        if (ret != -1)
+        {
+          skip_bytes = ret;
+          ret = 0;
+          break;
+        }
+
         int byte_count = GET_PC_INT16(1);
         int jump_to = address + byte_count;
         sprintf(label, "%s_%d", method_name, jump_to);
@@ -1926,7 +1952,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
 
       case 198: // ifnull (0xc6)
       {
-        ret = try_ternary(bytes, code_len + pc_start, pc);
+        ret = try_ternary(bytes, code_len + pc_start, pc, true, 0);
 
         if (ret != -1)
         {
@@ -1945,7 +1971,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
       }
       case 199: // ifnonnull (0xc7)
       {
-        ret = try_ternary(bytes, code_len + pc_start, pc);
+        ret = try_ternary(bytes, code_len + pc_start, pc, true, 0);
 
         if (ret != -1)
         {
@@ -2496,11 +2522,31 @@ int JavaCompiler::get_cond(uint8_t *bytes, int len, int address, int *cond, int 
 
   switch(bytes[address])
   {
+    case 153: // ifeq (0x99)
+    case 159: // if_icmpeq (0x9f)
     case 198: // ifnull (0xc6)
       *cond = COND_EQUAL;
       break;
+    case 154: // ifne (0x9a)
     case 199: // ifnonnull (0xc7)
+    case 160: // if_icmpne (0xa0)
       *cond = COND_NOT_EQUAL;
+      break;
+    case 155: // iflt (0x9b)
+    case 161: // if_icmplt (0xa1)
+      *cond = COND_LESS;
+      break;
+    case 156: // ifge (0x9c)
+    case 162: // if_icmpge (0xa2)
+      *cond = COND_GREATER_EQUAL;
+      break;
+    case 157: // ifgt (0x9d)
+    case 163: // if_icmpgt (0xa3)
+      *cond = COND_GREATER;
+      break;
+    case 158: // ifle (0x9e)
+    case 164: // if_icmple (0xa4)
+      *cond = COND_LESS_EQUAL;
       break;
     default:
       return -1;
@@ -2512,7 +2558,7 @@ int JavaCompiler::get_cond(uint8_t *bytes, int len, int address, int *cond, int 
   return 3;
 }
 
-int JavaCompiler::try_ternary(uint8_t *bytes, int len, int pc)
+int JavaCompiler::try_ternary(uint8_t *bytes, int len, int pc, bool compare_with_value, int compare)
 {
   int offset = pc;
   int value_true, value_false;
@@ -2546,9 +2592,19 @@ int JavaCompiler::try_ternary(uint8_t *bytes, int len, int pc)
 
   // printf(">> Ternary values (%d) ? %d : %d\n", cond, value_true, value_false);
 
-  if (generator->ternary(cond, value_true, value_false) == -1)
+  if (compare_with_value)
   {
-    return -1;
+    if (generator->ternary(cond, compare, value_true, value_false) == -1)
+    {
+      return -1;
+    }
+  }
+    else
+  {
+    if (generator->ternary(cond, value_true, value_false) == -1)
+    {
+      return -1;
+    }
   }
 
   // printf(">>> offset=%d %d   %d\n", offset, offset - pc, if_len);

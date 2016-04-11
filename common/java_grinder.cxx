@@ -265,7 +265,10 @@ int main(int argc, char *argv[])
 
   if (argc < 4)
   {
-    printf("Usage: %s <class> <outfile> <platform>\n"
+    printf("Usage: %s [ -v -O0 ] <class> <outfile> <platform>\n"
+           "   options:\n"
+           "     -v verbose output\n"
+           "     -O0 turn off optimizer\n"
            "   platforms:\n"
            "     appleiigs\n"
            "     attiny2313, atmega328, atmega328p, attiny85, attiny84, attiny13,\n"

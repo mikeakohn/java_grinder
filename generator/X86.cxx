@@ -623,6 +623,11 @@ int X86::ternary(int cond, int value_true, int value_false)
   return -1;
 }
 
+int X86::ternary(int cond, int compare, int value_true, int value_false)
+{
+  return -1;
+}
+
 int X86::return_local(int index, int local_count)
 {
   return -1;

@@ -818,6 +818,11 @@ int M6502::ternary(int cond, int value_true, int value_false)
   return -1;
 }
 
+int M6502::ternary(int cond, int compare, int value_true, int value_false)
+{
+  return -1;
+}
+
 int M6502::return_local(int index, int local_count)
 {
   fprintf(out, "; return_local\n");
