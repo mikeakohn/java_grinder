@@ -524,3 +524,24 @@ int CPC::cpc_poke8_IC()
 
   return 0;
 }
+
+int CPC::cpc_peek8_I(int where)
+{
+  fprintf(out, "  ld a, (0x%04x)\n", where);
+  fprintf(out, "  ld h,0\n");
+  fprintf(out, "  ld l,a\n");
+  fprintf(out, "  push hl\n");
+  
+  return 0;
+}
+
+int CPC::cpc_peek8_I()
+{
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld a,(hl)\n");
+  fprintf(out, "  ld l,a\n");
+  fprintf(out, "  ld h,0\n");
+  fprintf(out, "  push hl\n");
+  
+  return 0;
+}
