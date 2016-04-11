@@ -508,7 +508,7 @@ int CPC::cpc_draw_III()
 
 int CPC::cpc_poke8_IC(int where,char c)
 {
-  fprintf(out, "  ld hl, 0x%02x\n", where);
+  fprintf(out, "  ld hl, 0x%04x\n", where);
   fprintf(out, "  ld a, 0x%02x\n", c);
   fprintf(out, "  ld (hl),a\n");
 
