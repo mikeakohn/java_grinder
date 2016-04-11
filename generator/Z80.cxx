@@ -268,8 +268,8 @@ int Z80::swap()
   fprintf(out, "  ; swap()\n");
   fprintf(out, "  pop bc\n");
   fprintf(out, "  pop de\n");
-  fprintf(out, "  push de\n");
   fprintf(out, "  push bc\n");
+  fprintf(out, "  push de\n");
 
   return 0;
 }
