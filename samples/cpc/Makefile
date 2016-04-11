@@ -1,7 +1,7 @@
 
-default: TestCPC.class GrafCPC.class
+default: TestCPC.class GrafCPC.class ScreenCPC.class
 
-grind: testcpc grafcpc
+grind: testcpc grafcpc screencpc
 
 testcpc: TestCPC.class
 	../../java_grinder TestCPC.class testcpc.asm cpc
@@ -14,6 +14,12 @@ grafcpc: GrafCPC.class
 	naken_asm -l -I ../../../naken_asm/include -o grafcpc.hex grafcpc.asm
 	hex2bin grafcpc.hex
 	CPCDiskXP -File grafcpc.bin -AddAmsdosHeader 0x138 -AddToNewDsk grafcpc.dsk
+
+screencpc: ScreenCPC.class
+	../../java_grinder ScreenCPC.class screencpc.asm cpc
+	naken_asm -l -I ../../../naken_asm/include -o screencpc.hex screencpc.asm
+	hex2bin screencpc.hex
+	CPCDiskXP -File screencpc.bin -AddAmsdosHeader 0x138 -AddToNewDsk screencpc.dsk
 	
 %.class: %.java
 	javac -classpath ../../build/JavaGrinder.jar $*.java

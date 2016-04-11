@@ -280,247 +280,247 @@ return 0;
 
 int CPC::cpc_beep()
 {
-fprintf(out, "ld a, 7\n");
-fprintf(out, "call TXT_OUTPUT\n");
+  fprintf(out, "ld a, 7\n");
+  fprintf(out, "call TXT_OUTPUT\n");
 
-return 0;
+  return 0;
 }
 
 int CPC::cpc_setTxtPen_I(int c)
 {
 
-if (c < 0 || c > 15)
-{
-printf("Error: Color index out of range\n");
-return -1;
-}
-fprintf(out, "  ld a, 0x%02x\n", c);
-fprintf(out, "  call TXT_SET_PEN\n");
+  if (c < 0 || c > 15)
+  {
+    printf("Error: Color index out of range\n");
+    return -1;
+  }
+  fprintf(out, "  ld a, 0x%02x\n", c);
+  fprintf(out, "  call TXT_SET_PEN\n");
 
-return 0;
+  return 0;
 }
 
 int CPC::cpc_setTxtPen_I()
 {
-fprintf(out, "  pop hl\n");
-fprintf(out, "  ld a,l\n");
-fprintf(out, "  call TXT_SET_PEN\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "  call TXT_SET_PEN\n");
 
-return 0;
+  return 0;
 }
 
 int CPC::cpc_setTxtPaper_I(int c)
 {
-if (c < 0 || c > 15)
-{
-printf("Error: Color index out of range\n");
-return -1;
-}
-fprintf(out, "  ld a, 0x%02x\n", c);
-fprintf(out, "  call TXT_SET_PAPER\n");
+  if (c < 0 || c > 15)
+  {
+    printf("Error: Color index out of range\n");
+    return -1;
+  }
+  fprintf(out, "  ld a, 0x%02x\n", c);
+  fprintf(out, "  call TXT_SET_PAPER\n");
 
-return 0;
+  return 0;
 }
 
 int CPC::cpc_setTxtPaper_I()
 {
-fprintf(out, "  ; setTxtPaper()\n");
-fprintf(out, "  pop hl\n");
-fprintf(out, "  ld a,l\n");
-fprintf(out, "  call TXT_SET_PAPER\n");
+  fprintf(out, "  ; setTxtPaper()\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "  call TXT_SET_PAPER\n");
 
-return 0;
+  return 0;
 }
 
 int CPC::cpc_setGraPen_I(int c)
 {
-if (c < 0 || c > 15)
-{
-printf("Error: Color index out of range\n");
-return -1;
-}
-fprintf(out, "  ld a, 0x%02x\n", c);
-fprintf(out, "  ld a,l\n");
-fprintf(out, "  call GRA_SET_PEN\n");
+  if (c < 0 || c > 15)
+  {
+    printf("Error: Color index out of range\n");
+    return -1;
+  }
+  fprintf(out, "  ld a, 0x%02x\n", c);
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "  call GRA_SET_PEN\n");
 
-return 0;
+  return 0;
 }
 
 int CPC::cpc_setGraPen_I()
 {
-fprintf(out, "  ; setGraPen()\n");
-fprintf(out, "  pop hl\n");
-fprintf(out, "  ld a,l\n");
-fprintf(out, "  call GRA_SET_PEN\n");
+  fprintf(out, "  ; setGraPen()\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "  call GRA_SET_PEN\n");
 
-return 0;
+  return 0;
 }
 
 int CPC::cpc_setGraPaper_I(int c)
 {
-if (c < 0 || c > 15)
-{
-printf("Error: Color index out of range\n");
-return -1;
-}
-fprintf(out, "  ld a, 0x%02x\n", c);
-fprintf(out, "  ld a,l\n");
-fprintf(out, "  call GRA_SET_PAPER\n");
+  if (c < 0 || c > 15)
+  {
+    printf("Error: Color index out of range\n");
+    return -1;
+  }
+  fprintf(out, "  ld a, 0x%02x\n", c);
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "  call GRA_SET_PAPER\n");
 
-return 0;
+  return 0;
 }
 
 int CPC::cpc_setGraPaper_I()
 {
-fprintf(out, "  ; setGraPaper()\n");
-fprintf(out, "  pop hl\n");
-fprintf(out, "  ld a,l\n");
-fprintf(out, "  call GRA_SET_PAPER\n");
+  fprintf(out, "  ; setGraPaper()\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "  call GRA_SET_PAPER\n");
 
-return 0;
+  return 0;
 }
 
 int CPC::cpc_setBorderColor_I()
 {
-fprintf(out, "  ; setBorderColor()\n");
-fprintf(out, "  pop bc\n");
-fprintf(out, "  ld b,c\n");
-fprintf(out, "  call SCR_SET_BORDER\n");
+  fprintf(out, "  ; setBorderColor()\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  ld b,c\n");
+  fprintf(out, "  call SCR_SET_BORDER\n");
 
-return 0;
+  return 0;
 }
 
 int CPC::cpc_setBorderColor_I(int c)
 {
-if (c < 0 || c > 15)
-{
-printf("Error: Color index out of range\n");
-return -1;
-}
-fprintf(out, "  ld c, 0x%02x\n", c);
-fprintf(out, "  ld b,c\n");
-fprintf(out, "  call SCR_SET_BORDER\n");
+  if (c < 0 || c > 15)
+  {
+    printf("Error: Color index out of range\n");
+    return -1;
+  }
+  fprintf(out, "  ld c, 0x%02x\n", c);
+  fprintf(out, "  ld b,c\n");
+  fprintf(out, "  call SCR_SET_BORDER\n");
 
-return 0;
+  return 0;
 }
 
 int CPC::cpc_screen_I()
 {
-fprintf(out, "  ; screen()\n");
-fprintf(out, "  pop hl\n");
-fprintf(out, "  ld a,l\n");
-fprintf(out, "call SCR_SET_MODE\n");
+  fprintf(out, "  ; screen()\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "call SCR_SET_MODE\n");
 
-return 0;
+  return 0;
 }
 
 int CPC::cpc_screen_I(int c)
 {
-if (c < 0 || c > 2)
-{
-printf("Error: Color index out of range\n");
-return -1;
-}
-fprintf(out, "  ld a, 0x%02x\n", c);
-fprintf(out, "  ld a,l\n");
-fprintf(out, "call SCR_SET_MODE\n");
+  if (c < 0 || c > 2)
+  {
+    printf("Error: Color index out of range\n");
+    return -1;
+  }
+  fprintf(out, "  ld a, 0x%02x\n", c);
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "call SCR_SET_MODE\n");
 
-return 0;
+  return 0;
 }
 
 int CPC::cpc_cls()
 {
-fprintf(out, "  ; cls()\n");
-fprintf(out, "  call SCR_CLEAR\n");
+  fprintf(out, "  ; cls()\n");
+  fprintf(out, "  call SCR_CLEAR\n");
 
-return 0;
+  return 0;
 }
 
 int CPC::cpc_setCursor_II()
 {
-fprintf(out, "  ; setCursor_II()\n");
-fprintf(out, "  pop de\n");
-fprintf(out, "  ld l,e\n");
-fprintf(out, "  pop de\n");
-fprintf(out, "  ld h,e\n");
-fprintf(out, "  call TXT_SET_CURSOR\n");
+  fprintf(out, "  ; setCursor_II()\n");
+  fprintf(out, "  pop de\n");
+  fprintf(out, "  ld l,e\n");
+  fprintf(out, "  pop de\n");
+  fprintf(out, "  ld h,e\n");
+  fprintf(out, "  call TXT_SET_CURSOR\n");
 
-return 0;
+  return 0;
 }
 
 int CPC::cpc_putChar_C(char c)
 {
-fprintf(out, "  ld a, 0x%02x\n", c);
-fprintf(out, "  ld a,l\n");
-fprintf(out, "  call TXT_OUTPUT\n");
+  fprintf(out, "  ld a, 0x%02x\n", c);
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "  call TXT_OUTPUT\n");
 
-return 0;
+  return 0;
 }
 
 int CPC::cpc_putChar_C()
 {
-fprintf(out, "  ; putChar_C()\n");
-fprintf(out, "  pop hl\n");
-fprintf(out, "  ld a,l\n");
-fprintf(out, "  call TXT_OUTPUT\n");
+  fprintf(out, "  ; putChar_C()\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "  call TXT_OUTPUT\n");
 
-return 0;
+  return 0;
 }
 
 char CPC::cpc_readChar()
 {
-fprintf(out, "  ; readChar()\n");
-fprintf(out, "  call KM_WAIT_CHAR\n");
-fprintf(out, "  ld l,a\n");
-fprintf(out, "  ld h,0\n");
-fprintf(out, "  push hl\n");
+  fprintf(out, "  ; readChar()\n");
+  fprintf(out, "  call KM_WAIT_CHAR\n");
+  fprintf(out, "  ld l,a\n");
+  fprintf(out, "  ld h,0\n");
+  fprintf(out, "  push hl\n");
 
-return 0;
+  return 0;
 }
 
 
 
 int CPC::cpc_plot_III()
 {
-fprintf(out, "  ; plot_III()\n");
-fprintf(out, "  pop hl\n"); // get
-fprintf(out, "  ld a,l\n");
-fprintf(out, "  call GRA_SET_PEN\n");
-fprintf(out, "  pop hl\n"); // get y
-fprintf(out, "  pop de\n"); // get x
-fprintf(out, "  call GRA_PLOT_ABSOLUTE\n");
+  fprintf(out, "  ; plot_III()\n");
+  fprintf(out, "  pop hl\n"); // get
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "  call GRA_SET_PEN\n");
+  fprintf(out, "  pop hl\n"); // get y
+  fprintf(out, "  pop de\n"); // get x
+  fprintf(out, "  call GRA_PLOT_ABSOLUTE\n");
 
-return 0;
+  return 0;
 }
 
 int CPC::cpc_draw_III()
 {
-fprintf(out, "  ; draw_III()\n");
-fprintf(out, "  pop hl\n"); // get
-fprintf(out, "  ld a,l\n");
-fprintf(out, "  call GRA_SET_PEN\n");
-fprintf(out, "  pop hl\n"); // get y
-fprintf(out, "  pop de\n"); // get x
-fprintf(out, "  call GRA_LINE_ABSOLUTE\n");
+  fprintf(out, "  ; draw_III()\n");
+  fprintf(out, "  pop hl\n"); // get
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "  call GRA_SET_PEN\n");
+  fprintf(out, "  pop hl\n"); // get y
+  fprintf(out, "  pop de\n"); // get x
+  fprintf(out, "  call GRA_LINE_ABSOLUTE\n");
 
-return 0;
+  return 0;
 }
 
 int CPC::cpc_poke8_IC(int where,char c)
 {
-fprintf(out, "  ld hl, 0x%02x\n", where);
-fprintf(out, "  ld a, 0x%02x\n", c);
-fprintf(out, "  ld (hl),a\n");
+  fprintf(out, "  ld hl, 0x%02x\n", where);
+  fprintf(out, "  ld a, 0x%02x\n", c);
+  fprintf(out, "  ld (hl),a\n");
 
-return 0;
+  return 0;
 }
 
 int CPC::cpc_poke8_IC()
 {
-fprintf(out, "  pop hl\n");
-fprintf(out, "  ld a,l\n");
-fprintf(out, "  pop hl\n");
-fprintf(out, "  ld (hl),a\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld (hl),a\n");
 
-return 0;
+  return 0;
 }
