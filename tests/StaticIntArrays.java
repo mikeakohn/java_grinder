@@ -1,4 +1,6 @@
 
+// result=10
+
 public class StaticIntArrays
 {
   static int[] array = { 1, 2, 3, 4 };

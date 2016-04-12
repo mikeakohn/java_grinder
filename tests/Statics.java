@@ -1,4 +1,6 @@
 
+// result=21
+
 public class Statics
 {
   static int integer = 50;

@@ -1,4 +1,6 @@
 
+// result=45
+
 public class StaticArrayPointer
 {
   static byte[] array1 = { 1, 2, 3, 4 };
