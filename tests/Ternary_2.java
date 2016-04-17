@@ -1,4 +1,6 @@
 
+// result=0
+
 public class Ternary_2
 {
   static public int addIs5(int a, int b)

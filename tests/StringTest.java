@@ -1,13 +1,15 @@
 
+// result=335
+
 public class StringTest
 {
   static String letters = "ABCDE";
 
   static int add_letters()
   {
-  int len;
-  int n,a;
-  int total = 0;
+    int len;
+    int n,a;
+    int total = 0;
 
     len = letters.length();
 

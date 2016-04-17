@@ -1,4 +1,6 @@
 
+// result=11
+
 public class Testing
 {
   static public int add_nums(int a, int b)

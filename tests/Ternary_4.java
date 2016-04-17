@@ -1,4 +1,6 @@
 
+// result=1
+
 public class Ternary_4
 {
   static public int addLessThan5(int a, int b)
