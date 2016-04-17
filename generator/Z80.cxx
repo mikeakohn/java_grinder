@@ -364,6 +364,8 @@ void Z80::insert_div_integer()
   //In: Divide BC by divider DE
   //Out: BC = result, HL = rest
   fprintf(out, "div_integer:\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  pop de\n");
   fprintf(out, "  ld hl,0\n");
   fprintf(out, "  ld a,b\n");
   fprintf(out, "  ld b,8\n");
@@ -405,6 +407,8 @@ void Z80::insert_mod_integer()
   //In: Divide BC by divider DE
   //Out: BC = result, HL = rest
   fprintf(out, "mod_integer:\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  pop de\n");
   fprintf(out, "  ld hl,0\n");
   fprintf(out, "  ld a,b\n");
   fprintf(out, "  ld b,8\n");
