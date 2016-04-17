@@ -21,6 +21,7 @@ public:
   virtual ~Z80();
 
   virtual int open(const char *filename);
+  virtual int add_functions();
   virtual int start_init();
   virtual int insert_static_field_define(const char *name, const char *type, int index);
   virtual int init_heap(int field_count);
@@ -109,9 +110,17 @@ protected:
   //int reg_max;        // size of register stack 
   int stack;          // count how many things we put on the stack
   bool is_main : 1;
+  bool need_mul_integer:1;
+  bool need_div_integer:1;
+  bool need_mod_integer:1;
 
 private:
   void restore_stack(int count);
+  
+  void insert_mul_integer();
+  void insert_div_integer();
+  void insert_mod_integer();
+   
 };
 
 #endif
