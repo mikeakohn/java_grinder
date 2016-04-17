@@ -1035,7 +1035,7 @@ int Z80::stack_alu_const(int alu_op, int num)
   {
 #if 0
     fprintf(out, "  pop hl\n");
-    fprintf(out, "  ld bc, %04x\n", value);
+    fprintf(out, "  ld bc, 0x%04x\n", value);
     //fprintf(out, "  scf\n");   // set carry
     //fprintf(out, "  ccf\n");   // carry = not carry
     fprintf(out, "  and a   ; clear carry\n");
@@ -1043,8 +1043,8 @@ int Z80::stack_alu_const(int alu_op, int num)
     fprintf(out, "  push hl\n");
 #endif
     fprintf(out, "  pop hl\n");
-    fprintf(out, "  ld b, %04x\n", value >> 8);
-    fprintf(out, "  ld c, %04x\n", value & 0xff);
+    fprintf(out, "  ld b, 0x%02x\n", value >> 8);
+    fprintf(out, "  ld c, 0x%02x\n", value & 0xff);
     if (alu_op == ALU_SUB)
     {
       fprintf(out, "  and a   ; clear carry\n");
@@ -1058,10 +1058,10 @@ int Z80::stack_alu_const(int alu_op, int num)
   // Now we know this is a logic instruction
   fprintf(out, "  pop hl\n");
   fprintf(out, "  ld a, h\n");
-  fprintf(out, "  %s %02x\n", alu_str[alu_op], value >> 8);
+  fprintf(out, "  %s 0x%02x\n", alu_str[alu_op], value >> 8);
   fprintf(out, "  ld h, a\n");
   fprintf(out, "  ld a, l\n");
-  fprintf(out, "  %s %02x\n", alu_str[alu_op], value & 0xff);
+  fprintf(out, "  %s 0x%02x\n", alu_str[alu_op], value & 0xff);
   fprintf(out, "  ld l, a\n");
   fprintf(out, "  push hl\n");
 
