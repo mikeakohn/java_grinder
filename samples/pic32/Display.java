@@ -2,7 +2,7 @@
 import net.mikekohn.java_grinder.IOPort3;
 import net.mikekohn.java_grinder.IOPort5;
 import net.mikekohn.java_grinder.IOPort6;
-import net.mikekohn.java_grinder.SPI0;
+import net.mikekohn.java_grinder.SPI1;
 
 public class Display
 {
@@ -18,10 +18,10 @@ public class Display
     IOPort5.setPinsValue(0x01);
     IOPort6.setPinsValue(0x40);
 
-    SPI0.init16(SPI0.DIV128, 0);
+    SPI1.init16(SPI1.DIV128, 0);
 
     IOPort3.setPinsValue(0x000);
-    SPI0.send16(0x3fff);
+    SPI1.send16(0x3200);
     IOPort3.setPinsValue(0x200);
 
     while(true);

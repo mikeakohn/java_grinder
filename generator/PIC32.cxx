@@ -16,7 +16,7 @@
 #include "PIC32.h"
 
 #define CHECK_PORT_SPI() \
-  if (port != 0) { printf("Illegal SPI port\n"); return -1; } \
+  if (port > 1) { printf("Illegal SPI port\n"); return -1; } \
   port++;
 
 PIC32::PIC32()
@@ -148,7 +148,7 @@ int PIC32::spi_init_II(int port, int clock_divisor, int mode)
   // bit 6 = CKP (clock polarity select)
   // bit 5 = MSTEN
 
-  fprintf(out, "  ;; spit_init(%d, %d %d)\n", port, clock_divisor, mode);
+  fprintf(out, "  ;; spit_init(%d, %d, %d)\n", port, clock_divisor, mode);
   fprintf(out, "  li $t8, 0x%x\n", (1 << 15) | (1 << 5) | (mode << 8));
   fprintf(out, "  sw $t8, SPI%dCON($k1)\n", port);
 
@@ -179,16 +179,22 @@ int PIC32::spi_init16_II(int port, int clock_divisor, int mode)
   if (mode > 3) { mode = 0; }
   mode = mode_table[mode];
 
+  // bit 23 = MCLKSEL (1=MCLK, 0=PBCLK)
   // bit 15 = ENABLE
   // bit 10-11: 0=8 bit, 1=16 bit, 2=32 bit
   // bit 8 = CKE (clock edge select)
   // bit 6 = CKP (clock polarity select)
   // bit 5 = MSTEN
 
-  fprintf(out, "  ;; spit_init(%d, %d %d)\n", port, clock_divisor, mode);
+  fprintf(out, "  ;; spit_init(%d, %d, %d)\n", port, clock_divisor, mode);
+  fprintf(out, "  sw $0, SPI%dCON($k1)\n", port);
+  fprintf(out, "  li $t8, 1\n");
+  fprintf(out, "  sw $t8, SPI%dBRG($k1)\n", port);
+  //fprintf(out, "  li $t8, 0x%x\n", (1 << 23) | (1 << 15) | (1 << 10) | (1 << 5) | (mode << 8));
   fprintf(out, "  li $t8, 0x%x\n", (1 << 15) | (1 << 10) | (1 << 5) | (mode << 8));
   fprintf(out, "  sw $t8, SPI%dCON($k1)\n", port);
 
+#if 0
   fprintf(out, "  li $at, 0xbfc02ff8 ; DEVCFG1\n");
   fprintf(out, "  li $t9, 0x%08x\n", ~(3 << 12));
   fprintf(out, "  lw $t8, 0($at)\n");
@@ -196,6 +202,7 @@ int PIC32::spi_init16_II(int port, int clock_divisor, int mode)
   fprintf(out, "  li $t9, %d << 12\n", clock_divisor);
   fprintf(out, "  or $t8, $t8, $t9\n");
   fprintf(out, "  sw $t8, 0($at)\n");
+#endif
 
   return 0;
 }
