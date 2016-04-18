@@ -340,7 +340,6 @@ int CPC::cpc_setGraPen_I(int c)
     return -1;
   }
   fprintf(out, "  ld a, 0x%02x\n", c);
-  fprintf(out, "  ld a,l\n");
   fprintf(out, "  call GRA_SET_PEN\n");
 
   return 0;
@@ -364,7 +363,6 @@ int CPC::cpc_setGraPaper_I(int c)
     return -1;
   }
   fprintf(out, "  ld a, 0x%02x\n", c);
-  fprintf(out, "  ld a,l\n");
   fprintf(out, "  call GRA_SET_PAPER\n");
 
   return 0;
@@ -422,7 +420,6 @@ int CPC::cpc_screen_I(int c)
     return -1;
   }
   fprintf(out, "  ld a, 0x%02x\n", c);
-  fprintf(out, "  ld a,l\n");
   fprintf(out, "call SCR_SET_MODE\n");
 
   return 0;
@@ -451,7 +448,6 @@ int CPC::cpc_setCursor_II()
 int CPC::cpc_putChar_C(char c)
 {
   fprintf(out, "  ld a, 0x%02x\n", c);
-  fprintf(out, "  ld a,l\n");
   fprintf(out, "  call TXT_OUTPUT\n");
 
   return 0;
