@@ -41,9 +41,9 @@ enum
 Z80::Z80() :
   stack(0),
   is_main(0),
-  need_mul_integer(0),
-  need_div_integer(0),
-  need_mod_integer(0)
+  need_mul16_integer(0),
+  need_div16_integer(0),
+  need_mod16_integer(0)
 {
 }
 
@@ -68,9 +68,9 @@ int Z80::open(const char *filename)
 
 int Z80::add_functions()
 {
-  if(need_mul_integer) { insert_mul_integer(); }
-  if(need_div_integer) { insert_div_integer(); }
-  if(need_mod_integer) { insert_mod_integer(); }
+  if(need_mul16_integer) { insert_mul16_integer(); }
+  if(need_div16_integer) { insert_div16_integer(); }
+  if(need_mod16_integer) { insert_mod16_integer(); }
  
   return 0;
 }
@@ -308,8 +308,8 @@ int Z80::sub_integer(int num)
 
 int Z80::mul_integer()
 {
-  need_mul_integer = 1;
-  fprintf(out, "  call mul_integer\n");
+  need_mul16_integer = 1;
+  fprintf(out, "  call mul16_integer\n");
   stack--;
 
   return 0;
@@ -317,8 +317,8 @@ int Z80::mul_integer()
 
 int Z80::div_integer()
 {
-  need_div_integer = 1;
-  fprintf(out, "  call div_integer\n");
+  need_div16_integer = 1;
+  fprintf(out, "  call div16_integer\n");
   stack--;
 
   return 0;
@@ -326,122 +326,11 @@ int Z80::div_integer()
 
 int Z80::mod_integer()
 {
-  need_mod_integer = 1;
-  fprintf(out, "  call mod_integer\n");
+  need_mod16_integer = 1;
+  fprintf(out, "  call mod16_integer\n");
   stack--;
 
   return 0;
-}
-
-void Z80::insert_mul_integer()
-{
-  fprintf(out, "  ;Multiply 16-bit values (with 16-bit result)\n");
-  //In: Multiply BC with DE
-  //Out: HL = result
-  fprintf(out, "mul_integer:\n");
-  fprintf(out, "  pop bc\n");
-  fprintf(out, "  pop de\n");
-  fprintf(out, "  Mult16:\n");
-  fprintf(out, "  ld a,b\n");
-  fprintf(out, "  ld b,16\n");
-  fprintf(out, "  Mult16_Loop:\n");
-  fprintf(out, "  add hl,hl\n");
-  fprintf(out, "  sla c\n");
-  fprintf(out, "  rla\n");
-  fprintf(out, "  jr nc,Mult16_NoAdd\n");
-  fprintf(out, "  add hl,de\n");
-  fprintf(out, "  Mult16_NoAdd:\n");
-  fprintf(out, "  djnz Mult16_Loop\n");
-  fprintf(out, "  push hl\n");
-  fprintf(out, "  ret\n");
-  
-}
-
-void Z80::insert_div_integer()
-{  
-  
-  fprintf(out, ";Divide 16-bit values (with 16-bit result)\n");
-  //In: Divide BC by divider DE
-  //Out: BC = result, HL = rest
-  fprintf(out, "div_integer:\n");
-  fprintf(out, "  pop bc\n");
-  fprintf(out, "  pop de\n");
-  fprintf(out, "  ld hl,0\n");
-  fprintf(out, "  ld a,b\n");
-  fprintf(out, "  ld b,8\n");
-  fprintf(out, "Div16_Loop1:\n");
-  fprintf(out, "  rla\n");
-  fprintf(out, "  adc hl,hl\n");
-  fprintf(out, "  sbc hl,de\n");
-  fprintf(out, "  jr nc,Div16_NoAdd1\n");
-  fprintf(out, "  add hl,de\n");
-  fprintf(out, "Div16_NoAdd1:\n");
-  fprintf(out, "  djnz Div16_Loop1\n");
-  fprintf(out, "  ld b,a\n");
-  fprintf(out, "  ld a,c\n");
-  fprintf(out, "  ld c,b\n");
-  fprintf(out, "  ld b,8\n");
-  fprintf(out, "Div16_Loop2:\n");
-  fprintf(out, "  rla\n");
-  fprintf(out, "  adc hl,hl\n");
-  fprintf(out, "  sbc hl,de\n");
-  fprintf(out, "  jr nc,Div16_NoAdd2\n");
-  fprintf(out, "  add hl,de\n");
-  fprintf(out, "Div16_NoAdd2:\n");
-  fprintf(out, "  djnz Div16_Loop2\n");
-  fprintf(out, "  rla\n");
-  fprintf(out, "  cpl\n");
-  fprintf(out, "  ld b,a\n");
-  fprintf(out, "  ld a,c\n");
-  fprintf(out, "  ld c,b\n");
-  fprintf(out, "  rla\n");
-  fprintf(out, "  cpl\n");
-  fprintf(out, "  ld b,a\n");
-  fprintf(out, "  push bc\n");
-  fprintf(out, "  ret\n");
-}
-
-void Z80::insert_mod_integer()
-{
-  fprintf(out, ";Divide 16-bit values (with 16-bit result)\n");
-  //In: Divide BC by divider DE
-  //Out: BC = result, HL = rest
-  fprintf(out, "mod_integer:\n");
-  fprintf(out, "  pop bc\n");
-  fprintf(out, "  pop de\n");
-  fprintf(out, "  ld hl,0\n");
-  fprintf(out, "  ld a,b\n");
-  fprintf(out, "  ld b,8\n");
-  fprintf(out, "Mod16_Loop1:\n");
-  fprintf(out, "  rla\n");
-  fprintf(out, "  adc hl,hl\n");
-  fprintf(out, "  sbc hl,de\n");
-  fprintf(out, "  jr nc,Mod16_NoAdd1\n");
-  fprintf(out, "  add hl,de\n");
-  fprintf(out, "Mod16_NoAdd1:\n");
-  fprintf(out, "  djnz Div16_Loop1\n");
-  fprintf(out, "  ld b,a\n");
-  fprintf(out, "  ld a,c\n");
-  fprintf(out, "  ld c,b\n");
-  fprintf(out, "  ld b,8\n");
-  fprintf(out, "Mod16_Loop2:\n");
-  fprintf(out, "  rla\n");
-  fprintf(out, "  adc hl,hl\n");
-  fprintf(out, "  sbc hl,de\n");
-  fprintf(out, "  jr nc,Mod16_NoAdd2\n");
-  fprintf(out, "  add hl,de\n");
-  fprintf(out, "Mod16_NoAdd2:\n");
-  fprintf(out, "  djnz Mod16_Loop2\n");
-  fprintf(out, "  rla\n");
-  fprintf(out, "  cpl\n");
-  fprintf(out, "  ld b,a\n");
-  fprintf(out, "  ld a,c\n");
-  fprintf(out, "  ld c,b\n");
-  fprintf(out, "  rla\n");
-  fprintf(out, "  cpl\n");
-  fprintf(out, "  ld b,a\n");
-  fprintf(out, "  push hl\n"); //Save MODULO
-  fprintf(out, "  ret\n");
 }
 
 int Z80::neg_integer()
@@ -1221,4 +1110,119 @@ void Z80::restore_registers()
   fprintf(out, "  pop iy\n");
 }
 
+// *****************************
+// now the new private functions
+// *****************************
+
+void Z80::insert_mul16_integer()
+{
+  fprintf(out, "  ;Multiply 16-bit values (with 16-bit result)\n");
+  //In: Multiply BC with DE
+  //Out: HL = result
+  fprintf(out, "mul16_integer:\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  pop de\n");
+  fprintf(out, "  Mult16:\n");
+  fprintf(out, "  ld a,b\n");
+  fprintf(out, "  ld b,16\n");
+  fprintf(out, "  Mult16_Loop:\n");
+  fprintf(out, "  add hl,hl\n");
+  fprintf(out, "  sla c\n");
+  fprintf(out, "  rla\n");
+  fprintf(out, "  jr nc,Mult16_NoAdd\n");
+  fprintf(out, "  add hl,de\n");
+  fprintf(out, "  Mult16_NoAdd:\n");
+  fprintf(out, "  djnz Mult16_Loop\n");
+  fprintf(out, "  push hl\n");
+  fprintf(out, "  ret\n");
+  
+}
+
+
+void Z80::insert_div16_integer()
+{  
+  
+  fprintf(out, ";Divide 16-bit values (with 16-bit result)\n");
+  //In: Divide BC by divider DE
+  //Out: BC = result, HL = rest
+  fprintf(out, "div16_integer:\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  pop de\n");
+  fprintf(out, "  ld hl,0\n");
+  fprintf(out, "  ld a,b\n");
+  fprintf(out, "  ld b,8\n");
+  fprintf(out, "Div16_Loop1:\n");
+  fprintf(out, "  rla\n");
+  fprintf(out, "  adc hl,hl\n");
+  fprintf(out, "  sbc hl,de\n");
+  fprintf(out, "  jr nc,Div16_NoAdd1\n");
+  fprintf(out, "  add hl,de\n");
+  fprintf(out, "Div16_NoAdd1:\n");
+  fprintf(out, "  djnz Div16_Loop1\n");
+  fprintf(out, "  ld b,a\n");
+  fprintf(out, "  ld a,c\n");
+  fprintf(out, "  ld c,b\n");
+  fprintf(out, "  ld b,8\n");
+  fprintf(out, "Div16_Loop2:\n");
+  fprintf(out, "  rla\n");
+  fprintf(out, "  adc hl,hl\n");
+  fprintf(out, "  sbc hl,de\n");
+  fprintf(out, "  jr nc,Div16_NoAdd2\n");
+  fprintf(out, "  add hl,de\n");
+  fprintf(out, "Div16_NoAdd2:\n");
+  fprintf(out, "  djnz Div16_Loop2\n");
+  fprintf(out, "  rla\n");
+  fprintf(out, "  cpl\n");
+  fprintf(out, "  ld b,a\n");
+  fprintf(out, "  ld a,c\n");
+  fprintf(out, "  ld c,b\n");
+  fprintf(out, "  rla\n");
+  fprintf(out, "  cpl\n");
+  fprintf(out, "  ld b,a\n");
+  fprintf(out, "  push bc\n");
+  fprintf(out, "  ret\n");
+}
+
+void Z80::insert_mod16_integer()
+{
+  fprintf(out, ";Divide 16-bit values (with 16-bit result)\n");
+  //In: Divide BC by divider DE
+  //Out: BC = result, HL = rest
+  fprintf(out, "mod16_integer:\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  pop de\n");
+  fprintf(out, "  ld hl,0\n");
+  fprintf(out, "  ld a,b\n");
+  fprintf(out, "  ld b,8\n");
+  fprintf(out, "Mod16_Loop1:\n");
+  fprintf(out, "  rla\n");
+  fprintf(out, "  adc hl,hl\n");
+  fprintf(out, "  sbc hl,de\n");
+  fprintf(out, "  jr nc,Mod16_NoAdd1\n");
+  fprintf(out, "  add hl,de\n");
+  fprintf(out, "Mod16_NoAdd1:\n");
+  fprintf(out, "  djnz Div16_Loop1\n");
+  fprintf(out, "  ld b,a\n");
+  fprintf(out, "  ld a,c\n");
+  fprintf(out, "  ld c,b\n");
+  fprintf(out, "  ld b,8\n");
+  fprintf(out, "Mod16_Loop2:\n");
+  fprintf(out, "  rla\n");
+  fprintf(out, "  adc hl,hl\n");
+  fprintf(out, "  sbc hl,de\n");
+  fprintf(out, "  jr nc,Mod16_NoAdd2\n");
+  fprintf(out, "  add hl,de\n");
+  fprintf(out, "Mod16_NoAdd2:\n");
+  fprintf(out, "  djnz Mod16_Loop2\n");
+  fprintf(out, "  rla\n");
+  fprintf(out, "  cpl\n");
+  fprintf(out, "  ld b,a\n");
+  fprintf(out, "  ld a,c\n");
+  fprintf(out, "  ld c,b\n");
+  fprintf(out, "  rla\n");
+  fprintf(out, "  cpl\n");
+  fprintf(out, "  ld b,a\n");
+  fprintf(out, "  push hl\n"); //Save MODULO
+  fprintf(out, "  ret\n");
+}
 

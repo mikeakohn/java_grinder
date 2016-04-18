@@ -110,16 +110,16 @@ protected:
   //int reg_max;        // size of register stack 
   int stack;          // count how many things we put on the stack
   bool is_main : 1;
-  bool need_mul_integer:1;
-  bool need_div_integer:1;
-  bool need_mod_integer:1;
+  bool need_mul16_integer:1;
+  bool need_div16_integer:1;
+  bool need_mod16_integer:1;
 
 private:
   void restore_stack(int count);
   
-  void insert_mul_integer();
-  void insert_div_integer();
-  void insert_mod_integer();
+  void insert_mul16_integer();
+  void insert_div16_integer();
+  void insert_mod16_integer();
    
 };
 
