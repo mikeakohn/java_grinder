@@ -53,6 +53,8 @@ int cpc(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(draw,_III)
   CHECK_FUNC(readChar,)
   CHECK_FUNC(poke8,_IC)
+  CHECK_FUNC(peek8,_I)
+  
   return -1;
 }
 
@@ -65,6 +67,8 @@ int cpc(JavaClass *java_class, Generator *generator, char *method_name, int cons
   CHECK_FUNC_CONST(setGraPaper,_I)
   CHECK_FUNC_CONST(screen,_I)
   CHECK_FUNC_CONST(putChar,_C)
+  CHECK_FUNC_CONST(peek8,_I)
+ 
   return -1;
 }
 
