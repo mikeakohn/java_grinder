@@ -14,6 +14,19 @@
 
 #include "Generator.h"
 
+// Stack points to the last used slot.
+// push = subtract 4, then place value
+#define STACK_PUSH(t) \
+  fprintf(out, "  addi $sp, $sp, -4\n"); \
+  fprintf(out, "  sw $t%d, 0($sp)\n", t); \
+  stack++;
+
+// pop = read value, then subtract 4
+#define STACK_POP(t) \
+  fprintf(out, "  lw $%d, 0($sp)\n", t); \
+  fprintf(out, "  addi $sp, $sp, 4\n"); \
+  stack--;
+
 class MIPS32 : public Generator
 {
 public:
