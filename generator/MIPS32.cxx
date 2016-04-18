@@ -19,19 +19,6 @@
 #define REG_STACK(a) (a)
 #define LOCALS(i) (-(i * 4))
 
-// Stack points to the last used slot.
-// push = subtract 4, then place value
-#define STACK_PUSH(t) \
-  fprintf(out, "  addi $sp, $sp, -4\n"); \
-  fprintf(out, "  sw $t%d, 0($sp)\n", t); \
-  stack++;
-
-// pop = read value, then subtract 4
-#define STACK_POP(t) \
-  fprintf(out, "  lw $%d, 0($sp)\n", t); \
-  fprintf(out, "  addi $sp, $sp, 4\n"); \
-  stack--;
-
 // ABI is:
 // r0  $zero Always 0
 // r1  $at Reserved for pseudo instructions?
@@ -102,10 +89,10 @@ int MIPS32::open(const char *filename)
   fprintf(out, ".mips32\n");
 
   // Set where RAM starts / ends
-  fprintf(out, "ram_start equ 0x%x\n", ram_start);
-  fprintf(out, "ram_end equ 0x%x\n", ram_end);
-  fprintf(out, "virtual_address equ 0x%x\n", virtual_address);
-  fprintf(out, "physical_address equ 0x%x\n", physical_address);
+  fprintf(out, "  ram_start equ 0x%x\n", ram_start);
+  fprintf(out, "  ram_end equ 0x%x\n", ram_end);
+  fprintf(out, "  virtual_address equ 0x%x\n", virtual_address);
+  fprintf(out, "  physical_address equ 0x%x\n", physical_address);
 
   return 0;
 }

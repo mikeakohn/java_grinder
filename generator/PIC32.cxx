@@ -16,7 +16,8 @@
 #include "PIC32.h"
 
 #define CHECK_PORT_SPI() \
-  if (port != 0) { printf("Illegal SPI port\n"); return -1; }
+  if (port > 1) { printf("Illegal SPI port\n"); return -1; } \
+  port++;
 
 PIC32::PIC32()
 {
@@ -40,6 +41,10 @@ int PIC32::open(const char *filename)
   fprintf(out, "  SPI1STAT equ 0x5810\n");
   fprintf(out, "  SPI1BUF equ 0x5820\n");
   fprintf(out, "  SPI1BRG equ 0x5830\n");
+  fprintf(out, "  SPI2CON equ 0x5a00\n");
+  fprintf(out, "  SPI2STAT equ 0x5a10\n");
+  fprintf(out, "  SPI2BUF equ 0x5a20\n");
+  fprintf(out, "  SPI2BRG equ 0x5a30\n");
 
   return 0;
 }
@@ -63,7 +68,7 @@ int PIC32::ioport_setPinsAsInput_I(int port)
 int PIC32::ioport_setPinsAsOutput_I(int port)
 {
   fprintf(out, "  ; setPinsAsOutput() port=%d TRIS%c\n", port, 'A' + port);
-  fprintf(out, "  xori $t%d, $t%d, 0xff\n", reg - 1, reg - 1);
+  fprintf(out, "  xori $t%d, $t%d, 0xffff\n", reg - 1, reg - 1);
   fprintf(out, "  sw $t%d, 0x6%02x0($k0)\n", reg - 1, port * 4);
 
   reg--;
@@ -143,15 +148,15 @@ int PIC32::spi_init_II(int port, int clock_divisor, int mode)
   // bit 6 = CKP (clock polarity select)
   // bit 5 = MSTEN
 
-  fprintf(out, "  ;; spit_init(%d, %d %d)\n", port, clock_divisor, mode);
+  fprintf(out, "  ;; spit_init(%d, %d, %d)\n", port, clock_divisor, mode);
   fprintf(out, "  li $t8, 0x%x\n", (1 << 15) | (1 << 5) | (mode << 8));
-  fprintf(out, "  sw $t8, SPI1CON($k1)\n");
+  fprintf(out, "  sw $t8, SPI%dCON($k1)\n", port);
 
   fprintf(out, "  li $at, 0xbfc02ff8 ; DEVCFG1\n");
-  fprintf(out, "  lw $t9, ~(3 << 12)\n");
+  fprintf(out, "  li $t9, 0x%08x\n", ~(3 << 12));
   fprintf(out, "  lw $t8, 0($at)\n");
   fprintf(out, "  and $t8, $t8, $t9\n");
-  fprintf(out, "  lw $t9, %d << 12\n", clock_divisor);
+  fprintf(out, "  li $t9, %d << 12\n", clock_divisor);
   fprintf(out, "  or $t8, $t8, $t9\n");
   fprintf(out, "  sw $t8, 0($at)\n");
 
@@ -174,23 +179,30 @@ int PIC32::spi_init16_II(int port, int clock_divisor, int mode)
   if (mode > 3) { mode = 0; }
   mode = mode_table[mode];
 
+  // bit 23 = MCLKSEL (1=MCLK, 0=PBCLK)
   // bit 15 = ENABLE
   // bit 10-11: 0=8 bit, 1=16 bit, 2=32 bit
   // bit 8 = CKE (clock edge select)
   // bit 6 = CKP (clock polarity select)
   // bit 5 = MSTEN
 
-  fprintf(out, "  ;; spit_init(%d, %d %d)\n", port, clock_divisor, mode);
+  fprintf(out, "  ;; spit_init(%d, %d, %d)\n", port, clock_divisor, mode);
+  fprintf(out, "  sw $0, SPI%dCON($k1)\n", port);
+  fprintf(out, "  li $t8, 1\n");
+  fprintf(out, "  sw $t8, SPI%dBRG($k1)\n", port);
+  //fprintf(out, "  li $t8, 0x%x\n", (1 << 23) | (1 << 15) | (1 << 10) | (1 << 5) | (mode << 8));
   fprintf(out, "  li $t8, 0x%x\n", (1 << 15) | (1 << 10) | (1 << 5) | (mode << 8));
-  fprintf(out, "  sw $t8, SPI1CON($k1)\n");
+  fprintf(out, "  sw $t8, SPI%dCON($k1)\n", port);
 
+#if 0
   fprintf(out, "  li $at, 0xbfc02ff8 ; DEVCFG1\n");
-  fprintf(out, "  lw $t9, ~(3 << 12)\n");
+  fprintf(out, "  li $t9, 0x%08x\n", ~(3 << 12));
   fprintf(out, "  lw $t8, 0($at)\n");
   fprintf(out, "  and $t8, $t8, $t9\n");
-  fprintf(out, "  lw $t9, %d << 12\n", clock_divisor);
+  fprintf(out, "  li $t9, %d << 12\n", clock_divisor);
   fprintf(out, "  or $t8, $t8, $t9\n");
   fprintf(out, "  sw $t8, 0($at)\n");
+#endif
 
   return 0;
 }
@@ -199,44 +211,72 @@ int PIC32::spi_send_I(int port)
 {
   CHECK_PORT_SPI();
 
-#if 0
-  add_spi_send = 1;
+  if (stack == 0)
+  {
+    fprintf(out, "  sw $t%d, SPI%dBUF($k1)\n", reg - 1, port);
+    reg--;
+  }
+    else
+  {
+    STACK_POP(8);
+    fprintf(out, "  sw $t8, SPI%dBUF($k1)\n", port);
+  }
 
-  fprintf(out, "  addi $sp, $sp, -4\n");
-  fprintf(out, "  sw $ra, 0($sp)\n", t);
-  fprintf(out, "  jal _spi_send\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  lw $ra, 0($sp)\n", t);
-  fprintf(out, "  addi $sp, $sp, 4\n");
-#endif
+  fprintf(out, "_spi_send_%d:\n", label_count);
+  fprintf(out, "  lw $t8, SPI%dSTAT($k1)\n", port);
+  fprintf(out, "  andi $t8, $t8, ((1 << 11) | (1 << 1))\n");
+  fprintf(out, "  bnez $t8, _spi_send_%d\n", label_count);
 
-  fprintf(out, "  lw $t8, SPI1STAT($k1)\n");
-  fprintf(out, "  andi $t9, $t8, (1 << 11) | (1 << 1)\n");
-  fprintf(out, "  bne _spi_send\n");
+  label_count++;
 
-  return -1;
+  if (reg < 8)
+  {
+    fprintf(out, "  lw $t%d, SPI%dBUF($k1)\n", reg, port);
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  lw $t8, SPI%dBUF($k1)\n", port);
+    STACK_PUSH(8);
+  }
+
+  return 0;
 }
 
 int PIC32::spi_send16_I(int port)
 {
   CHECK_PORT_SPI();
 
-#if 0
-  add_spi_send = 1;
+  if (stack == 0)
+  {
+    fprintf(out, "  sw $t%d, SPI%dBUF($k1)\n", reg - 1, port);
+    reg--;
+  }
+    else
+  {
+    STACK_POP(8);
+    fprintf(out, "  sw $t8, SPI%dBUF($k1)\n", port);
+  }
 
-  fprintf(out, "  addi $sp, $sp, -4\n");
-  fprintf(out, "  sw $ra, 0($sp)\n", t);
-  fprintf(out, "  jal _spi_send\n");
-  fprintf(out, "  nop\n");
-  fprintf(out, "  lw $ra, 0($sp)\n", t);
-  fprintf(out, "  addi $sp, $sp, 4\n");
-#endif
+  fprintf(out, "_spi_send_%d:\n", label_count);
+  fprintf(out, "  lw $t8, SPI%dSTAT($k1)\n", port);
+  fprintf(out, "  andi $t8, $t8, ((1 << 11) | (1 << 1))\n");
+  fprintf(out, "  bnez $t8, _spi_send_%d\n", label_count);
 
-  fprintf(out, "  lw $t8, SPI1STAT($k1)\n");
-  fprintf(out, "  andi $t9, $t8, (1 << 11) | (1 << 1)\n");
-  fprintf(out, "  bne _spi_send\n");
+  label_count++;
 
-  return -1;
+  if (reg < 8)
+  {
+    fprintf(out, "  lw $t%d, SPI%dBUF($k1)\n", reg, port);
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  lw $t8, SPI%dBUF($k1)\n", port);
+    STACK_PUSH(8);
+  }
+
+  return 0;
 }
 
 int PIC32::spi_read(int port)

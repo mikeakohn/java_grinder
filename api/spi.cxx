@@ -30,7 +30,7 @@
   }
 
 #define CHECK_FUNC_CONST_2(funct,sig) \
-  if (strcmp(#funct, method_name) == 0) \
+  if (strcmp(#funct#sig, method_name) == 0) \
   { \
     return generator->spi_##funct##sig(port, const_val1, const_val2); \
   }
