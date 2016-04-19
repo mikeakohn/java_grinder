@@ -30,6 +30,7 @@ abstract public class CPC
   public static void plot(int x, int y, int foreground) { }
   public static void draw(int x, int y, int foreground) { }
   public static void poke8(int w, char c) { }
+  public static void peek8(int w) { }
 }
 
 
