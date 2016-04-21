@@ -16,7 +16,7 @@ run_msp430_test()
   cycles=`echo ${a} | sed 's/ clock cycles.*$//' | sed 's/^.* //'`
   answer=`echo ${a} | sed 's/^.* r15: //' | sed 's/,.*$//'`
   answer=`printf "%d" ${answer}`
-  result=`cat ${file}.result`
+  result=`cat ${file}.java | grep '^// result=' | sed 's/\/\/ result=//'`
   echo -n ${file} ": " ${cycles} "cycles", ${answer}
   if [ ${answer} -ne ${result} ]
   then
@@ -35,7 +35,7 @@ run_6502_test()
   cycles=`echo ${a} | sed 's/ clock cycles.*$//' | sed 's/^.* //'`
   answer=`echo ${a} | sed 's/^.* r15: //' | sed 's/,.*$//'`
   answer=`printf "%d" ${answer}`
-  result=`cat ${file}.result`
+  result=`cat ${file}.java | grep '^// result=' | sed 's/\/\/ result=//'`
   echo -n ${file} ": " ${cycles} "cycles", ${answer}
   if [ ${answer} -ne ${result} ]
   then

@@ -1,4 +1,6 @@
 
+// result=67
+
 public class Divide
 {
   static public int div_nums(int a, int b)

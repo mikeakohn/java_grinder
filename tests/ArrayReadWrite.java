@@ -1,4 +1,6 @@
 
+// result=35
+
 public class ArrayReadWrite
 {
   static public int add_nums()

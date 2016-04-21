@@ -1,4 +1,6 @@
 
+// result=1
+
 public class NotNull
 {
   static String string = "hello";

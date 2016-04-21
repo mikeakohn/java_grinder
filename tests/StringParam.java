@@ -1,4 +1,6 @@
 
+// result=335
+
 public class StringParam
 {
   static String letters = "ABCDE";

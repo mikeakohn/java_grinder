@@ -1,4 +1,6 @@
 
+// result=11
+
 public class OptimizeLoadStore
 {
   static public int add_nums(int a, int b)

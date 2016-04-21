@@ -1,4 +1,6 @@
 
+// result=30
+
 public class Multiply
 {
   static public int mul_nums(int a, int b)

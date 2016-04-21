@@ -1,4 +1,6 @@
 
+// result=0
+
 public class Null
 {
   static String string = "hello";

@@ -1,4 +1,6 @@
 
+// result=640
+
 public class LoopTest
 {
   static public int loop_up()

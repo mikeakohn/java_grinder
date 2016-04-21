@@ -1,4 +1,6 @@
 
+// result=45
+
 public class ArrayPointers
 {
   static byte[] array1 = { 1, 2, 3, 4 };
