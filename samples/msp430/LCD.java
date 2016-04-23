@@ -208,7 +208,7 @@ public class LCD
     clock();
 
     // Hardware clock out the rest of the bits
-    SPI0.send(a);
+    SPI0.read(a);
 
     // /CS = 1
     IOPort0.setPinsHigh(SPI_CS);
@@ -227,7 +227,7 @@ public class LCD
     IOPort0.setPinsLow(SPI_SDO);
 
     // Hardware clock out the rest of the bits
-    SPI0.send(a);
+    SPI0.read(a);
 
     // /CS = 1
     IOPort0.setPinsHigh(SPI_CS);
