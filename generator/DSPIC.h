@@ -131,7 +131,8 @@ public:
   virtual int spi_init16_II(int port, int clock_divisor, int mode);
   virtual int spi_send_I(int port);
   virtual int spi_send16_I(int port);
-  virtual int spi_read(int port);
+  virtual int spi_read_I(int port);
+  virtual int spi_read16_I(int port);
   virtual int spi_isDataAvailable(int port);
   virtual int spi_isBusy(int port);
   virtual int spi_disable(int port);
