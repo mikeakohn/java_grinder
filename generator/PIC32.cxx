@@ -222,24 +222,6 @@ int PIC32::spi_send_I(int port)
     fprintf(out, "  sw $t8, SPI%dBUF($k1)\n", port);
   }
 
-  fprintf(out, "_spi_send_%d:\n", label_count);
-  fprintf(out, "  lw $t8, SPI%dSTAT($k1)\n", port);
-  fprintf(out, "  andi $t8, $t8, ((1 << 11) | (1 << 1))\n");
-  fprintf(out, "  bnez $t8, _spi_send_%d\n", label_count);
-
-  label_count++;
-
-  if (reg < 8)
-  {
-    fprintf(out, "  lw $t%d, SPI%dBUF($k1)\n", reg, port);
-    reg++;
-  }
-    else
-  {
-    fprintf(out, "  lw $t8, SPI%dBUF($k1)\n", port);
-    STACK_PUSH(8);
-  }
-
   return 0;
 }
 
@@ -258,10 +240,28 @@ int PIC32::spi_send16_I(int port)
     fprintf(out, "  sw $t8, SPI%dBUF($k1)\n", port);
   }
 
-  fprintf(out, "_spi_send_%d:\n", label_count);
+  return 0;
+}
+
+int PIC32::spi_read_I(int port)
+{
+  CHECK_PORT_SPI();
+
+  if (stack == 0)
+  {
+    fprintf(out, "  sw $t%d, SPI%dBUF($k1)\n", reg - 1, port);
+    reg--;
+  }
+    else
+  {
+    STACK_POP(8);
+    fprintf(out, "  sw $t8, SPI%dBUF($k1)\n", port);
+  }
+
+  fprintf(out, "_spi_read_%d:\n", label_count);
   fprintf(out, "  lw $t8, SPI%dSTAT($k1)\n", port);
   fprintf(out, "  andi $t8, $t8, ((1 << 11) | (1 << 1))\n");
-  fprintf(out, "  bnez $t8, _spi_send_%d\n", label_count);
+  fprintf(out, "  bnez $t8, _spi_read_%d\n", label_count);
 
   label_count++;
 
@@ -279,10 +279,40 @@ int PIC32::spi_send16_I(int port)
   return 0;
 }
 
-int PIC32::spi_read(int port)
+int PIC32::spi_read16_I(int port)
 {
   CHECK_PORT_SPI();
-  return -1;
+
+  if (stack == 0)
+  {
+    fprintf(out, "  sw $t%d, SPI%dBUF($k1)\n", reg - 1, port);
+    reg--;
+  }
+    else
+  {
+    STACK_POP(8);
+    fprintf(out, "  sw $t8, SPI%dBUF($k1)\n", port);
+  }
+
+  fprintf(out, "_spi_read_%d:\n", label_count);
+  fprintf(out, "  lw $t8, SPI%dSTAT($k1)\n", port);
+  fprintf(out, "  andi $t8, $t8, ((1 << 11) | (1 << 1))\n");
+  fprintf(out, "  bnez $t8, _spi_read_%d\n", label_count);
+
+  label_count++;
+
+  if (reg < 8)
+  {
+    fprintf(out, "  lw $t%d, SPI%dBUF($k1)\n", reg, port);
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  lw $t8, SPI%dBUF($k1)\n", port);
+    STACK_PUSH(8);
+  }
+
+  return 0;
 }
 
 int PIC32::spi_isDataAvailable(int port)
