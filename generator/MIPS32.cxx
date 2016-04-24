@@ -922,7 +922,7 @@ int MIPS32::invoke_static_method(const char *name, int params, int is_void)
 
   // Restore ra and fp
   fprintf(out, "  lw $ra, %d($sp)\n", save_space - 4);
-  fprintf(out, "  lw $fp, %d($sp)\n", save_space - 0);
+  fprintf(out, "  lw $fp, %d($sp)\n", save_space - 8);
   fprintf(out, "  addi $sp, $sp, %d\n", save_space);
 
   // Decrease count on reg stack.

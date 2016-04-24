@@ -53,10 +53,9 @@ public:
   virtual int spi_enable(int port);
 
 private:
-  //void add_spi_send();
+  void add_spi_read();
 
-  //uint32_t need_spi_send : 1;
-
+  uint32_t need_spi_read : 1;
 };
 
 #endif
