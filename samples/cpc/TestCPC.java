@@ -1,4 +1,3 @@
-
 import net.mikekohn.java_grinder.CPC;
 
 public class TestCPC
