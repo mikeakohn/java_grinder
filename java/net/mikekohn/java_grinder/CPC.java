@@ -32,7 +32,7 @@ abstract public class CPC
   public static void poke8(int w, char c) { }
   public static void peek8(int w) { }
   public static int getVMEM(int start, char x, char y) { return 0; }
-  public static void putSpriteMode0(int pAddress, int nWidth, int nHeight, int pSprite) { }
+  public static void putSpriteMode0(int pAddress, int nWidth, int nHeight, int Sprite) { }
 }
 
 

@@ -495,7 +495,7 @@ int CPC::cpc_putSpriteMode0_IIII()
   fprintf(out, "  DJNZ _loop_psm0_i\n");
   fprintf(out, "  POP HL\n");
   fprintf(out, "  LD A,H\n");
-  fprintf(out, "  ADD 0x08\n");
+  fprintf(out, "  ADD A,0x08\n");
   fprintf(out, "  LD H,A\n");
   fprintf(out, "  SUB 0xC0\n");
   fprintf(out, "  JP NC, _sig_line_psm0\n");
