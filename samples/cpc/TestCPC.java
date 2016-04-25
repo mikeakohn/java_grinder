@@ -16,6 +16,7 @@ public class TestCPC
     }
     // Wait for Keypress and exit to BASIC
     c=CPC.readChar();
+    return;
   }
 }
 

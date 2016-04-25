@@ -25,5 +25,7 @@ public class GrafCPC
    
    c=CPC.readChar();
    
+   return;
+   
   }
 }

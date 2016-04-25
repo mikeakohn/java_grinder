@@ -54,6 +54,7 @@ int cpc(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(readChar,)
   CHECK_FUNC(poke8,_IC)
   CHECK_FUNC(peek8,_I)
+  CHECK_FUNC(getVMEM,_ICC)
   
   return -1;
 }

@@ -36,7 +36,7 @@ int CPC::open(const char *filename)
   if (Z80::open(filename) != 0) { return -1; }
 
   fprintf(out, "ram_start equ 0x0138\n");
-  fprintf(out, "heap_ptr equ 0xA000\n");
+  fprintf(out, "heap_ptr equ 0x9000\n");
   fprintf(out, "save_iy equ heap_ptr\n");
 
   fprintf(out,
@@ -434,6 +434,46 @@ int CPC::cpc_peek8_I()
   
   return 0;
 }
+
+int CPC::cpc_getVMEM_ICC()
+{
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld b,l\n"); 
+  fprintf(out, "  pop de\n");
+  fprintf(out, "  ld    a, e\n");
+  fprintf(out, "  add   a,c\n");
+  fprintf(out, "  ld    e, a\n");
+  fprintf(out, "  adc   a,d\n");
+  fprintf(out, "  sub   e\n");
+  fprintf(out, "  ld    d, a\n");
+  fprintf(out, "  ld    a, b\n");
+  fprintf(out, "  and   0xF8\n");
+  fprintf(out, "  ld    l, a\n");
+  fprintf(out, "  ld    h, 0\n");
+  fprintf(out, "  ld    a, b\n");
+  fprintf(out, "  add  hl, hl\n");
+  fprintf(out, "  ld    b, h\n");
+  fprintf(out, "  ld    c, l\n");
+  fprintf(out, "  add  hl, hl\n");
+  fprintf(out, "  add  hl, hl\n");
+  fprintf(out, "  add  hl, bc\n");
+  fprintf(out, "  and   0x07\n");
+  fprintf(out, "  rlca\n");
+  fprintf(out, "  rlca\n");
+  fprintf(out, "  rlca\n");
+  fprintf(out, "  add  a,h\n");
+  fprintf(out, "  ld    h, a\n");
+  fprintf(out, "  add  hl, de\n");
+  fprintf(out, "  ret\n");
+  fprintf(out, "  push hl\n");
+ 
+ return 0;
+ 
+}
+
+
+// now the functions with const
 
 int CPC::cpc_setTxtPen_I(int c)
 {
