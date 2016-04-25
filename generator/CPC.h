@@ -37,6 +37,8 @@ public:
   virtual char cpc_readChar();
   virtual int cpc_poke8_IC();
   virtual int cpc_peek8_I();
+  virtual int cpc_getVMEM_ICC();
+  
   
   virtual int cpc_setTxtPen_I(int c);
   virtual int cpc_setTxtPaper_I(int c);

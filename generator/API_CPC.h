@@ -32,6 +32,7 @@ public:
   virtual char cpc_readChar() { return -1; }
   virtual int cpc_poke8_IC() { return -1; }
   virtual int cpc_peek8_I() { return -1; }
+  virtual int cpc_getVMEM_ICC() {return -1;}
   
   // CPC with CONST
   virtual int cpc_setTxtPen_I(int c) { return -1; }

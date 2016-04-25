@@ -1,7 +1,10 @@
+#kicked out Mandel for crashing and ITOA because of to much unimplemented opcdoes in string/return/char at the moment
 
-default: TestCPC.class GrafCPC.class ScreenCPC.class MandelCPC.class ITOA.class
+default: TestCPC.class GrafCPC.class ScreenCPC.class
+#MandelCPC.class ITOA.class
 
-grind: testcpc grafcpc screencpc mandelcpc itoa
+grind: testcpc grafcpc screencpc 
+#mandelcpc itoa
 
 testcpc: TestCPC.class
 	../../java_grinder TestCPC.class testcpc.asm cpc
@@ -21,17 +24,17 @@ screencpc: ScreenCPC.class
 	hex2bin screencpc.hex
 	CPCDiskXP -File screencpc.bin -AddAmsdosHeader 0x138 -AddToExistingDsk javacpc.dsk
 
-mandelcpc: MandelCPC.class
-	../../java_grinder MandelCPC.class mandelcpc.asm cpc
-	naken_asm -l -I ../../../naken_asm/include -o mandelcpc.hex mandelcpc.asm
-	hex2bin mandelcpc.hex
-	CPCDiskXP -File mandelcpc.bin -AddAmsdosHeader 0x138 -AddToExistingDsk javacpc.dsk
+#mandelcpc: MandelCPC.class
+#	../../java_grinder MandelCPC.class mandelcpc.asm cpc
+#	naken_asm -l -I ../../../naken_asm/include -o mandelcpc.hex mandelcpc.asm
+#	hex2bin mandelcpc.hex
+#	CPCDiskXP -File mandelcpc.bin -AddAmsdosHeader 0x138 -AddToExistingDsk javacpc.dsk
 
-itoa: ITOA.class
-	../../java_grinder ITOA.class ITOA.asm cpc
-	naken_asm -l -I ../../../naken_asm/include -o ITOA.hex ITOAcpc.asm
-	hex2bin ITOA.hex
-	CPCDiskXP -File ITOA.bin -AddAmsdosHeader 0x138 -AddToExistingDsk javacpc.dsk
+#itoa: ITOA.class
+#	../../java_grinder ITOA.class ITOA.asm cpc
+#	naken_asm -l -I ../../../naken_asm/include -o ITOA.hex ITOAcpc.asm
+#	hex2bin ITOA.hex
+# CPCDiskXP -File ITOA.bin -AddAmsdosHeader 0x138 -AddToExistingDsk javacpc.dsk
 	
 %.class: %.java
 	javac -classpath ../../build/JavaGrinder.jar $*.java
