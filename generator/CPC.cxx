@@ -416,6 +416,7 @@ int CPC::cpc_draw_III()
 
 int CPC::cpc_poke8_IC()
 {
+  fprintf(out, "  ; poke8_IC\n");
   fprintf(out, "  pop hl\n");
   fprintf(out, "  ld a,l\n");
   fprintf(out, "  pop hl\n");
@@ -426,6 +427,7 @@ int CPC::cpc_poke8_IC()
 
 int CPC::cpc_peek8_I()
 {
+  fprintf(out, "  ; peek8_I\n");
   fprintf(out, "  pop hl\n");
   fprintf(out, "  ld a,(hl)\n");
   fprintf(out, "  ld l,a\n");
@@ -437,8 +439,9 @@ int CPC::cpc_peek8_I()
 
 int CPC::cpc_getVMEM_ICC()
 {
-  fprintf(out, "  pop bc\n");
+  fprintf(out, "  ; getVMEM_ICC\n");
   fprintf(out, "  pop hl\n");
+  fprintf(out, "  pop bc\n");
   fprintf(out, "  ld b,l\n"); 
   fprintf(out, "  pop de\n");
   fprintf(out, "  ld    a, e\n");
@@ -465,14 +468,46 @@ int CPC::cpc_getVMEM_ICC()
   fprintf(out, "  add  a,h\n");
   fprintf(out, "  ld    h, a\n");
   fprintf(out, "  add  hl, de\n");
-  fprintf(out, "  ret\n");
   fprintf(out, "  push hl\n");
- 
- return 0;
+  
+  return 0;
  
 }
 
+int CPC::cpc_putSpriteMode0_IIII()
+{
+  fprintf(out, "  ; PutSpriteMode0_IIII\n");
+  fprintf(out, "  pop de\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld c,l\n"); 
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld b,l\n"); 
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "_loop_psm0_o:\n");
+  fprintf(out, "  PUSH BC\n");
+  fprintf(out, "  LD B,C\n");
+  fprintf(out, "  PUSH HL\n");
+  fprintf(out, "_loop_psm0_i:\n");    
+  fprintf(out, "  LD A,(DE)\n");
+  fprintf(out, "  LD (HL),A\n");
+  fprintf(out, "  INC DE\n");
+  fprintf(out, "  INC HL\n");
+  fprintf(out, "  DJNZ _loop_psm0_i\n");
+  fprintf(out, "  POP HL\n");
+  fprintf(out, "  LD A,H\n");
+  fprintf(out, "  ADD 0x08\n");
+  fprintf(out, "  LD H,A\n");
+  fprintf(out, "  SUB 0xC0\n");
+  fprintf(out, "  JP NC, _sig_line_psm0\n");
+  fprintf(out, "  LD BC, 0xC050\n");
+  fprintf(out, "  ADD HL,BC\n");
+  fprintf(out, "_sig_line_psm0:\n");
+  fprintf(out, "  POP BC\n");
+  fprintf(out, "  DJNZ _loop_psm0_o\n");
+  
 
+  return 0;
+}
 // now the functions with const
 
 int CPC::cpc_setTxtPen_I(int c)

@@ -7,7 +7,7 @@
 *
 * Copyright 2014-2016 by Michael Kohn
 *
-* CPC support by SRS - https://github.com/deringenieur71
+* CPC support started by Carsten Dost - https://github.com/deringenieur71
 *
 */
 #ifndef _API_CPC_H
@@ -32,7 +32,8 @@ public:
   virtual char cpc_readChar() { return -1; }
   virtual int cpc_poke8_IC() { return -1; }
   virtual int cpc_peek8_I() { return -1; }
-  virtual int cpc_getVMEM_ICC() {return -1;}
+  virtual int cpc_getVMEM_ICC() {return -1; }
+  virtual int cpc_putSpriteMode0_IIII() { return -1; }
   
   // CPC with CONST
   virtual int cpc_setTxtPen_I(int c) { return -1; }

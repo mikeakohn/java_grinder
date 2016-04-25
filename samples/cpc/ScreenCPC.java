@@ -4,10 +4,10 @@ public class ScreenCPC
 {
   public static void main(String args[])
   {
-    int i,scr;
+    int i,scr,z;
     
     // x = 0 to 79
-    // y = 0 to 399
+    // y = 0 to 199
     
     char x,y,c;
     
@@ -45,8 +45,9 @@ public class ScreenCPC
         
     for (x=20; x<60; x++)
     {
-      CPC.poke8( CPC.getVMEM(scr,x,y), (char) 0x1a);
-      CPC.poke8( CPC.getVMEM(scr,x,y), (char) 215);
+      z = CPC.getVMEM(scr,x,y);
+      CPC.poke8( z, (char) 0x1a);
+      CPC.poke8( (z+0x800), (char) 215);
     }
     
     
