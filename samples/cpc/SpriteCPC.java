@@ -52,9 +52,13 @@ public class SpriteCPC
      int nXDir = 1;
      int puffer = 0x6000;
      
+     CPC.screen(0);
+     CPC.setBorderColor(0);
+     
+     
      for (int i=0; i< (SPRITE_HEIGHT*SPRITE_WIDTH); i++)
      {
-       CPC.poke8(puffer, (char) (Sprite[i] & 0x00FF));
+       CPC.poke8(puffer, (char) Sprite[i]);
        puffer++;
      }
      
