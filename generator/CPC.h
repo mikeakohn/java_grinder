@@ -7,7 +7,7 @@
 *
 * Copyright 2014-2016 by Michael Kohn
 *
-* CPC support by SRS  - https://github.com/deringenieur71
+* CPC support started by Carsten Dost  - https://github.com/deringenieur71
 *
 */
 
@@ -37,6 +37,9 @@ public:
   virtual char cpc_readChar();
   virtual int cpc_poke8_IC();
   virtual int cpc_peek8_I();
+  virtual int cpc_getVMEM_ICC();
+  virtual int cpc_putSpriteMode0_IIII();
+  
   
   virtual int cpc_setTxtPen_I(int c);
   virtual int cpc_setTxtPaper_I(int c);

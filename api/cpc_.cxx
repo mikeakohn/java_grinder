@@ -7,7 +7,7 @@
 *
 * Copyright 2014-2015 by Michael Kohn
 *
-* CPC support by SRS  - https://github.com/deringenieur71
+* CPC support started by Carsten Dost  - https://github.com/deringenieur71
 *
 */
 
@@ -39,8 +39,9 @@ return generator->cpc_##funct##sig(const_val1, const_val2); \
 
 int cpc(JavaClass *java_class, Generator *generator, char *method_name)
 {
+  // call with variable
   CHECK_FUNC(beep,)
-  CHECK_FUNC(setTxtPen,_I) // call with variable
+  CHECK_FUNC(setTxtPen,_I) 
   CHECK_FUNC(setTxtPaper,_I)
   CHECK_FUNC(setGraPen,_I)
   CHECK_FUNC(setGraPaper,_I)
@@ -54,13 +55,16 @@ int cpc(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(readChar,)
   CHECK_FUNC(poke8,_IC)
   CHECK_FUNC(peek8,_I)
+  CHECK_FUNC(getVMEM,_ICC)
+  CHECK_FUNC(putSpriteMode0,_IIII)
   
   return -1;
 }
 
 int cpc(JavaClass *java_class, Generator *generator, char *method_name, int const_val)
 {
-  CHECK_FUNC_CONST(setTxtPen,_I) // call with constant
+  // call with one constant
+  CHECK_FUNC_CONST(setTxtPen,_I) 
   CHECK_FUNC_CONST(setBorderColor,_I)
   CHECK_FUNC_CONST(setTxtPaper,_I)
   CHECK_FUNC_CONST(setGraPen,_I)
@@ -74,6 +78,7 @@ int cpc(JavaClass *java_class, Generator *generator, char *method_name, int cons
 
 int cpc(JavaClass *java_class, Generator *generator, char *function, int const_val1, int const_val2)
 {
+   // call with two constants
   //CHECK_FUNC_CONST_2(someFunction,_II)
   CHECK_FUNC_CONST_2(poke8,_IC)
   return -1;
