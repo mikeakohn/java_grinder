@@ -1,4 +1,5 @@
 import net.mikekohn.java_grinder.CPC;
+import net.mikekohn.java_grinder.Memory;
 
 public class ScreenCPC
 {
@@ -17,7 +18,7 @@ public class ScreenCPC
     
     for (i=0xC000; i<0xFFFF; i++)
     {
-      CPC.poke8( i, x);      
+      Memory.write8( i, (byte) x);      
     };
 
     CPC.setCursor(18,10);
@@ -46,8 +47,9 @@ public class ScreenCPC
     for (x=20; x<60; x++)
     {
       z = CPC.getVMEM(scr,x,y);
-      CPC.poke8( z, (char) 0x1a);
-      CPC.poke8( (z+0x800), (char) 215);
+      Memory.write8( z, (byte) 0x1a);
+      Memory.write16( z+0x800, (short) 0xa11a);
+      
     }
     
     

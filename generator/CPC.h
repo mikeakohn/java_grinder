@@ -35,10 +35,9 @@ public:
   virtual int cpc_plot_III();
   virtual int cpc_draw_III();
   virtual char cpc_readChar();
-  virtual int cpc_poke8_IC();
-  virtual int cpc_peek8_I();
   virtual int cpc_getVMEM_ICC();
   virtual int cpc_putSpriteMode0_IIII();
+  virtual int cpc_printI_I();
   
   
   virtual int cpc_setTxtPen_I(int c);
@@ -48,8 +47,7 @@ public:
   virtual int cpc_setBorderColor_I(int c);
   virtual int cpc_screen_I(int c);
   virtual int cpc_putChar_C(char c);
-  virtual int cpc_poke8_IC(int w, char c);
-  virtual int cpc_peek8_I(int where);
+
 
 protected:
   //void insert_ldirvv(void);
