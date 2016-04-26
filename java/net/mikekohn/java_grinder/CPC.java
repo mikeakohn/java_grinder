@@ -29,10 +29,9 @@ abstract public class CPC
   public static void setCursor(int column,int line) { }
   public static void plot(int x, int y, int foreground) { }
   public static void draw(int x, int y, int foreground) { }
-  public static void poke8(int w, char c) { }
-  public static void peek8(int w) { }
   public static int getVMEM(int start, char x, char y) { return 0; }
   public static void putSpriteMode0(int pAddress, int nWidth, int nHeight, int Sprite) { }
+  public static void printI(int s) { }
 }
 
 
