@@ -1,9 +1,9 @@
 #kicked out Mandel for crashing and ITOA because of to much unimplemented opcdoes in string/return/char at the moment
 
-default: TestCPC.class GrafCPC.class ScreenCPC.class SpriteCPC.class
+default: TestCPC.class GrafCPC.class ScreenCPC.class SpriteCPC.class DivCPC.class
 #MandelCPC.class ITOA.class
 
-grind: testcpc grafcpc screencpc spritecpc
+grind: testcpc grafcpc screencpc spritecpc divcpc
 #mandelcpc itoa
 
 testcpc: TestCPC.class
@@ -30,11 +30,11 @@ spritecpc: SpriteCPC.class
 	hex2bin spritecpc.hex
 	CPCDiskXP -File spritecpc.bin -AddAmsdosHeader 0x138 -AddToExistingDsk javacpc.dsk
 
-#mandelcpc: MandelCPC.class
-#	../../java_grinder MandelCPC.class mandelcpc.asm cpc
-#	naken_asm -l -I ../../../naken_asm/include -o mandelcpc.hex mandelcpc.asm
-#	hex2bin mandelcpc.hex
-#	CPCDiskXP -File mandelcpc.bin -AddAmsdosHeader 0x138 -AddToExistingDsk javacpc.dsk
+divcpc: DivCPC.class
+	../../java_grinder DivCPC.class divcpc.asm cpc
+	naken_asm -l -I ../../../naken_asm/include -o divcpc.hex divcpc.asm
+	hex2bin divcpc.hex
+	CPCDiskXP -File divcpc.bin -AddAmsdosHeader 0x138 -AddToExistingDsk javacpc.dsk
 
 #itoa: ITOA.class
 #	../../java_grinder ITOA.class ITOA.asm cpc

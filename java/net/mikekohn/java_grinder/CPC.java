@@ -7,7 +7,7 @@
 *
 * Copyright 2014-2016 by Michael Kohn
 *
-* CPC support started by Carsten Dost  - https://github.com/deringenieur71
+* CPC support started by Carsten Dost 2016  - https://github.com/deringenieur71
 *
 */
 

@@ -1,4 +1,5 @@
 import net.mikekohn.java_grinder.CPC;
+import net.mikekohn.java_grinder.Memory;
 
 public class SpriteCPC
 {
@@ -50,7 +51,7 @@ public class SpriteCPC
      char nX = 20;
      char nY = 100;
      int nXDir = 1;
-     int puffer = 0x6000;
+     int puffer = 0x9000;
      
      CPC.screen(0);
      CPC.setBorderColor(0);
@@ -58,7 +59,7 @@ public class SpriteCPC
      
      for (int i=0; i< (SPRITE_HEIGHT*SPRITE_WIDTH); i++)
      {
-       CPC.poke8(puffer, (char) Sprite[i]);
+       Memory.write8(puffer, (byte) Sprite[i]);
        puffer++;
      }
      

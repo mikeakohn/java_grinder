@@ -36,7 +36,7 @@ int CPC::open(const char *filename)
   if (Z80::open(filename) != 0) { return -1; }
 
   fprintf(out, "ram_start equ 0x0138\n");
-  fprintf(out, "heap_ptr equ 0x9000\n");
+  fprintf(out, "heap_ptr equ 0x9500\n");
   fprintf(out, "save_iy equ heap_ptr\n");
 
   fprintf(out,
@@ -298,7 +298,7 @@ int CPC::cpc_setTxtPen_I()
 int CPC::cpc_setTxtPaper_I()
 {
   fprintf(out, "  ; setTxtPaper()\n");
-  fprintf(out, "  pop hl\n");
+  fprintf(out, "  POP HL\n");
   fprintf(out, "  ld a,l\n");
   fprintf(out, "  call TXT_SET_PAPER\n");
 
@@ -386,8 +386,6 @@ char CPC::cpc_readChar()
   return 0;
 }
 
-
-
 int CPC::cpc_plot_III()
 {
   fprintf(out, "  ; plot_III()\n");
@@ -411,29 +409,6 @@ int CPC::cpc_draw_III()
   fprintf(out, "  pop de\n"); // get x
   fprintf(out, "  call GRA_LINE_ABSOLUTE\n");
 
-  return 0;
-}
-
-int CPC::cpc_poke8_IC()
-{
-  fprintf(out, "  ; poke8_IC\n");
-  fprintf(out, "  pop hl\n");
-  fprintf(out, "  ld a,l\n");
-  fprintf(out, "  pop hl\n");
-  fprintf(out, "  ld (hl),a\n");
-
-  return 0;
-}
-
-int CPC::cpc_peek8_I()
-{
-  fprintf(out, "  ; peek8_I\n");
-  fprintf(out, "  pop hl\n");
-  fprintf(out, "  ld a,(hl)\n");
-  fprintf(out, "  ld l,a\n");
-  fprintf(out, "  ld h,0\n");
-  fprintf(out, "  push hl\n");
-  
   return 0;
 }
 
@@ -476,38 +451,83 @@ int CPC::cpc_getVMEM_ICC()
 
 int CPC::cpc_putSpriteMode0_IIII()
 {
-  fprintf(out, "  ; PutSpriteMode0_IIII\n");
+  fprintf(out, "  ; putSpriteMode0_IIII\n");
   fprintf(out, "  pop de\n");
   fprintf(out, "  pop hl\n");
   fprintf(out, "  ld c,l\n"); 
   fprintf(out, "  pop hl\n");
   fprintf(out, "  ld b,l\n"); 
   fprintf(out, "  pop hl\n");
-  fprintf(out, "_loop_psm0_o:\n");
+  fprintf(out, "_loop_psm_o%d:\n", label_count);
   fprintf(out, "  PUSH BC\n");
   fprintf(out, "  LD B,C\n");
   fprintf(out, "  PUSH HL\n");
-  fprintf(out, "_loop_psm0_i:\n");    
+  fprintf(out, "_loop_psm_i%d:\n", label_count);    
   fprintf(out, "  LD A,(DE)\n");
   fprintf(out, "  LD (HL),A\n");
   fprintf(out, "  INC DE\n");
   fprintf(out, "  INC HL\n");
-  fprintf(out, "  DJNZ _loop_psm0_i\n");
+  fprintf(out, "  DJNZ _loop_psm_i%d\n", label_count);
   fprintf(out, "  POP HL\n");
   fprintf(out, "  LD A,H\n");
   fprintf(out, "  ADD A,0x08\n");
   fprintf(out, "  LD H,A\n");
   fprintf(out, "  SUB 0xC0\n");
-  fprintf(out, "  JP NC, _sig_line_psm0\n");
+  fprintf(out, "  JP NC, _sig_line_psm%d\n", label_count);
   fprintf(out, "  LD BC, 0xC050\n");
   fprintf(out, "  ADD HL,BC\n");
-  fprintf(out, "_sig_line_psm0:\n");
+  fprintf(out, "_sig_line_psm%d:\n", label_count);
   fprintf(out, "  POP BC\n");
-  fprintf(out, "  DJNZ _loop_psm0_o\n");
+  fprintf(out, "  DJNZ _loop_psm_o%d\n", label_count);
   
+  label_count++;
 
   return 0;
 }
+
+
+int CPC::cpc_printI_I()
+{
+  fprintf(out, "  ;printI_I()\n");
+  fprintf(out, "  pop HL\n");
+  fprintf(out, "  ld DE,pufr\n");
+  fprintf(out, "  call Num2Dec\n");
+  fprintf(out, "  ld hl, pufr;\n");
+  fprintf(out, "  ld b,0x05\n"); 
+  fprintf(out, "pSL_%d:\n", label_count);
+  fprintf(out, "  LD	A,(HL)\n");
+  fprintf(out, "  CALL	TXT_OUTPUT\n");
+  fprintf(out, "  INC	HL\n");
+  fprintf(out, "  DEC	B\n");
+  fprintf(out, "  JR	NZ,pSL_%d\n", label_count);
+  fprintf(out, "  JR endprintI%d\n",label_count);
+  fprintf(out, "  Num2Dec:	ld	bc,-10000\n");
+  fprintf(out, "  call	Num1\n");
+  fprintf(out, "  ld	bc,-1000\n");
+  fprintf(out, "  call	Num1\n");
+  fprintf(out, "  ld	bc,-100\n");
+  fprintf(out, "  call	Num1\n");
+  fprintf(out, "  ld	c,-10\n");
+  fprintf(out, "  call	Num1\n");
+  fprintf(out, "  ld	c,b\n");
+  fprintf(out, "  Num1:	ld	a,'0'-1\n");
+  fprintf(out, "  Num2:	inc	a\n");
+  fprintf(out, "  add	hl,bc\n");
+  fprintf(out, "  jr	c,Num2\n");
+  fprintf(out, "  sbc	hl,bc\n");
+  fprintf(out, "  ld	(de),a\n");
+  fprintf(out, "  inc	de\n");
+  fprintf(out, "  ret\n");
+  fprintf(out, "  pufr:\n");
+  fprintf(out, "  dc16 0\n");
+  fprintf(out, "  dc16 0\n");
+  fprintf(out, "  dc8 0\n");
+  fprintf(out, "  endprintI%d:\n",label_count);
+  label_count++;
+  
+  return 0;
+}
+
 // now the functions with const
 
 int CPC::cpc_setTxtPen_I(int c)
@@ -598,24 +618,3 @@ int CPC::cpc_putChar_C(char c)
   return 0;
 }
 
-
-int CPC::cpc_poke8_IC(int where,char c)
-{
-  fprintf(out, "  ld hl, 0x%04x\n", where);
-  fprintf(out, "  ld a, 0x%02x\n", c);
-  fprintf(out, "  ld (hl),a\n");
-
-  return 0;
-}
-
-
-
-int CPC::cpc_peek8_I(int where)
-{
-  fprintf(out, "  ld a, (0x%04x)\n", where);
-  fprintf(out, "  ld h,0\n");
-  fprintf(out, "  ld l,a\n");
-  fprintf(out, "  push hl\n");
-  
-  return 0;
-}
