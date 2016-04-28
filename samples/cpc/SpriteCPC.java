@@ -3,7 +3,7 @@ import net.mikekohn.java_grinder.Memory;
 
 public class SpriteCPC
 {
-  static int Sprite[] =
+  static int Sprite[] = 
   {
     0x00, 0xC0, 0xC0, 0x00, 0x00, 0xC0, 0xC0, 0xC0,
     0xC0, 0x00, 0x00, 0x00, 0x00, 0xC4, 0xC8, 0x00,
@@ -40,28 +40,31 @@ public class SpriteCPC
     ,0xC0, 0xC0, 0xC0, 0xC0, 0xC0, 0xC0, 0xC0, 0x00
     ,0x00, 0x00, 0x00, 0x00, 0xC0, 0xC0, 0xC0, 0xC0
     ,0xC0, 0xC0, 0x00, 0x00
-    };  
+  };  
 
-  static int SPRITE_HEIGHT = 23;
-  static int SPRITE_WIDTH = 12;
-  static int MAX_X = 79;
+  static char SPRITE_HEIGHT = 23;
+  static char SPRITE_WIDTH = 12;
+  static char MAX_X = 79;
   
   public static void main(String args[])
   {
      char nX = 20;
      char nY = 100;
-     int nXDir = 1;
-     int puffer = 0x9000;
+     short nXDir = 1;
+     char i;
+     //int puffer = 0x9000;
      
      CPC.screen(0);
      CPC.setBorderColor(0);
      
-     
+     /*
      for (int i=0; i< (SPRITE_HEIGHT*SPRITE_WIDTH); i++)
      {
        Memory.write8(puffer, (byte) Sprite[i]);
        puffer++;
      }
+     */
+     
      
      while(true)
      {
@@ -75,8 +78,22 @@ public class SpriteCPC
        {
          nX = (char) (MAX_X - SPRITE_WIDTH);
          nXDir = -1;
+       }
+                
+      /*for (char z=0;z<SPRITE_HEIGHT;z++)
+      {
+        for (char k=0;k<SPRITE_WIDTH;k++)
+        {
+         Memory.write8(CPC.getVMEM(0xC000,(char) (nX+z), (char) (nY+k)), (byte) Sprite[i]);
+         i++;         
+        }
       }
-      CPC.putSpriteMode0(CPC.getVMEM(0xC000, nX, nY), SPRITE_WIDTH, SPRITE_HEIGHT, puffer);
-  }
+      */
+      
+      CPC.putSpriteMode0(CPC.getVMEM(0xC000, nX, nY), SPRITE_WIDTH, SPRITE_HEIGHT, Sprite);    
+          
   }
 }
+}
+
+
