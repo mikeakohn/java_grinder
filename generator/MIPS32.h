@@ -123,6 +123,7 @@ protected:
 
 private:
   int stack_alu(const char *instr);
+  int divide();
   int get_values_from_stack(int *value1);
   int get_values_from_stack(int *value1, int *value2);
   int get_ref_from_stack(int *value1);

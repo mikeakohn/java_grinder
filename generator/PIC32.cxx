@@ -190,7 +190,7 @@ int PIC32::spi_init16_II(int port, int clock_divisor, int mode)
 
   fprintf(out, "  ;; spi_init(%d, %d, %d)\n", port, clock_divisor, mode);
   fprintf(out, "  sw $0, SPI%dCON($k1)\n", port);
-  fprintf(out, "  li $t8, 1\n");
+  fprintf(out, "  li $t8, 128\n");
   fprintf(out, "  sw $t8, SPI%dBRG($k1)\n", port);
   //fprintf(out, "  li $t8, 0x%x\n", (1 << 23) | (1 << 15) | (1 << 10) | (1 << 5) | (mode << 8));
   fprintf(out, "  li $t8, 0x%x\n", (1 << 15) | (1 << 10) | (1 << 5) | (mode << 8));
@@ -310,7 +310,10 @@ int PIC32::spi_read16_I(int port)
 
   fprintf(out, "_spi_read_%d:\n", label_count);
   fprintf(out, "  lw $t8, SPI%dSTAT($k1)\n", port);
-  fprintf(out, "  andi $t8, $t8, ((1 << 11) | (1 << 1))\n");
+  //fprintf(out, "  andi $t8, $t8, ((1 << 11) | (1 << 1))\n");
+  //fprintf(out, "  andi $t8, $t8, 1\n");
+  fprintf(out, "  andi $t8, $t8, (1 << 11)\n");
+  //fprintf(out, "  beqz $t8, _spi_read_%d\n", label_count);
   fprintf(out, "  bnez $t8, _spi_read_%d\n", label_count);
 
   label_count++;
