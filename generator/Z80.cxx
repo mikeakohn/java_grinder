@@ -43,12 +43,13 @@ Z80::Z80() :
   is_main(0),
   need_mul16_integer(0),
   need_div16_integer(0),
-  need_mod16_integer(0),
-  need_memory_read8(0),
-  need_memory_write8(0),
-  need_memory_read16(0),
-  need_memory_write16(0)
-    
+  need_mod16_integer(0)
+
+  //,need_memory_read8(0),
+  //need_memory_write8(0),
+  //need_memory_read16(0),
+  //need_memory_write16(0)
+  
 {
 }
 
@@ -77,12 +78,13 @@ int Z80::add_functions()
   if(need_mul16_integer) { insert_mul16_integer(); }
   if(need_div16_integer) { insert_div16_integer(); }
   if(need_mod16_integer) { insert_mod16_integer(); }
-  //Memory API 
+
+/*  //Memory API 
   if(need_memory_read8) { insert_memory_read8(); }
   if(need_memory_write8) { insert_memory_write8(); } 
   if(need_memory_read16) { insert_memory_read16(); }
   if(need_memory_write16) { insert_memory_write16(); } 
- 
+*/
   return 0;
 }
 
@@ -1125,31 +1127,110 @@ void Z80::restore_registers()
 
 int Z80::memory_read8_I()
 {
-  need_memory_read8 = 1;
-  fprintf(out, "  call memory_read8\n");
+  fprintf(out, ";;memory_read8\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld a,(hl)\n");
+  fprintf(out, "  ld l,a\n");
+  fprintf(out, "  ld h,0\n");
+  fprintf(out, "  push hl\n");
+  
   return 0;
 }
 
 int Z80::memory_write8_IB()
 {
-  need_memory_write8 = 1;
-  fprintf(out, "  call memory_write8\n");
+  fprintf(out, "  pop hl  ;;memory_write8\n");
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld (hl),a\n");
+
   return 0;
 }
 
 int Z80::memory_read16_I()
 {
-  need_memory_read16 = 1;
-  fprintf(out, "  call memory_read16\n");
-  return 0;
+  fprintf(out, ";;memory_read16\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld c,(hl)\n");
+  fprintf(out, "  inc hl\n");
+  fprintf(out, "  ld b,(hl)\n");
+  fprintf(out, "  push bc\n");
+  
+  return 0;  
 }
 
 int Z80::memory_write16_IS()
 {
-  need_memory_write16 = 1;
+  /*need_memory_write16 = 1;
   fprintf(out, "  call memory_write16\n");
+  return 0;*/
+  fprintf(out, ";;memory_write16\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld (hl),c\n");
+  fprintf(out, "  inc hl\n");
+  fprintf(out, "  ld (hl),b\n");
+  
+  return 0;  
+}
+
+int Z80::memory_read8_I(int adr)
+{
+  fprintf(out, "  ld hl, 0x%02x  ;;memory_read8_I_C\n", adr);
+  fprintf(out, "  ld a,(hl)\n");
+  fprintf(out, "  ld l,a\n");
+  fprintf(out, "  ld h,0\n");
+  fprintf(out, "  push hl\n");
+  
   return 0;
 }
+
+int Z80::memory_write8_IB(int adr, int8_t val)
+{
+    if (val > 255 || val < -127)
+  {
+    printf("Error: literal value %d bigger than 8 bit.\n", val);
+    return -1;
+  }
+  
+  fprintf(out, "  ld a,0x%02x  ;;memory_write8\n", val);
+  fprintf(out, "  ld hl,0x%04x\n", adr);
+  fprintf(out, "  ld (hl),a\n");
+
+  return 0;
+}
+
+
+int Z80::memory_read16_I(int adr)
+{
+  fprintf(out, "  ld hl, 0x%04x  ;;memory_read16_I_C\n", adr);
+  fprintf(out, "  ld c,(hl)\n");
+  fprintf(out, "  inc hl\n");
+  fprintf(out, "  ld b,(hl)\n");
+  fprintf(out, "  push bc\n");
+  
+  return 0;
+}
+
+int Z80::memory_write16_IS(int adr, short val)
+{
+  
+  if (val > 65535 || val < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", val);
+    return -1;
+  }
+  
+  fprintf(out, "  ld bc, 0x%04x  ;;memory_write16_C\n", val);
+  fprintf(out, "  ld hl, 0x%04x\n", adr);
+  fprintf(out, "  ld (hl),c\n");
+  fprintf(out, "  inc hl\n");
+  fprintf(out, "  ld (hl),b\n");
+  
+  return 0;  
+}
+
+
 
 // *****************************
 // now the new private functions
@@ -1264,48 +1345,5 @@ void Z80::insert_mod16_integer()
   fprintf(out, "  cpl\n");
   fprintf(out, "  ld b,a\n");
   fprintf(out, "  push hl\n"); //Save MODULO
-  fprintf(out, "  ret\n");
-}
-
-void Z80::insert_memory_read8()
-{
-  fprintf(out, "memory_read8:\n");
-  fprintf(out, "  pop hl\n");
-  fprintf(out, "  ld a,(hl)\n");
-  fprintf(out, "  ld l,a\n");
-  fprintf(out, "  ld h,0\n");
-  fprintf(out, "  push hl\n");
-  fprintf(out, "  ret\n");
-}
-
-void Z80::insert_memory_write8()
-{
-  fprintf(out, "memory_write8:\n");
-  fprintf(out, "  pop hl\n");
-  fprintf(out, "  ld a,l\n");
-  fprintf(out, "  pop hl\n");
-  fprintf(out, "  ld (hl),a\n");
-  fprintf(out, "  ret\n");
-}
-
-void Z80::insert_memory_read16()
-{
-  fprintf(out, "memory_read16:\n");
-  fprintf(out, "  pop hl\n");
-  fprintf(out, "  ld c,(hl)\n");
-  fprintf(out, "  inc hl\n");
-  fprintf(out, "  ld b,(hl)\n");
-  fprintf(out, "  push bc\n");
-  fprintf(out, "  ret\n");
-}
-
-void Z80::insert_memory_write16()
-{
-  fprintf(out, "memory_write16:\n");
-  fprintf(out, "  pop bc\n");
-  fprintf(out, "  pop hl\n");
-  fprintf(out, "  ld (hl),c\n");
-  fprintf(out, "  inc hl\n");
-  fprintf(out, "  ld (hl),b\n");
   fprintf(out, "  ret\n");
 }
