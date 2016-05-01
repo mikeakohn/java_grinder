@@ -1463,6 +1463,12 @@ int MIPS32::array_write_int(const char *name, int field_id)
   return 0;
 }
 
+int MIPS32::cpu_nop()
+{
+  fprintf(out, "  nop\n");
+  return 0;
+}
+
 int MIPS32::stack_alu(const char *instr)
 {
   if (stack == 0)

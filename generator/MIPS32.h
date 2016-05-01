@@ -110,6 +110,7 @@ public:
   virtual int array_write_byte(const char *name, int field_id);
   virtual int array_write_short(const char *name, int field_id);
   virtual int array_write_int(const char *name, int field_id);
+  virtual int cpu_nop();
 
 protected:
   int reg;            // count number of registers are are using as stack
