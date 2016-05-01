@@ -94,6 +94,7 @@ int MIPS32::open(const char *filename)
   fprintf(out, "  ram_end equ 0x%x\n", ram_end);
   fprintf(out, "  virtual_address equ 0x%x\n", virtual_address);
   fprintf(out, "  physical_address equ 0x%x\n", physical_address);
+  fprintf(out, "  voffset equ (virtual_address - physical_address)\n");
 
   return 0;
 }
@@ -104,7 +105,7 @@ int MIPS32::start_init()
   fprintf(out, ".org 0x%x\n", org);
   fprintf(out, "start:\n");
 
-  fprintf(out, "  li $s0, _constant_pool - physical_address + virtual_address  ; $s0 points to constant numbers\n");
+  fprintf(out, "  li $s0, _constant_pool + voffset  ; $s0 points to constant numbers\n");
   fprintf(out, "  li $s1, ram_start       ; $s1 points to statics\n");
   fprintf(out, "  li $sp, ram_end+1\n");
 
@@ -172,7 +173,7 @@ int MIPS32::field_init_int(char *name, int index, int value)
 int MIPS32::field_init_ref(char *name, int index)
 {
   fprintf(out, "  ; static init\n");
-  fprintf(out, "  li $t8, _%s\n", name);
+  fprintf(out, "  li $t8, _%s + voffset\n", name);
   //fprintf(out, "  sw $t8, 0x%04x($s1)\n", index * 4);
   fprintf(out, "  li $t9, %s\n", name);
   fprintf(out, "  sw $t8, ($t9)\n");
