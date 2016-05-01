@@ -38,7 +38,8 @@ public:
   virtual int cpc_getVMEM_ICC();
   virtual int cpc_putSpriteMode0_IIII();
   virtual int cpc_printI_I();
-  
+  virtual int cpc_getTime();
+  virtual int cpc_VSync();
   
   virtual int cpc_setTxtPen_I(int c);
   virtual int cpc_setTxtPaper_I(int c);

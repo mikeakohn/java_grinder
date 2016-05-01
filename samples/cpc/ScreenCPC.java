@@ -41,6 +41,9 @@ public class ScreenCPC
     }
     
     CPC.cls();
+    
+  
+    
   
     y=100; 
     scr = 0xC000; 
@@ -49,17 +52,25 @@ public class ScreenCPC
     for (x=20; x<60; x++)
     {
       z = CPC.getVMEM(scr,x,y);
-      Memory.write8( z, (byte) 0x1a);
+      Memory.write8( z, (byte) 0x22);
       z += 0x800;
       Memory.write16( z, help);   
     }
-        
-    for (i=1;i<5000;i++)
+    
+    CPC.setCursor(18,10);    
+    CPC.printI(CPC.getTime());
+    
+    for (i=1;i<10000;i++)
     {
       c=1;
       x=c;
     }
-   
+    
+    CPC.VSync();
+    
+    CPC.setCursor(18,15);    
+    CPC.printI(CPC.getTime());
+        
     c = CPC.readChar();
 
     return;      

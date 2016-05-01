@@ -33,6 +33,8 @@ public:
   virtual int cpc_getVMEM_ICC() {return -1; }
   virtual int cpc_putSpriteMode0_IIII() { return -1; }
   virtual int cpc_printI_I() { return -1; }
+  virtual int cpc_getTime() { return -1; }
+  virtual int cpc_VSync() { return -1; }
   
   // CPC with CONST
   virtual int cpc_setTxtPen_I(int c) { return -1; }

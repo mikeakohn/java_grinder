@@ -490,9 +490,9 @@ int CPC::cpc_printI_I()
 {
   fprintf(out, "  ;printI_I()\n");
   fprintf(out, "  pop HL\n");
-  fprintf(out, "  ld DE,pufr\n");
-  fprintf(out, "  call Num2Dec\n");
-  fprintf(out, "  ld hl, pufr;\n");
+  fprintf(out, "  ld DE,pufr_%d\n",label_count);
+  fprintf(out, "  call Num2Dec_%d\n",label_count);
+  fprintf(out, "  ld hl, pufr_%d;\n",label_count);
   fprintf(out, "  ld b,0x05\n"); 
   fprintf(out, "pSL_%d:\n", label_count);
   fprintf(out, "  LD	A,(HL)\n");
@@ -501,24 +501,24 @@ int CPC::cpc_printI_I()
   fprintf(out, "  DEC	B\n");
   fprintf(out, "  JR	NZ,pSL_%d\n", label_count);
   fprintf(out, "  JR endprintI%d\n",label_count);
-  fprintf(out, "  Num2Dec:	ld	bc,-10000\n");
-  fprintf(out, "  call	Num1\n");
+  fprintf(out, "  Num2Dec_%d:  ld  bc,-10000\n", label_count);
+  fprintf(out, "  call	Num1_%d\n",label_count);
   fprintf(out, "  ld	bc,-1000\n");
-  fprintf(out, "  call	Num1\n");
+  fprintf(out, "  call	Num1_%d\n",label_count);
   fprintf(out, "  ld	bc,-100\n");
-  fprintf(out, "  call	Num1\n");
+  fprintf(out, "  call	Num1_%d\n",label_count);
   fprintf(out, "  ld	c,-10\n");
-  fprintf(out, "  call	Num1\n");
+  fprintf(out, "  call	Num1_%d\n",label_count);
   fprintf(out, "  ld	c,b\n");
-  fprintf(out, "  Num1:	ld	a,'0'-1\n");
-  fprintf(out, "  Num2:	inc	a\n");
+  fprintf(out, "  Num1_%d:  ld	a,'0'-1\n",label_count);
+  fprintf(out, "  Num2_%d:	inc	a\n",label_count);
   fprintf(out, "  add	hl,bc\n");
-  fprintf(out, "  jr	c,Num2\n");
+  fprintf(out, "  jr	c,Num2_%d\n",label_count);
   fprintf(out, "  sbc	hl,bc\n");
   fprintf(out, "  ld	(de),a\n");
   fprintf(out, "  inc	de\n");
   fprintf(out, "  ret\n");
-  fprintf(out, "  pufr:\n");
+  fprintf(out, "  pufr_%d:\n",label_count);
   fprintf(out, "  dc16 0\n");
   fprintf(out, "  dc16 0\n");
   fprintf(out, "  dc8 0\n");
@@ -527,6 +527,24 @@ int CPC::cpc_printI_I()
   
   return 0;
 }
+
+int CPC::cpc_getTime()
+{
+  fprintf(out, "  ; time (lower 16bit from 32bit)\n");
+  fprintf(out, "  call KL_TIME_PLEASE\n");
+  fprintf(out, "  push hl\n");
+  
+  return 0;
+}
+
+int CPC::cpc_VSync()
+{
+  fprintf(out, "  call MC_WAIT_FLYBACK\n");
+  
+  return 0;
+}
+
+
 
 // now the functions with const
 

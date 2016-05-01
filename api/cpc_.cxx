@@ -56,7 +56,9 @@ int cpc(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(getVMEM,_ICC)
   CHECK_FUNC(putSpriteMode0,_IIII)
   CHECK_FUNC(printI,_I)
-  
+  CHECK_FUNC(getTime,)
+  CHECK_FUNC(VSync,)
+    
   return -1;
 }
 
