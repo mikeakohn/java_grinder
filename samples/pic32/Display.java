@@ -31,6 +31,27 @@ public class Display
   static public final int WIDTH = 176;
   static public final int HEIGHT = 220;
 
+  // Colors are RRRRR GGGGGG BBBBB  (R5, G6, B5)
+  static public int[] colors =
+  {
+    0b0000000000000000,
+    0b0001100001100011,
+    0b0011100011100111,
+    0b1111100000011111,
+    0b0011100000011111,
+    0b0001100000011111,
+    0b0000000000011111,
+    0b0000000011111111,
+    0b0000011111111111,
+    0b0000011111100111,
+    0b0000011111100000,
+    0b0000111111100000,
+    0b0011111111100000,
+    0b1111111111100000,
+    0b1111100011100000,
+    0b1111100000000000,
+  };
+
   static public void send(int data)
   {
     // /CS on
@@ -47,7 +68,7 @@ public class Display
     IOPort3.setPinsValue(LCD_CS|LCD_BACKLIGHT);
     IOPort3.setPinsValue(LCD_BACKLIGHT);
     SPI1.read16(command);
-    IOPort3.setPinsValue(LCD_RS|LCD_CS|LCD_BACKLIGHT);
+    IOPort3.setPinsValue(LCD_CS|LCD_BACKLIGHT);
   }
 
   static public void writeData(int data)
@@ -66,7 +87,7 @@ public class Display
   static public void delay()
   {
     int n;
-    for (n = 0; n < 20000; n++);
+    for (n = 0; n < 1000000; n++);
   }
 
   static public void initDisplay()
@@ -156,7 +177,64 @@ public class Display
 
     for (n = 0; n < WIDTH * HEIGHT; n++)
     {
-      writeData(31);
+      //writeData(0b0000000000011111);
+      //writeData(0b0000011111100000);
+      //writeData(0b1111100000000000);
+      writeData(colors[7]);
+    }
+  }
+
+  static public void drawMandelbrot()
+  {
+    final int DEC_PLACE = 10;
+    int x,y;
+    int rs,is;
+    int zi,zr;
+    int tr,ti;
+    int zr2,zi2;
+    int count;
+    final int r0 = (-2 << DEC_PLACE);
+    final int i0 = (-1 << DEC_PLACE);
+    final int r1 = (1 << DEC_PLACE);
+    final int i1 = (1 << DEC_PLACE);
+    int dx = (r1 - r0) / WIDTH;
+    int dy = (i1 - i0) / HEIGHT;
+
+    setWindow(0, 0, WIDTH - 1, HEIGHT - 1);
+
+    is = i0;
+
+    for (y = 0; y < HEIGHT; y++)
+    {
+      rs = r0;
+
+      for (x = 0; x < WIDTH; x++)
+      {
+        zr = 0;
+        zi = 0;
+
+        for (count = 0; count < 16; count++)
+        {
+          zr2 = (zr * zr) >> DEC_PLACE;
+          zi2 = (zi * zi) >> DEC_PLACE;
+
+          if (zr2 + zi2 > (4 << DEC_PLACE)) { break; }
+
+          tr = zr2 - zi2;
+          ti = 2 * ((zr * zi) >> DEC_PLACE);
+
+          zr = tr + rs;
+          zi = ti + is;
+        }
+
+        //writeData(colors[count & 0xf]);
+        writeData(count);
+        //writeData(31);
+
+        rs += dx;
+      }
+
+      is += dy;
     }
   }
 
@@ -164,10 +242,10 @@ public class Display
   {
     int n;
 
-    IOPort1.setPinsAsOutput(0x04);
-    IOPort3.setPinsAsOutput(0x608);
+    IOPort1.setPinsAsOutput(LCD_RESET);
+    IOPort3.setPinsAsOutput(LCD_RS|LCD_CS|LCD_BACKLIGHT);
     IOPort5.setPinsAsOutput(0x01);
-    IOPort6.setPinsAsOutput(0x40);
+    //IOPort6.setPinsAsOutput(0x40);
 
     IOPort1.setPinsValue(LCD_RESET);
     IOPort3.setPinsValue(LCD_RS|LCD_CS|LCD_BACKLIGHT);
@@ -177,11 +255,12 @@ public class Display
     SPI1.init16(SPI1.DIV128, 0);
 
     initDisplay();
-    IOPort5.setPinsValue(0x00);
     clearDisplay();
 
-
+    //drawMandelbrot();
     //send(0x3200);
+
+    IOPort5.setPinsValue(0x00);
 
     while(true);
   }
