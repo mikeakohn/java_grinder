@@ -1768,7 +1768,12 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         if (type[0] == 'L')
         {
           int index = java_class->get_field_index(field_name);
-          generator->get_static(field_name, index);
+          if (generator->get_static(field_name, index) != 0)
+          {
+            printf("Internal Error: get_static not implemented\n");
+            ret = -1;
+            break;
+          }
           java_class->get_ref_name_type(field_name, type, sizeof(field_name), ref);
 
           // This fixes Joe's demo (meant to deal with strings) kind of

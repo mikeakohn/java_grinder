@@ -721,11 +721,11 @@ int MIPS32::jump_cond(const char *label, int cond, int distance)
   switch(cond)
   {
     case COND_EQUAL:
-      fprintf(out, "  beq $t%d, $r0, %s\n", --reg, label);
+      fprintf(out, "  beq $t%d, $0, %s\n", --reg, label);
       fprintf(out, "  nop\n");
       return 0;
     case COND_NOT_EQUAL:
-      fprintf(out, "  bne $t%d, $r0, %s\n", --reg, label);
+      fprintf(out, "  bne $t%d, $0, %s\n", --reg, label);
       fprintf(out, "  nop\n");
       return 0;
     case COND_LESS:
@@ -807,11 +807,117 @@ int MIPS32::jump_cond_integer(const char *label, int cond, int distance)
 
 int MIPS32::ternary(int cond, int value_true, int value_false)
 {
+  fprintf(out, "  ; ternary %d ? %d : %d\n", cond, value_true, value_false);
+  fprintf(out, "  ; true condition is in delay slot\n");
+
+  switch(cond)
+  {
+    case COND_EQUAL:
+      fprintf(out, "  beq $t%d, $t%d, ternary_%d\n", reg - 2, reg - 1, label_count);
+      if (set_constant(reg - 2, value_true) != 0) { return -1; }
+      if (set_constant(reg - 2, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      reg -= 1;
+      return 0;
+    case COND_NOT_EQUAL:
+      fprintf(out, "  bne $t%d, $t%d, ternary_%d\n", reg - 2, reg - 1, label_count);
+      if (set_constant(reg - 2, value_true) != 0) { return -1; }
+      if (set_constant(reg - 2, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      reg -= 1;
+      return 0;
+    case COND_LESS:
+      fprintf(out, "  subu $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
+      fprintf(out, "  bltz $t%d, ternary_%d\n", reg - 2, label_count);
+      if (set_constant(reg - 2, value_true) != 0) { return -1; }
+      if (set_constant(reg - 2, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      reg -= 1;
+      return 0;
+    case COND_LESS_EQUAL:
+      fprintf(out, "  subu $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
+      fprintf(out, "  blez $t%d, ternary_%d\n", reg - 2, label_count);
+      if (set_constant(reg - 2, value_true) != 0) { return -1; }
+      if (set_constant(reg - 2, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      reg -= 1;
+      return 0;
+    case COND_GREATER:
+      fprintf(out, "  subu $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
+      fprintf(out, "  bgtz $t%d, ternary_%d\n", reg - 2, label_count);
+      if (set_constant(reg - 2, value_true) != 0) { return -1; }
+      if (set_constant(reg - 2, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      reg -= 1;
+      return 0;
+    case COND_GREATER_EQUAL:
+      fprintf(out, "  subu $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
+      fprintf(out, "  bgez $t%d, ternary_%d\n", reg - 2, label_count);
+      if (set_constant(reg - 2, value_true) != 0) { return -1; }
+      if (set_constant(reg - 2, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      reg -= 1;
+      return 0;
+    default:
+      break;
+  }
+
   return -1;
 }
 
 int MIPS32::ternary(int cond, int compare, int value_true, int value_false)
 {
+  fprintf(out, "  ; ternary %d (%d) ? %d : %d\n", cond, compare, value_true, value_false);
+  fprintf(out, "  ; true condition is in delay slot\n");
+
+  if (set_constant(8, compare) != 0) { return -1; }
+
+  switch(cond)
+  {
+    case COND_EQUAL:
+      fprintf(out, "  beq $t%d, $t8, ternary_%d\n", reg - 1, label_count);
+      if (set_constant(reg - 1, value_true) != 0) { return -1; }
+      if (set_constant(reg - 1, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      return 0;
+    case COND_NOT_EQUAL:
+      fprintf(out, "  bne $t%d, $t8, ternary_%d\n", reg - 1, label_count);
+      if (set_constant(reg - 1, value_true) != 0) { return -1; }
+      if (set_constant(reg - 1, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      return 0;
+    case COND_LESS:
+      fprintf(out, "  subu $t8, $t%d, $t8\n", reg - 1);
+      fprintf(out, "  bltz $t8, ternary_%d\n", label_count);
+      if (set_constant(reg - 1, value_true) != 0) { return -1; }
+      if (set_constant(reg - 1, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      return 0;
+    case COND_LESS_EQUAL:
+      fprintf(out, "  subu $t8, $t%d, $t8\n", reg - 1);
+      fprintf(out, "  blez $t8, ternary_%d\n", label_count);
+      if (set_constant(reg - 1, value_true) != 0) { return -1; }
+      if (set_constant(reg - 1, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      return 0;
+    case COND_GREATER:
+      fprintf(out, "  subu $t8, $t%d, $t8\n", reg - 1);
+      fprintf(out, "  bgtz $t8, ternary_%d\n", label_count);
+      if (set_constant(reg - 1, value_true) != 0) { return -1; }
+      if (set_constant(reg - 1, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      return 0;
+    case COND_GREATER_EQUAL:
+      fprintf(out, "  subu $t8, $t%d, $t8\n", reg - 1);
+      fprintf(out, "  bgez $t8, ternary_%d\n", label_count);
+      if (set_constant(reg - 1, value_true) != 0) { return -1; }
+      if (set_constant(reg - 1, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      return 0;
+    default:
+      break;
+  }
+
   return -1;
 }
 
@@ -960,12 +1066,37 @@ int MIPS32::invoke_static_method(const char *name, int params, int is_void)
 
 int MIPS32::put_static(const char *name, int index)
 {
-  return -1;
+  fprintf(out, "  ; put_static(%s, %d)\n", name, index);
+
+  if (stack > 0)
+  {
+    STACK_POP(8);
+    fprintf(out, "  sw $t8, %d($s1)\n", index * 4);
+  }
+    else
+  {
+    fprintf(out, "  sw $t%d, %d($s1)\n", reg - 1, index * 4);
+    reg--;
+  }
+
+  return 0;
 }
 
 int MIPS32::get_static(const char *name, int index)
 {
-  return -1;
+  fprintf(out, "  ; get_static(%s, %d)\n", name, index);
+
+  if (reg < reg_max)
+  {
+    fprintf(out, "  lw $t%d, %d($s1)\n", reg++, index * 4);
+  }
+    else
+  {
+    fprintf(out, "  lw $t8, %d($s1)\n", index * 4);
+    STACK_PUSH(8);
+  }
+
+  return 0;
 }
 
 int MIPS32::brk()
@@ -1450,4 +1581,32 @@ int MIPS32::get_ref_from_stack(int *value1)
   }
 }
 
+int MIPS32::set_constant(int reg, int value)
+{
+  if (value == 0)
+  {
+    fprintf(out, "  move $t%d, $0\n", reg);
+    return 0;
+  }
+    else
+  if ((value & 0x0000ffff) == 0x0000)
+  {
+    fprintf(out, "  lui $t%d, 0x%04x\n", reg, value >> 16);
+    return 0;
+  }
+
+  int index = get_constant(value);
+
+  if (index == -1)
+  {
+    printf("Internal Error: Constants pool exhausted %s:%d\n", __FILE__, __LINE__);
+    return -1;
+  }
+    else
+  {
+    fprintf(out, "  lw $t%d, 0x%04x($s0)\n", reg, index * 4);
+  }
+
+  return 0;
+}
 

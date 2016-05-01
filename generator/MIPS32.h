@@ -127,6 +127,7 @@ private:
   int get_values_from_stack(int *value1);
   int get_values_from_stack(int *value1, int *value2);
   int get_ref_from_stack(int *value1);
+  int set_constant(int reg, int value);
 
   bool is_main : 1;
 };
