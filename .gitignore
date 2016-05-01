@@ -16,3 +16,5 @@ nvram
 snap
 *.smc
 *.dsk
+*.8xk
+*.d64
