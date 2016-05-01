@@ -107,6 +107,10 @@ public:
   virtual int memory_write16_IS();
   
   virtual int memory_read8_I(int adr);
+  virtual int memory_write8_IB(int adr, int8_t val);
+  virtual int memory_read16_I(int adr);
+  virtual int memory_write16_IS(int adr, short val);
+  
 
 protected:
   int stack_alu(int alu_op);

@@ -42,17 +42,18 @@ public class ScreenCPC
     
     CPC.cls();
   
-    y=100; scr = 0xC000;
+    y=100; 
+    scr = 0xC000; 
+    short help = (short) 0xa11a;
         
     for (x=20; x<60; x++)
     {
       z = CPC.getVMEM(scr,x,y);
       Memory.write8( z, (byte) 0x1a);
-      Memory.write16( z+0x800, (short) 0xa11a);
-      
+      z += 0x800;
+      Memory.write16( z, help);   
     }
-    
-    
+        
     for (i=1;i<5000;i++)
     {
       c=1;
