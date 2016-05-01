@@ -79,8 +79,9 @@ public class SpriteCPC
          nX = (char) (MAX_X - SPRITE_WIDTH);
          nXDir = -1;
        }
-                
-      /*for (char z=0;z<SPRITE_HEIGHT;z++)
+      
+      i=0;          
+      for (char z=0;z<SPRITE_HEIGHT;z++)
       {
         for (char k=0;k<SPRITE_WIDTH;k++)
         {
@@ -88,9 +89,11 @@ public class SpriteCPC
          i++;         
         }
       }
-      */
       
-      CPC.putSpriteMode0(CPC.getVMEM(0xC000, nX, nY), SPRITE_WIDTH, SPRITE_HEIGHT, Sprite);    
+      CPC.VSync();
+      
+      
+      //CPC.putSpriteMode0(CPC.getVMEM(0xC000, nX, nY), SPRITE_WIDTH, SPRITE_HEIGHT, Sprite);    
           
   }
 }
