@@ -1,4 +1,5 @@
 
+import net.mikekohn.java_grinder.CPU;
 import net.mikekohn.java_grinder.IOPort1;
 import net.mikekohn.java_grinder.IOPort3;
 import net.mikekohn.java_grinder.IOPort5;
@@ -8,6 +9,8 @@ import net.mikekohn.java_grinder.SPI1;
 // 4Display-Shield-22
 // Much of this code was copied from 4D Systems sample source code
 // and translated to Java.
+//
+// This appears to be an ILI9225C chip.
 
 // ChipKit UNO's SPI:
 // Pin 7  - /CS       (RD9)
@@ -73,6 +76,7 @@ public class Display
 
   static public void writeData(int data)
   {
+    IOPort3.setPinsValue(LCD_RS|LCD_CS|LCD_BACKLIGHT);
     IOPort3.setPinsValue(LCD_RS|LCD_BACKLIGHT);
     SPI1.read16(data);
     IOPort3.setPinsValue(LCD_RS|LCD_CS|LCD_BACKLIGHT);
@@ -92,6 +96,8 @@ public class Display
 
   static public void initDisplay()
   {
+    IOPort1.setPinsValue(LCD_RESET);
+    delay();
     IOPort1.setPinsValue(0);
     delay();
     IOPort1.setPinsValue(LCD_RESET);
@@ -153,19 +159,30 @@ public class Display
     writeDisplay(0x07, 0x0012); 
     delay(); 
     writeDisplay(0x07, 0x1017);
+
+    // setDisplay()
+    //writeDisplay(0xff, 0x0000);
+    //writeDisplay(0x10, 0x0000);
+    //delay();
+    //writeDisplay(0x07, 0x1017);
+    //delay();
   }
 
   static public void setWindow(int x0, int y0, int x1, int y1)
   {
+    // Horizontal Window Address 1/2
     writeDisplay(0x36, x1);
     writeDisplay(0x37, x0);
 
+    // Vertical Window Address 1/2
     writeDisplay(0x38, y1);
     writeDisplay(0x39, y0);
 
+    // RAM Address Set 1/2
     writeDisplay(0x20, x0);
     writeDisplay(0x21, y0);
 
+    // Write Data to GRAM
     writeCommand(0x22);
   }
 
@@ -180,7 +197,7 @@ public class Display
       //writeData(0b0000000000011111);
       //writeData(0b0000011111100000);
       //writeData(0b1111100000000000);
-      writeData(colors[7]);
+      writeData(colors[1]);
     }
   }
 
@@ -227,8 +244,8 @@ public class Display
           zi = ti + is;
         }
 
-        //writeData(colors[count & 0xf]);
-        writeData(count);
+        writeData(colors[count & 0xf]);
+        //writeData(count);
         //writeData(31);
 
         rs += dx;
@@ -252,12 +269,13 @@ public class Display
     IOPort5.setPinsValue(0x01);
     //IOPort6.setPinsValue(0x40);
 
-    SPI1.init16(SPI1.DIV128, 0);
+    //SPI1.init16(SPI1.DIV128, 0);
+    SPI1.init16(4, 0);
 
     initDisplay();
     clearDisplay();
 
-    //drawMandelbrot();
+    drawMandelbrot();
     //send(0x3200);
 
     IOPort5.setPinsValue(0x00);
