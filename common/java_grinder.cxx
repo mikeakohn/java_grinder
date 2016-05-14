@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -258,7 +258,7 @@ int main(int argc, char *argv[])
   int n;
 
   printf("\nJava Grinder\n"
-         "Authors: Michael Kohn, Joe Davisson\n"
+         "Authors: Michael Kohn, Joe Davisson, Carsten Dost\n"
          "    Web: http://www.mikekohn.net/micro/java_grinder.php\n"
          "  Email: mike@mikekohn.net\n\n"
          "Version: "VERSION"\n\n");
