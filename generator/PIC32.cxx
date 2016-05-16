@@ -39,6 +39,8 @@ int PIC32::open(const char *filename)
 {
   if (MIPS32::open(filename) != 0) { return -1; }
 
+  fprintf(out, ".mips32\n");
+
   fprintf(out, "  SPI1CON equ 0x5800\n");
   fprintf(out, "  SPI1STAT equ 0x5810\n");
   fprintf(out, "  SPI1BUF equ 0x5820\n");

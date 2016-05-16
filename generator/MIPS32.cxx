@@ -87,7 +87,7 @@ int MIPS32::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 
-  fprintf(out, ".mips32\n");
+  //fprintf(out, ".mips32\n");
 
   // Set where RAM starts / ends
   fprintf(out, "  ram_start equ 0x%x\n", ram_start);

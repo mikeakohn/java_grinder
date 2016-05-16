@@ -34,6 +34,8 @@ int Playstation2::open(const char *filename)
 {
   if (MIPS64::open(filename) != 0) { return -1; }
 
+  fprintf(out, ".emotion_engine\n");
+
   return 0;
 }
 
