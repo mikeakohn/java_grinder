@@ -79,6 +79,7 @@ MIPS32::MIPS32() :
 
 MIPS32::~MIPS32()
 {
+  fprintf(out, ".align 32\n");
   insert_constants_pool();
 }
 
@@ -86,13 +87,14 @@ int MIPS32::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 
-  fprintf(out, ".mips32\n");
+  //fprintf(out, ".mips32\n");
 
   // Set where RAM starts / ends
   fprintf(out, "  ram_start equ 0x%x\n", ram_start);
   fprintf(out, "  ram_end equ 0x%x\n", ram_end);
   fprintf(out, "  virtual_address equ 0x%x\n", virtual_address);
   fprintf(out, "  physical_address equ 0x%x\n", physical_address);
+  fprintf(out, "  voffset equ (virtual_address - physical_address)\n");
 
   return 0;
 }
@@ -103,7 +105,7 @@ int MIPS32::start_init()
   fprintf(out, ".org 0x%x\n", org);
   fprintf(out, "start:\n");
 
-  fprintf(out, "  li $s0, _constant_pool - physical_address + virtual_address  ; $s0 points to constant numbers\n");
+  fprintf(out, "  li $s0, _constant_pool + voffset  ; $s0 points to constant numbers\n");
   fprintf(out, "  li $s1, ram_start       ; $s1 points to statics\n");
   fprintf(out, "  li $sp, ram_end+1\n");
 
@@ -112,7 +114,7 @@ int MIPS32::start_init()
 
 int MIPS32::insert_static_field_define(const char *name, const char *type, int index)
 {
-  fprintf(out, "%s equ ram_start+%d\n", name, index * 4);
+  fprintf(out, "  %s equ ram_start+%d\n", name, index * 4);
   return 0;
 }
 
@@ -154,7 +156,7 @@ int MIPS32::field_init_int(char *name, int index, int value)
     return 0;
   }
     else
-  if (n > 0xffff0000)
+  if ((n & 0x0000ffff) == 0x0000)
   {
     fprintf(out, "  lui $t8, 0x%04x\n", n >> 16);
   }
@@ -170,8 +172,11 @@ int MIPS32::field_init_int(char *name, int index, int value)
 
 int MIPS32::field_init_ref(char *name, int index)
 {
-  fprintf(out, "  li $t8, %s\n", name);
-  fprintf(out, "  sw $t8, 0x%04x($s1)\n", index * 4);
+  fprintf(out, "  ; static init\n");
+  fprintf(out, "  li $t8, _%s + voffset\n", name);
+  //fprintf(out, "  sw $t8, 0x%04x($s1)\n", index * 4);
+  fprintf(out, "  li $t9, %s\n", name);
+  fprintf(out, "  sw $t8, ($t9)\n");
 
   return 0;
 }
@@ -182,9 +187,8 @@ void MIPS32::method_start(int local_count, int max_stack, int param_count, const
 
   fprintf(out, "%s:\n", name);
   fprintf(out, "  ; %s(local_count=%d, max_stack=%d, param_count=%d)\n", name, local_count, max_stack, param_count);
-  //fprintf(out, "  addi $fp, $sp, -%d\n", local_count * 4);
-  fprintf(out, "  addi $fp, $sp, -4\n");
-  fprintf(out, "  addi $sp, $sp, -%d\n", (local_count * 4) + 4);
+  fprintf(out, "  addiu $fp, $sp, -4\n");
+  fprintf(out, "  addiu $sp, $sp, -%d\n", (local_count * 4) + 4);
 }
 
 void MIPS32::method_end(int local_count)
@@ -192,7 +196,7 @@ void MIPS32::method_end(int local_count)
   if (!is_main)
   {
     // If this isn't main() restore stack pointer.
-    //fprintf(out, "  addi $sp, $sp, %d\n", local_count * 4);
+    //fprintf(out, "  addiu $sp, $sp, %d\n", local_count * 4);
   }
 
   fprintf(out, "\n");
@@ -263,7 +267,7 @@ int MIPS32::push_int(int32_t n)
     return 0;
   }
     else
-  if (value > 0xffff0000)
+  if ((value & 0x0000ffff) == 0x0000)
   {
     if (reg < reg_max)
     {
@@ -372,7 +376,7 @@ int MIPS32::pop()
 
   if (stack > 0)
   {
-    fprintf(out, "  addi $sp, $sp, 4\n"); \
+    fprintf(out, "  addiu $sp, $sp, 4\n"); \
     stack--;
   }
     else
@@ -481,21 +485,22 @@ int MIPS32::add_integer()
 int MIPS32::add_integer(int num)
 {
   if (stack != 0) { return -1; }
-  if (num < 0 || num > 0xffff) { return -1; }
-  fprintf(out, "  addi $t%d, $t%d, %d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
+  if (num < -32768 || num > 32767) { return -1; }
+  fprintf(out, "  addiu $t%d, $t%d, %d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
   return 0;
 }
 
 int MIPS32::sub_integer()
 {
-  return stack_alu("sub");
+  return stack_alu("subu");
 }
 
 int MIPS32::sub_integer(int num)
 {
   if (stack != 0) { return -1; }
-  if (num < 0 || num > 0xffff) { return -1; }
-  fprintf(out, "  subi $t%d, $t%d, %d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
+  num = -num;
+  if (num < -32768 || num > 32767) { return -1; }
+  fprintf(out, "  addiu $t%d, $t%d, %d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
   return 0;
 }
 
@@ -506,18 +511,17 @@ int MIPS32::mul_integer()
 
 int MIPS32::div_integer()
 {
-  stack_alu("div");
+  divide();
 
   if (stack > 0)
   {
-    // OUCH.  This is probably very rare anyway
-    STACK_POP(8);
     fprintf(out, "  mflo $t8\n");
     STACK_PUSH(8);
   }
     else
   {
-    fprintf(out, "  mflo $t%d\n", REG_STACK(reg - 1));
+    fprintf(out, "  mflo $t%d\n", REG_STACK(reg));
+    reg++;
   }
 
   return 0;
@@ -525,7 +529,7 @@ int MIPS32::div_integer()
 
 int MIPS32::mod_integer()
 {
-  stack_alu("div");
+  divide();
 
   if (stack > 0)
   {
@@ -673,7 +677,7 @@ int MIPS32::inc_integer(int index, int num)
 {
   fprintf(out, "  ; inc_integer(local_%d,%d)\n", index, num);
   fprintf(out, "  lw $t8, %d($fp)\n", LOCALS(index));
-  fprintf(out, "  addi $t8, $t8, %d\n", num);
+  fprintf(out, "  addiu $t8, $t8, %d\n", num);
   fprintf(out, "  sw $t8, %d($fp)\n", LOCALS(index));
 
   return 0;
@@ -718,11 +722,11 @@ int MIPS32::jump_cond(const char *label, int cond, int distance)
   switch(cond)
   {
     case COND_EQUAL:
-      fprintf(out, "  beq $t%d, $r0, %s\n", --reg, label);
+      fprintf(out, "  beq $t%d, $0, %s\n", --reg, label);
       fprintf(out, "  nop\n");
       return 0;
     case COND_NOT_EQUAL:
-      fprintf(out, "  bne $t%d, $r0, %s\n", --reg, label);
+      fprintf(out, "  bne $t%d, $0, %s\n", --reg, label);
       fprintf(out, "  nop\n");
       return 0;
     case COND_LESS:
@@ -772,25 +776,25 @@ int MIPS32::jump_cond_integer(const char *label, int cond, int distance)
       reg -= 2;
       return 0;
     case COND_LESS:
-      fprintf(out, "  sub $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
+      fprintf(out, "  subu $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
       fprintf(out, "  bltz $t%d, %s\n", reg - 2, label);
       fprintf(out, "  nop\n");
       reg -= 2;
       return 0;
     case COND_LESS_EQUAL:
-      fprintf(out, "  sub $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
+      fprintf(out, "  subu $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
       fprintf(out, "  blez $t%d, %s\n", reg - 2, label);
       fprintf(out, "  nop\n");
       reg -= 2;
       return 0;
     case COND_GREATER:
-      fprintf(out, "  sub $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
+      fprintf(out, "  subu $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
       fprintf(out, "  bgtz $t%d, %s\n", reg - 2, label);
       fprintf(out, "  nop\n");
       reg -= 2;
       return 0;
     case COND_GREATER_EQUAL:
-      fprintf(out, "  sub $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
+      fprintf(out, "  subu $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
       fprintf(out, "  bgez $t%d, %s\n", reg - 2, label);
       fprintf(out, "  nop\n");
       reg -= 2;
@@ -804,11 +808,117 @@ int MIPS32::jump_cond_integer(const char *label, int cond, int distance)
 
 int MIPS32::ternary(int cond, int value_true, int value_false)
 {
+  fprintf(out, "  ; ternary %d ? %d : %d\n", cond, value_true, value_false);
+  fprintf(out, "  ; true condition is in delay slot\n");
+
+  switch(cond)
+  {
+    case COND_EQUAL:
+      fprintf(out, "  beq $t%d, $t%d, ternary_%d\n", reg - 2, reg - 1, label_count);
+      if (set_constant(reg - 2, value_true) != 0) { return -1; }
+      if (set_constant(reg - 2, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      reg -= 1;
+      return 0;
+    case COND_NOT_EQUAL:
+      fprintf(out, "  bne $t%d, $t%d, ternary_%d\n", reg - 2, reg - 1, label_count);
+      if (set_constant(reg - 2, value_true) != 0) { return -1; }
+      if (set_constant(reg - 2, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      reg -= 1;
+      return 0;
+    case COND_LESS:
+      fprintf(out, "  subu $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
+      fprintf(out, "  bltz $t%d, ternary_%d\n", reg - 2, label_count);
+      if (set_constant(reg - 2, value_true) != 0) { return -1; }
+      if (set_constant(reg - 2, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      reg -= 1;
+      return 0;
+    case COND_LESS_EQUAL:
+      fprintf(out, "  subu $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
+      fprintf(out, "  blez $t%d, ternary_%d\n", reg - 2, label_count);
+      if (set_constant(reg - 2, value_true) != 0) { return -1; }
+      if (set_constant(reg - 2, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      reg -= 1;
+      return 0;
+    case COND_GREATER:
+      fprintf(out, "  subu $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
+      fprintf(out, "  bgtz $t%d, ternary_%d\n", reg - 2, label_count);
+      if (set_constant(reg - 2, value_true) != 0) { return -1; }
+      if (set_constant(reg - 2, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      reg -= 1;
+      return 0;
+    case COND_GREATER_EQUAL:
+      fprintf(out, "  subu $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
+      fprintf(out, "  bgez $t%d, ternary_%d\n", reg - 2, label_count);
+      if (set_constant(reg - 2, value_true) != 0) { return -1; }
+      if (set_constant(reg - 2, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      reg -= 1;
+      return 0;
+    default:
+      break;
+  }
+
   return -1;
 }
 
 int MIPS32::ternary(int cond, int compare, int value_true, int value_false)
 {
+  fprintf(out, "  ; ternary %d (%d) ? %d : %d\n", cond, compare, value_true, value_false);
+  fprintf(out, "  ; true condition is in delay slot\n");
+
+  if (set_constant(8, compare) != 0) { return -1; }
+
+  switch(cond)
+  {
+    case COND_EQUAL:
+      fprintf(out, "  beq $t%d, $t8, ternary_%d\n", reg - 1, label_count);
+      if (set_constant(reg - 1, value_true) != 0) { return -1; }
+      if (set_constant(reg - 1, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      return 0;
+    case COND_NOT_EQUAL:
+      fprintf(out, "  bne $t%d, $t8, ternary_%d\n", reg - 1, label_count);
+      if (set_constant(reg - 1, value_true) != 0) { return -1; }
+      if (set_constant(reg - 1, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      return 0;
+    case COND_LESS:
+      fprintf(out, "  subu $t8, $t%d, $t8\n", reg - 1);
+      fprintf(out, "  bltz $t8, ternary_%d\n", label_count);
+      if (set_constant(reg - 1, value_true) != 0) { return -1; }
+      if (set_constant(reg - 1, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      return 0;
+    case COND_LESS_EQUAL:
+      fprintf(out, "  subu $t8, $t%d, $t8\n", reg - 1);
+      fprintf(out, "  blez $t8, ternary_%d\n", label_count);
+      if (set_constant(reg - 1, value_true) != 0) { return -1; }
+      if (set_constant(reg - 1, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      return 0;
+    case COND_GREATER:
+      fprintf(out, "  subu $t8, $t%d, $t8\n", reg - 1);
+      fprintf(out, "  bgtz $t8, ternary_%d\n", label_count);
+      if (set_constant(reg - 1, value_true) != 0) { return -1; }
+      if (set_constant(reg - 1, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      return 0;
+    case COND_GREATER_EQUAL:
+      fprintf(out, "  subu $t8, $t%d, $t8\n", reg - 1);
+      fprintf(out, "  bgez $t8, ternary_%d\n", label_count);
+      if (set_constant(reg - 1, value_true) != 0) { return -1; }
+      if (set_constant(reg - 1, value_false) != 0) { return -1; }
+      fprintf(out, "ternary_%d:\n", label_count++);
+      return 0;
+    default:
+      break;
+  }
+
   return -1;
 }
 
@@ -820,7 +930,7 @@ int MIPS32::return_local(int index, int local_count)
   }
 
   fprintf(out, "  lw $v0, %d($fp) ; local_%d\n", LOCALS(index), index);
-  fprintf(out, "  addi $sp, $sp, %d\n", (local_count * 4) + 4);
+  fprintf(out, "  addiu $sp, $sp, %d\n", (local_count * 4) + 4);
   fprintf(out, "  jr $ra\n");
   fprintf(out, "  nop\n");
 
@@ -835,9 +945,9 @@ int MIPS32::return_integer(int local_count)
   }
 
   fprintf(out, "  move $v0, $t0\n");
-  fprintf(out, "  addi $sp, $sp, %d\n", (local_count * 4) + 4);
+  fprintf(out, "  addiu $sp, $sp, %d\n", (local_count * 4) + 4);
   fprintf(out, "  jr $ra\n");
-  fprintf(out, "  nop ; Delay slot :(\n");
+  fprintf(out, "  nop ; Delay slot\n");
   reg--;
 
   return 0;
@@ -850,16 +960,16 @@ int MIPS32::return_void(int local_count)
     printf("Internal Error: Reg stack not empty %s:%d\n", __FILE__, __LINE__);
   }
 
-  fprintf(out, "  addi $sp, $sp, %d\n", (local_count * 4) + 4);
+  fprintf(out, "  addiu $sp, $sp, %d\n", (local_count * 4) + 4);
   fprintf(out, "  jr $ra\n");
-  fprintf(out, "  nop ; Delay slot :(\n");
+  fprintf(out, "  nop ; Delay slot\n");
   return 0;
 }
 
 int MIPS32::jump(const char *name, int distance)
 {
   fprintf(out, "  b %s\n", name);
-  fprintf(out, "  nop ; Delay slot :(\n");
+  fprintf(out, "  nop ; Delay slot\n");
 
   return 0;
 }
@@ -883,7 +993,7 @@ int MIPS32::invoke_static_method(const char *name, int params, int is_void)
   save_space = ((save_regs) * 4) + 8;
 
   // Save ra and fp
-  fprintf(out, "  addi $sp, $sp, -%d\n", save_space);
+  fprintf(out, "  addiu $sp, $sp, -%d\n", save_space);
   fprintf(out, "  sw $ra, %d($sp)\n", save_space - 4);
   fprintf(out, "  sw $fp, %d($sp)\n", save_space - 8);
 
@@ -912,7 +1022,7 @@ int MIPS32::invoke_static_method(const char *name, int params, int is_void)
   }
 
   fprintf(out, "  jal %s\n", name);
-  fprintf(out, "  nop ; Delay slot :(\n");
+  fprintf(out, "  nop ; Delay slot\n");
 
   // Restore temp registers
   for (n = 0; n < save_regs; n++)
@@ -923,14 +1033,14 @@ int MIPS32::invoke_static_method(const char *name, int params, int is_void)
   // Restore ra and fp
   fprintf(out, "  lw $ra, %d($sp)\n", save_space - 4);
   fprintf(out, "  lw $fp, %d($sp)\n", save_space - 8);
-  fprintf(out, "  addi $sp, $sp, %d\n", save_space);
+  fprintf(out, "  addiu $sp, $sp, %d\n", save_space);
 
   // Decrease count on reg stack.
   if (stack > 0)
   {
     // Pick the min between stack and params.
     n = (stack > params) ? params : stack;
-    fprintf(out, "  addi $sp, $sp, %d\n", n * 4);
+    fprintf(out, "  addiu $sp, $sp, %d\n", n * 4);
     params -= n;
   }
 
@@ -946,7 +1056,7 @@ int MIPS32::invoke_static_method(const char *name, int params, int is_void)
     }
       else
     {
-      fprintf(out, "  addi $sp, $sp, -%d\n", 4);
+      fprintf(out, "  addiu $sp, $sp, -%d\n", 4);
       fprintf(out, "  sw $v0, 0($sp)\n");
       stack++;
     }
@@ -957,22 +1067,88 @@ int MIPS32::invoke_static_method(const char *name, int params, int is_void)
 
 int MIPS32::put_static(const char *name, int index)
 {
-  return -1;
+  fprintf(out, "  ; put_static(%s, %d)\n", name, index);
+
+  if (stack > 0)
+  {
+    STACK_POP(8);
+    fprintf(out, "  sw $t8, %d($s1)\n", index * 4);
+  }
+    else
+  {
+    fprintf(out, "  sw $t%d, %d($s1)\n", reg - 1, index * 4);
+    reg--;
+  }
+
+  return 0;
 }
 
 int MIPS32::get_static(const char *name, int index)
 {
-  return -1;
+  fprintf(out, "  ; get_static(%s, %d)\n", name, index);
+
+  if (reg < reg_max)
+  {
+    fprintf(out, "  lw $t%d, %d($s1)\n", reg++, index * 4);
+  }
+    else
+  {
+    fprintf(out, "  lw $t8, %d($s1)\n", index * 4);
+    STACK_PUSH(8);
+  }
+
+  return 0;
 }
 
 int MIPS32::brk()
 {
-  return -1;
+  fprintf(out, "  break\n");
+  return 0;
 }
 
 int MIPS32::new_array(uint8_t type)
 {
-  return -1;
+  int t;
+
+  fprintf(out, "  ; new_array(%d)\n", type);
+
+  if (stack > 0)
+  {
+    STACK_POP(8);
+    t = 8;
+  }
+    else
+  {
+    t = reg - 1;
+  }
+
+  fprintf(out, "  sw $t%d, 0($gp)\n", t);
+
+  if (type == TYPE_INT)
+  {
+    fprintf(out, "  sll $t%d, $t%d, 2\n", t, t);
+  }
+    else
+  if (type == TYPE_SHORT || type == TYPE_CHAR)
+  {
+    fprintf(out, "  sll $t%d, $t%d, 1\n", t, t);
+  }
+
+  fprintf(out, "  addiu $t%d, $t%d, 4\n", t, t);
+  fprintf(out, "  move $t9, $gp\n");
+  fprintf(out, "  addu $gp, $gp, $t%d\n", t);
+  fprintf(out, "  addiu $t9, $t9, 4\n");
+
+  if (t == 8)
+  {
+    STACK_PUSH(9);
+  }
+    else
+  {
+    fprintf(out, "  move $t%d, $t9\n", t);
+  }
+
+  return 0;
 }
 
 int MIPS32::insert_array(const char *name, int32_t *data, int len, uint8_t type)
@@ -1038,7 +1214,7 @@ int MIPS32::array_read_byte()
 
   get_values_from_stack(&index_reg, &ref_reg);
 
-  fprintf(out, "  add t%d, $t%d, $t%d\n", ref_reg, ref_reg, index_reg);
+  fprintf(out, "  addu $t%d, $t%d, $t%d\n", ref_reg, ref_reg, index_reg);
 
   if (reg < reg_max)
   {
@@ -1062,7 +1238,7 @@ int MIPS32::array_read_short()
   get_values_from_stack(&index_reg, &ref_reg);
 
   fprintf(out, "  sll $t%d, $t%d, 1\n", index_reg, index_reg);
-  fprintf(out, "  add $t%d, $t%d, $t%d\n", ref_reg, ref_reg, index_reg);
+  fprintf(out, "  addu $t%d, $t%d, $t%d\n", ref_reg, ref_reg, index_reg);
 
   if (reg < reg_max)
   {
@@ -1086,7 +1262,7 @@ int MIPS32::array_read_int()
   get_values_from_stack(&index_reg, &ref_reg);
 
   fprintf(out, "  sll $t%d, $t%d, 2\n", index_reg, index_reg);
-  fprintf(out, "  add $t%d, $t%d, $t%d\n", ref_reg, ref_reg, index_reg);
+  fprintf(out, "  addu $t%d, $t%d, $t%d\n", ref_reg, ref_reg, index_reg);
 
   if (reg < reg_max)
   {
@@ -1109,7 +1285,7 @@ int MIPS32::array_read_byte(const char *name, int field_id)
   get_values_from_stack(&index_reg);
 
   fprintf(out, "  lw $at, %d($s1)\n", field_id * 4);
-  fprintf(out, "  add $at, $at, $t%d\n", index_reg);
+  fprintf(out, "  addu $at, $at, $t%d\n", index_reg);
 
   if (reg < reg_max)
   {
@@ -1133,7 +1309,7 @@ int MIPS32::array_read_short(const char *name, int field_id)
 
   fprintf(out, "  lw $at, %d($s1)\n", field_id * 4);
   fprintf(out, "  sll $t%d, $t%d, 1\n", index_reg, index_reg);
-  fprintf(out, "  add $at, $at, $t%d\n", index_reg);
+  fprintf(out, "  addu $at, $at, $t%d\n", index_reg);
 
   if (reg < reg_max)
   {
@@ -1157,7 +1333,7 @@ int MIPS32::array_read_int(const char *name, int field_id)
 
   fprintf(out, "  lw $at, %d($s1)\n", field_id * 4);
   fprintf(out, "  sll $t%d, $t%d, 2\n", index_reg, index_reg);
-  fprintf(out, "  add $at, $at, $t%d\n", index_reg);
+  fprintf(out, "  addu $at, $at, $t%d\n", index_reg);
 
   if (reg < reg_max)
   {
@@ -1183,12 +1359,12 @@ int MIPS32::array_write_byte()
 
   if (get_ref_from_stack(&ref_reg) == -1)
   {
-    fprintf(out, "  add $at, $at, $t%d\n", index_reg);
+    fprintf(out, "  addu $at, $at, $t%d\n", index_reg);
     fprintf(out, "  sb $t%d, 0($at)\n", value_reg);
   }
     else
   {
-    fprintf(out, "  add $t%d, $t%d, $t%d\n", ref_reg, ref_reg, index_reg);
+    fprintf(out, "  addu $t%d, $t%d, $t%d\n", ref_reg, ref_reg, index_reg);
     fprintf(out, "  sb $t%d, 0($t%d)\n", value_reg, ref_reg);
   }
 
@@ -1206,13 +1382,13 @@ int MIPS32::array_write_short()
   if (get_ref_from_stack(&ref_reg) == -1)
   {
     fprintf(out, "  sll $t%d, $t%d, 1\n", index_reg, index_reg);
-    fprintf(out, "  add $at, $at, $t%d\n", index_reg);
+    fprintf(out, "  addu $at, $at, $t%d\n", index_reg);
     fprintf(out, "  sh $t%d, 0($at)\n", value_reg);
   }
     else
   {
     fprintf(out, "  sll $t%d, $t%d, 1\n", index_reg, index_reg);
-    fprintf(out, "  add $t%d, $t%d, $t%d\n", ref_reg, ref_reg, index_reg);
+    fprintf(out, "  addu $t%d, $t%d, $t%d\n", ref_reg, ref_reg, index_reg);
     fprintf(out, "  sh $t%d, 0($t%d)\n", value_reg, ref_reg);
   }
 
@@ -1230,13 +1406,13 @@ int MIPS32::array_write_int()
   if (get_ref_from_stack(&ref_reg) == -1)
   {
     fprintf(out, "  sll $t%d, $t%d, 2\n", index_reg, index_reg);
-    fprintf(out, "  add $at, $at, $t%d\n", index_reg);
+    fprintf(out, "  addu $at, $at, $t%d\n", index_reg);
     fprintf(out, "  sw $t%d, 0($at)\n", value_reg);
   }
     else
   {
     fprintf(out, "  sll $t%d, $t%d, 2\n", index_reg, index_reg);
-    fprintf(out, "  add $t%d, $t%d, $t%d\n", ref_reg, ref_reg, index_reg);
+    fprintf(out, "  addu $t%d, $t%d, $t%d\n", ref_reg, ref_reg, index_reg);
     fprintf(out, "  sw $t%d, 0($t%d)\n", value_reg, ref_reg);
   }
 
@@ -1251,7 +1427,7 @@ int MIPS32::array_write_byte(const char *name, int field_id)
   get_values_from_stack(&value_reg, &index_reg);
 
   fprintf(out, "  lw $at, %d($s1)\n", field_id * 4);
-  fprintf(out, "  add $at, $at, $t%d\n", index_reg);
+  fprintf(out, "  addu $at, $at, $t%d\n", index_reg);
   fprintf(out, "  sb $t%d, 0($at)\n", value_reg);
 
   return 0;
@@ -1266,7 +1442,7 @@ int MIPS32::array_write_short(const char *name, int field_id)
 
   fprintf(out, "  lw $at, %d($s1)\n", field_id * 4);
   fprintf(out, "  sll $t%d, $t%d, 1\n", index_reg, index_reg);
-  fprintf(out, "  add $at, $at, $t%d\n", index_reg);
+  fprintf(out, "  addu $at, $at, $t%d\n", index_reg);
   fprintf(out, "  sh $t%d, 0($at)\n", value_reg);
 
   return 0;
@@ -1281,9 +1457,15 @@ int MIPS32::array_write_int(const char *name, int field_id)
 
   fprintf(out, "  lw $at, %d($s1)\n", field_id * 4);
   fprintf(out, "  sll $t%d, $t%d, 2\n", index_reg, index_reg);
-  fprintf(out, "  add $at, $at, $t%d\n", index_reg);
+  fprintf(out, "  addu $at, $at, $t%d\n", index_reg);
   fprintf(out, "  sw $t%d, 0($at)\n", value_reg);
 
+  return 0;
+}
+
+int MIPS32::cpu_nop()
+{
+  fprintf(out, "  nop\n");
   return 0;
 }
 
@@ -1310,6 +1492,41 @@ int MIPS32::stack_alu(const char *instr)
 
   return 0;
 }
+
+int MIPS32::divide()
+{
+  int rs, rt;
+
+  if (stack > 0)
+  {
+    STACK_POP(8);
+    rt = 8;
+  }
+    else
+  {
+    rt = reg - 1;
+    reg--;
+  }
+
+  if (stack > 0)
+  {
+    STACK_POP(9);
+    rs = 9;
+  }
+    else
+  {
+    rs = reg - 1;
+    reg--;
+  }
+
+  // MIPS manual says DIV needs a couple instructions before the mfhi / mflo.
+  fprintf(out, "  div $t%d, $t%d\n", rs, rt);
+  fprintf(out, "  nop\n");
+  fprintf(out, "  nop\n");
+
+  return 0;
+}
+
 
 int MIPS32::get_values_from_stack(int *value)
 {
@@ -1359,7 +1576,7 @@ int MIPS32::get_ref_from_stack(int *value1)
   if (stack > 0)
   {
     fprintf(out, "  lw $at, 0($sp)\n"); \
-    fprintf(out, "  addi $sp, $sp, 4\n"); \
+    fprintf(out, "  addiu $sp, $sp, 4\n"); \
     return -1;
   }
     else
@@ -1371,4 +1588,32 @@ int MIPS32::get_ref_from_stack(int *value1)
   }
 }
 
+int MIPS32::set_constant(int reg, int value)
+{
+  if (value == 0)
+  {
+    fprintf(out, "  move $t%d, $0\n", reg);
+    return 0;
+  }
+    else
+  if ((value & 0x0000ffff) == 0x0000)
+  {
+    fprintf(out, "  lui $t%d, 0x%04x\n", reg, value >> 16);
+    return 0;
+  }
+
+  int index = get_constant(value);
+
+  if (index == -1)
+  {
+    printf("Internal Error: Constants pool exhausted %s:%d\n", __FILE__, __LINE__);
+    return -1;
+  }
+    else
+  {
+    fprintf(out, "  lw $t%d, 0x%04x($s0)\n", reg, index * 4);
+  }
+
+  return 0;
+}
 

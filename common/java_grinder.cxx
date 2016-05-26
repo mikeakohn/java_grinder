@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2016 by Michael Kohn
  *
  */
 
@@ -33,6 +33,7 @@
 #include "MSP430X.h"
 #include "MSX.h"
 #include "PIC32.h"
+#include "Playstation2.h"
 #include "Propeller.h"
 #include "SegaGenesis.h"
 #include "SNES.h"
@@ -174,6 +175,11 @@ static Generator *new_generator(const char *chip_type)
     generator = new PIC32();
   }
     else
+  if (strcasecmp("playstation2", chip_type) == 0)
+  {
+    generator = new Playstation2();
+  }
+    else
   if (strcasecmp("propeller", chip_type) == 0)
   {
     generator = new Propeller();
@@ -258,7 +264,7 @@ int main(int argc, char *argv[])
   int n;
 
   printf("\nJava Grinder\n"
-         "Authors: Michael Kohn, Joe Davisson\n"
+         "Authors: Michael Kohn, Joe Davisson, Carsten Dost\n"
          "    Web: http://www.mikekohn.net/micro/java_grinder.php\n"
          "  Email: mike@mikekohn.net\n\n"
          "Version: "VERSION"\n\n");
@@ -275,7 +281,7 @@ int main(int argc, char *argv[])
            "     dspic,\n"
            "     m6502, c64\n"
            "     m6502_8, atari2600\n"
-           "     mips32, pic32\n"
+           "     mips32, pic32, playstation2\n"
            "     msp430g2231, msp430g2452, msp430g2553, msp430f5529\n"
            "     propeller\n"
            "     sega_genesis\n"
