@@ -42,8 +42,7 @@ Z80::Z80() :
   stack(0),
   is_main(0),
   need_mul16_integer(0),
-  need_div16_integer(0),
-  need_mod16_integer(0)
+  need_div16_integer(0)
 
   //,need_memory_read8(0),
   //need_memory_write8(0),
@@ -77,8 +76,7 @@ int Z80::add_functions()
   // Math
   if(need_mul16_integer) { insert_mul16_integer(); }
   if(need_div16_integer) { insert_div16_integer(); }
-  if(need_mod16_integer) { insert_mod16_integer(); }
-
+  
 /*  //Memory API 
   if(need_memory_read8) { insert_memory_read8(); }
   if(need_memory_write8) { insert_memory_write8(); } 
@@ -332,6 +330,7 @@ int Z80::div_integer()
 {
   need_div16_integer = 1;
   fprintf(out, "  call div16_integer\n");
+  fprintf(out, " pop hl\n"); // del reminder from stack, result is on stack
   //stack--;
 
   return 0;
@@ -339,8 +338,13 @@ int Z80::div_integer()
 
 int Z80::mod_integer()
 {
-  need_mod16_integer = 1;
-  fprintf(out, "  call mod16_integer\n");
+  need_div16_integer = 1;
+  fprintf(out, "  call div16_integer\n");
+  fprintf(out, " pop hl\n"); // get reminder
+  fprintf(out, " pop bc\n"); // del result from stack
+  fprintf(out, " push hl\n"); // store reminder
+   
+  
   //stack--;
 
   return 0;
@@ -545,7 +549,7 @@ int Z80::jump_cond(const char *label, int cond, int distance)
     case COND_EQUAL:
       fprintf(out, "  and a\n");  // clear carry
       fprintf(out, "  sbc hl, bc\n");
-      fprintf(out, "  jr z, %s\n", label);
+      fprintf(out, "  jp z, %s\n", label);
       //fprintf(out, "  cp d\n");
       //fprintf(out, "  jr nz, label_%d\n", label_count);
       //fprintf(out, "  cp e\n");
@@ -556,7 +560,7 @@ int Z80::jump_cond(const char *label, int cond, int distance)
     case COND_NOT_EQUAL:
       fprintf(out, "  and a\n");  // clear carry
       fprintf(out, "  sbc hl, bc\n");
-      fprintf(out, "  jr nz, %s\n", label);
+      fprintf(out, "  jp nz, %s\n", label);
       //fprintf(out, "  cp d\n");
       //fprintf(out, "  jr z, label_%d\n", label_count);
       //fprintf(out, "  cp e\n");
@@ -630,12 +634,12 @@ int Z80::jump_cond_integer(const char *label, int cond, int distance)
     case COND_EQUAL:
       fprintf(out, "  and a\n");  // clear carry
       fprintf(out, "  sbc hl, bc\n");
-      fprintf(out, "  jr z, %s\n", label);
+      fprintf(out, "  jp z, %s\n", label);
       break;
     case COND_NOT_EQUAL:
       fprintf(out, "  and a\n");  // clear carry
       fprintf(out, "  sbc hl, bc\n");
-      fprintf(out, "  jr nz, %s\n", label);
+      fprintf(out, "  jp nz, %s\n", label);
       label_count++;
       break;
     case COND_LESS:
@@ -1029,11 +1033,23 @@ int Z80::stack_alu(int alu_op)
     fprintf(out, "  pop hl\n");
     fprintf(out, "  pop bc\n");
     fprintf(out, "  ld a, b\n");
-    fprintf(out, "  %s a, h\n", alu_str[alu_op]);
-    fprintf(out, "  ld h, a\n");
-    fprintf(out, "  ld a, c\n");
-    fprintf(out, "  %s a, l\n", alu_str[alu_op]);
-    fprintf(out, "  ld l, a\n");
+    if (alu_op == ALU_OR || alu_op == ALU_XOR)
+    {
+      fprintf(out, "  %s h\n", alu_str[alu_op]);
+      fprintf(out, "  ld h, a\n");
+      fprintf(out, "  ld a, c\n");
+      fprintf(out, "  %s l\n", alu_str[alu_op]);
+      fprintf(out, "  ld l, a\n");
+    }
+    else
+    {
+      fprintf(out, "  %s a, h\n", alu_str[alu_op]);
+      fprintf(out, "  ld h, a\n");
+      fprintf(out, "  ld a, c\n");
+      fprintf(out, "  %s a, l\n", alu_str[alu_op]);
+      fprintf(out, "  ld l, a\n");
+    }
+    
     fprintf(out, "  push hl\n");
   }
 
@@ -1301,49 +1317,8 @@ void Z80::insert_div16_integer()
   fprintf(out, "  rla\n");
   fprintf(out, "  cpl\n");
   fprintf(out, "  ld b,a\n");
-  fprintf(out, "  push bc\n");
-  fprintf(out, "  ret\n");
-}
-
-void Z80::insert_mod16_integer()
-{
-  fprintf(out, ";Divide 16-bit values (with 16-bit result)\n");
-  //In: Divide BC by divider DE
-  //Out: BC = result, HL = rest
-  fprintf(out, "mod16_integer:\n");
-  fprintf(out, "  pop bc\n");
-  fprintf(out, "  pop de\n");
-  fprintf(out, "  ld hl,0\n");
-  fprintf(out, "  ld a,b\n");
-  fprintf(out, "  ld b,8\n");
-  fprintf(out, "Mod16_Loop1:\n");
-  fprintf(out, "  rla\n");
-  fprintf(out, "  adc hl,hl\n");
-  fprintf(out, "  sbc hl,de\n");
-  fprintf(out, "  jr nc,Mod16_NoAdd1\n");
-  fprintf(out, "  add hl,de\n");
-  fprintf(out, "Mod16_NoAdd1:\n");
-  fprintf(out, "  djnz Div16_Loop1\n");
-  fprintf(out, "  ld b,a\n");
-  fprintf(out, "  ld a,c\n");
-  fprintf(out, "  ld c,b\n");
-  fprintf(out, "  ld b,8\n");
-  fprintf(out, "Mod16_Loop2:\n");
-  fprintf(out, "  rla\n");
-  fprintf(out, "  adc hl,hl\n");
-  fprintf(out, "  sbc hl,de\n");
-  fprintf(out, "  jr nc,Mod16_NoAdd2\n");
-  fprintf(out, "  add hl,de\n");
-  fprintf(out, "Mod16_NoAdd2:\n");
-  fprintf(out, "  djnz Mod16_Loop2\n");
-  fprintf(out, "  rla\n");
-  fprintf(out, "  cpl\n");
-  fprintf(out, "  ld b,a\n");
-  fprintf(out, "  ld a,c\n");
-  fprintf(out, "  ld c,b\n");
-  fprintf(out, "  rla\n");
-  fprintf(out, "  cpl\n");
-  fprintf(out, "  ld b,a\n");
+  fprintf(out, "  push bc\n"); // save result
   fprintf(out, "  push hl\n"); //Save MODULO
   fprintf(out, "  ret\n");
 }
+

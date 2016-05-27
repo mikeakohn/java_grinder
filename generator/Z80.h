@@ -138,7 +138,7 @@ private:
   
   void insert_mul16_integer();
   void insert_div16_integer();
-  void insert_mod16_integer();
+  // void insert_mod16_integer(); now integrated into div16
 
 
    //Memory API
