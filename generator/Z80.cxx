@@ -330,7 +330,7 @@ int Z80::div_integer()
 {
   need_div16_integer = 1;
   fprintf(out, "  call div16_integer\n");
-  fprintf(out, " pop hl\n"); // del reminder from stack, result is on stack
+  fprintf(out, "  pop hl\n"); // del reminder from stack, result is on stack
   //stack--;
 
   return 0;
@@ -340,9 +340,9 @@ int Z80::mod_integer()
 {
   need_div16_integer = 1;
   fprintf(out, "  call div16_integer\n");
-  fprintf(out, " pop hl\n"); // get reminder
-  fprintf(out, " pop bc\n"); // del result from stack
-  fprintf(out, " push hl\n"); // store reminder
+  fprintf(out, "  pop hl\n"); // get reminder
+  fprintf(out, "  pop bc\n"); // del result from stack
+  fprintf(out, "  push hl\n"); // store reminder
    
   
   //stack--;
