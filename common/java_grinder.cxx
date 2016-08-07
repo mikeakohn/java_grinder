@@ -31,6 +31,7 @@
 #include "MIPS32.h"
 #include "MSP430.h"
 #include "MSP430X.h"
+#include "MCS51.h"
 #include "MSX.h"
 #include "PIC32.h"
 #include "Playstation2.h"
@@ -55,6 +56,11 @@ static Generator *new_generator(const char *chip_type)
 {
   Generator *generator = NULL;
 
+  if (strcasecmp("8051", chip_type) == 0)
+  {
+    generator = new MCS51();
+  }
+    else
   if (strcasecmp("appleiigs", chip_type) == 0)
   {
     generator = new AppleIIgs();
@@ -276,6 +282,7 @@ int main(int argc, char *argv[])
            "     -v verbose output\n"
            "     -O0 turn off optimizer\n"
            "   platforms:\n"
+           "     8051\n"
            "     appleiigs\n"
            "     attiny2313, atmega328, atmega328p, attiny85, attiny84, attiny13,\n"
            "     dspic,\n"
