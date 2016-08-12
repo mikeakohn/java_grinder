@@ -1317,8 +1317,8 @@ void Z80::insert_div16_integer()
   fprintf(out, "  rla\n");
   fprintf(out, "  cpl\n");
   fprintf(out, "  ld b,a\n");
-  fprintf(out, "  push bc\n"); // save result
-  fprintf(out, "  push hl\n"); //Save MODULO
+  fprintf(out, "  push bc ;save result\n");
+  fprintf(out, "  push hl ;save modulo\n");
   fprintf(out, "  ret\n");
 }
 

@@ -125,7 +125,6 @@ protected:
   
   bool need_mul16_integer:1;
   bool need_div16_integer:1;
-  bool need_mod16_integer:1;
   
   //// Memory API
   //bool need_memory_read8:1;
