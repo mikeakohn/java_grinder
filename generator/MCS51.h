@@ -7,6 +7,8 @@
  *
  * Copyright 2014-2016 by Michael Kohn
  *
+ * MCS-51 (8051) written by Joe Davisson
+ *
  */
 
 #ifndef _TEMPLATE_H
@@ -14,11 +16,11 @@
 
 #include "Generator.h"
 
-class Template : public Generator
+class MCS51 : public Generator
 {
 public:
-  Template();
-  virtual ~Template();
+  MCS51();
+  virtual ~MCS51();
 
   virtual int open(const char *filename);
   virtual int start_init();
