@@ -58,8 +58,7 @@ int MCS51::start_init()
   // Add any set up items (stack, registers, etc).
   fprintf(out, ".org 0x0000\n");
   fprintf(out, "start:\n");
-  fprintf(out, "  mov r1,#0x20\n");
-  fprintf(out, "  mov SP,@r1\n");
+  fprintf(out, "  mov SP,#0x20\n");
 
   return 0;
 }
