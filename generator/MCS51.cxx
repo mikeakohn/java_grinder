@@ -13,12 +13,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 
 #include "MCS51.h"
 
 #define REG_STACK(a) (a)
-#define LOCALS(i) (i * 4)
+#define LOCALS(i) (i * 2)
 
 // ABI is:
 
@@ -39,11 +40,15 @@ int MCS51::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 
-  fprintf(out, ".CPU_PART\n");
+  //fprintf(out, ".CPU_PART\n");
 
   // Set where RAM starts / ends
   //fprintf(out, "ram_start equ 0\n");
   //fprintf(out, "ram_end equ 0x8000\n");
+  fprintf(out, ".8051\n");
+
+  fprintf(out, "stack equ 0x20\n");
+  fprintf(out, "locals equ r2\n");
 
   return 0;
 }
@@ -51,8 +56,10 @@ int MCS51::open(const char *filename)
 int MCS51::start_init()
 {
   // Add any set up items (stack, registers, etc).
-  //fprintf(out, ".org ???\n");
+  fprintf(out, ".org 0x0000\n");
   fprintf(out, "start:\n");
+  fprintf(out, "  mov r1,#0x20\n");
+  fprintf(out, "  mov SP,@r1\n");
 
   return 0;
 }
@@ -82,15 +89,45 @@ int MCS51::field_init_ref(char *name, int index)
 
 void MCS51::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
+  stack = 0;
+
+  is_main = (strcmp(name, "main") == 0) ? 1 : 0;
+
+  fprintf(out, "%s:\n", name);
+
+  // main() function goes here
+  if (!is_main)
+  {
+    fprintf(out, "  push 0x00\n");
+    fprintf(out, "  clr A\n");
+    fprintf(out, "  push ACC\n");
+  }
+
+  fprintf(out, "  mov locals,SP\n");
+  fprintf(out, "  mov A,SP\n");
+  fprintf(out, "  add A,#0x%02x\n", local_count * 2);
+  fprintf(out, "  mov SP,A\n");
 }
 
 void MCS51::method_end(int local_count)
 {
+  fprintf(out, "\n");
 }
 
 int MCS51::push_local_var_int(int index)
 {
-  return -1;
+  fprintf(out, "; push_local_var_int\n");
+  fprintf(out, "  mov A,locals\n");
+  fprintf(out, "  add A,%d\n", LOCALS(index));
+  fprintf(out, "  mov r1,A\n");
+  fprintf(out, "  mov A,@r1\n");
+  fprintf(out, "  push ACC\n");
+  fprintf(out, "  inc r1\n");
+  fprintf(out, "  mov A,@r1\n");
+  fprintf(out, "  push ACC\n");
+  stack++;
+
+  return 0;
 }
 
 int MCS51::push_local_var_ref(int index)
@@ -110,12 +147,28 @@ int MCS51::push_fake()
 
 int MCS51::push_int(int32_t n)
 {
-  return -1;
+  if (n > 65535 || n < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", n);
+
+    return -1;
+  }
+
+  uint16_t value = (n & 0xffff);
+
+  fprintf(out, "; push_int\n");
+  fprintf(out, "  mov A,#0x%02x\n", value & 0xff);
+  fprintf(out, "  push ACC\n");
+  fprintf(out, "  mov A,#0x%02x\n", value  >> 8);
+  fprintf(out, "  push ACC\n");
+  stack++;
+
+  return 0;
 }
 
 int MCS51::push_long(int64_t n)
 {
-  return -1;
+  return push_int((int32_t)n);
 }
 
 int MCS51::push_float(float f)
@@ -136,7 +189,20 @@ int MCS51::push_ref(char *name)
 
 int MCS51::pop_local_var_int(int index)
 {
-  return -1;
+  fprintf(out, "; pop_local_var_int\n");
+
+  fprintf(out, "  pop 0x05\n");
+  fprintf(out, "  pop 0x04\n");
+
+  fprintf(out, "  mov A,locals\n");
+  fprintf(out, "  add A,%d\n", LOCALS(index));
+  fprintf(out, "  mov r1,A\n");
+  fprintf(out, "  mov @r1,0x04\n");
+  fprintf(out, "  inc r1\n");
+  fprintf(out, "  mov @r1,0x05\n");
+  stack--;
+
+  return 0;
 }
 
 int MCS51::pop_local_var_ref(int index)
@@ -311,7 +377,16 @@ int MCS51::return_integer(int local_count)
 
 int MCS51::return_void(int local_count)
 {
-  return -1;
+  fprintf(out, "; return void\n");
+  fprintf(out, "  mov locals,SP\n");
+
+  if(!is_main)
+  {
+    fprintf(out, "  pop locals\n");
+    fprintf(out, "  ret\n");
+  }
+
+  return 0;
 }
 
 int MCS51::jump(const char *name, int distance)
