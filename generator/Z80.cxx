@@ -1203,11 +1203,15 @@ int Z80::memory_read8_I(int adr)
 
 int Z80::memory_write8_IB(int adr, int8_t val)
 {
-    if (val > 255 || val < -127)
+#if 0
+  // signed 8 bit values can't be more than 127 and it could be -128
+  // this is causing a compiler warning.
+  if (val > 255 || val < -127)
   {
     printf("Error: literal value %d bigger than 8 bit.\n", val);
     return -1;
   }
+#endif
   
   fprintf(out, "  ld a,0x%02x  ;;memory_write8\n", val);
   fprintf(out, "  ld hl,0x%04x\n", adr);
@@ -1230,12 +1234,15 @@ int Z80::memory_read16_I(int adr)
 
 int Z80::memory_write16_IS(int adr, short val)
 {
-  
+#if 0
+  // signed 16 bit values can't be more than 32767 or less than -32768 
+  // this is causing a compiler warning.
   if (val > 65535 || val < -32768)
   {
     printf("Error: literal value %d bigger than 16 bit.\n", val);
     return -1;
   }
+#endif
   
   fprintf(out, "  ld bc, 0x%04x  ;;memory_write16_C\n", val);
   fprintf(out, "  ld hl, 0x%04x\n", adr);
