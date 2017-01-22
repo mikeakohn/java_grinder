@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2017 by Michael Kohn, Joe Davisson
  *
  * C64 written by Joe Davisson
  *
@@ -61,7 +61,7 @@ int C64::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 
-  fprintf(out, ".65xx\n");
+  fprintf(out, ".6502\n");
 
   // heap
   fprintf(out, "ram_start equ 0x%04x\n", ram_start);
