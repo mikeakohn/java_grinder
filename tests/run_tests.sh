@@ -45,6 +45,33 @@ run_6502_test()
   echo " PASS"
 }
 
+run_mips_test()
+{
+  file=$1
+  ../java_grinder $2 ${file}.class ${file}.asm pic32 > /dev/null
+  if [ $? -ne 0 ]
+  then
+    echo "${file} : GRIND FAILED ***"
+    exit 1
+  fi
+  ../../naken_asm/naken_asm -l -I../../naken_asm/include -o ${file}.hex ${file}.asm > /dev/null
+  a=`../../naken_asm/naken_util -run -mips32 ${file}.hex`
+  cycles=`echo ${a} | grep cycles | sed 's/ clock cycles.*$//' | sed 's/^.* //'`
+  answer=`echo ${a} | grep '$v0' | sed 's/^.* $v0: //' | sed 's/ .*$//'`
+  #echo ${a}
+  #echo ${cycles}
+  #echo ${answer}
+  answer=`printf "%d" ${answer}`
+  result=`cat ${file}.java | grep '^// result=' | sed 's/\/\/ result=//'`
+  echo -n ${file} ": " ${cycles} "cycles", ${answer}
+  if [ ${answer} -ne ${result} ]
+  then
+    echo " FAIL got ${answer} but expected ${result}"
+    exit 1
+  fi
+  echo " PASS"
+}
+
 echo " ---- Testing MSP430 ----"
 
 for file in *.class
@@ -68,6 +95,22 @@ done
 #  file=${file%.class}
 #  run_6502_test ${file}
 #done
+
+echo " ---- Testing MIPS32 ----"
+
+for file in *.class
+do
+  file=${file%.class}
+  run_mips_test ${file}
+done
+
+echo " ---- Testing MIPS32 (Unoptimized) ----"
+
+for file in *.class
+do
+  file=${file%.class}
+  run_mips_test ${file} -O0
+done
 
 make clean
 

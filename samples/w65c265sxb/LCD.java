@@ -1,7 +1,5 @@
-
-import net.mikekohn.java_grinder.SPI0;
-import net.mikekohn.java_grinder.CPU;
-import net.mikekohn.java_grinder.IOPort0;
+import net.mikekohn.java_grinder.W65C265SXB;
+import net.mikekohn.java_grinder.IOPort5;
 
 public class LCD
 {
@@ -58,107 +56,78 @@ public class LCD
 
   // The masks for the IO pins used to communicate with the LCD.
   static final int LCD_RESET = 0x08;
-  static final int SPI_CS = 0x10;
-  static final int SPI_CLK = 0x20;
-  static final int SPI_SDO = 0x40;
+  static final int SPI_CS = 0x04;
+  static final int SPI_CLK = 0x01;
+  static final int SPI_SDO = 0x02;
 
-  static public void main(String args[])
+  // color palette
+  static int palette[] =
   {
-    int x=60,y=30;
-    int dx=1,dy=1;
-    int n;
-    int del;
+    0xf0f, 0xf00, 0xf80, 0xff0, 0x0f0, 0x0ff, 0x08f, 0x00f,
+    0x80f, 0xf0f, 0xf08, 0x000, 0x444, 0x888, 0xccc, 0xfff
+  };
 
-    // Set the DCO to 16MHz
-    CPU.setClock16();
+  public static void delay()
+  {
+    int i;
 
-    // Not sure how fast this can be
-    SPI0.init(SPI0.DIV8, 2);
-
-    // Setup IO port.
-    // Pin 3 is LCD reset
-    // Pin 4 is /CS
-    // Pin 5 is SCLK
-    // Pin 6 is SDO
-    IOPort0.setPinsAsOutput(LCD_RESET|SPI_CS|SPI_CLK|SPI_SDO);
-    IOPort0.setPinsValue(LCD_RESET|SPI_CS|SPI_CLK);
-
-    // Reset LCD
-    IOPort0.setPinsLow(LCD_RESET);
-    delay();
-    IOPort0.setPinsHigh(LCD_RESET);
-    delay();
-    delay();
-
-    // Wake up
-    lcdCommand(SLEEPOUT);
-
-    // Set contrast
-    lcdCommand(SETCON);
-    lcdData(0x30);
-
-    // Set color mode (12 bit)
-    lcdCommand(COLMOD);
-    lcdData(0x03);
-
-    // Reverse some stuff
-    lcdCommand(MADCTL);
-    lcdData(0xc8);
-
-    // Display On (should already be on by reset, but owell)
-    lcdCommand(DISPON);
-
-    delay();
-
-    clearDisplay();
-
-    while(true)
+    for(i = 0; i < 10000; i++)
     {
-      // Draw a blue box
-      setArea(x, y, x+23, y+23);
-      for (n = 0; n < 24*24/2; n++)
-      {
-        lcdData(0xf0);
-        lcdData(0x0f);
-        lcdData(0x00);
-      }
-
-      // FIXME - this fails for some reason.
-      //del = (dx == 1) ? x : x+23;
-      if (dx == 1) { del = x; }
-      else { del = x+23; }
-
-      setArea(del, y, del, y+23);
-      for (n = 0; n < 24/2; n++)
-      {
-        lcdData(0x0f);
-        lcdData(0x00);
-        lcdData(0xf0);
-      }
-
-      // FIXME - this fails for some reason.
-      //del = (dy == 1) ? y : y+23;
-      if (dy == 1) { del = y; }
-      else { del = y+23; }
-
-      setArea(x, del, x+23, del);
-      for (n = 0; n < 24/2; n++)
-      {
-        lcdData(0x0f);
-        lcdData(0x00);
-        lcdData(0xf0);
-      }
-
-      // Move the box by 1 pixel
-      x += dx;
-      y += dy;
-
-      // If bounds are hit, change the direction of the box.
-      if (x >= 131-30) { dx = -1; }
-      if (y >= 133-30) { dy = -1; }
-      if (x == 0) { dx = 1; }
-      if (y == 0) { dy = 1; }
     }
+  } 
+
+  /** Send a 9 bit command to the LCD display.  Bit 8 is always a 0 for
+      a command */
+  public static void lcdCommand(int a)
+  {
+    int i;
+
+    IOPort5.setPinsHigh(SPI_CS);
+    IOPort5.setPinsLow(SPI_CLK);
+    IOPort5.setPinsLow(SPI_CS);
+
+    for(i = 0; i < 9; i++)
+    {
+      if((a & 0x100) > 0)
+        IOPort5.setPinsHigh(SPI_SDO);
+      else
+        IOPort5.setPinsLow(SPI_SDO);
+
+      IOPort5.setPinsHigh(SPI_CLK);
+      IOPort5.setPinsLow(SPI_CLK);
+
+      a <<= 1;
+    }
+
+    IOPort5.setPinsHigh(SPI_CS);
+  }
+
+  /** Send a 9 bit data byte to the LCD display.  Bit 8 is always a 1 for
+      data */
+  public static void lcdData(int a)
+  {
+    int i;
+
+    a |= 0x100;
+
+    IOPort5.setPinsHigh(SPI_CS);
+    IOPort5.setPinsLow(SPI_CLK);
+    IOPort5.setPinsLow(SPI_CS);
+
+    for(i = 0; i < 9; i++)
+    {
+      if((a & 0x100) > 0)
+        IOPort5.setPinsHigh(SPI_SDO);
+      else
+        IOPort5.setPinsLow(SPI_SDO);
+
+      IOPort5.setPinsHigh(SPI_CLK);
+      IOPort5.setPinsLow(SPI_CLK);
+
+      a <<= 1;
+    }
+
+    IOPort5.setPinsHigh(SPI_CS);
   }
 
   /** This function tells the LCD (x0,y0) to (x1,y1) area to draw
@@ -196,69 +165,100 @@ public class LCD
     }
   }
 
-  /** Send a 9 bit command to the LCD display.  Bit 8 is always a 0 for
-      a command */
-  public static void lcdCommand(int a)
+  public static void mandel()
   {
-  int n;
-    IOPort0.setPinsLow(SPI_SDO);
+    int recen = -8;
+    int imcen = 0;
+    int re, im, re2, im2, rec, imc;
+    int x, y, xx, yy, i;
+    int last, result;
 
-    // /CS = 0
-    IOPort0.setPinsLow(SPI_CS);
-    clock();
+    setArea(0,0, 131,131);
 
-    // Hardware clock out the rest of the bits
-    SPI0.read(a);
+    yy = 0;
 
-    // /CS = 1
-    IOPort0.setPinsHigh(SPI_CS);
-  }
-
-  /** Send a 9 bit data byte to the LCD display.  Bit 8 is always a 1 for
-      data */
-  public static void lcdData(int a)
-  {
-  int n;
-    IOPort0.setPinsHigh(SPI_SDO);
-
-    // /CS = 0
-    IOPort0.setPinsLow(SPI_CS);
-    clock();
-    IOPort0.setPinsLow(SPI_SDO);
-
-    // Hardware clock out the rest of the bits
-    SPI0.read(a);
-
-    // /CS = 1
-    IOPort0.setPinsHigh(SPI_CS);
-  }
-
-  public static void clock()
-  {
-    // Manually clock out a bit to SPI since MSP430 hardware only supports
-    // 8 bit or 16 bit data.
-    SPI0.disable();
-    IOPort0.setPinsLow(SPI_CLK);
-    CPU.nop();
-    CPU.nop();
-    CPU.nop();
-    CPU.nop();
-    IOPort0.setPinsHigh(SPI_CLK);
-    CPU.nop();
-    CPU.nop();
-    CPU.nop();
-    CPU.nop();
-    SPI0.enable();
-  }
-
-  public static void delay()
-  {
-    int n,a;
-    for (a = 0; a < 3; a++)
+    for(y = 0; y < 132 * 16; y += 16, yy++)
     {
-      for (n = 0; n < 65535; n++) { }
+      imc = (y - 66 * 16) >> 5;
+      imc += imcen;
+
+      xx = 0;
+      last = 0;
+
+      for(x = 0; x < 132 * 16; x += 16, xx++)
+      {
+        rec = (x - 66 * 16) >> 5;
+        rec += recen;
+
+        re = rec;
+        im = imc;
+
+        re2 = (re * re) >> 4;
+        im2 = (im * im) >> 4;
+
+        for(i = 1; i < 11; i++)
+        {
+          if((re2 + im2) > 4 * 16)
+            break;
+
+          im = (re * im) >> 3;
+          im += imc;
+
+          re = (re2 - im2) + rec;
+
+          re2 = (re * re) >> 4;
+          im2 = (im * im) >> 4;
+        }
+
+        if((xx & 1) == 1)
+        {
+          int temp1 = palette[last];
+          int temp2 = palette[i];
+//          result = (palette[last] << 12) | (palette[i]);
+//          lcdData((result >> 16) & 0xff);
+//          lcdData((result >> 8) & 0xff);
+//          lcdData((result & 0xff));
+          lcdData((temp1 >> 4) & 0xff);
+          lcdData(((temp1 & 0xf) << 4) | ((temp2 >> 8) & 0xf));
+          lcdData(temp2 & 0xff);
+        }
+
+        last = i;
+      }
     }
   }
-}
 
+//WriteSpiData((color >> 4) & 0xFF);
+//WriteSpiData(((color & 0xF) << 4) | ((color >> 8) & 0xF));
+//WriteSpiData(color & 0xFF);
+  public static void main(String args[])
+  {
+    IOPort5.setPinsAsOutput(LCD_RESET|SPI_CS|SPI_CLK|SPI_SDO);
+    IOPort5.setPinsValue(LCD_RESET|SPI_CS|SPI_CLK);
+
+    IOPort5.setPinsLow(LCD_RESET);
+//    delay();
+    IOPort5.setPinsHigh(LCD_RESET);
+//    delay();
+
+    lcdCommand(SLEEPOUT);
+    // Set contrast
+    lcdCommand(SETCON);
+    lcdData(0x30);
+
+    // Set color mode (12 bit)
+    lcdCommand(COLMOD);
+    lcdData(0x03);
+
+    // Reverse some stuff
+    lcdCommand(MADCTL);
+    lcdData(0xc8);
+
+    // Display On (should already be on by reset, but owell)
+    lcdCommand(DISPON);
+    mandel();
+
+    W65C265SXB.putString("\ngot here\n");
+  }
+}
 

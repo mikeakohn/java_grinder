@@ -84,12 +84,16 @@ int AppleIIgs::open(const char *filename)
   // random number seed
   fprintf(out, "_seed equ _vars + 20\n");
   fprintf(out, "_bit equ _vars + 22\n");
-//  fprintf(out, "rep #0x30\n");
   fprintf(out, "lda #0xace1\n");
   fprintf(out, "sta _seed\n");
 
   // graphics bank
   fprintf(out, "_bank equ _vars + 24\n");
+
+  // stack should be at 0x1FF
+  fprintf(out, "; set up processor stack\n");
+  fprintf(out, "  lda #0x1ff\n");
+  fprintf(out, "  tcs\n");
 
   return 0;
 }

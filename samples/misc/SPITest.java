@@ -8,8 +8,7 @@ public class SPITest
     int n;
 
     SPI0.init(SPI0.DIV128, 0);
-    SPI0.send('A');
-    n = SPI0.read();
+    n = SPI0.read('A');
 
     while(true);
   }

@@ -45,17 +45,17 @@ public:
   virtual int spi_init16_II(int port, int clock_divisor, int mode);
   virtual int spi_send_I(int port);
   virtual int spi_send16_I(int port);
-  virtual int spi_read(int port);
+  virtual int spi_read_I(int port);
+  virtual int spi_read16_I(int port);
   virtual int spi_isDataAvailable(int port);
   virtual int spi_isBusy(int port);
   virtual int spi_disable(int port);
   virtual int spi_enable(int port);
 
 private:
-  //void add_spi_send();
+  void add_spi_read();
 
-  //uint32_t need_spi_send : 1;
-
+  uint32_t need_spi_read : 1;
 };
 
 #endif

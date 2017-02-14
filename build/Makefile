@@ -25,6 +25,7 @@ API= \
   math_.o \
   memory.o \
   msx_.o \
+  playstation_2.o \
   propeller_.o \
   sega_genesis.o \
   snes_.o \
@@ -45,7 +46,9 @@ CPUS= \
   MC68000.o \
   MC68020.o \
   MC6809.o \
+  MCS51.o \
   MIPS32.o \
+  MIPS64.o \
   MSP430.o \
   MSP430X.o \
   Propeller.o \
@@ -61,6 +64,7 @@ SYSTEMS= \
   C64.o \
   CPC.o \
   MSX.o \
+  Playstation2.o \
   PIC32.o \
   SegaGenesis.o \
   SNES.o \

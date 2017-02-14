@@ -7,7 +7,7 @@
 *
 * Copyright 2014-2016 by Michael Kohn
 *
-* CPC support by SRS - https://github.com/deringenieur71
+* CPC support started by Carsten Dost - https://github.com/deringenieur71
 *
 */
 #ifndef _API_CPC_H
@@ -30,8 +30,11 @@ public:
   virtual int cpc_plot_III() { return -1; }
   virtual int cpc_draw_III() { return -1; }
   virtual char cpc_readChar() { return -1; }
-  virtual int cpc_poke8_IC() { return -1; }
-  virtual int cpc_peek8_I() { return -1; }
+  virtual int cpc_getVMEM_ICC() {return -1; }
+  virtual int cpc_putSpriteMode0_IIII() { return -1; }
+  virtual int cpc_printI_I() { return -1; }
+  virtual int cpc_getTime() { return -1; }
+  virtual int cpc_VSync() { return -1; }
   
   // CPC with CONST
   virtual int cpc_setTxtPen_I(int c) { return -1; }
@@ -41,8 +44,6 @@ public:
   virtual int cpc_setBorderColor_I(int c) { return -1; }
   virtual int cpc_screen_I(int c) { return -1; }
   virtual int cpc_putChar_C(char c) { return -1; }
-  virtual int cpc_poke8_IC(int w, char c) { return -1; }
-  virtual int cpc_peek8_I(int where) { return -1; }
   
 };
 #endif

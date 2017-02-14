@@ -42,8 +42,13 @@ Z80::Z80() :
   stack(0),
   is_main(0),
   need_mul16_integer(0),
-  need_div16_integer(0),
-  need_mod16_integer(0)
+  need_div16_integer(0)
+
+  //,need_memory_read8(0),
+  //need_memory_write8(0),
+  //need_memory_read16(0),
+  //need_memory_write16(0)
+  
 {
 }
 
@@ -68,10 +73,16 @@ int Z80::open(const char *filename)
 
 int Z80::add_functions()
 {
+  // Math
   if(need_mul16_integer) { insert_mul16_integer(); }
   if(need_div16_integer) { insert_div16_integer(); }
-  if(need_mod16_integer) { insert_mod16_integer(); }
- 
+  
+/*  //Memory API 
+  if(need_memory_read8) { insert_memory_read8(); }
+  if(need_memory_write8) { insert_memory_write8(); } 
+  if(need_memory_read16) { insert_memory_read16(); }
+  if(need_memory_write16) { insert_memory_write16(); } 
+*/
   return 0;
 }
 
@@ -310,7 +321,7 @@ int Z80::mul_integer()
 {
   need_mul16_integer = 1;
   fprintf(out, "  call mul16_integer\n");
-  stack--;
+  //stack--;
 
   return 0;
 }
@@ -319,16 +330,22 @@ int Z80::div_integer()
 {
   need_div16_integer = 1;
   fprintf(out, "  call div16_integer\n");
-  stack--;
+  fprintf(out, "  pop hl\n"); // del reminder from stack, result is on stack
+  //stack--;
 
   return 0;
 }
 
 int Z80::mod_integer()
 {
-  need_mod16_integer = 1;
-  fprintf(out, "  call mod16_integer\n");
-  stack--;
+  need_div16_integer = 1;
+  fprintf(out, "  call div16_integer\n");
+  fprintf(out, "  pop hl\n"); // get reminder
+  fprintf(out, "  pop bc\n"); // del result from stack
+  fprintf(out, "  push hl\n"); // store reminder
+   
+  
+  //stack--;
 
   return 0;
 }
@@ -532,7 +549,7 @@ int Z80::jump_cond(const char *label, int cond, int distance)
     case COND_EQUAL:
       fprintf(out, "  and a\n");  // clear carry
       fprintf(out, "  sbc hl, bc\n");
-      fprintf(out, "  jr z, %s\n", label);
+      fprintf(out, "  jp z, %s\n", label);
       //fprintf(out, "  cp d\n");
       //fprintf(out, "  jr nz, label_%d\n", label_count);
       //fprintf(out, "  cp e\n");
@@ -543,7 +560,7 @@ int Z80::jump_cond(const char *label, int cond, int distance)
     case COND_NOT_EQUAL:
       fprintf(out, "  and a\n");  // clear carry
       fprintf(out, "  sbc hl, bc\n");
-      fprintf(out, "  jr nz, %s\n", label);
+      fprintf(out, "  jp nz, %s\n", label);
       //fprintf(out, "  cp d\n");
       //fprintf(out, "  jr z, label_%d\n", label_count);
       //fprintf(out, "  cp e\n");
@@ -617,12 +634,12 @@ int Z80::jump_cond_integer(const char *label, int cond, int distance)
     case COND_EQUAL:
       fprintf(out, "  and a\n");  // clear carry
       fprintf(out, "  sbc hl, bc\n");
-      fprintf(out, "  jr z, %s\n", label);
+      fprintf(out, "  jp z, %s\n", label);
       break;
     case COND_NOT_EQUAL:
       fprintf(out, "  and a\n");  // clear carry
       fprintf(out, "  sbc hl, bc\n");
-      fprintf(out, "  jr nz, %s\n", label);
+      fprintf(out, "  jp nz, %s\n", label);
       label_count++;
       break;
     case COND_LESS:
@@ -1016,11 +1033,23 @@ int Z80::stack_alu(int alu_op)
     fprintf(out, "  pop hl\n");
     fprintf(out, "  pop bc\n");
     fprintf(out, "  ld a, b\n");
-    fprintf(out, "  %s a, h\n", alu_str[alu_op]);
-    fprintf(out, "  ld h, a\n");
-    fprintf(out, "  ld a, c\n");
-    fprintf(out, "  %s a, l\n", alu_str[alu_op]);
-    fprintf(out, "  ld l, a\n");
+    if (alu_op == ALU_OR || alu_op == ALU_XOR)
+    {
+      fprintf(out, "  %s h\n", alu_str[alu_op]);
+      fprintf(out, "  ld h, a\n");
+      fprintf(out, "  ld a, c\n");
+      fprintf(out, "  %s l\n", alu_str[alu_op]);
+      fprintf(out, "  ld l, a\n");
+    }
+    else
+    {
+      fprintf(out, "  %s a, h\n", alu_str[alu_op]);
+      fprintf(out, "  ld h, a\n");
+      fprintf(out, "  ld a, c\n");
+      fprintf(out, "  %s a, l\n", alu_str[alu_op]);
+      fprintf(out, "  ld l, a\n");
+    }
+    
     fprintf(out, "  push hl\n");
   }
 
@@ -1110,6 +1139,122 @@ void Z80::restore_registers()
   fprintf(out, "  pop iy\n");
 }
 
+// Memory API
+
+int Z80::memory_read8_I()
+{
+  fprintf(out, ";;memory_read8\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld a,(hl)\n");
+  fprintf(out, "  ld l,a\n");
+  fprintf(out, "  ld h,0\n");
+  fprintf(out, "  push hl\n");
+  
+  return 0;
+}
+
+int Z80::memory_write8_IB()
+{
+  fprintf(out, "  pop hl  ;;memory_write8\n");
+  fprintf(out, "  ld a,l\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld (hl),a\n");
+
+  return 0;
+}
+
+int Z80::memory_read16_I()
+{
+  fprintf(out, ";;memory_read16\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld c,(hl)\n");
+  fprintf(out, "  inc hl\n");
+  fprintf(out, "  ld b,(hl)\n");
+  fprintf(out, "  push bc\n");
+  
+  return 0;  
+}
+
+int Z80::memory_write16_IS()
+{
+  /*need_memory_write16 = 1;
+  fprintf(out, "  call memory_write16\n");
+  return 0;*/
+  fprintf(out, ";;memory_write16\n");
+  fprintf(out, "  pop bc\n");
+  fprintf(out, "  pop hl\n");
+  fprintf(out, "  ld (hl),c\n");
+  fprintf(out, "  inc hl\n");
+  fprintf(out, "  ld (hl),b\n");
+  
+  return 0;  
+}
+
+int Z80::memory_read8_I(int adr)
+{
+  fprintf(out, "  ld hl, 0x%02x  ;;memory_read8_I_C\n", adr);
+  fprintf(out, "  ld a,(hl)\n");
+  fprintf(out, "  ld l,a\n");
+  fprintf(out, "  ld h,0\n");
+  fprintf(out, "  push hl\n");
+  
+  return 0;
+}
+
+int Z80::memory_write8_IB(int adr, int8_t val)
+{
+#if 0
+  // signed 8 bit values can't be more than 127 and it could be -128
+  // this is causing a compiler warning.
+  if (val > 255 || val < -127)
+  {
+    printf("Error: literal value %d bigger than 8 bit.\n", val);
+    return -1;
+  }
+#endif
+  
+  fprintf(out, "  ld a,0x%02x  ;;memory_write8\n", val);
+  fprintf(out, "  ld hl,0x%04x\n", adr);
+  fprintf(out, "  ld (hl),a\n");
+
+  return 0;
+}
+
+
+int Z80::memory_read16_I(int adr)
+{
+  fprintf(out, "  ld hl, 0x%04x  ;;memory_read16_I_C\n", adr);
+  fprintf(out, "  ld c,(hl)\n");
+  fprintf(out, "  inc hl\n");
+  fprintf(out, "  ld b,(hl)\n");
+  fprintf(out, "  push bc\n");
+  
+  return 0;
+}
+
+int Z80::memory_write16_IS(int adr, short val)
+{
+#if 0
+  // signed 16 bit values can't be more than 32767 or less than -32768 
+  // this is causing a compiler warning.
+  if (val > 65535 || val < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", val);
+    return -1;
+  }
+#endif
+  
+  fprintf(out, "  ld bc, 0x%04x  ;;memory_write16_C\n", val);
+  fprintf(out, "  ld hl, 0x%04x\n", adr);
+  fprintf(out, "  ld (hl),c\n");
+  fprintf(out, "  inc hl\n");
+  fprintf(out, "  ld (hl),b\n");
+  
+  return 0;  
+}
+
+
+
 // *****************************
 // now the new private functions
 // *****************************
@@ -1179,50 +1324,8 @@ void Z80::insert_div16_integer()
   fprintf(out, "  rla\n");
   fprintf(out, "  cpl\n");
   fprintf(out, "  ld b,a\n");
-  fprintf(out, "  push bc\n");
-  fprintf(out, "  ret\n");
-}
-
-void Z80::insert_mod16_integer()
-{
-  fprintf(out, ";Divide 16-bit values (with 16-bit result)\n");
-  //In: Divide BC by divider DE
-  //Out: BC = result, HL = rest
-  fprintf(out, "mod16_integer:\n");
-  fprintf(out, "  pop bc\n");
-  fprintf(out, "  pop de\n");
-  fprintf(out, "  ld hl,0\n");
-  fprintf(out, "  ld a,b\n");
-  fprintf(out, "  ld b,8\n");
-  fprintf(out, "Mod16_Loop1:\n");
-  fprintf(out, "  rla\n");
-  fprintf(out, "  adc hl,hl\n");
-  fprintf(out, "  sbc hl,de\n");
-  fprintf(out, "  jr nc,Mod16_NoAdd1\n");
-  fprintf(out, "  add hl,de\n");
-  fprintf(out, "Mod16_NoAdd1:\n");
-  fprintf(out, "  djnz Div16_Loop1\n");
-  fprintf(out, "  ld b,a\n");
-  fprintf(out, "  ld a,c\n");
-  fprintf(out, "  ld c,b\n");
-  fprintf(out, "  ld b,8\n");
-  fprintf(out, "Mod16_Loop2:\n");
-  fprintf(out, "  rla\n");
-  fprintf(out, "  adc hl,hl\n");
-  fprintf(out, "  sbc hl,de\n");
-  fprintf(out, "  jr nc,Mod16_NoAdd2\n");
-  fprintf(out, "  add hl,de\n");
-  fprintf(out, "Mod16_NoAdd2:\n");
-  fprintf(out, "  djnz Mod16_Loop2\n");
-  fprintf(out, "  rla\n");
-  fprintf(out, "  cpl\n");
-  fprintf(out, "  ld b,a\n");
-  fprintf(out, "  ld a,c\n");
-  fprintf(out, "  ld c,b\n");
-  fprintf(out, "  rla\n");
-  fprintf(out, "  cpl\n");
-  fprintf(out, "  ld b,a\n");
-  fprintf(out, "  push hl\n"); //Save MODULO
+  fprintf(out, "  push bc ;save result\n");
+  fprintf(out, "  push hl ;save modulo\n");
   fprintf(out, "  ret\n");
 }
 

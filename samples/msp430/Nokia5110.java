@@ -119,7 +119,7 @@ public class Nokia5110
     IOPort0.setPinLow(SPI_CS);
 
     // Hardware clock out the rest of the bits
-    SPI0.send(a);
+    SPI0.read(a);
 
     // /CS = 1
     IOPort0.setPinHigh(SPI_CS);
@@ -136,7 +136,7 @@ public class Nokia5110
     IOPort0.setPinLow(SPI_CS);
 
     // Hardware clock out the rest of the bits
-    SPI0.send(a);
+    SPI0.read(a);
 
     // /CS = 1
     IOPort0.setPinHigh(SPI_CS);

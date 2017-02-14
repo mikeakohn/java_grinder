@@ -19,7 +19,8 @@
   if (port > 1) { printf("Illegal SPI port\n"); return -1; } \
   port++;
 
-PIC32::PIC32()
+PIC32::PIC32() :
+  need_spi_read(0)
 {
   org = 0x1d001000;
   ram_start = 0x80000000;
@@ -30,12 +31,15 @@ PIC32::PIC32()
 
 PIC32::~PIC32()
 {
-  //if (need_spi_send) { add_spi_send(); }
+  // it's 6 instructions to inline and 5 instructions to call
+  //if (need_spi_read) { add_spi_read(); }
 }
 
 int PIC32::open(const char *filename)
 {
   if (MIPS32::open(filename) != 0) { return -1; }
+
+  fprintf(out, ".mips32\n");
 
   fprintf(out, "  SPI1CON equ 0x5800\n");
   fprintf(out, "  SPI1STAT equ 0x5810\n");
@@ -148,7 +152,7 @@ int PIC32::spi_init_II(int port, int clock_divisor, int mode)
   // bit 6 = CKP (clock polarity select)
   // bit 5 = MSTEN
 
-  fprintf(out, "  ;; spit_init(%d, %d, %d)\n", port, clock_divisor, mode);
+  fprintf(out, "  ;; spi_init(%d, %d, %d)\n", port, clock_divisor, mode);
   fprintf(out, "  li $t8, 0x%x\n", (1 << 15) | (1 << 5) | (mode << 8));
   fprintf(out, "  sw $t8, SPI%dCON($k1)\n", port);
 
@@ -186,9 +190,9 @@ int PIC32::spi_init16_II(int port, int clock_divisor, int mode)
   // bit 6 = CKP (clock polarity select)
   // bit 5 = MSTEN
 
-  fprintf(out, "  ;; spit_init(%d, %d, %d)\n", port, clock_divisor, mode);
+  fprintf(out, "  ;; spi_init(%d, %d, %d)\n", port, clock_divisor, mode);
   fprintf(out, "  sw $0, SPI%dCON($k1)\n", port);
-  fprintf(out, "  li $t8, 1\n");
+  fprintf(out, "  li $t8, %d\n", 1 << clock_divisor);
   fprintf(out, "  sw $t8, SPI%dBRG($k1)\n", port);
   //fprintf(out, "  li $t8, 0x%x\n", (1 << 23) | (1 << 15) | (1 << 10) | (1 << 5) | (mode << 8));
   fprintf(out, "  li $t8, 0x%x\n", (1 << 15) | (1 << 10) | (1 << 5) | (mode << 8));
@@ -211,6 +215,8 @@ int PIC32::spi_send_I(int port)
 {
   CHECK_PORT_SPI();
 
+  fprintf(out, "  ;; spi_send_I()\n");
+
   if (stack == 0)
   {
     fprintf(out, "  sw $t%d, SPI%dBUF($k1)\n", reg - 1, port);
@@ -220,24 +226,6 @@ int PIC32::spi_send_I(int port)
   {
     STACK_POP(8);
     fprintf(out, "  sw $t8, SPI%dBUF($k1)\n", port);
-  }
-
-  fprintf(out, "_spi_send_%d:\n", label_count);
-  fprintf(out, "  lw $t8, SPI%dSTAT($k1)\n", port);
-  fprintf(out, "  andi $t8, $t8, ((1 << 11) | (1 << 1))\n");
-  fprintf(out, "  bnez $t8, _spi_send_%d\n", label_count);
-
-  label_count++;
-
-  if (reg < 8)
-  {
-    fprintf(out, "  lw $t%d, SPI%dBUF($k1)\n", reg, port);
-    reg++;
-  }
-    else
-  {
-    fprintf(out, "  lw $t8, SPI%dBUF($k1)\n", port);
-    STACK_PUSH(8);
   }
 
   return 0;
@@ -247,6 +235,8 @@ int PIC32::spi_send16_I(int port)
 {
   CHECK_PORT_SPI();
 
+  fprintf(out, "  ;; spi_send16_I()\n");
+
   if (stack == 0)
   {
     fprintf(out, "  sw $t%d, SPI%dBUF($k1)\n", reg - 1, port);
@@ -258,14 +248,37 @@ int PIC32::spi_send16_I(int port)
     fprintf(out, "  sw $t8, SPI%dBUF($k1)\n", port);
   }
 
-  fprintf(out, "_spi_send_%d:\n", label_count);
+  return 0;
+}
+
+int PIC32::spi_read_I(int port)
+{
+  CHECK_PORT_SPI();
+
+  need_spi_read = 1;
+
+  fprintf(out, "  ;; spi_read_I()\n");
+
+  if (stack == 0)
+  {
+    fprintf(out, "  sw $t%d, SPI%dBUF($k1)\n", reg - 1, port);
+    reg--;
+  }
+    else
+  {
+    STACK_POP(8);
+    fprintf(out, "  sw $t8, SPI%dBUF($k1)\n", port);
+  }
+
+  fprintf(out, "_spi_read_%d:\n", label_count);
   fprintf(out, "  lw $t8, SPI%dSTAT($k1)\n", port);
   fprintf(out, "  andi $t8, $t8, ((1 << 11) | (1 << 1))\n");
-  fprintf(out, "  bnez $t8, _spi_send_%d\n", label_count);
+  fprintf(out, "  bnez $t8, _spi_read_%d\n", label_count);
+  fprintf(out, "  nop\n");
 
   label_count++;
 
-  if (reg < 8)
+  if (reg < reg_max)
   {
     fprintf(out, "  lw $t%d, SPI%dBUF($k1)\n", reg, port);
     reg++;
@@ -279,10 +292,45 @@ int PIC32::spi_send16_I(int port)
   return 0;
 }
 
-int PIC32::spi_read(int port)
+int PIC32::spi_read16_I(int port)
 {
   CHECK_PORT_SPI();
-  return -1;
+
+  need_spi_read = 1;
+
+  fprintf(out, "  ;; spi_read16_I()\n");
+
+  if (stack == 0)
+  {
+    fprintf(out, "  sw $t%d, SPI%dBUF($k1)\n", reg - 1, port);
+    reg--;
+  }
+    else
+  {
+    STACK_POP(8);
+    fprintf(out, "  sw $t8, SPI%dBUF($k1)\n", port);
+  }
+
+  fprintf(out, "_spi_read_%d:\n", label_count);
+  fprintf(out, "  lw $t8, SPI%dSTAT($k1)\n", port);
+  fprintf(out, "  andi $t8, $t8, (1 << 11)\n");
+  fprintf(out, "  bnez $t8, _spi_read_%d\n", label_count);
+  fprintf(out, "  nop\n");
+
+  label_count++;
+
+  if (reg < reg_max)
+  {
+    fprintf(out, "  lw $t%d, SPI%dBUF($k1)\n", reg, port);
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  lw $t8, SPI%dBUF($k1)\n", port);
+    STACK_PUSH(8);
+  }
+
+  return 0;
 }
 
 int PIC32::spi_isDataAvailable(int port)
@@ -309,17 +357,16 @@ int PIC32::spi_enable(int port)
   return -1;
 }
 
-#if 0
-void PIC32::add_spi_send()
+void PIC32::add_spi_read()
 {
-  fprintf(out, "_spi_send:\n");
-  //fprintf(out, "  li $t9, (1 << 11) | (1 << 1)\n");
-  //fprintf(out, "_spi_send_wait:\n");
-  fprintf(out, "  lw $t8, SPI1STAT($k1)\n");
-  fprintf(out, "  andi $t9, $t8, (1 << 11) | (1 << 1)\n");
-  fprintf(out, "  bne _spi_send\n");
+  fprintf(out, "_spi_read:\n");
+  fprintf(out, "  lw $t8, SPI2BUF($k1)\n");
+  fprintf(out, "_spi_send_wait:\n");
+  fprintf(out, "  lw $t8, SPI2STAT($k1)\n");
+  fprintf(out, "  andi $t8, $t8, ((1 << 11) | (1 << 1))\n");
+  fprintf(out, "  bne $t8, _spi_read_wait\n");
+  fprintf(out, "  lw $t0, SPI2BUF($k1)\n");
   fprintf(out, "  jr $ra\n");
 }
-#endif
 
 

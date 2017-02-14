@@ -110,6 +110,7 @@ public:
   virtual int array_write_byte(const char *name, int field_id);
   virtual int array_write_short(const char *name, int field_id);
   virtual int array_write_int(const char *name, int field_id);
+  virtual int cpu_nop();
 
 protected:
   int reg;            // count number of registers are are using as stack
@@ -123,9 +124,11 @@ protected:
 
 private:
   int stack_alu(const char *instr);
+  int divide();
   int get_values_from_stack(int *value1);
   int get_values_from_stack(int *value1, int *value2);
   int get_ref_from_stack(int *value1);
+  int set_constant(int reg, int value);
 
   bool is_main : 1;
 };

@@ -41,14 +41,17 @@ abstract public class SPI
   /** Initialize SPI in 16 bit mode if supported. */
   public static void init16(int clock_divisor, int mode) { }
 
-  /** send and receive a byte. */
-  public static int send(int c) { return 0; }
+  /** Send a byte without checking if SPI bus is busy. */
+  public static void send(int c) { }
 
-  /** send and receive a 16 bit data. */
-  public static int send16(int c) { return 0; }
+  /** Send a short without checking if SPI bus is busy. */
+  public static void send16(int c) { }
 
-  /** receive a byte. */
-  public static int read() { return 0; }
+  /** Sends a byte, waits until a byte is received, and returns it. */
+  public static int read(int c) { return 0; }
+
+  /** Sends a short, waits until a byte is received, and returns it. */
+  public static int read16(int c) { return 0; }
 
   /** Returns true if data is available on the SPI bus. */
   public static boolean isDataAvailable() { return true; }

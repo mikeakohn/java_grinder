@@ -99,6 +99,18 @@ public:
   virtual int array_write_short(const char *name, int field_id);
   virtual int array_write_int(const char *name, int field_id);
   //virtual void close();
+  
+
+  virtual int memory_read8_I();
+  virtual int memory_write8_IB();
+  virtual int memory_read16_I();
+  virtual int memory_write16_IS();
+  
+  virtual int memory_read8_I(int adr);
+  virtual int memory_write8_IB(int adr, int8_t val);
+  virtual int memory_read16_I(int adr);
+  virtual int memory_write16_IS(int adr, short val);
+  
 
 protected:
   int stack_alu(int alu_op);
@@ -110,16 +122,30 @@ protected:
   //int reg_max;        // size of register stack 
   int stack;          // count how many things we put on the stack
   bool is_main : 1;
+  
   bool need_mul16_integer:1;
   bool need_div16_integer:1;
-  bool need_mod16_integer:1;
+  
+  //// Memory API
+  //bool need_memory_read8:1;
+  //bool need_memory_write8:1;
+  //bool need_memory_read16:1;
+  //bool need_memory_write16:1;
 
 private:
   void restore_stack(int count);
   
   void insert_mul16_integer();
   void insert_div16_integer();
-  void insert_mod16_integer();
+  // void insert_mod16_integer(); now integrated into div16
+
+
+   //Memory API
+  //void insert_memory_read8();
+  //void insert_memory_write8();
+  //void insert_memory_read16();
+  //void insert_memory_write16();
+
    
 };
 

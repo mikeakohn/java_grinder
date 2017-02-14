@@ -1253,9 +1253,11 @@ int DSPIC::spi_init16_II(int port, int clock_divisor, int mode)
 
 int DSPIC::spi_send_I(int port)
 {
-char dst[16];
+  char dst[16];
 
   pop_reg(dst);
+
+  fprintf(out, "  ; spi_send_I()\n");
   fprintf(out, "  mov %s, SPI1BUF\n", dst);
 
   return 0;
@@ -1266,8 +1268,21 @@ int DSPIC::spi_send16_I(int port)
   return -1;
 }
 
-int DSPIC::spi_read(int port)
+int DSPIC::spi_read_I(int port)
 {
+  char dst[16];
+
+  pop_reg(dst);
+
+  fprintf(out, "  ; spi_read_I()\n");
+  fprintf(out, "  mov %s, SPI1BUF\n", dst);
+  fprintf(out, "spi_wait_%d:\n", label_count);
+  fprintf(out, "  mov SPI1STAT, w13\n");
+  fprintf(out, "  bset w13, #SPITBF\n");
+  fprintf(out, "  bra NZ, spi_wait_%d\n", label_count);
+
+  label_count++;
+
   if (reg < reg_max)
   {
     fprintf(out, "  mov SPI1BUF, w%d\n", REG_STACK(reg));
@@ -1280,6 +1295,11 @@ int DSPIC::spi_read(int port)
   }
 
   return 0;
+}
+
+int DSPIC::spi_read16_I(int port)
+{
+  return -1;
 }
 
 int DSPIC::spi_isDataAvailable(int port)

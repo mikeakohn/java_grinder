@@ -1831,6 +1831,35 @@ int MSP430::spi_send_I(int port)
   char dst[16];
   pop_reg(dst);
 
+  fprintf(out, "  ;; spi_send_I()\n");
+  fprintf(out, "  mov.b %s, &USISRL\n", dst);
+  fprintf(out, "  mov.b #8, &USICNT\n");
+
+  return 0;
+}
+
+int MSP430::spi_send16_I(int port)
+{
+  if (port != 0) { return -1; }
+
+  char dst[16];
+  pop_reg(dst);
+
+  fprintf(out, "  ;; spi_send16_I()\n");
+  fprintf(out, "  mov.w %s, &USISRL\n", dst);
+  fprintf(out, "  mov.b #16, &USICNT\n");
+
+  return 0;
+}
+
+int MSP430::spi_read_I(int port)
+{
+  if (port != 0) { return -1; }
+
+  char dst[16];
+  pop_reg(dst);
+
+  fprintf(out, "  ;; spi_read_I()\n");
   fprintf(out, "  mov.b %s, r15\n", dst);
   fprintf(out, "  call #_read_spi\n");
   push_reg("r15");
@@ -1840,21 +1869,9 @@ int MSP430::spi_send_I(int port)
   return 0;
 }
 
-int MSP430::spi_send16_I(int port)
+int MSP430::spi_read16_I(int port)
 {
   return -1;
-}
-
-int MSP430::spi_read(int port)
-{
-  if (port != 0) { return -1; }
-
-  fprintf(out, "  call #_read_spi\n");
-  push_reg("r15");
-
-  need_read_spi = 1;
-
-  return 0;
 }
 
 int MSP430::spi_isDataAvailable(int port)
