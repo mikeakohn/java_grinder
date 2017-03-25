@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2016 by Michael Kohn
+ * Copyright 2014-2017 by Michael Kohn
  *
  */
 
@@ -59,8 +59,8 @@ int MC68000::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 
-  // For now we only support a specific chip
-  fprintf(out, ".680x0\n");
+  // For now only support a specific chip
+  fprintf(out, ".68000\n");
 
   // Set where RAM starts / ends
   // FIXME - Not sure what to set this to right now

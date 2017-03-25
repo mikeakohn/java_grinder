@@ -64,6 +64,10 @@ int W65C265SXB::open(const char *filename)
   fprintf(out, "lda #1\n");
   fprintf(out, "sta put_int_table + 8\n");
 
+  fprintf(out, "; set up processor stack\n");
+  fprintf(out, "  lda #0x8ff\n");
+  fprintf(out, "  tcs\n");
+
   return 0;
 }
 
