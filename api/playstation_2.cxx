@@ -39,7 +39,9 @@ int playstation2(JavaClass *java_class, Generator *generator, char *method_name)
 {
   CHECK_FUNC(setVideoMode,_III)
   CHECK_FUNC(setFrameBuffer1,_IIIII)
+  CHECK_FUNC(setFrameBuffer2,_IIIII)
   CHECK_FUNC(setDisplay1,_IIIIII)
+  CHECK_FUNC(setDisplay2,_IIIIII)
   CHECK_FUNC(waitVsync,)
 
   return -1;
