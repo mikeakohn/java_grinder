@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2017 by Michael Kohn
  *
  * W65C265SXB by Joe Davisson
  *
@@ -466,7 +466,7 @@ int W65C265SXB::w65c265sxb_controlTones_IIZZ()
   fprintf(out, "  phx\n");
   fprintf(out, "  tax\n");
   fprintf(out, "  sep #0x20\n");
-  fprintf(out, "  lda value1\n");
+  fprintf(out, "  lda.b value1\n");
   fprintf(out, "  jsr.l 0xe009\n");
   fprintf(out, "  rep #0x30\n");
   fprintf(out, "  plx\n");

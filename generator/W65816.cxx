@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2016 by Michael Kohn
+ * Copyright 2014-2017 by Michael Kohn
  *
  * W65816 written by Joe Davisson
  *
@@ -616,13 +616,13 @@ int W65816::jump_cond(const char *label, int cond, int distance)
       case COND_EQUAL:
         fprintf(out, "  lda stack,x\n");
         fprintf(out, "  cmp #0\n");
-        fprintf(out, "  bne #3\n");
+        fprintf(out, "  bne label_%d\n", label_count);
         fprintf(out, "  jmp %s\n", label);
         break;
       case COND_NOT_EQUAL:
         fprintf(out, "  lda stack,x\n");
         fprintf(out, "  cmp #0\n");
-        fprintf(out, "  beq #3\n");
+        fprintf(out, "  beq label_%d\n", label_count);
         fprintf(out, "  jmp %s\n", label);
         break;
       case COND_LESS:
@@ -630,14 +630,14 @@ int W65816::jump_cond(const char *label, int cond, int distance)
         {
           fprintf(out, "  lda stack,x\n");
           fprintf(out, "  cmp #0\n");
-          fprintf(out, "  bpl #3\n");
+          fprintf(out, "  bpl label_%d\n", label_count);
           fprintf(out, "  jmp %s\n", label);
         }
           else
         {
           fprintf(out, "  lda #0\n");
           fprintf(out, "  cmp stack,x\n");
-          fprintf(out, "  bpl #3\n");
+          fprintf(out, "  bpl label_%d\n", label_count);
           fprintf(out, "  jmp %s\n", label);
         }
         break;
@@ -646,18 +646,21 @@ int W65816::jump_cond(const char *label, int cond, int distance)
         {
           fprintf(out, "  lda stack,x\n");
           fprintf(out, "  cmp #0\n");
-          fprintf(out, "  bmi #3\n");
+          fprintf(out, "  bmi lalbe_%d\n", label_count);
           fprintf(out, "  jmp %s\n", label);
         }
           else
         {
           fprintf(out, "  lda #0\n");
           fprintf(out, "  cmp stack,x\n");
-          fprintf(out, "  bmi #3\n");
+          fprintf(out, "  bmi label_%d\n", label_count);
           fprintf(out, "  jmp %s\n", label);
         }
         break;
     }
+
+    fprintf(out, "label_%d:\n", label_count);
+    label_count++;
 
     stack--;
   }
@@ -694,13 +697,13 @@ int W65816::jump_cond_integer(const char *label, int cond, int distance)
       case COND_EQUAL:
         fprintf(out, "  lda stack - 0,x\n");
         fprintf(out, "  cmp stack - 2,x\n");
-        fprintf(out, "  bne #3\n");
+        fprintf(out, "  bne label_%d\n", label_count);
         fprintf(out, "  jmp %s\n", label);
         break;
       case COND_NOT_EQUAL:
         fprintf(out, "  lda stack - 0,x\n");
         fprintf(out, "  cmp stack - 2,x\n");
-        fprintf(out, "  beq #3\n");
+        fprintf(out, "  beq label_%d\n", label_count);
         fprintf(out, "  jmp %s\n", label);
         break;
       case COND_LESS:
@@ -708,14 +711,14 @@ int W65816::jump_cond_integer(const char *label, int cond, int distance)
         {
           fprintf(out, "  lda stack - 0,x\n");
           fprintf(out, "  cmp stack - 2,x\n");
-          fprintf(out, "  bpl #3\n");
+          fprintf(out, "  bpl label_%d\n", label_count);
           fprintf(out, "  jmp %s\n", label);
         }
           else
         {
           fprintf(out, "  lda stack - 2,x\n");
           fprintf(out, "  cmp stack - 0,x\n");
-          fprintf(out, "  bpl #3\n");
+          fprintf(out, "  bpl label_%d\n", label_count);
           fprintf(out, "  jmp %s\n", label);
         }
         break;
@@ -724,18 +727,21 @@ int W65816::jump_cond_integer(const char *label, int cond, int distance)
         {
           fprintf(out, "  lda stack - 0,x\n");
           fprintf(out, "  cmp stack - 2,x\n");
-          fprintf(out, "  bmi #3\n");
+          fprintf(out, "  bmi label_%d\n", label_count);
           fprintf(out, "  jmp %s\n", label);
         }
           else
         {
           fprintf(out, "  lda stack - 2,x\n");
           fprintf(out, "  cmp stack - 0,x\n");
-          fprintf(out, "  bmi #3\n");
+          fprintf(out, "  bmi label_%d\n", label_count);
           fprintf(out, "  jmp %s\n", label);
         }
         break;
     }
+
+    fprintf(out, "label_%d:\n", label_count);
+    label_count++;
 
     stack -= 2;
   }
