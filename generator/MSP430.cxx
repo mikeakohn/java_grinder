@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2016 by Michael Kohn
+ * Copyright 2014-2017 by Michael Kohn
  *
  */
 
@@ -2005,6 +2005,7 @@ int MSP430::timer_setInterval_II(int cycles, int divider)
   else if (divider == 8) { divider = 3; }
   else { printf("** divider must be 1,2,4,8\n"); return -1; }
 
+  fprintf(out, "  ;; MSP430::timer_setInterval_II(%d, %d)\n", cycles, divider);
   fprintf(out, "  mov.w #%d, &TACCR0\n", cycles);
   fprintf(out, "  mov.w #(TASSEL_2|MC_1|%d), &TACTL ; SMCLK, DIV1, COUNT to TACCR0\n", divider << 6);
   fprintf(out, "  mov.w #0, &TACCTL1\n");
@@ -2020,6 +2021,8 @@ int MSP430::timer_setListener_Z()
 
 int MSP430::timer_setListener_Z(int const_value)
 {
+  fprintf(out, "  ;; MSP430X::timer_setListener_Z(%d)\n", const_value);
+
   if (const_value != 0)
   {
     need_timer_interrupt = true;
