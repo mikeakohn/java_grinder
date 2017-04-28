@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2016 by Michael Kohn
+ * Copyright 2014-2017 by Michael Kohn
  *
  */
 
@@ -75,8 +75,29 @@ int Epiphany::open(const char *filename)
 
 int Epiphany::start_init()
 {
+  fprintf(out, ".org 0x00\n");
+  fprintf(out, "  b _sync_interrupt\n");
+  fprintf(out, ".org 0x04\n");
+  fprintf(out, "  b _sw_exception_interrupt\n");
+  fprintf(out, ".org 0x08\n");
+  fprintf(out, "  b _memory_fault_interrupt\n");
+  fprintf(out, ".org 0x0c\n");
+  fprintf(out, "  b _timer0_interrupt\n");
+  fprintf(out, ".org 0x10\n");
+  fprintf(out, "  b _timer1_interrupt\n");
+  fprintf(out, ".org 0x14\n");
+  fprintf(out, "  b _message_interrupt\n");
+  fprintf(out, ".org 0x18\n");
+  fprintf(out, "  b _dma0_interrupt\n");
+  fprintf(out, ".org 0x1c\n");
+  fprintf(out, "  b _dma1_interrupt\n");
+  fprintf(out, ".org 0x20\n");
+  fprintf(out, "  b _wand_interrupt\n");
+  fprintf(out, ".org 0x24\n");
+  fprintf(out, "  b _user_interrupt\n");
+
   // Add any set up items (stack, registers, etc).
-  //fprintf(out, ".org ???\n");
+  fprintf(out, ".org 0x8000\n");
   fprintf(out, "start:\n");
 
   return 0;
