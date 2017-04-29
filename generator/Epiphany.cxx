@@ -15,9 +15,9 @@
 
 #include "Epiphany.h"
 
-#define REG_STACK(a) (a)
+#define REG_STACK(a) (reg_stack[a])
 #define LOCALS(i) (i * 4)
-// We want to use a full descending stack.
+// Use a full descending stack.
 // SP points to last occupied.
 // PUSH will decrement SP, and move value
 // POP will move value, increment SP
@@ -32,16 +32,27 @@
 // r2
 // r4
 // r5
-// r6
-// r7
-// r8 End of reg stack
+// r6 End of reg stack (extends from r15 to r63)
+// r7 temp
+// r8 temp
 // r9 temp
-// r10 temp
-// r11 Statics pointer
+// r10 statics pointer
+// r11 Frame Pointer
 // r12 Constants pointer
 // r13 SP
 // r14 Link Register
-// r15 PC
+// r15
+
+static const uint8_t reg_stack[] = {
+  0, 1, 2, 3, 4, 5, 6,
+  15, 16, 17, 18, 19, 20, 21,
+  22, 23, 24, 25, 26, 27, 28,
+  29, 30, 31, 32, 33, 34, 35,
+  36, 37, 38, 39, 40, 41, 42,
+  43, 44, 45, 46, 47, 48, 49,
+  50, 51, 52, 53, 54, 55, 56,
+  57, 58, 59, 60, 61, 62, 63,
+};
 
 static const char *cond_str[] = { "eq", "ne", "lt", "le", "gt", "ge" };
 
@@ -99,7 +110,7 @@ int Epiphany::start_init()
   // Add any set up items (stack, registers, etc).
   fprintf(out, ".org 0x8000\n");
   fprintf(out, "start:\n");
-
+  //fprintf(out, "  sub r0, r0, r0\n");
   return 0;
 }
 
@@ -113,7 +124,7 @@ int Epiphany::init_heap(int field_count)
 {
   fprintf(out, "  ;; Set up heap and static initializers\n");
   //fprintf(out, "  mov #ram_start+%d, &ram_start\n", (field_count + 1) * 2);
-  fprintf(out, "  mov r11, #0 ; Point to memory holding static vars\n");
+  fprintf(out, "  mov r10, #0 ; Point to memory holding static vars\n");
   return 0;
 }
 
@@ -121,14 +132,15 @@ int Epiphany::field_init_int(char *name, int index, int value)
 {
   if (immediate_is_possible(value))
   {
-    fprintf(out, "  mov r10, #%d\n", value);
-    fprintf(out, "  str r10, [r11,#%s]\n", name);
+    fprintf(out, "  mov r7, #%d\n", value);
+    fprintf(out, "  strw r7, [r10,#%d]\n", index);
   }
     else
   {
     int n = get_constant(value);
-    fprintf(out, "  ldr r10, [r12,#%d]\n", n * 4);
-    fprintf(out, "  str r10, [r11,#%s]\n", name);
+
+    fprintf(out, "  ldrw r7, [r12,#%d]\n", n);
+    fprintf(out, "  strw r7, [r10,#%d]\n", index);
   }
 
   return 0;
@@ -149,7 +161,9 @@ void Epiphany::method_end(int local_count)
 
 int Epiphany::push_local_var_int(int index)
 {
-  return -1;
+  fprintf(out, "  ldrw r%d, [r11,#%d]\n", REG_STACK(reg++), index);
+
+  return 0;
 }
 
 int Epiphany::push_local_var_ref(int index)
@@ -159,20 +173,29 @@ int Epiphany::push_local_var_ref(int index)
 
 int Epiphany::push_ref_static(const char *name, int index)
 {
-  return -1;
+  fprintf(out, "  strw r%d, [r10,#%d]\n", REG_STACK(reg++), index);
+
+  return 0;
 }
 
 int Epiphany::push_fake()
 {
-  if (stack != 0) { return -1; }
-
   reg++;
   return 0;
 }
 
 int Epiphany::push_int(int32_t n)
 {
-  return -1;
+  fprintf(out, "  mov r%d, #%d\n", REG_STACK(reg), n & 0xffff);
+
+  if ((n & 0xffff0000) != 0)
+  {
+    fprintf(out, "  movt r%d, #%d\n", REG_STACK(reg), (n >> 16) & 0xffff);
+  }
+
+  reg++;
+
+  return 0;
 }
 
 int Epiphany::push_long(int64_t n)
@@ -208,51 +231,82 @@ int Epiphany::pop_local_var_ref(int index)
 
 int Epiphany::pop()
 {
-  return -1;
+  reg--;
+
+  return 0;
 }
 
 int Epiphany::dup()
 {
-  return -1;
+  fprintf(out, "  mov r%d, r%d\n", REG_STACK(reg), REG_STACK(reg - 1));
+  reg++;
+
+  return 0;
 }
 
 int Epiphany::dup2()
 {
-  return -1;
+  fprintf(out, "  mov r%d, r%d\n", REG_STACK(reg), REG_STACK(reg - 2));
+  fprintf(out, "  mov r%d, r%d\n", REG_STACK(reg + 1), REG_STACK(reg - 1));
+  reg += 2;
+
+  return 0;
 }
 
 int Epiphany::swap()
 {
-  return -1;
+  fprintf(out, "  mov r8, r%d\n", REG_STACK(reg - 2));
+  fprintf(out, "  mov r%d, r%d\n", REG_STACK(reg - 2), REG_STACK(reg - 1));
+  fprintf(out, "  mov r%d, r8\n", REG_STACK(reg - 1));
+
+  return 0;
 }
 
 int Epiphany::add_integer()
 {
-  return stack_alu("add");
+  fprintf(out, "  iadd r%d, r%d, r%d\n",
+     REG_STACK(reg - 2), REG_STACK(reg - 2), REG_STACK(reg - 1));
+
+  reg--;
+
+  return 0;
 }
 
 int Epiphany::add_integer(int num)
 {
-  if (!immediate_is_possible(num)) { return -1; }
-  fprintf(out, "  add r%d, r%d, #%d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
+  if (num < -1024 || num > 1023) { return -1; }
+
+  fprintf(out, "  add r%d, r%d, #%d\n", REG_STACK(reg - 1), REG_STACK(reg - 1), num);
+
   return 0;
 }
 
 int Epiphany::sub_integer()
 {
-  return stack_alu("sub");
+  fprintf(out, "  isub r%d, r%d, r%d\n",
+     REG_STACK(reg - 2), REG_STACK(reg - 2), REG_STACK(reg - 1));
+
+  reg--;
+
+  return 0;
 }
 
 int Epiphany::sub_integer(int num)
 {
-  if (!immediate_is_possible(num)) { return -1; }
+  if (num < -1024 || num > 1023) { return -1; }
+
   fprintf(out, "  sub r%d, r%d, #%d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
   return 0;
 }
 
 int Epiphany::mul_integer()
 {
-  return stack_alu("mul");
+  fprintf(out, "  imul r%d, r%d, r%d\n",
+     REG_STACK(reg - 2), REG_STACK(reg - 2), REG_STACK(reg - 1));
+
+  reg--;
+
+  return 0;
 }
 
 int Epiphany::div_integer()
@@ -267,82 +321,116 @@ int Epiphany::mod_integer()
 
 int Epiphany::neg_integer()
 {
-  return -1;
+  // FIXME - Could keep one register set to 0 at all times and drop one
+  // instruction here.
+  fprintf(out, "  mov r8, #0\n");
+  fprintf(out, "  sub r%d, r8, r%d\n", REG_STACK(reg - 1), REG_STACK(reg - 1));
+
+  return 0;
 }
 
 int Epiphany::shift_left_integer()
 {
-  // mov r0, r1, lsl r2
-  return -1;
+  fprintf(out, "  lsl r%d, r%d, r%d\n",
+     REG_STACK(reg - 2), REG_STACK(reg - 2), REG_STACK(reg - 1));
+
+  reg--;
+
+  return 0;
 }
 
 int Epiphany::shift_left_integer(int num)
 {
-  fprintf(out, "  mov r%d, r%d, lsl #%d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
+  fprintf(out, "  lsl r%d, r%d, #%d\n", REG_STACK(reg - 1), REG_STACK(reg - 1), num);
   return 0;
 }
 
 int Epiphany::shift_right_integer()
 {
-  return -1;
+  fprintf(out, "  asr r%d, r%d, r%d\n",
+     REG_STACK(reg - 2), REG_STACK(reg - 2), REG_STACK(reg - 1));
+
+  reg--;
+
+  return 0;
 }
 
 int Epiphany::shift_right_integer(int num)
 {
-  fprintf(out, "  mov r%d, r%d, rsl #%d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
+  fprintf(out, "  asr r%d, r%d, #%d\n", REG_STACK(reg - 1), REG_STACK(reg - 1), num);
+
   return 0;
 }
 
 int Epiphany::shift_right_uinteger()
 {
-  return -1;
+  fprintf(out, "  asr r%d, r%d, r%d\n",
+     REG_STACK(reg - 2), REG_STACK(reg - 2), REG_STACK(reg - 1));
+
+  reg--;
+
+  return 0;
 }
 
 int Epiphany::shift_right_uinteger(int num)
 {
-  fprintf(out, "  mov r%d, r%d, rsl #%d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
+  fprintf(out, "  lsr r%d, r%d, #%d\n", REG_STACK(reg - 1), REG_STACK(reg - 1), num);
+
   return 0;
 }
 
 int Epiphany::and_integer()
 {
-  return stack_alu("and");
+  fprintf(out, "  and r%d, r%d, r%d\n",
+     REG_STACK(reg - 2), REG_STACK(reg - 2), REG_STACK(reg - 1));
+
+  reg--;
+
+  return 0;
 }
 
 int Epiphany::and_integer(int num)
 {
-  if (!immediate_is_possible(num)) { return -1; }
-  fprintf(out, "  and r%d, r%d, #%d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
-  return 0;
+  return -1;
 }
 
 int Epiphany::or_integer()
 {
-  return stack_alu("orr");
+  fprintf(out, "  orr r%d, r%d, r%d\n",
+     REG_STACK(reg - 2), REG_STACK(reg - 2), REG_STACK(reg - 1));
+
+  reg--;
+
+  return 0;
 }
 
 int Epiphany::or_integer(int num)
 {
-  if (!immediate_is_possible(num)) { return -1; }
-  fprintf(out, "  orr r%d, r%d, #%d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
-  return 0;
+  return -1;
 }
 
 int Epiphany::xor_integer()
 {
-  return stack_alu("eor");
+  fprintf(out, "  eor r%d, r%d, r%d\n",
+     REG_STACK(reg - 2), REG_STACK(reg - 2), REG_STACK(reg - 1));
+
+  reg--;
+
+  return 0;
 }
 
 int Epiphany::xor_integer(int num)
 {
-  if (!immediate_is_possible(num)) { return -1; }
-  fprintf(out, "  eor r%d, r%d, #%d\n", REG_STACK(reg-1), REG_STACK(reg-1), num);
-  return 0;
+  return -1;
 }
 
 int Epiphany::inc_integer(int index, int num)
 {
-  return -1;
+  fprintf(out, "  ldrw r8, [r11,#%d]\n", index);
+  fprintf(out, "  add r8, r8, #1\n");
+  fprintf(out, "  strw r8, [r11,#%d]\n", index);
+
+  return 0;
 }
 
 int Epiphany::integer_to_byte()
@@ -521,13 +609,8 @@ int Epiphany::array_write_int(const char *name, int field_id)
 bool Epiphany::immediate_is_possible(int immediate)
 {
   uint32_t i = immediate;
-  int n;
 
-  for (n = 0; n < 16; n++)
-  {
-    if (i < 256) { return true; }
-    i=((i & 0xc0000000) >> 30) | (i << 2);
-  }
+  if ((i & 0xffff0000) == 0) { return true; }
 
   return false;
 }
