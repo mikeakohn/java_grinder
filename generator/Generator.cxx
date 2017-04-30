@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2017 by Michael Kohn
  *
  */
 
@@ -38,6 +38,24 @@ int Generator::open(const char *filename)
   }
 
   return 0;
+}
+
+int Generator::push_local_var_float(int index)
+{
+  printf("Error: Floats are not supported on this platform.\n");
+  return -1;
+}
+
+int Generator::set_float_local(int index, float value)
+{
+  printf("Error: Floats are not supported on this platform.\n");
+  return -1;
+}
+
+int Generator::new_object(const char *object_name, int field_count)
+{
+  printf("Error: Object instantiation is not supported on this platform.\n");
+  return -1;
 }
 
 void Generator::label(char *name)

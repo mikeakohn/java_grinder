@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2016 by Michael Kohn
+ * Copyright 2014-2017 by Michael Kohn
  *
  */
 
@@ -74,9 +74,11 @@ public:
   virtual void method_end(int local_count) = 0;
   virtual int push_local_var_int(int index) = 0;
   virtual int push_local_var_ref(int index) = 0;
+  virtual int push_local_var_float(int index);
   virtual int push_ref_static(const char *name, int index) = 0;
   virtual int push_fake() { return -1; } // move stack ptr without push
   virtual int set_integer_local(int index, int value) { return -1; }
+  virtual int set_float_local(int index, float value);
   virtual int set_ref_local(int index, char *name) { return -1; }
   virtual int push_int(int32_t n) = 0;
   virtual int push_long(int64_t n) = 0;
@@ -129,6 +131,7 @@ public:
   virtual int put_static(const char *name, int index) = 0;
   virtual int get_static(const char *name, int index) = 0;
   virtual int brk() = 0;
+  virtual int new_object(const char *object_name, int field_count);
   virtual int new_array(uint8_t type) = 0;
   virtual int insert_array(const char *name, int32_t *data, int len, uint8_t type) = 0;
   virtual int insert_string(const char *name, uint8_t *bytes, int len) = 0;
