@@ -5,9 +5,9 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2017 by Michael Kohn
  *
- * SNES by Joe Davisson
+ * W65C265SXB by Joe Davisson
  *
  */
 
