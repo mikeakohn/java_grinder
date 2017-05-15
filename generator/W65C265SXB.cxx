@@ -72,7 +72,7 @@ int W65C265SXB::open(const char *filename)
 }
 
 // terminal interface API
-int W65C265SXB::w65c265sxb_getChar()
+int W65C265SXB::sxb_getChar()
 {
   fprintf(out, "; getChar\n");
   fprintf(out, "  lda #0\n");
@@ -90,7 +90,7 @@ int W65C265SXB::w65c265sxb_getChar()
   return 0;
 }
 
-int W65C265SXB::w65c265sxb_putChar_C()
+int W65C265SXB::sxb_putChar_C()
 {
   POP();
   fprintf(out, "; putChar\n");
@@ -104,13 +104,13 @@ int W65C265SXB::w65c265sxb_putChar_C()
   return 0;
 }
 
-int W65C265SXB::w65c265sxb_getInt()
+int W65C265SXB::sxb_getInt()
 {
   fprintf(out, "; getInt\n");
   return -1;
 }
 
-int W65C265SXB::w65c265sxb_putInt_I()
+int W65C265SXB::sxb_putInt_I()
 {
   need_put_int = 1;
   fprintf(out, "; putInt\n");
@@ -120,13 +120,13 @@ int W65C265SXB::w65c265sxb_putInt_I()
   return 0;
 }
 
-int W65C265SXB::w65c265sxb_getString()
+int W65C265SXB::sxb_getString()
 {
   fprintf(out, "; getString\n");
   return -1;
 }
 
-int W65C265SXB::w65c265sxb_putString_X()
+int W65C265SXB::sxb_putString_X()
 {
   need_put_string = 1;
   fprintf(out, "  jsr put_string\n");
@@ -449,7 +449,7 @@ int W65C265SXB::ioport_getPortInputValue(int port)
 }
 
 // tone generator API
-int W65C265SXB::w65c265sxb_controlTones_IIZZ()
+int W65C265SXB::sxb_controlTones_IIZZ()
 {
 //  int control = (enable2 & 1) | ((enable2 & 1) << 1);
 

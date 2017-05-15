@@ -7,20 +7,20 @@
  *
  * Copyright 2014-2017 by Michael Kohn
  *
- * W65C265SXB by Joe Davisson
+ * W65C134SXB by Joe Davisson
  *
  */
 
-#ifndef _W65C265SXB_H
-#define _W65C265SXB_H
+#ifndef _W65C134SXB_H
+#define _W65C134SXB_H
 
-#include "W65816.h"
+#include "M6502.h"
 
-class W65C265SXB : public W65816
+class W65C134SXB : public M6502
 {
 public:
-  W65C265SXB();
-  virtual ~W65C265SXB();
+  W65C134SXB();
+  virtual ~W65C134SXB();
 
   virtual int open(const char *filename);
 

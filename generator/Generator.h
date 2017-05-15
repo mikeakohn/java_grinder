@@ -3,7 +3,7 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
  * Copyright 2014-2017 by Michael Kohn
  *
@@ -30,10 +30,10 @@
 #include "API_SegaGenesis.h"
 #include "API_SNES.h"
 #include "API_System.h"
+#include "API_SXB.h"
 #include "API_TI84.h"
 #include "API_TI99.h"
 #include "API_TRS80_Coco.h"
-#include "API_W65C265SXB.h"
 
 class Generator :
   public API_AppleIIgs,
@@ -48,11 +48,11 @@ class Generator :
   public API_Propeller,
   public API_SegaGenesis,
   public API_SNES,
+  public API_SXB,
   public API_System,
   public API_TI84,
   public API_TI99,
-  public API_TRS80_Coco,
-  public API_W65C265SXB
+  public API_TRS80_Coco
 {
 public:
   Generator();

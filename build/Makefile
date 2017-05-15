@@ -30,12 +30,12 @@ API= \
   sega_genesis.o \
   snes_.o \
   spi.o \
+  sxb.o \
   ti84_.o \
   ti99_.o \
   timer.o \
   trs80_coco.o \
-  uart.o \
-  w65c265sxb_.o
+  uart.o
 CPUS= \
   ARM.o \
   AVR8.o \
@@ -71,6 +71,7 @@ SYSTEMS= \
   TI84.o \
   TI99.o \
   TRS80Coco.o \
+  W65C134SXB.o \
   W65C265SXB.o
 OBJS=fileio.o Compiler.o Generator.o JavaClass.o JavaCompiler.o execute_static.o table_java_instr.o $(CPUS) $(SYSTEMS) $(API)
 

@@ -29,6 +29,7 @@ JAVA_SRC=\
   $(SRC_DIR)/SPI.java \
   $(SRC_DIR)/SPI0.java \
   $(SRC_DIR)/SPI1.java \
+  $(SRC_DIR)/SXB.java \
   $(SRC_DIR)/TI84.java \
   $(SRC_DIR)/TI99.java \
   $(SRC_DIR)/Timer.java \
@@ -36,8 +37,7 @@ JAVA_SRC=\
   $(SRC_DIR)/TRS80Coco.java \
   $(SRC_DIR)/UART.java \
   $(SRC_DIR)/UART0.java \
-  $(SRC_DIR)/UART1.java \
-  $(SRC_DIR)/W65C265SXB.java
+  $(SRC_DIR)/UART1.java
 
 default:
 	javac -classpath . -d ../build $(JAVA_SRC) 
