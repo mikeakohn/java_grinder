@@ -32,6 +32,9 @@ public class Parallella
   public static int readSharedRamInt(int address) { return 0; }
   public static float readSharedRamFloat(int address) { return 0; }
 
+  /** Core information */
+  public static int getCoreId() { return 0; }
+
   /** Enable user interrupts */
   public static void setUserInterruptListener(boolean enabled) { }
 }

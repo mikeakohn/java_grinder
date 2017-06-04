@@ -40,9 +40,12 @@ int parallella(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(writeSharedRamByte,_IB)
   CHECK_FUNC(writeSharedRamShort,_IS)
   CHECK_FUNC(writeSharedRamInt,_II)
+  CHECK_FUNC(writeSharedRamFloat,_IF)
   CHECK_FUNC(readSharedRamByte,_I)
   CHECK_FUNC(readSharedRamShort,_I)
   CHECK_FUNC(readSharedRamInt,_I)
+  CHECK_FUNC(readSharedRamFloat,_I)
+  CHECK_FUNC(getCoreId,)
   CHECK_FUNC(setUserInterruptListener,_Z)
 
   return -1;

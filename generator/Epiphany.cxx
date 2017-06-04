@@ -802,6 +802,20 @@ int Epiphany::parallella_readSharedRamFloat_I()
   return parallella_readSharedRamInt_I();
 }
 
+int Epiphany::parallella_getCoreId()
+{
+  fprintf(out,
+    "mov r8, #0x3f\n"
+    "movfs r9, COREID\n"
+    "lsr r7, r9, #6\n"
+    "and r7, r7, r8\n"
+    "sub r7, r7, #32\n"
+    "and r9, r9, r8\n"
+    "sub r%d, r9, #8\n", REG_STACK(reg++));
+
+  return 0;
+}
+
 int Epiphany::parallella_setUserInterruptListener_Z()
 {
   return -1;

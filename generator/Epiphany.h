@@ -109,6 +109,7 @@ public:
   virtual int parallella_readSharedRamShort_I();
   virtual int parallella_readSharedRamInt_I();
   virtual int parallella_readSharedRamFloat_I();
+  virtual int parallella_getCoreId();
   virtual int parallella_setUserInterruptListener_Z();
   virtual int parallella_setUserInterruptListener_Z(int const_value);
 
