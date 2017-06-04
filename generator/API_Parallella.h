@@ -19,6 +19,7 @@ public:
   virtual int parallella_writeSharedRamByte_IB() { return -1; }
   virtual int parallella_writeSharedRamShort_IS() { return -1; }
   virtual int parallella_writeSharedRamInt_II() { return -1; }
+  virtual int parallella_writeSharedRamFloat_IF() { return -1; }
 
   virtual int parallella_readSharedRamByte_I() { return -1; }
   virtual int parallella_readSharedRamShort_I() { return -1; }

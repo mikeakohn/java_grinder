@@ -24,10 +24,12 @@ public class Parallella
   public static void writeSharedRamByte(int address, byte data) { }
   public static void writeSharedRamShort(int address, short data) { }
   public static void writeSharedRamInt(int address, int data) { }
+  public static void writeSharedRamFloat(int address, float data) { }
 
   /** Read data from shared memory.  Addresses start at 0 and extend 32k. */
   public static byte readSharedRamByte(int address) { return 0; }
   public static short readSharedRamShort(int address) { return 0; }
   public static int readSharedRamInt(int address) { return 0; }
+  public static float readSharedRamFloat(int address) { return 0; }
 }
 

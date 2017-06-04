@@ -104,16 +104,19 @@ public:
   virtual int parallella_writeSharedRamByte_IB();
   virtual int parallella_writeSharedRamShort_IS();
   virtual int parallella_writeSharedRamInt_II();
+  virtual int parallella_writeSharedRamFloat_IF();
   virtual int parallella_readSharedRamByte_I();
   virtual int parallella_readSharedRamShort_I();
   virtual int parallella_readSharedRamInt_I();
-
+  virtual int parallella_readSharedRamFloat_I();
 
 protected:
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 
   int stack;          // count how many things we put on the stack
   bool is_main : 1;
+  bool is_interrupt : 1;
+
   bool immediate_is_possible(int immediate);
   int stack_alu(const char *instr);
 };

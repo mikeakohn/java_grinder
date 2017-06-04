@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 
 #include "Epiphany.h"
@@ -32,14 +33,14 @@
 // r2
 // r4
 // r5 End of reg stack (extends from r15 to r63)
-// r6 Frame Pointer
+// r6 SP / Frame Pointer
 // r7 temp
 // r8 temp
 // r9 temp
 // r10 statics pointer
 // r11 Shared memory pointer (Parallella)
 // r12 Constants pointer
-// r13 SP
+// r13
 // r14 Link Register
 // r15
 
@@ -60,7 +61,8 @@ Epiphany::Epiphany() :
   reg(0),
   reg_max(9),
   stack(0),
-  is_main(0)
+  is_main(0),
+  is_interrupt(0)
 {
 
 }
@@ -68,7 +70,6 @@ Epiphany::Epiphany() :
 Epiphany::~Epiphany()
 {
   fprintf(out,
-    "\n"
     "_sw_exception_interrupt:\n"
     "_exception_interrupt:\n"
     "_memory_fault_interrupt:\n"
@@ -120,15 +121,20 @@ int Epiphany::start_init()
     ".org 0x20\n"
     "  b _wand_interrupt\n"
     ".org 0x24\n"
-    "  b _user_interrupt\n");
+    "  b _user_interrupt\n\n");
+
+  fprintf(out, "static_vars:\n");
 
   // Add any set up items (stack, registers, etc).
   fprintf(out,
     ".org 0x2000\n"
     "_sync_interrupt:\n"
     "start:\n"
-    "mov r11, #0x0000\n"
-    "movt r11, #0x8e00\n");
+    "  ;; Setup stack pointer\n"
+    "  mov r6, #0x8000\n"
+    "  ;; Point to Parallella shared segment\n"
+    "  mov r11, #0x0000\n"
+    "  movt r11, #0x8e00\n");
 
   return 0;
 }
@@ -141,9 +147,10 @@ int Epiphany::insert_static_field_define(const char *name, const char *type, int
 
 int Epiphany::init_heap(int field_count)
 {
-  fprintf(out, "  ;; Set up heap and static initializers\n");
+  fprintf(out, "  ;; Setup heap and static initializers\n");
   //fprintf(out, "  mov #ram_start+%d, &ram_start\n", (field_count + 1) * 2);
-  fprintf(out, "  mov r10, #0 ; Point to memory holding static vars\n");
+  fprintf(out, "  mov r10, #static_vars\n");
+
   return 0;
 }
 
@@ -172,10 +179,40 @@ int Epiphany::field_init_ref(char *name, int index)
 
 void Epiphany::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
+  //this->max_stack = max_stack;
+  printf("max_stack=%d\n", max_stack);
+
+  is_interrupt = (strcmp(name, "userInterrupt") == 0) ? 1 : 0;
+
+  // main() function goes here
+  fprintf(out, "%s:\n", name);
+
+  if (is_interrupt)
+  {
+    fprintf(out, "  sub r6, r6, #%d\n", (local_count * 4) + (max_stack * 4));
+
+    int start = local_count;
+
+    // If this is an interrupt, we have to push all possible registers that
+    // could be in use.  Right now we'll push all temporary registers and
+    // and max_stack registers.  This is bad because if the user calls a
+    // another method in the interrupt that has a bigger max_stack, it
+    // could cause odd results.  Fix later maybe.
+    for (int n = 0; n < max_stack; n++)
+    {
+      fprintf(out, "  str r%d, [r6,#%d]\n", REG_STACK(n), start++);
+    }
+  }
+    else
+  {
+    fprintf(out, "  ;; Setup frame pointer for this function\n");
+    fprintf(out, "  sub r6, r6, #%d\n", (local_count * 4));
+  }
 }
 
 void Epiphany::method_end(int local_count)
 {
+  fprintf(out, "\n");
 }
 
 int Epiphany::push_local_var_int(int index)
@@ -240,7 +277,7 @@ int Epiphany::push_ref(char *name)
 
 int Epiphany::pop_local_var_int(int index)
 {
-  fprintf(out, "  str r%d, [r10,#%d]\n", REG_STACK(--reg), index);
+  fprintf(out, "  str r%d, [r6,#%d]\n", REG_STACK(--reg), index);
 
   return 0;
 }
@@ -646,43 +683,67 @@ int Epiphany::stack_alu(const char *instr)
 // Parallella
 int Epiphany::parallella_writeSharedRamByte_IB()
 {
-  int reg_offset = --reg;
   int reg_data = --reg;
+  int reg_offset = --reg;
 
-  fprintf(out, "  strb r%d, [r11,r%d]\n", reg_data, reg_offset);
+  fprintf(out, "  strb r%d, [r11,r%d]\n", REG_STACK(reg_data), REG_STACK(reg_offset));
 
   return 0;
 }
 
 int Epiphany::parallella_writeSharedRamShort_IS()
 {
-  return -1;
-}
-
-int Epiphany::parallella_writeSharedRamInt_II()
-{
-  int reg_offset = --reg;
   int reg_data = --reg;
+  int reg_offset = --reg;
 
-  fprintf(out, "  lsl r%d, r%d, #2\n", reg_offset, reg_offset);
-  fprintf(out, "  str r%d, [r11,r%d]\n", reg_data, reg_offset);
+  fprintf(out, "  lsl r%d, r%d, #1\n", REG_STACK(reg_offset), REG_STACK(reg_offset));
+  fprintf(out, "  strh r%d, [r11,r%d]\n", REG_STACK(reg_data), REG_STACK(reg_offset));
 
   return 0;
 }
 
+int Epiphany::parallella_writeSharedRamInt_II()
+{
+  int reg_data = --reg;
+  int reg_offset = --reg;
+
+  fprintf(out, "  lsl r%d, r%d, #2\n", REG_STACK(reg_offset), REG_STACK(reg_offset));
+  fprintf(out, "  str r%d, [r11,r%d]\n", REG_STACK(reg_data), REG_STACK(reg_offset));
+
+  return 0;
+}
+
+int Epiphany::parallella_writeSharedRamFloat_IF()
+{
+  return parallella_writeSharedRamInt_II();
+}
+
 int Epiphany::parallella_readSharedRamByte_I()
 {
-  return -1;
+  fprintf(out, "  ldrb r%d, [r11,r%d]\n", REG_STACK(reg), REG_STACK(reg));
+
+  return 0;
 }
 
 int Epiphany::parallella_readSharedRamShort_I()
 {
-  return -1;
+  fprintf(out, "  lsl r%d, r%d, #1\n", REG_STACK(reg), REG_STACK(reg));
+  fprintf(out, "  ldrh r%d, [r11,r%d]\n", REG_STACK(reg), REG_STACK(reg));
+
+  return 0;
 }
 
 int Epiphany::parallella_readSharedRamInt_I()
 {
-  return -1;
+  fprintf(out, "  lsl r%d, r%d, #2\n", REG_STACK(reg), REG_STACK(reg));
+  fprintf(out, "  ldr r%d, [r11,r%d]\n", REG_STACK(reg), REG_STACK(reg));
+
+  return 0;
+}
+
+int Epiphany::parallella_readSharedRamFloat_I()
+{
+  return parallella_readSharedRamInt_I();
 }
 
 
