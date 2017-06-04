@@ -33,6 +33,7 @@ public:
   virtual void method_end(int local_count);
   virtual int push_local_var_int(int index);
   virtual int push_local_var_ref(int index);
+  virtual int push_local_var_float(int index);
   virtual int push_ref_static(const char *name, int index);
   virtual int push_fake();
   virtual int push_int(int32_t n);
@@ -42,6 +43,7 @@ public:
   virtual int push_ref(char *name);
   virtual int pop_local_var_int(int index);
   virtual int pop_local_var_ref(int index);
+  virtual int pop_local_var_float(int index);
   virtual int pop();
   virtual int dup();
   virtual int dup2();
@@ -69,8 +71,12 @@ public:
   virtual int inc_integer(int index, int num);
   virtual int integer_to_byte();
   virtual int integer_to_short();
+  virtual int add_float();
+  virtual int sub_float();
+  virtual int mul_float();
   virtual int jump_cond(const char *label, int cond, int distance);
   virtual int jump_cond_integer(const char *label, int cond, int distance);
+  virtual int compare_floats(int cond);
   virtual int ternary(int cond, int value_true, int value_false);
   virtual int ternary(int cond, int compare, int value_true, int value_false);
   virtual int return_local(int index, int local_count);

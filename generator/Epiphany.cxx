@@ -56,7 +56,7 @@ static const uint8_t reg_stack[] = {
   57, 58, 59, 60, 61, 62
 };
 
-static const char *cond_str[] = { "eq", "ne", "lt", "le", "gt", "ge" };
+static const char *cond_str[] = { "eq", "ne", "lt", "lte", "gt", "gte" };
 
 Epiphany::Epiphany() :
   reg(0),
@@ -92,6 +92,7 @@ int Epiphany::open(const char *filename)
   if (Generator::open(filename) != 0) { return -1; }
 
   fprintf(out, ".epiphany\n\n");
+  fprintf(out, ".include \"epiphany.inc\"\n\n");
 
   // Set where RAM starts / ends
   // FIXME - Not sure what to set this to right now
@@ -224,12 +225,18 @@ void Epiphany::method_end(int local_count)
 
 int Epiphany::push_local_var_int(int index)
 {
+  fprintf(out, "  ;; push_local_var_int()\n");
   fprintf(out, "  ldr r%d, [r6,#%d]\n", REG_STACK(reg++), index);
 
   return 0;
 }
 
 int Epiphany::push_local_var_ref(int index)
+{
+  return push_local_var_int(index);
+}
+
+int Epiphany::push_local_var_float(int index)
 {
   return push_local_var_int(index);
 }
@@ -269,7 +276,13 @@ int Epiphany::push_long(int64_t n)
 
 int Epiphany::push_float(float f)
 {
-  return -1;
+  void *data = (void *)&f;
+  uint32_t value = *((uint32_t *)data);
+  int n = get_constant(value);
+
+  fprintf(out, "  ldr r%d, [r12,#%d]\n", REG_STACK(reg++), n);
+
+  return 0;
 }
 
 int Epiphany::push_double(double f)
@@ -288,6 +301,7 @@ int Epiphany::push_ref(char *name)
 
 int Epiphany::pop_local_var_int(int index)
 {
+  fprintf(out, "  ;; pop_local_var_int()\n");
   fprintf(out, "  str r%d, [r6,#%d]\n", REG_STACK(--reg), index);
 
   return 0;
@@ -298,8 +312,14 @@ int Epiphany::pop_local_var_ref(int index)
   return pop_local_var_int(index);
 }
 
+int Epiphany::pop_local_var_float(int index)
+{
+  return pop_local_var_int(index);
+}
+
 int Epiphany::pop()
 {
+  fprintf(out, "  ;; pop()\n");
   reg--;
 
   return 0;
@@ -307,6 +327,7 @@ int Epiphany::pop()
 
 int Epiphany::dup()
 {
+  fprintf(out, "  ;; dup()\n");
   fprintf(out, "  mov r%d, r%d\n", REG_STACK(reg), REG_STACK(reg - 1));
   reg++;
 
@@ -315,6 +336,7 @@ int Epiphany::dup()
 
 int Epiphany::dup2()
 {
+  fprintf(out, "  ;; dup2()\n");
   fprintf(out, "  mov r%d, r%d\n", REG_STACK(reg), REG_STACK(reg - 2));
   fprintf(out, "  mov r%d, r%d\n", REG_STACK(reg + 1), REG_STACK(reg - 1));
   reg += 2;
@@ -324,6 +346,7 @@ int Epiphany::dup2()
 
 int Epiphany::swap()
 {
+  fprintf(out, "  ;; swap()\n");
   fprintf(out, "  mov r8, r%d\n", REG_STACK(reg - 2));
   fprintf(out, "  mov r%d, r%d\n", REG_STACK(reg - 2), REG_STACK(reg - 1));
   fprintf(out, "  mov r%d, r8\n", REG_STACK(reg - 1));
@@ -333,6 +356,7 @@ int Epiphany::swap()
 
 int Epiphany::add_integer()
 {
+  fprintf(out, "  ;; add_integer()\n");
   fprintf(out, "  iadd r%d, r%d, r%d\n",
      REG_STACK(reg - 2), REG_STACK(reg - 2), REG_STACK(reg - 1));
 
@@ -352,6 +376,7 @@ int Epiphany::add_integer(int num)
 
 int Epiphany::sub_integer()
 {
+  fprintf(out, "  ;; sub_integer()\n");
   fprintf(out, "  isub r%d, r%d, r%d\n",
      REG_STACK(reg - 2), REG_STACK(reg - 2), REG_STACK(reg - 1));
 
@@ -370,6 +395,7 @@ int Epiphany::sub_integer(int num)
 
 int Epiphany::mul_integer()
 {
+  fprintf(out, "  ;; mul_integer()\n");
   fprintf(out, "  imul r%d, r%d, r%d\n",
      REG_STACK(reg - 2), REG_STACK(reg - 2), REG_STACK(reg - 1));
 
@@ -390,8 +416,7 @@ int Epiphany::mod_integer()
 
 int Epiphany::neg_integer()
 {
-  // FIXME - Could keep one register set to 0 at all times and drop one
-  // instruction here.
+  fprintf(out, "  ;; neg_integer()\n");
   fprintf(out, "  mov r8, #0\n");
   fprintf(out, "  sub r%d, r8, r%d\n", REG_STACK(reg - 1), REG_STACK(reg - 1));
 
@@ -495,6 +520,7 @@ int Epiphany::xor_integer(int num)
 
 int Epiphany::inc_integer(int index, int num)
 {
+  fprintf(out, "  ;; inc_integer()\n");
   fprintf(out, "  ldr r8, [r6,#%d]\n", index);
   fprintf(out, "  add r8, r8, #1\n");
   fprintf(out, "  str r8, [r6,#%d]\n", index);
@@ -512,6 +538,38 @@ int Epiphany::integer_to_short()
   return -1;
 }
 
+int Epiphany::add_float()
+{
+  fprintf(out, "  ;; add_float()\n");
+  fprintf(out, "  fadd r%d, r%d, r%d\n",
+     REG_STACK(reg - 2), REG_STACK(reg - 2), REG_STACK(reg - 1));
+
+  reg--;
+
+  return 0;
+}
+
+int Epiphany::sub_float()
+{
+  fprintf(out, "  ;; sub_float()\n");
+  fprintf(out, "  fsub r%d, r%d, r%d\n",
+     REG_STACK(reg - 2), REG_STACK(reg - 2), REG_STACK(reg - 1));
+  reg--;
+
+  return 0;
+}
+
+int Epiphany::mul_float()
+{
+  fprintf(out, "  ;; sub_float()\n");
+  fprintf(out, "  fmul r%d, r%d, r%d\n",
+     REG_STACK(reg - 2), REG_STACK(reg - 2), REG_STACK(reg - 1));
+
+  reg--;
+
+  return 0;
+}
+
 int Epiphany::jump_cond(const char *label, int cond, int distance)
 {
   fprintf(out, "  ;; Compare r%d with 0\n", REG_STACK(reg-1));
@@ -524,7 +582,34 @@ int Epiphany::jump_cond(const char *label, int cond, int distance)
 
 int Epiphany::jump_cond_integer(const char *label, int cond, int distance)
 {
-  return -1;
+  fprintf(out, "  ;; Compare r%d with r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+  fprintf(out, "  sub r7, r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
+  reg--;
+
+  fprintf(out, "  b%s %s\n", cond_str[cond], label);
+  return 0;
+}
+
+int Epiphany::compare_floats(int cond)
+{
+  fprintf(out, "  ;; compare_float()\n");
+
+  if (cond == 0)
+  {
+    fprintf(out, "  fsub r7, r%d, r%d\n", REG_STACK(reg - 2), REG_STACK(reg - 1));
+  }
+    else
+  {
+    fprintf(out, "  fsub r7, r%d, r%d\n", REG_STACK(reg - 1), REG_STACK(reg - 2));
+  }
+
+  fprintf(out, "  mov r%d, #0\n", REG_STACK(reg-2));
+  fprintf(out, "  mov r8, #1\n");
+  fprintf(out, "  movblt r%d, r8\n", REG_STACK(reg-2));
+
+  reg--;
+
+  return 0;
 }
 
 int Epiphany::ternary(int cond, int value_true, int value_false)
@@ -805,13 +890,13 @@ int Epiphany::parallella_readSharedRamFloat_I()
 int Epiphany::parallella_getCoreId()
 {
   fprintf(out,
-    "mov r8, #0x3f\n"
-    "movfs r9, COREID\n"
-    "lsr r7, r9, #6\n"
-    "and r7, r7, r8\n"
-    "sub r7, r7, #32\n"
-    "and r9, r9, r8\n"
-    "sub r%d, r9, #8\n", REG_STACK(reg++));
+    "  mov r8, #0x3f\n"
+    "  movfs r9, COREID\n"
+    "  lsr r7, r9, #6\n"
+    "  and r7, r7, r8\n"
+    "  sub r7, r7, #32\n"
+    "  and r9, r9, r8\n"
+    "  sub r%d, r9, #8\n", REG_STACK(reg++));
 
   return 0;
 }

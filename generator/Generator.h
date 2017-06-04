@@ -91,6 +91,7 @@ public:
   virtual int push_ref(char *name) = 0;
   virtual int pop_local_var_int(int index) = 0;
   virtual int pop_local_var_ref(int index) = 0;
+  virtual int pop_local_var_float(int index) { return -1; }
   virtual int pop() = 0;
   virtual int dup() = 0;
   virtual int dup2() = 0;
@@ -118,10 +119,14 @@ public:
   virtual int inc_integer(int index, int num) = 0;
   virtual int integer_to_byte() = 0;
   virtual int integer_to_short() = 0;
+  virtual int add_float();
+  virtual int sub_float();
+  virtual int mul_float();
   virtual int jump_cond(const char *label, int cond, int distance) = 0;
   virtual int jump_cond_zero(const char *label, int cond, int distance) { return -1; }
   virtual int jump_cond_integer(const char *label, int cond, int distance) = 0;
   virtual int jump_cond_integer(const char *label, int cond, int const_val, int distance) { return -1; } 
+  virtual int compare_floats(int cond);
   virtual int ternary(int cond, int value_true, int value_false) = 0;
   virtual int ternary(int cond, int compare, int value_true, int value_false) = 0;
   virtual int return_local(int index, int local_count) = 0;

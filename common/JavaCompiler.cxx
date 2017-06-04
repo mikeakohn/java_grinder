@@ -1020,19 +1020,11 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
       case 37: // fload_3 (0x25)
         // Push a local integer variable on the stack
         ret = generator->push_local_var_float(bytes[pc] - 34);
+        break;
 
       case 38: // dload_0 (0x26)
-        UNIMPL()
-        break;
-
       case 39: // dload_1 (0x27)
-        UNIMPL()
-        break;
-
       case 40: // dload_2 (0x28)
-        UNIMPL()
-        break;
-
       case 41: // dload_3 (0x29)
         UNIMPL()
         break;
@@ -1105,7 +1097,15 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         break;
 
       case 56: // fstore (0x38)
-        UNIMPL()
+        // Pop float off stack and store in local variable
+        if (wide == 1)
+        {
+          ret = generator->pop_local_var_float(GET_PC_UINT16(1));
+        }
+          else
+        {
+          ret = generator->pop_local_var_float(bytes[pc+1]);
+        }
         break;
 
       case 57: // dstore (0x39)
@@ -1156,23 +1156,11 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         break;
 
       case 67: // fstore_0 (0x43)
-        UNIMPL()
-        //local_vars[0] = POP_FLOAT_I()
-        break;
-
       case 68: // fstore_1 (0x44)
-        UNIMPL()
-        //local_vars[1] = POP_FLOAT_I()
-        break;
-
       case 69: // fstore_2 (0x45)
-        UNIMPL()
-        //local_vars[2] = POP_FLOAT_I()
-        break;
-
       case 70: // fstore_3 (0x46)
-        UNIMPL()
-        //local_vars[3] = POP_FLOAT_I()
+        // Pop float off stack and store in local variable
+        ret = generator->pop_local_var_float(bytes[pc]-67);
         break;
 
       case 71: // dstore_0 (0x47)
@@ -1305,8 +1293,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
 
       case 98: // fadd (0x62)
         // Pop top two floats from stack, add them, push result
-        // ret = generator->add_floats();
-        UNIMPL()
+        ret = generator->add_float();
         break;
 
       case 99: // dadd (0x63)
@@ -1330,9 +1317,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
 
       case 102: // fsub (0x66)
         // Pop top two floats from stack, subtract them, push result
-        // *(stack-1) - *(stack-0)
-        // ret = generator->sub_floats();
-        UNIMPL()
+        ret = generator->sub_float();
         break;
 
       case 103: // dsub (0x67)
@@ -1355,8 +1340,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
 
       case 106: // fmul (0x6a)
         // Pop top two floats from stack, multiply them, push result
-        // ret = generator->mul_floats();
-        UNIMPL()
+        ret = generator->mul_float();
         break;
 
       case 107: // dmul (0x6b)
@@ -1583,11 +1567,8 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         break;
 
       case 149: // fcmpl (0x95)
-        UNIMPL()
-        break;
-
       case 150: // fcmpg (0x96)
-        UNIMPL()
+        ret = generator->compare_floats(bytes[pc]-149);
         break;
 
       case 151: // dcmpl (0x97)

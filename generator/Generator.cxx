@@ -52,6 +52,30 @@ int Generator::set_float_local(int index, float value)
   return -1;
 }
 
+int Generator::add_float()
+{
+  printf("Error: Floats are not supported on this platform.\n");
+  return -1;
+}
+
+int Generator::sub_float()
+{
+  printf("Error: Floats are not supported on this platform.\n");
+  return -1;
+}
+
+int Generator::mul_float()
+{
+  printf("Error: Floats are not supported on this platform.\n");
+  return -1;
+}
+
+int Generator::compare_floats(int cond)
+{
+  printf("Error: Floats are not supported on this platform.\n");
+  return -1;
+}
+
 int Generator::new_object(const char *object_name, int field_count)
 {
   printf("Error: Object instantiation is not supported on this platform.\n");
