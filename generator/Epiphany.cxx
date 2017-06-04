@@ -509,7 +509,8 @@ int Epiphany::integer_to_short()
 
 int Epiphany::jump_cond(const char *label, int cond, int distance)
 {
-  fprintf(out, "  cmp r%d, #0\n", REG_STACK(reg-1));
+  fprintf(out, "  ;; Compare r%d with 0\n", REG_STACK(reg-1));
+  fprintf(out, "  sub r7, r%d, #0\n", REG_STACK(reg-1));
   reg--;
 
   fprintf(out, "  b%s %s\n", cond_str[cond], label);
