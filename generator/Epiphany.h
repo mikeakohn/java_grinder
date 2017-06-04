@@ -100,6 +100,15 @@ public:
   virtual int array_write_short(const char *name, int field_id);
   virtual int array_write_int(const char *name, int field_id);
 
+  // Parallella
+  virtual int parallella_writeSharedRamByte_IB();
+  virtual int parallella_writeSharedRamShort_IS();
+  virtual int parallella_writeSharedRamInt_II();
+  virtual int parallella_readSharedRamByte_I();
+  virtual int parallella_readSharedRamShort_I();
+  virtual int parallella_readSharedRamInt_I();
+
+
 protected:
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 

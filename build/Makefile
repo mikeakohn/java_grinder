@@ -25,6 +25,7 @@ API= \
   math_.o \
   memory.o \
   msx_.o \
+  parallella.o \
   playstation_2.o \
   propeller_.o \
   sega_genesis.o \

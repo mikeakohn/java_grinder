@@ -25,6 +25,7 @@
 #include "API_Math.h"
 #include "API_Microcontroller.h"
 #include "API_MSX.h"
+#include "API_Parallella.h"
 #include "API_Playstation2.h"
 #include "API_Propeller.h"
 #include "API_SegaGenesis.h"
@@ -44,6 +45,7 @@ class Generator :
   public API_Math,
   public API_Microcontroller,
   public API_MSX,
+  public API_Parallella,
   public API_Playstation2,
   public API_Propeller,
   public API_SegaGenesis,

@@ -22,6 +22,7 @@ JAVA_SRC=\
   $(SRC_DIR)/Math.java \
   $(SRC_DIR)/Memory.java \
   $(SRC_DIR)/MSX.java \
+  $(SRC_DIR)/Parallella.java \
   $(SRC_DIR)/Playstation2.java \
   $(SRC_DIR)/Propeller.java \
   $(SRC_DIR)/SegaGenesis.java \

@@ -29,6 +29,7 @@
 #include "ioport.h"
 #include "memory.h"
 #include "msx_.h"
+#include "parallella.h"
 #include "playstation_2.h"
 #include "propeller_.h"
 #include "sega_genesis.h"
@@ -145,6 +146,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     CHECK_WITH_PORT(UART, uart, 0)
     CHECK_WITH_PORT(UART, uart, 1)
     CHECK(MSX, msx)
+    CHECK(Parallella, parallella)
     CHECK(Playstation2, playstation2)
     CHECK(Propeller, propeller)
     CHECK(SegaGenesis, sega_genesis)
@@ -225,6 +227,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, in
     CHECK_CONST(CPU, cpu)
     CHECK_CONST(CPC, cpc)
     CHECK_CONST(MSX, msx)
+    CHECK_CONST(Parallella, parallella)
     CHECK_CONST(Playstation2, playstation2)
     CHECK_CONST(Propeller, propeller)
     CHECK_CONST(SegaGenesis, sega_genesis)
