@@ -34,7 +34,7 @@
 // r4
 // r5 End of reg stack (extends from r15 to r63)
 // r6 SP / Frame Pointer
-// r7 temp
+// r7 temp / return value from method
 // r8 temp
 // r9 temp
 // r10 statics pointer
@@ -43,6 +43,7 @@
 // r13
 // r14 Link Register
 // r15
+// r63 Points to user interrupt
 
 static const uint8_t reg_stack[] = {
   0, 1, 2, 3, 4, 5,
@@ -52,7 +53,7 @@ static const uint8_t reg_stack[] = {
   36, 37, 38, 39, 40, 41, 42,
   43, 44, 45, 46, 47, 48, 49,
   50, 51, 52, 53, 54, 55, 56,
-  57, 58, 59, 60, 61, 62, 63,
+  57, 58, 59, 60, 61, 62
 };
 
 static const char *cond_str[] = { "eq", "ne", "lt", "le", "gt", "ge" };
@@ -62,7 +63,8 @@ Epiphany::Epiphany() :
   reg_max(9),
   stack(0),
   is_main(0),
-  is_interrupt(0)
+  is_interrupt(0),
+  max_stack(0)
 {
 
 }
@@ -89,18 +91,13 @@ int Epiphany::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 
-  fprintf(out, ".epiphany\n");
+  fprintf(out, ".epiphany\n\n");
 
   // Set where RAM starts / ends
   // FIXME - Not sure what to set this to right now
   //fprintf(out, "ram_start equ 0\n");
   //fprintf(out, "ram_end equ 0x8000\n");
 
-  return 0;
-}
-
-int Epiphany::start_init()
-{
   fprintf(out,
     ".org 0x00\n"
     "  b _sync_interrupt\n"
@@ -121,10 +118,16 @@ int Epiphany::start_init()
     ".org 0x20\n"
     "  b _wand_interrupt\n"
     ".org 0x24\n"
-    "  b _user_interrupt\n\n");
+    "  jr r63\n\n");
 
   fprintf(out, "static_vars:\n");
 
+
+  return 0;
+}
+
+int Epiphany::start_init()
+{
   // Add any set up items (stack, registers, etc).
   fprintf(out,
     ".org 0x2000\n"
@@ -134,7 +137,9 @@ int Epiphany::start_init()
     "  mov r6, #0x8000\n"
     "  ;; Point to Parallella shared segment\n"
     "  mov r11, #0x0000\n"
-    "  movt r11, #0x8e00\n");
+    "  movt r11, #0x8e00\n"
+    "  ;; Set user interrupt to nothing\n"
+    "  mov r63, #_user_interrupt\n");
 
   return 0;
 }
@@ -148,7 +153,6 @@ int Epiphany::insert_static_field_define(const char *name, const char *type, int
 int Epiphany::init_heap(int field_count)
 {
   fprintf(out, "  ;; Setup heap and static initializers\n");
-  //fprintf(out, "  mov #ram_start+%d, &ram_start\n", (field_count + 1) * 2);
   fprintf(out, "  mov r10, #static_vars\n");
 
   return 0;
@@ -179,7 +183,7 @@ int Epiphany::field_init_ref(char *name, int index)
 
 void Epiphany::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
-  //this->max_stack = max_stack;
+  this->max_stack = max_stack;
   printf("max_stack=%d\n", max_stack);
 
   is_interrupt = (strcmp(name, "userInterrupt") == 0) ? 1 : 0;
@@ -271,8 +275,10 @@ int Epiphany::push_double(double f)
 
 int Epiphany::push_ref(char *name)
 {
-  // Need to move the address of name to the top of stack
-  return -1;
+  fprintf(out, "  mov r7, #%s\n", name);
+  fprintf(out, "  ldr r%d, [r7]\n", REG_STACK(reg++));
+
+  return 0;
 }
 
 int Epiphany::pop_local_var_int(int index)
@@ -527,17 +533,53 @@ int Epiphany::ternary(int cond, int compare, int value_true, int value_false)
 
 int Epiphany::return_local(int index, int local_count)
 {
-  return -1;
+  fprintf(out, "  ;; Return local(%d)\n", index);
+  fprintf(out, "  ldr r7, [r6,#%d]\n", index);
+  fprintf(out, "  ;; Release stack\n");
+  fprintf(out, "  add r6, r6, #%d\n", (local_count * 4) + 4);
+  fprintf(out, "  jr r14\n");
+
+  return 0;
 }
 
 int Epiphany::return_integer(int local_count)
 {
-  return -1;
+  fprintf(out, "  ;; Return top of reg stack\n");
+  fprintf(out, "  mov r7, #%d\n", REG_STACK(--reg));
+  fprintf(out, "  ;; Release stack\n");
+  fprintf(out, "  add r6, r6, #%d\n", (local_count * 4) + 4);
+  fprintf(out, "  jr r14\n");
+
+  return 0;
 }
 
 int Epiphany::return_void(int local_count)
 {
-  return -1;
+  if (is_interrupt)
+  {
+    int start = local_count;
+
+    // If this is an interrupt, we have to push all possible registers that
+    // could be in use.  Right now we'll push all temporary registers and
+    // and max_stack registers.  This is bad because if the user calls a
+    // another method in the interrupt that has a bigger max_stack, it
+    // could cause odd results.  Fix later maybe.
+    for (int n = 0; n < max_stack; n++)
+    {
+      fprintf(out, "  str r%d, [r6,#%d]\n", REG_STACK(n), start++);
+    }
+
+    fprintf(out, "  add r6, r6, #%d\n", (local_count * 4) + (max_stack * 4));
+    fprintf(out, "  rti\n");
+  }
+    else
+  {
+    fprintf(out, "  ;; Release stack\n");
+    fprintf(out, "  add r6, r6, #%d\n", (local_count * 4) + 4);
+    fprintf(out, "  jr r14\n");
+  }
+
+  return 0;
 }
 
 int Epiphany::jump(const char *name, int distance)
@@ -558,12 +600,16 @@ int Epiphany::invoke_static_method(const char *name, int params, int is_void)
 
 int Epiphany::put_static(const char *name, int index)
 {
-  return -1;
+  fprintf(out, "  ldr r%d, [r10,#%d]\n", REG_STACK(--reg), index);
+
+  return 0;
 }
 
 int Epiphany::get_static(const char *name, int index)
 {
-  return -1;
+  fprintf(out, "  ldr r%d, [r10,#%d]\n", REG_STACK(reg++), index);
+
+  return 0;
 }
 
 int Epiphany::brk()
@@ -746,6 +792,24 @@ int Epiphany::parallella_readSharedRamFloat_I()
   return parallella_readSharedRamInt_I();
 }
 
+int Epiphany::parallella_setUserInterruptListener_Z()
+{
+  return -1;
+}
+
+int Epiphany::parallella_setUserInterruptListener_Z(int const_value)
+{
+  if (const_value == 0)
+  {
+    fprintf(out, "  mov r63, #_user_interrupt\n");
+  }
+    else
+  {
+    fprintf(out, "  mov r63, #userInterrupt\n");
+  }
+
+  return 0;
+}
 
 
 

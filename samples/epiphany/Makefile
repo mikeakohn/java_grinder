@@ -1,5 +1,9 @@
 
-defauit: Test.class
+defauit: Test.class Mandelbrot.class
+
+mandel: Mandelbrot.class
+	../../java_grinder -v Mandelbrot.class mandelbrot.asm epiphany
+	naken_asm -l -I ../../../naken_asm/include -s -o mandelbrot.srec mandelbrot.asm
 
 grind: Test.class
 	../../java_grinder -v Test.class test.asm epiphany

@@ -36,6 +36,7 @@ JAVA_SRC=\
   $(SRC_DIR)/Timer.java \
   $(SRC_DIR)/TimerListener.java \
   $(SRC_DIR)/TRS80Coco.java \
+  $(SRC_DIR)/UserInterruptListener.java \
   $(SRC_DIR)/UART.java \
   $(SRC_DIR)/UART0.java \
   $(SRC_DIR)/UART1.java

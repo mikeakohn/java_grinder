@@ -43,6 +43,7 @@ int parallella(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(readSharedRamByte,_I)
   CHECK_FUNC(readSharedRamShort,_I)
   CHECK_FUNC(readSharedRamInt,_I)
+  CHECK_FUNC(setUserInterruptListener,_Z)
 
   return -1;
 }
@@ -52,6 +53,7 @@ int parallella(JavaClass *java_class, Generator *generator, char *method_name, i
   //CHECK_FUNC_CONST(readSharedRamByte,_I)
   //CHECK_FUNC_CONST(readSharedRamShort,_I)
   //CHECK_FUNC_CONST(readSharedRamInt,_I)
+  CHECK_FUNC_CONST(setUserInterruptListener,_Z)
 
   return -1;
 }

@@ -27,6 +27,9 @@ public:
   //virtual int parallella_readSharedRamByte_I(int address) { return -1; }
   //virtual int parallella_readSharedRamShort_I(int address) { return -1; }
   //virtual int parallella_readSharedRamInt_I(int address) { return -1; }
+
+  virtual int parallella_setUserInterruptListener_Z() { return -1; }
+  virtual int parallella_setUserInterruptListener_Z(int const_value) { return -1; }
 };
 
 #endif

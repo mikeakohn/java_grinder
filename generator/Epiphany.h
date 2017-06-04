@@ -109,6 +109,8 @@ public:
   virtual int parallella_readSharedRamShort_I();
   virtual int parallella_readSharedRamInt_I();
   virtual int parallella_readSharedRamFloat_I();
+  virtual int parallella_setUserInterruptListener_Z();
+  virtual int parallella_setUserInterruptListener_Z(int const_value);
 
 protected:
   int reg;            // count number of registers are are using as stack
@@ -116,6 +118,7 @@ protected:
   int stack;          // count how many things we put on the stack
   bool is_main : 1;
   bool is_interrupt : 1;
+  int max_stack;
 
   bool immediate_is_possible(int immediate);
   int stack_alu(const char *instr);

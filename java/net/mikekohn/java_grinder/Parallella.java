@@ -31,5 +31,8 @@ public class Parallella
   public static short readSharedRamShort(int address) { return 0; }
   public static int readSharedRamInt(int address) { return 0; }
   public static float readSharedRamFloat(int address) { return 0; }
+
+  /** Enable user interrupts */
+  public static void setUserInterruptListener(boolean enabled) { }
 }
 
