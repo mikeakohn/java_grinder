@@ -146,7 +146,9 @@ int Epiphany::start_init()
 
 int Epiphany::insert_static_field_define(const char *name, const char *type, int index)
 {
-  fprintf(out, "%s equ %d\n", name, (index + 1) * 4);
+  fprintf(out, "%s:\n", name);
+  fprintf(out, "  dw 0\n");
+
   return 0;
 }
 
@@ -194,6 +196,7 @@ void Epiphany::method_start(int local_count, int max_stack, int param_count, con
   if (is_interrupt)
   {
     fprintf(out, "  sub r6, r6, #%d\n", (local_count * 4) + (max_stack * 4));
+    fprintf(out, "  ;; Save register stack\n");
 
     int start = local_count;
 
@@ -233,6 +236,7 @@ int Epiphany::push_local_var_ref(int index)
 
 int Epiphany::push_ref_static(const char *name, int index)
 {
+  fprintf(out, "  ;; push_ref_static(%s,%d)\n", name, index);
   fprintf(out, "  str r%d, [r10,#%d]\n", REG_STACK(reg++), index);
 
   return 0;
@@ -275,6 +279,7 @@ int Epiphany::push_double(double f)
 
 int Epiphany::push_ref(char *name)
 {
+  fprintf(out, "  ;; push_ref(%s)\n", name);
   fprintf(out, "  mov r7, #%s\n", name);
   fprintf(out, "  ldr r%d, [r7]\n", REG_STACK(reg++));
 
@@ -560,6 +565,8 @@ int Epiphany::return_void(int local_count)
   {
     int start = local_count;
 
+    fprintf(out, "  ;; Restore register stack\n");
+
     // If this is an interrupt, we have to push all possible registers that
     // could be in use.  Right now we'll push all temporary registers and
     // and max_stack registers.  This is bad because if the user calls a
@@ -567,7 +574,7 @@ int Epiphany::return_void(int local_count)
     // could cause odd results.  Fix later maybe.
     for (int n = 0; n < max_stack; n++)
     {
-      fprintf(out, "  str r%d, [r6,#%d]\n", REG_STACK(n), start++);
+      fprintf(out, "  ldr r%d, [r6,#%d]\n", REG_STACK(n), start++);
     }
 
     fprintf(out, "  add r6, r6, #%d\n", (local_count * 4) + (max_stack * 4));
@@ -601,6 +608,7 @@ int Epiphany::invoke_static_method(const char *name, int params, int is_void)
 
 int Epiphany::put_static(const char *name, int index)
 {
+  fprintf(out, "  ;; put_static(%s,%d)\n", name, index);
   fprintf(out, "  ldr r%d, [r10,#%d]\n", REG_STACK(--reg), index);
 
   return 0;
@@ -608,6 +616,7 @@ int Epiphany::put_static(const char *name, int index)
 
 int Epiphany::get_static(const char *name, int index)
 {
+  fprintf(out, "  ;; get_static(%s,%d)\n", name, index);
   fprintf(out, "  ldr r%d, [r10,#%d]\n", REG_STACK(reg++), index);
 
   return 0;
