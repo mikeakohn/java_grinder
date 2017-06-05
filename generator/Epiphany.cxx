@@ -679,7 +679,7 @@ int Epiphany::return_void(int local_count)
     fprintf(out, "  ldr r8, [r6,#%d]\n", start++);
     fprintf(out, "  ldr r9, [r6,#%d]\n", start++);
 
-    fprintf(out, "  add r6, r6, #%d\n", (local_count * 4) + (max_stack * 4) + 4);
+    fprintf(out, "  add r6, r6, #%d\n", (local_count * 4) + (max_stack * 4) + 12);
     fprintf(out, "  rti\n");
   }
     else
@@ -876,21 +876,21 @@ int Epiphany::parallella_writeSharedRamFloat_IF()
 
 int Epiphany::parallella_readSharedRamByte_I()
 {
-  fprintf(out, "  ldrb r%d, [r11,r%d]\n", REG_STACK(reg), REG_STACK(reg));
+  fprintf(out, "  ldrb r%d, [r11,r%d]\n", REG_STACK(reg - 1), REG_STACK(reg - 1));
 
   return 0;
 }
 
 int Epiphany::parallella_readSharedRamShort_I()
 {
-  fprintf(out, "  ldrh r%d, [r11,r%d]\n", REG_STACK(reg), REG_STACK(reg));
+  fprintf(out, "  ldrh r%d, [r11,r%d]\n", REG_STACK(reg - 1), REG_STACK(reg - 1));
 
   return 0;
 }
 
 int Epiphany::parallella_readSharedRamInt_I()
 {
-  fprintf(out, "  ldr r%d, [r11,r%d]\n", REG_STACK(reg), REG_STACK(reg));
+  fprintf(out, "  ldr r%d, [r11,r%d]\n", REG_STACK(reg - 1), REG_STACK(reg - 1));
 
   return 0;
 }
@@ -909,8 +909,10 @@ int Epiphany::parallella_getCoreId()
     "  lsr r7, r9, #6\n"
     "  and r7, r7, r8\n"
     "  sub r7, r7, #32\n"
+    "  lsl r7, r7, #2\n"
     "  and r9, r9, r8\n"
-    "  sub r%d, r9, #8\n", REG_STACK(reg++));
+    "  sub r9, r9, #8\n"
+    "  add r%d, r7, r9\n", REG_STACK(reg++));
 
   return 0;
 }
