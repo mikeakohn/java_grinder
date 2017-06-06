@@ -84,6 +84,8 @@ Epiphany::~Epiphany()
     "_user_interrupt:\n"
     "  rti\n\n");
 
+  fprintf(out, ".align 32\n");
+
   insert_constants_pool();
 }
 
@@ -136,6 +138,8 @@ int Epiphany::start_init()
     "start:\n"
     "  ;; Setup stack pointer\n"
     "  mov r6, #0x8000\n"
+    "  ;; Point to constant pool\n"
+    "  mov r12, #_constant_pool\n"
     "  ;; Point to Parallella shared segment\n"
     "  mov r11, #0x0000\n"
     "  movt r11, #0x8e00\n"
@@ -264,12 +268,15 @@ int Epiphany::push_ref_static(const char *name, int index)
 
 int Epiphany::push_fake()
 {
+  fprintf(out, "  ;; push_fake()\n");
+
   reg++;
   return 0;
 }
 
 int Epiphany::push_int(int32_t n)
 {
+  fprintf(out, "  ;; push_int(%d)\n", n);
   fprintf(out, "  mov r%d, #%d\n", REG_STACK(reg), n & 0xffff);
 
   if ((n & 0xffff0000) != 0)
@@ -370,7 +377,7 @@ int Epiphany::swap()
 int Epiphany::add_integer()
 {
   fprintf(out, "  ;; add_integer()\n");
-  fprintf(out, "  iadd r%d, r%d, r%d\n",
+  fprintf(out, "  add r%d, r%d, r%d\n",
      REG_STACK(reg - 2), REG_STACK(reg - 2), REG_STACK(reg - 1));
 
   reg--;
@@ -390,7 +397,7 @@ int Epiphany::add_integer(int num)
 int Epiphany::sub_integer()
 {
   fprintf(out, "  ;; sub_integer()\n");
-  fprintf(out, "  isub r%d, r%d, r%d\n",
+  fprintf(out, "  sub r%d, r%d, r%d\n",
      REG_STACK(reg - 2), REG_STACK(reg - 2), REG_STACK(reg - 1));
 
   reg--;
@@ -535,7 +542,7 @@ int Epiphany::inc_integer(int index, int num)
 {
   fprintf(out, "  ;; inc_integer()\n");
   fprintf(out, "  ldr r8, [r6,#%d]\n", index);
-  fprintf(out, "  add r8, r8, #1\n");
+  fprintf(out, "  add r8, r8, #%d\n", num);
   fprintf(out, "  str r8, [r6,#%d]\n", index);
 
   return 0;
@@ -543,7 +550,14 @@ int Epiphany::inc_integer(int index, int num)
 
 int Epiphany::integer_to_byte()
 {
-  return -1;
+  // There must be a cleaner way to do this.
+  fprintf(out, "  ;; integer_to_byte()\n");
+  fprintf(out, "  mov r7, #127\n");
+  fprintf(out, "  sub r7, r7, r%d\n", REG_STACK(reg-1));
+  fprintf(out, "  lsr r7, r7, #7\n");
+  fprintf(out, "  lsl r7, r7, #7\n");
+  fprintf(out, "  orr r%d, r%d, r7\n", REG_STACK(reg-1), REG_STACK(reg-1));
+  return 0;
 }
 
 int Epiphany::integer_to_short()
@@ -574,7 +588,7 @@ int Epiphany::sub_float()
 
 int Epiphany::mul_float()
 {
-  fprintf(out, "  ;; sub_float()\n");
+  fprintf(out, "  ;; mul_float()\n");
   fprintf(out, "  fmul r%d, r%d, r%d\n",
      REG_STACK(reg - 2), REG_STACK(reg - 2), REG_STACK(reg - 1));
 
@@ -597,7 +611,7 @@ int Epiphany::jump_cond_integer(const char *label, int cond, int distance)
 {
   fprintf(out, "  ;; Compare r%d with r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
   fprintf(out, "  sub r7, r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
-  reg--;
+  reg -= 2;
 
   fprintf(out, "  b%s %s\n", cond_str[cond], label);
   return 0;
@@ -607,7 +621,7 @@ int Epiphany::compare_floats(int cond)
 {
   fprintf(out, "  ;; compare_float()\n");
 
-  if (cond == 0)
+  if (cond == 1)
   {
     fprintf(out, "  fsub r7, r%d, r%d\n", REG_STACK(reg - 2), REG_STACK(reg - 1));
   }
@@ -844,6 +858,7 @@ int Epiphany::parallella_writeSharedRamByte_IB()
   int reg_data = --reg;
   int reg_offset = --reg;
 
+  fprintf(out, "  ;; writeSharedRamByte()\n");
   fprintf(out, "  strb r%d, [r11,r%d]\n", REG_STACK(reg_data), REG_STACK(reg_offset));
 
   return 0;
@@ -854,6 +869,7 @@ int Epiphany::parallella_writeSharedRamShort_IS()
   int reg_data = --reg;
   int reg_offset = --reg;
 
+  fprintf(out, "  ;; writeSharedRamShort()\n");
   fprintf(out, "  strh r%d, [r11,r%d]\n", REG_STACK(reg_data), REG_STACK(reg_offset));
 
   return 0;
@@ -864,6 +880,7 @@ int Epiphany::parallella_writeSharedRamInt_II()
   int reg_data = --reg;
   int reg_offset = --reg;
 
+  fprintf(out, "  ;; writeSharedRamint()\n");
   fprintf(out, "  str r%d, [r11,r%d]\n", REG_STACK(reg_data), REG_STACK(reg_offset));
 
   return 0;
@@ -876,6 +893,7 @@ int Epiphany::parallella_writeSharedRamFloat_IF()
 
 int Epiphany::parallella_readSharedRamByte_I()
 {
+  fprintf(out, "  ;; readSharedRamByte()\n");
   fprintf(out, "  ldrb r%d, [r11,r%d]\n", REG_STACK(reg - 1), REG_STACK(reg - 1));
 
   return 0;
@@ -883,6 +901,7 @@ int Epiphany::parallella_readSharedRamByte_I()
 
 int Epiphany::parallella_readSharedRamShort_I()
 {
+  fprintf(out, "  ;; readSharedRamShort()\n");
   fprintf(out, "  ldrh r%d, [r11,r%d]\n", REG_STACK(reg - 1), REG_STACK(reg - 1));
 
   return 0;
@@ -890,6 +909,7 @@ int Epiphany::parallella_readSharedRamShort_I()
 
 int Epiphany::parallella_readSharedRamInt_I()
 {
+  fprintf(out, "  ;; readSharedRamInt()\n");
   fprintf(out, "  ldr r%d, [r11,r%d]\n", REG_STACK(reg - 1), REG_STACK(reg - 1));
 
   return 0;
@@ -924,6 +944,8 @@ int Epiphany::parallella_setUserInterruptListener_Z()
 
 int Epiphany::parallella_setUserInterruptListener_Z(int const_value)
 {
+  fprintf(out, "  ;; setUserInterruptListener()\n");
+
   if (const_value == 0)
   {
     fprintf(out, "  mov r63, #_user_interrupt\n");

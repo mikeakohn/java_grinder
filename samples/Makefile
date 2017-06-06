@@ -34,6 +34,7 @@ clean:
 	@cd atari_2600 && make clean
 	@cd c64 && make clean
 	@cd dspic && make clean
+	@cd epiphany && make clean
 	@cd misc && make clean
 	@cd msp430 && make clean
 	@cd pic32 && make clean

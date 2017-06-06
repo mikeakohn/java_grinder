@@ -8,26 +8,30 @@ public class Mandelbrot implements UserInterruptListener
 
   public static void main(String args[])
   {
+    int data;
     float real_start;
     float imaginary_start;
     float real_inc;
     int data_count;
     int core_id;
-    int data;
     int picture_start, picture;
     int n;
 
-    n = 0;
+    // n = 0;
 
     core_id = Parallella.getCoreId();
-    data = 2048 * core_id;
+    //data = 2048 * core_id;
+    data = core_id << 11;
     picture_start = data + 1024;
 
     Parallella.setUserInterruptListener(true);
+    Parallella.writeSharedRamInt(data + 16, 1);
 
     while(true)
     {
       while(start_signal == false);
+
+      start_signal = false;
 
       picture = picture_start;
 
@@ -52,9 +56,10 @@ public class Mandelbrot implements UserInterruptListener
           zi = ti + imaginary_start;
 
           if ((zr * zr) + (zi * zi) > 4) { break; }
+          count--;
         }
 
-        Parallella.writeSharedRamInt(picture, count >> 3);
+        Parallella.writeSharedRamByte(picture, (byte)(count >> 3));
         real_start += real_inc;
 
         picture++;
