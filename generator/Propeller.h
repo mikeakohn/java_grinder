@@ -3,9 +3,9 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
- * Copyright 2014-2016 by Michael Kohn
+ * Copyright 2014-2017 by Michael Kohn
  *
  */
 
@@ -141,6 +141,10 @@ protected:
   int reg_max;        // size of register stack 
   std::vector<std::string> statics;
   bool is_main : 1;
+  bool need_muls : 1;
+
+private:
+  int add_muls();
 };
 
 #endif

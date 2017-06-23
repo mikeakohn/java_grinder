@@ -3,9 +3,9 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
- * Copyright 2014-2016 by Michael Kohn
+ * Copyright 2014-2017 by Michael Kohn
  *
  */
 
@@ -45,7 +45,8 @@
 Propeller::Propeller() :
   reg(0),
   reg_max(0),
-  is_main(0)
+  is_main(0),
+  need_muls(0)
 {
 
 }
@@ -53,6 +54,11 @@ Propeller::Propeller() :
 Propeller::~Propeller()
 {
   int n;
+
+  if (need_muls)
+  {
+    add_muls();
+  }
 
   fprintf(out, "  ;; Constants\n");
   for (std::map<uint32_t,int>::iterator it = constants_pool.begin();
@@ -269,7 +275,9 @@ int Propeller::sub_integer(int num)
 
 int Propeller::mul_integer()
 {
-  return -1;
+  fprintf(out, "  call _muls_ret, #_muls\n");
+
+  return 0;
 }
 
 int Propeller::div_integer()
@@ -779,4 +787,55 @@ int Propeller::ioport_getPortInputValue(int port)
 
   return 0;
 }
+
+int Propeller::add_muls()
+{
+  reg -= 1;
+
+  fprintf(out,
+    "_muls:\n"
+    "  mov _is_neg, #0\n"
+    "  cmps reg_%d, #0, wc wz\n"
+    "  if_b xor _is_neg, #1\n"
+    "  cmps reg_%d, #0, wc wz\n"
+    "  if_b xor _is_neg, #1\n",
+    reg, reg - 1);
+
+  fprintf(out,
+    "  abs reg_%d, reg_%d\n"
+    "  abs reg_%d, reg_%d\n"
+    "  and reg_%d, _mask16\n"
+    "  and reg_%d, _mask16\n",
+    reg - 3, reg - 2,
+    reg - 2, reg - 1,
+    reg - 3,
+    reg - 2);
+
+  fprintf(out, "  mov reg_%d, #0\n", reg - 1);
+
+  fprintf(out,
+    "_repeat_muls:\n"
+    "  shr reg_%d, #1, wc wz\n"
+    "  if_c add reg_%d, reg_%d\n"
+    "  shl reg_%d, #1\n"
+    "  if_nz jmp #repeat_muls\n",
+    reg - 2,
+    reg - 1, reg - 3,
+    reg - 3);
+
+  fprintf(out,
+    "  cmp _is_neg, #1, wz\n"
+    "  if_e neg reg_%d, reg_%d\n\n"
+    "_muls_ret:\n",
+    reg - 1, reg - 1);
+
+  fprintf(out,
+    "_mask16:\n"
+    "  dc32 0xffff\n"
+    "_is_neg:\n"
+    "  dc32 0xffff\n");
+
+  return 0;
+}
+
 
