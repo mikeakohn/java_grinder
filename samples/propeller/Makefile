@@ -11,6 +11,12 @@ mandel: Mandelbrot.class
 	openspin ../../../naken_asm/samples/propeller/mandelbrot.spin -o mandelbrot.binary
 	propeller-load -r -p /dev/ttyUSB0 mandelbrot.binary
 
+flip_blink: FlipBlink.class
+	../../java_grinder -v FlipBlink.class flip_blink_code.asm propeller
+	naken_asm -l -b -o flip_blink_code.bin flip_blink_code.asm
+	openspin ../../../naken_asm/samples/propeller/flip_blink.spin -o flip_blink.binary
+	propeller-load -r -p /dev/ttyUSB0 flip_blink.binary
+
 %.class: %.java
 	javac -classpath ../../build/JavaGrinder.jar:. $*.java
 
