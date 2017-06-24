@@ -140,6 +140,7 @@ public:
 protected:
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 
+  std::string method_name;
   std::vector<std::string> statics;
   bool is_main : 1;
   bool need_muls : 1;
