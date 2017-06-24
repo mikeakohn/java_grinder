@@ -1,4 +1,3 @@
-
 import net.mikekohn.java_grinder.CPU;
 import net.mikekohn.java_grinder.IOPort0;
 import net.mikekohn.java_grinder.Propeller;
@@ -14,7 +13,6 @@ public class JavaPropellerDemo
     led = 1 << 16;
 
     IOPort0.setPinsAsOutput(0xff << 16);
-    //IOPort0.setPinsHigh(1 << 21);
     IOPort0.setPinsHigh(1 << 21);
     IOPort0.setPinsHigh(1 << 18);
 
@@ -35,14 +33,6 @@ public class JavaPropellerDemo
         IOPort0.setPinsValue(led);
         led = led >> 1;
       }
-/*
-      IOPort0.setPinsLow(1 << 22);
-      for (delay = 0xffff; delay != 0; delay--);
-      //count = Propeller.waitCount(count, 0xffff);
-      IOPort0.setPinsHigh(1 << 22);
-      for (delay = 0xffff; delay != 0; delay--);
-      //count = Propeller.waitCount(count, 0xffff);
-*/
     }
   }
 }
