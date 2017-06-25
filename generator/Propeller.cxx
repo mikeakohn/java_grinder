@@ -200,7 +200,7 @@ int Propeller::push_local_var_int(int index)
 
   if (index == 0)
   {
-    fprintf(out, "  movd label_%d, _stack_ptr\n", label_count);
+    fprintf(out, "  movs label_%d, _stack_ptr\n", label_count);
   }
     else
   {
@@ -494,6 +494,8 @@ int Propeller::inc_integer(int index, int num)
 {
   index = local_count - index - 1;
 
+  fprintf(out, "  ;; inc_integer(%d, %d)\n", index, num);
+
   if (index == 0)
   {
     fprintf(out, "  movd label_%d, _stack_ptr\n", label_count);
@@ -506,7 +508,16 @@ int Propeller::inc_integer(int index, int num)
   }
 
   fprintf(out, "label_%d:\n", label_count);
-  fprintf(out, "  adds 0, #%d\n", num);
+
+  if (num >= 0 && num < 512)
+  {
+    fprintf(out, "  adds 0, #%d\n", num);
+  }
+    else
+  {
+    get_constant(num);
+    fprintf(out, "  adds 0, _const_%x\n", num);
+  }
 
   label_count++;
 
@@ -615,7 +626,7 @@ int Propeller::return_local(int index, int local_count)
   {
     fprintf(out, "  mov _temp0, _stack_ptr\n");
     fprintf(out, "  add _temp0, #%d\n", index);
-    fprintf(out, "  movd label_%d, _temp0\n", label_count);
+    fprintf(out, "  movs label_%d, _temp0\n", label_count);
   }
 
   fprintf(out, "label_%d:\n", label_count);
@@ -699,6 +710,8 @@ int Propeller::invoke_static_method(const char *name, int params, int is_void)
   }
 
   fprintf(out, "  call %s_ret, #%s\n", name, name);
+
+  fprintf(out, "  add _stack_ptr, #%d\n", params);
 
   // Restore registers
   for (n = 0; n < reg - params; n++)
@@ -995,7 +1008,7 @@ int Propeller::ioport_setPinsHigh_I(int port)
 int Propeller::ioport_setPinsHigh_I(int port, int value)
 {
   CHECK_PORT();
-  if (value >= 0 && value <= 255)
+  if (value >= 0 && value <= 511)
   {
     fprintf(out, "  or _out%c, #0x%02x\n", p, value);
   }
@@ -1013,6 +1026,22 @@ int Propeller::ioport_setPinsLow_I(int port)
   CHECK_PORT();
   fprintf(out, "  andn _out%c, reg_%d\n", p, reg - 1);
   reg--;
+
+  return 0;
+}
+
+int Propeller::ioport_setPinsLow_I(int port, int value)
+{
+  CHECK_PORT();
+  if (value >= 0 && value <= 511)
+  {
+    fprintf(out, "  andn _out%c, #0x%02x\n", p, value);
+  }
+    else
+  {
+    get_constant(value);
+    fprintf(out, "  andn _out%c, _const_%x\n", p, value);
+  }
 
   return 0;
 }

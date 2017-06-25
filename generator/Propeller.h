@@ -130,6 +130,7 @@ public:
   virtual int ioport_setPinsHigh_I(int port);
   virtual int ioport_setPinsHigh_I(int port, int value);
   virtual int ioport_setPinsLow_I(int port);
+  virtual int ioport_setPinsLow_I(int port, int value);
   //virtual int ioport_setPinAsOutput_I(int port);
   //virtual int ioport_setPinAsInput_I(int port);
   //virtual int ioport_setPinHigh_I(int port);
