@@ -140,6 +140,8 @@ public:
 protected:
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 
+  int local_count;    // number of locals in the current method
+  int extra_stack;    // stack space allocated at start of method
   std::string method_name;
   std::vector<std::string> statics;
   bool is_main : 1;

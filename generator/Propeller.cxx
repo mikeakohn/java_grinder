@@ -163,13 +163,30 @@ void Propeller::method_start(int local_count, int max_stack, int param_count, co
 
   is_main = (strcmp(name, "main") == 0);
 
+  if (is_main)
+  {
+    extra_stack = local_count;
+  }
+    else
+  {
+    extra_stack = local_count - param_count;
+  }
+
+  if (extra_stack < 0)
+  {
+    printf("Internal Error: %s:%d\n", __FILE__, __LINE__);
+    exit(1);
+  }
+
   fprintf(out, "  ;; method_start() local_count=%d is_main=%d\n", local_count, is_main);
   fprintf(out, "%s:\n", name);
 
-  if (local_count != 0)
+  if (extra_stack != 0)
   {
-    fprintf(out, "  sub _stack_ptr, #%d\n", local_count);
+    fprintf(out, "  sub _stack_ptr, #%d\n", extra_stack);
   }
+
+  this->local_count = local_count;
 }
 
 void Propeller::method_end(int local_count)
@@ -179,6 +196,8 @@ void Propeller::method_end(int local_count)
 
 int Propeller::push_local_var_int(int index)
 {
+  index = local_count - index - 1;
+
   if (index == 0)
   {
     fprintf(out, "  movd label_%d, _stack_ptr\n", label_count);
@@ -218,6 +237,8 @@ int Propeller::push_fake()
 
 int Propeller::set_integer_local(int index, int value)
 {
+  index = local_count - index - 1;
+
   if (index == 0)
   {
     fprintf(out, "  movd label_%d, _stack_ptr\n", label_count);
@@ -278,6 +299,8 @@ int Propeller::push_ref(char *name)
 
 int Propeller::pop_local_var_int(int index)
 {
+  index = local_count - index - 1;
+
   if (index == 0)
   {
     fprintf(out, "  movd label_%d, _stack_ptr\n", label_count);
@@ -467,6 +490,8 @@ int Propeller::xor_integer(int num)
 
 int Propeller::inc_integer(int index, int num)
 {
+  index = local_count - index - 1;
+
   if (index == 0)
   {
     fprintf(out, "  movd label_%d, _stack_ptr\n", label_count);
@@ -578,6 +603,8 @@ int Propeller::ternary(int cond, int compare, int value_true, int value_false)
 
 int Propeller::return_local(int index, int local_count)
 {
+  index = local_count - index - 1;
+
   if (index == 0)
   {
     fprintf(out, "  movs label_%d, _stack_ptr\n", label_count);
@@ -594,6 +621,11 @@ int Propeller::return_local(int index, int local_count)
 
   label_count++;
 
+  if (extra_stack != 0)
+  {
+    fprintf(out, "  add _stack_ptr, #%d\n", extra_stack);
+  }
+
   if (!is_main)
   {
     fprintf(out, "%s_ret:\n", method_name.c_str());
@@ -608,6 +640,11 @@ int Propeller::return_integer(int local_count)
 {
   fprintf(out, "  mov _temp0, reg_%d\n", --reg);
 
+  if (extra_stack != 0)
+  {
+    fprintf(out, "  add _stack_ptr, #%d\n", extra_stack);
+  }
+
   if (!is_main)
   {
     fprintf(out, "%s_ret:\n", method_name.c_str());
@@ -620,9 +657,9 @@ int Propeller::return_integer(int local_count)
 
 int Propeller::return_void(int local_count)
 {
-  if (local_count != 0)
+  if (extra_stack != 0)
   {
-    fprintf(out, "  add _stack_ptr, #%d\n", local_count);
+    fprintf(out, "  add _stack_ptr, #%d\n", extra_stack);
   }
 
   if (!is_main)
@@ -650,8 +687,10 @@ int Propeller::invoke_static_method(const char *name, int params, int is_void)
 {
   int n;
 
+  fprintf(out, "  ;; invoke_static_method(%s, %d, %d)\n", name, params, is_void);
+
   // Save any unused registers
-  for (n = 0; n < reg - params; n++)
+  for (n = 0; n < reg; n++)
   {
     fprintf(out, "  sub _stack_ptr, #1\n");
     fprintf(out, "  mov _stack_ptr, reg_%d\n", n);
@@ -666,9 +705,11 @@ int Propeller::invoke_static_method(const char *name, int params, int is_void)
     fprintf(out, "  add _stack_ptr, #1\n");
   }
 
+  reg -= params;
+
   if (is_void == 0)
   {
-    fprintf(out, "  mov reg_%d, _temp_0\n", reg++);
+    fprintf(out, "  mov reg_%d, _temp0\n", reg++);
   }
 
   return 0;

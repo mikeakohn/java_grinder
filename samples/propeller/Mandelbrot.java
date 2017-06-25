@@ -3,6 +3,12 @@ import net.mikekohn.java_grinder.IOPort0;
 
 public class Mandelbrot
 {
+  static final int DATA = 1;
+  static final int CLK = 2;
+  static final int CS = 4;
+  static final int DC = 8;
+  static final int RES = 16;
+
 /*
   public static short[] palette =
   {
@@ -80,14 +86,43 @@ public class Mandelbrot
 
     while(true)
     {
-      for (i = 0; i < 300000; i++);
-      IOPort0.setPinsValue(1 << 26);
-      for (i = 0; i < 300000; i++);
-      IOPort0.setPinsValue(1 << 27);
+      for (i = 0; i < 100000; i++);
+      IOPort0.setPinsLow(1 << 26);
+      IOPort0.setPinsHigh(1 << 27);
+
+      sendData(0xff);
+      sendData(0x00);
+
+      for (i = 0; i < 100000; i++);
+      IOPort0.setPinsHigh(1 << 26);
+      IOPort0.setPinsLow(1 << 27);
+    }
+  }
+
+  static public void sendData(int data)
+  {
+    int i;
+
+    IOPort0.setPinsHigh(DC);
+    IOPort0.setPinsLow(CS);
+
+    for (i = 0; i < 8; i++)
+    {
+      if ((data & 0x80) != 0)
+      {
+        IOPort0.setPinsHigh(DATA);
+      }
+        else
+      {
+        IOPort0.setPinsLow(DATA);
+      }
+
+      IOPort0.setPinsLow(CLK);
+      data = data << 1;
+      IOPort0.setPinsHigh(CLK);
     }
 
+    IOPort0.setPinsHigh(CS);
   }
 }
-
-
 
