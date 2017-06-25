@@ -377,6 +377,8 @@ int Propeller::sub_integer(int num)
 
 int Propeller::mul_integer()
 {
+  need_muls = 1;
+
   fprintf(out, "  call _muls_ret, #_muls\n");
 
   return 0;
@@ -1063,7 +1065,7 @@ int Propeller::add_muls()
     "  shr reg_%d, #1, wc wz\n"
     "  if_c add reg_%d, reg_%d\n"
     "  shl reg_%d, #1\n"
-    "  if_nz jmp #repeat_muls\n",
+    "  if_nz jmp #_repeat_muls\n",
     reg - 2,
     reg - 1, reg - 3,
     reg - 3);

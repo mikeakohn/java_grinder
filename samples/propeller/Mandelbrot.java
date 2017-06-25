@@ -15,8 +15,9 @@ public class Mandelbrot
     0x000, 0x04e, 0x044, 0x040, 0x440, 0x880, 0x808, 0xe0e,
     0xe4e, 0x02e, 0x88e, 0x444, 0xe40, 0xee0, 0x400, 0x000,
   };
+*/
 
-  public static void run()
+  static public void main(String args[])
   {
     final int DEC_PLACE = 10;
     int x,y;
@@ -29,24 +30,27 @@ public class Mandelbrot
     final int i0 = (-1 << DEC_PLACE);
     final int r1 = (1 << DEC_PLACE);
     final int i1 = (1 << DEC_PLACE);
-    int dx = (r1 - r0) / 320;
-    int dy = (i1 - i0) / 224;
+    int dx = (r1 - r0) / 96;
+    int dy = (i1 - i0) / 64;
+    int i;
 
-    SegaGenesis.initBitmap();
-    SegaGenesis.setPaletteColors(Mandelbrots.palette);
+    IOPort0.setPinsAsOutput(0x1f | (1 << 26) | (1 << 27));
+    IOPort0.setPinsHigh(1 << 26);
 
     is = i0;
 
-    for (y = 0; y < 224; y++)
+    for (y = 0; y < 64; y++)
     {
       rs = r0;
 
-      for (x = 0; x < 320; x++)
+      for (x = 0; x < 96; x++)
       {
         zr = 0;
         zi = 0;
 
-        for (count = 0; count < 16; count++)
+        count = 127;
+
+        while(count != 0)
         {
           zr2 = (zr * zr) >> DEC_PLACE;
           zi2 = (zi * zi) >> DEC_PLACE;
@@ -58,14 +62,12 @@ public class Mandelbrot
 
           zr = tr + rs;
           zi = ti + is;
+
+          count--;
         }
 
-        //if (count == 16) { count = 15; }
-
-        if (count < 15)
-        {
-          SegaGenesis.plot(x, y, count);
-        }
+        sendData((count & 0xf) << 3);
+        sendData(count >> 4);
 
         rs += dx;
       }
@@ -73,25 +75,11 @@ public class Mandelbrot
       is += dy;
     }
 
-    Common.wait(60);
-  }
-*/
-
-  static public void main(String args[])
-  {
-    int i;
-
-    IOPort0.setPinsAsOutput(0x1f | (1 << 26) | (1 << 27));
-    IOPort0.setPinsHigh(1 << 26);
-
     while(true)
     {
       for (i = 0; i < 100000; i++);
       IOPort0.setPinsLow(1 << 26);
       IOPort0.setPinsHigh(1 << 27);
-
-      sendData(0xff);
-      sendData(0x00);
 
       for (i = 0; i < 100000; i++);
       IOPort0.setPinsHigh(1 << 26);
