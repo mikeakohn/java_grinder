@@ -154,6 +154,7 @@ int Propeller::field_init_int(char *name, int index, int value)
 
 int Propeller::field_init_ref(char *name, int index)
 {
+  fprintf(out, "  mov _static_%s, #_%s\n", name, name);
   return -1;
 }
 
