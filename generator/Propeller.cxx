@@ -392,7 +392,54 @@ int Propeller::mul_integer()
 {
   need_muls = 1;
 
-  fprintf(out, "  call _muls_ret, #_muls\n");
+  //fprintf(out, "  call _muls_ret, #_muls\n");
+
+  // It takes almost as many instructions to set up a function
+  // call to this code as it would to just inline it.
+
+  if (reg + 1 > reg_max) { reg_max = reg + 1; }
+
+  reg -= 1;
+
+  fprintf(out,
+    "  ;; mul_integer()\n"
+    "  mov _temp0, #0\n"
+    "  cmps reg_%d, #0, wc wz\n"
+    "  if_b xor _temp0, #1\n"
+    "  cmps reg_%d, #0, wc wz\n"
+    "  if_b xor _temp0, #1\n",
+    reg, reg - 1);
+
+  fprintf(out,
+    "  abs reg_%d, reg_%d\n"
+    "  abs reg_%d, reg_%d\n"
+    "  and reg_%d, _mask16\n"
+    "  and reg_%d, _mask16\n",
+    reg + 1, reg - 1,
+    reg, reg,
+    reg + 1,
+    reg);
+
+  fprintf(out, "  mov reg_%d, #0\n", reg - 1);
+
+  fprintf(out,
+    "_repeat_muls_%d:\n"
+    "  shr reg_%d, #1, wc wz\n"
+    "  if_c add reg_%d, reg_%d\n"
+    "  shl reg_%d, #1\n"
+    "  if_nz jmp #_repeat_muls_%d\n",
+    label_count,
+    reg + 1,
+    reg - 1, reg,
+    reg,
+    label_count);
+
+  fprintf(out,
+    "  cmp _temp0, #1, wz\n"
+    "  if_e neg reg_%d, reg_%d\n",
+    reg - 1, reg - 1);
+
+  label_count++;
 
   return 0;
 }
@@ -415,6 +462,7 @@ int Propeller::neg_integer()
 
 int Propeller::shift_left_integer()
 {
+  fprintf(out, "  ;; shift_left_integer()\n");
   fprintf(out, "  shl reg_%d, reg_%d\n", reg - 2, reg - 1);
   reg--;
   return 0;
@@ -424,12 +472,14 @@ int Propeller::shift_left_integer(int num)
 {
   if (num < -256 || num > 255) { return -1; }
 
+  fprintf(out, "  ;; shift_left_integer(%d)\n", num);
   fprintf(out, "  shl reg_%d, #%d\n", reg - 1, num);
   return 0;
 }
 
 int Propeller::shift_right_integer()
 {
+  fprintf(out, "  ;; shift_right_integer()\n");
   fprintf(out, "  sar reg_%d, reg_%d\n", reg - 2, reg - 1);
   reg--;
   return 0;
@@ -439,12 +489,14 @@ int Propeller::shift_right_integer(int num)
 {
   if (num < -256 || num > 255) { return -1; }
 
+  fprintf(out, "  ;; shift_right_integer(%d)\n", num);
   fprintf(out, "  sar reg_%d, #%d\n", reg - 1, num);
   return 0;
 }
 
 int Propeller::shift_right_uinteger()
 {
+  fprintf(out, "  ;; shift_right_uinteger()\n");
   fprintf(out, "  shr reg_%d, reg_%d\n", reg - 2, reg - 1);
   reg--;
   return 0;
@@ -454,12 +506,14 @@ int Propeller::shift_right_uinteger(int num)
 {
   if (num < -256 || num > 255) { return -1; }
 
+  fprintf(out, "  ;; shift_right_uinteger(%d)\n", num);
   fprintf(out, "  shr reg_%d, #%d\n", reg - 1, num);
   return 0;
 }
 
 int Propeller::and_integer()
 {
+  fprintf(out, "  ;; and_integer()\n");
   fprintf(out, "  and reg_%d, reg_%d\n", reg - 2, reg - 1);
   reg--;
   return 0;
@@ -469,12 +523,14 @@ int Propeller::and_integer(int num)
 {
   if (num < -256 || num > 255) { return -1; }
 
+  fprintf(out, "  ;; and_integer(%d)\n", num);
   fprintf(out, "  and reg_%d, #%d\n", reg - 1, num);
   return 0;
 }
 
 int Propeller::or_integer()
 {
+  fprintf(out, "  ;; or_integer()\n");
   fprintf(out, "  or reg_%d, reg_%d\n", reg - 2, reg - 1);
   reg--;
   return 0;
@@ -484,12 +540,14 @@ int Propeller::or_integer(int num)
 {
   if (num < -256 || num > 255) { return -1; }
 
+  fprintf(out, "  ;; or_integer(%d)\n", num);
   fprintf(out, "  or reg_%d, #%d\n", reg - 1, num);
   return 0;
 }
 
 int Propeller::xor_integer()
 {
+  fprintf(out, "  ;; xor_integer()\n");
   fprintf(out, "  xor reg_%d, reg_%d\n", reg - 2, reg - 1);
   reg--;
   return 0;
@@ -499,6 +557,7 @@ int Propeller::xor_integer(int num)
 {
   if (num < -256 || num > 255) { return -1; }
 
+  fprintf(out, "  ;; xor_integer(%d)\n", num);
   fprintf(out, "  xor reg_%d, #%d\n", reg - 1, num);
   return 0;
 }
@@ -1091,6 +1150,7 @@ int Propeller::ioport_getPortInputValue(int port)
 
 int Propeller::add_muls()
 {
+/*
   reg -= 1;
 
   fprintf(out,
@@ -1129,6 +1189,7 @@ int Propeller::add_muls()
     "  if_e neg reg_%d, reg_%d\n\n"
     "_muls_ret:\n",
     reg - 1, reg - 1);
+*/
 
   fprintf(out,
     "_mask16:\n"
