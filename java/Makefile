@@ -39,7 +39,8 @@ JAVA_SRC=\
   $(SRC_DIR)/UserInterruptListener.java \
   $(SRC_DIR)/UART.java \
   $(SRC_DIR)/UART0.java \
-  $(SRC_DIR)/UART1.java
+  $(SRC_DIR)/UART1.java \
+  $(SRC_DIR)/Watchdog.java
 
 default:
 	javac -classpath . -d ../build $(JAVA_SRC) 

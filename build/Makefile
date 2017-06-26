@@ -36,7 +36,8 @@ API= \
   ti99_.o \
   timer.o \
   trs80_coco.o \
-  uart.o
+  uart.o \
+  watchdog.o
 CPUS= \
   ARM.o \
   AVR8.o \

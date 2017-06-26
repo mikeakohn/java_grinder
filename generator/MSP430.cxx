@@ -2076,6 +2076,31 @@ int MSP430::timer_setValue_I(int const_value)
   return 0;
 }
 
+// Watchdog
+int MSP430::watchdog_enable()
+{
+  fprintf(out, "  ;; Set watchdog to clock / 32768.\n");
+  fprintf(out, "  mov.w #(WDTPW|WDTIS0), &WDTCTL\n");
+
+  return 0;
+}
+
+int MSP430::watchdog_disable()
+{
+  fprintf(out, "  ;; Turn off watchdog\n");
+  fprintf(out, "  ;mov.w #(WDTPW|WDTHOLD), &WDTCTL\n");
+
+  return 0;
+}
+
+int MSP430::watchdog_kick()
+{
+  fprintf(out, "  ;; Kick watchdog\n");
+  fprintf(out, "  mov.w #WATCHDOG_RESET, &WATCHDOG\n");
+
+  return 0;
+}
+
 // Memory
 int MSP430::memory_read8_I()
 {

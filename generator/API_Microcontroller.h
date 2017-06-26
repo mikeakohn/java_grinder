@@ -3,9 +3,9 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
- * Copyright 2014-2016 by Michael Kohn
+ * Copyright 2014-2017 by Michael Kohn
  *
  */
 
@@ -77,6 +77,11 @@ public:
   virtual int timer_getValue() { return -1; }
   virtual int timer_setValue_I() { return -1; }
   virtual int timer_setValue_I(int const_value) { return -1; }
+
+  // Watchdog
+  virtual int watchdog_enable() { return -1; }
+  virtual int watchdog_disable() { return -1; }
+  virtual int watchdog_kick() { return -1; }
 };
 
 #endif

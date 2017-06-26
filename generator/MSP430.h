@@ -171,6 +171,11 @@ public:
   virtual int timer_setValue_I();
   virtual int timer_setValue_I(int const_value);
 
+  // Watchdog
+  virtual int watchdog_enable();
+  virtual int watchdog_disable();
+  virtual int watchdog_kick();
+
   // CPU functions
   virtual int cpu_setClock16();
   virtual int cpu_nop();
