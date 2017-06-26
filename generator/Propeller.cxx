@@ -196,6 +196,8 @@ void Propeller::method_end(int local_count)
 
 int Propeller::push_local_var_int(int index)
 {
+  fprintf(out, "  ;; push_local_var_int(index=%d)\n", index);
+
   index = local_count - index - 1;
 
   if (index == 0)
@@ -209,6 +211,7 @@ int Propeller::push_local_var_int(int index)
     fprintf(out, "  movs label_%d, _temp0\n", label_count);
   }
 
+  fprintf(out, "  nop\n");
   fprintf(out, "label_%d:\n", label_count);
   fprintf(out, "  mov reg_%d, 0\n", reg++);
   if (reg > reg_max) { reg_max = reg; }
@@ -237,6 +240,8 @@ int Propeller::push_fake()
 
 int Propeller::set_integer_local(int index, int value)
 {
+  fprintf(out, "  ;; set_integer_local(index=%d, %d)\n", index, value);
+
   index = local_count - index - 1;
 
   if (index == 0)
@@ -250,6 +255,7 @@ int Propeller::set_integer_local(int index, int value)
     fprintf(out, "  movd label_%d, _temp0\n", label_count);
   }
 
+  fprintf(out, "  nop\n");
   fprintf(out, "label_%d:\n", label_count);
 
   if (value >= 0 && value < 512)
@@ -299,6 +305,8 @@ int Propeller::push_ref(char *name)
 
 int Propeller::pop_local_var_int(int index)
 {
+  fprintf(out, "  ;; pop_local_var_int(index=%d)\n", index);
+
   index = local_count - index - 1;
 
   if (index == 0)
@@ -312,6 +320,7 @@ int Propeller::pop_local_var_int(int index)
     fprintf(out, "  movd label_%d, _temp0\n", label_count);
   }
 
+  fprintf(out, "  nop\n");
   fprintf(out, "label_%d:\n", label_count);
   fprintf(out, "  mov 0, reg_%d\n", --reg);
 
@@ -347,6 +356,7 @@ int Propeller::swap()
 
 int Propeller::add_integer()
 {
+  fprintf(out, "  ;; add_integer()\n");
   fprintf(out, "  adds reg_%d, reg_%d\n", reg - 2, reg - 1);
   reg--;
   return 0;
@@ -354,14 +364,16 @@ int Propeller::add_integer()
 
 int Propeller::add_integer(int num)
 {
-  if (num < -256 || num > 255) { return -1; }
+  if (num < 0 || num > 511) { return -1; }
 
+  fprintf(out, "  ;; add_integer(%d)\n", num);
   fprintf(out, "  adds reg_%d, #%d\n", reg - 1, num);
   return 0;
 }
 
 int Propeller::sub_integer()
 {
+  fprintf(out, "  ;; sub_integer()\n");
   fprintf(out, "  subs reg_%d, reg_%d\n", reg - 2, reg - 1);
   reg--;
   return 0;
@@ -369,8 +381,9 @@ int Propeller::sub_integer()
 
 int Propeller::sub_integer(int num)
 {
-  if (num < -256 || num > 255) { return -1; }
+  if (num < 0 || num > 511) { return -1; }
 
+  fprintf(out, "  ;; sub_integer(%d)\n", num);
   fprintf(out, "  subs reg_%d, #%d\n", reg - 1, num);
   return 0;
 }
@@ -492,9 +505,9 @@ int Propeller::xor_integer(int num)
 
 int Propeller::inc_integer(int index, int num)
 {
-  index = local_count - index - 1;
+  fprintf(out, "  ;; inc_integer(index=%d, %d)\n", index, num);
 
-  fprintf(out, "  ;; inc_integer(%d, %d)\n", index, num);
+  index = local_count - index - 1;
 
   if (index == 0)
   {
@@ -507,6 +520,7 @@ int Propeller::inc_integer(int index, int num)
     fprintf(out, "  movd label_%d, _temp0\n", label_count);
   }
 
+  fprintf(out, "  nop\n");
   fprintf(out, "label_%d:\n", label_count);
 
   if (num >= 0 && num < 512)
@@ -536,6 +550,8 @@ int Propeller::integer_to_short()
 
 int Propeller::jump_cond(const char *label, int cond, int distance)
 {
+  fprintf(out, "  ;; jump_cond(%s, %d)\n", label, cond);
+
   if (cond == COND_EQUAL)
   {
     fprintf(out, "  tjz reg_%d, #%s\n", --reg, label);
@@ -573,6 +589,8 @@ int Propeller::jump_cond(const char *label, int cond, int distance)
 
 int Propeller::jump_cond_integer(const char *label, int cond, int distance)
 {
+  fprintf(out, "  ;; jump_cond_integer(%s, %d)\n", label, cond);
+
   fprintf(out, "  cmps reg_%d, reg_%d, wc wz\n", reg - 2, reg - 1);
   reg -= 2;
 
@@ -616,6 +634,8 @@ int Propeller::ternary(int cond, int compare, int value_true, int value_false)
 
 int Propeller::return_local(int index, int local_count)
 {
+  fprintf(out, "  ;; return_local(index=%d)\n", index);
+
   index = local_count - index - 1;
 
   if (index == 0)
@@ -629,6 +649,7 @@ int Propeller::return_local(int index, int local_count)
     fprintf(out, "  movs label_%d, _temp0\n", label_count);
   }
 
+  fprintf(out, "  nop\n");
   fprintf(out, "label_%d:\n", label_count);
   fprintf(out, "  mov _temp0, 0\n");
 
@@ -702,11 +723,15 @@ int Propeller::invoke_static_method(const char *name, int params, int is_void)
 
   fprintf(out, "  ;; invoke_static_method(%s, %d, %d)\n", name, params, is_void);
 
-  // Save any unused registers
+  // Save any unused registers and params
   for (n = 0; n < reg; n++)
   {
     fprintf(out, "  sub _stack_ptr, #1\n");
-    fprintf(out, "  mov _stack_ptr, reg_%d\n", n);
+    fprintf(out, "  movd label_%d, _stack_ptr\n", label_count);
+    fprintf(out, "  nop\n");
+    fprintf(out, "label_%d:\n", label_count);
+    fprintf(out, "  mov 0, reg_%d\n", n);
+    label_count++;
   }
 
   fprintf(out, "  call %s_ret, #%s\n", name, name);
@@ -716,7 +741,7 @@ int Propeller::invoke_static_method(const char *name, int params, int is_void)
   // Restore registers
   for (n = 0; n < reg - params; n++)
   {
-    fprintf(out, "  mov _stack_ptr, reg_%d\n", n);
+    fprintf(out, "  mov reg_%d, _stack_ptr\n", n);
     fprintf(out, "  add _stack_ptr, #1\n");
   }
 
