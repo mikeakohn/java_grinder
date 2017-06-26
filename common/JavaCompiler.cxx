@@ -527,7 +527,7 @@ int JavaCompiler::array_load(JavaClass *java_class, int constant_id, uint8_t arr
       return -1;
     }
 
-    // FIXME - Do we get this from the array or from the instruction
+    // FIXME - Does this come from the array or from the instruction
     if (array_type == ARRAY_TYPE_BYTE)
     { return generator->array_read_byte(field_name, 0); }
       else

@@ -878,7 +878,17 @@ int Propeller::array_read_short()
 
 int Propeller::array_read_int()
 {
-  return -1;
+  fprintf(out, "  ;; array_read_int()\n");
+  fprintf(out, "  add reg_%d, reg_%d\n", reg - 2, reg - 1);
+  fprintf(out, "  movs label_%d, reg_%d\n", label_count, reg - 2);
+  fprintf(out, "  nop\n");
+  fprintf(out, "label_%d:\n", label_count);
+  fprintf(out, "  mov reg_%d, 0\n", reg - 2);
+
+  reg -= 1;
+  label_count++;
+
+  return 0;
 }
 
 int Propeller::array_read_byte(const char *name, int field_id)

@@ -9,13 +9,25 @@ public class Mandelbrot
   static final int DC = 8;
   static final int RES = 16;
 
-/*
-  public static short[] palette =
+  public static int[] colors =
   {
-    0x000, 0x04e, 0x044, 0x040, 0x440, 0x880, 0x808, 0xe0e,
-    0xe4e, 0x02e, 0x88e, 0x444, 0xe40, 0xee0, 0x400, 0x000,
+    0x0000,
+    0x000c,
+    0x0013,
+    0x0015,
+    0x0195,
+    0x0335,
+    0x04d5,
+    0x34c0,
+    0x64c0,
+    0x9cc0,
+    0x6320,
+    0xa980,
+    0xaaa0,
+    0xcaa0,
+    0xe980,
+    0xf800,
   };
-*/
 
   static public void main(String args[])
   {
@@ -66,8 +78,10 @@ public class Mandelbrot
           count--;
         }
 
-        sendData((count & 0xf) << 3);
-        sendData(count >> 4);
+        int color = colors[count >> 3];
+
+        sendData(color >> 8);
+        sendData(color & 0xff);
 
         rs += dx;
       }
