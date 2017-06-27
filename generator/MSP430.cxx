@@ -2096,7 +2096,7 @@ int MSP430::watchdog_disable()
 int MSP430::watchdog_kick()
 {
   fprintf(out, "  ;; Kick watchdog\n");
-  fprintf(out, "  mov.w #WATCHDOG_RESET, &WATCHDOG\n");
+  fprintf(out, "  mov.w #(WDTPW|WDTCNTCL), &WDTCTL\n");
 
   return 0;
 }

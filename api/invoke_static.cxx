@@ -41,6 +41,7 @@
 #include "timer.h"
 #include "trs80_coco.h"
 #include "uart.h"
+#include "watchdog.h"
 
 #define CHECK_WITH_PORT(a,b,c) \
     if (strcmp(cls, #a#c) == 0) \
@@ -155,6 +156,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     CHECK(TI99, ti99)
     CHECK(TRS80Coco, trs80_coco)
     CHECK(SXB, sxb)
+    CHECK(Watchdog, watchdog)
       else
     {}
   }
@@ -239,6 +241,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, in
     CHECK_WITH_PORT_CONST(TI99, ti99, 0)
     CHECK_WITH_PORT_CONST(UART, uart, 0)
     CHECK_WITH_PORT_CONST(UART, uart, 1)
+    CHECK_CONST(Watchdog, watchdog)
       else
     {}
   }
