@@ -3,9 +3,9 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
- * Copyright 2014-2016 by Michael Kohn
+ * Copyright 2014-2017 by Michael Kohn
  *
  */
 
@@ -527,7 +527,7 @@ int JavaCompiler::array_load(JavaClass *java_class, int constant_id, uint8_t arr
       return -1;
     }
 
-    // FIXME - Do we get this from the array or from the instruction
+    // FIXME - Does this come from the array or from the instruction
     if (array_type == ARRAY_TYPE_BYTE)
     { return generator->array_read_byte(field_name, 0); }
       else
@@ -636,6 +636,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
   int ret = 0;
   char label[128];
   char method_name[64];
+  char class_name[256];
   _stack *stack;
   int const_val;
   int skip_bytes;
@@ -967,7 +968,16 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         break;
 
       case 23: // fload (0x17)
-        UNIMPL()
+        if (wide == 1)
+        {
+          index = GET_PC_UINT16(1);
+        }
+          else
+        {
+          index = bytes[pc+1];
+        }
+
+        ret = generator->push_local_var_float(index);
         break;
 
       case 24: // dload (0x18)
@@ -975,8 +985,6 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         break;
 
       case 25: // aload (0x19)
-      {
-        int index;
         if (wide == 1)
         {
           index = GET_PC_UINT16(1);
@@ -988,13 +996,13 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
 
         ret = generator->push_local_var_ref(index);
         break;
-      }
+
       case 26: // iload_0 (0x1a)
       case 27: // iload_1 (0x1b)
       case 28: // iload_2 (0x1c)
       case 29: // iload_3 (0x1d)
         // Push a local integer variable on the stack
-        ret = generator->push_local_var_int(bytes[pc]-26);
+        ret = generator->push_local_var_int(bytes[pc] - 26);
         break;
 
       case 30: // lload_0 (0x1e)
@@ -1007,37 +1015,16 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         break;
 
       case 34: // fload_0 (0x22)
-        UNIMPL()
-        //PUSH_FLOAT_I(local_vars[0]);
-        break;
-
       case 35: // fload_1 (0x23)
-        UNIMPL()
-        //PUSH_FLOAT_I(local_vars[1]);
-        break;
-
       case 36: // fload_2 (0x24)
-        UNIMPL()
-        //PUSH_FLOAT_I(local_vars[2]);
-        break;
-
       case 37: // fload_3 (0x25)
-        UNIMPL()
-        //PUSH_FLOAT_I(local_vars[3]);
+        // Push a local integer variable on the stack
+        ret = generator->push_local_var_float(bytes[pc] - 34);
         break;
 
       case 38: // dload_0 (0x26)
-        UNIMPL()
-        break;
-
       case 39: // dload_1 (0x27)
-        UNIMPL()
-        break;
-
       case 40: // dload_2 (0x28)
-        UNIMPL()
-        break;
-
       case 41: // dload_3 (0x29)
         UNIMPL()
         break;
@@ -1046,7 +1033,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
       case 43: // aload_1 (0x2b)
       case 44: // aload_2 (0x2c)
       case 45: // aload_3 (0x2d)
-        ret = generator->push_local_var_ref(bytes[pc]-42);
+        ret = generator->push_local_var_ref(bytes[pc] - 42);
         break;
 
       case 46: // iaload (0x2e)
@@ -1110,7 +1097,15 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         break;
 
       case 56: // fstore (0x38)
-        UNIMPL()
+        // Pop float off stack and store in local variable
+        if (wide == 1)
+        {
+          ret = generator->pop_local_var_float(GET_PC_UINT16(1));
+        }
+          else
+        {
+          ret = generator->pop_local_var_float(bytes[pc+1]);
+        }
         break;
 
       case 57: // dstore (0x39)
@@ -1161,23 +1156,11 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         break;
 
       case 67: // fstore_0 (0x43)
-        UNIMPL()
-        //local_vars[0] = POP_FLOAT_I()
-        break;
-
       case 68: // fstore_1 (0x44)
-        UNIMPL()
-        //local_vars[1] = POP_FLOAT_I()
-        break;
-
       case 69: // fstore_2 (0x45)
-        UNIMPL()
-        //local_vars[2] = POP_FLOAT_I()
-        break;
-
       case 70: // fstore_3 (0x46)
-        UNIMPL()
-        //local_vars[3] = POP_FLOAT_I()
+        // Pop float off stack and store in local variable
+        ret = generator->pop_local_var_float(bytes[pc]-67);
         break;
 
       case 71: // dstore_0 (0x47)
@@ -1310,8 +1293,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
 
       case 98: // fadd (0x62)
         // Pop top two floats from stack, add them, push result
-        // ret = generator->add_floats();
-        UNIMPL()
+        ret = generator->add_float();
         break;
 
       case 99: // dadd (0x63)
@@ -1335,9 +1317,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
 
       case 102: // fsub (0x66)
         // Pop top two floats from stack, subtract them, push result
-        // *(stack-1) - *(stack-0)
-        // ret = generator->sub_floats();
-        UNIMPL()
+        ret = generator->sub_float();
         break;
 
       case 103: // dsub (0x67)
@@ -1360,8 +1340,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
 
       case 106: // fmul (0x6a)
         // Pop top two floats from stack, multiply them, push result
-        // ret = generator->mul_floats();
-        UNIMPL()
+        ret = generator->mul_float();
         break;
 
       case 107: // dmul (0x6b)
@@ -1588,11 +1567,8 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         break;
 
       case 149: // fcmpl (0x95)
-        UNIMPL()
-        break;
-
       case 150: // fcmpg (0x96)
-        UNIMPL()
+        ret = generator->compare_floats(bytes[pc]-149);
         break;
 
       case 151: // dcmpl (0x97)
@@ -1774,6 +1750,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
             ret = -1;
             break;
           }
+
           java_class->get_ref_name_type(field_name, type, sizeof(field_name), ref);
 
           // This fixes Joe's demo (meant to deal with strings) kind of
@@ -1869,7 +1846,9 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         break;
 
       case 187: // new (0xbb)
-        UNIMPL()
+        index = GET_PC_UINT16(1);
+        java_class->get_class_name(class_name, sizeof(class_name), index);
+        ret = generator->new_object(class_name, 0);
         break;
 
       case 188: // newarray (0xbc)

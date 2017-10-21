@@ -3,9 +3,9 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
- * Copyright 2014-2016 by Michael Kohn
+ * Copyright 2014-2017 by Michael Kohn
  *
  */
 
@@ -29,17 +29,19 @@
 #include "ioport.h"
 #include "memory.h"
 #include "msx_.h"
+#include "parallella.h"
 #include "playstation_2.h"
 #include "propeller_.h"
 #include "sega_genesis.h"
 #include "spi.h"
 #include "snes_.h"
+#include "sxb.h"
 #include "ti84_.h"
 #include "ti99_.h"
 #include "timer.h"
 #include "trs80_coco.h"
 #include "uart.h"
-#include "w65c265sxb_.h"
+#include "watchdog.h"
 
 #define CHECK_WITH_PORT(a,b,c) \
     if (strcmp(cls, #a#c) == 0) \
@@ -145,6 +147,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     CHECK_WITH_PORT(UART, uart, 0)
     CHECK_WITH_PORT(UART, uart, 1)
     CHECK(MSX, msx)
+    CHECK(Parallella, parallella)
     CHECK(Playstation2, playstation2)
     CHECK(Propeller, propeller)
     CHECK(SegaGenesis, sega_genesis)
@@ -152,7 +155,8 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     CHECK(TI84, ti84)
     CHECK(TI99, ti99)
     CHECK(TRS80Coco, trs80_coco)
-    CHECK(W65C265SXB, w65c265sxb)
+    CHECK(SXB, sxb)
+    CHECK(Watchdog, watchdog)
       else
     {}
   }
@@ -225,17 +229,19 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, in
     CHECK_CONST(CPU, cpu)
     CHECK_CONST(CPC, cpc)
     CHECK_CONST(MSX, msx)
+    CHECK_CONST(Parallella, parallella)
     CHECK_CONST(Playstation2, playstation2)
     CHECK_CONST(Propeller, propeller)
     CHECK_CONST(SegaGenesis, sega_genesis)
     CHECK_CONST(SNES, snes)
     CHECK_CONST(TRS80Coco, trs80_coco)
-    CHECK_CONST(W65C265SXB, w65c265sxb)
+    CHECK_CONST(SXB, sxb)
     CHECK_WITH_PORT_CONST(SPI, spi, 0)
     CHECK_WITH_PORT_CONST(SPI, spi, 1)
     CHECK_WITH_PORT_CONST(TI99, ti99, 0)
     CHECK_WITH_PORT_CONST(UART, uart, 0)
     CHECK_WITH_PORT_CONST(UART, uart, 1)
+    CHECK_CONST(Watchdog, watchdog)
       else
     {}
   }

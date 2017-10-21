@@ -3,19 +3,19 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.naken.cc/
- * License: GPL
+ * License: GPLv3
  *
  * Copyright 2014-2015 by Michael Kohn
  *
- * W65C265SXB by Joe Davisson
+ * Western Design Center SXB board by Joe Davisson
  *
  */
 
 package net.mikekohn.java_grinder;
 
-abstract public class W65C265SXB
+abstract public class SXB
 {
-  protected W65C265SXB() { }
+  protected SXB() { }
 
   // terminal interface routines
   public static char getChar() { return 0; }

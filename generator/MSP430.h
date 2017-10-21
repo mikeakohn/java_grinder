@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2016 by Michael Kohn
+ * Copyright 2014-2017 by Michael Kohn
  *
  */
 
@@ -170,6 +170,11 @@ public:
   virtual int timer_getValue();
   virtual int timer_setValue_I();
   virtual int timer_setValue_I(int const_value);
+
+  // Watchdog
+  virtual int watchdog_enable();
+  virtual int watchdog_disable();
+  virtual int watchdog_kick();
 
   // CPU functions
   virtual int cpu_setClock16();

@@ -33,6 +33,7 @@ public:
   virtual void method_end(int local_count);
   virtual int push_local_var_int(int index);
   virtual int push_local_var_ref(int index);
+  virtual int push_local_var_float(int index);
   virtual int push_ref_static(const char *name, int index);
   virtual int push_fake();
   virtual int push_int(int32_t n);
@@ -42,6 +43,7 @@ public:
   virtual int push_ref(char *name);
   virtual int pop_local_var_int(int index);
   virtual int pop_local_var_ref(int index);
+  virtual int pop_local_var_float(int index);
   virtual int pop();
   virtual int dup();
   virtual int dup2();
@@ -69,8 +71,12 @@ public:
   virtual int inc_integer(int index, int num);
   virtual int integer_to_byte();
   virtual int integer_to_short();
+  virtual int add_float();
+  virtual int sub_float();
+  virtual int mul_float();
   virtual int jump_cond(const char *label, int cond, int distance);
   virtual int jump_cond_integer(const char *label, int cond, int distance);
+  virtual int compare_floats(int cond);
   virtual int ternary(int cond, int value_true, int value_false);
   virtual int ternary(int cond, int compare, int value_true, int value_false);
   virtual int return_local(int index, int local_count);
@@ -100,11 +106,27 @@ public:
   virtual int array_write_short(const char *name, int field_id);
   virtual int array_write_int(const char *name, int field_id);
 
+  // Parallella
+  virtual int parallella_writeSharedRamByte_IB();
+  virtual int parallella_writeSharedRamShort_IS();
+  virtual int parallella_writeSharedRamInt_II();
+  virtual int parallella_writeSharedRamFloat_IF();
+  virtual int parallella_readSharedRamByte_I();
+  virtual int parallella_readSharedRamShort_I();
+  virtual int parallella_readSharedRamInt_I();
+  virtual int parallella_readSharedRamFloat_I();
+  virtual int parallella_getCoreId();
+  virtual int parallella_setUserInterruptListener_Z();
+  virtual int parallella_setUserInterruptListener_Z(int const_value);
+
 protected:
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 
   int stack;          // count how many things we put on the stack
   bool is_main : 1;
+  bool is_interrupt : 1;
+  int max_stack;
+
   bool immediate_is_possible(int immediate);
   int stack_alu(const char *instr);
 };

@@ -3,7 +3,7 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
  * Copyright 2014-2017 by Michael Kohn
  *
@@ -44,6 +44,7 @@
 #include "TMS9900.h"
 #include "TRS80Coco.h"
 #include "W65816.h"
+#include "W65C134SXB.h"
 #include "W65C265SXB.h"
 #include "X86.h"
 #include "X86_64.h"
@@ -236,6 +237,11 @@ static Generator *new_generator(const char *chip_type)
     generator = new W65816();
   }
     else
+  if (strcasecmp("w65c134sxb", chip_type) == 0)
+  {
+    generator = new W65C134SXB();
+  }
+    else
   if (strcasecmp("w65c265sxb", chip_type) == 0)
   {
     generator = new W65C265SXB();
@@ -293,7 +299,7 @@ int main(int argc, char *argv[])
            "     propeller\n"
            "     sega_genesis\n"
            "     ti99\n"
-           "     w65c265sxb\n"
+           "     w65c134sxb, w65c265sxb\n"
            "     x86\n"
            "     z80, cpc, msx, ti84plus\n", argv[0]);
     exit(0);

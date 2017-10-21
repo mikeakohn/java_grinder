@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2017 by Michael Kohn
  *
  */
 
@@ -30,7 +30,7 @@ public:
 
   // Timer functions
   virtual int timer_setInterval_II(int cycles, int divider);
-  virtual int timer_setListener_II(int const_value);
+  virtual int timer_setListener_Z(int const_value);
   virtual int timer_getValue();
   virtual int timer_setValue_I();
   virtual int timer_setValue_I(int const_value);

@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2017 by Michael Kohn, Joe Davisson
  *
  */
 
@@ -63,8 +63,7 @@ int Atari2600::open(const char *filename)
 {
   if (M6502_8::open(filename) != 0) { return -1; }
 
-  print_tia_definitions();
-  print_pia_definitions();
+  fprintf(out, ".include \"atari2600.inc\"\n\n");
 
   insert_variables();
 
@@ -1180,84 +1179,6 @@ int Atari2600::atari2600_setBank_B(int value)
   fprintf(out, "  jmp _bank_switch\n");
 
   return 0;
-}
-
-void Atari2600::print_tia_definitions()
-{
-  fprintf(out, "  VSYNC equ 0x00\n");
-  fprintf(out, "  VBLANK equ 0x01\n");
-  fprintf(out, "  WSYNC equ 0x02\n");
-  fprintf(out, "  RSYNC equ 0x03\n");
-  fprintf(out, "  NUSIZ0 equ 0x04\n");
-  fprintf(out, "  NUSIZ1 equ 0x05\n");
-  fprintf(out, "  COLUP0 equ 0x06\n");
-  fprintf(out, "  COLUP1 equ 0x07\n");
-  fprintf(out, "  COLUPF equ 0x08\n");
-  fprintf(out, "  COLUBK equ 0x09\n");
-  fprintf(out, "  CTRLPF equ 0x0A\n");
-  fprintf(out, "  REFP0 equ 0x0B\n");
-  fprintf(out, "  REFP1 equ 0x0C\n");
-  fprintf(out, "  PF0 equ 0x0D\n");
-  fprintf(out, "  PF1 equ 0x0E\n");
-  fprintf(out, "  PF2 equ 0x0F\n");
-  fprintf(out, "  RESP0 equ 0x10\n");
-  fprintf(out, "  RESP1 equ 0x11\n");
-  fprintf(out, "  RESM0 equ 0x12\n");
-  fprintf(out, "  RESM1 equ 0x13\n");
-  fprintf(out, "  RESBL equ 0x14\n");
-  fprintf(out, "  AUDC0 equ 0x15\n");
-  fprintf(out, "  AUDC1 equ 0x16\n");
-  fprintf(out, "  AUDF0 equ 0x17\n");
-  fprintf(out, "  AUDF1 equ 0x18\n");
-  fprintf(out, "  AUDV0 equ 0x19\n");
-  fprintf(out, "  AUDV1 equ 0x1A\n");
-  fprintf(out, "  GRP0 equ 0x1B\n");
-  fprintf(out, "  GRP1 equ 0x1C\n");
-  fprintf(out, "  ENAM0 equ 0x1D\n");
-  fprintf(out, "  ENAM1 equ 0x1E\n");
-  fprintf(out, "  ENABL equ 0x1F\n");
-  fprintf(out, "  HMP0 equ 0x20\n");
-  fprintf(out, "  HMP1 equ 0x21\n");
-  fprintf(out, "  HMM0 equ 0x22\n");
-  fprintf(out, "  HMM1 equ 0x23\n");
-  fprintf(out, "  HMBL equ 0x24\n");
-  fprintf(out, "  VDELP0 equ 0x25\n");
-  fprintf(out, "  VDELP1 equ 0x26\n");
-  fprintf(out, "  VDELBL equ 0x27\n");
-  fprintf(out, "  RESMP0 equ 0x28\n");
-  fprintf(out, "  RESMP1 equ 0x29\n");
-  fprintf(out, "  HMOVE equ 0x2A\n");
-  fprintf(out, "  HMCLR equ 0x2B\n");
-  fprintf(out, "  CXCLR equ 0x2C\n");
-
-  fprintf(out, "  CXM0P equ 0x00\n");
-  fprintf(out, "  CXM1P equ 0x01\n");
-  fprintf(out, "  CXP0FB equ 0x02\n");
-  fprintf(out, "  CXP1FB equ 0x03\n");
-  fprintf(out, "  CXM0FB equ 0x04\n");
-  fprintf(out, "  CXM1FB equ 0x05\n");
-  fprintf(out, "  CXBLPF equ 0x06\n");
-  fprintf(out, "  CXPPMM equ 0x07\n");
-  fprintf(out, "  INPT0 equ 0x08\n");
-  fprintf(out, "  INPT1 equ 0x09\n");
-  fprintf(out, "  INPT2 equ 0x0a\n");
-  fprintf(out, "  INPT3 equ 0x0b\n");
-  fprintf(out, "  INPT4 equ 0x0c\n");
-  fprintf(out, "  INPT5 equ 0x0d\n\n");
-}
-
-void Atari2600::print_pia_definitions()
-{
-  fprintf(out, "  SWCHA equ 0x280\n");
-  fprintf(out, "  SWACNT equ 0x281\n");
-  fprintf(out, "  SWCHB equ 0x282\n");
-  fprintf(out, "  SWBCNT equ 0x283\n");
-  fprintf(out, "  INTIM equ 0x284\n");
-  fprintf(out, "  TIMINT equ 0x285\n");
-  fprintf(out, "  TIM1T equ 0x294\n");
-  fprintf(out, "  TIM8T equ 0x295\n");
-  fprintf(out, "  TIM64T equ 0x296\n");
-  fprintf(out, "  T1024T equ 0x297\n\n");
 }
 
 void Atari2600::insert_game_draw()

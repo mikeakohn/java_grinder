@@ -3,15 +3,16 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
- * Copyright 2014-2016 by Michael Kohn
+ * Copyright 2014-2017 by Michael Kohn
  *
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "Propeller.h"
 
@@ -21,7 +22,7 @@
 
 #define PUSH_CONST(a) \
   get_constant(a); \
-  fprintf(out, "  mov reg_%d, _const_%d\n", reg++, a); \
+  fprintf(out, "  mov reg_%d, _const_%x\n", reg++, a); \
   if (reg > reg_max) { reg_max = reg; }
 
 #define PUSH_SIGNED(a) \
@@ -45,7 +46,8 @@
 Propeller::Propeller() :
   reg(0),
   reg_max(0),
-  is_main(0)
+  is_main(0),
+  need_muls(0)
 {
 
 }
@@ -54,12 +56,17 @@ Propeller::~Propeller()
 {
   int n;
 
+  if (need_muls)
+  {
+    add_muls();
+  }
+
   fprintf(out, "  ;; Constants\n");
   for (std::map<uint32_t,int>::iterator it = constants_pool.begin();
        it != constants_pool.end();
        it++)
   {
-    fprintf(out, "_const_%d:\n", it->first);
+    fprintf(out, "_const_%x:\n", it->first);
     fprintf(out, "  dc32 0x%x\n", it->first);
   }
 
@@ -78,6 +85,11 @@ Propeller::~Propeller()
     fprintf(out, "reg_%d:\n", n);
     fprintf(out, "  dc32 0\n");
   }
+
+  fprintf(out, "_temp0:\n");
+  fprintf(out, "  dc32 0\n");
+  fprintf(out, "_stack_ptr:\n");
+  fprintf(out, "  dc32 496\n");
 }
 
 int Propeller::open(const char *filename)
@@ -142,12 +154,40 @@ int Propeller::field_init_int(char *name, int index, int value)
 
 int Propeller::field_init_ref(char *name, int index)
 {
+  fprintf(out, "  mov _static_%s, #_%s\n", name, name);
   return -1;
 }
 
 void Propeller::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
+  method_name = name;
+
+  is_main = (strcmp(name, "main") == 0);
+
+  if (is_main)
+  {
+    extra_stack = local_count;
+  }
+    else
+  {
+    extra_stack = local_count - param_count;
+  }
+
+  if (extra_stack < 0)
+  {
+    printf("Internal Error: %s:%d\n", __FILE__, __LINE__);
+    exit(1);
+  }
+
+  fprintf(out, "  ;; method_start() local_count=%d is_main=%d\n", local_count, is_main);
   fprintf(out, "%s:\n", name);
+
+  if (extra_stack != 0)
+  {
+    fprintf(out, "  sub _stack_ptr, #%d\n", extra_stack);
+  }
+
+  this->local_count = local_count;
 }
 
 void Propeller::method_end(int local_count)
@@ -157,7 +197,29 @@ void Propeller::method_end(int local_count)
 
 int Propeller::push_local_var_int(int index)
 {
-  return -1;
+  fprintf(out, "  ;; push_local_var_int(index=%d)\n", index);
+
+  index = local_count - index - 1;
+
+  if (index == 0)
+  {
+    fprintf(out, "  movs label_%d, _stack_ptr\n", label_count);
+  }
+    else
+  {
+    fprintf(out, "  mov _temp0, _stack_ptr\n");
+    fprintf(out, "  add _temp0, #%d\n", index);
+    fprintf(out, "  movs label_%d, _temp0\n", label_count);
+  }
+
+  fprintf(out, "  nop\n");
+  fprintf(out, "label_%d:\n", label_count);
+  fprintf(out, "  mov reg_%d, 0\n", reg++);
+  if (reg > reg_max) { reg_max = reg; }
+
+  label_count++;
+
+  return 0;
 }
 
 int Propeller::push_local_var_ref(int index)
@@ -175,6 +237,41 @@ int Propeller::push_ref_static(const char *name, int index)
 int Propeller::push_fake()
 {
   return -1;
+}
+
+int Propeller::set_integer_local(int index, int value)
+{
+  fprintf(out, "  ;; set_integer_local(index=%d, %d)\n", index, value);
+
+  index = local_count - index - 1;
+
+  if (index == 0)
+  {
+    fprintf(out, "  movd label_%d, _stack_ptr\n", label_count);
+  }
+    else
+  {
+    fprintf(out, "  mov _temp0, _stack_ptr\n");
+    fprintf(out, "  add _temp0, #%d\n", index);
+    fprintf(out, "  movd label_%d, _temp0\n", label_count);
+  }
+
+  fprintf(out, "  nop\n");
+  fprintf(out, "label_%d:\n", label_count);
+
+  if (value >= 0 && value < 512)
+  {
+    fprintf(out, "  mov 0, #%d\n", value);
+  }
+    else
+  {
+    get_constant(value);
+    fprintf(out, "  mov 0, _const_%x\n", value);
+  }
+
+  label_count++;
+
+  return 0;
 }
 
 int Propeller::push_int(int32_t n)
@@ -209,7 +306,28 @@ int Propeller::push_ref(char *name)
 
 int Propeller::pop_local_var_int(int index)
 {
-  return -1;
+  fprintf(out, "  ;; pop_local_var_int(index=%d)\n", index);
+
+  index = local_count - index - 1;
+
+  if (index == 0)
+  {
+    fprintf(out, "  movd label_%d, _stack_ptr\n", label_count);
+  }
+    else
+  {
+    fprintf(out, "  mov _temp0, _stack_ptr\n");
+    fprintf(out, "  add _temp0, #%d\n", index);
+    fprintf(out, "  movd label_%d, _temp0\n", label_count);
+  }
+
+  fprintf(out, "  nop\n");
+  fprintf(out, "label_%d:\n", label_count);
+  fprintf(out, "  mov 0, reg_%d\n", --reg);
+
+  label_count++;
+
+  return 0;
 }
 
 int Propeller::pop_local_var_ref(int index)
@@ -239,6 +357,7 @@ int Propeller::swap()
 
 int Propeller::add_integer()
 {
+  fprintf(out, "  ;; add_integer()\n");
   fprintf(out, "  adds reg_%d, reg_%d\n", reg - 2, reg - 1);
   reg--;
   return 0;
@@ -246,14 +365,16 @@ int Propeller::add_integer()
 
 int Propeller::add_integer(int num)
 {
-  if (num < -256 || num > 255) { return -1; }
+  if (num < 0 || num > 511) { return -1; }
 
+  fprintf(out, "  ;; add_integer(%d)\n", num);
   fprintf(out, "  adds reg_%d, #%d\n", reg - 1, num);
   return 0;
 }
 
 int Propeller::sub_integer()
 {
+  fprintf(out, "  ;; sub_integer()\n");
   fprintf(out, "  subs reg_%d, reg_%d\n", reg - 2, reg - 1);
   reg--;
   return 0;
@@ -261,15 +382,67 @@ int Propeller::sub_integer()
 
 int Propeller::sub_integer(int num)
 {
-  if (num < -256 || num > 255) { return -1; }
+  if (num < 0 || num > 511) { return -1; }
 
+  fprintf(out, "  ;; sub_integer(%d)\n", num);
   fprintf(out, "  subs reg_%d, #%d\n", reg - 1, num);
   return 0;
 }
 
 int Propeller::mul_integer()
 {
-  return -1;
+  need_muls = 1;
+
+  //fprintf(out, "  call _muls_ret, #_muls\n");
+
+  // It takes almost as many instructions to set up a function
+  // call to this code as it would to just inline it.
+
+  if (reg + 1 > reg_max) { reg_max = reg + 1; }
+
+  reg -= 1;
+
+  fprintf(out,
+    "  ;; mul_integer()\n"
+    "  mov _temp0, #0\n"
+    "  cmps reg_%d, #0, wc wz\n"
+    "  if_b xor _temp0, #1\n"
+    "  cmps reg_%d, #0, wc wz\n"
+    "  if_b xor _temp0, #1\n",
+    reg, reg - 1);
+
+  fprintf(out,
+    "  abs reg_%d, reg_%d\n"
+    "  abs reg_%d, reg_%d\n"
+    "  and reg_%d, _mask16\n"
+    "  and reg_%d, _mask16\n",
+    reg + 1, reg - 1,
+    reg, reg,
+    reg + 1,
+    reg);
+
+  fprintf(out, "  mov reg_%d, #0\n", reg - 1);
+
+  fprintf(out,
+    "_repeat_muls_%d:\n"
+    "  shr reg_%d, #1, wc wz\n"
+    "  if_c add reg_%d, reg_%d\n"
+    "  shl reg_%d, #1\n"
+    "  if_nz jmp #_repeat_muls_%d\n",
+    label_count,
+    reg + 1,
+    reg - 1, reg,
+    reg,
+    label_count);
+
+  fprintf(out,
+    "  cmp _temp0, #1, wz\n"
+    "  if_e neg reg_%d, reg_%d\n",
+    reg - 1, reg - 1);
+
+  label_count++;
+
+  return 0;
 }
 
 int Propeller::div_integer()
@@ -290,6 +463,7 @@ int Propeller::neg_integer()
 
 int Propeller::shift_left_integer()
 {
+  fprintf(out, "  ;; shift_left_integer()\n");
   fprintf(out, "  shl reg_%d, reg_%d\n", reg - 2, reg - 1);
   reg--;
   return 0;
@@ -299,12 +473,14 @@ int Propeller::shift_left_integer(int num)
 {
   if (num < -256 || num > 255) { return -1; }
 
+  fprintf(out, "  ;; shift_left_integer(%d)\n", num);
   fprintf(out, "  shl reg_%d, #%d\n", reg - 1, num);
   return 0;
 }
 
 int Propeller::shift_right_integer()
 {
+  fprintf(out, "  ;; shift_right_integer()\n");
   fprintf(out, "  sar reg_%d, reg_%d\n", reg - 2, reg - 1);
   reg--;
   return 0;
@@ -314,12 +490,14 @@ int Propeller::shift_right_integer(int num)
 {
   if (num < -256 || num > 255) { return -1; }
 
+  fprintf(out, "  ;; shift_right_integer(%d)\n", num);
   fprintf(out, "  sar reg_%d, #%d\n", reg - 1, num);
   return 0;
 }
 
 int Propeller::shift_right_uinteger()
 {
+  fprintf(out, "  ;; shift_right_uinteger()\n");
   fprintf(out, "  shr reg_%d, reg_%d\n", reg - 2, reg - 1);
   reg--;
   return 0;
@@ -329,12 +507,14 @@ int Propeller::shift_right_uinteger(int num)
 {
   if (num < -256 || num > 255) { return -1; }
 
+  fprintf(out, "  ;; shift_right_uinteger(%d)\n", num);
   fprintf(out, "  shr reg_%d, #%d\n", reg - 1, num);
   return 0;
 }
 
 int Propeller::and_integer()
 {
+  fprintf(out, "  ;; and_integer()\n");
   fprintf(out, "  and reg_%d, reg_%d\n", reg - 2, reg - 1);
   reg--;
   return 0;
@@ -344,12 +524,14 @@ int Propeller::and_integer(int num)
 {
   if (num < -256 || num > 255) { return -1; }
 
+  fprintf(out, "  ;; and_integer(%d)\n", num);
   fprintf(out, "  and reg_%d, #%d\n", reg - 1, num);
   return 0;
 }
 
 int Propeller::or_integer()
 {
+  fprintf(out, "  ;; or_integer()\n");
   fprintf(out, "  or reg_%d, reg_%d\n", reg - 2, reg - 1);
   reg--;
   return 0;
@@ -359,12 +541,14 @@ int Propeller::or_integer(int num)
 {
   if (num < -256 || num > 255) { return -1; }
 
+  fprintf(out, "  ;; or_integer(%d)\n", num);
   fprintf(out, "  or reg_%d, #%d\n", reg - 1, num);
   return 0;
 }
 
 int Propeller::xor_integer()
 {
+  fprintf(out, "  ;; xor_integer()\n");
   fprintf(out, "  xor reg_%d, reg_%d\n", reg - 2, reg - 1);
   reg--;
   return 0;
@@ -374,13 +558,43 @@ int Propeller::xor_integer(int num)
 {
   if (num < -256 || num > 255) { return -1; }
 
+  fprintf(out, "  ;; xor_integer(%d)\n", num);
   fprintf(out, "  xor reg_%d, #%d\n", reg - 1, num);
   return 0;
 }
 
 int Propeller::inc_integer(int index, int num)
 {
-  fprintf(out, "  add reg_%d, #%d\n", reg - 1, num);
+  fprintf(out, "  ;; inc_integer(index=%d, %d)\n", index, num);
+
+  index = local_count - index - 1;
+
+  if (index == 0)
+  {
+    fprintf(out, "  movd label_%d, _stack_ptr\n", label_count);
+  }
+    else
+  {
+    fprintf(out, "  mov _temp0, _stack_ptr\n");
+    fprintf(out, "  add _temp0, #%d\n", index);
+    fprintf(out, "  movd label_%d, _temp0\n", label_count);
+  }
+
+  fprintf(out, "  nop\n");
+  fprintf(out, "label_%d:\n", label_count);
+
+  if (num >= 0 && num < 512)
+  {
+    fprintf(out, "  adds 0, #%d\n", num);
+  }
+    else
+  {
+    get_constant(num);
+    fprintf(out, "  adds 0, _const_%x\n", num);
+  }
+
+  label_count++;
+
   return 0;
 }
 
@@ -396,6 +610,8 @@ int Propeller::integer_to_short()
 
 int Propeller::jump_cond(const char *label, int cond, int distance)
 {
+  fprintf(out, "  ;; jump_cond(%s, %d)\n", label, cond);
+
   if (cond == COND_EQUAL)
   {
     fprintf(out, "  tjz reg_%d, #%s\n", --reg, label);
@@ -408,17 +624,62 @@ int Propeller::jump_cond(const char *label, int cond, int distance)
     return 0;
   }
 
-  fprintf(out, "  cmps reg_%d, #0\n", --reg);
+  fprintf(out, "  cmps reg_%d, #0, wc wz\n", --reg);
 
-  return -1;
+  switch(cond)
+  {
+    case COND_LESS:
+      fprintf(out, "  if_b jmp #%s\n", label);
+      break;
+    case COND_LESS_EQUAL:
+      fprintf(out, "  if_be jmp #%s\n", label);
+      break;
+    case COND_GREATER:
+      fprintf(out, "  if_a jmp #%s\n", label);
+      break;
+    case COND_GREATER_EQUAL:
+      fprintf(out, "  if_ae jmp #%s\n", label);
+      break;
+    default:
+      return -1;
+  }
+
+  return 0;
 }
 
 int Propeller::jump_cond_integer(const char *label, int cond, int distance)
 {
-  fprintf(out, "  cmps reg_%d, reg_%d\n", reg - 2, reg - 1);
+  fprintf(out, "  ;; jump_cond_integer(%s, %d)\n", label, cond);
+
+  fprintf(out, "  cmps reg_%d, reg_%d, wc wz\n", reg - 2, reg - 1);
   reg -= 2;
 
-  return -1;
+  switch(cond)
+  {
+    case COND_EQUAL:
+      fprintf(out, "  if_e jmp #%s\n", label);
+      break;
+    case COND_NOT_EQUAL:
+      fprintf(out, "  if_ne jmp #%s\n", label);
+      break;
+    case COND_LESS:
+      fprintf(out, "  if_b jmp #%s\n", label);
+      break;
+    case COND_LESS_EQUAL:
+      fprintf(out, "  if_be jmp #%s\n", label);
+      break;
+    case COND_GREATER:
+      fprintf(out, "  if_a jmp #%s\n", label);
+      break;
+    case COND_GREATER_EQUAL:
+      fprintf(out, "  if_ae jmp #%s\n", label);
+      break;
+    default:
+      return -1;
+  }
+
+  return 0;
+
 }
 
 int Propeller::ternary(int cond, int value_true, int value_false)
@@ -433,17 +694,76 @@ int Propeller::ternary(int cond, int compare, int value_true, int value_false)
 
 int Propeller::return_local(int index, int local_count)
 {
-  return -1;
+  fprintf(out, "  ;; return_local(index=%d)\n", index);
+
+  index = local_count - index - 1;
+
+  if (index == 0)
+  {
+    fprintf(out, "  movs label_%d, _stack_ptr\n", label_count);
+  }
+    else
+  {
+    fprintf(out, "  mov _temp0, _stack_ptr\n");
+    fprintf(out, "  add _temp0, #%d\n", index);
+    fprintf(out, "  movs label_%d, _temp0\n", label_count);
+  }
+
+  fprintf(out, "  nop\n");
+  fprintf(out, "label_%d:\n", label_count);
+  fprintf(out, "  mov _temp0, 0\n");
+
+  label_count++;
+
+  if (extra_stack != 0)
+  {
+    fprintf(out, "  add _stack_ptr, #%d\n", extra_stack);
+  }
+
+  if (!is_main)
+  {
+    fprintf(out, "%s_ret:\n", method_name.c_str());
+  }
+
+  fprintf(out, "  ret\n");
+
+  return 0;
 }
 
 int Propeller::return_integer(int local_count)
 {
-  return -1;
+  fprintf(out, "  mov _temp0, reg_%d\n", --reg);
+
+  if (extra_stack != 0)
+  {
+    fprintf(out, "  add _stack_ptr, #%d\n", extra_stack);
+  }
+
+  if (!is_main)
+  {
+    fprintf(out, "%s_ret:\n", method_name.c_str());
+  }
+
+  fprintf(out, "  ret\n");
+
+  return 0;
 }
 
 int Propeller::return_void(int local_count)
 {
-  return -1;
+  if (extra_stack != 0)
+  {
+    fprintf(out, "  add _stack_ptr, #%d\n", extra_stack);
+  }
+
+  if (!is_main)
+  {
+    fprintf(out, "%s_ret:\n", method_name.c_str());
+  }
+
+  fprintf(out, "  ret\n");
+
+  return 0;
 }
 
 int Propeller::jump(const char *name, int distance)
@@ -459,7 +779,40 @@ int Propeller::call(const char *name)
 
 int Propeller::invoke_static_method(const char *name, int params, int is_void)
 {
-  return -1;
+  int n;
+
+  fprintf(out, "  ;; invoke_static_method(%s, %d, %d)\n", name, params, is_void);
+
+  // Save any unused registers and params
+  for (n = 0; n < reg; n++)
+  {
+    fprintf(out, "  sub _stack_ptr, #1\n");
+    fprintf(out, "  movd label_%d, _stack_ptr\n", label_count);
+    fprintf(out, "  nop\n");
+    fprintf(out, "label_%d:\n", label_count);
+    fprintf(out, "  mov 0, reg_%d\n", n);
+    label_count++;
+  }
+
+  fprintf(out, "  call %s_ret, #%s\n", name, name);
+
+  fprintf(out, "  add _stack_ptr, #%d\n", params);
+
+  // Restore registers
+  for (n = 0; n < reg - params; n++)
+  {
+    fprintf(out, "  mov reg_%d, _stack_ptr\n", n);
+    fprintf(out, "  add _stack_ptr, #1\n");
+  }
+
+  reg -= params;
+
+  if (is_void == 0)
+  {
+    fprintf(out, "  mov reg_%d, _temp0\n", reg++);
+  }
+
+  return 0;
 }
 
 int Propeller::put_static(const char *name, int index)
@@ -526,7 +879,17 @@ int Propeller::array_read_short()
 
 int Propeller::array_read_int()
 {
-  return -1;
+  fprintf(out, "  ;; array_read_int()\n");
+  fprintf(out, "  add reg_%d, reg_%d\n", reg - 2, reg - 1);
+  fprintf(out, "  movs label_%d, reg_%d\n", label_count, reg - 2);
+  fprintf(out, "  nop\n");
+  fprintf(out, "label_%d:\n", label_count);
+  fprintf(out, "  mov reg_%d, 0\n", reg - 2);
+
+  reg -= 1;
+  label_count++;
+
+  return 0;
 }
 
 int Propeller::array_read_byte(const char *name, int field_id)
@@ -697,7 +1060,7 @@ int Propeller::ioport_setPinsAsOutput_I(int port, int value)
     else
   {
     get_constant(value);
-    fprintf(out, "  or _dir%c, _const_%d\n", p, value);
+    fprintf(out, "  or _dir%c, _const_%x\n", p, value);
   }
 
   return 0;
@@ -722,7 +1085,7 @@ int Propeller::ioport_setPinsValue_I(int port, int value)
     else
   {
     get_constant(value);
-    fprintf(out, "  mov _out%c, _const_%d\n", p, value);
+    fprintf(out, "  mov _out%c, _const_%x\n", p, value);
   }
 
   return 0;
@@ -740,14 +1103,14 @@ int Propeller::ioport_setPinsHigh_I(int port)
 int Propeller::ioport_setPinsHigh_I(int port, int value)
 {
   CHECK_PORT();
-  if (value >= 0 && value <= 255)
+  if (value >= 0 && value <= 511)
   {
     fprintf(out, "  or _out%c, #0x%02x\n", p, value);
   }
     else
   {
     get_constant(value);
-    fprintf(out, "  or _out%c, _const_%d\n", p, value);
+    fprintf(out, "  or _out%c, _const_%x\n", p, value);
   }
 
   return 0;
@@ -758,6 +1121,22 @@ int Propeller::ioport_setPinsLow_I(int port)
   CHECK_PORT();
   fprintf(out, "  andn _out%c, reg_%d\n", p, reg - 1);
   reg--;
+
+  return 0;
+}
+
+int Propeller::ioport_setPinsLow_I(int port, int value)
+{
+  CHECK_PORT();
+  if (value >= 0 && value <= 511)
+  {
+    fprintf(out, "  andn _out%c, #0x%02x\n", p, value);
+  }
+    else
+  {
+    get_constant(value);
+    fprintf(out, "  andn _out%c, _const_%x\n", p, value);
+  }
 
   return 0;
 }
@@ -779,4 +1158,55 @@ int Propeller::ioport_getPortInputValue(int port)
 
   return 0;
 }
+
+int Propeller::add_muls()
+{
+/*
+  reg -= 1;
+
+  fprintf(out,
+    "_muls:\n"
+    "  mov _temp0, #0\n"
+    "  cmps reg_%d, #0, wc wz\n"
+    "  if_b xor _temp0, #1\n"
+    "  cmps reg_%d, #0, wc wz\n"
+    "  if_b xor _temp0, #1\n",
+    reg, reg - 1);
+
+  fprintf(out,
+    "  abs reg_%d, reg_%d\n"
+    "  abs reg_%d, reg_%d\n"
+    "  and reg_%d, _mask16\n"
+    "  and reg_%d, _mask16\n",
+    reg - 3, reg - 2,
+    reg - 2, reg - 1,
+    reg - 3,
+    reg - 2);
+
+  fprintf(out, "  mov reg_%d, #0\n", reg - 1);
+
+  fprintf(out,
+    "_repeat_muls:\n"
+    "  shr reg_%d, #1, wc wz\n"
+    "  if_c add reg_%d, reg_%d\n"
+    "  shl reg_%d, #1\n"
+    "  if_nz jmp #_repeat_muls\n",
+    reg - 2,
+    reg - 1, reg - 3,
+    reg - 3);
+
+  fprintf(out,
+    "  cmp _temp0, #1, wz\n"
+    "  if_e neg reg_%d, reg_%d\n\n"
+    "_muls_ret:\n",
+    reg - 1, reg - 1);
+*/
+
+  fprintf(out,
+    "_mask16:\n"
+    "  dc32 0xffff\n");
+
+  return 0;
+}
+
 

@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2017 by Michael Kohn, Joe Davisson
  *
  */
 
@@ -151,9 +151,6 @@ private:
   bool need_title_draw:1;
   bool need_set_bank:1;
   int bank_index;
-
-  void print_tia_definitions();
-  void print_pia_definitions();
 
   void insert_game_draw();
   void insert_title_draw();

@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2016 by Michael Kohn
+ * Copyright 2014-2017 by Michael Kohn
  *
  */
 
@@ -286,8 +286,9 @@ int TMS9900::dup()
 {
   CHECK_STACK();
 
-  fprintf(out, "  mov r%d, r0\n", REG_STACK(reg-1));
-  fprintf(out, "  mov r0, r%d\n", REG_STACK(reg));
+  //fprintf(out, "  mov r%d, r0\n", REG_STACK(reg-1));
+  //fprintf(out, "  mov r0, r%d\n", REG_STACK(reg));
+  fprintf(out, "  mov r%d, r%d\n", REG_STACK(reg-1), REG_STACK(reg));
   reg++;
 
   return 0;

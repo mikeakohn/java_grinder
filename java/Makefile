@@ -22,6 +22,7 @@ JAVA_SRC=\
   $(SRC_DIR)/Math.java \
   $(SRC_DIR)/Memory.java \
   $(SRC_DIR)/MSX.java \
+  $(SRC_DIR)/Parallella.java \
   $(SRC_DIR)/Playstation2.java \
   $(SRC_DIR)/Propeller.java \
   $(SRC_DIR)/SegaGenesis.java \
@@ -29,15 +30,17 @@ JAVA_SRC=\
   $(SRC_DIR)/SPI.java \
   $(SRC_DIR)/SPI0.java \
   $(SRC_DIR)/SPI1.java \
+  $(SRC_DIR)/SXB.java \
   $(SRC_DIR)/TI84.java \
   $(SRC_DIR)/TI99.java \
   $(SRC_DIR)/Timer.java \
   $(SRC_DIR)/TimerListener.java \
   $(SRC_DIR)/TRS80Coco.java \
+  $(SRC_DIR)/UserInterruptListener.java \
   $(SRC_DIR)/UART.java \
   $(SRC_DIR)/UART0.java \
   $(SRC_DIR)/UART1.java \
-  $(SRC_DIR)/W65C265SXB.java
+  $(SRC_DIR)/Watchdog.java
 
 default:
 	javac -classpath . -d ../build $(JAVA_SRC) 

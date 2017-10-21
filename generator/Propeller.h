@@ -3,9 +3,9 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
- * Copyright 2014-2016 by Michael Kohn
+ * Copyright 2014-2017 by Michael Kohn
  *
  */
 
@@ -35,6 +35,7 @@ public:
   virtual int push_local_var_ref(int index);
   virtual int push_ref_static(const char *name, int index);
   virtual int push_fake();
+  virtual int set_integer_local(int index, int value);
   virtual int push_int(int32_t n);
   virtual int push_long(int64_t n);
   virtual int push_float(float f);
@@ -129,6 +130,7 @@ public:
   virtual int ioport_setPinsHigh_I(int port);
   virtual int ioport_setPinsHigh_I(int port, int value);
   virtual int ioport_setPinsLow_I(int port);
+  virtual int ioport_setPinsLow_I(int port, int value);
   //virtual int ioport_setPinAsOutput_I(int port);
   //virtual int ioport_setPinAsInput_I(int port);
   //virtual int ioport_setPinHigh_I(int port);
@@ -139,8 +141,15 @@ public:
 protected:
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 
+  int local_count;    // number of locals in the current method
+  int extra_stack;    // stack space allocated at start of method
+  std::string method_name;
   std::vector<std::string> statics;
   bool is_main : 1;
+  bool need_muls : 1;
+
+private:
+  int add_muls();
 };
 
 #endif
