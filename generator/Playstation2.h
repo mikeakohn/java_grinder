@@ -23,17 +23,17 @@ public:
   virtual int open(const char *filename);
   virtual int start_init();
 
-  virtual int playstation2_setVideoMode_III();
-  virtual int playstation2_setFrameBuffer1_IIIII();
-  virtual int playstation2_setFrameBuffer2_IIIII();
-  virtual int playstation2_setDisplay1_IIIIII();
-  virtual int playstation2_setDisplay2_IIIIII();
+  //virtual int playstation2_setVideoMode_III();
+  //virtual int playstation2_setFrameBuffer1_IIIII();
+  //virtual int playstation2_setFrameBuffer2_IIIII();
+  //virtual int playstation2_setDisplay1_IIIIII();
+  //virtual int playstation2_setDisplay2_IIIIII();
   virtual int playstation2_waitVsync();
 
 private:
   void playstation2_addDMAReset();
-  virtual int playstation2_setFrameBuffer(int index);
-  virtual int playstation2_setDisplay(int index);
+  //virtual int playstation2_setFrameBuffer(int index);
+  //virtual int playstation2_setDisplay(int index);
 };
 
 #endif

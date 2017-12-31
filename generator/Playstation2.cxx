@@ -36,8 +36,16 @@ int Playstation2::open(const char *filename)
 {
   if (MIPS64::open(filename) != 0) { return -1; }
 
-  fprintf(out, ".ps2_ee\n");
-  fprintf(out, ".include \"playstation2.inc\"\n");
+  fprintf(out,
+    ".ps2_ee\n"
+    ".include \"macros.inc\"\n"
+    ".include \"registers_gs_gp.inc\"\n"
+    ".include \"system_calls.inc\"\n"
+    ".include \"registers_ee.inc\"\n"
+    ".include \"registers_gs_priv.inc\"\n"
+    ".include \"vif.inc\"\n\n"
+    ".entry_point main\n"
+    ".export start\n\n");
 
   return 0;
 }
@@ -61,18 +69,60 @@ int Playstation2::start_init()
     "  li $v1, GsPutIMR\n"
     "  li $a0, 0xff00\n"
     "  syscall\n"
-    "  nop\n\n"
+    "  nop\n\n");
 
+  fprintf(out,
+    "  ;; interlace      { PS2_NONINTERLACED = 0, PS2_INTERLACED = 1 };\n"
+    "  ;; videotype      { PS2_NTSC = 2, PS2_PAL = 3 };\n"
+    "  ;; frame          { PS2_FRAME = 1, PS2_FIELD = 0 };\n"
+    "  ;; SetGsCrt(s16 interlace, s16 pal_ntsc, s16 field);\n"
+    "  li $v1, SetGsCrt\n"
+    "  li $a0, 1\n"
+    "  li $a1, 2\n"
+    "  li $a2, 1\n"
+    "  syscall\n"
+    "  nop\n\n");
+
+  // FIXME - GS_PMODE can be a settable function.
+  fprintf(out,
     "  ;; Use framebuffer read circuit (1 or 2?)\n"
     "  li $v1, GS_PMODE\n"
     "  li $v0, 0xff62\n"
     "  sd $v0, ($v1)\n\n");
 
-  // FIXME - GS_PMODE can be a settable function.
+  // These were originally settable, but I think for now I'd rather
+  // just get the drawing functions working.
+
+  fprintf(out,
+    "  ;; GS_DISPFB2 with 0x1400\n"
+    "  ;;         base pointer (fbp): 0x0 (0x0)\n"
+    "  ;;   frame buffer width (fbw): 10 (640)\n"
+    "  ;; pixel storage format (psm): 0 (PSMCT32)\n"
+    "  ;;           position x (dbx): 0 (0x0)\n"
+    "  ;;           position y (dby): 0 (0x0)\n"
+    "  li $v1, GS_DISPFB2\n"
+    "  li $v0, 0x1400\n"
+    "  sd $v0, ($v1)\n\n");
+
+  fprintf(out,
+    "  ;; GS_DISPLAY2 with 0x000d_f9ff_0182_4290\n"
+    "  ;;         x position vck units (dx): 656\n"
+    "  ;;      y position raster units (dy): 36\n"
+    "  ;;        horiz magnification (magh): 3 (x8)\n"
+    "  ;;         vert magnification (magv): 0 (x1)\n"
+    "  ;;     display width - 1 in vck (dw): 2559\n"
+    "  ;; display height - 1 in pixels (dh): 223\n"
+    "  li $v1, GS_DISPLAY2\n"
+    "  li $at, 0xdf9ff\n"
+    "  dsll32 $at, $at, 0\n"
+    "  li $v0, 0x0182_4290\n"
+    "  or $at, $at, $v0\n"
+    "  sd $at, ($v1)\n\n");
 
   return 0;
 }
 
+#if 0
 int Playstation2::playstation2_setVideoMode_III()
 {
   fprintf(out,
@@ -88,7 +138,9 @@ int Playstation2::playstation2_setVideoMode_III()
 
   return 0;
 }
+#endif
 
+#if 0
 int Playstation2::playstation2_setFrameBuffer1_IIIII()
 {
   return playstation2_setFrameBuffer(1);
@@ -108,6 +160,7 @@ int Playstation2::playstation2_setDisplay2_IIIIII()
 {
   return playstation2_setDisplay(2);
 }
+#endif
 
 int Playstation2::playstation2_waitVsync()
 {
@@ -159,6 +212,7 @@ void Playstation2::playstation2_addDMAReset()
     "  nop\n\n");
 }
 
+#if 0
 int Playstation2::playstation2_setFrameBuffer(int index)
 {
   // FIXME - If parameters are stack based, this will fail.
@@ -247,4 +301,5 @@ int Playstation2::playstation2_setDisplay(int index)
 
   return 0;
 }
+#endif
 

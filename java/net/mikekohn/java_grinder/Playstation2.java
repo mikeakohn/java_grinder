@@ -52,19 +52,19 @@ abstract public class Playstation2
   public static final int MAGNIFY_V_4 = 3;
 
   /** Set video display format (what video mode the CRT will use). */
-  public static void setVideoMode(int interlaced, int video_type, int frame) { }
+  //public static void setVideoMode(int interlaced, int video_type, int frame) { }
 
   /** Set frame buffer 1's (DISPFB1) location in memory and shape. */
-  public static void setFrameBuffer1(int base_pointer, int frame_buffer_width, int pixel_storage_format, int position_x, int position_y) { }
+  //public static void setFrameBuffer1(int base_pointer, int frame_buffer_width, int pixel_storage_format, int position_x, int position_y) { }
 
   /** Set frame buffer 2's (DISPFB2) location in memory and shape. */
-  public static void setFrameBuffer2(int base_pointer, int frame_buffer_width, int pixel_storage_format, int position_x, int position_y) { }
+  //public static void setFrameBuffer2(int base_pointer, int frame_buffer_width, int pixel_storage_format, int position_x, int position_y) { }
 
   /** Set frame buffer 1's (DISPLAY1) offset and shape. */
-  public static void setDisplay1(int dx, int dy, int magnify_x, int magnify_y, int dw, int dh) { }
+  //public static void setDisplay1(int dx, int dy, int magnify_x, int magnify_y, int dw, int dh) { }
 
   /** Set frame buffer 2's (DISPLAY2) offset and shape. */
-  public static void setDisplay2(int dx, int dy, int magnify_x, int magnify_y, int dw, int dh) { }
+  //public static void setDisplay2(int dx, int dy, int magnify_x, int magnify_y, int dw, int dh) { }
 
   public static void waitVsync() { }
 }
