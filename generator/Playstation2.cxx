@@ -142,7 +142,8 @@ int Playstation2::new_object(const char *object_name, int field_count)
   while(s != object_name && *s != '/') { s--; }
   if (*s == '/') { s++; }
 
-  if (strcmp(s, "Draw3DPoints") != 0)
+  if (strcmp(s, "Draw3DPoints") != 0 &&
+      strcmp(s, "Draw3DTriangle") != 0)
   {
      printf("Error: Unknown class %s\n", object_name);
      return -1;
@@ -153,14 +154,30 @@ int Playstation2::new_object(const char *object_name, int field_count)
 
 int Playstation2::draw3d_Constructor_X(int type)
 {
-  fprintf(out, "  ; draw3d_Constructor_X()\n");
+  fprintf(out, "  ; draw3d_Constructor_X(type=%d)\n", type);
 
   return -1;
 }
 
 int Playstation2::draw3d_Constructor_I(int type)
 {
-  fprintf(out, "  ; draw3d_Constructor_I()\n");
+  // Need to allocate enough space for:
+  // rx, ry, rz, 0 / x, y, z, 0  (32 bytes)
+  // count, 0, 0, 0,   0, 0, 0, 0 (16 bytes)
+  // 16 bytes per point (for x, y, z)
+  // 16 bytes per point (for color) 
+  fprintf(out, "  ; draw3d_Constructor_I(type=%d)\n", type);
+  fprintf(out, "  ; Align stack pointer, alloca() some memory\n");
+  fprintf(out, "  ; Clear rotation and offset and set point count\n");
+  fprintf(out, "  addi $at, $0, -16\n");
+  fprintf(out, "  and $sp, $fp, $at\n");
+  fprintf(out, "  sll $at, $t%d, 4\n", reg - 1);
+  fprintf(out, "  addi $at, $at, %d\n", 32);
+  fprintf(out, "  sub $sp, $sp, $at\n");
+  fprintf(out, "  sq $0, 0($sp)\n");
+  fprintf(out, "  sq $0, 16($sp)\n");
+  fprintf(out, "  sq $t%d, 24($sp)\n", reg - 1);
+  fprintf(out, "  move $t%d, $sp\n", reg - 1);
 
   return 0;
 }
@@ -236,13 +253,14 @@ int Playstation2::playstation2_waitVsync()
   // so might as well inline it?  Saving $ra, restoring,
   // calling, returning is almost the size of this function.
   fprintf(out,
-    " li $v0, 8\n"
-    " sw $v0, ($v1)\n"
+    "  ; playstation2_waitVsync()\n"
+    "  li $v0, 8\n"
+    "  sw $v0, ($v1)\n"
     "_wait_vsync_%d:\n"
-    " lw $v0, ($v1)\n"
-    " andi $v0, $v0, 8\n"
-    " beqz $v0, _wait_vsync_%d\n"
-    " nop\n", label_count, label_count);
+    "  lw $v0, ($v1)\n"
+    "  andi $v0, $v0, 8\n"
+    "  beqz $v0, _wait_vsync_%d\n"
+    "  nop\n", label_count, label_count);
 
   label_count++;
 

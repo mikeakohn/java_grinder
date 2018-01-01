@@ -5,7 +5,7 @@
  *     Web: http://www.naken.cc/
  * License: GPL
  *
- * Copyright 2014-2017 by Michael Kohn
+ * Copyright 2014-2018 by Michael Kohn
  *
  */
 
@@ -31,7 +31,7 @@ abstract public class Draw3DObject
    public void setPointColor(int index, int color) { }
    public void draw() { }
 
-   float rx, ry, rz;
-   int x, y, z;
+   private float rx, ry, rz;
+   private int x, y, z;
 }
 
