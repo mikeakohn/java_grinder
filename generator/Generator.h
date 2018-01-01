@@ -22,6 +22,7 @@
 #include "API_C64.h"
 #include "API_CPC.h"
 #include "API_DSP.h"
+#include "API_Draw3D.h"
 #include "API_Math.h"
 #include "API_Microcontroller.h"
 #include "API_MSX.h"
@@ -42,6 +43,7 @@ class Generator :
   public API_C64,
   public API_CPC,
   public API_DSP,
+  public API_Draw3D,
   public API_Math,
   public API_Microcontroller,
   public API_MSX,

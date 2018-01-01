@@ -1,10 +1,14 @@
 
 import net.mikekohn.java_grinder.Playstation2;
+import net.mikekohn.java_grinder.Draw3D.Draw3DObject;
+import net.mikekohn.java_grinder.Draw3D.Draw3DPoints;
 
 public class PS2JavaDemo
 {
   static public void main(String args[])
   {
+    Draw3DObject object = new Draw3DPoints("blah.obj");
+    Draw3DPoints points = new Draw3DPoints(5);
 /*
     Playstation2.setVideoMode(Playstation2.INTERLACED,
                               Playstation2.VIDEO_TYPE_NTSC,

@@ -151,6 +151,45 @@ int Playstation2::new_object(const char *object_name, int field_count)
   return 0;
 }
 
+int Playstation2::draw3d_Constructor_X(int type)
+{
+  fprintf(out, "  ; draw3d_Constructor_X()\n");
+
+  return -1;
+}
+
+int Playstation2::draw3d_Constructor_I(int type)
+{
+  fprintf(out, "  ; draw3d_Constructor_I()\n");
+
+  return 0;
+}
+
+int Playstation2::draw3d_rotate_III()
+{
+  return -1;
+}
+
+int Playstation2::draw3d_setPosition_III()
+{
+  return -1;
+}
+
+int Playstation2::draw3d_setPointPosition_IIII()
+{
+  return -1;
+}
+
+int Playstation2::draw3d_setPointColor_II()
+{
+  return -1;
+}
+
+int Playstation2::draw3d_draw()
+{
+  return -1;
+}
+
 #if 0
 int Playstation2::playstation2_setVideoMode_III()
 {

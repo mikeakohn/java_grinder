@@ -16,6 +16,7 @@ API= \
   cpc_.o \
   cpu.o \
   dsp.o \
+  draw3d.o \
   invoke.o \
   invoke_static.o \
   invoke_virtual.o \

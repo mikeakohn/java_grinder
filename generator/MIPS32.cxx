@@ -236,7 +236,7 @@ int MIPS32::push_ref_static(const char *name, int index)
     STACK_PUSH(8);
   }
 
-  return -1;
+  return 0;
 }
 
 int MIPS32::push_fake()

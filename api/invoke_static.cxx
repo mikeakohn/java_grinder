@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2017 by Michael Kohn
+ * Copyright 2014-2018 by Michael Kohn
  *
  */
 
@@ -111,8 +111,8 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
   //printf("function: %s()\n", function);
   int ret = -1;
 
-  size_t len = sizeof("net/mikekohn/java_grinder/") - 1;
-  size_t len_c64 = sizeof("net/mikekohn/java_grinder/C64/") - 1;
+  const size_t len = sizeof("net/mikekohn/java_grinder/") - 1;
+  const size_t len_c64 = sizeof("net/mikekohn/java_grinder/C64/") - 1;
 
   if (strncmp("net/mikekohn/java_grinder/C64/", method_class, len_c64) == 0)
   {

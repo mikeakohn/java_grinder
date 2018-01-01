@@ -1829,7 +1829,8 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         break;
 
       case 183: // invokespecial (0xb7)
-        UNIMPL()
+        ref = GET_PC_UINT16(1);
+        ret = invoke_virtual(java_class, ref, generator);
         break;
 
       case 184: // invokestatic (0xb8)
