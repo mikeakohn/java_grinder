@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2017 by Michael Kohn
+ * Copyright 2014-2018 by Michael Kohn
  *
  */
 
@@ -22,6 +22,7 @@ public:
 
   virtual int open(const char *filename);
   virtual int start_init();
+  virtual int new_object(const char *object_name, int field_count);
 
   //virtual int playstation2_setVideoMode_III();
   //virtual int playstation2_setFrameBuffer1_IIIII();

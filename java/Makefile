@@ -25,6 +25,8 @@ JAVA_SRC=\
   $(SRC_DIR)/Parallella.java \
   $(SRC_DIR)/Playstation2.java \
   $(SRC_DIR)/Propeller.java \
+  $(SRC_DIR)/Draw3D/Draw3DObject.java \
+  $(SRC_DIR)/Draw3D/Draw3DPoints.java \
   $(SRC_DIR)/SegaGenesis.java \
   $(SRC_DIR)/SNES.java \
   $(SRC_DIR)/SPI.java \

@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2017 by Michael Kohn
+ * Copyright 2014-2018 by Michael Kohn
  *
  */
 
@@ -1848,6 +1848,9 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
       case 187: // new (0xbb)
         index = GET_PC_UINT16(1);
         java_class->get_class_name(class_name, sizeof(class_name), index);
+        // FIXME - Field count is 0 here.  This needs to be filled in and
+        // class needs to be loaded and compiled in order to support user
+        // defined classes.  Only API classes can be new'd right now.
         ret = generator->new_object(class_name, 0);
         break;
 

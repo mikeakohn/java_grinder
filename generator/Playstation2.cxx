@@ -5,15 +5,19 @@
  *     Web: http://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2017 by Michael Kohn
+ * Copyright 2014-2018 by Michael Kohn
  *
  */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 
 #include "Playstation2.h"
+
+#define DRAW3D "net/mikekohn/java_grinder/Draw3D/"
+#define DRAW3D_LEN (sizeof(DRAW3D) - 1)
 
 Playstation2::Playstation2()
 {
@@ -118,6 +122,31 @@ int Playstation2::start_init()
     "  li $v0, 0x0182_4290\n"
     "  or $at, $at, $v0\n"
     "  sd $at, ($v1)\n\n");
+
+  return 0;
+}
+
+int Playstation2::new_object(const char *object_name, int field_count)
+{
+  //printf("Error: Here  %s field_count=%d.\n", object_name, field_count);
+
+  if (strncmp(object_name, DRAW3D, DRAW3D_LEN) != 0)
+  {
+     printf("Error: Unsupported class %s\n", object_name);
+     return -1;
+  }
+
+  const char *s = object_name;
+
+  while(*s != 0) { s++; }
+  while(s != object_name && *s != '/') { s--; }
+  if (*s == '/') { s++; }
+
+  if (strcmp(s, "Draw3DPoints") != 0)
+  {
+     printf("Error: Unknown class %s\n", object_name);
+     return -1;
+  }
 
   return 0;
 }
