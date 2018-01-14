@@ -30,10 +30,9 @@ Playstation2::Playstation2()
 
 Playstation2::~Playstation2()
 {
-  // it's 6 instructions to inline and 5 instructions to call
-  //if (need_spi_read) { add_spi_read(); }
-
-  playstation2_addDMAReset();
+  add_dma_reset();
+  add_dma_wait();
+  add_screen_init_clear();
 }
 
 int Playstation2::open(const char *filename)
@@ -123,6 +122,20 @@ int Playstation2::start_init()
     "  or $at, $at, $v0\n"
     "  sd $at, ($v1)\n\n");
 
+  // Not sure if this needs to be called on every frame draw.  I believe
+  // at least part of it should be since it clears the display.
+  fprintf(out,
+    "  ;; Setup draw environment\n"
+    "  jal _dma02_wait\n"
+    "  nop\n"
+    "  li $v0, D2_CHCR\n"
+    "  li $v1, _screen_init_clear\n"
+    "  sw $v1, 0x10($v0)         ; DMA02 ADDRESS\n"
+    "  li $v1, (_screen_init_clear_end - _screen_init_clear) / 16\n"
+    "  sw $v1, 0x20($v0)         ; DMA02 SIZE\n"
+    "  li $v1, 0x101\n"
+    "  sw $v1, ($v0)             ; start\n\n");
+
   return 0;
 }
 
@@ -165,7 +178,7 @@ int Playstation2::draw3d_Constructor_I(int type)
   // rx, ry, rz, 0 / x, y, z, 0  (32 bytes)
   // count, 0, 0, 0,   0, 0, 0, 0 (16 bytes)
   // 16 bytes per point (for x, y, z)
-  // 16 bytes per point (for color) 
+  // 16 bytes per point (for color)
   fprintf(out, "  ; draw3d_Constructor_I(type=%d)\n", type);
   fprintf(out, "  ; Align stack pointer, alloca() some memory\n");
   fprintf(out, "  ; Clear rotation and offset and set point count\n");
@@ -267,7 +280,7 @@ int Playstation2::playstation2_waitVsync()
   return 0;
 }
 
-void Playstation2::playstation2_addDMAReset()
+void Playstation2::add_dma_reset()
 {
   fprintf(out,
     "_dma_reset:\n"
@@ -298,94 +311,41 @@ void Playstation2::playstation2_addDMAReset()
     "  nop\n\n");
 }
 
-#if 0
-int Playstation2::playstation2_setFrameBuffer(int index)
+void Playstation2::add_dma_wait()
 {
-  // FIXME - If parameters are stack based, this will fail.
-
   fprintf(out,
-    "  ;; GS_DISPFB%d -- Will silently fail for out of range values\n"
-    "  ;;         base pointer (fbp  8:0 ): 0x0 (0x0)\n"
-    "  ;;   frame buffer width (fbw 14:9 ): 10 (640)\n"
-    "  ;; pixel storage format (psm 19:15): 0 (PSMCT32)\n"
-    "  ;;           position x (dbx 42:32): 0 (0x0)\n"
-    "  ;;           position y (dby 53:43): 0 (0x0)\n"
-    "  li $v1, GS_DISPFB%d\n"
-    "  dsrl $t%d, $t%d, 11\n"
-    "  move $v0, $t%d\n"
-    "  dsrl $t%d, $t%d, 6\n"
-    "  dsll $t%d, $t%d, 14\n"
-    "  or $v0, $v0, $t%d\n"
-    "  dsll $t%d, $t%d, 15\n"
-    "  or $v0, $v0, $t%d\n"
-    "  dsll32 $t%d, $t%d, 0\n"
-    "  or $v0, $v0, $t%d\n"
-    "  dsll32 $t%d, $t%d, 11\n"
-    "  or $v0, $v0, $t%d\n"
-    "  sd $v0, ($v1)\n\n",
-    index, index,
-    reg - 1, reg - 1,
-    reg - 1,
-    reg - 2, reg - 2,
-    reg - 2, reg - 2,
-    reg - 2,
-    reg - 3, reg - 3,
-    reg - 3,
-    reg - 4, reg - 4,
-    reg - 4,
-    reg - 5, reg - 5,
-    reg - 5);
-
-  reg -= 5;
-
-  return 0;
+    "_dma02_wait:\n"
+    "  li $s1, D2_CHCR\n"
+    "  lw $s0, ($s1)\n"
+    "  andi $s0, $s0, 0x100\n"
+    "  bnez $s0, _dma02_wait\n"
+    "  nop\n"
+    "  jr $ra\n"
+    "  nop\n\n");
 }
 
-int Playstation2::playstation2_setDisplay(int index)
+void Playstation2::add_screen_init_clear()
 {
-  // FIXME - If parameters are stack based, this will fail.
-
   fprintf(out,
-    "  ;; GS_DISPLAY%d -- Bad values will silently fail\n"
-    "  ;;         x position vck units (dx 11:0 ): 656\n"
-    "  ;;      y position raster units (dx 22:12): 36\n"
-    "  ;;        horiz magnification (magh 26:23): 3 (x8)\n"
-    "  ;;         vert magnification (magv 28:27): 0 (x1)\n"
-    "  ;;     display width - 1 in vck (dw 43:32): 2559\n"
-    "  ;; display height - 1 in pixels (dh 54:44): 223\n"
-    "  li $v1, GS_DISPLAY%d\n"
-    "  move $v0, $t%d\n"
-    "  dsll $t%d, $t%d, 12\n"
-    "  or $v0, $v0, $t%d\n"
-    "  dsll $t%d, $t%d, 23\n"
-    "  or $v0, $v0, $t%d\n"
-    "  dsll $t%d, $t%d, 27\n"
-    "  or $v0, $v0, $t%d\n"
-    "  addi $t%d, $t%d, -1\n"
-    "  dsll32 $t%d, $t%d, 0\n"
-    "  or $v0, $v0, $t%d\n"
-    "  addi $t%d, $t%d, -1\n"
-    "  dsll32 $t%d, $t%d, 11\n"
-    "  or $v0, $v0, $t%d\n"
-    "  sd $at, ($v1)\n\n",
-    index, index,
-    reg - 1,
-    reg - 2, reg - 2,
-    reg - 2,
-    reg - 3, reg - 3,
-    reg - 3,
-    reg - 4, reg - 4,
-    reg - 4,
-    reg - 5, reg - 5,
-    reg - 5, reg - 5,
-    reg - 5,
-    reg - 6, reg - 6,
-    reg - 6, reg - 6,
-    reg - 6);
-
-  reg -= 6;
-
-  return 0;
+    ".align 128\n"
+    "_screen_init_clear:\n"
+    "  dc64 0x100000000000800e, REG_A_D\n"
+    "  dc64 0x00a0000, REG_FRAME_1            ; framebuffer width = 640/64\n"
+    "  dc64 0x8c, REG_ZBUF_1              ; 0-8 Zbuffer base, 24-27 Z format (32bit)\n"
+    "  dc32 27648, 30976                      ; X,Y offset\n"
+    "  dc64 REG_XYOFFSET_1\n"
+    "  dc16 0,639, 0,223                      ; x1,y1,x2,y2 - scissor window\n"
+    "  dc64 REG_SCISSOR_1\n"
+    "  dc64 1, REG_PRMODECONT                 ; refer to prim attributes\n"
+    "  dc64 1, REG_COLCLAMP\n"
+    "  dc64 0, REG_DTHE                       ; Dither off\n"
+    "  dc64 0x70000, REG_TEST_1\n"
+    "  dc64 0x30000, REG_TEST_1\n"
+    "  dc64 6, REG_PRIM\n"
+    "  dc64 0x3f80_0000_0000_00ff, REG_RGBAQ  ; Background RGBA\n"
+    "  dc64 0x79006c00, REG_XYZ2              ; (1728.0, 1936.0, 0)\n"
+    "  dc64 0x87009400, REG_XYZ2              ; (2368.0, 2160.0, 0)\n"
+    "  dc64 0x70000, REG_TEST_1\n"
+    "_screen_init_clear_end:\n\n");
 }
-#endif
 

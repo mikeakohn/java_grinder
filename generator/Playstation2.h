@@ -31,17 +31,12 @@ public:
   virtual int draw3d_setPointColor_II();
   virtual int draw3d_draw();
 
-  //virtual int playstation2_setVideoMode_III();
-  //virtual int playstation2_setFrameBuffer1_IIIII();
-  //virtual int playstation2_setFrameBuffer2_IIIII();
-  //virtual int playstation2_setDisplay1_IIIIII();
-  //virtual int playstation2_setDisplay2_IIIIII();
   virtual int playstation2_waitVsync();
 
 private:
-  void playstation2_addDMAReset();
-  //virtual int playstation2_setFrameBuffer(int index);
-  //virtual int playstation2_setDisplay(int index);
+  void add_dma_reset();
+  void add_dma_wait();
+  void add_screen_init_clear();
 };
 
 #endif
