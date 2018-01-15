@@ -32,7 +32,10 @@ Playstation2::~Playstation2()
 {
   add_dma_reset();
   add_dma_wait();
+  add_copy_vu1_code();
   add_screen_init_clear();
+  add_primitive_gif_tag();
+  add_vu1_code();
 }
 
 int Playstation2::open(const char *filename)
@@ -175,90 +178,178 @@ int Playstation2::draw3d_Constructor_X(int type)
 int Playstation2::draw3d_Constructor_I(int type)
 {
   // Need to allocate enough space for:
-  // rx, ry, rz, 0 / x, y, z, 0  (32 bytes)
-  // count, 0, 0, 0,   0, 0, 0, 0 (16 bytes)
-  // 16 bytes per point (for x, y, z)
-  // 16 bytes per point (for color)
+  //  0: rx, ry, rz, 0
+  // 16: x, y, z, 0
+  // 32: count, 0, 0, 0
+  // 48: 16 byte GIF tag
+  // 64: 16 byte primitive info
+  //   : 16 bytes per point (for x, y, z)
+  //   : 16 bytes per point (for color)
   fprintf(out, "  ; draw3d_Constructor_I(type=%d)\n", type);
   fprintf(out, "  ; Align stack pointer, alloca() some memory\n");
   fprintf(out, "  ; Clear rotation and offset and set point count\n");
   fprintf(out, "  addi $at, $0, -16\n");
-  fprintf(out, "  and $sp, $fp, $at\n");
+  fprintf(out, "  and $sp, $sp, $at\n");
   fprintf(out, "  sll $at, $t%d, 4\n", reg - 1);
-  fprintf(out, "  addi $at, $at, %d\n", 32);
+  fprintf(out, "  addi $at, $at, 64\n");
   fprintf(out, "  sub $sp, $sp, $at\n");
   fprintf(out, "  sq $0, 0($sp)\n");
   fprintf(out, "  sq $0, 16($sp)\n");
-  fprintf(out, "  sq $t%d, 24($sp)\n", reg - 1);
+  fprintf(out, "  li $v0, _primitive_gif_tag\n");
+  fprintf(out, "  lq $v1, 0($v0)\n");
+  fprintf(out, "  sll $at, $t%d, 1\n", reg - 1);
+  fprintf(out, "  addi $at, $at, 1\n");
+  fprintf(out, "  or $v1, $v1, $at\n");
+  fprintf(out, "  sq $v1, 48($sp)\n");
+  fprintf(out, "  lq $v1, 16($v0)\n");
+  fprintf(out, "  ori $v1, $v1, %d\n", type);
+  fprintf(out, "  sq $v1, 64($sp)\n");
+  fprintf(out, "  sw $t%d, 32($sp)\n", reg - 1);
+  fprintf(out, "  move $a0, $t%d\n", reg - 1);
   fprintf(out, "  move $t%d, $sp\n", reg - 1);
+
+  // Set points and colors
+  fprintf(out,
+    "  move $v0, $sp\n"
+    "  addi $v0, $sp, 80\n"
+    "  li $a3, 0x3f80_0000\n"
+    "  dsll32 $a3, $a3, 0\n"
+    "  li $a2, REG_RGBAQ\n"
+    "  li $a1, REG_XYZ2\n"
+    "_const_object_%d:\n"
+    "  ld $a3, 0($v0)\n"
+    "  ld $a2, 8($v0)\n"
+    "  ld $0, 16($v0)\n"
+    "  ld $a1, 24($v0)\n"
+    "  addi $v0, $v0, 32\n"
+    "  addi $a0, $a0, -1\n"
+    "  bne $a0, $0, _const_object_%d\n"
+    "  nop\n", label_count, label_count);
+
+  label_count++;
 
   return 0;
 }
 
 int Playstation2::draw3d_rotate_III()
 {
-  return -1;
+  int object = reg - 4;
+  int x = reg - 3;
+  int y = reg - 2;
+  int z = reg - 1;
+
+  fprintf(out,
+    "  ; draw3d_rotate_III()\n"
+    "  lw $t%d, 16($t%d)\n"
+    "  lw $t%d, 20($t%d)\n"
+    "  lw $t%d, 24($t%d)\n",
+    x, object,
+    y, object,
+    z, object);
+
+  reg -= 4;
+
+  return 0;
 }
 
 int Playstation2::draw3d_setPosition_III()
 {
-  return -1;
+  int object = reg - 4;
+  int x = reg - 3;
+  int y = reg - 2;
+  int z = reg - 1;
+
+  fprintf(out,
+    "  ; draw3d_setPointPosition_IIII()\n"
+    "  lw $t%d, 16($t%d)\n"
+    "  lw $t%d, 20($t%d)\n"
+    "  lw $t%d, 24($t%d)\n",
+    x, object,
+    y, object,
+    z, object);
+
+  reg -= 4;
+
+  return 0;
 }
 
 int Playstation2::draw3d_setPointPosition_IIII()
 {
-  return -1;
+  int object = reg - 5;
+  int index = reg - 4;
+  int x = reg - 3;
+  int y = reg - 2;
+  int z = reg - 1;
+
+  fprintf(out,
+    "  ; draw3d_setPointPosition_IIII()\n"
+    "  sll $t%d, $t%d, 5\n"
+    "  add $t%d, $t%d, $t%d\n"
+    "  lw $t%d, 96($t%d)\n"
+    "  lw $t%d, 128($t%d)\n"
+    "  lw $t%d, 104($t%d)\n",
+    index, index,
+    object, object, index,
+    x, object,
+    y, object,
+    z, object);
+
+  reg -= 5;
+
+  return 0;
 }
 
 int Playstation2::draw3d_setPointColor_II()
 {
-  return -1;
-}
+  int object = reg - 3;
+  int index = reg - 2;
+  int color = reg - 1;
 
-int Playstation2::draw3d_draw()
-{
-  return -1;
-}
-
-#if 0
-int Playstation2::playstation2_setVideoMode_III()
-{
   fprintf(out,
-    "  ;; SetGsCrt(s16 interlace, s16 pal_ntsc, s16 field);\n"
-    "  li $v1, SetGsCrt\n"
-    "  move $a0, $t%d\n"
-    "  move $a1, $t%d\n"
-    "  move $a2, $t%d\n"
-    "  syscall\n"
-    "  nop\n\n", reg - 3, reg - 2, reg - 1);
+    "  ; draw3d_setPointColor_II()\n"
+    "  sll $t%d, $t%d, 5\n"
+    "  add $t%d, $t%d, $t%d\n"
+    "  lw $t%d, 80($t%d)\n",
+    index, index,
+    object, object, index,
+    color, object);
 
   reg -= 3;
 
   return 0;
 }
-#endif
 
-#if 0
-int Playstation2::playstation2_setFrameBuffer1_IIIII()
+int Playstation2::draw3d_draw()
 {
-  return playstation2_setFrameBuffer(1);
-}
+  int object = reg - 1;
 
-int Playstation2::playstation2_setFrameBuffer2_IIIII()
-{
-  return playstation2_setFrameBuffer(2);
-}
+  fprintf(out,
+    "  ; draw3d_draw()\n"
+    "  ;; This an be done with DMA, but trying it with the main CPU\n"
+    "  ;; for now.  Copy GIF packet to VU1's data memory segment.\n"
+    "  li $v0, VU1_VU_MEM\n"
+    "  li $a1, $t%d\n"
+    "  sll $a1, 5\n"
+    "  addi $a1, $a1, 80\n"
+    "_repeat_vu1_data_copy_%d:\n"
+    "  lq $a0, ($t%d)\n"
+    "  sq $a0, ($v0)\n"
+    "  addi $t%d, $t%d, 16\n"
+    "  addi $v0, $v0, 16\n"
+    "  addi $a1, $a1, -1\n"
+    "  bnez $a1, _repeat_vu1_data_copy_%d\n"
+    "  nop\n",
+    object,
+    label_count,
+    object, object, object,
+    label_count);
 
-int Playstation2::playstation2_setDisplay1_IIIIII()
-{
-  return playstation2_setDisplay(1);
-}
+  label_count++;
 
-int Playstation2::playstation2_setDisplay2_IIIIII()
-{
-  return playstation2_setDisplay(2);
+  reg -= 1;
+
+  return -1;
 }
-#endif
 
 int Playstation2::playstation2_waitVsync()
 {
@@ -324,6 +415,27 @@ void Playstation2::add_dma_wait()
     "  nop\n\n");
 }
 
+void Playstation2::add_copy_vu1_code()
+{
+  fprintf(out,
+    "  ; draw3d_draw()\n"
+    "  li $v0, VU1_MICRO_MEM\n"
+    "  li $a1, (_rotation_vu1_end - _rotation_vu1) / 16\n"
+    "  li $v1, _rotation_vu1\n"
+    "_repeat_vu1_prog_copy_%d:\n"
+    "  lq $a0, ($v1)\n"
+    "  sq $a0, ($v0)\n"
+    "  addi $v1, $v1, 16\n"
+    "  addi $v0, $v0, 16\n"
+    "  addi $a1, $a1, -1\n"
+    "  bnez $a1, _repeat_vu1_prog_copy_%d\n"
+    "  nop\n",
+    label_count, label_count
+  );
+
+  label_count++;
+}
+
 void Playstation2::add_screen_init_clear()
 {
   fprintf(out,
@@ -347,5 +459,27 @@ void Playstation2::add_screen_init_clear()
     "  dc64 0x87009400, REG_XYZ2              ; (2368.0, 2160.0, 0)\n"
     "  dc64 0x70000, REG_TEST_1\n"
     "_screen_init_clear_end:\n\n");
+}
+
+void Playstation2::add_primitive_gif_tag()
+{
+  fprintf(out,
+    "_primitive_gif_tag:\n"
+    "  dc64 GIF_TAG(0, 1, 0, 0, FLG_PACKED, 1, 0x0), REG_A_D\n"
+    "  dc64 SETREG_PRIM(0, 1, 0, 0, 0, 0, 0, 0, 1), REG_PRIM\n\n");
+}
+
+void Playstation2::add_vu1_code()
+{
+  fprintf(out,
+  ".ps2_ee_vu1\n"
+  ".org 0\n"
+  "_rotation_vu1:\n"
+  "  nop isub vi0, vi0, vi0\n"
+  "  nop nop\n"
+  "  nop xgkick vi0\n"
+  "  nop nop\n"
+  "  nop[E] nop\n"
+  "_rotation_vu1_end:\n\n");
 }
 
