@@ -24,8 +24,8 @@ Playstation2::Playstation2()
   org = 0x100000;
   ram_start = 0x00000000;
   ram_end = 32 * 1024 * 1024;
-  //virtual_address = 0x9d000000;
-  //physical_address = 0x1d000000;
+  virtual_address = 0x0;
+  physical_address = 0x0;
 }
 
 Playstation2::~Playstation2()
@@ -144,7 +144,7 @@ int Playstation2::start_init()
 
 int Playstation2::new_object(const char *object_name, int field_count)
 {
-  //printf("Error: Here  %s field_count=%d.\n", object_name, field_count);
+  fprintf(out, "  ;; new_object(%s, field_count=%d)\n", object_name, field_count);
 
   if (strncmp(object_name, DRAW3D, DRAW3D_LEN) != 0)
   {
@@ -170,7 +170,7 @@ int Playstation2::new_object(const char *object_name, int field_count)
 
 int Playstation2::draw3d_Constructor_X(int type)
 {
-  fprintf(out, "  ; draw3d_Constructor_X(type=%d)\n", type);
+  fprintf(out, "  ;; draw3d_Constructor_X(type=%d)\n", type);
 
   return -1;
 }
@@ -185,9 +185,9 @@ int Playstation2::draw3d_Constructor_I(int type)
   // 64: 16 byte primitive info
   //   : 16 bytes per point (for x, y, z)
   //   : 16 bytes per point (for color)
-  fprintf(out, "  ; draw3d_Constructor_I(type=%d)\n", type);
-  fprintf(out, "  ; Align stack pointer, alloca() some memory\n");
-  fprintf(out, "  ; Clear rotation and offset and set point count\n");
+  fprintf(out, "  ;; draw3d_Constructor_I(type=%d)\n", type);
+  fprintf(out, "  ;; Align stack pointer, alloca() some memory\n");
+  fprintf(out, "  ;; Clear rotation and offset and set point count\n");
   fprintf(out, "  addi $at, $0, -16\n");
   fprintf(out, "  and $sp, $sp, $at\n");
   fprintf(out, "  sll $at, $t%d, 4\n", reg - 1);
@@ -206,7 +206,9 @@ int Playstation2::draw3d_Constructor_I(int type)
   fprintf(out, "  sq $v1, 64($sp)\n");
   fprintf(out, "  sw $t%d, 32($sp)\n", reg - 1);
   fprintf(out, "  move $a0, $t%d\n", reg - 1);
-  fprintf(out, "  move $t%d, $sp\n", reg - 1);
+  //fprintf(out, "  move $t%d, $sp\n", reg - 1);
+  fprintf(out, "  move $t%d, $sp\n", reg - 2);
+  fprintf(out, "  move $t%d, $sp\n", reg - 3);
 
   // Set points and colors
   fprintf(out,
@@ -227,6 +229,7 @@ int Playstation2::draw3d_Constructor_I(int type)
     "  nop\n", label_count, label_count);
 
   label_count++;
+  reg -= 2;
 
   return 0;
 }
@@ -239,7 +242,7 @@ int Playstation2::draw3d_rotate_III()
   int z = reg - 1;
 
   fprintf(out,
-    "  ; draw3d_rotate_III()\n"
+    "  ;; draw3d_rotate_III()\n"
     "  lw $t%d, 16($t%d)\n"
     "  lw $t%d, 20($t%d)\n"
     "  lw $t%d, 24($t%d)\n",
@@ -260,7 +263,7 @@ int Playstation2::draw3d_setPosition_III()
   int z = reg - 1;
 
   fprintf(out,
-    "  ; draw3d_setPosition_III()\n"
+    "  ;; draw3d_setPosition_III()\n"
     "  lw $t%d, 16($t%d)\n"
     "  lw $t%d, 20($t%d)\n"
     "  lw $t%d, 24($t%d)\n",
@@ -282,7 +285,7 @@ int Playstation2::draw3d_setPointPosition_IIII()
   int z = reg - 1;
 
   fprintf(out,
-    "  ; draw3d_setPointPosition_IIII()\n"
+    "  ;; draw3d_setPointPosition_IIII()\n"
     "  sll $t%d, $t%d, 5\n"
     "  add $t%d, $t%d, $t%d\n"
     "  lw $t%d, 96($t%d)\n"
@@ -306,7 +309,7 @@ int Playstation2::draw3d_setPointColor_II()
   int color = reg - 1;
 
   fprintf(out,
-    "  ; draw3d_setPointColor_II()\n"
+    "  ;; draw3d_setPointColor_II()\n"
     "  sll $t%d, $t%d, 5\n"
     "  add $t%d, $t%d, $t%d\n"
     "  lw $t%d, 80($t%d)\n",
@@ -324,7 +327,7 @@ int Playstation2::draw3d_draw()
   int object = reg - 1;
 
   fprintf(out,
-    "  ; draw3d_draw()\n"
+    "  ;; draw3d_draw()\n"
     "  ;; This an be done with DMA, but trying it with the main CPU\n"
     "  ;; for now.  Copy GIF packet to VU1's data memory segment.\n"
     "  li $v0, VU1_VU_MEM\n"
@@ -357,7 +360,7 @@ int Playstation2::playstation2_waitVsync()
   // so might as well inline it?  Saving $ra, restoring,
   // calling, returning is almost the size of this function.
   fprintf(out,
-    "  ; playstation2_waitVsync()\n"
+    "  ;; playstation2_waitVsync()\n"
     "  li $v0, 8\n"
     "  sw $v0, ($v1)\n"
     "_wait_vsync_%d:\n"
@@ -375,27 +378,27 @@ void Playstation2::add_dma_reset()
 {
   fprintf(out,
     "_dma_reset:\n"
-    "  li $s0, D2_CHCR\n"
-    "  sw $zero, 0x00($s0)    ; D2_CHCR\n"
-    "  sw $zero, 0x30($s0)    ; D2_TADR\n"
-    "  sw $zero, 0x10($s0)    ; D2_MADR\n"
-    "  sw $zero, 0x50($s0)    ; D2_ASR1\n"
-    "  sw $zero, 0x40($s0)    ; D2_ASR0\n\n"
+    "  li $v1, D2_CHCR\n"
+    "  sw $zero, 0x00($v1)    ; D2_CHCR\n"
+    "  sw $zero, 0x30($v1)    ; D2_TADR\n"
+    "  sw $zero, 0x10($v1)    ; D2_MADR\n"
+    "  sw $zero, 0x50($v1)    ; D2_ASR1\n"
+    "  sw $zero, 0x40($v1)    ; D2_ASR0\n\n"
 
-    "  li $s0, D_CTRL\n"
-    "  li $s1, 0xff1f\n"
-    "  sw $s1, 0x10($s0)      ; DMA_STAT\n\n"
+    "  li $v1, D_CTRL\n"
+    "  li $v0, 0xff1f\n"
+    "  sw $v0, 0x10($v1)      ; DMA_STAT\n\n"
 
-    "  sw $zero, 0x00($s0)    ; DMA_CTRL\n"
-    "  sw $zero, 0x20($s0)    ; DMA_PCR\n"
-    "  sw $zero, 0x30($s0)    ; DMA_SQWC\n"
-    "  sw $zero, 0x50($s0)    ; DMA_RBOR\n"
-    "  sw $zero, 0x40($s0)    ; DMA_RBSR\n\n"
+    "  sw $zero, 0x00($v1)    ; DMA_CTRL\n"
+    "  sw $zero, 0x20($v1)    ; DMA_PCR\n"
+    "  sw $zero, 0x30($v1)    ; DMA_SQWC\n"
+    "  sw $zero, 0x50($v1)    ; DMA_RBOR\n"
+    "  sw $zero, 0x40($v1)    ; DMA_RBSR\n\n"
 
-    "  lw $s1, 0x00($s0)      ; DMA_CTRL\n"
-    "  ori $s1, $s1, 1\n"
+    "  lw $v0, 0x00($v1)      ; DMA_CTRL\n"
+    "  ori $v0, $v0, 1\n"
     "  nop\n"
-    "  sw $s1, 0x00($s0)      ; DMA_CTRL\n"
+    "  sw $v0, 0x00($v1)      ; DMA_CTRL\n"
     "  nop\n\n"
 
     "  jr $ra\n"
@@ -406,10 +409,10 @@ void Playstation2::add_dma_wait()
 {
   fprintf(out,
     "_dma02_wait:\n"
-    "  li $s1, D2_CHCR\n"
-    "  lw $s0, ($s1)\n"
-    "  andi $s0, $s0, 0x100\n"
-    "  bnez $s0, _dma02_wait\n"
+    "  li $v1, D2_CHCR\n"
+    "  lw $v0, ($v1)\n"
+    "  andi $v0, $v0, 0x100\n"
+    "  bnez $v0, _dma02_wait\n"
     "  nop\n"
     "  jr $ra\n"
     "  nop\n\n");
@@ -418,7 +421,7 @@ void Playstation2::add_dma_wait()
 void Playstation2::add_copy_vu1_code()
 {
   fprintf(out,
-    "  ; draw3d_draw()\n"
+    "  ;; add_copy_vu1_code()\n"
     "  li $v0, VU1_MICRO_MEM\n"
     "  li $a1, (_rotation_vu1_end - _rotation_vu1) / 16\n"
     "  li $v1, _rotation_vu1\n"

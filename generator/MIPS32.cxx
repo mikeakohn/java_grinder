@@ -282,6 +282,22 @@ int MIPS32::push_int(int32_t n)
 
     return 0;
   }
+    else
+  if (value < 32768)
+  {
+    if (reg < reg_max)
+    {
+      fprintf(out, "  ori $t%d, $0, 0x%04x\n", reg, value);
+      reg++;
+    }
+      else
+    {
+      fprintf(out, "  ori $t8, $0, 0x%04x\n", value);
+      STACK_PUSH(8)
+    }
+
+    return 0;
+  }
 
   int index = get_constant(value);
 
