@@ -13,9 +13,17 @@ public class PS2JavaDemo
     Draw3DPoints points = new Draw3DPoints(5);
     Draw3DTriangle triangle = new Draw3DTriangle(3);
 
+    triangle.setPointPosition(0, 1800 << 4, 2000 << 4, 128);
+    triangle.setPointColor(0, 0x000000ff);
+    triangle.setPointPosition(0, 1800 << 4, 2010 << 4, 128);
+    triangle.setPointColor(1, 0x000000ff);
+    triangle.setPointPosition(0, 1900 << 4, 2010 << 4, 128);
+    triangle.setPointColor(2, 0x000000ff);
+
     for(n = 0; n < 1000; n++)
     {
       Playstation2.waitVsync();
+      triangle.draw();
     }
   }
 

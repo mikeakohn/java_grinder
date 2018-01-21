@@ -3,7 +3,7 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
  * Copyright 2014-2018 by Michael Kohn
  *
@@ -15,9 +15,9 @@
 #include "Generator.h"
 #include "JavaClass.h"
 
-int playstation2(JavaClass *java_class, Generator *generator, char *method_name);
-int playstation2(JavaClass *java_class, Generator *generator, char *method_name, int const_val);
-int playstation2(JavaClass *java_class, Generator *generator, char *method_name, int const_val1, int const_val2);
+int draw3d(JavaClass *java_class, Generator *generator, char *method_name);
+int draw3d(JavaClass *java_class, Generator *generator, char *method_name, int const_val);
+int draw3d(JavaClass *java_class, Generator *generator, char *method_name, int const_val1, int const_val2);
 
 #endif
 

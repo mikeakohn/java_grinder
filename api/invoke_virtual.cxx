@@ -3,7 +3,7 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
  * Copyright 2014-2018 by Michael Kohn
  *
@@ -179,7 +179,14 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
         }
       }
     }
-
+      else
+    {
+      if (strcmp(cls, "Draw3DPoints") == 0 ||
+          strcmp(cls, "Draw3DTriangle") == 0)
+      {
+        ret = draw3d(java_class, generator, function);
+      }
+    }
   }
 
   if (ret == 0) { return 0; }

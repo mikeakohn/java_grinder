@@ -3,7 +3,7 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
  * Copyright 2014-2018 by Michael Kohn
  *
@@ -15,11 +15,6 @@
 class API_Playstation2
 {
 public:
-  //virtual int playstation2_setVideoMode_III() { return -1; }
-  //virtual int playstation2_setFrameBuffer1_IIIII() { return -1; }
-  //virtual int playstation2_setFrameBuffer2_IIIII() { return -1; }
-  //virtual int playstation2_setDisplay1_IIIIII() { return -1; }
-  //virtual int playstation2_setDisplay2_IIIIII() { return -1; }
   virtual int playstation2_waitVsync() { return -1; }
 };
 

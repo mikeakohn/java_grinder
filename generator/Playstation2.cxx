@@ -3,7 +3,7 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
  * Copyright 2014-2018 by Michael Kohn
  *
@@ -260,7 +260,7 @@ int Playstation2::draw3d_setPosition_III()
   int z = reg - 1;
 
   fprintf(out,
-    "  ; draw3d_setPointPosition_IIII()\n"
+    "  ; draw3d_setPosition_III()\n"
     "  lw $t%d, 16($t%d)\n"
     "  lw $t%d, 20($t%d)\n"
     "  lw $t%d, 24($t%d)\n",
@@ -328,8 +328,8 @@ int Playstation2::draw3d_draw()
     "  ;; This an be done with DMA, but trying it with the main CPU\n"
     "  ;; for now.  Copy GIF packet to VU1's data memory segment.\n"
     "  li $v0, VU1_VU_MEM\n"
-    "  li $a1, $t%d\n"
-    "  sll $a1, 5\n"
+    "  move $a1, $t%d\n"
+    "  sll $a1, $a1, 5\n"
     "  addi $a1, $a1, 80\n"
     "_repeat_vu1_data_copy_%d:\n"
     "  lq $a0, ($t%d)\n"
@@ -348,7 +348,7 @@ int Playstation2::draw3d_draw()
 
   reg -= 1;
 
-  return -1;
+  return 0;
 }
 
 int Playstation2::playstation2_waitVsync()
@@ -476,6 +476,7 @@ void Playstation2::add_vu1_code()
   ".org 0\n"
   "_rotation_vu1:\n"
   "  nop isub vi0, vi0, vi0\n"
+  "  nop iaddiu vi0, vi0, 48\n"
   "  nop nop\n"
   "  nop xgkick vi0\n"
   "  nop nop\n"
