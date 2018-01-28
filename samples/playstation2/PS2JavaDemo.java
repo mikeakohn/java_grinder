@@ -23,14 +23,20 @@ public class PS2JavaDemo
     for(n = 0; n < 1000; n++)
     {
       Playstation2.waitVsync();
+      Playstation2.clearScreen();
       triangle.draw();
     }
   }
 
   static public void main(String args[])
   {
-    animate();
-    while(true);
+    //animate();
+
+    while(true)
+    {
+      Playstation2.waitVsync();
+      Playstation2.clearScreen();
+    }
   }
 }
 

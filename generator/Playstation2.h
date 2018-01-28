@@ -31,6 +31,7 @@ public:
   virtual int draw3d_setPointColor_II();
   virtual int draw3d_draw();
 
+  virtual int playstation2_clearScreen();
   virtual int playstation2_waitVsync();
 
 private:

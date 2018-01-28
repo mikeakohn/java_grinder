@@ -37,6 +37,7 @@
 
 int playstation2(JavaClass *java_class, Generator *generator, char *method_name)
 {
+  CHECK_FUNC(clearScreen,)
   CHECK_FUNC(waitVsync,)
 
   return -1;

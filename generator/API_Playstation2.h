@@ -15,6 +15,7 @@
 class API_Playstation2
 {
 public:
+  virtual int playstation2_clearScreen() { return -1; }
   virtual int playstation2_waitVsync() { return -1; }
 };
 

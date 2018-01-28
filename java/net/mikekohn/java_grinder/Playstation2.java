@@ -66,6 +66,7 @@ abstract public class Playstation2
   /** Set frame buffer 2's (DISPLAY2) offset and shape. */
   //public static void setDisplay2(int dx, int dy, int magnify_x, int magnify_y, int dw, int dh) { }
 
+  public static void clearScreen() { }
   public static void waitVsync() { }
 }
 

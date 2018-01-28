@@ -50,7 +50,7 @@ int Playstation2::open(const char *filename)
     ".include \"registers_ee.inc\"\n"
     ".include \"registers_gs_priv.inc\"\n"
     ".include \"vif.inc\"\n\n"
-    ".entry_point main\n"
+    ".entry_point start\n"
     ".export start\n\n");
 
   return 0;
@@ -124,20 +124,6 @@ int Playstation2::start_init()
     "  li $v0, 0x0182_4290\n"
     "  or $at, $at, $v0\n"
     "  sd $at, ($v1)\n\n");
-
-  // Not sure if this needs to be called on every frame draw.  I believe
-  // at least part of it should be since it clears the display.
-  fprintf(out,
-    "  ;; Setup draw environment\n"
-    "  jal _dma02_wait\n"
-    "  nop\n"
-    "  li $v0, D2_CHCR\n"
-    "  li $v1, _screen_init_clear\n"
-    "  sw $v1, 0x10($v0)         ; DMA02 ADDRESS\n"
-    "  li $v1, (_screen_init_clear_end - _screen_init_clear) / 16\n"
-    "  sw $v1, 0x20($v0)         ; DMA02 SIZE\n"
-    "  li $v1, 0x101\n"
-    "  sw $v1, ($v0)             ; start\n\n");
 
   return 0;
 }
@@ -354,6 +340,25 @@ int Playstation2::draw3d_draw()
   return 0;
 }
 
+int Playstation2::playstation2_clearScreen()
+{
+  // Not sure if this needs to be called on every frame draw.  I believe
+  // at least part of it should be since it clears the display.
+  fprintf(out,
+    "  ;; Draw a black square over the entire screen\n"
+    "  jal _dma02_wait\n"
+    "  nop\n"
+    "  li $v0, D2_CHCR\n"
+    "  li $v1, _screen_init_clear\n"
+    "  sw $v1, 0x10($v0)         ; DMA02 ADDRESS\n"
+    "  li $v1, (_screen_init_clear_end - _screen_init_clear) / 16\n"
+    "  sw $v1, 0x20($v0)         ; DMA02 SIZE\n"
+    "  li $v1, 0x101\n"
+    "  sw $v1, ($v0)             ; start\n\n");
+
+  return 0;
+}
+
 int Playstation2::playstation2_waitVsync()
 {
   // It seems like this shouldn't be called very often
@@ -361,12 +366,13 @@ int Playstation2::playstation2_waitVsync()
   // calling, returning is almost the size of this function.
   fprintf(out,
     "  ;; playstation2_waitVsync()\n"
-    "  li $v0, 8\n"
-    "  sw $v0, ($v1)\n"
+    "  li $v0, GS_CSR\n"
+    "  li $v1, 8\n"
+    "  sw $v1, ($v0)\n"
     "_wait_vsync_%d:\n"
-    "  lw $v0, ($v1)\n"
-    "  andi $v0, $v0, 8\n"
-    "  beqz $v0, _wait_vsync_%d\n"
+    "  lw $v1, ($v0)\n"
+    "  andi $v1, $v1, 8\n"
+    "  beqz $v1, _wait_vsync_%d\n"
     "  nop\n", label_count, label_count);
 
   label_count++;
@@ -467,6 +473,7 @@ void Playstation2::add_screen_init_clear()
 void Playstation2::add_primitive_gif_tag()
 {
   fprintf(out,
+    ".align 128\n"
     "_primitive_gif_tag:\n"
     "  dc64 GIF_TAG(0, 1, 0, 0, FLG_PACKED, 1, 0x0), REG_A_D\n"
     "  dc64 SETREG_PRIM(0, 1, 0, 0, 0, 0, 0, 0, 1), REG_PRIM\n\n");
@@ -476,7 +483,8 @@ void Playstation2::add_vu1_code()
 {
   fprintf(out,
   ".ps2_ee_vu1\n"
-  ".org 0\n"
+  //".org 0\n"
+  ".align 128\n"
   "_rotation_vu1:\n"
   "  nop isub vi0, vi0, vi0\n"
   "  nop iaddiu vi0, vi0, 48\n"
@@ -485,5 +493,7 @@ void Playstation2::add_vu1_code()
   "  nop nop\n"
   "  nop[E] nop\n"
   "_rotation_vu1_end:\n\n");
+
+  fprintf(out, ".ps2_ee\n\n");
 }
 
