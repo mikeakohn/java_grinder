@@ -169,38 +169,50 @@ int Playstation2::draw3d_Constructor_I(int type)
   // 32: count, 0, 0, 0
   // 48: 16 byte GIF tag
   // 64: 16 byte primitive info
-  //   : 16 bytes per point (for x, y, z)
-  //   : 16 bytes per point (for color)
+  // 80: 32 bytes per point (for x, y, z)
+  //   : 32 bytes per point (for color)
   fprintf(out, "  ;; draw3d_Constructor_I(type=%d)\n", type);
   fprintf(out, "  ;; Align stack pointer, alloca() some memory\n");
   fprintf(out, "  ;; Clear rotation and offset and set point count\n");
-  fprintf(out, "  addi $at, $0, -16\n");
+  fprintf(out, "  addiu $at, $0, -16\n");
   fprintf(out, "  and $sp, $sp, $at\n");
-  fprintf(out, "  sll $at, $t%d, 4\n", reg - 1);
-  fprintf(out, "  addi $at, $at, 64\n");
-  fprintf(out, "  sub $sp, $sp, $at\n");
+
+  // Allocated memory is number of points * 32 + size of header.
+  fprintf(out, "  sll $at, $t%d, 5\n", reg - 1);
+  fprintf(out, "  addiu $at, $at, 80\n");
+  fprintf(out, "  subu $sp, $sp, $at\n");
+
+  // Clear out members of the structure (rotation, xyz position, etc).
   fprintf(out, "  sq $0, 0($sp)\n");
   fprintf(out, "  sq $0, 16($sp)\n");
+
+  // Copy the default primitive tag to the new structure.
   fprintf(out, "  li $v0, _primitive_gif_tag\n");
   fprintf(out, "  lq $v1, 0($v0)\n");
   fprintf(out, "  sll $at, $t%d, 1\n", reg - 1);
-  fprintf(out, "  addi $at, $at, 1\n");
+  fprintf(out, "  addiu $at, $at, 1\n");
   fprintf(out, "  or $v1, $v1, $at\n");
   fprintf(out, "  sq $v1, 48($sp)\n");
   fprintf(out, "  lq $v1, 16($v0)\n");
   fprintf(out, "  ori $v1, $v1, %d\n", type);
   fprintf(out, "  sq $v1, 64($sp)\n");
+
+  // Save point count in the struct
   fprintf(out, "  sw $t%d, 32($sp)\n", reg - 1);
+
+  // a0 = count
   fprintf(out, "  move $a0, $t%d\n", reg - 1);
-  //fprintf(out, "  move $t%d, $sp\n", reg - 1);
-  fprintf(out, "  move $t%d, $sp\n", reg - 2);
-  fprintf(out, "  move $t%d, $sp\n", reg - 3);
+
+  // Return value of new is a pointer to the constructed object.
+  fprintf(out, "  move $t%d, $sp\n", reg - 1);
+  //fprintf(out, "  move $t%d, $sp\n", reg - 2);
+  //fprintf(out, "  move $t%d, $sp\n", reg - 3);
 
   // Set points and colors
   fprintf(out,
     "  move $v0, $sp\n"
-    "  addi $v0, $sp, 80\n"
-    "  li $a3, 0x3f80_0000\n"
+    "  addiu $v0, $sp, 80\n"
+    "  lui $a3, 0x3f80\n"
     "  dsll32 $a3, $a3, 0\n"
     "  li $a2, REG_RGBAQ\n"
     "  li $a1, REG_XYZ2\n"
@@ -209,8 +221,8 @@ int Playstation2::draw3d_Constructor_I(int type)
     "  ld $a2, 8($v0)\n"
     "  ld $0, 16($v0)\n"
     "  ld $a1, 24($v0)\n"
-    "  addi $v0, $v0, 32\n"
-    "  addi $a0, $a0, -1\n"
+    "  addiu $v0, $v0, 32\n"
+    "  addiu $a0, $a0, -1\n"
     "  bne $a0, $0, _const_object_%d\n"
     "  nop\n", label_count, label_count);
 
@@ -273,7 +285,7 @@ int Playstation2::draw3d_setPointPosition_IIII()
   fprintf(out,
     "  ;; draw3d_setPointPosition_IIII()\n"
     "  sll $t%d, $t%d, 5\n"
-    "  add $t%d, $t%d, $t%d\n"
+    "  addu $t%d, $t%d, $t%d\n"
     "  lw $t%d, 96($t%d)\n"
     "  lw $t%d, 128($t%d)\n"
     "  lw $t%d, 104($t%d)\n",
@@ -297,7 +309,7 @@ int Playstation2::draw3d_setPointColor_II()
   fprintf(out,
     "  ;; draw3d_setPointColor_II()\n"
     "  sll $t%d, $t%d, 5\n"
-    "  add $t%d, $t%d, $t%d\n"
+    "  addu $t%d, $t%d, $t%d\n"
     "  lw $t%d, 80($t%d)\n",
     index, index,
     object, object, index,
@@ -319,13 +331,13 @@ int Playstation2::draw3d_draw()
     "  li $v0, VU1_VU_MEM\n"
     "  move $a1, $t%d\n"
     "  sll $a1, $a1, 5\n"
-    "  addi $a1, $a1, 80\n"
+    "  addiu $a1, $a1, 80\n"
     "_repeat_vu1_data_copy_%d:\n"
     "  lq $a0, ($t%d)\n"
     "  sq $a0, ($v0)\n"
-    "  addi $t%d, $t%d, 16\n"
-    "  addi $v0, $v0, 16\n"
-    "  addi $a1, $a1, -1\n"
+    "  addiu $t%d, $t%d, 16\n"
+    "  addiu $v0, $v0, 16\n"
+    "  addiu $a1, $a1, -1\n"
     "  bnez $a1, _repeat_vu1_data_copy_%d\n"
     "  nop\n",
     object,
@@ -434,9 +446,9 @@ void Playstation2::add_copy_vu1_code()
     "_repeat_vu1_prog_copy_%d:\n"
     "  lq $a0, ($v1)\n"
     "  sq $a0, ($v0)\n"
-    "  addi $v1, $v1, 16\n"
-    "  addi $v0, $v0, 16\n"
-    "  addi $a1, $a1, -1\n"
+    "  addiu $v1, $v1, 16\n"
+    "  addiu $v0, $v0, 16\n"
+    "  addiu $a1, $a1, -1\n"
     "  bnez $a1, _repeat_vu1_prog_copy_%d\n"
     "  nop\n",
     label_count, label_count

@@ -3,7 +3,7 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
  * Copyright 2014-2018 by Michael Kohn
  *
@@ -105,7 +105,7 @@ int MIPS32::start_init()
   fprintf(out, ".org 0x%x\n", org);
   fprintf(out, "start:\n");
 
-  fprintf(out, "  li $s0, _constant_pool + voffset  ; $s0 points to constant numbers\n");
+  //fprintf(out, "  li $s0, _constant_pool + voffset  ; $s0 points to constant numbers\n");
   fprintf(out, "  li $s1, ram_start       ; $s1 points to statics\n");
   fprintf(out, "  li $sp, ram_end+1\n");
 
@@ -187,7 +187,7 @@ void MIPS32::method_start(int local_count, int max_stack, int param_count, const
 
   fprintf(out, "%s:\n", name);
   fprintf(out, "  ; %s(local_count=%d, max_stack=%d, param_count=%d)\n", name, local_count, max_stack, param_count);
-  fprintf(out, "  addi $sp, $sp, -%d\n", local_count * 4);
+  fprintf(out, "  addiu $sp, $sp, -%d\n", local_count * 4);
   fprintf(out, "  or $fp, $0, $sp\n");
 }
 
@@ -264,7 +264,7 @@ int MIPS32::push_int(int32_t n)
       STACK_PUSH(0)
     }
 
-    return 0;
+    //return 0;
   }
     else
   if ((value & 0x0000ffff) == 0x0000)
@@ -280,10 +280,10 @@ int MIPS32::push_int(int32_t n)
       STACK_PUSH(8)
     }
 
-    return 0;
+    //return 0;
   }
     else
-  if (value < 32768)
+  if (n >= 0 && n < 0xffff)
   {
     if (reg < reg_max)
     {
@@ -296,9 +296,39 @@ int MIPS32::push_int(int32_t n)
       STACK_PUSH(8)
     }
 
-    return 0;
+    //return 0;
+  }
+    else
+  if (n >= -32768 && n < 32768)
+  {
+    if (reg < reg_max)
+    {
+      fprintf(out, "  addiu $t%d, $0, %d\n", reg, n);
+      reg++;
+    }
+      else
+    {
+      fprintf(out, "  addiu $t8, $0, %d\n", n);
+      STACK_PUSH(8)
+    }
+
+    //return 0;
+  }
+    else
+  {
+    if (reg < reg_max)
+    {
+      fprintf(out, "  li $t%d, $0, 0x%04x\n", reg, value);
+      reg++;
+    }
+      else
+    {
+      fprintf(out, "  li $t8, $0, 0x%04x\n", value);
+      STACK_PUSH(8)
+    }
   }
 
+#if 0
   int index = get_constant(value);
 
   if (index == -1)
@@ -327,6 +357,7 @@ int MIPS32::push_int(int32_t n)
       STACK_PUSH(8)
     }
   }
+#endif
 
   return 0;
 }
@@ -946,7 +977,7 @@ int MIPS32::return_local(int index, int local_count)
   }
 
   fprintf(out, "  lw $v0, %d($fp) ; local_%d\n", LOCALS(index), index);
-  fprintf(out, "  addi $sp, $fp, %d\n", local_count * 4);
+  fprintf(out, "  addiu $sp, $fp, %d\n", local_count * 4);
   fprintf(out, "  jr $ra\n");
   fprintf(out, "  nop\n");
 
@@ -961,7 +992,7 @@ int MIPS32::return_integer(int local_count)
   }
 
   fprintf(out, "  move $v0, $t0\n");
-  fprintf(out, "  addi $sp, $fp, %d\n", local_count * 4);
+  fprintf(out, "  addiu $sp, $fp, %d\n", local_count * 4);
   fprintf(out, "  jr $ra\n");
   fprintf(out, "  nop ; Delay slot\n");
   reg--;
@@ -976,7 +1007,7 @@ int MIPS32::return_void(int local_count)
     printf("Internal Error: Reg stack not empty %s:%d\n", __FILE__, __LINE__);
   }
 
-  fprintf(out, "  addi $sp, $fp, %d\n", local_count * 4);
+  fprintf(out, "  addiu $sp, $fp, %d\n", local_count * 4);
   fprintf(out, "  jr $ra\n");
   fprintf(out, "  nop ; Delay slot\n");
   return 0;
@@ -1009,7 +1040,7 @@ int MIPS32::invoke_static_method(const char *name, int params, int is_void)
   save_space = ((save_regs) * 4) + 8;
 
   // Save ra and fp
-  fprintf(out, "  addi $sp, $sp, -%d\n", save_space);
+  fprintf(out, "  addiu $sp, $sp, -%d\n", save_space);
   fprintf(out, "  sw $ra, %d($sp)\n", save_space - 4);
   fprintf(out, "  sw $fp, %d($sp)\n", save_space - 8);
 
@@ -1049,14 +1080,14 @@ int MIPS32::invoke_static_method(const char *name, int params, int is_void)
   // Restore ra and fp
   fprintf(out, "  lw $ra, %d($sp)\n", save_space - 4);
   fprintf(out, "  lw $fp, %d($sp)\n", save_space - 8);
-  fprintf(out, "  addi $sp, $sp, %d\n", save_space);
+  fprintf(out, "  addiu $sp, $sp, %d\n", save_space);
 
   // Decrease count on reg stack.
   if (stack > 0)
   {
     // Pick the min between stack and params.
     n = (stack > params) ? params : stack;
-    fprintf(out, "  addi $sp, $sp, %d\n", n * 4);
+    fprintf(out, "  addiu $sp, $sp, %d\n", n * 4);
     params -= n;
   }
 
@@ -1072,7 +1103,7 @@ int MIPS32::invoke_static_method(const char *name, int params, int is_void)
     }
       else
     {
-      fprintf(out, "  addi $sp, $sp, -%d\n", 4);
+      fprintf(out, "  addiu $sp, $sp, -%d\n", 4);
       fprintf(out, "  sw $v0, 0($sp)\n");
       stack++;
     }
