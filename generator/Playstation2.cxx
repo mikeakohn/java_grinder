@@ -346,8 +346,10 @@ int Playstation2::playstation2_clearScreen()
   // at least part of it should be since it clears the display.
   fprintf(out,
     "  ;; Draw a black square over the entire screen\n"
+    "  move $at, $ra\n"
     "  jal _dma02_wait\n"
     "  nop\n"
+    "  move $ra, $at\n"
     "  li $v0, D2_CHCR\n"
     "  li $v1, _screen_init_clear\n"
     "  sw $v1, 0x10($v0)         ; DMA02 ADDRESS\n"
