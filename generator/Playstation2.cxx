@@ -62,6 +62,7 @@ int Playstation2::start_init()
   fprintf(out,
     "  // Set stack pointer and reset DMA\n"
     "  li $sp, 0x02000000\n"
+    //"  li $sp, 0x100700\n"
     "  jal _dma_reset\n"
     "  nop\n\n"
 
@@ -183,6 +184,9 @@ int Playstation2::draw3d_Constructor_I(int type)
   fprintf(out, "  addiu $at, $at, 80\n");
   fprintf(out, "  subu $sp, $sp, $at\n");
 
+  // Set top of reg stack (return value) to allocated memory.
+  fprintf(out, "  move $t%d, $sp\n", reg - 3);
+
   // Clear out members of the structure (rotation, xyz position, etc).
   fprintf(out, "  sq $0, 0($sp)\n");
   fprintf(out, "  sq $0, 16($sp)\n");
@@ -204,24 +208,18 @@ int Playstation2::draw3d_Constructor_I(int type)
   // a0 = count
   fprintf(out, "  move $a0, $t%d\n", reg - 1);
 
-  // Return value of new is a pointer to the constructed object.
-  fprintf(out, "  move $t%d, $sp\n", reg - 1);
-  //fprintf(out, "  move $t%d, $sp\n", reg - 2);
-  //fprintf(out, "  move $t%d, $sp\n", reg - 3);
-
   // Set points and colors
   fprintf(out,
-    "  move $v0, $sp\n"
     "  addiu $v0, $sp, 80\n"
     "  lui $a3, 0x3f80\n"
     "  dsll32 $a3, $a3, 0\n"
     "  li $a2, REG_RGBAQ\n"
     "  li $a1, REG_XYZ2\n"
     "_const_object_%d:\n"
-    "  ld $a3, 0($v0)\n"
-    "  ld $a2, 8($v0)\n"
-    "  ld $0, 16($v0)\n"
-    "  ld $a1, 24($v0)\n"
+    "  sd $a3, 0($v0)\n"
+    "  sd $a2, 8($v0)\n"
+    "  sd $0, 16($v0)\n"
+    "  sd $a1, 24($v0)\n"
     "  addiu $v0, $v0, 32\n"
     "  addiu $a0, $a0, -1\n"
     "  bne $a0, $0, _const_object_%d\n"
@@ -242,9 +240,9 @@ int Playstation2::draw3d_rotate_III()
 
   fprintf(out,
     "  ;; draw3d_rotate_III()\n"
-    "  lw $t%d, 16($t%d)\n"
-    "  lw $t%d, 20($t%d)\n"
-    "  lw $t%d, 24($t%d)\n",
+    "  sw $t%d, 16($t%d)\n"
+    "  sw $t%d, 20($t%d)\n"
+    "  sw $t%d, 24($t%d)\n",
     x, object,
     y, object,
     z, object);
@@ -263,9 +261,9 @@ int Playstation2::draw3d_setPosition_III()
 
   fprintf(out,
     "  ;; draw3d_setPosition_III()\n"
-    "  lw $t%d, 16($t%d)\n"
-    "  lw $t%d, 20($t%d)\n"
-    "  lw $t%d, 24($t%d)\n",
+    "  sw $t%d, 16($t%d)\n"
+    "  sw $t%d, 20($t%d)\n"
+    "  sw $t%d, 24($t%d)\n",
     x, object,
     y, object,
     z, object);
@@ -286,11 +284,13 @@ int Playstation2::draw3d_setPointPosition_IIII()
   fprintf(out,
     "  ;; draw3d_setPointPosition_IIII()\n"
     "  sll $t%d, $t%d, 5\n"
+    "  addiu $t%d, $t%d, 96\n"
     "  addu $t%d, $t%d, $t%d\n"
-    "  lw $t%d, 96($t%d)\n"
-    "  lw $t%d, 128($t%d)\n"
-    "  lw $t%d, 104($t%d)\n",
+    "  sh $t%d, 0($t%d)\n"
+    "  sh $t%d, 2($t%d)\n"
+    "  sh $t%d, 4($t%d)\n",
     index, index,
+    object, object,
     object, object, index,
     x, object,
     y, object,
@@ -310,9 +310,11 @@ int Playstation2::draw3d_setPointColor_II()
   fprintf(out,
     "  ;; draw3d_setPointColor_II()\n"
     "  sll $t%d, $t%d, 5\n"
+    "  addiu $t%d, $t%d, 80\n"
     "  addu $t%d, $t%d, $t%d\n"
-    "  lw $t%d, 80($t%d)\n",
+    "  sw $t%d, 0($t%d)\n",
     index, index,
+    object, object,
     object, object, index,
     color, object);
 
@@ -330,9 +332,10 @@ int Playstation2::draw3d_draw()
     "  ;; This an be done with DMA, but trying it with the main CPU\n"
     "  ;; for now.  Copy GIF packet to VU1's data memory segment.\n"
     "  li $v0, VU1_VU_MEM\n"
-    "  move $a1, $t%d\n"
-    "  lw $a1, 32($a1)\n"
-    "  addiu $v1, $t%d, 48\n"
+    "  move $v1, $t%d\n"
+    "  lw $a1, 32($v1)\n"
+    "  sll $a1, $a1, 1\n"
+    "  addiu $a1, $a1, 5\n"
     "_repeat_vu1_data_copy_%d:\n"
     "  lq $a0, ($v1)\n"
     "  sq $a0, ($v0)\n"
@@ -341,7 +344,6 @@ int Playstation2::draw3d_draw()
     "  addiu $a1, $a1, -1\n"
     "  bnez $a1, _repeat_vu1_data_copy_%d\n"
     "  nop\n\n",
-    object,
     object,
     label_count,
     label_count);
@@ -516,10 +518,10 @@ void Playstation2::add_vu1_code()
   //".org 0\n"
   ".align 128\n"
   "_rotation_vu1:\n"
-  "  nop isub vi0, vi0, vi0\n"
-  "  nop iaddiu vi0, vi0, 48\n"
+  "  nop isub vi1, vi1, vi1\n"
+  "  nop iaddiu vi1, vi1, 3\n"
   "  nop nop\n"
-  "  nop xgkick vi0\n"
+  "  nop xgkick vi1\n"
   "  nop nop\n"
   "  nop[E] nop\n"
   "_rotation_vu1_end:\n\n");
