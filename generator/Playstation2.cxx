@@ -32,7 +32,6 @@ Playstation2::~Playstation2()
 {
   add_dma_reset();
   add_dma_wait();
-  add_copy_vu1_code();
   add_screen_init_clear();
   add_primitive_gif_tag();
   add_vu1_code();
@@ -124,6 +123,8 @@ int Playstation2::start_init()
     "  li $v0, 0x0182_4290\n"
     "  or $at, $at, $v0\n"
     "  sd $at, ($v1)\n\n");
+
+  add_copy_vu1_code();
 
   return 0;
 }
@@ -330,20 +331,30 @@ int Playstation2::draw3d_draw()
     "  ;; for now.  Copy GIF packet to VU1's data memory segment.\n"
     "  li $v0, VU1_VU_MEM\n"
     "  move $a1, $t%d\n"
-    "  sll $a1, $a1, 5\n"
-    "  addiu $a1, $a1, 80\n"
+    "  lw $a1, 32($a1)\n"
+    "  addiu $v1, $t%d, 48\n"
     "_repeat_vu1_data_copy_%d:\n"
-    "  lq $a0, ($t%d)\n"
+    "  lq $a0, ($v1)\n"
     "  sq $a0, ($v0)\n"
-    "  addiu $t%d, $t%d, 16\n"
+    "  addiu $v1, $v1, 16\n"
     "  addiu $v0, $v0, 16\n"
     "  addiu $a1, $a1, -1\n"
     "  bnez $a1, _repeat_vu1_data_copy_%d\n"
-    "  nop\n",
+    "  nop\n\n",
+    object,
     object,
     label_count,
-    object, object, object,
     label_count);
+
+  fprintf(out,
+    "  ;; Start the VU1 with a VIF packet\n"
+    "  li $v0, D1_CHCR\n"
+    "  li $v1, vu1_start\n"
+    "  sw $v1, 0x10($v0)         ; DMA01 ADDRESS\n"
+    "  li $v1, 1                 ; Length is only 1 qword\n"
+    "  sw $v1, 0x20($v0)         ; DMA01 SIZE\n"
+    "  li $v1, 0x101\n"
+    "  sw $v1, ($v0)             ; start\n\n");
 
   label_count++;
 
@@ -495,6 +506,11 @@ void Playstation2::add_primitive_gif_tag()
 
 void Playstation2::add_vu1_code()
 {
+  fprintf(out,
+    ".align 128\n"
+    "vu1_start:\n"
+    "  dc64 0x0, (VIF_MSCAL << 24)\n\n");
+
   fprintf(out,
   ".ps2_ee_vu1\n"
   //".org 0\n"

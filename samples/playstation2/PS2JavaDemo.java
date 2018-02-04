@@ -10,15 +10,15 @@ public class PS2JavaDemo
   {
     int n;
 
-    Draw3DPoints points = new Draw3DPoints(5);
+    //Draw3DPoints points = new Draw3DPoints(5);
     Draw3DTriangle triangle = new Draw3DTriangle(3);
 
     triangle.setPointPosition(0, 1800 << 4, 2000 << 4, 128);
-    triangle.setPointColor(0, 0x000000ff);
+    triangle.setPointColor(0, 0x0000ff00);
     triangle.setPointPosition(0, 1800 << 4, 2010 << 4, 128);
-    triangle.setPointColor(1, 0x000000ff);
+    triangle.setPointColor(1, 0x0000ff00);
     triangle.setPointPosition(0, 1900 << 4, 2010 << 4, 128);
-    triangle.setPointColor(2, 0x000000ff);
+    triangle.setPointColor(2, 0x0000ff00);
 
     for(n = 0; n < 1000; n++)
     {
@@ -30,7 +30,7 @@ public class PS2JavaDemo
 
   static public void main(String args[])
   {
-    //animate();
+    animate();
 
     while(true)
     {
