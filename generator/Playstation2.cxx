@@ -171,8 +171,8 @@ int Playstation2::draw3d_Constructor_I(int type)
   // 32: count, 0, 0, 0
   // 48: 16 byte GIF tag
   // 64: 16 byte primitive info
-  // 80: 32 bytes per point (for x, y, z)
-  //   : 32 bytes per point (for color)
+  // 80: 16 bytes per point (for x, y, z)
+  //   : 16 bytes per point (for color)
   fprintf(out, "  ;; draw3d_Constructor_I(type=%d)\n", type);
   fprintf(out, "  ;; Align stack pointer, alloca() some memory\n");
   fprintf(out, "  ;; Clear rotation and offset and set point count\n");
@@ -502,7 +502,7 @@ void Playstation2::add_primitive_gif_tag()
   fprintf(out,
     ".align 128\n"
     "_primitive_gif_tag:\n"
-    "  dc64 GIF_TAG(0, 1, 0, 0, FLG_PACKED, 1, 0x0), REG_A_D\n"
+    "  dc64 GIF_TAG(0, 1, 0, 0, FLG_PACKED, 1), REG_A_D\n"
     "  dc64 SETREG_PRIM(0, 1, 0, 0, 0, 0, 0, 0, 1), REG_PRIM\n\n");
 }
 
@@ -518,10 +518,10 @@ void Playstation2::add_vu1_code()
   //".org 0\n"
   ".align 128\n"
   "_rotation_vu1:\n"
-  "  nop isub vi1, vi1, vi1\n"
-  "  nop iaddiu vi1, vi1, 3\n"
+  "  nop isub vi01, vi01, vi01\n"
+  "  nop iaddiu vi01, vi01, 3\n"
   "  nop nop\n"
-  "  nop xgkick vi1\n"
+  "  nop xgkick vi01\n"
   "  nop nop\n"
   "  nop[E] nop\n"
   "_rotation_vu1_end:\n\n");
