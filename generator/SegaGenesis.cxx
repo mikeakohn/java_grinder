@@ -3,9 +3,9 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
- * Copyright 2014-2016 by Michael Kohn
+ * Copyright 2014-2018 by Michael Kohn
  *
  * Sega Genesis initialization code is based on Bruce Tomlin's hello.asm:
  * http://atariage.com/forums/topic/98540-sega-genesis-programming/
@@ -30,7 +30,7 @@
 // Pattern Table: 40 * 28 * (8 * 8 / 2) = 35840 bytes (0x8c00)
 // Font table: 32 * 27 = 864 bytes (0x360).  Load at 0x8c00 (pattern #1120)
 
-// FIXME - This is redundant and kind of dangerous.
+// FIXME - This is redundant
 #define REG_STACK(a) (a)
 
 #define CD_VRAM_WRITE 1
@@ -46,7 +46,7 @@
   ((cd & 0x3c) << 2) | \
   (a >> 14))
 
-// Functions that return voice should never use the stack for registers.. ?
+// Functions that return void should never use the stack for registers.. ?
 #define CHECK_STACK \
   if (stack != 0) \
   { \
