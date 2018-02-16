@@ -171,8 +171,9 @@ int Playstation2::draw3d_Constructor_I(int type)
   // 32: count, 0, 0, 0
   // 48: 16 byte GIF tag
   // 64: 16 byte primitive info
-  // 80: 16 bytes per point (for x, y, z)
-  //   : 16 bytes per point (for color)
+  // 80: 16 byte GIF tag
+  // 96: 16 bytes per point (for color)   REG_A_D
+  //   : 16 bytes per point (for x, y, z) REG_XYZ2
   fprintf(out, "  ;; draw3d_Constructor_I(type=%d)\n", type);
   fprintf(out, "  ;; Align stack pointer, alloca() some memory\n");
   fprintf(out, "  ;; Clear rotation and offset and set point count\n");
@@ -181,7 +182,7 @@ int Playstation2::draw3d_Constructor_I(int type)
 
   // Allocated memory is number of points * 32 + size of header.
   fprintf(out, "  sll $at, $t%d, 5\n", reg - 1);
-  fprintf(out, "  addiu $at, $at, 80\n");
+  fprintf(out, "  addiu $at, $at, 96\n");
   fprintf(out, "  subu $sp, $sp, $at\n");
 
   // Set top of reg stack (return value) to allocated memory.
@@ -191,35 +192,35 @@ int Playstation2::draw3d_Constructor_I(int type)
   fprintf(out, "  sq $0, 0($sp)\n");
   fprintf(out, "  sq $0, 16($sp)\n");
 
+  // Save point count in the struct
+  fprintf(out, "  sw $t%d, 32($sp)\n", reg - 1);
+
   // Copy the default primitive tag to the new structure.
   fprintf(out, "  li $v0, _primitive_gif_tag\n");
   fprintf(out, "  lq $v1, 0($v0)\n");
-  fprintf(out, "  sll $at, $t%d, 1\n", reg - 1);
-  fprintf(out, "  addiu $at, $at, 1\n");
-  fprintf(out, "  or $v1, $v1, $at\n");
   fprintf(out, "  sq $v1, 48($sp)\n");
   fprintf(out, "  lq $v1, 16($v0)\n");
   fprintf(out, "  ori $v1, $v1, %d\n", type);
   fprintf(out, "  sq $v1, 64($sp)\n");
-
-  // Save point count in the struct
-  fprintf(out, "  sw $t%d, 32($sp)\n", reg - 1);
+  fprintf(out, "  lq $v1, 32($v0)\n");
+  fprintf(out, "  or $v1, $v1, $t%d\n", reg - 1);
+  fprintf(out, "  sq $v1, 80($sp)\n");
 
   // a0 = count
   fprintf(out, "  move $a0, $t%d\n", reg - 1);
 
   // Set points and colors
   fprintf(out,
-    "  addiu $v0, $sp, 80\n"
+    "  addiu $v0, $sp, 96\n"
     "  lui $a3, 0x3f80\n"
     "  dsll32 $a3, $a3, 0\n"
     "  li $a2, REG_RGBAQ\n"
-    "  li $a1, REG_XYZ2\n"
+    //"  li $a1, REG_XYZ2\n"
     "_const_object_%d:\n"
     "  sd $a3, 0($v0)\n"
     "  sd $a2, 8($v0)\n"
-    "  sd $0, 16($v0)\n"
-    "  sd $a1, 24($v0)\n"
+    "  sq $0, 16($v0)\n"
+    //"  sd $a1, 24($v0)\n"
     "  addiu $v0, $v0, 32\n"
     "  addiu $a0, $a0, -1\n"
     "  bne $a0, $0, _const_object_%d\n"
@@ -284,16 +285,18 @@ int Playstation2::draw3d_setPointPosition_IIII()
   fprintf(out,
     "  ;; draw3d_setPointPosition_IIII()\n"
     "  sll $t%d, $t%d, 5\n"
-    "  addiu $t%d, $t%d, 96\n"
+    "  addiu $t%d, $t%d, 112\n"
     "  addu $t%d, $t%d, $t%d\n"
-    "  sh $t%d, 0($t%d)\n"
-    "  sh $t%d, 2($t%d)\n"
-    "  sh $t%d, 4($t%d)\n",
+    "  sw $t%d, 0($t%d)\n"
+    "  sw $t%d, 4($t%d)\n"
+    "  sll $t%d, $t%d, 4\n"
+    "  sw $t%d, 8($t%d)\n",
     index, index,
     object, object,
     object, object, index,
     x, object,
     y, object,
+    z, z,
     z, object);
 
   reg -= 5;
@@ -310,7 +313,7 @@ int Playstation2::draw3d_setPointColor_II()
   fprintf(out,
     "  ;; draw3d_setPointColor_II()\n"
     "  sll $t%d, $t%d, 5\n"
-    "  addiu $t%d, $t%d, 80\n"
+    "  addiu $t%d, $t%d, 96\n"
     "  addu $t%d, $t%d, $t%d\n"
     "  sw $t%d, 0($t%d)\n",
     index, index,
@@ -327,15 +330,15 @@ int Playstation2::draw3d_draw()
 {
   int object = reg - 1;
 
+  // This could be done with DMA.  Not sure what's better.
   fprintf(out,
     "  ;; draw3d_draw()\n"
-    "  ;; This an be done with DMA, but trying it with the main CPU\n"
-    "  ;; for now.  Copy GIF packet to VU1's data memory segment.\n"
+    "  ;; Copy GIF packet to VU1's data memory segment.\n"
     "  li $v0, VU1_VU_MEM\n"
     "  move $v1, $t%d\n"
     "  lw $a1, 32($v1)\n"
     "  sll $a1, $a1, 1\n"
-    "  addiu $a1, $a1, 5\n"
+    "  addiu $a1, $a1, 6\n"
     "_repeat_vu1_data_copy_%d:\n"
     "  lq $a0, ($v1)\n"
     "  sq $a0, ($v0)\n"
@@ -502,8 +505,11 @@ void Playstation2::add_primitive_gif_tag()
   fprintf(out,
     ".align 128\n"
     "_primitive_gif_tag:\n"
-    "  dc64 GIF_TAG(0, 1, 0, 0, FLG_PACKED, 1), REG_A_D\n"
-    "  dc64 SETREG_PRIM(0, 1, 0, 0, 0, 0, 0, 0, 1), REG_PRIM\n\n");
+    "  dc64 GIF_TAG(1, 0, 0, 0, FLG_PACKED, 1), REG_A_D\n"
+    "  dc64 SETREG_PRIM(0, 1, 0, 0, 0, 0, 0, 0, 1), REG_PRIM\n"
+    "  dc64 GIF_TAG(0, 1, 0, 0, FLG_PACKED, 2), (REG_A_D|(REG_XYZ2<<4))\n");
+    //"  dc64 GIF_TAG(0, 1, 0, 0, FLG_PACKED, 1), REG_A_D\n"
+    //"  dc64 SETREG_PRIM(0, 1, 0, 0, 0, 0, 0, 0, 1), REG_PRIM\n\n");
 }
 
 void Playstation2::add_vu1_code()
@@ -522,6 +528,9 @@ void Playstation2::add_vu1_code()
   "  nop iaddiu vi01, vi01, 3\n"
   "  nop nop\n"
   "  nop xgkick vi01\n"
+  "  nop nop\n"
+  //"  nop iaddiu vi01, vi01, 2\n"
+  //"  nop xgkick vi01\n"
   "  nop nop\n"
   "  nop[E] nop\n"
   "_rotation_vu1_end:\n\n");

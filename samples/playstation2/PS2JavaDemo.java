@@ -14,11 +14,11 @@ public class PS2JavaDemo
     Draw3DTriangle triangle = new Draw3DTriangle(3);
 
     triangle.setPointPosition(0, 1800 << 4, 2000 << 4, 128);
-    triangle.setPointColor(0, 0x0000ff00);
+    triangle.setPointColor(0, 0x000000ff);
     triangle.setPointPosition(1, 1800 << 4, 2010 << 4, 128);
     triangle.setPointColor(1, 0x0000ff00);
     triangle.setPointPosition(2, 1900 << 4, 2010 << 4, 128);
-    triangle.setPointColor(2, 0x0000ff00);
+    triangle.setPointColor(2, 0x00ff0000);
 
     for(n = 0; n < 1000; n++)
     {
