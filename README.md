@@ -11,24 +11,24 @@ Authors:
 - Joe Davisson
 
 For more info:
-[http://www.mikekohn.net/micro/java_grinder.php] (http://www.mikekohn.net/micro/java_grinder.php)
+[http://www.mikekohn.net/micro/java_grinder.php](http://www.mikekohn.net/micro/java_grinder.php)
 
 Examples
 --------
-* [Sega Genesis] (http://www.mikekohn.net/micro/sega_genesis_java.php)
-* [Commodore 64] (http://www.mikekohn.net/micro/c64_java.php)
-* [Atari 2600] (http://www.mikekohn.net/micro/atari2600_java.php)
-* [TI/99a] (http://www.mikekohn.net/micro/retro_console_java.php)
-* [dsPIC] (http://www.mikekohn.net/micro/dspic_mandelbrots.php)
-* [Apple IIgs] (http://www.mikekohn.net/micro/apple_iigs_java.php)
-* [Parallax Propeller] (http://www.mikekohn.net/micro/propeller_java.php)
+* [Sega Genesis](http://www.mikekohn.net/micro/sega_genesis_java.php)
+* [Commodore 64](http://www.mikekohn.net/micro/c64_java.php)
+* [Atari 2600](http://www.mikekohn.net/micro/atari2600_java.php)
+* [TI/99a](http://www.mikekohn.net/micro/retro_console_java.php)
+* [dsPIC](http://www.mikekohn.net/micro/dspic_mandelbrots.php)
+* [Apple IIgs](http://www.mikekohn.net/micro/apple_iigs_java.php)
+* [Parallax Propeller](http://www.mikekohn.net/micro/propeller_java.php)
 
 How it works
 ------------
 
-This is just a litte blurb on how this all fits together maybe to
+This is just a little blurb on how this all fits together maybe to
 help others who want to make a generator for another CPU architecture.
-Basically the code can be seperated into 4 distinct modules in 4
+Basically the code can be separated into 4 distinct modules in 4
 directories:
 
 
@@ -61,34 +61,38 @@ the non-optimized version of the function instead.  Here's an example:
 
 If we had the following Java code:
 
-    a = b + 1
+```
+a = b + 1
+```
 
 Both a and b are local variables, so the Java byte code ends up being:
 
-
-     8: iload_1     (push local variable 1 onto stack)
-     9: iconst_1    (push the constant 1 on the stack)
-    10: iadd        (pop 2 values off stack, add them, push answer)
-
+```
+ 8: iload_1     (push local variable 1 onto stack)
+ 9: iconst_1    (push the constant 1 on the stack)
+10: iadd        (pop 2 values off stack, add them, push answer)
+```
 
 In Generator.h there are two functions used for adding integers:
 
-    virtual int add_integer() = 0;
-    virtual int add_integer(int num) { return -1; }
+```
+virtual int add_integer() = 0;
+virtual int add_integer(int num) { return -1; }
+```
 
 The first one is the unoptimized version and is abstract.  It must be
 implemented by the architecture.  The second one is called by compile.cxx's
-optimzer.  If the optimizer sees a constant pushed on the stack and notices
-that the next instruction is to add them, then it will call add_integer(int num)
+optimizer.  If the optimizer sees a constant pushed on the stack and notices
+that the next instruction is to add them, then it will call `add_integer(int num)`
 first to see if that's implemented.  If it returns -1, then it will call
-the unoptimized version add_integer().  The difference is in the unoptimized
+the unoptimized version `add_integer()`.  The difference is in the unoptimized
 version it would do:
-
-    mov.w -4(r12), r4
-    mov.w #1, r5
-    add.w r5, r4
-
-While add_integer(int num) knows what the constant is and can just add
+```
+mov.w -4(r12), r4
+mov.w #1, r5
+add.w r5, r4
+```
+While `add_integer(int num)` knows what the constant is and can just add
 it to whatever is at the top of the stack.
 
     mov.w -4(r12), r4
@@ -96,18 +100,14 @@ it to whatever is at the top of the stack.
 
 The optimized function could also be implemented and return 0 if
 some conditions are met or return -1 if it can do it.  For example
-if the add_integer(int num) function for a certain CPU could only
+if the `add_integer(int num)` function for a certain CPU could only
 add an immediate value between 0 and 255, then the generator for that
 CPU can check if "num" is between 0 and 255, return -1 if false,
-or fprintf() some assembly code and return 0 if true.
+or `fprintf()` some assembly code and return 0 if true.
 
 The same thing goes for API calls.  There are some API calls (such
 as initializing SPI in MSP430 and dsPIC) that if one or two parameters
 in Java are constants, the generator can produce optimized code for them.
-So if spi_init() has an overloaded version of this function that takes in
+So if `spi_init()` has an overloaded version of this function that takes in
 constants, the optimizer in compile.cxx will automatically try and use
 it first.
-
-
-
-
