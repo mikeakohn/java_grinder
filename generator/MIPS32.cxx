@@ -318,12 +318,12 @@ int MIPS32::push_int(int32_t n)
   {
     if (reg < reg_max)
     {
-      fprintf(out, "  li $t%d, $0, 0x%04x\n", reg, value);
+      fprintf(out, "  li $t%d, 0x%04x\n", reg, value);
       reg++;
     }
       else
     {
-      fprintf(out, "  li $t8, $0, 0x%04x\n", value);
+      fprintf(out, "  li $t8, 0x%04x\n", value);
       STACK_PUSH(8)
     }
   }

@@ -45,3 +45,39 @@ int MIPS64::start_init()
   return 0;
 }
 
+int MIPS64::push_float(float f)
+{
+  uint32_t *data = (uint32_t *)&f;
+  uint32_t value = *data;
+
+  fprintf(out, "  ; push_float(%f) -- data=0x%08x\n", f, value);
+
+  if (value == 0)
+  {
+    if (reg < reg_max)
+    {
+      fprintf(out, "  move $t%d, $0\n", reg);
+      reg++;
+    }
+      else
+    {
+      STACK_PUSH(0)
+    }
+  }
+    else
+  {
+    if (reg < reg_max)
+    {
+      fprintf(out, "  li $t%d, 0x%04x\n", reg, value);
+      reg++;
+    }
+      else
+    {
+      fprintf(out, "  li $t8, 0x%04x\n", value);
+      STACK_PUSH(8)
+    }
+  }
+
+  return 0;
+}
+

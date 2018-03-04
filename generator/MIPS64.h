@@ -23,6 +23,8 @@ public:
   virtual int open(const char *filename);
   virtual int start_init();
 
+  virtual int push_float(float f);
+
 private:
 };
 
