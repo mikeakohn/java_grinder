@@ -25,7 +25,9 @@ public:
   virtual int new_object(const char *object_name, int field_count);
   virtual int draw3d_Constructor_X(int type);
   virtual int draw3d_Constructor_I(int type);
-  virtual int draw3d_rotate512_III();
+  virtual int draw3d_rotateX512_I();
+  virtual int draw3d_rotateY512_I();
+  virtual int draw3d_rotateZ512_I();
   virtual int draw3d_setPosition_FFF();
   virtual int draw3d_setPointPosition_IFFF();
   virtual int draw3d_setPointColor_II();

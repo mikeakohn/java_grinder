@@ -3,7 +3,7 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
  * Copyright 2014-2018 by Michael Kohn
  *
@@ -39,7 +39,9 @@ int draw3d(JavaClass *java_class, Generator *generator, char *method_name)
 {
   //CHECK_FUNC(Constructor,_X)
   //CHECK_FUNC(Constructor,_I)
-  CHECK_FUNC(rotate512,_III)
+  CHECK_FUNC(rotateX512,_I)
+  CHECK_FUNC(rotateY512,_I)
+  CHECK_FUNC(rotateZ512,_I)
   CHECK_FUNC(setPosition,_FFF)
   CHECK_FUNC(setPointPosition,_IFFF)
   CHECK_FUNC(setPointColor,_II)

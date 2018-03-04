@@ -3,9 +3,9 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2018 by Michael Kohn
  *
  */
 
@@ -41,6 +41,8 @@ int math(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(xor,_I)
   CHECK_FUNC(min,_II)
   CHECK_FUNC(max,_II)
+  CHECK_FUNC(sin512,_I)
+  CHECK_FUNC(cos512,_I)
 
   return -1;
 }

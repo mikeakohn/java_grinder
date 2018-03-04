@@ -19,6 +19,8 @@ public:
   virtual int math_xor_I() { return -1; }
   virtual int math_min_II() { return -1; }
   virtual int math_max_II() { return -1; }
+  virtual int math_sin512_I() { return -1; }
+  virtual int math_cos512_I() { return -1; }
 };
 
 #endif

@@ -14,6 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
+#include "Math.h"
 #include "Playstation2.h"
 
 #define DRAW3D "net/mikekohn/java_grinder/Draw3D/"
@@ -35,6 +36,8 @@ Playstation2::~Playstation2()
   add_screen_init_clear();
   add_primitive_gif_tag();
   add_vu1_code();
+  Math::add_sin_table(out);
+  Math::add_cos_table(out);
 }
 
 int Playstation2::open(const char *filename)
@@ -241,23 +244,98 @@ int Playstation2::draw3d_Constructor_I(int type)
   return 0;
 }
 
-int Playstation2::draw3d_rotate512_III()
+int Playstation2::draw3d_rotateX512_I()
 {
-  int object = reg - 4;
-  int x = reg - 3;
-  int y = reg - 2;
+  int object = reg - 2;
+  int x = reg - 1;
+
+  fprintf(out,
+    "  ;; draw3d_rotate512_III()\n"
+    "  andi $t%d, $t%d, 511\n"
+    "  sll $t%d, $t%d, 2\n"
+    "  li $v1, _sin_table_512\n"
+    "  addu $v1, $v1, $t%d\n"
+    "  lw $v0, ($v1)\n"
+    "  sw $v0, 0($t%d)\n"
+    "  li $v1, _cos_table_512\n"
+    "  addu $v1, $v1, $t%d\n"
+    "  lw $v0, ($v1)\n"
+    "  sw $v0, 4($t%d)\n"
+    "  ori $v1, $0, 1\n"
+    "  sw $v1, 52($t%d)\n",
+    x, x,
+    x, x,
+    x,
+    object,
+    x,
+    object,
+    object);
+
+  reg -= 2;
+
+  return 0;
+}
+
+int Playstation2::draw3d_rotateY512_I()
+{
+  int object = reg - 2;
+  int y = reg - 1;
+
+  fprintf(out,
+    "  ;; draw3d_rotate512_III()\n"
+    "  andi $t%d, $t%d, 511\n"
+    "  sll $t%d, $t%d, 2\n"
+    "  li $v1, _sin_table_512\n"
+    "  addu $v1, $v1, $t%d\n"
+    "  lw $v0, ($v1)\n"
+    "  sw $v0, 8($t%d)\n"
+    "  li $v1, _cos_table_512\n"
+    "  addu $v1, $v1, $t%d\n"
+    "  lw $v0, ($v1)\n"
+    "  sw $v0, 12($t%d)\n"
+    "  ori $v1, $0, 1\n"
+    "  sw $v1, 56($t%d)\n",
+    y, y,
+    y, y,
+    y,
+    object,
+    y,
+    object,
+    object);
+
+  reg -= 2;
+
+  return 0;
+}
+
+int Playstation2::draw3d_rotateZ512_I()
+{
+  int object = reg - 2;
   int z = reg - 1;
 
   fprintf(out,
     "  ;; draw3d_rotate512_III()\n"
-    "  sw $t%d, 16($t%d)\n"
-    "  sw $t%d, 20($t%d)\n"
-    "  sw $t%d, 24($t%d)\n",
-    x, object,
-    y, object,
-    z, object);
+    "  andi $t%d, $t%d, 511\n"
+    "  sll $t%d, $t%d, 2\n"
+    "  li $v1, _sin_table_512\n"
+    "  addu $v1, $v1, $t%d\n"
+    "  lw $v0, ($v1)\n"
+    "  sw $v0, 16($t%d)\n"
+    "  li $v1, _cos_table_512\n"
+    "  addu $v1, $v1, $t%d\n"
+    "  lw $v0, ($v1)\n"
+    "  sw $v0, 20($t%d)\n"
+    "  ori $v1, $0, 1\n"
+    "  sw $v1, 60($t%d)\n",
+    z, z,
+    z, z,
+    z,
+    object,
+    z,
+    object,
+    object);
 
-  reg -= 4;
+  reg -= 2;
 
   return 0;
 }

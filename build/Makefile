@@ -38,7 +38,9 @@ API= \
   timer.o \
   trs80_coco.o \
   uart.o \
-  watchdog.o
+  watchdog.o \
+  Math.o
+
 CPUS= \
   ARM.o \
   AVR8.o \
@@ -61,6 +63,7 @@ CPUS= \
   X86.o \
   X86_64.o \
   Z80.o
+
 SYSTEMS= \
   AppleIIgs.o \
   Atari2600.o \

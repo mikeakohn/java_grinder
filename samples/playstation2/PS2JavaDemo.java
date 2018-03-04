@@ -25,11 +25,12 @@ public class PS2JavaDemo
     // Set the position on the screen.
     triangle.setPosition(1900.0f, 2100.0f, 128.0f);
 
-    for(n = 0; n < 1000; n++)
+    for(n = 0; n < 10000; n++)
     {
       Playstation2.waitVsync();
       Playstation2.clearScreen();
       triangle.draw();
+      triangle.rotateZ512(n);
     }
   }
 
