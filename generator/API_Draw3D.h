@@ -25,9 +25,9 @@ class API_Draw3D
 public:
   virtual int draw3d_Constructor_X(int type) { return -1; }
   virtual int draw3d_Constructor_I(int type) { return -1; }
-  virtual int draw3d_rotate_III() { return -1; }
-  virtual int draw3d_setPosition_III() { return -1; }
-  virtual int draw3d_setPointPosition_IIII() { return -1; }
+  virtual int draw3d_rotate512_III() { return -1; }
+  virtual int draw3d_setPosition_FFF() { return -1; }
+  virtual int draw3d_setPointPosition_IFFF() { return -1; }
   virtual int draw3d_setPointColor_II() { return -1; }
   virtual int draw3d_draw() { return -1; }
 };

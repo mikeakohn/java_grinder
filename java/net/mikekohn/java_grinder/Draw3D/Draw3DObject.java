@@ -25,9 +25,9 @@ abstract public class Draw3DObject
    {
    }
 
-   public void rotate(int rx, int ry, int rz) { }
-   public void setPosition(int x, int y, int z) { }
-   public void setPointPosition(int index, int x, int y, int z) { }
+   public void rotate512(int rx, int ry, int rz) { }
+   public void setPosition(float x, float y, float z) { }
+   public void setPointPosition(int index, float x, float y, float z) { }
    public void setPointColor(int index, int color) { }
    public void draw() { }
 

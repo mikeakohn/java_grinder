@@ -39,9 +39,9 @@ int draw3d(JavaClass *java_class, Generator *generator, char *method_name)
 {
   //CHECK_FUNC(Constructor,_X)
   //CHECK_FUNC(Constructor,_I)
-  CHECK_FUNC(rotate,_III)
-  CHECK_FUNC(setPosition,_III)
-  CHECK_FUNC(setPointPosition,_IIII)
+  CHECK_FUNC(rotate512,_III)
+  CHECK_FUNC(setPosition,_FFF)
+  CHECK_FUNC(setPointPosition,_IFFF)
   CHECK_FUNC(setPointColor,_II)
   CHECK_FUNC(draw,)
 
