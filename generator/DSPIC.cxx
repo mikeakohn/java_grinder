@@ -3,9 +3,9 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
- * Copyright 2014-2016 by Michael Kohn
+ * Copyright 2014-2018 by Michael Kohn
  *
  */
 
@@ -241,23 +241,22 @@ int DSPIC::push_int(int32_t n)
   return 0;
 }
 
+#if 0
 int DSPIC::push_long(int64_t n)
 {
-  printf("long is not supported right now\n");
   return -1;
 }
 
 int DSPIC::push_float(float f)
 {
-  printf("float is not supported right now\n");
   return -1;
 }
 
 int DSPIC::push_double(double f)
 {
-  printf("double is not supported right now\n");
   return -1;
 }
+#endif
 
 int DSPIC::push_ref(char *name)
 {

@@ -3,9 +3,9 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
- * Copyright 2014-2017 by Michael Kohn
+ * Copyright 2014-2018 by Michael Kohn
  *
  * W65816 written by Joe Davisson
  *
@@ -276,17 +276,17 @@ int W65816::push_long(int64_t n)
   return push_int((int32_t)n);
 }
 
+#if 0
 int W65816::push_float(float f)
 {
-  printf("Float is not supported right now.\n");
   return -1;
 }
 
 int W65816::push_double(double f)
 {
-  printf("Double is not supported right now.\n");
   return -1;
 }
+#endif
 
 int W65816::push_ref(char *name)
 {

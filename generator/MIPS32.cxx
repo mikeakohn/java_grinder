@@ -362,6 +362,7 @@ int MIPS32::push_int(int32_t n)
   return 0;
 }
 
+#if 0
 int MIPS32::push_long(int64_t n)
 {
   return -1;
@@ -376,6 +377,7 @@ int MIPS32::push_double(double f)
 {
   return -1;
 }
+#endif
 
 int MIPS32::push_ref(char *name)
 {

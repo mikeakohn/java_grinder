@@ -3,9 +3,9 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
- * Copyright 2014-2017 by Michael Kohn
+ * Copyright 2014-2018 by Michael Kohn
  *
  */
 
@@ -289,10 +289,12 @@ int Epiphany::push_int(int32_t n)
   return 0;
 }
 
+#if 0
 int Epiphany::push_long(int64_t n)
 {
   return -1;
 }
+#endif
 
 int Epiphany::push_float(float f)
 {
@@ -305,10 +307,12 @@ int Epiphany::push_float(float f)
   return 0;
 }
 
+#if 0
 int Epiphany::push_double(double f)
 {
   return -1;
 }
+#endif
 
 int Epiphany::push_ref(char *name)
 {

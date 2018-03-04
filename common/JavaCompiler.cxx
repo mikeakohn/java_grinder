@@ -886,12 +886,12 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
           instruction_length = 3;
         }
 
+        gen32 = (generic_32bit_t *)java_class->get_constant(index);
+
         if (verbose)
         {
-          printf("  index=%d\n", index);
+          printf("  index=%d tag=%d\n", index, gen32->tag);
         }
-
-        gen32 = (generic_32bit_t *)java_class->get_constant(index);
 
         if (gen32->tag == CONSTANT_INTEGER)
         {

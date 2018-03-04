@@ -3,9 +3,9 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
- * Copyright 2014-2016 by Michael Kohn
+ * Copyright 2014-2018 by Michael Kohn
  *
  */
 
@@ -184,6 +184,7 @@ int temp_reg;
   return -1;
 }
 
+#if 0
 int ARM::push_long(int64_t n)
 {
   return -1;
@@ -198,6 +199,7 @@ int ARM::push_double(double f)
 {
   return -1;
 }
+#endif
 
 int ARM::push_ref(char *name)
 {

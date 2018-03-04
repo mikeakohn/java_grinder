@@ -3,9 +3,9 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
- * Copyright 2014-2016 by Michael Kohn
+ * Copyright 2014-2018 by Michael Kohn, Joe Davisson
  *
  * MCS-51 (8051) written by Joe Davisson
  *
@@ -165,6 +165,7 @@ int MCS51::push_int(int32_t n)
   return 0;
 }
 
+# if 0
 int MCS51::push_long(int64_t n)
 {
   return push_int((int32_t)n);
@@ -179,6 +180,7 @@ int MCS51::push_double(double f)
 {
   return -1;
 }
+#endif
 
 int MCS51::push_ref(char *name)
 {

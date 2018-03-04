@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2017 by Michael Kohn
+ * Copyright 2014-2018 by Michael Kohn
  *
  */
 
@@ -280,6 +280,7 @@ int Propeller::push_int(int32_t n)
   return 0;
 }
 
+#if 0
 int Propeller::push_long(int64_t n)
 {
   return -1;
@@ -294,6 +295,7 @@ int Propeller::push_double(double f)
 {
   return -1;
 }
+#endif
 
 int Propeller::push_ref(char *name)
 {

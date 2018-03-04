@@ -3,9 +3,9 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
- * Copyright 2014-2016 by Michael Kohn
+ * Copyright 2014-2018 by Michael Kohn
  *
  */
 
@@ -116,6 +116,7 @@ int X86_64::push_int(int32_t n)
   return -1;
 }
 
+#if 0
 int X86_64::push_long(int64_t n)
 {
   return -1;
@@ -130,6 +131,7 @@ int X86_64::push_double(double f)
 {
   return -1;
 }
+#endif
 
 int X86_64::push_ref(char *name)
 {

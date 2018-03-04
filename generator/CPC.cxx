@@ -1,15 +1,15 @@
-//*  Java Grinder
 /**
-*  Author: Michael Kohn
-*   Email: mike@mikekohn.net
-*     Web: http://www.mikekohn.net/
-* License: GPL
-*
-* Copyright 2014-2016 by Michael Kohn
-*
-* CPC support by Carsten Dost  - https://github.com/deringenieur71
-*
-*/
+ *  Java Grinder
+ *  Author: Michael Kohn
+ *   Email: mike@mikekohn.net
+ *     Web: http://www.mikekohn.net/
+ * License: GPLv3
+ *
+ * Copyright 2014-2018 by Michael Kohn
+ *
+ * CPC support by Carsten Dost  - https://github.com/deringenieur71
+ *
+ */
 
 #include <stdio.h>
 #include <stdlib.h>

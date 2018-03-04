@@ -47,9 +47,9 @@ public:
   virtual int push_fake();
   //virtual int set_integer_local(int index, int value);
   virtual int push_int(int32_t n);
-  virtual int push_long(int64_t n);
-  virtual int push_float(float f);
-  virtual int push_double(double f);
+  //virtual int push_long(int64_t n);
+  //virtual int push_float(float f);
+  //virtual int push_double(double f);
   virtual int push_ref(char *name);
   virtual int pop_local_var_int(int index);
   virtual int pop_local_var_ref(int index);

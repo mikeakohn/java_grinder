@@ -3,7 +3,7 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
  * Copyright 2014-2018 by Michael Kohn
  *
@@ -49,6 +49,24 @@ int Generator::push_local_var_float(int index)
 int Generator::set_float_local(int index, float value)
 {
   printf("Error: Floats are not supported on this platform.\n");
+  return -1;
+}
+
+int Generator::push_long(int64_t n)
+{
+  printf("Error: Longs are not currently supported on this platform.\n");
+  return -1;
+}
+
+int Generator::push_float(float f)
+{
+  printf("Error: Floats are not currently supported on this platform.\n");
+  return -1;
+}
+
+int Generator::push_double(double f)
+{
+  printf("Error: Doubles are not currently supported on this platform.\n");
   return -1;
 }
 

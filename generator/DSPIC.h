@@ -3,9 +3,9 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
- * Copyright 2014-2016 by Michael Kohn
+ * Copyright 2014-2018 by Michael Kohn
  *
  */
 
@@ -42,9 +42,9 @@ public:
   virtual int push_ref_static(const char *name, int index);
   virtual int push_fake();
   virtual int push_int(int32_t n);
-  virtual int push_long(int64_t n);
-  virtual int push_float(float f);
-  virtual int push_double(double f);
+  //virtual int push_long(int64_t n);
+  //virtual int push_float(float f);
+  //virtual int push_double(double f);
   virtual int push_ref(char *name);
   virtual int pop_local_var_int(int index);
   virtual int pop_local_var_ref(int index);

@@ -7,10 +7,6 @@
  *
  * Copyright 2014-2018 by Michael Kohn
  *
- * Sega Genesis initialization code is based on Bruce Tomlin's hello.asm:
- * http://atariage.com/forums/topic/98540-sega-genesis-programming/
- * http://emu-docs.org/Genesis/sega2f.htm
- *
  */
 
 #include <stdio.h>
