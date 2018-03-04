@@ -62,7 +62,7 @@ int Playstation2::start_init()
   fprintf(out,
     "  // Set stack pointer and reset DMA\n"
     "  li $sp, 0x02000000\n"
-    //"  li $sp, 0x100700\n"
+    //"  li $sp, _constant_pool + 256\n"
     "  jal _dma_reset\n"
     "  nop\n\n"
 
@@ -85,7 +85,7 @@ int Playstation2::start_init()
     "  li $v1, SetGsCrt\n"
     "  li $a0, 1\n"
     "  li $a1, 2\n"
-    "  li $a2, 1\n"
+    "  li $a2, 0\n"
     "  syscall\n"
     "  nop\n\n");
 
@@ -119,7 +119,7 @@ int Playstation2::start_init()
     "  ;;     display width - 1 in vck (dw): 2559\n"
     "  ;; display height - 1 in pixels (dh): 223\n"
     "  li $v1, GS_DISPLAY2\n"
-    "  li $at, 0xdf9ff\n"
+    "  li $at, 0x1bf_9ff\n"
     "  dsll32 $at, $at, 0\n"
     "  li $v0, 0x0182_4290\n"
     "  or $at, $at, $v0\n"
@@ -165,6 +165,10 @@ int Playstation2::draw3d_Constructor_X(int type)
 
 int Playstation2::draw3d_Constructor_I(int type)
 {
+  const int reg_point_count = reg - 1;
+  //const int reg_object_dup = reg - 2;
+  const int reg_object_ref = reg - 3;
+
   // Need to allocate enough space for:
   //  0: sin512(rx), cos512(rx), sin512(ry), sin512(ry)
   // 16: sin512(rz), cos(rz), 0, 0
@@ -175,42 +179,46 @@ int Playstation2::draw3d_Constructor_I(int type)
   // 96: 16 byte GIF tag
   //112: 16 bytes per point (for color)   REG_A_D
   //   : 16 bytes per point (for x, y, z) REG_XYZ2
-  fprintf(out, "  ;; draw3d_Constructor_I(type=%d)\n", type);
-  fprintf(out, "  ;; Align stack pointer, alloca() some memory\n");
-  fprintf(out, "  ;; Clear rotation and offset and set point count\n");
-  fprintf(out, "  addiu $at, $0, -16\n");
-  fprintf(out, "  and $sp, $sp, $at\n");
+  fprintf(out,
+    "  ;; draw3d_Constructor_I(type=%d)\n"
+    "  ;; Align stack pointer, alloca() some memory\n"
+    "  ;; Clear rotation and offset and set point count\n"
+    "  addiu $at, $0, -16\n"
+    "  and $sp, $sp, $at\n", type);
 
   // Allocated memory is number of points * 32 + size of header.
-  fprintf(out, "  sll $at, $t%d, 5\n", reg - 1);
-  fprintf(out, "  addiu $at, $at, 112\n");
-  fprintf(out, "  subu $sp, $sp, $at\n");
+  fprintf(out,
+    "  sll $at, $t%d, 5\n"
+    "  addiu $at, $at, 112\n"
+    "  subu $sp, $sp, $at\n", reg_point_count);
 
   // Set top of reg stack (return value) to allocated memory.
-  fprintf(out, "  move $t%d, $sp\n", reg - 3);
+  fprintf(out, "  move $t%d, $sp\n", reg_object_ref);
 
   // Clear out members of the structure (rotation, xyz position, etc).
-  fprintf(out, "  sq $0, 0($sp)\n");
-  fprintf(out, "  sq $0, 16($sp)\n");
-  fprintf(out, "  sq $0, 32($sp)\n");
-  fprintf(out, "  sq $0, 48($sp)\n");
+  fprintf(out,
+    "  sq $0, 0($sp)\n"
+    "  sq $0, 16($sp)\n"
+    "  sq $0, 32($sp)\n"
+    "  sq $0, 48($sp)\n");
 
   // Save point count in the struct
-  fprintf(out, "  sw $t%d, 32($sp)\n", reg - 1);
+  fprintf(out, "  sw $t%d, 48($sp)\n", reg_point_count);
 
   // Copy the default primitive tag to the new structure.
-  fprintf(out, "  li $v0, _primitive_gif_tag\n");
-  fprintf(out, "  lq $v1, 0($v0)\n");
-  fprintf(out, "  sq $v1, 64($sp)\n");
-  fprintf(out, "  lq $v1, 16($v0)\n");
-  fprintf(out, "  ori $v1, $v1, %d\n", type);
-  fprintf(out, "  sq $v1, 80($sp)\n");
-  fprintf(out, "  lq $v1, 32($v0)\n");
-  fprintf(out, "  or $v1, $v1, $t%d\n", reg - 1);
-  fprintf(out, "  sq $v1, 96($sp)\n");
+  fprintf(out,
+    "  li $v0, _primitive_gif_tag\n"
+    "  lq $v1, 0($v0)\n"
+    "  sq $v1, 64($sp)\n"
+    "  lq $v1, 16($v0)\n"
+    "  ori $v1, $v1, %d\n"
+    "  sq $v1, 80($sp)\n"
+    "  lq $v1, 32($v0)\n"
+    "  or $v1, $v1, $t%d\n"
+    "  sq $v1, 96($sp)\n", type, reg_point_count);
 
   // a0 = count
-  fprintf(out, "  move $a0, $t%d\n", reg - 1);
+  fprintf(out, "  move $a0, $t%d\n", reg_point_count);
 
   // Set points and colors
   fprintf(out,
@@ -263,9 +271,9 @@ int Playstation2::draw3d_setPosition_FFF()
 
   fprintf(out,
     "  ;; draw3d_setPosition_FFF()\n"
-    "  sw $t%d, 16($t%d)\n"
-    "  sw $t%d, 20($t%d)\n"
-    "  sw $t%d, 24($t%d)\n",
+    "  sw $t%d, 32($t%d)\n"
+    "  sw $t%d, 36($t%d)\n"
+    "  sw $t%d, 40($t%d)\n",
     x, object,
     y, object,
     z, object);
@@ -284,20 +292,18 @@ int Playstation2::draw3d_setPointPosition_IFFF()
   int z = reg - 1;
 
   fprintf(out,
-    "  ;; draw3d_setPointPosition_IIII()\n"
+    "  ;; draw3d_setPointPosition_IFFF()\n"
     "  sll $t%d, $t%d, 5\n"
     "  addiu $t%d, $t%d, 128\n"
     "  addu $t%d, $t%d, $t%d\n"
     "  sw $t%d, 0($t%d)\n"
     "  sw $t%d, 4($t%d)\n"
-    "  sll $t%d, $t%d, 4\n"
     "  sw $t%d, 8($t%d)\n",
     index, index,
     object, object,
     object, object, index,
     x, object,
     y, object,
-    z, z,
     z, object);
 
   reg -= 5;
@@ -314,7 +320,7 @@ int Playstation2::draw3d_setPointColor_II()
   fprintf(out,
     "  ;; draw3d_setPointColor_II()\n"
     "  sll $t%d, $t%d, 5\n"
-    "  addiu $t%d, $t%d, 96\n"
+    "  addiu $t%d, $t%d, 112\n"
     "  addu $t%d, $t%d, $t%d\n"
     "  sw $t%d, 0($t%d)\n",
     index, index,
@@ -481,22 +487,20 @@ void Playstation2::add_screen_init_clear()
   fprintf(out,
     ".align 128\n"
     "_screen_init_clear:\n"
-    "  dc64 0x100000000000800e, REG_A_D\n"
+    "  dc64 GIF_TAG(14, 0, 0, 0, FLG_PACKED, 1), REG_A_D\n"
     "  dc64 0x00a0000, REG_FRAME_1            ; framebuffer width = 640/64\n"
     "  dc64 0x8c, REG_ZBUF_1              ; 0-8 Zbuffer base, 24-27 Z format (32bit)\n"
-    "  dc32 27648, 30976                      ; X,Y offset\n"
-    "  dc64 REG_XYOFFSET_1\n"
-    "  dc16 0,639, 0,223                      ; x1,y1,x2,y2 - scissor window\n"
-    "  dc64 REG_SCISSOR_1\n"
+    "  dc64 SETREG_XYOFFSET(1728 << 4, 1936 << 4), REG_XYOFFSET_1\n"
+    "  dc64 SETREG_SCISSOR(0,639,0,447), REG_SCISSOR_1\n"
     "  dc64 1, REG_PRMODECONT                 ; refer to prim attributes\n"
     "  dc64 1, REG_COLCLAMP\n"
     "  dc64 0, REG_DTHE                       ; Dither off\n"
     "  dc64 0x70000, REG_TEST_1\n"
     "  dc64 0x30000, REG_TEST_1\n"
     "  dc64 6, REG_PRIM\n"
-    "  dc64 0x3f80_0000_0000_00ff, REG_RGBAQ  ; Background RGBA\n"
-    "  dc64 0x79006c00, REG_XYZ2              ; (1728.0, 1936.0, 0)\n"
-    "  dc64 0x87009400, REG_XYZ2              ; (2368.0, 2160.0, 0)\n"
+    "  dc64 0x3f80_0000_0000_0000, REG_RGBAQ  ; Background RGBA\n"
+    "  dc64 SETREG_XYZ2(1728 << 4, 1936 << 4, 0), REG_XYZ2\n"
+    "  dc64 SETREG_XYZ2(2368 << 4, 2384 << 4, 0), REG_XYZ2\n"
     "  dc64 0x70000, REG_TEST_1\n"
     "_screen_init_clear_end:\n\n");
 }
@@ -507,8 +511,8 @@ void Playstation2::add_primitive_gif_tag()
     ".align 128\n"
     "_primitive_gif_tag:\n"
     "  dc64 GIF_TAG(1, 0, 0, 0, FLG_PACKED, 1), REG_A_D\n"
-    "  dc64 SETREG_PRIM(0, 1, 0, 0, 0, 0, 0, 0, 1), REG_PRIM\n"
-    "  dc64 GIF_TAG(0, 1, 0, 0, FLG_PACKED, 2), (REG_A_D|(REG_XYZ2<<4))\n");
+    "  dc64 SETREG_PRIM(0, 1, 0, 0, 0, 0, 0, 0, 0), REG_PRIM\n"
+    "  dc64 GIF_TAG(0, 1, 0, 0, FLG_PACKED, 2), (REG_A_D|(REG_XYZ2<<4))\n\n");
     //"  dc64 GIF_TAG(0, 1, 0, 0, FLG_PACKED, 1), REG_A_D\n"
     //"  dc64 SETREG_PRIM(0, 1, 0, 0, 0, 0, 0, 0, 1), REG_PRIM\n\n");
 }
