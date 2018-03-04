@@ -16,10 +16,10 @@ public class PS2JavaDemo
     // Define all the triangle vertexes (position and color)
     // with a reference point of (0, 0).
     triangle.setPointPosition(0, -100.0f, -100.0f, 0.0f);
-    triangle.setPointColor(0, 0x000000ff);
     triangle.setPointPosition(1, -100.0f, 110.0f, 0.0f);
-    triangle.setPointColor(1, 0x0000ff00);
     triangle.setPointPosition(2, 0.0f, 110.0f, 0.0f);
+    triangle.setPointColor(0, 0x000000ff);
+    triangle.setPointColor(1, 0x0000ff00);
     triangle.setPointColor(2, 0x00ff0000);
 
     // Set the position on the screen.
