@@ -304,7 +304,7 @@ int Playstation2::draw3d_setPosition_FFF()
   return 0;
 }
 
-int Playstation2::draw3d_setPointPosition_IFFF()
+int Playstation2::draw3d_setPoint_IFFF()
 {
   int object = reg - 5;
   int index = reg - 4;
@@ -352,6 +352,16 @@ int Playstation2::draw3d_setPointColor_II()
   reg -= 3;
 
   return 0;
+}
+
+int Playstation2::draw3d_setPoints_Fa()
+{
+  return -1;
+}
+
+int Playstation2::draw3d_setPointColors_Ia()
+{
+  return -1;
 }
 
 int Playstation2::draw3d_draw()
