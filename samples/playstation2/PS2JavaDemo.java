@@ -23,7 +23,7 @@ public class PS2JavaDemo
     triangle.setPointColor(2, 0x00ff0000);
 
     // Set the position on the screen.
-    triangle.setPosition(1900.0f, 2100.0f, 128.0f);
+    triangle.setPosition(1900.0f, 2100.0f, 2048.0f);
 
     for(n = 0; n < 10000; n++)
     {

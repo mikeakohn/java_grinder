@@ -34,6 +34,7 @@ Playstation2::~Playstation2()
   add_dma_reset();
   add_dma_wait();
   add_screen_init_clear();
+  add_draw3d_constructor();
   add_primitive_gif_tag();
   add_vu1_code();
   Math::add_sin_table(out);
@@ -172,73 +173,15 @@ int Playstation2::draw3d_Constructor_I(int type)
   //const int reg_object_dup = reg - 2;
   const int reg_object_ref = reg - 3;
 
-  // Need to allocate enough space for:
-  //  0: sin512(rx), cos512(rx), sin512(ry), sin512(ry)
-  // 16: sin512(rz), cos(rz), 0, 0
-  // 32: x, y, z, 0
-  // 48: count, do_rot_x, do_rot_y, do_rot_z
-  // 64: 16 byte GIF tag
-  // 80: 16 byte primitive info
-  // 96: 16 byte GIF tag
-  //112: 16 bytes per point (for color)   REG_A_D
-  //   : 16 bytes per point (for x, y, z) REG_XYZ2
-  fprintf(out,
-    "  ;; draw3d_Constructor_I(type=%d)\n"
-    "  ;; Align stack pointer, alloca() some memory\n"
-    "  ;; Clear rotation and offset and set point count\n"
-    "  addiu $at, $0, -16\n"
-    "  and $sp, $sp, $at\n", type);
+  fprintf(out, "  ;; draw3d_Constructor_I(type=%d)\n", type);
+  fprintf(out, "  li $a0, %d\n", type);
+  fprintf(out, "  move $a1, $t%d\n", reg_point_count);
+  fprintf(out, "  move $s0, $ra\n");
+  fprintf(out, "  jal _draw3d_constructor\n");
+  fprintf(out, "  nop\n");
+  fprintf(out, "  move $ra, $s0\n");
+  fprintf(out, "  move $t%d, $v0\n", reg_object_ref);
 
-  // Allocated memory is number of points * 32 + size of header.
-  fprintf(out,
-    "  sll $at, $t%d, 5\n"
-    "  addiu $at, $at, 112\n"
-    "  subu $sp, $sp, $at\n", reg_point_count);
-
-  // Set top of reg stack (return value) to allocated memory.
-  fprintf(out, "  move $t%d, $sp\n", reg_object_ref);
-
-  // Clear out members of the structure (rotation, xyz position, etc).
-  fprintf(out,
-    "  sq $0, 0($sp)\n"
-    "  sq $0, 16($sp)\n"
-    "  sq $0, 32($sp)\n"
-    "  sq $0, 48($sp)\n");
-
-  // Save point count in the struct
-  fprintf(out, "  sw $t%d, 48($sp)\n", reg_point_count);
-
-  // Copy the default primitive tag to the new structure.
-  fprintf(out,
-    "  li $v0, _primitive_gif_tag\n"
-    "  lq $v1, 0($v0)\n"
-    "  sq $v1, 64($sp)\n"
-    "  lq $v1, 16($v0)\n"
-    "  ori $v1, $v1, %d\n"
-    "  sq $v1, 80($sp)\n"
-    "  lq $v1, 32($v0)\n"
-    "  or $v1, $v1, $t%d\n"
-    "  sq $v1, 96($sp)\n", type, reg_point_count);
-
-  // a0 = count
-  fprintf(out, "  move $a0, $t%d\n", reg_point_count);
-
-  // Set points and colors
-  fprintf(out,
-    "  addiu $v0, $sp, 112\n"
-    "  lui $a3, 0x3f80\n"
-    "  dsll32 $a3, $a3, 0\n"
-    "  li $a2, REG_RGBAQ\n"
-    "_const_object_%d:\n"
-    "  sd $a3, 0($v0)\n"
-    "  sd $a2, 8($v0)\n"
-    "  sq $0, 16($v0)\n"
-    "  addiu $v0, $v0, 32\n"
-    "  addiu $a0, $a0, -1\n"
-    "  bne $a0, $0, _const_object_%d\n"
-    "  nop\n", label_count, label_count);
-
-  label_count++;
   reg -= 2;
 
   return 0;
@@ -593,5 +536,81 @@ void Playstation2::add_primitive_gif_tag()
     "  dc64 GIF_TAG(0, 1, 0, 0, FLG_PACKED, 2), (REG_A_D|(REG_XYZ2<<4))\n\n");
     //"  dc64 GIF_TAG(0, 1, 0, 0, FLG_PACKED, 1), REG_A_D\n"
     //"  dc64 SETREG_PRIM(0, 1, 0, 0, 0, 0, 0, 0, 1), REG_PRIM\n\n");
+}
+
+void Playstation2::add_draw3d_constructor()
+{
+  // Need to allocate enough space for:
+  //  0: sin512(rx), cos512(rx), sin512(ry), sin512(ry)
+  // 16: sin512(rz), cos(rz), 0, 0
+  // 32: x, y, z, 0
+  // 48: count, do_rot_x, do_rot_y, do_rot_z
+  // 64: 16 byte GIF tag
+  // 80: 16 byte primitive info
+  // 96: 16 byte GIF tag
+  //112: 16 bytes per point (for color)   REG_A_D
+  //   : 16 bytes per point (for x, y, z) REG_XYZ2
+  fprintf(out,
+    "_draw3d_constructor:\n"
+    "  ;; _draw3d_constructor(type, point_count)\n"
+    "  ;; Align stack pointer, alloca() some memory\n"
+    "  ;; Clear rotation and offset and set point count\n"
+    "  addiu $at, $0, -16\n"
+    "  and $sp, $sp, $at\n");
+
+  // Allocated memory is number of points * 32 + size of header.
+  fprintf(out,
+    "  sll $at, $a1, 5\n"
+    "  addiu $at, $at, 112\n"
+    "  subu $sp, $sp, $at\n");
+
+  // Set top of reg stack (return value) to allocated memory.
+  fprintf(out, "  move $v0, $sp\n");
+
+  // Clear out members of the structure (rotation, xyz position, etc).
+  fprintf(out,
+    "  sq $0, 0($sp)\n"
+    "  sq $0, 16($sp)\n"
+    "  sq $0, 32($sp)\n"
+    "  sq $0, 48($sp)\n");
+
+  // Save point count in the struct
+  fprintf(out, "  sw $a1, 48($sp)\n");
+
+  // Copy the default primitive tag to the new structure.
+  fprintf(out,
+    "  li $t8, _primitive_gif_tag\n"
+    "  lq $t9, 0($t8)\n"
+    "  sq $t9, 64($sp)\n"
+    "  lq $t9, 16($t8)\n"
+    "  or $t9, $t9, $a0\n"
+    "  sq $t9, 80($sp)\n"
+    "  lq $t9, 32($t8)\n"
+    "  or $t9, $t9, $a1\n"
+    "  sq $t9, 96($sp)\n");
+
+  // a0 = count
+  //fprintf(out, "  move $a0, $t%d\n", reg_point_count);
+
+  // Set points and colors
+  fprintf(out,
+    "  addiu $t8, $sp, 112\n"
+    "  lui $t9, 0x3f80\n"
+    "  dsll32 $t9, $t9, 0\n"
+    "  li $a2, REG_RGBAQ\n"
+    "_draw3d_constructor_l0:\n"
+    "  sd $t9, 0($t8)\n"
+    "  sd $a2, 8($t8)\n"
+    "  sq $0, 16($t8)\n"
+    "  addiu $t8, $t8, 32\n"
+    "  addiu $a0, $a0, -1\n"
+    "  bne $a0, $0, _draw3d_constructor_l0\n"
+    "  nop\n");
+
+  fprintf(out,
+    "  jr $ra\n"
+    "  nop\n\n");
+
+  label_count++;
 }
 
