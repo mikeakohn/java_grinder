@@ -163,7 +163,11 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
     int draw3d_type = -1;
 
     if (strcmp(cls, "Draw3DPoints") == 0) { draw3d_type = 0; }
+    if (strcmp(cls, "Draw3DLine") == 0) { draw3d_type = 1; }
+    if (strcmp(cls, "Draw3DLineStrip") == 0) { draw3d_type = 2; }
     else if (strcmp(cls, "Draw3DTriangle") == 0) { draw3d_type = 3; }
+    else if (strcmp(cls, "Draw3DTriangleStrip") == 0) { draw3d_type = 4; }
+    else if (strcmp(cls, "Draw3DTriangleFan") == 0) { draw3d_type = 5; }
 
     if (is_constructor == true)
     {
