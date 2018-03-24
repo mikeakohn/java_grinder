@@ -31,8 +31,8 @@ public:
   virtual int draw3d_setPosition_FFF() { return -1; }
   virtual int draw3d_setPoint_IFFF() { return -1; }
   virtual int draw3d_setPointColor_II() { return -1; }
-  virtual int draw3d_setPoints_Fa() { return -1; }
-  virtual int draw3d_setPointColors_Ia() { return -1; }
+  virtual int draw3d_setPoints_aF() { return -1; }
+  virtual int draw3d_setPointColors_aI() { return -1; }
   virtual int draw3d_draw() { return -1; }
 };
 

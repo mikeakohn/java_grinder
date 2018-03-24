@@ -187,8 +187,8 @@ void MIPS32::method_start(int local_count, int max_stack, int param_count, const
 
   fprintf(out, "%s:\n", name);
   fprintf(out, "  ; %s(local_count=%d, max_stack=%d, param_count=%d)\n", name, local_count, max_stack, param_count);
-  fprintf(out, "  addiu $sp, $sp, -%d\n", local_count * 4);
   fprintf(out, "  or $fp, $0, $sp\n");
+  fprintf(out, "  addiu $sp, $sp, -%d\n", local_count * 4);
 }
 
 void MIPS32::method_end(int local_count)
@@ -1162,39 +1162,53 @@ int MIPS32::new_array(uint8_t type)
   fprintf(out, "  ; new_array(%d)\n", type);
 
   if (stack > 0)
-  {
+  { 
     STACK_POP(8);
     t = 8;
   }
     else
-  {
+  { 
     t = reg - 1;
   }
 
-  fprintf(out, "  sw $t%d, 0($gp)\n", t);
+  //fprintf(out, "  move $at, $t%d\n", t);
 
   if (type == TYPE_INT)
   {
-    fprintf(out, "  sll $t%d, $t%d, 2\n", t, t);
+    fprintf(out, "  sll $at, $t%d, 2\n", t);
   }
     else
   if (type == TYPE_SHORT || type == TYPE_CHAR)
   {
-    fprintf(out, "  sll $t%d, $t%d, 1\n", t, t);
+    fprintf(out, "  sll $at, $%d, 1\n", t);
+  }
+    else
+  {
+    fprintf(out, "  move $at, $%d\n", t);
   }
 
-  fprintf(out, "  addiu $t%d, $t%d, 4\n", t, t);
-  fprintf(out, "  move $t9, $gp\n");
-  fprintf(out, "  addu $gp, $gp, $t%d\n", t);
-  fprintf(out, "  addiu $t9, $t9, 4\n");
+  // $at = length * sizeof(type) + 4
+  fprintf(out, "  addiu $at, $at, 4\n");
+
+  // Allocate stack space for array
+  fprintf(out, "  subu $sp, $sp, $at\n");
+
+  // Align stack
+  fprintf(out,
+    "  addiu $at, $0, -8\n"
+    "  and $sp, $sp, $at\n");
+
+  // Save count at start of array
+  fprintf(out, "  sw $t%d, 0($sp)\n", t);
 
   if (t == 8)
   {
+    fprintf(out, "  addiu $t9, $sp, 4\n");
     STACK_PUSH(9);
   }
     else
   {
-    fprintf(out, "  move $t%d, $t9\n", t);
+    fprintf(out, "  addiu $t%d, $sp, 4\n", t);
   }
 
   return 0;

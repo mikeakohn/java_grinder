@@ -354,14 +354,42 @@ int Playstation2::draw3d_setPointColor_II()
   return 0;
 }
 
-int Playstation2::draw3d_setPoints_Fa()
+int Playstation2::draw3d_setPoints_aF()
 {
   return -1;
 }
 
-int Playstation2::draw3d_setPointColors_Ia()
+int Playstation2::draw3d_setPointColors_aI()
 {
-  return -1;
+  int array = reg - 1;
+  int object = reg - 2;
+
+  fprintf(out,
+    "  ;; draw3d_setPointColors_aI()\n"
+    "  lw $t8, -4($t%d)\n"
+    //"  sll $t8, $t8, 5\n"
+    "  addiu $t%d, $t%d, 112\n"
+    "_set_point_colors_%d:\n"
+    "  lw $at, 0($t%d)\n"
+    "  sw $at, 0($t%d)\n"
+    "  addiu $t%d, $t%d, 4\n"
+    "  addiu $t%d, $t%d, 32\n"
+    "  addiu $t8, $t8, -1\n"
+    "  bne $t8, $0, _set_point_colors_%d\n"
+    "  nop\n",
+    array,
+    object, object,
+    label_count,
+    array,
+    object,
+    array, array,
+    object, object,
+    label_count);
+
+  label_count++;
+  reg -= 2;
+
+  return 0;
 }
 
 int Playstation2::draw3d_draw()

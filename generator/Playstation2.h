@@ -31,8 +31,8 @@ public:
   virtual int draw3d_setPosition_FFF();
   virtual int draw3d_setPoint_IFFF();
   virtual int draw3d_setPointColor_II();
-  virtual int draw3d_setPoints_Fa();
-  virtual int draw3d_setPointColors_Ia();
+  virtual int draw3d_setPoints_aF();
+  virtual int draw3d_setPointColors_aI();
   virtual int draw3d_draw();
 
   virtual int playstation2_clearScreen();
