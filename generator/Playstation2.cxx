@@ -359,7 +359,43 @@ int Playstation2::draw3d_setPointColor_II()
 
 int Playstation2::draw3d_setPoints_aF()
 {
-  return -1;
+  int array = reg - 1;
+  int object = reg - 2;
+
+  fprintf(out,
+    "  ;; draw3d_setPoints_aF()\n"
+    "  lw $t8, -4($t%d)\n"
+    //"  sll $t8, $t8, 5\n"
+    "  addiu $t%d, $t%d, 128\n"
+    "_set_points_%d:\n"
+    "  lw $at, 0($t%d)\n"
+    "  sw $at, 0($t%d)\n"
+    "  lw $at, 4($t%d)\n"
+    "  sw $at, 4($t%d)\n"
+    "  lw $at, 8($t%d)\n"
+    "  sw $at, 8($t%d)\n"
+    "  addiu $t%d, $t%d, 12\n"
+    "  addiu $t%d, $t%d, 32\n"
+    "  addiu $t8, $t8, -3\n"
+    "  bne $t8, $0, _set_points_%d\n"
+    "  nop\n",
+    array,
+    object, object,
+    label_count,
+    array,
+    object,
+    array,
+    object,
+    array,
+    object,
+    array, array,
+    object, object,
+    label_count);
+
+  label_count++;
+  reg -= 2;
+
+  return 0;
 }
 
 int Playstation2::draw3d_setPointColors_aI()
