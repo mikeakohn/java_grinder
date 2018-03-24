@@ -3,9 +3,9 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
- * Copyright 2014-2016 by Michael Kohn
+ * Copyright 2014-2018 by Michael Kohn
  *
  */
 
@@ -52,10 +52,10 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
   int max_stack;
   int max_locals;
   int code_len;
-  //int32_t *stack;
   int32_t temp;
   int32_t value;
-  //int stack_ptr;
+  float value_float;
+  int32_t *value_bin;
   _stack *stack;
   int32_t *array = NULL;
   int array_len = -1;
@@ -140,8 +140,20 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
         stack->push(bytes[pc] - 0x09);
         break;
       case 11: // fconst_0 (0x0b)
+        value_float = 0.0;
+        value_bin = (int32_t *)&value_float;
+        stack->push(*value_bin);
+        break;
       case 12: // fconst_1 (0x0c)
+        value_float = 1.0;
+        value_bin = (int32_t *)&value_float;
+        stack->push(*value_bin);
+        break;
       case 13: // fconst_2 (0x0d)
+        value_float = 2.0;
+        value_bin = (int32_t *)&value_float;
+        stack->push(*value_bin);
+        break;
       case 14: // dconst_0 (0x0e)
       case 15: // dconst_1 (0x0f)
         UNIMPL();
@@ -300,11 +312,21 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
         index = stack->pop();
         CHECK_BOUNDS();
         array[index] = value;
-        //stack_ptr -= 3;
         stack->pop();
         break;
       case 80: // lastore (0x50)
+        UNIMPL();
       case 81: // fastore (0x51)
+        CHECK_STACK(3);
+        //value_float = stack->pop_float();
+        value = stack->pop();
+        //value_bin = (int32_t *)&value_float;
+        index = stack->pop();
+        CHECK_BOUNDS();
+        //array[index] = *value_bin;
+        array[index] = value;
+        stack->pop();
+        break;
       case 82: // dastore (0x52)
       case 83: // aastore (0x53)
         UNIMPL();
@@ -494,6 +516,11 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
               generator->insert_array(full_field_name, array, array_len, TYPE_INT);
             }
               else
+            if (array_type == ARRAY_TYPE_FLOAT)
+            {
+              generator->insert_array(full_field_name, array, array_len, TYPE_FLOAT);
+            }
+              else
             {
               printf("Unsupported array type\n");
               ret = -1;
@@ -678,5 +705,4 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
 
   return 0;
 }
-
 

@@ -237,6 +237,39 @@ int Generator::insert_dc32(const char *name, int32_t *data, int len, uint8_t len
   return 0;
 }
 
+int Generator::insert_float(const char *name, int32_t *data, int len, uint8_t len_type, const char *dc32)
+{
+  int n;
+
+  // FIXME: For dc32, the len_type should be dc32 always.
+  if (len_type == TYPE_SHORT)
+  {
+    fprintf(out, "  dw %d   ; %s.length\n", len, name);
+  }
+    else
+  if (len_type == TYPE_INT)
+  {
+    fprintf(out, "  %s %d   ; %s.length\n", dc32, len, name);
+  }
+
+  fprintf(out, "_%s:\n", name);
+
+  for (n = 0; n < len; n++)
+  {
+    if ((n % 8) == 0) { fprintf(out, "  %s", dc32); }
+    else { fprintf(out, ","); }
+
+    float *a = (float *)&data[n];
+    fprintf(out, " %f", *a);
+
+    if (((n + 1) % 8) == 0) { fprintf(out, "\n"); }
+  }
+
+  fprintf(out, "\n\n");
+
+  return 0;
+}
+
 int Generator::get_constant(uint32_t value)
 {
   std::map<uint32_t,int>::iterator it;

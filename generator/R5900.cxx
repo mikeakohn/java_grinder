@@ -1228,14 +1228,26 @@ int R5900::new_array(uint8_t type)
 int R5900::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 {
   fprintf(out, ".align 32\n");
+
   if (type == TYPE_BYTE)
-  { return insert_db(name, data, len, TYPE_INT); }
+  {
+    return insert_db(name, data, len, TYPE_INT);
+  }
     else
   if (type == TYPE_SHORT)
-  { return insert_dw(name, data, len, TYPE_INT); } 
+  {
+    return insert_dw(name, data, len, TYPE_INT);
+  } 
     else
   if (type == TYPE_INT)
-  { return insert_dc32(name, data, len, TYPE_INT); } 
+  {
+    return insert_dc32(name, data, len, TYPE_INT);
+  } 
+    else
+  if (type == TYPE_FLOAT)
+  {
+    return insert_float(name, data, len, TYPE_INT);
+  } 
 
   return -1;
 }

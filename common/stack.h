@@ -3,9 +3,9 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2018 by Michael Kohn
  *
  */
 
@@ -16,11 +16,19 @@ struct _stack
 {
   void reset() { ptr = 0; }
   int length() { return ptr; }
-  void push(uint32_t value) { data[ptr++] = value; }
-  uint32_t pop() { return data[--ptr]; }
+  void push(uint32_t value) { data[ptr++].i = value; }
+  void push_float(float value) { data[ptr++].f = value; }
+  uint32_t pop() { return data[--ptr].i; }
+  float pop_float() { return data[--ptr].f; }
 
   int ptr;
-  uint32_t data[];
+
+private:
+  union
+  {
+    uint32_t i;
+    float f;
+  } data[];
 };
 
 #endif
