@@ -43,7 +43,7 @@ Playstation2::~Playstation2()
 
 int Playstation2::open(const char *filename)
 {
-  if (MIPS64::open(filename) != 0) { return -1; }
+  if (R5900::open(filename) != 0) { return -1; }
 
   fprintf(out,
     ".ps2_ee\n"
@@ -61,7 +61,7 @@ int Playstation2::open(const char *filename)
 
 int Playstation2::start_init()
 {
-  MIPS64::start_init();
+  R5900::start_init();
 
   fprintf(out,
     "  // Set stack pointer and reset DMA\n"

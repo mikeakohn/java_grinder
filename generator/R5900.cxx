@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "MIPS32.h"
+#include "R5900.h"
 
 #define REG_STACK(a) (a)
 #define LOCALS(i) (-(i * 4))
@@ -63,27 +63,26 @@
 //
 //   STACK <--- $sp
 
-MIPS32::MIPS32() :
+R5900::R5900() :
   reg(0),
   reg_max(8),
   stack(0),
   org(0),
   ram_start(0),
   ram_end(0),
-  virtual_address(0),
   physical_address(0),
   is_main(0)
 {
 
 }
 
-MIPS32::~MIPS32()
+R5900::~R5900()
 {
   fprintf(out, ".align 32\n");
   insert_constants_pool();
 }
 
-int MIPS32::open(const char *filename)
+int R5900::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 
@@ -94,61 +93,42 @@ int MIPS32::open(const char *filename)
   fprintf(out, "  ram_end equ 0x%x\n", ram_end);
   fprintf(out, "  virtual_address equ 0x%x\n", virtual_address);
   fprintf(out, "  physical_address equ 0x%x\n", physical_address);
-  fprintf(out, "  voffset equ (virtual_address - physical_address)\n");
+  //fprintf(out, "  voffset equ (virtual_address - physical_address)\n");
 
   return 0;
 }
 
-int MIPS32::start_init()
+int R5900::start_init()
 {
   // Add any set up items (stack, registers, etc).
   fprintf(out, ".org 0x%x\n", org);
   fprintf(out, "start:\n");
 
-  fprintf(out, "  li $s0, _constant_pool + voffset  ; $s0 points to constant numbers\n");
+  //fprintf(out, "  li $s0, _constant_pool + voffset  ; $s0 points to constant numbers\n");
   fprintf(out, "  li $s1, ram_start       ; $s1 points to statics\n");
   fprintf(out, "  li $sp, ram_end+1\n");
 
   return 0;
 }
 
-int MIPS32::insert_static_field_define(const char *name, const char *type, int index)
+int R5900::insert_static_field_define(const char *name, const char *type, int index)
 {
-  fprintf(out, "  %s equ ram_start+%d\n", name, index * 4);
+  //fprintf(out, "  %s equ ram_end+%d\n", name, index * 4);
+  fprintf(out, "  %s equ ram_end-%d\n", name, (index + 1) * 4);
   return 0;
 }
 
 
-int MIPS32::init_heap(int field_count)
+int R5900::init_heap(int field_count)
 {
   fprintf(out, "  ;; Set up heap and static initializers\n");
   fprintf(out, "  li $gp, ram_start+%d\n", field_count * 4);
   return 0;
 }
 
-int MIPS32::field_init_int(char *name, int index, int value)
+int R5900::field_init_int(char *name, int index, int value)
 {
   uint32_t n = (uint32_t)value;
-
-#if 0
-  if (n == 0 || n > 0xffff0000)
-  {
-    fprintf(out, "  lui $t8, 0x%04x\n", n >> 16);
-  }
-    else
-  {
-    int const_index = get_constant(n);
-
-    if (const_index == -1)
-    {
-      fprintf(out, "  li $t8, 0x%04x\n", n);
-    }
-      else
-    {
-      fprintf(out, "  lw $t8, 0x%04x($s0)\n", const_index * 4);
-    }
-  }
-#endif
 
   if (n == 0)
   {
@@ -170,28 +150,28 @@ int MIPS32::field_init_int(char *name, int index, int value)
   return 0;
 }
 
-int MIPS32::field_init_ref(char *name, int index)
+int R5900::field_init_ref(char *name, int index)
 {
   fprintf(out, "  ; static init\n");
-  fprintf(out, "  li $t8, _%s + voffset\n", name);
-  //fprintf(out, "  sw $t8, 0x%04x($s1)\n", index * 4);
+  fprintf(out, "  li $t8, _%s\n", name);
+  //fprintf(out, "  li $t8, _%s + voffset\n", name);
   fprintf(out, "  li $t9, %s\n", name);
   fprintf(out, "  sw $t8, ($t9)\n");
 
   return 0;
 }
 
-void MIPS32::method_start(int local_count, int max_stack, int param_count, const char *name)
+void R5900::method_start(int local_count, int max_stack, int param_count, const char *name)
 {
   is_main = (strcmp(name, "main") == 0) ? 1 : 0;
 
   fprintf(out, "%s:\n", name);
   fprintf(out, "  ; %s(local_count=%d, max_stack=%d, param_count=%d)\n", name, local_count, max_stack, param_count);
-  fprintf(out, "  addiu $fp, $sp, -4\n");
-  fprintf(out, "  addiu $sp, $sp, -%d\n", (local_count * 4) + 4);
+  fprintf(out, "  or $fp, $0, $sp\n");
+  fprintf(out, "  addiu $sp, $sp, -%d\n", local_count * 4);
 }
 
-void MIPS32::method_end(int local_count)
+void R5900::method_end(int local_count)
 {
   if (!is_main)
   {
@@ -202,7 +182,7 @@ void MIPS32::method_end(int local_count)
   fprintf(out, "\n");
 }
 
-int MIPS32::push_local_var_int(int index)
+int R5900::push_local_var_int(int index)
 {
   if (reg < 8)
   {
@@ -218,12 +198,12 @@ int MIPS32::push_local_var_int(int index)
   return 0;
 }
 
-int MIPS32::push_local_var_ref(int index)
+int R5900::push_local_var_ref(int index)
 {
   return push_local_var_int(index);
 }
 
-int MIPS32::push_ref_static(const char *name, int index)
+int R5900::push_ref_static(const char *name, int index)
 {
   if (reg < reg_max)
   {
@@ -236,17 +216,17 @@ int MIPS32::push_ref_static(const char *name, int index)
     STACK_PUSH(8);
   }
 
-  return -1;
+  return 0;
 }
 
-int MIPS32::push_fake()
+int R5900::push_fake()
 {
   if (stack != 0) { return -1; }
   reg++;
   return 0;
 }
 
-int MIPS32::push_int(int32_t n)
+int R5900::push_int(int32_t n)
 {
   uint32_t value = (uint32_t)n;
 
@@ -264,7 +244,7 @@ int MIPS32::push_int(int32_t n)
       STACK_PUSH(0)
     }
 
-    return 0;
+    //return 0;
   }
     else
   if ((value & 0x0000ffff) == 0x0000)
@@ -280,9 +260,55 @@ int MIPS32::push_int(int32_t n)
       STACK_PUSH(8)
     }
 
-    return 0;
+    //return 0;
+  }
+    else
+  if (n >= 0 && n < 0xffff)
+  {
+    if (reg < reg_max)
+    {
+      fprintf(out, "  ori $t%d, $0, 0x%04x\n", reg, value);
+      reg++;
+    }
+      else
+    {
+      fprintf(out, "  ori $t8, $0, 0x%04x\n", value);
+      STACK_PUSH(8)
+    }
+
+    //return 0;
+  }
+    else
+  if (n >= -32768 && n < 32768)
+  {
+    if (reg < reg_max)
+    {
+      fprintf(out, "  addiu $t%d, $0, %d\n", reg, n);
+      reg++;
+    }
+      else
+    {
+      fprintf(out, "  addiu $t8, $0, %d\n", n);
+      STACK_PUSH(8)
+    }
+
+    //return 0;
+  }
+    else
+  {
+    if (reg < reg_max)
+    {
+      fprintf(out, "  li $t%d, 0x%04x\n", reg, value);
+      reg++;
+    }
+      else
+    {
+      fprintf(out, "  li $t8, 0x%04x\n", value);
+      STACK_PUSH(8)
+    }
   }
 
+#if 0
   int index = get_constant(value);
 
   if (index == -1)
@@ -311,28 +337,62 @@ int MIPS32::push_int(int32_t n)
       STACK_PUSH(8)
     }
   }
+#endif
 
   return 0;
 }
 
 #if 0
-int MIPS32::push_long(int64_t n)
-{
-  return -1;
-}
-
-int MIPS32::push_float(float f)
-{
-  return -1;
-}
-
-int MIPS32::push_double(double f)
+int R5900::push_long(int64_t n)
 {
   return -1;
 }
 #endif
 
-int MIPS32::push_ref(char *name)
+int R5900::push_float(float f)
+{
+  uint32_t *data = (uint32_t *)&f;
+  uint32_t value = *data;
+
+  fprintf(out, "  ; push_float(%f) -- data=0x%08x\n", f, value);
+
+  if (value == 0)
+  {
+    if (reg < reg_max)
+    {
+      fprintf(out, "  move $t%d, $0\n", reg);
+      reg++;
+    }
+      else
+    {
+      STACK_PUSH(0)
+    }
+  }
+    else
+  {
+    if (reg < reg_max)
+    {
+      fprintf(out, "  li $t%d, 0x%04x\n", reg, value);
+      reg++;
+    }
+      else
+    {
+      fprintf(out, "  li $t8, 0x%04x\n", value);
+      STACK_PUSH(8)
+    }
+  }
+
+  return 0;
+}
+
+#if 0
+int R5900::push_double(double f)
+{
+  return -1;
+}
+#endif
+
+int R5900::push_ref(char *name)
 {
   fprintf(out, "  ; push_ref(%s)\n", name);
   fprintf(out, "  li $t8, %s\n", name);
@@ -351,7 +411,7 @@ int MIPS32::push_ref(char *name)
   return 0;
 }
 
-int MIPS32::pop_local_var_int(int index)
+int R5900::pop_local_var_int(int index)
 {
   if (stack > 0)
   {
@@ -367,12 +427,12 @@ int MIPS32::pop_local_var_int(int index)
   return 0;
 }
 
-int MIPS32::pop_local_var_ref(int index)
+int R5900::pop_local_var_ref(int index)
 {
   return pop_local_var_int(index);
 }
 
-int MIPS32::pop()
+int R5900::pop()
 {
   fprintf(out, "  ; pop()\n");
 
@@ -389,7 +449,7 @@ int MIPS32::pop()
   return 0;
 }
 
-int MIPS32::dup()
+int R5900::dup()
 {
   fprintf(out, "  ; dup()\n");
 
@@ -414,7 +474,7 @@ int MIPS32::dup()
   return 0;
 }
 
-int MIPS32::dup2()
+int R5900::dup2()
 {
   fprintf(out, "  ; dup2()\n");
 
@@ -453,7 +513,7 @@ int MIPS32::dup2()
   return 0;
 }
 
-int MIPS32::swap()
+int R5900::swap()
 {
   if (stack >= 2)
   {
@@ -479,12 +539,12 @@ int MIPS32::swap()
   return 0;
 }
 
-int MIPS32::add_integer()
+int R5900::add_integer()
 {
   return stack_alu("add");
 }
 
-int MIPS32::add_integer(int num)
+int R5900::add_integer(int num)
 {
   if (stack != 0) { return -1; }
   if (num < -32768 || num > 32767) { return -1; }
@@ -492,12 +552,12 @@ int MIPS32::add_integer(int num)
   return 0;
 }
 
-int MIPS32::sub_integer()
+int R5900::sub_integer()
 {
   return stack_alu("subu");
 }
 
-int MIPS32::sub_integer(int num)
+int R5900::sub_integer(int num)
 {
   if (stack != 0) { return -1; }
   num = -num;
@@ -506,12 +566,12 @@ int MIPS32::sub_integer(int num)
   return 0;
 }
 
-int MIPS32::mul_integer()
+int R5900::mul_integer()
 {
   return stack_alu("mul");
 }
 
-int MIPS32::div_integer()
+int R5900::div_integer()
 {
   divide();
 
@@ -529,7 +589,7 @@ int MIPS32::div_integer()
   return 0;
 }
 
-int MIPS32::mod_integer()
+int R5900::mod_integer()
 {
   divide();
 
@@ -548,7 +608,7 @@ int MIPS32::mod_integer()
   return 0;
 }
 
-int MIPS32::neg_integer()
+int R5900::neg_integer()
 {
   if (stack > 0)
   {
@@ -564,13 +624,13 @@ int MIPS32::neg_integer()
   return 0;
 }
 
-int MIPS32::shift_left_integer()
+int R5900::shift_left_integer()
 {
   return stack_alu("sll");
   return 0;
 }
 
-int MIPS32::shift_left_integer(int num)
+int R5900::shift_left_integer(int num)
 {
   if (num < 0 || num > 31) { printf("Shift out of range\n"); return -1; }
 
@@ -588,13 +648,13 @@ int MIPS32::shift_left_integer(int num)
   return 0;
 }
 
-int MIPS32::shift_right_integer()
+int R5900::shift_right_integer()
 {
   return stack_alu("sra");
   return 0;
 }
 
-int MIPS32::shift_right_integer(int num)
+int R5900::shift_right_integer(int num)
 {
   if (num < 0 || num > 31) { printf("Shift out of range\n"); return -1; }
 
@@ -612,13 +672,13 @@ int MIPS32::shift_right_integer(int num)
   return 0;
 }
 
-int MIPS32::shift_right_uinteger()
+int R5900::shift_right_uinteger()
 {
   return stack_alu("srl");
   return 0;
 }
 
-int MIPS32::shift_right_uinteger(int num)
+int R5900::shift_right_uinteger(int num)
 {
   if (num < 0 || num > 31) { printf("Shift out of range\n"); return -1; }
 
@@ -636,12 +696,12 @@ int MIPS32::shift_right_uinteger(int num)
   return 0;
 }
 
-int MIPS32::and_integer()
+int R5900::and_integer()
 {
   return stack_alu("and");
 }
 
-int MIPS32::and_integer(int num)
+int R5900::and_integer(int num)
 {
   if (stack != 0) { return -1; }
   if (num < 0 || num > 0xffff) { return -1; }
@@ -649,12 +709,12 @@ int MIPS32::and_integer(int num)
   return 0;
 }
 
-int MIPS32::or_integer()
+int R5900::or_integer()
 {
   return stack_alu("or");
 }
 
-int MIPS32::or_integer(int num)
+int R5900::or_integer(int num)
 {
   if (stack != 0) { return -1; }
   if (num < 0 || num > 0xffff) { return -1; }
@@ -662,12 +722,12 @@ int MIPS32::or_integer(int num)
   return 0;
 }
 
-int MIPS32::xor_integer()
+int R5900::xor_integer()
 {
   return stack_alu("xor");
 }
 
-int MIPS32::xor_integer(int num)
+int R5900::xor_integer(int num)
 {
   if (stack != 0) { return -1; }
   if (num < 0 || num > 0xffff) { return -1; }
@@ -675,7 +735,7 @@ int MIPS32::xor_integer(int num)
   return 0;
 }
 
-int MIPS32::inc_integer(int index, int num)
+int R5900::inc_integer(int index, int num)
 {
   fprintf(out, "  ; inc_integer(local_%d,%d)\n", index, num);
   fprintf(out, "  lw $t8, %d($fp)\n", LOCALS(index));
@@ -685,7 +745,7 @@ int MIPS32::inc_integer(int index, int num)
   return 0;
 }
 
-int MIPS32::integer_to_byte()
+int R5900::integer_to_byte()
 {
   if (stack > 0)
   {
@@ -701,7 +761,7 @@ int MIPS32::integer_to_byte()
   return 0;
 }
 
-int MIPS32::integer_to_short()
+int R5900::integer_to_short()
 {
   if (stack > 0)
   {
@@ -717,7 +777,7 @@ int MIPS32::integer_to_short()
   return 0;
 }
 
-int MIPS32::jump_cond(const char *label, int cond, int distance)
+int R5900::jump_cond(const char *label, int cond, int distance)
 {
   fprintf(out, "  ; jump_cond(%s, %d, %d)\n", label, cond, distance);
 
@@ -754,7 +814,7 @@ int MIPS32::jump_cond(const char *label, int cond, int distance)
   return -1;
 }
 
-int MIPS32::jump_cond_integer(const char *label, int cond, int distance)
+int R5900::jump_cond_integer(const char *label, int cond, int distance)
 {
   fprintf(out, "  ; jump_cond_integer(%s, %d, %d)\n", label, cond, distance);
 
@@ -808,7 +868,7 @@ int MIPS32::jump_cond_integer(const char *label, int cond, int distance)
   return -1;
 }
 
-int MIPS32::ternary(int cond, int value_true, int value_false)
+int R5900::ternary(int cond, int value_true, int value_false)
 {
   fprintf(out, "  ; ternary %d ? %d : %d\n", cond, value_true, value_false);
   fprintf(out, "  ; true condition is in delay slot\n");
@@ -868,7 +928,7 @@ int MIPS32::ternary(int cond, int value_true, int value_false)
   return -1;
 }
 
-int MIPS32::ternary(int cond, int compare, int value_true, int value_false)
+int R5900::ternary(int cond, int compare, int value_true, int value_false)
 {
   fprintf(out, "  ; ternary %d (%d) ? %d : %d\n", cond, compare, value_true, value_false);
   fprintf(out, "  ; true condition is in delay slot\n");
@@ -924,7 +984,7 @@ int MIPS32::ternary(int cond, int compare, int value_true, int value_false)
   return -1;
 }
 
-int MIPS32::return_local(int index, int local_count)
+int R5900::return_local(int index, int local_count)
 {
   if (reg != 0)
   {
@@ -932,14 +992,14 @@ int MIPS32::return_local(int index, int local_count)
   }
 
   fprintf(out, "  lw $v0, %d($fp) ; local_%d\n", LOCALS(index), index);
-  fprintf(out, "  addiu $sp, $sp, %d\n", (local_count * 4) + 4);
+  fprintf(out, "  addiu $sp, $fp, %d\n", local_count * 4);
   fprintf(out, "  jr $ra\n");
   fprintf(out, "  nop\n");
 
   return 0;
 }
 
-int MIPS32::return_integer(int local_count)
+int R5900::return_integer(int local_count)
 {
   if (reg != 1)
   {
@@ -947,7 +1007,7 @@ int MIPS32::return_integer(int local_count)
   }
 
   fprintf(out, "  move $v0, $t0\n");
-  fprintf(out, "  addiu $sp, $sp, %d\n", (local_count * 4) + 4);
+  fprintf(out, "  addiu $sp, $fp, %d\n", local_count * 4);
   fprintf(out, "  jr $ra\n");
   fprintf(out, "  nop ; Delay slot\n");
   reg--;
@@ -955,20 +1015,20 @@ int MIPS32::return_integer(int local_count)
   return 0;
 }
 
-int MIPS32::return_void(int local_count)
+int R5900::return_void(int local_count)
 {
   if (reg != 0)
   {
     printf("Internal Error: Reg stack not empty %s:%d\n", __FILE__, __LINE__);
   }
 
-  fprintf(out, "  addiu $sp, $sp, %d\n", (local_count * 4) + 4);
+  fprintf(out, "  addiu $sp, $fp, %d\n", local_count * 4);
   fprintf(out, "  jr $ra\n");
   fprintf(out, "  nop ; Delay slot\n");
   return 0;
 }
 
-int MIPS32::jump(const char *name, int distance)
+int R5900::jump(const char *name, int distance)
 {
   fprintf(out, "  b %s\n", name);
   fprintf(out, "  nop ; Delay slot\n");
@@ -976,12 +1036,12 @@ int MIPS32::jump(const char *name, int distance)
   return 0;
 }
 
-int MIPS32::call(const char *name)
+int R5900::call(const char *name)
 {
   return -1;
 }
 
-int MIPS32::invoke_static_method(const char *name, int params, int is_void)
+int R5900::invoke_static_method(const char *name, int params, int is_void)
 {
   int save_space;
   int save_regs;
@@ -1067,7 +1127,7 @@ int MIPS32::invoke_static_method(const char *name, int params, int is_void)
   return 0;
 }
 
-int MIPS32::put_static(const char *name, int index)
+int R5900::put_static(const char *name, int index)
 {
   fprintf(out, "  ; put_static(%s, %d)\n", name, index);
 
@@ -1085,7 +1145,7 @@ int MIPS32::put_static(const char *name, int index)
   return 0;
 }
 
-int MIPS32::get_static(const char *name, int index)
+int R5900::get_static(const char *name, int index)
 {
   fprintf(out, "  ; get_static(%s, %d)\n", name, index);
 
@@ -1102,58 +1162,72 @@ int MIPS32::get_static(const char *name, int index)
   return 0;
 }
 
-int MIPS32::brk()
+int R5900::brk()
 {
   fprintf(out, "  break\n");
   return 0;
 }
 
-int MIPS32::new_array(uint8_t type)
+int R5900::new_array(uint8_t type)
 {
   int t;
 
   fprintf(out, "  ; new_array(%d)\n", type);
 
   if (stack > 0)
-  {
+  { 
     STACK_POP(8);
     t = 8;
   }
     else
-  {
+  { 
     t = reg - 1;
   }
 
-  fprintf(out, "  sw $t%d, 0($gp)\n", t);
+  //fprintf(out, "  move $at, $t%d\n", t);
 
   if (type == TYPE_INT)
   {
-    fprintf(out, "  sll $t%d, $t%d, 2\n", t, t);
+    fprintf(out, "  sll $at, $t%d, 2\n", t);
   }
     else
   if (type == TYPE_SHORT || type == TYPE_CHAR)
   {
-    fprintf(out, "  sll $t%d, $t%d, 1\n", t, t);
+    fprintf(out, "  sll $at, $%d, 1\n", t);
+  }
+    else
+  {
+    fprintf(out, "  move $at, $%d\n", t);
   }
 
-  fprintf(out, "  addiu $t%d, $t%d, 4\n", t, t);
-  fprintf(out, "  move $t9, $gp\n");
-  fprintf(out, "  addu $gp, $gp, $t%d\n", t);
-  fprintf(out, "  addiu $t9, $t9, 4\n");
+  // $at = length * sizeof(type) + 4
+  fprintf(out, "  addiu $at, $at, 4\n");
+
+  // Allocate stack space for array
+  fprintf(out, "  subu $sp, $sp, $at\n");
+
+  // Align stack
+  fprintf(out,
+    "  addiu $at, $0, -8\n"
+    "  and $sp, $sp, $at\n");
+
+  // Save count at start of array
+  fprintf(out, "  sw $t%d, 0($sp)\n", t);
 
   if (t == 8)
   {
+    fprintf(out, "  addiu $t9, $sp, 4\n");
     STACK_PUSH(9);
   }
     else
   {
-    fprintf(out, "  move $t%d, $t9\n", t);
+    fprintf(out, "  addiu $t%d, $sp, 4\n", t);
   }
 
   return 0;
 }
 
-int MIPS32::insert_array(const char *name, int32_t *data, int len, uint8_t type)
+int R5900::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 {
   fprintf(out, ".align 32\n");
   if (type == TYPE_BYTE)
@@ -1168,14 +1242,14 @@ int MIPS32::insert_array(const char *name, int32_t *data, int len, uint8_t type)
   return -1;
 }
 
-int MIPS32::insert_string(const char *name, uint8_t *bytes, int len)
+int R5900::insert_string(const char *name, uint8_t *bytes, int len)
 {
   fprintf(out, ".align 32\n");
   fprintf(out, "  dc32 %d\n", len);
   return insert_utf8(name, bytes, len);
 }
 
-int MIPS32::push_array_length()
+int R5900::push_array_length()
 {
   if (stack > 0)
   {
@@ -1192,7 +1266,7 @@ int MIPS32::push_array_length()
   return 0;
 }
 
-int MIPS32::push_array_length(const char *name, int field_id)
+int R5900::push_array_length(const char *name, int field_id)
 {
   fprintf(out, "  lw $t8, 0x%04x($s1) ; static %s\n", field_id * 4, name);
 
@@ -1209,7 +1283,7 @@ int MIPS32::push_array_length(const char *name, int field_id)
   return 0;
 }
 
-int MIPS32::array_read_byte()
+int R5900::array_read_byte()
 {
   int index_reg;
   int ref_reg;
@@ -1232,7 +1306,7 @@ int MIPS32::array_read_byte()
   return 0;
 }
 
-int MIPS32::array_read_short()
+int R5900::array_read_short()
 {
   int index_reg;
   int ref_reg;
@@ -1256,7 +1330,7 @@ int MIPS32::array_read_short()
   return 0;
 }
 
-int MIPS32::array_read_int()
+int R5900::array_read_int()
 {
   int index_reg;
   int ref_reg;
@@ -1280,7 +1354,7 @@ int MIPS32::array_read_int()
   return 0;
 }
 
-int MIPS32::array_read_byte(const char *name, int field_id)
+int R5900::array_read_byte(const char *name, int field_id)
 {
   int index_reg;
 
@@ -1303,7 +1377,7 @@ int MIPS32::array_read_byte(const char *name, int field_id)
   return 0;
 }
 
-int MIPS32::array_read_short(const char *name, int field_id)
+int R5900::array_read_short(const char *name, int field_id)
 {
   int index_reg;
 
@@ -1327,7 +1401,7 @@ int MIPS32::array_read_short(const char *name, int field_id)
   return 0;
 }
 
-int MIPS32::array_read_int(const char *name, int field_id)
+int R5900::array_read_int(const char *name, int field_id)
 {
   int index_reg;
 
@@ -1351,7 +1425,7 @@ int MIPS32::array_read_int(const char *name, int field_id)
   return 0;
 }
 
-int MIPS32::array_write_byte()
+int R5900::array_write_byte()
 {
   int value_reg;
   int index_reg;
@@ -1373,7 +1447,7 @@ int MIPS32::array_write_byte()
   return 0;
 }
 
-int MIPS32::array_write_short()
+int R5900::array_write_short()
 {
   int value_reg;
   int index_reg;
@@ -1397,7 +1471,7 @@ int MIPS32::array_write_short()
   return 0;
 }
 
-int MIPS32::array_write_int()
+int R5900::array_write_int()
 {
   int value_reg;
   int index_reg;
@@ -1421,7 +1495,7 @@ int MIPS32::array_write_int()
   return 0;
 }
 
-int MIPS32::array_write_byte(const char *name, int field_id)
+int R5900::array_write_byte(const char *name, int field_id)
 {
   int value_reg;
   int index_reg;
@@ -1435,7 +1509,7 @@ int MIPS32::array_write_byte(const char *name, int field_id)
   return 0;
 }
 
-int MIPS32::array_write_short(const char *name, int field_id)
+int R5900::array_write_short(const char *name, int field_id)
 {
   int value_reg;
   int index_reg;
@@ -1450,7 +1524,7 @@ int MIPS32::array_write_short(const char *name, int field_id)
   return 0;
 }
 
-int MIPS32::array_write_int(const char *name, int field_id)
+int R5900::array_write_int(const char *name, int field_id)
 {
   int value_reg;
   int index_reg;
@@ -1465,13 +1539,13 @@ int MIPS32::array_write_int(const char *name, int field_id)
   return 0;
 }
 
-int MIPS32::cpu_nop()
+int R5900::cpu_nop()
 {
   fprintf(out, "  nop\n");
   return 0;
 }
 
-int MIPS32::stack_alu(const char *instr)
+int R5900::stack_alu(const char *instr)
 {
   if (stack == 0)
   {
@@ -1495,7 +1569,7 @@ int MIPS32::stack_alu(const char *instr)
   return 0;
 }
 
-int MIPS32::divide()
+int R5900::divide()
 {
   int rs, rt;
 
@@ -1530,7 +1604,7 @@ int MIPS32::divide()
 }
 
 
-int MIPS32::get_values_from_stack(int *value)
+int R5900::get_values_from_stack(int *value)
 {
   if (stack > 0)
   {
@@ -1546,7 +1620,7 @@ int MIPS32::get_values_from_stack(int *value)
   return 0;
 }
 
-int MIPS32::get_values_from_stack(int *value1, int *value2)
+int R5900::get_values_from_stack(int *value1, int *value2)
 {
   if (stack > 0)
   {
@@ -1573,7 +1647,7 @@ int MIPS32::get_values_from_stack(int *value1, int *value2)
   return 0;
 }
 
-int MIPS32::get_ref_from_stack(int *value1)
+int R5900::get_ref_from_stack(int *value1)
 {
   if (stack > 0)
   {
@@ -1590,7 +1664,7 @@ int MIPS32::get_ref_from_stack(int *value1)
   }
 }
 
-int MIPS32::set_constant(int reg, int value)
+int R5900::set_constant(int reg, int value)
 {
   if (value == 0)
   {

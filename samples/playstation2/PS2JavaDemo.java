@@ -6,10 +6,11 @@ import net.mikekohn.java_grinder.Draw3D.Draw3DTriangle;
 
 public class PS2JavaDemo
 {
+  static int[] colors = { 0x000000ff, 0x0000ff00, 0x00ff0000 };
+
   static public void animate(int count)
   {
     int n;
-    int[] colors = { 0x000000ff, 0x0000ff00, 0x00ff0000 };
 
     //Draw3DPoints points = new Draw3DPoints(5);
     Draw3DTriangle triangle = new Draw3DTriangle(3);

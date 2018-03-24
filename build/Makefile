@@ -53,10 +53,10 @@ CPUS= \
   MC6809.o \
   MCS51.o \
   MIPS32.o \
-  MIPS64.o \
   MSP430.o \
   MSP430X.o \
   Propeller.o \
+  R5900.o \
   STDC.o \
   TMS9900.o \
   W65816.o \

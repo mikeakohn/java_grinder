@@ -12,9 +12,9 @@
 #ifndef _PLAYSTATION_2_H
 #define _PLAYSTATION_2_H
 
-#include "MIPS64.h"
+#include "R5900.h"
 
-class Playstation2 : public MIPS64
+class Playstation2 : public R5900
 {
 public:
   Playstation2();
