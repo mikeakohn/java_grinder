@@ -36,8 +36,8 @@
 // r13 $t5
 // r14 $t6
 // r15 $t7 Top Of Stack
-// r16 $s0 Saved registers 0  (point to constant pool)
-// r17 $s1 Saved registers 1  (point to statics)
+// r16 $s0 Saved registers 0
+// r17 $s1 Saved registers 1
 // r18 $s2 Saved registers 2
 // r19 $s3 Saved registers 3
 // r20 $s4 Saved registers 4
@@ -48,7 +48,7 @@
 // r25 $t9 Temporary
 // r26 $k0 kernel (point to I/O ports or something)
 // r27 $k1 kernel (do not use?)
-// r28 $gp Heap pointer
+// r28 $gp Heap pointer (point to statics)
 // r29 $sp Stack pointer
 // r30 $fp Frame pointer (link register)
 // r31 $ra Return address
@@ -86,14 +86,11 @@ int R5900::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 
-  //fprintf(out, ".mips32\n");
+  fprintf(out, ".ps2_ee\n");
 
   // Set where RAM starts / ends
-  fprintf(out, "  ram_start equ 0x%x\n", ram_start);
-  fprintf(out, "  ram_end equ 0x%x\n", ram_end);
-  fprintf(out, "  virtual_address equ 0x%x\n", virtual_address);
-  fprintf(out, "  physical_address equ 0x%x\n", physical_address);
-  //fprintf(out, "  voffset equ (virtual_address - physical_address)\n");
+  //fprintf(out, "  ram_start equ 0x%x\n", ram_start);
+  //fprintf(out, "  ram_end equ 0x%x\n", ram_end);
 
   return 0;
 }
@@ -104,17 +101,15 @@ int R5900::start_init()
   fprintf(out, ".org 0x%x\n", org);
   fprintf(out, "start:\n");
 
-  //fprintf(out, "  li $s0, _constant_pool + voffset  ; $s0 points to constant numbers\n");
-  fprintf(out, "  li $s1, ram_start       ; $s1 points to statics\n");
-  fprintf(out, "  li $sp, ram_end+1\n");
+  //fprintf(out, "  li $s1, ram_start       ; $s1 points to statics\n");
+  //fprintf(out, "  li $sp, ram_end+1\n");
 
   return 0;
 }
 
 int R5900::insert_static_field_define(const char *name, const char *type, int index)
 {
-  //fprintf(out, "  %s equ ram_end+%d\n", name, index * 4);
-  fprintf(out, "  %s equ ram_end-%d\n", name, (index + 1) * 4);
+  fprintf(out, "  %s equ 0x%x\n", name, ram_end - (index + 1) * 4);
   return 0;
 }
 
@@ -122,7 +117,8 @@ int R5900::insert_static_field_define(const char *name, const char *type, int in
 int R5900::init_heap(int field_count)
 {
   fprintf(out, "  ;; Set up heap and static initializers\n");
-  fprintf(out, "  li $gp, ram_start+%d\n", field_count * 4);
+  fprintf(out, "  li $gp, 0x%x\n", ram_end - (field_count * 4));
+  fprintf(out, "  move $sp, $gp\n");
   return 0;
 }
 
@@ -130,9 +126,11 @@ int R5900::field_init_int(char *name, int index, int value)
 {
   uint32_t n = (uint32_t)value;
 
+  fprintf(out, "  li $t9, 0x%x\n", ram_end - ((index + 1) * 4));
+
   if (n == 0)
   {
-    fprintf(out, "  sw $0, 0x%04x($s1)\n", index * 4);
+    fprintf(out, "  sw $0, 0($t9)\n");
     return 0;
   }
     else
@@ -145,7 +143,7 @@ int R5900::field_init_int(char *name, int index, int value)
     fprintf(out, "  li $t8, 0x%04x\n", n);
   }
 
-  fprintf(out, "  sw $t8, 0x%04x($s1) ; static %s\n", index * 4, name);
+  fprintf(out, "  sw $t8, 0x%04x($t9) ; static %s\n", index * 4, name);
 
   return 0;
 }

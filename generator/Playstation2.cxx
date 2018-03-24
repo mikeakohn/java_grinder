@@ -25,7 +25,6 @@ Playstation2::Playstation2()
   org = 0x100000;
   ram_start = 0x00000000;
   ram_end = 32 * 1024 * 1024;
-  virtual_address = 0x0;
   physical_address = 0x0;
 }
 
@@ -46,7 +45,6 @@ int Playstation2::open(const char *filename)
   if (R5900::open(filename) != 0) { return -1; }
 
   fprintf(out,
-    ".ps2_ee\n"
     ".include \"macros.inc\"\n"
     ".include \"registers_gs_gp.inc\"\n"
     ".include \"system_calls.inc\"\n"
@@ -64,9 +62,14 @@ int Playstation2::start_init()
   R5900::start_init();
 
   fprintf(out,
-    "  // Set stack pointer and reset DMA\n"
-    "  li $sp, 0x02000000\n"
-    //"  li $sp, _constant_pool + 256\n"
+    "  ;; Set stack pointer and reset DMA\n"
+    "  li $sp, 0x%x\n",
+    ram_end);
+
+  //fprintf("  li $sp, _constant_pool + 256\n");
+
+  fprintf(out,
+    "  ;; Reset DMA\n"
     "  jal _dma_reset\n"
     "  nop\n\n"
 
