@@ -147,15 +147,19 @@ public:
   virtual int array_read_byte() = 0;
   virtual int array_read_short() = 0;
   virtual int array_read_int() = 0;
+  virtual int array_read_float();
   virtual int array_read_byte(const char *name, int field_id) = 0;
   virtual int array_read_short(const char *name, int field_id) = 0;
   virtual int array_read_int(const char *name, int field_id) = 0;
+  virtual int array_read_float(const char *name, int field_id);
   virtual int array_write_byte() = 0;
   virtual int array_write_short() = 0;
   virtual int array_write_int() = 0;
+  virtual int array_write_float();
   virtual int array_write_byte(const char *name, int field_id) = 0;
   virtual int array_write_short(const char *name, int field_id) = 0;
   virtual int array_write_int(const char *name, int field_id) = 0;
+  virtual int array_write_float(const char *name, int field_id);
   //virtual void close() = 0;
 
   // CPU

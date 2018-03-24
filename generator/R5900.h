@@ -101,15 +101,19 @@ public:
   virtual int array_read_byte();
   virtual int array_read_short();
   virtual int array_read_int();
+  virtual int array_read_float();
   virtual int array_read_byte(const char *name, int field_id);
   virtual int array_read_short(const char *name, int field_id);
   virtual int array_read_int(const char *name, int field_id);
+  virtual int array_read_float(const char *name, int field_id);
   virtual int array_write_byte();
   virtual int array_write_short();
   virtual int array_write_int();
+  virtual int array_write_float();
   virtual int array_write_byte(const char *name, int field_id);
   virtual int array_write_short(const char *name, int field_id);
   virtual int array_write_int(const char *name, int field_id);
+  virtual int array_write_float(const char *name, int field_id);
   virtual int cpu_nop();
 
 protected:

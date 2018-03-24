@@ -529,13 +529,24 @@ int JavaCompiler::array_load(JavaClass *java_class, int constant_id, uint8_t arr
 
     // FIXME - Does this come from the array or from the instruction
     if (array_type == ARRAY_TYPE_BYTE)
-    { return generator->array_read_byte(field_name, 0); }
+    {
+      return generator->array_read_byte(field_name, 0);
+    }
       else
     if (array_type == ARRAY_TYPE_SHORT)
-    { return generator->array_read_short(field_name, 0); }
+    {
+      return generator->array_read_short(field_name, 0);
+    }
       else
     if (array_type == ARRAY_TYPE_INT)
-    { return generator->array_read_int(field_name, 0); }
+    {
+      return generator->array_read_int(field_name, 0);
+    }
+      else
+    if (array_type == ARRAY_TYPE_FLOAT)
+    {
+      return generator->array_read_float(field_name, 0);
+    }
   }
     else
   {
@@ -570,15 +581,26 @@ int JavaCompiler::array_store(JavaClass *java_class, int constant_id, uint8_t ar
       return -1;
     }
 
-    // FIXME - Do we get this from the array or from the instruction
+    // FIXME - Does this come from the array or from the instruction
     if (array_type == ARRAY_TYPE_BYTE)
-    { return generator->array_write_byte(field_name, 0); }
+    {
+      return generator->array_write_byte(field_name, 0);
+    }
       else
     if (array_type == ARRAY_TYPE_SHORT)
-    { return generator->array_write_short(field_name, 0); }
+    {
+      return generator->array_write_short(field_name, 0);
+    }
       else
     if (array_type == ARRAY_TYPE_INT)
-    { return generator->array_write_int(field_name, 0); }
+    {
+      return generator->array_write_int(field_name, 0);
+    }
+      else
+    if (array_type == ARRAY_TYPE_FLOAT)
+    {
+      return generator->array_write_float(field_name, 0);
+    }
   }
     else
   {
@@ -1049,7 +1071,12 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         break;
 
       case 48: // faload (0x30)
-        UNIMPL()
+        if (stack->length() == 0)
+        { ret = generator->array_read_float(); }
+          else
+        { ret = array_load(java_class, stack->pop(), ARRAY_TYPE_FLOAT); }
+
+        break;
         break;
 
       case 49: // daload (0x31)
@@ -1204,7 +1231,11 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         break;
 
       case 81: // fastore (0x51)
-        UNIMPL()
+        if (stack->length() == 0)
+        { ret = generator->array_write_float(); }
+          else
+        { ret = array_store(java_class, stack->pop(), ARRAY_TYPE_FLOAT); }
+
         break;
 
       case 82: // dastore (0x52)

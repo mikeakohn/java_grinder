@@ -94,6 +94,30 @@ int Generator::compare_floats(int cond)
   return -1;
 }
 
+int Generator::array_read_float()
+{
+  printf("Error: Floats are not supported on this platform.\n");
+  return -1;
+}
+
+int Generator::array_read_float(const char *name, int field_id)
+{
+  printf("Error: Floats are not supported on this platform.\n");
+  return -1;
+}
+
+int Generator::array_write_float()
+{
+  printf("Error: Floats are not supported on this platform.\n");
+  return -1;
+}
+
+int Generator::array_write_float(const char *name, int field_id)
+{
+  printf("Error: Floats are not supported on this platform.\n");
+  return -1;
+}
+
 int Generator::new_object(const char *object_name, int field_count)
 {
   printf("Error: Object instantiation is not supported on this platform.\n");

@@ -1184,7 +1184,7 @@ int R5900::new_array(uint8_t type)
 
   //fprintf(out, "  move $at, $t%d\n", t);
 
-  if (type == TYPE_INT)
+  if (type == TYPE_INT || type == TYPE_FLOAT)
   {
     fprintf(out, "  sll $at, $t%d, 2\n", t);
   }
@@ -1352,6 +1352,11 @@ int R5900::array_read_int()
   return 0;
 }
 
+int R5900::array_read_float()
+{
+  return array_read_int();
+}
+
 int R5900::array_read_byte(const char *name, int field_id)
 {
   int index_reg;
@@ -1421,6 +1426,11 @@ int R5900::array_read_int(const char *name, int field_id)
   }
 
   return 0;
+}
+
+int R5900::array_read_float(const char *name, int field_id)
+{
+  return array_read_int(name, field_id);
 }
 
 int R5900::array_write_byte()
@@ -1493,6 +1503,11 @@ int R5900::array_write_int()
   return 0;
 }
 
+int R5900::array_write_float()
+{
+  return array_write_int();
+}
+
 int R5900::array_write_byte(const char *name, int field_id)
 {
   int value_reg;
@@ -1535,6 +1550,11 @@ int R5900::array_write_int(const char *name, int field_id)
   fprintf(out, "  sw $t%d, 0($at)\n", value_reg);
 
   return 0;
+}
+
+int R5900::array_write_float(const char *name, int field_id)
+{
+  return array_write_int(name, field_id);
 }
 
 int R5900::cpu_nop()

@@ -10,6 +10,13 @@ public class PS2JavaDemo
 
   static public void animate(int count)
   {
+    float[] points =
+    {
+      -100.0f, -100.0f, 0.f,
+      -100.0f,  110.0f, 0.f,
+         0.0f,  110.0f, 0.f,
+    };
+
     int n;
 
     //Draw3DPoints points = new Draw3DPoints(5);
@@ -17,12 +24,15 @@ public class PS2JavaDemo
 
     // Define all the triangle vertexes (position and color)
     // with a reference point of (0, 0).
-    triangle.setPoint(0, -100.0f, -100.0f, 0.0f);
-    triangle.setPoint(1, -100.0f, 110.0f, 0.0f);
-    triangle.setPoint(2, 0.0f, 110.0f, 0.0f);
+    //triangle.setPoint(0, -100.0f, -100.0f, 0.0f);
+    //triangle.setPoint(1, -100.0f, 110.0f, 0.0f);
+    //triangle.setPoint(2, 0.0f, 110.0f, 0.0f);
     //triangle.setPointColor(0, 0x000000ff);
     //triangle.setPointColor(1, 0x0000ff00);
     //triangle.setPointColor(2, 0x00ff0000);
+
+    // Define triangle vertexes with an array instead.
+    triangle.setPoints(points);
     triangle.setPointColors(colors);
 
     // Set the position on the screen.
