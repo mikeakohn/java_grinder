@@ -47,6 +47,12 @@ int draw3d(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(setPointColor,_II)
   CHECK_FUNC(setPoints,_aF)
   CHECK_FUNC(setPointColors,_aI)
+  CHECK_FUNC(disableGouraudShading,)
+  CHECK_FUNC(enableGouraudShading,)
+  CHECK_FUNC(disableFogging,)
+  CHECK_FUNC(enableFogging,)
+  CHECK_FUNC(disableTexture,)
+  CHECK_FUNC(enableTexture,)
   CHECK_FUNC(draw,)
 
   return -1;

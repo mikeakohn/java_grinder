@@ -33,6 +33,12 @@ public:
   virtual int draw3d_setPointColor_II() { return -1; }
   virtual int draw3d_setPoints_aF() { return -1; }
   virtual int draw3d_setPointColors_aI() { return -1; }
+  virtual int draw3d_disableGouraudShading() { return -1; }
+  virtual int draw3d_enableGouraudShading() { return -1; }
+  virtual int draw3d_disableFogging() { return -1; }
+  virtual int draw3d_enableFogging() { return -1; }
+  virtual int draw3d_disableTexture() { return -1; }
+  virtual int draw3d_enableTexture() { return -1; }
   virtual int draw3d_draw() { return -1; }
 };
 

@@ -33,6 +33,12 @@ abstract public class Draw3DObject
    public void setPointColor(int index, int color) { }
    public void setPoints(float[] points) { }
    public void setPointColors(int[] colors) { }
+   public void disableGouraudShading() { }
+   public void enableGouraudShading() { }
+   public void disableFogging() { }
+   public void enableFogging() { }
+   public void disableTexture() { }
+   public void enableTexture() { }
    public void draw() { }
 
    private float rx, ry, rz;
