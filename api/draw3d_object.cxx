@@ -15,27 +15,27 @@
 #include <stdint.h>
 
 #include "JavaClass.h"
-#include "draw3d.h"
+#include "draw3d_object.h"
 
 #define CHECK_FUNC(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return generator->draw3d_##funct##sig(); \
+    return generator->draw3d_object_##funct##sig(); \
   }
 
 #define CHECK_FUNC_CONST_1(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return generator->draw3d_##funct##sig(const_val); \
+    return generator->draw3d_object_##funct##sig(const_val); \
   }
 
 #define CHECK_FUNC_CONST_2(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return generator->draw3d_##funct##sig(const_val1, const_val2); \
+    return generator->draw3d_object_##funct##sig(const_val1, const_val2); \
   }
 
-int draw3d(JavaClass *java_class, Generator *generator, char *method_name)
+int draw3d_object(JavaClass *java_class, Generator *generator, char *method_name)
 {
   //CHECK_FUNC(Constructor,_X)
   //CHECK_FUNC(Constructor,_I)
@@ -58,12 +58,12 @@ int draw3d(JavaClass *java_class, Generator *generator, char *method_name)
   return -1;
 }
 
-int draw3d(JavaClass *java_class, Generator *generator, char *method_name, int const_val)
+int draw3d_object(JavaClass *java_class, Generator *generator, char *method_name, int const_val)
 {
   return -1;
 }
 
-int draw3d(JavaClass *java_class, Generator *generator, char *function, int const_val1, int const_val2)
+int draw3d_object(JavaClass *java_class, Generator *generator, char *function, int const_val1, int const_val2)
 {
   return -1;
 }

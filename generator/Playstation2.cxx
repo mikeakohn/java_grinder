@@ -33,7 +33,7 @@ Playstation2::~Playstation2()
   add_dma_reset();
   add_dma_wait();
   add_screen_init_clear();
-  add_draw3d_constructor();
+  add_draw3d_object_constructor();
   add_primitive_gif_tag();
   add_vu1_code();
   Math::add_sin_table(out);
@@ -163,24 +163,24 @@ int Playstation2::new_object(const char *object_name, int field_count)
   return 0;
 }
 
-int Playstation2::draw3d_Constructor_X(int type)
+int Playstation2::draw3d_object_Constructor_X(int type)
 {
-  fprintf(out, "  ;; draw3d_Constructor_X(type=%d)\n", type);
+  fprintf(out, "  ;; draw3d_object_Constructor_X(type=%d)\n", type);
 
   return -1;
 }
 
-int Playstation2::draw3d_Constructor_I(int type)
+int Playstation2::draw3d_object_Constructor_I(int type)
 {
   const int reg_point_count = reg - 1;
   //const int reg_object_dup = reg - 2;
   const int reg_object_ref = reg - 3;
 
-  fprintf(out, "  ;; draw3d_Constructor_I(type=%d)\n", type);
+  fprintf(out, "  ;; draw3d_object_Constructor_I(type=%d)\n", type);
   fprintf(out, "  li $a0, %d\n", type);
   fprintf(out, "  move $a1, $t%d\n", reg_point_count);
   fprintf(out, "  move $s0, $ra\n");
-  fprintf(out, "  jal _draw3d_constructor\n");
+  fprintf(out, "  jal _draw3d_object_constructor\n");
   fprintf(out, "  nop\n");
   fprintf(out, "  move $ra, $s0\n");
   fprintf(out, "  move $t%d, $v0\n", reg_object_ref);
@@ -190,13 +190,13 @@ int Playstation2::draw3d_Constructor_I(int type)
   return 0;
 }
 
-int Playstation2::draw3d_rotateX512_I()
+int Playstation2::draw3d_object_rotateX512_I()
 {
   int object = reg - 2;
   int x = reg - 1;
 
   fprintf(out,
-    "  ;; draw3d_rotate512_III()\n"
+    "  ;; draw3d_object_rotate512_III()\n"
     "  andi $t%d, $t%d, 511\n"
     "  sll $t%d, $t%d, 2\n"
     "  li $v1, _sin_table_512\n"
@@ -222,13 +222,13 @@ int Playstation2::draw3d_rotateX512_I()
   return 0;
 }
 
-int Playstation2::draw3d_rotateY512_I()
+int Playstation2::draw3d_object_rotateY512_I()
 {
   int object = reg - 2;
   int y = reg - 1;
 
   fprintf(out,
-    "  ;; draw3d_rotate512_III()\n"
+    "  ;; draw3d_object_rotate512_III()\n"
     "  andi $t%d, $t%d, 511\n"
     "  sll $t%d, $t%d, 2\n"
     "  li $v1, _sin_table_512\n"
@@ -254,13 +254,13 @@ int Playstation2::draw3d_rotateY512_I()
   return 0;
 }
 
-int Playstation2::draw3d_rotateZ512_I()
+int Playstation2::draw3d_object_rotateZ512_I()
 {
   int object = reg - 2;
   int z = reg - 1;
 
   fprintf(out,
-    "  ;; draw3d_rotate512_III()\n"
+    "  ;; draw3d_object_rotate512_III()\n"
     "  andi $t%d, $t%d, 511\n"
     "  sll $t%d, $t%d, 2\n"
     "  li $v1, _sin_table_512\n"
@@ -286,7 +286,7 @@ int Playstation2::draw3d_rotateZ512_I()
   return 0;
 }
 
-int Playstation2::draw3d_setPosition_FFF()
+int Playstation2::draw3d_object_setPosition_FFF()
 {
   int object = reg - 4;
   int x = reg - 3;
@@ -294,7 +294,7 @@ int Playstation2::draw3d_setPosition_FFF()
   int z = reg - 1;
 
   fprintf(out,
-    "  ;; draw3d_setPosition_FFF()\n"
+    "  ;; draw3d_object_setPosition_FFF()\n"
     "  sw $t%d, 32($t%d)\n"
     "  sw $t%d, 36($t%d)\n"
     "  sw $t%d, 40($t%d)\n",
@@ -307,7 +307,7 @@ int Playstation2::draw3d_setPosition_FFF()
   return 0;
 }
 
-int Playstation2::draw3d_setPoint_IFFF()
+int Playstation2::draw3d_object_setPoint_IFFF()
 {
   int object = reg - 5;
   int index = reg - 4;
@@ -316,7 +316,7 @@ int Playstation2::draw3d_setPoint_IFFF()
   int z = reg - 1;
 
   fprintf(out,
-    "  ;; draw3d_setPointPosition_IFFF()\n"
+    "  ;; draw3d_object_setPointPosition_IFFF()\n"
     "  sll $t%d, $t%d, 5\n"
     "  addiu $t%d, $t%d, 128\n"
     "  addu $t%d, $t%d, $t%d\n"
@@ -335,14 +335,14 @@ int Playstation2::draw3d_setPoint_IFFF()
   return 0;
 }
 
-int Playstation2::draw3d_setPointColor_II()
+int Playstation2::draw3d_object_setPointColor_II()
 {
   int object = reg - 3;
   int index = reg - 2;
   int color = reg - 1;
 
   fprintf(out,
-    "  ;; draw3d_setPointColor_II()\n"
+    "  ;; draw3d_object_setPointColor_II()\n"
     "  sll $t%d, $t%d, 5\n"
     "  addiu $t%d, $t%d, 112\n"
     "  addu $t%d, $t%d, $t%d\n"
@@ -357,13 +357,13 @@ int Playstation2::draw3d_setPointColor_II()
   return 0;
 }
 
-int Playstation2::draw3d_setPoints_aF()
+int Playstation2::draw3d_object_setPoints_aF()
 {
   int array = reg - 1;
   int object = reg - 2;
 
   fprintf(out,
-    "  ;; draw3d_setPoints_aF()\n"
+    "  ;; draw3d_object_setPoints_aF()\n"
     "  lw $t8, -4($t%d)\n"
     //"  sll $t8, $t8, 5\n"
     "  addiu $t%d, $t%d, 128\n"
@@ -398,13 +398,13 @@ int Playstation2::draw3d_setPoints_aF()
   return 0;
 }
 
-int Playstation2::draw3d_setPointColors_aI()
+int Playstation2::draw3d_object_setPointColors_aI()
 {
   int array = reg - 1;
   int object = reg - 2;
 
   fprintf(out,
-    "  ;; draw3d_setPointColors_aI()\n"
+    "  ;; draw3d_object_setPointColors_aI()\n"
     "  lw $t8, -4($t%d)\n"
     //"  sll $t8, $t8, 5\n"
     "  addiu $t%d, $t%d, 112\n"
@@ -431,13 +431,13 @@ int Playstation2::draw3d_setPointColors_aI()
   return 0;
 }
 
-int Playstation2::draw3d_draw()
+int Playstation2::draw3d_object_draw()
 {
   int object = reg - 1;
 
   // This could be done with DMA.  Not sure what's better.
   fprintf(out,
-    "  ;; draw3d_draw()\n"
+    "  ;; draw3d_object_draw()\n"
     "  ;; Copy GIF packet to VU1's data memory segment.\n"
     "  li $v0, VU1_VU_MEM\n"
     "  move $v1, $t%d\n"
@@ -471,6 +471,26 @@ int Playstation2::draw3d_draw()
   reg -= 1;
 
   return 0;
+}
+
+int Playstation2::draw3d_texture_Constructor_II()
+{
+  return -1;
+}
+
+int Playstation2::draw3d_texture_setPixel_II()
+{
+  return -1;
+}
+
+int Playstation2::draw3d_texture_setPixels_aI()
+{
+  return -1;
+}
+
+int Playstation2::draw3d_texture_upload()
+{
+  return -1;
 }
 
 int Playstation2::playstation2_clearScreen()
@@ -615,7 +635,7 @@ void Playstation2::add_primitive_gif_tag()
     //"  dc64 SETREG_PRIM(0, 1, 0, 0, 0, 0, 0, 0, 1), REG_PRIM\n\n");
 }
 
-void Playstation2::add_draw3d_constructor()
+void Playstation2::add_draw3d_object_constructor()
 {
   // Need to allocate enough space for:
   //  0: sin512(rx), cos512(rx), sin512(ry), sin512(ry)
@@ -628,8 +648,8 @@ void Playstation2::add_draw3d_constructor()
   //112: 16 bytes per point (for color)   REG_A_D
   //   : 16 bytes per point (for x, y, z) REG_XYZ2
   fprintf(out,
-    "_draw3d_constructor:\n"
-    "  ;; _draw3d_constructor(type, point_count)\n"
+    "_draw3d_object_constructor:\n"
+    "  ;; _draw3d_object_constructor(type, point_count)\n"
     "  ;; Align stack pointer, alloca() some memory\n"
     "  ;; Clear rotation and offset and set point count\n"
     "  addiu $at, $0, -16\n"
@@ -675,13 +695,13 @@ void Playstation2::add_draw3d_constructor()
     "  lui $t9, 0x3f80\n"
     "  dsll32 $t9, $t9, 0\n"
     "  li $a2, REG_RGBAQ\n"
-    "_draw3d_constructor_l0:\n"
+    "_draw3d_object_constructor_l0:\n"
     "  sd $t9, 0($t8)\n"
     "  sd $a2, 8($t8)\n"
     "  sq $0, 16($t8)\n"
     "  addiu $t8, $t8, 32\n"
     "  addiu $a0, $a0, -1\n"
-    "  bne $a0, $0, _draw3d_constructor_l0\n"
+    "  bne $a0, $0, _draw3d_object_constructor_l0\n"
     "  nop\n");
 
   fprintf(out,

@@ -20,7 +20,8 @@
 #include "invoke_virtual.h"
 #include "java_lang_string.h"
 #include "java_lang_system.h"
-#include "draw3d.h"
+#include "draw3d_object.h"
+#include "draw3d_texture.h"
 
 #define DRAW3D "net/mikekohn/java_grinder/Draw3D"
 #define DRAW3D_LEN (sizeof(DRAW3D) - 1)
@@ -175,20 +176,29 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
       {
         if (strcmp(method_sig, "(Ljava/lang/String;)V") == 0)
         {
-          ret = generator->draw3d_Constructor_X(draw3d_type);
+          ret = generator->draw3d_object_Constructor_X(draw3d_type);
         }
         else if (strcmp(method_sig, "(I)V") == 0)
         {
-          ret = generator->draw3d_Constructor_I(draw3d_type);
+          ret = generator->draw3d_object_Constructor_I(draw3d_type);
         }
       }
     }
       else
     {
       if (strcmp(cls, "Draw3DPoints") == 0 ||
-          strcmp(cls, "Draw3DTriangle") == 0)
+          strcmp(cls, "Draw3DLine") == 0 ||
+          strcmp(cls, "Draw3DLineStrip") == 0 ||
+          strcmp(cls, "Draw3DTriangle") == 0 ||
+          strcmp(cls, "Draw3DTriangleStrip") == 0 ||
+          strcmp(cls, "Draw3DTriangleFan") == 0)
       {
-        ret = draw3d(java_class, generator, function);
+        ret = draw3d_object(java_class, generator, function);
+      }
+        else
+      if (strcmp(cls, "Draw3DTexture") == 0)
+      {
+        ret = draw3d_texture(java_class, generator, function);
       }
     }
   }
