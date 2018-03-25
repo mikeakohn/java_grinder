@@ -53,6 +53,10 @@ int draw3d_object(JavaClass *java_class, Generator *generator, char *method_name
   CHECK_FUNC(enableFogging,)
   CHECK_FUNC(disableTexture,)
   CHECK_FUNC(enableTexture,)
+  CHECK_FUNC(disableAlphaBlending,)
+  CHECK_FUNC(enableAlphaBlending,)
+  CHECK_FUNC(disableAntialiasing,)
+  CHECK_FUNC(enableAntialiasing,)
   CHECK_FUNC(draw,)
 
   return -1;

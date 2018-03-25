@@ -39,6 +39,10 @@ abstract public class Draw3DObject
    public void enableFogging() { }
    public void disableTexture() { }
    public void enableTexture() { }
+   public void disableAlphaBlending() { }
+   public void enableAlphaBlending() { }
+   public void disableAntialiasing() { }
+   public void enableAntialiasing() { }
    public void draw() { }
 
    private float rx, ry, rz;

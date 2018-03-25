@@ -39,6 +39,10 @@ public:
   virtual int draw3d_object_enableFogging() { return -1; }
   virtual int draw3d_object_disableTexture() { return -1; }
   virtual int draw3d_object_enableTexture() { return -1; }
+  virtual int draw3d_object_disableAlphaBlending() { return -1; }
+  virtual int draw3d_object_enableAlphaBlending() { return -1; }
+  virtual int draw3d_object_disableAntialiasing() { return -1; }
+  virtual int draw3d_object_enableAntialiasing() { return -1; }
   virtual int draw3d_object_draw() { return -1; }
 
   virtual int draw3d_texture_Constructor_II(int type) { return -1; }

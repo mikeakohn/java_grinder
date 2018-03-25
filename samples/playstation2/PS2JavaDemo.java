@@ -34,6 +34,8 @@ public class PS2JavaDemo
     triangle.setPoints(points);
     triangle.setPointColors(colors);
 
+    triangle.disableGouraudShading();
+
     // Set the position on the screen.
     triangle.setPosition(1900.0f, 2100.0f, 2048.0f);
 
