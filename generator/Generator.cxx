@@ -88,6 +88,18 @@ int Generator::mul_float()
   return -1;
 }
 
+int Generator::div_float()
+{
+  printf("Error: Floats are not supported on this platform.\n");
+  return -1;
+}
+
+int Generator::neg_float()
+{
+  printf("Error: Floats are not supported on this platform.\n");
+  return -1;
+}
+
 int Generator::compare_floats(int cond)
 {
   printf("Error: Floats are not supported on this platform.\n");

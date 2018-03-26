@@ -1390,7 +1390,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         break;
 
       case 110: // fdiv (0x6e)
-        UNIMPL()
+        ret = generator->div_float();
         break;
 
       case 111: // ddiv (0x6f)
@@ -1425,7 +1425,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         break;
 
       case 118: // fneg (0x76)
-        UNIMPL()
+        ret = generator->neg_float();
         break;
 
       case 119: // dneg (0x77)

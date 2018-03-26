@@ -775,6 +775,82 @@ int R5900::integer_to_short()
   return 0;
 }
 
+int R5900::add_float()
+{
+  fprintf(out,
+    "  mtc1 $t%d, $f0\n"
+    "  mtc1 $t%d, $f1\n"
+    "  add.s $f0, $f0, $f1\n"
+    "  mfc1 $f0, $t%d\n",
+    reg - 2,
+    reg - 1,
+    reg - 2);
+
+  reg =- 1;
+
+  return 0;
+}
+
+int R5900::sub_float()
+{
+  fprintf(out,
+    "  mtc1 $t%d, $f0\n"
+    "  mtc1 $t%d, $f1\n"
+    "  sub.s $f0, $f0, $f1\n"
+    "  mfc1 $f0, $t%d\n",
+    reg - 2,
+    reg - 1,
+    reg - 2);
+
+  reg =- 1;
+
+  return 0;
+}
+
+int R5900::mul_float()
+{
+  fprintf(out,
+    "  mtc1 $t%d, $f0\n"
+    "  mtc1 $t%d, $f1\n"
+    "  mul.s $f0, $f0, $f1\n"
+    "  mfc1 $f0, $t%d\n",
+    reg - 2,
+    reg - 1,
+    reg - 2);
+
+  reg =- 1;
+
+  return 0;
+}
+
+int R5900::div_float()
+{
+  fprintf(out,
+    "  mtc1 $t%d, $f0\n"
+    "  mtc1 $t%d, $f1\n"
+    "  div.s $f0, $f0, $f1\n"
+    "  mfc1 $f0, $t%d\n",
+    reg - 2,
+    reg - 1,
+    reg - 2);
+
+  reg =- 1;
+
+  return 0;
+}
+
+int R5900::neg_float()
+{
+  fprintf(out,
+    "  mtc1 $t%d, $f0\n"
+    "  neg.s $f0, $f0\n"
+    "  mfc1 $f0, $t%d\n",
+    reg - 1,
+    reg - 1);
+
+  return 0;
+}
+
 int R5900::jump_cond(const char *label, int cond, int distance)
 {
   fprintf(out, "  ; jump_cond(%s, %d, %d)\n", label, cond, distance);

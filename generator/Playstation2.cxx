@@ -34,7 +34,9 @@ Playstation2::~Playstation2()
   add_dma_wait();
   add_screen_init_clear();
   add_draw3d_object_constructor();
+  add_draw3d_texture_constructor();
   add_primitive_gif_tag();
+  add_texture_gif_tag();
   add_vu1_code();
   Math::add_sin_table(out);
   Math::add_cos_table(out);
@@ -635,7 +637,23 @@ int Playstation2::draw3d_object_draw()
 
 int Playstation2::draw3d_texture_Constructor_II()
 {
-  return -1;
+  const int reg_height = reg - 1;
+  const int reg_width = reg - 2;
+  //const int reg_object_dup = reg - 3;
+  const int reg_object_ref = reg - 4;
+
+  fprintf(out, "  ;; draw3d_texture_Constructor_II()\n");
+  fprintf(out, "  move $a0, $t%d\n", reg_width);
+  fprintf(out, "  move $a1, $t%d\n", reg_height);
+  fprintf(out, "  move $s0, $ra\n");
+  fprintf(out, "  jal _draw3d_texture_constructor\n");
+  fprintf(out, "  nop\n");
+  fprintf(out, "  move $ra, $s0\n");
+  fprintf(out, "  move $t%d, $v0\n", reg_object_ref);
+
+  reg -= 3;
+
+  return 0;
 }
 
 int Playstation2::draw3d_texture_setPixel_II()
@@ -791,8 +809,22 @@ void Playstation2::add_primitive_gif_tag()
     "  dc64 GIF_TAG(1, 0, 0, 0, FLG_PACKED, 1), REG_A_D\n"
     "  dc64 SETREG_PRIM(0, 1, 0, 0, 0, 0, 0, 0, 0), REG_PRIM\n"
     "  dc64 GIF_TAG(0, 1, 0, 0, FLG_PACKED, 2), (REG_A_D|(REG_XYZ2<<4))\n\n");
-    //"  dc64 GIF_TAG(0, 1, 0, 0, FLG_PACKED, 1), REG_A_D\n"
-    //"  dc64 SETREG_PRIM(0, 1, 0, 0, 0, 0, 0, 0, 1), REG_PRIM\n\n");
+}
+
+void Playstation2::add_texture_gif_tag()
+{
+  fprintf(out,
+    ".align 128\n"
+    "_texture_gif_tag:\n"
+    "  dc64 GIF_TAG(7, 1, 0, 0, FLG_PACKED, 1), REG_A_D\n"
+    "  dc64 SETREG_BITBLTBUF(0, 0, 0, 0x200000 / 256, 64 / 64, FMT_PSMCT24), REG_BITBLTBUF\n"
+    "  dc64 SETREG_TEX0(0x200000 / 64, 64 / 64, FMT_PSMCT24, 6, 6, 0, TEX_MODULATE, 0, 0, 0, 0, 0), REG_TEX0_1\n"
+    "  dc64 SETREG_TEX1(0, 0, FILTER_NEAREST, 0, 0, 0, 0), REG_TEX1_1\n"
+    "  dc64 SETREG_TEX2(FMT_PSMCT24, 0, 0, 0, 0, 0), REG_TEX2_1\n"
+    "  dc64 SETREG_TRXPOS(0, 0, 0, 0, DIR_UL_LR), REG_TRXPOS\n"
+    "  dc64 SETREG_TRXREG(64, 64), REG_TRXREG\n"
+    "  dc64 SETREG_TRXDIR(XDIR_HOST_TO_LOCAL), REG_TRXDIR\n"
+    "  dc64 GIF_TAG(768, 0, 0, 0, FLG_IMAGE, 1), REG_A_D\n\n");
 }
 
 void Playstation2::add_draw3d_object_constructor()
@@ -869,5 +901,54 @@ void Playstation2::add_draw3d_object_constructor()
     "  nop\n\n");
 
   label_count++;
+}
+
+void Playstation2::add_draw3d_texture_constructor()
+{
+  // Need to allocate enough space for:
+  //   0: 16 byte GIF tag (for texture info)
+  //  16: BITBLTBUF
+  //  32: TEX0
+  //  48: TEX1
+  //  64: TEX2
+  //  80: TRXPOS
+  //  96: TRXREG
+  // 112: TRXDIR
+  // 128: 16 byte GIF tag (for actual image)
+  // 144: (width * height * 3) bytes of image
+  fprintf(out,
+    "_draw3d_texture_constructor:\n"
+    "  ;; _draw3d_object_constructor(type, point_count)\n"
+    "  ;; Align stack pointer, alloca() some memory\n"
+    "  ;; Clear rotation and offset and set point count\n"
+    "  addiu $at, $0, -16\n"
+    "  and $sp, $sp, $at\n");
+
+  // Allocated memory is (width * height * 3) + 144.
+  fprintf(out,
+    "  mult $a0, $a1\n"
+    "  mflo $a2\n"
+    "  addu $a3, $a2, $a2\n"
+    "  addu $a3, $a3, $a2\n"
+    "  addui $sp, $sp, -144\n"
+    "  subu $sp, $sp, $a3\n"
+    "  and $sp, $sp, $at\n");
+
+  // Set top of reg stack (return value) to allocated memory.
+  fprintf(out, "  move $v0, $sp\n");
+
+  // Copy default GIF packet to new memory.
+  fprintf(out,
+    "  li $t8, _texture_gif_tag\n"
+    "  li $t9, 9\n"
+    "  move $v1, $v0\n"
+    "_draw3d_texture_constructor_l0:\n"
+    "  lq $t9, 0($t8)\n"
+    "  sq $t9, 0($v1)\n"
+    "  addui $t9, $t9, 1\n"
+    "  addui $t8, $t8, 16\n"
+    "  addui $v1, $v1, 16\n"
+    "  bne $t9, $0, _draw3d_texture_constructor_l0\n"
+    "  nop\n");
 }
 

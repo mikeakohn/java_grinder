@@ -80,6 +80,11 @@ public:
   virtual int inc_integer(int index, int num);
   virtual int integer_to_byte();
   virtual int integer_to_short();
+  virtual int add_float();
+  virtual int sub_float();
+  virtual int mul_float();
+  virtual int div_float();
+  virtual int neg_float();
   virtual int jump_cond(const char *label, int cond, int distance);
   virtual int jump_cond_integer(const char *label, int cond, int distance);
   virtual int ternary(int cond, int value_true, int value_false);
