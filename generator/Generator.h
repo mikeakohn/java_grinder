@@ -124,6 +124,8 @@ public:
   virtual int mul_float();
   virtual int div_float();
   virtual int neg_float();
+  virtual int float_to_integer();
+  virtual int integer_to_float();
   virtual int jump_cond(const char *label, int cond, int distance) = 0;
   virtual int jump_cond_zero(const char *label, int cond, int distance) { return -1; }
   virtual int jump_cond_integer(const char *label, int cond, int distance) = 0;

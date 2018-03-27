@@ -1525,7 +1525,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
 
       case 134: // i2f (0x86)
         // Pop top integer from stack and push as a float
-        UNIMPL()
+        ret = generator->integer_to_float();
         break;
 
       case 135: // i2d (0x87)
@@ -1550,7 +1550,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
 
       case 139: // f2i (0x8b)
         // Pop top float from stack and push as a integer
-        UNIMPL()
+        ret = generator->float_to_integer();
         break;
 
       case 140: // f2l (0x8c)

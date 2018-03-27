@@ -100,6 +100,18 @@ int Generator::neg_float()
   return -1;
 }
 
+int Generator::float_to_integer()
+{
+  printf("Error: Floats are not supported on this platform.\n");
+  return -1;
+}
+
+int Generator::integer_to_float()
+{
+  printf("Error: Floats are not supported on this platform.\n");
+  return -1;
+}
+
 int Generator::compare_floats(int cond)
 {
   printf("Error: Floats are not supported on this platform.\n");
