@@ -713,6 +713,36 @@ int Playstation2::playstation2_waitVsync()
   return 0;
 }
 
+int Playstation2::playstation2_vu0UploadCode_aB()
+{
+  return -1;
+}
+
+int Playstation2::playstation2_vu0UploadData_aB()
+{
+  return -1;
+}
+
+int Playstation2::playstation2_vu0DownloadData_aB()
+{
+  return -1;
+}
+
+int Playstation2::playstation2_vu0Start()
+{
+  return -1;
+}
+
+int Playstation2::playstation2_vu0Stop()
+{
+  return -1;
+}
+
+int Playstation2::playstation2_vu0IsRunning()
+{
+  return -1;
+}
+
 void Playstation2::add_dma_reset()
 {
   fprintf(out,

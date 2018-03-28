@@ -17,6 +17,12 @@ class API_Playstation2
 public:
   virtual int playstation2_clearScreen() { return -1; }
   virtual int playstation2_waitVsync() { return -1; }
+  virtual int playstation2_vu0UploadCode_aB() { return -1; }
+  virtual int playstation2_vu0UploadData_aB() { return -1; }
+  virtual int playstation2_vu0DownloadData_aB() { return -1; }
+  virtual int playstation2_vu0Start() { return -1; }
+  virtual int playstation2_vu0Stop() { return -1; }
+  virtual int playstation2_vu0IsRunning() { return -1; }
 };
 
 #endif

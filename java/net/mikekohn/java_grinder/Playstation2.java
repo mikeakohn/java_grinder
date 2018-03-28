@@ -68,5 +68,12 @@ abstract public class Playstation2
 
   public static void clearScreen() { }
   public static void waitVsync() { }
+
+  public static void vu0UploadCode(byte[] code) {}
+  public static void vu0UploadData(byte[] data) {}
+  public static void vu0DownloadData(byte[] data) {}
+  public static void vu0Start() {}
+  public static void vu0Stop() {}
+  public static boolean vu0IsRunning() {}
 }
 
