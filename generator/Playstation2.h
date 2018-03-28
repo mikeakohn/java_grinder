@@ -52,11 +52,14 @@ public:
   virtual int playstation2_clearScreen();
   virtual int playstation2_waitVsync();
   virtual int playstation2_vu0UploadCode_aB();
-  virtual int playstation2_vu0UploadData_aB();
-  virtual int playstation2_vu0DownloadData_aB();
+  virtual int playstation2_vu0UploadData_IaB();
+  virtual int playstation2_vu0DownloadData_IaB();
   virtual int playstation2_vu0Start();
   virtual int playstation2_vu0Stop();
   virtual int playstation2_vu0IsRunning();
+  virtual int playstation2_randomInit_I();
+  virtual int playstation2_randomGet();
+  virtual int playstation2_randomNext();
 
 private:
   void add_dma_reset();

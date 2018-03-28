@@ -69,11 +69,33 @@ abstract public class Playstation2
   public static void clearScreen() { }
   public static void waitVsync() { }
 
-  public static void vu0UploadCode(byte[] code) {}
-  public static void vu0UploadData(byte[] data) {}
-  public static void vu0DownloadData(byte[] data) {}
-  public static void vu0Start() {}
-  public static void vu0Stop() {}
-  public static boolean vu0IsRunning() {}
+  /** Upload program in code[] to VU0. */
+  public static void vu0UploadCode(byte[] code) { }
+
+  /** Upload data from data[] to VU0's data RAM starting at index.
+      VU0 has 4k of RAM, so index is a number between 0 and 255. */
+  public static void vu0UploadData(int index, byte[] data) { }
+
+  /** Download data into data[] from VU0's data RAM starting at index.
+      VU0 has 4k of RAM, so index is a number between 0 and 255. */
+  public static void vu0DownloadData(int index, byte[] data) { }
+
+  /** Start executing code at location 0 of VU0's code RAM. */
+  public static void vu0Start() { }
+
+  /** Stop VU0 from executing code. */
+  public static void vu0Stop() { }
+
+  /** Check to see if VU0's program is still running. */
+  public static boolean vu0IsRunning() { return false; }
+
+  /** Initializes random number generator.  Input is a 23 bit integer. */
+  public static void randomInit(int r) { }
+
+  /** Get a random number (a 23 bit integer). */
+  public static int randomGet() { return 0; }
+
+  /** Get next random number (a 23 bit integer). */
+  public static int randomNext() { return 0; }
 }
 

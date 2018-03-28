@@ -40,11 +40,14 @@ int playstation2(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(clearScreen,)
   CHECK_FUNC(waitVsync,)
   CHECK_FUNC(vu0UploadCode, _aB)
-  CHECK_FUNC(vu0UploadData, _aB)
-  CHECK_FUNC(vu0DownloadData, _aB)
+  CHECK_FUNC(vu0UploadData, _IaB)
+  CHECK_FUNC(vu0DownloadData, _IaB)
   CHECK_FUNC(vu0Start,)
   CHECK_FUNC(vu0Stop,)
   CHECK_FUNC(vu0IsRunning,)
+  CHECK_FUNC(randomInit,_I)
+  CHECK_FUNC(randomGet,)
+  CHECK_FUNC(randomNext,)
 
   return -1;
 }

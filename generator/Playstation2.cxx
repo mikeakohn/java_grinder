@@ -718,12 +718,12 @@ int Playstation2::playstation2_vu0UploadCode_aB()
   return -1;
 }
 
-int Playstation2::playstation2_vu0UploadData_aB()
+int Playstation2::playstation2_vu0UploadData_IaB()
 {
   return -1;
 }
 
-int Playstation2::playstation2_vu0DownloadData_aB()
+int Playstation2::playstation2_vu0DownloadData_IaB()
 {
   return -1;
 }
@@ -739,6 +739,21 @@ int Playstation2::playstation2_vu0Stop()
 }
 
 int Playstation2::playstation2_vu0IsRunning()
+{
+  return -1;
+}
+
+int Playstation2::playstation2_randomInit_I()
+{
+  return -1;
+}
+
+int Playstation2::playstation2_randomGet()
+{
+  return -1;
+}
+
+int Playstation2::playstation2_randomNext()
 {
   return -1;
 }
