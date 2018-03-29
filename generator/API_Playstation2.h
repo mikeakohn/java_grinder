@@ -23,6 +23,7 @@ public:
   virtual int playstation2_vu0Start() { return -1; }
   virtual int playstation2_vu0Stop() { return -1; }
   virtual int playstation2_vu0IsRunning() { return -1; }
+  virtual int playstation2_getPerformanceCount() { return -1; }
   virtual int playstation2_randomInit_I() { return -1; }
   virtual int playstation2_randomGet() { return -1; }
   virtual int playstation2_randomNext() { return -1; }

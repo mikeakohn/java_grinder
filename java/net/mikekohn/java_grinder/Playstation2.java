@@ -89,6 +89,9 @@ abstract public class Playstation2
   /** Check to see if VU0's program is still running. */
   public static boolean vu0IsRunning() { return false; }
 
+  /** Get performance counter 0. */
+  public static int getPerformanceCount() { return 0; }
+
   /** Initializes random number generator.  Input is a 23 bit integer. */
   public static void randomInit(int r) { }
 

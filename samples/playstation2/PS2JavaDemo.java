@@ -36,6 +36,11 @@ public class PS2JavaDemo
 
     //triangle.disableGouraudShading();
 
+    Playstation2.randomInit(Playstation2.getPerformanceCount());
+
+    n = Playstation2.randomGet();
+    n = Playstation2.randomNext();
+
     // Set the position on the screen.
     triangle.setPosition(1900.0f, 2100.0f, 2048.0f);
 

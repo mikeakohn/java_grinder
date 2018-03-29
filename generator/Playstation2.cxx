@@ -743,19 +743,54 @@ int Playstation2::playstation2_vu0IsRunning()
   return -1;
 }
 
+int Playstation2::playstation2_getPerformanceCount()
+{
+  fprintf(out,
+    "  ;; getPerformanceCount()\n"
+    "  mfpc $t%d, 0\n",
+    reg);
+
+  reg++;
+  return 0;
+}
+
 int Playstation2::playstation2_randomInit_I()
 {
-  return -1;
+  fprintf(out,
+    "  ;; randomInit()\n"
+    "  qmtc2 $t%d, $vf01\n"
+    "  vrinit R, $vf01x\n",
+    reg - 1);
+
+  reg--;
+
+  return 0;
 }
 
 int Playstation2::playstation2_randomGet()
 {
-  return -1;
+  fprintf(out,
+    "  ;; randomGet()\n"
+    "  vrget $vf01x, R\n"
+    "  qmfc2 $t%d, $vf01\n",
+    reg);
+
+  reg++;
+
+  return 0;
 }
 
 int Playstation2::playstation2_randomNext()
 {
-  return -1;
+  fprintf(out,
+    "  ;; randomNext()\n"
+    "  vrnext $vf01x, R\n"
+    "  qmfc2 $t%d, $vf01\n",
+    reg);
+
+  reg++;
+
+  return 0;
 }
 
 void Playstation2::add_dma_reset()
@@ -975,7 +1010,7 @@ void Playstation2::add_draw3d_texture_constructor()
     "  mflo $a2\n"
     "  addu $a3, $a2, $a2\n"
     "  addu $a3, $a3, $a2\n"
-    "  addui $sp, $sp, -144\n"
+    "  addiu $sp, $sp, -144\n"
     "  subu $sp, $sp, $a3\n"
     "  and $sp, $sp, $at\n");
 
@@ -990,9 +1025,9 @@ void Playstation2::add_draw3d_texture_constructor()
     "_draw3d_texture_constructor_l0:\n"
     "  lq $t9, 0($t8)\n"
     "  sq $t9, 0($v1)\n"
-    "  addui $t9, $t9, 1\n"
-    "  addui $t8, $t8, 16\n"
-    "  addui $v1, $v1, 16\n"
+    "  addiu $t9, $t9, 1\n"
+    "  addiu $t8, $t8, 16\n"
+    "  addiu $v1, $v1, 16\n"
     "  bne $t9, $0, _draw3d_texture_constructor_l0\n"
     "  nop\n");
 }
