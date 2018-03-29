@@ -715,17 +715,88 @@ int Playstation2::playstation2_waitVsync()
 
 int Playstation2::playstation2_vu0UploadCode_aB()
 {
-  return -1;
+  fprintf(out,
+    "  ;; vu0UploadCode_aB()\n"
+    "  li $v0, VU0_MICRO_MEM\n"
+    "  lw $a1, -4($t%d)\n"
+    "  li $v1, $t%d\n"
+    "vu0_upload_code_%d:\n"
+    "  lq $a0, ($v1)\n"
+    "  sq $a0, ($v0)\n"
+    "  addi $v1, $v1, 16\n"
+    "  addi $v0, $v0, 16\n"
+    "  addi $a1, $a1, -1\n"
+    "  bnez $a1, vu0_upload_code_%d\n"
+    "  nop\n",
+    reg - 1,
+    reg - 1,
+    label_count,
+    label_count);
+
+  label_count++;
+  reg--;
+
+  return 0;
 }
 
 int Playstation2::playstation2_vu0UploadData_IaB()
 {
-  return -1;
+  fprintf(out,
+    "  ;; vu0UploadData_IaB()\n"
+    "  li $v0, VU0_VU_MEM\n"
+    "  lw $a1, -4($t%d)\n"
+    "  li $v1, $t%d\n"
+    "  sll $t%d, $t%d, 4\n"
+    "  addu $v0, $v0, $t%d\n"
+    "vu0_upload_data_%d:\n"
+    "  lq $a0, ($v1)\n"
+    "  sq $a0, ($v0)\n"
+    "  addi $v1, $v1, 16\n"
+    "  addi $v0, $v0, 16\n"
+    "  addi $a1, $a1, -1\n"
+    "  bnez $a1, vu0_upload_data_%d\n"
+    "  nop\n",
+    reg - 1,
+    reg - 1,
+    reg - 2, reg - 2,
+    reg - 2,
+    label_count,
+    label_count);
+
+  label_count++;
+  reg -= 2;
+
+  return 0;
 }
 
 int Playstation2::playstation2_vu0DownloadData_IaB()
 {
-  return -1;
+  fprintf(out,
+    "  ;; vu0DownloadData_IaB()\n"
+    "  li $v0, VU0_VU_MEM\n"
+    "  lw $a1, -4($t%d)\n"
+    "  li $v1, $t%d\n"
+    "  sll $t%d, $t%d, 4\n"
+    "  addu $v0, $v0, $t%d\n"
+    "vu0_download_data_%d:\n"
+    "  sq $a0, ($v1)\n"
+    "  lq $a0, ($v0)\n"
+    "  addi $v1, $v1, 16\n"
+    "  addi $v0, $v0, 16\n"
+    "  addi $a1, $a1, -1\n"
+    "  bnez $a1, vu0_download_data_%d\n"
+    "  nop\n",
+    reg - 1,
+    reg - 1,
+    reg - 2, reg - 2,
+    reg - 2,
+    label_count,
+    label_count);
+
+  label_count++;
+  reg -= 2;
+
+  return 0;
 }
 
 int Playstation2::playstation2_vu0Start()
@@ -740,7 +811,16 @@ int Playstation2::playstation2_vu0Stop()
 
 int Playstation2::playstation2_vu0IsRunning()
 {
-  return -1;
+  fprintf(out,
+    "  ;; vu0IsRunning()\n"
+    "  li $v1, VIF0_STAT\n"
+    "  lw $v0, ($v1)\n"
+    "  andi $t%d, $v0, 0x04\n",
+    reg);
+
+  reg++;
+
+  return 0;
 }
 
 int Playstation2::playstation2_getPerformanceCount()
