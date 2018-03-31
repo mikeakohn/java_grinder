@@ -157,7 +157,12 @@ int Playstation2::new_object(const char *object_name, int field_count)
   if (*s == '/') { s++; }
 
   if (strcmp(s, "Draw3DPoints") != 0 &&
+      strcmp(s, "Draw3DLine") != 0 &&
+      strcmp(s, "Draw3DLineStrip") != 0 &&
       strcmp(s, "Draw3DTriangle") != 0 &&
+      strcmp(s, "Draw3DTriangleStrip") != 0 &&
+      strcmp(s, "Draw3DTriangleFan") != 0 &&
+      strcmp(s, "Draw3DTriangleSprite") != 0 &&
       strcmp(s, "Draw3DTexture") != 0)
   {
      printf("Error: Unknown class %s\n", object_name);
@@ -1175,7 +1180,7 @@ void Playstation2::add_screen_init_clear()
   fprintf(out,
     ".align 128\n"
     "_screen_init_clear:\n"
-    "  dc64 GIF_TAG(14, 0, 0, 0, FLG_PACKED, 1), REG_A_D\n"
+    "  dc64 GIF_TAG(14, 1, 0, 0, FLG_PACKED, 1), REG_A_D\n"
     "  dc64 0x00a0000, REG_FRAME_1            ; framebuffer width = 640/64\n"
     "  dc64 0x8c, REG_ZBUF_1              ; 0-8 Zbuffer base, 24-27 Z format (32bit)\n"
     "  dc64 SETREG_XYOFFSET(1728 << 4, 1936 << 4), REG_XYOFFSET_1\n"
@@ -1208,7 +1213,7 @@ void Playstation2::add_texture_gif_tag()
   fprintf(out,
     ".align 128\n"
     "_texture_gif_tag:\n"
-    "  dc64 GIF_TAG(7, 1, 0, 0, FLG_PACKED, 1), REG_A_D\n"
+    "  dc64 GIF_TAG(7, 0, 0, 0, FLG_PACKED, 1), REG_A_D\n"
     "  dc64 SETREG_BITBLTBUF(0, 0, 0, 0x200000 / 256, 0, FMT_PSMCT24), REG_BITBLTBUF\n"
     "  dc64 SETREG_TEX0(0x200000 / 64, 0, FMT_PSMCT24, 0, 0, 0, TEX_MODULATE, 0, 0, 0, 0, 0), REG_TEX0_1\n"
     "  dc64 SETREG_TEX1(0, 0, FILTER_NEAREST, 0, 0, 0, 0), REG_TEX1_1\n"
@@ -1216,7 +1221,7 @@ void Playstation2::add_texture_gif_tag()
     "  dc64 SETREG_TRXPOS(0, 0, 0, 0, DIR_UL_LR), REG_TRXPOS\n"
     "  dc64 SETREG_TRXREG(64, 64), REG_TRXREG\n"
     "  dc64 SETREG_TRXDIR(XDIR_HOST_TO_LOCAL), REG_TRXDIR\n"
-    "  dc64 GIF_TAG(0, 0, 0, 0, FLG_IMAGE, 1), REG_A_D\n\n");
+    "  dc64 GIF_TAG(0, 1, 0, 0, FLG_IMAGE, 1), REG_A_D\n\n");
 }
 
 void Playstation2::add_vu0_code()
@@ -1281,8 +1286,8 @@ void Playstation2::add_draw3d_object_constructor()
     "  or $t9, $t9, $a1\n"
     "  sq $t9, 96($sp)\n");
 
-  // a0 = count
-  //fprintf(out, "  move $a0, $t%d\n", reg_point_count);
+  // a1 = count
+  //fprintf(out, "  move $a1, $t%d\n", reg_point_count);
 
   // Set points and colors
   fprintf(out,
@@ -1295,8 +1300,8 @@ void Playstation2::add_draw3d_object_constructor()
     "  sd $a2, 8($t8)\n"
     "  sq $0, 16($t8)\n"
     "  addiu $t8, $t8, 32\n"
-    "  addiu $a0, $a0, -1\n"
-    "  bne $a0, $0, _draw3d_object_constructor_l0\n"
+    "  addiu $a1, $a1, -1\n"
+    "  bne $a1, $0, _draw3d_object_constructor_l0\n"
     "  nop\n");
 
   fprintf(out,
@@ -1321,7 +1326,7 @@ void Playstation2::add_draw3d_texture_constructor()
   // 144: (width * height * 3) bytes of image
   fprintf(out,
     "_draw3d_texture_constructor:\n"
-    "  ;; _draw3d_object_constructor(type, point_count)\n"
+    "  ;; _draw3d_texture_constructor(type, point_count)\n"
     "  ;; Align stack pointer, alloca() some memory\n"
     "  ;; Clear rotation and offset and set point count\n"
     "  addiu $at, $0, -16\n"
