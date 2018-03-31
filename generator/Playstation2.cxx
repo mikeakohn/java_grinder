@@ -986,9 +986,12 @@ int Playstation2::playstation2_randomGet()
 {
   fprintf(out,
     "  ;; randomGet()\n"
-    "  vrget $vf01x, R\n"
-    "  qmfc2 $t%d, $vf01\n",
-    reg);
+    "  vrget.x $vf01x, R\n"
+    "  qmfc2 $t%d, $vf01\n"
+    "  li $at, 0x007fffff\n"
+    "  and $t%d, $t%d, $at\n",
+    reg,
+    reg, reg);
 
   reg++;
 
@@ -999,9 +1002,12 @@ int Playstation2::playstation2_randomNext()
 {
   fprintf(out,
     "  ;; randomNext()\n"
-    "  vrnext $vf01x, R\n"
-    "  qmfc2 $t%d, $vf01\n",
-    reg);
+    "  vrnext.x $vf01x, R\n"
+    "  qmfc2 $t%d, $vf01\n"
+    "  li $at, 0x007fffff\n"
+    "  and $t%d, $t%d, $at\n",
+    reg,
+    reg, reg);
 
   reg++;
 
