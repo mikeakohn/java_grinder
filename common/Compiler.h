@@ -14,6 +14,8 @@
 
 #include "Generator.h"
 
+#define DEBUG_PRINT(a, ...) if (verbose == 1) { printf(a, ##__VA_ARGS__); }
+
 class Compiler
 {
 public:

@@ -161,10 +161,7 @@ int JavaCompiler::find_external_fields(JavaClass *java_class, bool is_parent)
 #endif
       java_class->get_class_name(class_name, sizeof(class_name), index);
 
-      if (verbose)
-      {
-        printf("CLASSNAME '%s' field='%s'\n", class_name, field_name);
-      }
+      DEBUG_PRINT("CLASSNAME '%s' field='%s'\n", class_name, field_name);
 
       // If this field / method exists outside of this class...
       if (strcmp(class_name, java_class->class_name) != 0)
@@ -183,10 +180,7 @@ int JavaCompiler::find_external_fields(JavaClass *java_class, bool is_parent)
           strcat(filename, class_name);
           strcat(filename, ".class");
 
-          if (verbose)
-          {
-            printf("find_external_fields: fopen('%s')\n", filename);
-          }
+          DEBUG_PRINT("find_external_fields: fopen('%s')\n", filename);
 
           FILE *in = fopen(filename, "rb");
 
@@ -209,10 +203,8 @@ int JavaCompiler::find_external_fields(JavaClass *java_class, bool is_parent)
         // Record this field in list of external fields.
         if (constant_fieldref->tag == CONSTANT_FIELDREF)
         {
-          if (verbose)
-          {
-            printf("  adding: %s\n", field_name);
-          }
+          DEBUG_PRINT("  adding: %s\n", field_name);
+
           external_fields[field_name] = field_type_to_int(field_type);
           external_field_count++;
         }
@@ -515,11 +507,8 @@ int JavaCompiler::array_load(JavaClass *java_class, int constant_id, uint8_t arr
   {
     constant_fieldref_t *field_ref = (struct constant_fieldref_t *)gen32;
 
-    if (verbose)
-    {
-      printf("FIELD_REF: class_index=%d name_and_type=%d\n",
-             field_ref->class_index, field_ref->name_and_type_index);
-    }
+    DEBUG_PRINT("FIELD_REF: class_index=%d name_and_type=%d\n",
+                field_ref->class_index, field_ref->name_and_type_index);
 
     if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), constant_id) != 0)
     {
@@ -569,11 +558,8 @@ int JavaCompiler::array_store(JavaClass *java_class, int constant_id, uint8_t ar
   {
     constant_fieldref_t *field_ref = (struct constant_fieldref_t *)gen32;
 
-    if (verbose)
-    {
-      printf("class_index=%d name_and_type=%d\n",
-             field_ref->class_index, field_ref->name_and_type_index);
-    }
+    DEBUG_PRINT("class_index=%d name_and_type=%d\n",
+                field_ref->class_index, field_ref->name_and_type_index);
 
     if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), constant_id) != 0)
     {
@@ -672,17 +658,12 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
 
   if (alt_name != NULL) { strcpy(method_name, alt_name); }
 
-  if (verbose)
-  {
-    printf("--- Compiling method '%s' method_id=%d\n", method_name, method_id);
-  }
+  DEBUG_PRINT("--- Compiling method '%s' method_id=%d\n", method_name, method_id);
 
   if (strcmp(method_name, "<init>") == 0 || method_name[0] == 0)
   {
-    if (verbose)
-    {
-      printf("Skipping method <--\n");
-    }
+    DEBUG_PRINT("Skipping method <--\n");
+
     return 0;
   }
 
@@ -749,11 +730,8 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
     method_sig[0] = '_';
     if (method_sig[1] != 0 ) { strcat(method_name, method_sig); }
 
-    if (verbose)
-    {
-      printf("Using method name '%s' param_count=%d\n",
-             method_name, param_count);
-    }
+    DEBUG_PRINT("Using method name '%s' param_count=%d\n",
+                method_name, param_count);
   }
     else
   {
@@ -780,13 +758,10 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
   fill_label_map(label_map, label_map_len, bytes, code_len, pc_start);
 
 #ifdef DEBUG
-  if (verbose)
-  {
-    printf("pc=%d\n", pc);
-    printf("max_stack=%d\n", max_stack);
-    printf("max_locals=%d\n", max_locals);
-    printf("code_len=%d\n", code_len);
-  }
+  DEBUG_PRINT("pc=%d\n", pc);
+  DEBUG_PRINT("max_stack=%d\n", max_stack);
+  DEBUG_PRINT("max_locals=%d\n", max_locals);
+  DEBUG_PRINT("code_len=%d\n", code_len);
 #endif
 
   generator->instruction_count_clear();
@@ -796,10 +771,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
     int address = pc - pc_start;
     skip_bytes = 0;
 #ifdef DEBUG
-    if (verbose)
-    {
-      printf("pc=%d %s opcode=%d (0x%02x)\n", address, table_java_instr[bytes[pc]].name, bytes[pc], bytes[pc]);
-    }
+    DEBUG_PRINT("pc=%d %s opcode=%d (0x%02x)\n", address, table_java_instr[bytes[pc]].name, bytes[pc], bytes[pc]);
 #endif
     //if ((label_map[address / 8] & (1 << (address % 8))) != 0)
     if (needs_label(label_map, pc, pc_start))
@@ -910,10 +882,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
 
         gen32 = (generic_32bit_t *)java_class->get_constant(index);
 
-        if (verbose)
-        {
-          printf("  index=%d tag=%d\n", index, gen32->tag);
-        }
+        DEBUG_PRINT("  index=%d tag=%d\n", index, gen32->tag);
 
         if (gen32->tag == CONSTANT_INTEGER)
         {
@@ -1788,10 +1757,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
           // gross with a strcmp :(  Maybe revisit later.
           if (strcmp("Ljava/lang/String;", type) == 0)
           {
-            if (verbose)
-            {
-              printf("  static is %s (will invoke)\n", field_name);
-            }
+            DEBUG_PRINT("  static is %s (will invoke)\n", field_name);
             //generator->push_ref(field_name);
             stack->push(ref);
           }
@@ -1895,10 +1861,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         break;
 
       case 190: // arraylength (0xbe)
-        if (verbose)
-        {
-          printf("stack->length()=%d\n", stack->length());
-        }
+        DEBUG_PRINT("stack->length()=%d\n", stack->length());
 
         // FIXME - This is may not be correct
         if (stack->length() > 0)
@@ -1911,11 +1874,9 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
             char type[64];
             constant_fieldref_t *field_ref = (struct constant_fieldref_t *)gen32;
 
-            if (verbose)
-            {
-              printf("class_index=%d name_and_type=%d\n",
-                     field_ref->class_index, field_ref->name_and_type_index);
-            }
+            DEBUG_PRINT("class_index=%d name_and_type=%d\n",
+                        field_ref->class_index,
+                        field_ref->name_and_type_index);
 
             if (java_class->get_ref_name_type(field_name, type, sizeof(field_name), value) != 0)
             {
@@ -2127,10 +2088,7 @@ int JavaCompiler::load_class(const char *filename)
   int ptr;
   int last_slash = -1;
 
-  if (verbose)
-  {
-    printf("load_class(%s)\n", filename);
-  }
+  DEBUG_PRINT("load_class(%s)\n", filename);
 
   ptr = 0;
   while(filename[ptr] != 0)
@@ -2147,10 +2105,7 @@ int JavaCompiler::load_class(const char *filename)
     classpath[last_slash] = 0;
   }
 
-  if (verbose)
-  {
-    printf("CLASSPATH: '%s'\n\n", classpath);
-  }
+  DEBUG_PRINT("CLASSPATH: '%s'\n\n", classpath);
 
   in = fopen(filename, "rb");
   if (in == NULL) { return -1; }
@@ -2251,10 +2206,7 @@ int JavaCompiler::add_static_initializers()
 
     java_class_external->get_method_name(name, sizeof(name), index);
 
-    if (verbose)
-    {
-      printf("CLASS %s.%s  index=%d\n", iter->first.c_str(), name, index);
-    }
+    DEBUG_PRINT("CLASS %s.%s  index=%d\n", iter->first.c_str(), name, index);
 
     if (execute_static(java_class_external, index, generator, false, verbose, java_class) != 0)
     {
@@ -2281,10 +2233,7 @@ int JavaCompiler::execute_statics(int index)
   std::map<std::string,JavaClass *>::iterator iter;
   for (iter = external_classes.begin(); iter != external_classes.end(); iter++)
   {
-    if (verbose)
-    {
-      printf("Adding external class: %s\n", iter->first.c_str());
-    }
+    DEBUG_PRINT("Adding external class: %s\n", iter->first.c_str());
 
     JavaClass *java_class_external = iter->second;
     int index = java_class_external->get_clinit_method();
@@ -2342,11 +2291,8 @@ int JavaCompiler::compile_methods(bool do_main)
     }
   }
 
-  if (verbose)
-  {
-    printf("external_classes.size()=%zu did_execute_statics=%d do_main=%d\n",
-           external_classes.size(), did_execute_statics, do_main);
-  }
+  DEBUG_PRINT("external_classes.size()=%zu did_execute_statics=%d do_main=%d\n",
+              external_classes.size(), did_execute_statics, do_main);
 
   //if (!did_execute_statics && !do_main && external_classes.size() != 0)
   if (!do_main && external_classes.size() != 0)
@@ -2363,11 +2309,8 @@ int JavaCompiler::compile_methods(bool do_main)
       //int constant_count = java_class->get_constant_count();
       int method_count = java_class->get_method_count();
 
-      if (verbose)
-      {
-        printf("Compile Class: %s (%p)\n", class_name, this);
-        printf("  method_count=%d\n", method_count);
-      }
+      DEBUG_PRINT("Compile Class: %s (%p)\n", class_name, this);
+      DEBUG_PRINT("  method_count=%d\n", method_count);
 
       // For all methods in class
       for (index = 0; index < method_count; index++)
@@ -2403,10 +2346,7 @@ int JavaCompiler::compile_methods(bool do_main)
         }
 #endif
 
-        if (verbose)
-        {
-          printf("  compiling: %s.%s\n", class_name, method_name);
-        }
+        DEBUG_PRINT("  compiling: %s.%s\n", class_name, method_name);
 
         if (compile_method(java_class, index, alt_name) != 0) { return -1; }
       }
