@@ -33,6 +33,8 @@ public:
   virtual int draw3d_object_setPointColor_II();
   virtual int draw3d_object_setPoints_aF();
   virtual int draw3d_object_setPointColors_aI();
+  virtual int draw3d_object_setTextureCoord_IF();
+  virtual int draw3d_object_setTextureCoords_aF();
   virtual int draw3d_object_disableGouraudShading();
   virtual int draw3d_object_enableGouraudShading();
   virtual int draw3d_object_disableFogging();

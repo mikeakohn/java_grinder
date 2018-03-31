@@ -435,6 +435,61 @@ int Playstation2::draw3d_object_setPointColors_aI()
   return 0;
 }
 
+int Playstation2::draw3d_object_setTextureCoord_IF()
+{
+  int object = reg - 3;
+  int index = reg - 2;
+  int coord = reg - 1;
+
+  fprintf(out,
+    "  ;; draw3d_object_setPointColor_II()\n"
+    "  sll $t%d, $t%d, 5\n"
+    "  addiu $t%d, $t%d, 112\n"
+    "  addu $t%d, $t%d, $t%d\n"
+    "  sw $t%d, 4($t%d)\n",
+    index, index,
+    object, object,
+    object, object, index,
+    coord, object);
+
+  reg -= 3;
+
+  return 0;
+}
+
+int Playstation2::draw3d_object_setTextureCoords_aF()
+{
+  int array = reg - 1;
+  int object = reg - 2;
+
+  fprintf(out,
+    "  ;; draw3d_object_setPointColors_aI()\n"
+    "  lw $t8, -4($t%d)\n"
+    //"  sll $t8, $t8, 5\n"
+    "  addiu $t%d, $t%d, 112\n"
+    "_set_point_colors_%d:\n"
+    "  lw $at, 0($t%d)\n"
+    "  sw $at, 4($t%d)\n"
+    "  addiu $t%d, $t%d, 4\n"
+    "  addiu $t%d, $t%d, 32\n"
+    "  addiu $t8, $t8, -1\n"
+    "  bne $t8, $0, _set_point_colors_%d\n"
+    "  nop\n",
+    array,
+    object, object,
+    label_count,
+    array,
+    object,
+    array, array,
+    object, object,
+    label_count);
+
+  label_count++;
+  reg -= 2;
+
+  return 0;
+}
+
 int Playstation2::draw3d_object_disableGouraudShading()
 {
   int object = reg - 1;
