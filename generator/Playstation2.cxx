@@ -920,7 +920,35 @@ int Playstation2::playstation2_vu0IsRunning()
   return 0;
 }
 
-int Playstation2::playstation2_getPerformanceCount()
+int Playstation2::playstation2_performanceCountEnable_I()
+{
+  fprintf(out,
+    "  ;; performanceCountDisable()\n"
+    "  li $at, 0x8000_001c\n"
+    "  sll $t%d, $t%d, 5\n"
+    "  or $at, $at, $t%d\n"
+    "  mtpc $at, 0\n"
+    "  sync.p\n",
+    reg - 1, reg - 1,
+    reg - 1);
+
+  reg -= 1;
+
+  return 0;
+}
+
+int Playstation2::playstation2_performanceCountDisable()
+{
+  fprintf(out,
+    "  ;; performanceCountDisable()\n"
+    "  li $at, 0\n"
+    "  mtpc $at, 0\n"
+    "  sync.p\n");
+
+  return 0;
+}
+
+int Playstation2::playstation2_performanceCountGet()
 {
   fprintf(out,
     "  ;; getPerformanceCount()\n"
@@ -928,6 +956,16 @@ int Playstation2::playstation2_getPerformanceCount()
     reg);
 
   reg++;
+  return 0;
+}
+
+int Playstation2::playstation2_performanceCountReset()
+{
+  fprintf(out,
+    "  ;; performanceCountReset()\n"
+    "  li $at, 0\n"
+    "  mtpc $at, 0\n");
+
   return 0;
 }
 

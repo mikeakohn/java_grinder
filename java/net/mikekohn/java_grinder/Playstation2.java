@@ -51,6 +51,23 @@ abstract public class Playstation2
   public static final int MAGNIFY_V_3 = 2;
   public static final int MAGNIFY_V_4 = 3;
 
+  public static final int EVENT_PROCESSOR_CYCLE = 1;
+  public static final int EVENT_SINGLE_INSTRUCTION = 2;
+  public static final int EVENT_BRANCH = 3;
+  public static final int EVENT_BTAC_MISS = 4;
+  public static final int EVENT_ITLB_MISS = 5;
+  public static final int EVENT_INSTR_CACHE_MISS = 6;
+  public static final int EVENT_ACCESS_TO_DTLB = 7;
+  public static final int EVENT_NON_BLOCKING_LOAD = 8;
+  public static final int EVENT_WBB_SINGLE_REQUEST = 9;
+  public static final int EVENT_WBB_BURST_REQUEST = 10;
+  public static final int EVENT_CPU_ADDR_BUS_BUSY = 11;
+  public static final int EVENT_INSTR_COMPLETED = 12;
+  public static final int EVENT_NONBDS_INSTR_COMPLETED = 13;
+  public static final int EVENT_COP2_INSTR_COMPLETED = 14;
+  public static final int EVENT_LOAD_COMPLETED = 15;
+  public static final int EVENT_NO_EVENT = 16;
+
   /** Set video display format (what video mode the CRT will use). */
   //public static void setVideoMode(int interlaced, int video_type, int frame) { }
 
@@ -89,8 +106,17 @@ abstract public class Playstation2
   /** Check to see if VU0's program is still running. */
   public static boolean vu0IsRunning() { return false; }
 
+  /** Enable performance counter 0. */
+  public static void performanceCountEnable(int event) { }
+
+  /** Disable performance counter 0. */
+  public static void performanceCountDisable() { }
+
   /** Get performance counter 0. */
-  public static int getPerformanceCount() { return 0; }
+  public static int performanceCountGet() { return 0; }
+
+  /** Clear counter 0 (only valid when performance counter is disabled). */
+  public static void performanceCountReset() { }
 
   /** Initializes random number generator.  Input is a 23 bit integer. */
   public static void randomInit(int r) { }

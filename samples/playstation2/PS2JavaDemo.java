@@ -36,7 +36,7 @@ public class PS2JavaDemo
 
     //triangle.disableGouraudShading();
 
-    Playstation2.randomInit(Playstation2.getPerformanceCount());
+    Playstation2.randomInit(Playstation2.performanceCountGet());
 
     n = Playstation2.randomGet();
     n = Playstation2.randomNext();
@@ -55,6 +55,8 @@ public class PS2JavaDemo
 
   static public void main(String args[])
   {
+    Playstation2.performanceCountEnable(Playstation2.EVENT_PROCESSOR_CYCLE);
+
     animate(10000);
 
     while(true)
