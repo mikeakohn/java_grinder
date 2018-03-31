@@ -157,7 +157,8 @@ int Playstation2::new_object(const char *object_name, int field_count)
   if (*s == '/') { s++; }
 
   if (strcmp(s, "Draw3DPoints") != 0 &&
-      strcmp(s, "Draw3DTriangle") != 0)
+      strcmp(s, "Draw3DTriangle") != 0 &&
+      strcmp(s, "Draw3DTexture") != 0)
   {
      printf("Error: Unknown class %s\n", object_name);
      return -1;
@@ -731,7 +732,7 @@ int Playstation2::draw3d_texture_upload()
 {
   fprintf(out,
     "  ;; draw3d_texture_upload()\n"
-    "  jal dma02_wait\n"
+    "  jal _dma02_wait\n"
     "  nop\n"
     "  li $v0, D2_CHCR\n"
     "  sw $t%d, 0x10($v0)        ; DMA02 ADDRESS\n"

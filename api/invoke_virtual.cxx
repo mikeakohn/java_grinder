@@ -140,7 +140,7 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
 
   get_static_function(function, method_name, method_sig);
 
-  printf("function: %s()\n", function);
+  printf("virtual function: %s()\n", function);
 
   int ret = -1;
 
@@ -157,6 +157,20 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
   if (strcmp(method_class, "java/lang/String") == 0)
   {
     ret = java_lang_string(java_class, generator, function);
+  }
+  else if (strcmp(method_class, "net/mikekohn/java_grinder/Draw3D/Draw3DTexture") == 0)
+  {
+    if (is_constructor == true)
+    {
+      if (strcmp(method_sig, "(II)V") == 0)
+      {
+        ret = generator->draw3d_texture_Constructor_II();
+      }
+    }
+      else
+    {
+      ret = draw3d_texture(java_class, generator, function);
+    }
   }
   else if (strncmp(method_class, DRAW3D, DRAW3D_LEN) == 0)
   {
@@ -194,11 +208,6 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
           strcmp(cls, "Draw3DTriangleFan") == 0)
       {
         ret = draw3d_object(java_class, generator, function);
-      }
-        else
-      if (strcmp(cls, "Draw3DTexture") == 0)
-      {
-        ret = draw3d_texture(java_class, generator, function);
       }
     }
   }

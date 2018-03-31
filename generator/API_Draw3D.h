@@ -45,7 +45,7 @@ public:
   virtual int draw3d_object_enableAntialiasing() { return -1; }
   virtual int draw3d_object_draw() { return -1; }
 
-  virtual int draw3d_texture_Constructor_II(int type) { return -1; }
+  virtual int draw3d_texture_Constructor_II() { return -1; }
   virtual int draw3d_texture_setPixel_II() { return -1; }
   virtual int draw3d_texture_setPixels_aI() { return -1; }
   virtual int draw3d_texture_upload() { return -1; }

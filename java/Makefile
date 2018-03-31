@@ -32,6 +32,7 @@ JAVA_SRC=\
   $(SRC_DIR)/Draw3D/Draw3DTriangle.java \
   $(SRC_DIR)/Draw3D/Draw3DTriangleStrip.java \
   $(SRC_DIR)/Draw3D/Draw3DTriangleFan.java \
+  $(SRC_DIR)/Draw3D/Draw3DTexture.java \
   $(SRC_DIR)/SegaGenesis.java \
   $(SRC_DIR)/SNES.java \
   $(SRC_DIR)/SPI.java \

@@ -11,7 +11,7 @@
 
 package net.mikekohn.java_grinder.Draw3D;
 
-abstract public class Draw3DTexture
+public class Draw3DTexture
 {
    public Draw3DTexture()
    {
