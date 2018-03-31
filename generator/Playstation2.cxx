@@ -37,6 +37,7 @@ Playstation2::~Playstation2()
   add_draw3d_texture_constructor();
   add_primitive_gif_tag();
   add_texture_gif_tag();
+  add_vu0_code();
   add_vu1_code();
   Math::add_sin_table(out);
   Math::add_cos_table(out);
@@ -658,17 +659,92 @@ int Playstation2::draw3d_texture_Constructor_II()
 
 int Playstation2::draw3d_texture_setPixel_II()
 {
-  return -1;
+  const int reg_color = reg - 1;
+  const int reg_index = reg - 2;
+  const int reg_object_ref = reg - 3;
+
+  fprintf(out,
+    "  addiu $t%d, $t%d, 144\n"
+    "  addu $at, $t%d, $t%d\n"
+    "  addu $t%d, $at, $t%d\n"
+    "  addu $t%d, $t%d, $t%d\n"
+    "  sb $t%d, 0($t%d)\n"
+    "  srl $t%d, $t%d, 8\n"
+    "  sb $t%d, 0($t%d)\n"
+    "  srl $t%d, $t%d, 8\n"
+    "  sb $t%d, 0($t%d)\n",
+    reg_object_ref, reg_object_ref,
+    reg_index, reg_index,
+    reg_index, reg_index,
+    reg_object_ref, reg_object_ref, reg_index,
+    reg_color, reg_object_ref,
+    reg_color, reg_color,
+    reg_color, reg_object_ref,
+    reg_color, reg_color,
+    reg_color, reg_object_ref);
+
+  reg -= 3;
+
+  return 0;
 }
 
 int Playstation2::draw3d_texture_setPixels_aI()
 {
-  return -1;
+  const int reg_color_array = reg - 1;
+  const int reg_object_ref = reg - 2;
+
+  fprintf(out,
+    "  addiu $t%d, $t%d, 144\n"
+    "  lw $t9, -4($t%d)\n"
+    "draw3d_texture_setPixels_%d\n"
+    "  lb $at, 0($t%d)\n"
+    "  sb $at, 0($t%d)\n"
+    "  lb $at, 1($t%d)\n"
+    "  sb $at, 1($t%d)\n"
+    "  lb $at, 2($t%d)\n"
+    "  sb $at, 2($t%d)\n"
+    "  addui $t%d, 3\n"
+    "  addui $t%d, 3\n"
+    "  addui $t9, $t9, -1\n"
+    "  bne $t9, $0, draw3d_texture_setPixels_%d\n"
+    "  nop\n",
+    reg_object_ref, reg_object_ref,
+    reg_color_array,
+    label_count,
+    reg_color_array,
+    reg_object_ref,
+    reg_color_array,
+    reg_object_ref,
+    reg_color_array,
+    reg_object_ref,
+    reg_color_array,
+    reg_object_ref,
+    label_count);
+
+  label_count++;
+  reg -= 3;
+
+  return 0;
 }
 
 int Playstation2::draw3d_texture_upload()
 {
-  return -1;
+  fprintf(out,
+    "  ;; draw3d_texture_upload()\n"
+    "  jal dma02_wait\n"
+    "  nop\n"
+    "  li $v0, D2_CHCR\n"
+    "  sw $t%d, 0x10($v0)        ; DMA02 ADDRESS\n"
+    "  sw $v1, -16($t%d)\n"
+    "  sw $v1, 0x20($v0)         ; DMA02 SIZE\n"
+    "  li $v1, 0x101\n"
+    "  sw $v1, ($v0)             ; start\n",
+    reg - 1,
+    reg - 1);
+
+  reg -= 1;
+
+  return 0;
 }
 
 int Playstation2::playstation2_clearScreen()
@@ -801,12 +877,33 @@ int Playstation2::playstation2_vu0DownloadData_IaB()
 
 int Playstation2::playstation2_vu0Start()
 {
-  return -1;
+#if 0
+  fprintf(out,
+    "  ;; Send data (VIF_UNPACK) and start VU1 (VIF_MSCAL)\n"
+    "  li $v0, D0_CHCR\n"
+    "  li $v1, vif_packet_start\n"
+    "  sw $v1, 0x10($v0)                   ; DMA00 ADDRESS\n"
+    "  li $v1, ((_vif_vu0_end - _vif_vu0_start) / 16)\n"
+    "  sw $v1, 0x20($v0)                   ; DMA00 SIZE\n"
+    "  li $v1, 0x101\n"
+    "  sw $v1, ($v0)                       ; start\n");
+#endif
+
+  fprintf(out,
+    "  ;; vu0Start()\n"
+    "  vcallms 0\n");
+
+  return 0;
 }
 
 int Playstation2::playstation2_vu0Stop()
 {
-  return -1;
+  fprintf(out,
+    "  ;; vu0Stop()\n"
+    "  li $at, 28\n"
+    "  ctc2 $at, 1\n");
+
+  return 0;
 }
 
 int Playstation2::playstation2_vu0IsRunning()
@@ -877,6 +974,23 @@ void Playstation2::add_dma_reset()
 {
   fprintf(out,
     "_dma_reset:\n"
+    "  ;; VIF0\n"
+    "  li $v1, D0_CHCR\n"
+    "  sw $zero, 0x00($v1)    ; D0_CHCR\n"
+    "  sw $zero, 0x30($v1)    ; D0_TADR\n"
+    "  sw $zero, 0x10($v1)    ; D0_MADR\n"
+    "  sw $zero, 0x50($v1)    ; D0_ASR1\n"
+    "  sw $zero, 0x40($v1)    ; D0_ASR0\n\n"
+
+    "  ;; VIF1\n"
+    "  li $v1, D1_CHCR\n"
+    "  sw $zero, 0x00($v1)    ; D1_CHCR\n"
+    "  sw $zero, 0x30($v1)    ; D1_TADR\n"
+    "  sw $zero, 0x10($v1)    ; D1_MADR\n"
+    "  sw $zero, 0x50($v1)    ; D1_ASR1\n"
+    "  sw $zero, 0x40($v1)    ; D1_ASR0\n\n"
+
+    "  ;; GIF\n"
     "  li $v1, D2_CHCR\n"
     "  sw $zero, 0x00($v1)    ; D2_CHCR\n"
     "  sw $zero, 0x30($v1)    ; D2_TADR\n"
@@ -907,6 +1021,24 @@ void Playstation2::add_dma_reset()
 void Playstation2::add_dma_wait()
 {
   fprintf(out,
+    "_dma00_wait:\n"
+    "  li $v1, D0_CHCR\n"
+    "  lw $v0, ($v1)\n"
+    "  andi $v0, $v0, 0x100\n"
+    "  bnez $v0, _dma00_wait\n"
+    "  nop\n"
+    "  jr $ra\n"
+    "  nop\n\n"
+
+    "_dma01_wait:\n"
+    "  li $v1, D0_CHCR\n"
+    "  lw $v0, ($v1)\n"
+    "  andi $v0, $v0, 0x100\n"
+    "  bnez $v0, _dma01_wait\n"
+    "  nop\n"
+    "  jr $ra\n"
+    "  nop\n\n"
+
     "_dma02_wait:\n"
     "  li $v1, D2_CHCR\n"
     "  lw $v0, ($v1)\n"
@@ -977,14 +1109,25 @@ void Playstation2::add_texture_gif_tag()
     ".align 128\n"
     "_texture_gif_tag:\n"
     "  dc64 GIF_TAG(7, 1, 0, 0, FLG_PACKED, 1), REG_A_D\n"
-    "  dc64 SETREG_BITBLTBUF(0, 0, 0, 0x200000 / 256, 64 / 64, FMT_PSMCT24), REG_BITBLTBUF\n"
-    "  dc64 SETREG_TEX0(0x200000 / 64, 64 / 64, FMT_PSMCT24, 6, 6, 0, TEX_MODULATE, 0, 0, 0, 0, 0), REG_TEX0_1\n"
+    "  dc64 SETREG_BITBLTBUF(0, 0, 0, 0x200000 / 256, 0, FMT_PSMCT24), REG_BITBLTBUF\n"
+    "  dc64 SETREG_TEX0(0x200000 / 64, 0, FMT_PSMCT24, 0, 0, 0, TEX_MODULATE, 0, 0, 0, 0, 0), REG_TEX0_1\n"
     "  dc64 SETREG_TEX1(0, 0, FILTER_NEAREST, 0, 0, 0, 0), REG_TEX1_1\n"
     "  dc64 SETREG_TEX2(FMT_PSMCT24, 0, 0, 0, 0, 0), REG_TEX2_1\n"
     "  dc64 SETREG_TRXPOS(0, 0, 0, 0, DIR_UL_LR), REG_TRXPOS\n"
     "  dc64 SETREG_TRXREG(64, 64), REG_TRXREG\n"
     "  dc64 SETREG_TRXDIR(XDIR_HOST_TO_LOCAL), REG_TRXDIR\n"
-    "  dc64 GIF_TAG(768, 0, 0, 0, FLG_IMAGE, 1), REG_A_D\n\n");
+    "  dc64 GIF_TAG(0, 0, 0, 0, FLG_IMAGE, 1), REG_A_D\n\n");
+}
+
+void Playstation2::add_vu0_code()
+{
+#if 0
+  fprintf(out,
+    ".align 128\n"
+    "_vif_vu0_start:\n"
+    "  dc32 (VIF_MSCAL << 24), 0, 0, 0\n");
+    "_vif_vu0_end:\n\n"
+#endif
 }
 
 void Playstation2::add_draw3d_object_constructor()
@@ -1110,5 +1253,33 @@ void Playstation2::add_draw3d_texture_constructor()
     "  addiu $v1, $v1, 16\n"
     "  bne $t9, $0, _draw3d_texture_constructor_l0\n"
     "  nop\n");
+
+  // Update information in GIF tag for this->(width/height)
+  fprintf(out,
+    "  srl $at, $a0, 6\n"
+    "  sh $at, 22($v0)\n"
+    "  li $t9, 30\n"
+    "  ld $t8, 32($v0)\n"
+    "  sll $at, $at, 14\n"
+    "  or $t8, $t8, $at\n"
+    "  plzcw $at, $a0\n"
+    "  andi $at, $at, 0xff\n"
+    "  subu $at, $t9, $at\n"
+    "  sll $at, $at, 26\n"
+    "  or $t8, $t8, $at\n"
+    "  plzcw $at, $a1\n"
+    "  andi $at, $at, 0xff\n"
+    "  subu $at, $t9, $at\n"
+    "  sll $at, $at, 30\n"
+    "  or $t8, $t8, $at\n"
+    "  ld $t8, 32($v0)\n"
+    "  addiu $a3, $a3, 15\n"
+    "  addiu $at, $0, -16\n"
+    "  and $a3, $a3, $at\n"
+    "  sll $a3, $a3, 4\n"
+    //"  li $at, 0x8000\n"
+    //"  or $a3, $a3, $at\n"
+    "  ori $a3, $a3, 0x8000\n"
+    "  lh $a3, 128($v0)\n");
 }
 
