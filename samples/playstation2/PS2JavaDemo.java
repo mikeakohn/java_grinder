@@ -23,7 +23,7 @@ public class PS2JavaDemo
     //Draw3DPoints points = new Draw3DPoints(5);
     Draw3DTriangle triangle = new Draw3DTriangle(3);
     Draw3DTriangleStrip picture = new Draw3DTriangleStrip(4);
-    //Draw3DTexture texture = new Draw3DTexture(64, 64);
+    Draw3DTexture texture = new Draw3DTexture(64, 64);
 
     // Define all the triangle vertexes (position and color)
     // with a reference point of (0, 0).
@@ -40,16 +40,14 @@ public class PS2JavaDemo
     triangle.setPoints(points);
     triangle.setPointColors(colors);
 
-/*
     for(n = 0; n < 64 * 64; n++)
     {
-      texture.setPixel(n, n);
+      texture.setPixel(n, 0xff);
     }
-*/
 
     //triangle.disableGouraudShading();
-    //picture.enableTexture();
-    //picture.disableGouraudShading();
+    picture.enableTexture();
+    picture.disableGouraudShading();
 
 /*
     Playstation2.randomInit(Playstation2.performanceCountGet());
@@ -67,7 +65,7 @@ public class PS2JavaDemo
       Playstation2.waitVsync();
       Playstation2.clearScreen();
       triangle.draw();
-      //texture.upload();
+      texture.upload();
       picture.draw();
       triangle.rotateZ512(n);
     }

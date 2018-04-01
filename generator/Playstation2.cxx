@@ -725,15 +725,16 @@ int Playstation2::draw3d_texture_setPixel_II()
   const int reg_object_ref = reg - 3;
 
   fprintf(out,
+    "  ;; draw3d_texture_setPixel_II()\n"
     "  addiu $t%d, $t%d, 144\n"
     "  addu $at, $t%d, $t%d\n"
     "  addu $t%d, $at, $t%d\n"
     "  addu $t%d, $t%d, $t%d\n"
     "  sb $t%d, 0($t%d)\n"
     "  srl $t%d, $t%d, 8\n"
-    "  sb $t%d, 0($t%d)\n"
+    "  sb $t%d, 1($t%d)\n"
     "  srl $t%d, $t%d, 8\n"
-    "  sb $t%d, 0($t%d)\n",
+    "  sb $t%d, 2($t%d)\n",
     reg_object_ref, reg_object_ref,
     reg_index, reg_index,
     reg_index, reg_index,
@@ -755,6 +756,7 @@ int Playstation2::draw3d_texture_setPixels_aI()
   const int reg_object_ref = reg - 2;
 
   fprintf(out,
+    "  ;; draw3d_texture_setPixel_aI()\n"
     "  addiu $t%d, $t%d, 144\n"
     "  lw $t9, -4($t%d)\n"
     "draw3d_texture_setPixels_%d\n"
@@ -796,7 +798,7 @@ int Playstation2::draw3d_texture_upload()
     "  nop\n"
     "  li $v0, D2_CHCR\n"
     "  sw $t%d, 0x10($v0)        ; DMA02 ADDRESS\n"
-    "  sw $v1, -16($t%d)\n"
+    "  lw $v1, -16($t%d)\n"
     "  sw $v1, 0x20($v0)         ; DMA02 SIZE\n"
     "  li $v1, 0x101\n"
     "  sw $v1, ($v0)             ; start\n",
@@ -1307,8 +1309,6 @@ void Playstation2::add_draw3d_object_constructor()
   fprintf(out,
     "  jr $ra\n"
     "  nop\n\n");
-
-  label_count++;
 }
 
 void Playstation2::add_draw3d_texture_constructor()
@@ -1334,57 +1334,77 @@ void Playstation2::add_draw3d_texture_constructor()
 
   // Allocated memory is (width * height * 3) + 144.
   fprintf(out,
-    "  mult $a0, $a1\n"
+    "  multu $a0, $a1\n"
     "  mflo $a2\n"
     "  addu $a3, $a2, $a2\n"
     "  addu $a3, $a3, $a2\n"
-    "  addiu $sp, $sp, -144\n"
+    "  addiu $sp, $sp, -160\n"
     "  subu $sp, $sp, $a3\n"
     "  and $sp, $sp, $at\n");
 
   // Set top of reg stack (return value) to allocated memory.
-  fprintf(out, "  move $v0, $sp\n");
+  // 16 bytes before the allocated memory is the size of the
+  // DMA transfer.
+  fprintf(out, "  addiu $v0, $sp, 16\n");
 
   // Copy default GIF packet to new memory.
   fprintf(out,
     "  li $t8, _texture_gif_tag\n"
-    "  li $t9, 9\n"
+    "  ori $t9, $0, 9\n"
     "  move $v1, $v0\n"
     "_draw3d_texture_constructor_l0:\n"
-    "  lq $t9, 0($t8)\n"
-    "  sq $t9, 0($v1)\n"
-    "  addiu $t9, $t9, 1\n"
+    "  lq $at, 0($t8)\n"
+    "  sq $at, 0($v1)\n"
+    "  addiu $t9, $t9, -1\n"
     "  addiu $t8, $t8, 16\n"
     "  addiu $v1, $v1, 16\n"
     "  bne $t9, $0, _draw3d_texture_constructor_l0\n"
     "  nop\n");
 
-  // Update information in GIF tag for this->(width/height)
+  // Update TRXREG in GIF packet with width, height
+  fprintf(out,
+    "  sw $a0, 96($v0)\n"
+    "  sw $a1, 100($v0)\n");
+
+  // Update BITBLTBUF in GIF packet with width / 64 field.
   fprintf(out,
     "  srl $at, $a0, 6\n"
-    "  sh $at, 22($v0)\n"
+    "  sh $at, 22($v0)\n");
+
+  // Update TEXT0_1 in GIF packet for log2(width) / log2(height).
+  fprintf(out,
     "  li $t9, 30\n"
-    "  ld $t8, 32($v0)\n"
-    "  sll $at, $at, 14\n"
+    "  lq $t8, 32($v0)\n"
+    "  dsll $at, $at, 14\n"
     "  or $t8, $t8, $at\n"
     "  plzcw $at, $a0\n"
     "  andi $at, $at, 0xff\n"
     "  subu $at, $t9, $at\n"
-    "  sll $at, $at, 26\n"
+    "  dsll $at, $at, 26\n"
     "  or $t8, $t8, $at\n"
     "  plzcw $at, $a1\n"
     "  andi $at, $at, 0xff\n"
     "  subu $at, $t9, $at\n"
-    "  sll $at, $at, 30\n"
+    "  dsll $at, $at, 30\n"
     "  or $t8, $t8, $at\n"
-    "  ld $t8, 32($v0)\n"
+    "  sq $t8, 32($v0)\n");
+
+  // Update image GIF packet quadword count.
+  fprintf(out,
     "  addiu $a3, $a3, 15\n"
     "  addiu $at, $0, -16\n"
     "  and $a3, $a3, $at\n"
-    "  sll $a3, $a3, 4\n"
-    //"  li $at, 0x8000\n"
-    //"  or $a3, $a3, $at\n"
-    "  ori $a3, $a3, 0x8000\n"
-    "  lh $a3, 128($v0)\n");
+    "  srl $a3, $a3, 4\n"
+    "  ori $at, $a3, 0x8000\n"
+    "  sh $at, 128($v0)\n");
+
+  // Save the size of the GIF packets to the memory-chunk -16
+  fprintf(out,
+    "  addiu $a3, $a3, 9\n"
+    "  sw $a3, -16($v0)\n");
+
+  fprintf(out,
+    "  jr $ra\n"
+    "  nop\n\n");
 }
 
