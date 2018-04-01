@@ -23,7 +23,7 @@ public class Draw3DLine extends Draw3DObject
    {
    }
 
-   public Draw3DLine(int points)
+   public Draw3DLine(int point_count)
    {
    }
 }

@@ -26,12 +26,16 @@ JAVA_SRC=\
   $(SRC_DIR)/Playstation2.java \
   $(SRC_DIR)/Propeller.java \
   $(SRC_DIR)/Draw3D/Draw3DObject.java \
+  $(SRC_DIR)/Draw3D/Draw3DObjectWithTexture.java \
   $(SRC_DIR)/Draw3D/Draw3DPoints.java \
   $(SRC_DIR)/Draw3D/Draw3DLine.java \
   $(SRC_DIR)/Draw3D/Draw3DLineStrip.java \
   $(SRC_DIR)/Draw3D/Draw3DTriangle.java \
+  $(SRC_DIR)/Draw3D/Draw3DTriangleWithTexture.java \
   $(SRC_DIR)/Draw3D/Draw3DTriangleStrip.java \
+  $(SRC_DIR)/Draw3D/Draw3DTriangleStripWithTexture.java \
   $(SRC_DIR)/Draw3D/Draw3DTriangleFan.java \
+  $(SRC_DIR)/Draw3D/Draw3DTriangleFanWithTexture.java \
   $(SRC_DIR)/Draw3D/Draw3DTexture.java \
   $(SRC_DIR)/SegaGenesis.java \
   $(SRC_DIR)/SNES.java \

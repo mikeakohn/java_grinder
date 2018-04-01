@@ -23,7 +23,7 @@ public class Draw3DTriangleStrip extends Draw3DObject
    {
    }
 
-   public Draw3DTriangleStrip(int points)
+   public Draw3DTriangleStrip(int point_count)
    {
    }
 }

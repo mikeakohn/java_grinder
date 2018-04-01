@@ -23,7 +23,7 @@ public class Draw3DPoints extends Draw3DObject
    {
    }
 
-   public Draw3DPoints(int points)
+   public Draw3DPoints(int point_count)
    {
    }
 }

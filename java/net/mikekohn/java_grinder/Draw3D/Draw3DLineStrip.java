@@ -23,7 +23,7 @@ public class Draw3DLineStrip extends Draw3DObject
    {
    }
 
-   public Draw3DLineStrip(int points)
+   public Draw3DLineStrip(int point_count)
    {
    }
 }

@@ -23,7 +23,7 @@ public class Draw3DTriangleFan extends Draw3DObject
    {
    }
 
-   public Draw3DTriangleFan(int points)
+   public Draw3DTriangleFan(int point_count)
    {
    }
 }

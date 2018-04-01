@@ -449,7 +449,7 @@ int Playstation2::draw3d_object_setPointColors_aI()
   return 0;
 }
 
-int Playstation2::draw3d_object_setTextureCoord_IF()
+int Playstation2::draw3d_object_setTextureCoord_IFF()
 {
   int object = reg - 3;
   int index = reg - 2;
