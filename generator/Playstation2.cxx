@@ -217,12 +217,15 @@ int Playstation2::draw3d_object_rotateX512_I()
     "  lw $v0, ($v1)\n"
     "  sw $v0, 4($t%d)\n"
     "  ori $v1, $0, 1\n"
+    "  lw $v1, 52($t%d)\n"
+    "  ori $v1, $v1, 1\n"
     "  sw $v1, 52($t%d)\n",
     x, x,
     x, x,
     x,
     object,
     x,
+    object,
     object,
     object);
 
@@ -249,12 +252,15 @@ int Playstation2::draw3d_object_rotateY512_I()
     "  lw $v0, ($v1)\n"
     "  sw $v0, 12($t%d)\n"
     "  ori $v1, $0, 1\n"
-    "  sw $v1, 56($t%d)\n",
+    "  lw $v1, 52($t%d)\n"
+    "  ori $v1, $v1, 2\n"
+    "  sw $v1, 52($t%d)\n",
     y, y,
     y, y,
     y,
     object,
     y,
+    object,
     object,
     object);
 
@@ -281,12 +287,15 @@ int Playstation2::draw3d_object_rotateZ512_I()
     "  lw $v0, ($v1)\n"
     "  sw $v0, 20($t%d)\n"
     "  ori $v1, $0, 1\n"
-    "  sw $v1, 60($t%d)\n",
+    "  lw $v1, 52($t%d)\n"
+    "  ori $v1, $v1, 4\n"
+    "  sw $v1, 52($t%d)\n",
     z, z,
     z, z,
     z,
     object,
     z,
+    object,
     object,
     object);
 
@@ -1287,6 +1296,11 @@ void Playstation2::add_draw3d_object_constructor()
     "  lq $t9, 32($t8)\n"
     "  or $t9, $t9, $a1\n"
     "  sq $t9, 96($sp)\n");
+
+  // Set vertex size (2 for no texture and 3 for texture)
+  fprintf(out,
+    "  li $t9, 2\n"
+    "  sw $t9, 56($sp)\n");
 
   // a1 = count
   //fprintf(out, "  move $a1, $t%d\n", reg_point_count);

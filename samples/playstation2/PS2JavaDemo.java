@@ -35,6 +35,10 @@ public class PS2JavaDemo
     picture.setPointColor(1, 0x0000ff00);
     picture.setPointColor(2, 0x00ff0000);
     picture.setPointColor(3, 0x00ff00ff);
+    picture.setTextureCoord(0, 0.0f);
+    picture.setTextureCoord(1, 1.1f);
+    picture.setTextureCoord(2, 1.1f);
+    picture.setTextureCoord(3, 1.1f);
 
     // Define triangle vertexes with an array instead.
     triangle.setPoints(points);

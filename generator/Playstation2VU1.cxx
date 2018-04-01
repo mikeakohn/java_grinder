@@ -32,13 +32,19 @@ void Playstation2::add_vu1_code()
   "_rotation_vu1:\n"
 
   "  sub.xyzw vf29, vf29, vf29   iaddiu vi01, vi00, 4\n"
-  "  nop                         iaddiu vi04, vi00, 8\n\n"
+  "  nop                         iaddiu vi04, vi00, 6\n\n"
 
   "  ;; Setup count/vi03, vi10=do_rot_x, vi11=do_rot_y, vi12=do_rot_z\n"
   "  nop                         ilw.x vi03, 3(vi00)\n"
-  "  nop                         ilw.y vi10, 3(vi00)\n"
-  "  nop                         ilw.z vi11, 3(vi00)\n"
-  "  nop                         ilw.w vi12, 3(vi00)\n\n"
+  "  nop                         ilw.y vi15, 3(vi00)\n"
+  "  nop                         iaddiu vi13, vi00, 1\n"
+  "  nop                         iand vi10, vi15, vi13\n"
+  "  nop                         iaddiu vi13, vi00, 2\n"
+  "  nop                         iand vi11, vi15, vi13\n"
+  "  nop                         iaddiu vi13, vi00, 4\n"
+  "  nop                         iand vi12, vi15, vi13\n"
+  "  nop                         ilw.z vi14, 3(vi00)\n"
+  "  nop                         iadd vi04, vi04, vi14\n\n"
 
   "  ;; Load sin / cos from the data sent from EE\n"
   "  nop                         lq.xyzw vf05, 0(vi00)\n"
@@ -182,7 +188,8 @@ void Playstation2::add_vu1_code()
   "  nop                         sq.xyzw vf10, 0(vi04)\n\n"
 
   "  ;; Increment registers and finish for loop.\n"
-  "  nop                         iaddiu vi04, vi04, 2\n\n"
+  "  ;nop                         iaddiu vi04, vi04, 2\n"
+  "  nop                         iadd vi04, vi04, vi14\n\n"
 
   "  nop                         ibne vi03, vi00, next_point\n"
   "  nop                         nop\n\n"
@@ -193,7 +200,7 @@ void Playstation2::add_vu1_code()
 
   "  ;; End micro program\n"
   "  nop[E]                      nop\n"
-  "  nop                         nop\n\n"
+  "  nop                         nop\n"
 
   "_rotation_vu1_end:\n\n");
 
