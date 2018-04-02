@@ -473,6 +473,7 @@ int Playstation2::draw3d_object_with_texture_setPoint_IFFF()
   fprintf(out,
     "  ;; draw3d_object_with_texture_setPointPosition_IFFF()\n"
     "  sll $at, $t%d, 5\n"
+    "  sll $t%d, $t%d, 4\n"
     "  addu $t%d, $t%d, $at\n"
     "  addiu $t%d, $t%d, 144\n"
     "  addu $t%d, $t%d, $t%d\n"
@@ -480,6 +481,7 @@ int Playstation2::draw3d_object_with_texture_setPoint_IFFF()
     "  sw $t%d, 4($t%d)\n"
     "  sw $t%d, 8($t%d)\n",
     index,
+    index, index,
     index, index,
     object, object,
     object, object, index,
@@ -501,11 +503,13 @@ int Playstation2::draw3d_object_with_texture_setPointColor_II()
   fprintf(out,
     "  ;; draw3d_object_with_texture_setPointColor_II()\n"
     "  sll $at, $t%d, 5\n"
+    "  sll $t%d, $t%d, 4\n"
     "  addu $t%d, $t%d, $at\n"
     "  addiu $t%d, $t%d, 112\n"
     "  addu $t%d, $t%d, $t%d\n"
     "  sw $t%d, 0($t%d)\n",
     index,
+    index, index,
     index, index,
     object, object,
     object, object, index,
@@ -598,12 +602,14 @@ int Playstation2::draw3d_object_setTextureCoord_IFF()
   fprintf(out,
     "  ;; draw3d_object_setTextureCoord_IFF()\n"
     "  sll $at, $t%d, 5\n"
+    "  sll $t%d, $t%d, 4\n"
     "  addu $at, $at, $t%d\n"
     "  addiu $t%d, $t%d, 128\n"
     "  addu $t%d, $t%d, $at\n"
     "  sw $t%d, 0($t%d)\n"
     "  sw $t%d, 4($t%d)\n",
     index,
+    index, index,
     index,
     object, object,
     object, object,
@@ -1503,7 +1509,8 @@ void Playstation2::add_draw3d_object_with_texture_constructor()
   // Allocated memory is number of points * 48 + size of header.
   fprintf(out,
     "  sll $at, $a1, 5\n"
-    "  addu $at, $at, $a1\n"
+    "  sll $t9, $a1, 4\n"
+    "  addu $at, $at, $t9\n"
     "  addiu $at, $at, 112\n"
     "  subu $sp, $sp, $at\n");
 
