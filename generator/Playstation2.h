@@ -23,8 +23,8 @@ public:
   virtual int open(const char *filename);
   virtual int start_init();
   virtual int new_object(const char *object_name, int field_count);
-  virtual int draw3d_object_Constructor_X(int type);
-  virtual int draw3d_object_Constructor_I(int type);
+  virtual int draw3d_object_Constructor_X(int type, bool with_texture);
+  virtual int draw3d_object_Constructor_I(int type, bool with_texture);
   virtual int draw3d_object_rotateX512_I();
   virtual int draw3d_object_rotateY512_I();
   virtual int draw3d_object_rotateZ512_I();
@@ -33,8 +33,12 @@ public:
   virtual int draw3d_object_setPointColor_II();
   virtual int draw3d_object_setPoints_aF();
   virtual int draw3d_object_setPointColors_aI();
-  virtual int draw3d_object_setTextureCoord_IF();
-  virtual int draw3d_object_setTextureCoords_aFF();
+  virtual int draw3d_object_with_texture_setPoint_IFFF();
+  virtual int draw3d_object_with_texture_setPointColor_II();
+  virtual int draw3d_object_with_texture_setPoints_aF();
+  virtual int draw3d_object_with_texture_setPointColors_aI();
+  virtual int draw3d_object_setTextureCoord_IFF();
+  virtual int draw3d_object_setTextureCoords_aF();
   virtual int draw3d_object_disableGouraudShading();
   virtual int draw3d_object_enableGouraudShading();
   virtual int draw3d_object_disableFogging();
@@ -77,6 +81,7 @@ private:
   void add_vu0_code();
   void add_vu1_code();
   void add_draw3d_object_constructor();
+  void add_draw3d_object_with_texture_constructor();
   void add_draw3d_texture_constructor();
 };
 

@@ -23,8 +23,8 @@
 class API_Draw3D
 {
 public:
-  virtual int draw3d_object_Constructor_X(int type) { return -1; }
-  virtual int draw3d_object_Constructor_I(int type) { return -1; }
+  virtual int draw3d_object_Constructor_X(int type, bool with_texture) { return -1; }
+  virtual int draw3d_object_Constructor_I(int type, bool with_texture) { return -1; }
   virtual int draw3d_object_rotateX512_I() { return -1; }
   virtual int draw3d_object_rotateY512_I() { return -1; }
   virtual int draw3d_object_rotateZ512_I() { return -1; }
@@ -33,6 +33,10 @@ public:
   virtual int draw3d_object_setPointColor_II() { return -1; }
   virtual int draw3d_object_setPoints_aF() { return -1; }
   virtual int draw3d_object_setPointColors_aI() { return -1; }
+  virtual int draw3d_object_with_texture_setPoint_IFFF() { return -1; }
+  virtual int draw3d_object_with_texture_setPointColor_II() { return -1; }
+  virtual int draw3d_object_with_texture_setPoints_aF() { return -1; }
+  virtual int draw3d_object_with_texture_setPointColors_aI() { return -1; }
   virtual int draw3d_object_setTextureCoord_IFF() { return -1; }
   virtual int draw3d_object_setTextureCoords_aF() { return -1; }
   virtual int draw3d_object_disableGouraudShading() { return -1; }

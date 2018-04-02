@@ -35,6 +35,12 @@
     return generator->draw3d_object_##funct##sig(const_val1, const_val2); \
   }
 
+#define CHECK_FUNC_WITH_TEXTURE(funct,sig) \
+  if (strcmp(#funct#sig, method_name) == 0) \
+  { \
+    return generator->draw3d_object_with_texture_##funct##sig(); \
+  }
+
 int draw3d_object(JavaClass *java_class, Generator *generator, char *method_name)
 {
   //CHECK_FUNC(Constructor,_X)
@@ -71,6 +77,16 @@ int draw3d_object(JavaClass *java_class, Generator *generator, char *method_name
 
 int draw3d_object(JavaClass *java_class, Generator *generator, char *function, int const_val1, int const_val2)
 {
+  return -1;
+}
+
+int draw3d_object_with_texture(JavaClass *java_class, Generator *generator, char *method_name)
+{
+  CHECK_FUNC_WITH_TEXTURE(setPoint,_IFFF)
+  CHECK_FUNC_WITH_TEXTURE(setPointColor,_II)
+  CHECK_FUNC_WITH_TEXTURE(setPoints,_aF)
+  CHECK_FUNC_WITH_TEXTURE(setPointColors,_aI)
+
   return -1;
 }
 

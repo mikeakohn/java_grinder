@@ -3,7 +3,7 @@ import net.mikekohn.java_grinder.Playstation2;
 import net.mikekohn.java_grinder.Draw3D.Draw3DObject;
 import net.mikekohn.java_grinder.Draw3D.Draw3DPoints;
 import net.mikekohn.java_grinder.Draw3D.Draw3DTriangle;
-import net.mikekohn.java_grinder.Draw3D.Draw3DTriangleStrip;
+import net.mikekohn.java_grinder.Draw3D.Draw3DTriangleStripWithTexture;
 import net.mikekohn.java_grinder.Draw3D.Draw3DTexture;
 
 public class PS2JavaDemo
@@ -22,8 +22,8 @@ public class PS2JavaDemo
 
     //Draw3DPoints points = new Draw3DPoints(5);
     Draw3DTriangle triangle = new Draw3DTriangle(3);
-    Draw3DTriangleStrip picture = new Draw3DTriangleStrip(4);
     Draw3DTexture texture = new Draw3DTexture(64, 64);
+    Draw3DTriangleStripWithTexture picture = new Draw3DTriangleStripWithTexture(4);
 
     // Define all the triangle vertexes (position and color)
     // with a reference point of (0, 0).
@@ -35,10 +35,10 @@ public class PS2JavaDemo
     picture.setPointColor(1, 0x0000ff00);
     picture.setPointColor(2, 0x00ff0000);
     picture.setPointColor(3, 0x00ff00ff);
-    picture.setTextureCoord(0, 0.0f);
-    picture.setTextureCoord(1, 1.1f);
-    picture.setTextureCoord(2, 1.1f);
-    picture.setTextureCoord(3, 1.1f);
+    picture.setTextureCoord(0, 0.0f, 0.0f);
+    picture.setTextureCoord(1, 0.0f, 1.0f);
+    picture.setTextureCoord(2, 1.0f, 1.0f);
+    picture.setTextureCoord(3, 1.0f, 0.0f);
 
     // Define triangle vertexes with an array instead.
     triangle.setPoints(points);
