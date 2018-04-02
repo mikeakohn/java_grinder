@@ -616,7 +616,7 @@ int Playstation2::draw3d_object_setTextureCoord_IFF()
     coord_s, object,
     coord_t, object);
 
-  reg -= 3;
+  reg -= 4;
 
   return 0;
 }

@@ -50,7 +50,7 @@ public class PS2JavaDemo
     }
 
     //triangle.disableGouraudShading();
-    picture.enableTexture();
+    //picture.disableTexture();
     picture.disableGouraudShading();
 
 /*
