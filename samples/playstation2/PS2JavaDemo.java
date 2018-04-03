@@ -3,7 +3,7 @@ import net.mikekohn.java_grinder.Playstation2;
 import net.mikekohn.java_grinder.Draw3D.Draw3DObject;
 import net.mikekohn.java_grinder.Draw3D.Draw3DPoints;
 import net.mikekohn.java_grinder.Draw3D.Draw3DTriangle;
-import net.mikekohn.java_grinder.Draw3D.Draw3DTriangleStripWithTexture;
+import net.mikekohn.java_grinder.Draw3D.Draw3DTriangleFanWithTexture;
 import net.mikekohn.java_grinder.Draw3D.Draw3DTexture;
 
 public class PS2JavaDemo
@@ -23,7 +23,7 @@ public class PS2JavaDemo
     //Draw3DPoints points = new Draw3DPoints(5);
     Draw3DTriangle triangle = new Draw3DTriangle(3);
     Draw3DTexture texture = new Draw3DTexture(64, 64);
-    Draw3DTriangleStripWithTexture picture = new Draw3DTriangleStripWithTexture(4);
+    Draw3DTriangleFanWithTexture picture = new Draw3DTriangleFanWithTexture(4);
 
     // Define all the triangle vertexes (position and color)
     // with a reference point of (0, 0).
@@ -51,7 +51,7 @@ public class PS2JavaDemo
 
     //triangle.disableGouraudShading();
     //picture.disableTexture();
-    picture.disableGouraudShading();
+    //picture.enableGouraudShading();
 
 /*
     Playstation2.randomInit(Playstation2.performanceCountGet());

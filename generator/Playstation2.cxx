@@ -1388,16 +1388,20 @@ void Playstation2::add_primitive_gif_tag()
 
 void Playstation2::add_texture_gif_tag()
 {
+  // 4M = 0x400_000
+  // 640*480*3 = 921600
+  // 0x400_000 - 921600 = 0x31f000
+
   fprintf(out,
     ".align 128\n"
     "_texture_gif_tag:\n"
     "  dc64 GIF_TAG(7, 0, 0, 0, FLG_PACKED, 1), REG_A_D\n"
-    "  dc64 SETREG_BITBLTBUF(0, 0, 0, 0x200000 / 256, 0, FMT_PSMCT24), REG_BITBLTBUF\n"
-    "  dc64 SETREG_TEX0(0x200000 / 64, 0, FMT_PSMCT24, 0, 0, 0, TEX_MODULATE, 0, 0, 0, 0, 0), REG_TEX0_1\n"
+    "  dc64 SETREG_BITBLTBUF(0, 0, 0, 0x31f000 / 64, 0, FMT_PSMCT24), REG_BITBLTBUF\n"
+    "  dc64 SETREG_TEX0(0x31f000 / 64, 0, FMT_PSMCT24, 0, 0, 0, TEX_MODULATE, 0, 0, 0, 0, 0), REG_TEX0_1\n"
     "  dc64 SETREG_TEX1(0, 0, FILTER_NEAREST, 0, 0, 0, 0), REG_TEX1_1\n"
     "  dc64 SETREG_TEX2(FMT_PSMCT24, 0, 0, 0, 0, 0), REG_TEX2_1\n"
     "  dc64 SETREG_TRXPOS(0, 0, 0, 0, DIR_UL_LR), REG_TRXPOS\n"
-    "  dc64 SETREG_TRXREG(64, 64), REG_TRXREG\n"
+    "  dc64 SETREG_TRXREG(0, 0), REG_TRXREG\n"
     "  dc64 SETREG_TRXDIR(XDIR_HOST_TO_LOCAL), REG_TRXDIR\n"
     "  dc64 GIF_TAG(0, 1, 0, 0, FLG_IMAGE, 1), REG_A_D\n\n");
 }
@@ -1434,7 +1438,7 @@ void Playstation2::add_draw3d_object_constructor()
     "  addiu $at, $0, -16\n"
     "  and $sp, $sp, $at\n");
 
-  // Allocated memory is number of points * 32 + size of header.
+  // Allocated memory is number of points * 32 + size of header + 16.
   fprintf(out,
     "  sll $at, $a1, 5\n"
     "  addiu $at, $at, 128\n"
@@ -1521,7 +1525,7 @@ void Playstation2::add_draw3d_object_with_texture_constructor()
     "  addiu $at, $0, -16\n"
     "  and $sp, $sp, $at\n");
 
-  // Allocated memory is number of points * 48 + size of header.
+  // Allocated memory is number of points * 48 + size of header + 16.
   fprintf(out,
     "  sll $at, $a1, 5\n"
     "  sll $t9, $a1, 4\n"
@@ -1614,7 +1618,7 @@ void Playstation2::add_draw3d_texture_constructor()
     "  addiu $at, $0, -16\n"
     "  and $sp, $sp, $at\n");
 
-  // Allocated memory is (width * height * 3) + 144.
+  // Allocated memory is (width * height * 3) + 144 + 16.
   fprintf(out,
     "  multu $a0, $a1\n"
     "  mflo $a2\n"
