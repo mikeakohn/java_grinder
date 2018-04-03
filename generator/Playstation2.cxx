@@ -36,6 +36,7 @@ Playstation2::~Playstation2()
   add_draw3d_object_constructor();
   add_draw3d_object_with_texture_constructor();
   add_draw3d_texture_constructor();
+  add_draw3d_object_draw();
   add_primitive_gif_tag();
   add_texture_gif_tag();
   add_vu0_code();
@@ -821,37 +822,12 @@ int Playstation2::draw3d_object_draw()
 {
   int object = reg - 1;
 
-  // This could be done with DMA.  Not sure what's better.
-  fprintf(out,
-    "  ;; draw3d_object_draw()\n"
-    "  ;; Copy GIF packet to VU1's data memory segment.\n"
-    "  li $v0, VU1_VU_MEM\n"
-    "  lw $a0, -16($t%d)\n"
-    "_repeat_vu1_data_copy_%d:\n"
-    "  lq $a1, ($t%d)\n"
-    "  sq $a1, ($v0)\n"
-    "  addiu $t%d, $t%d, 16\n"
-    "  addiu $v0, $v0, 16\n"
-    "  addiu $a0, $a0, -1\n"
-    "  bnez $a0, _repeat_vu1_data_copy_%d\n"
-    "  nop\n\n",
-    object,
-    label_count,
-    object,
-    object, object,
-    label_count);
-
-  fprintf(out,
-    "  ;; Start the VU1 with a VIF packet\n"
-    "  li $v0, D1_CHCR\n"
-    "  li $v1, vu1_start\n"
-    "  sw $v1, 0x10($v0)         ; DMA01 ADDRESS\n"
-    "  li $v1, 1                 ; Length is only 1 qword\n"
-    "  sw $v1, 0x20($v0)         ; DMA01 SIZE\n"
-    "  li $v1, 0x101\n"
-    "  sw $v1, ($v0)             ; start\n\n");
-
-  label_count++;
+  fprintf(out, "  ;; draw3d_object_draw()\n");
+  fprintf(out, "  move $a0, $t%d\n", object);
+  fprintf(out, "  move $s0, $ra\n");
+  fprintf(out, "  jal _draw3d_object_draw\n");
+  fprintf(out, "  nop\n");
+  fprintf(out, "  move $ra, $s0\n");
 
   reg -= 1;
 
@@ -1317,6 +1293,36 @@ void Playstation2::add_dma_wait()
     "  nop\n"
     "  jr $ra\n"
     "  nop\n\n");
+}
+
+void Playstation2::add_draw3d_object_draw()
+{
+  // This could be done with DMA.  Not sure what's better.
+  fprintf(out,
+    "  ;; add_draw3d_object_draw()\n"
+    "  ;; Copy GIF packet to VU1's data memory segment.\n"
+    "_draw3d_object_draw:\n"
+    "  li $v0, VU1_VU_MEM\n"
+    "  lw $a1, -16($a0)\n"
+    "_repeat_vu1_data_copy_0:\n"
+    "  lq $at, ($a0)\n"
+    "  sq $at, ($v0)\n"
+    "  addiu $a0, $a0, 16\n"
+    "  addiu $v0, $v0, 16\n"
+    "  addiu $a1, $a1, -1\n"
+    "  bnez $a1, _repeat_vu1_data_copy_0\n"
+    "  nop\n");
+
+  fprintf(out,
+    "  ;; Start the VU1 with a VIF packet\n"
+    "  li $v0, D1_CHCR\n"
+    "  li $v1, vu1_start\n"
+    "  sw $v1, 0x10($v0)         ; DMA01 ADDRESS\n"
+    "  li $v1, 1                 ; Length is only 1 qword\n"
+    "  sw $v1, 0x20($v0)         ; DMA01 SIZE\n"
+    "  li $v1, 0x101\n"
+    "  sw $v1, ($v0)             ; start\n\n"
+    "  jr $ra\n\n");
 }
 
 void Playstation2::add_copy_vu1_code()

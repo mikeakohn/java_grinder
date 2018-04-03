@@ -74,6 +74,7 @@ public:
 private:
   void add_dma_reset();
   void add_dma_wait();
+  void add_draw3d_object_draw();
   void add_copy_vu1_code();
   void add_screen_init_clear();
   void add_primitive_gif_tag();
