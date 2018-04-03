@@ -826,21 +826,19 @@ int Playstation2::draw3d_object_draw()
     "  ;; draw3d_object_draw()\n"
     "  ;; Copy GIF packet to VU1's data memory segment.\n"
     "  li $v0, VU1_VU_MEM\n"
-    "  move $v1, $t%d\n"
-    "  lw $a1, -16($v1)\n"
-    //"  lw $a1, 48($v1)\n"
-    //"  sll $a1, $a1, 1\n"
-    //"  addiu $a1, $a1, 7\n"
+    "  lw $a0, -16($t%d)\n"
     "_repeat_vu1_data_copy_%d:\n"
-    "  lq $a0, ($v1)\n"
-    "  sq $a0, ($v0)\n"
-    "  addiu $v1, $v1, 16\n"
+    "  lq $a1, ($t%d)\n"
+    "  sq $a1, ($v0)\n"
+    "  addiu $t%d, $t%d, 16\n"
     "  addiu $v0, $v0, 16\n"
-    "  addiu $a1, $a1, -1\n"
-    "  bnez $a1, _repeat_vu1_data_copy_%d\n"
+    "  addiu $a0, $a0, -1\n"
+    "  bnez $a0, _repeat_vu1_data_copy_%d\n"
     "  nop\n\n",
     object,
     label_count,
+    object,
+    object, object,
     label_count);
 
   fprintf(out,
@@ -955,6 +953,8 @@ int Playstation2::draw3d_texture_setPixels_aI()
 
 int Playstation2::draw3d_texture_upload()
 {
+  int object = reg - 1;
+
   fprintf(out,
     "  ;; draw3d_texture_upload()\n"
     "  jal _dma02_wait\n"
@@ -965,8 +965,8 @@ int Playstation2::draw3d_texture_upload()
     "  sw $v1, 0x20($v0)         ; DMA02 SIZE\n"
     "  li $v1, 0x101\n"
     "  sw $v1, ($v0)             ; start\n",
-    reg - 1,
-    reg - 1);
+    object,
+    object);
 
   reg -= 1;
 
