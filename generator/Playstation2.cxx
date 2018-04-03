@@ -827,9 +827,10 @@ int Playstation2::draw3d_object_draw()
     "  ;; Copy GIF packet to VU1's data memory segment.\n"
     "  li $v0, VU1_VU_MEM\n"
     "  move $v1, $t%d\n"
-    "  lw $a1, 48($v1)\n"
-    "  sll $a1, $a1, 1\n"
-    "  addiu $a1, $a1, 7\n"
+    "  lw $a1, -16($v1)\n"
+    //"  lw $a1, 48($v1)\n"
+    //"  sll $a1, $a1, 1\n"
+    //"  addiu $a1, $a1, 7\n"
     "_repeat_vu1_data_copy_%d:\n"
     "  lq $a0, ($v1)\n"
     "  sq $a0, ($v0)\n"
@@ -1409,15 +1410,16 @@ void Playstation2::add_vu0_code()
 void Playstation2::add_draw3d_object_constructor()
 {
   // Need to allocate enough space for:
-  //  0: sin512(rx), cos512(rx), sin512(ry), sin512(ry)
-  // 16: sin512(rz), cos(rz), 0, 0
-  // 32: x, y, z, 0
-  // 48: count, do_rot_x, do_rot_y, do_rot_z
-  // 64: 16 byte GIF tag
-  // 80: 16 byte primitive info
-  // 96: 16 byte GIF tag
-  //112: 16 bytes per point (for color)   REG_A_D
-  //   : 16 bytes per point (for x, y, z) REG_XYZ2
+  // -16: size of packet
+  //   0: sin512(rx), cos512(rx), sin512(ry), sin512(ry)
+  //  16: sin512(rz), cos(rz), 0, 0
+  //  32: x, y, z, 0
+  //  48: count, do_rot_x, do_rot_y, do_rot_z
+  //  64: 16 byte GIF tag
+  //  80: 16 byte primitive info
+  //  96: 16 byte GIF tag
+  // 112: 16 bytes per point (for color)   REG_A_D
+  //    : 16 bytes per point (for x, y, z) REG_XYZ2
   fprintf(out,
     "_draw3d_object_constructor:\n"
     "  ;; _draw3d_object_constructor(type, point_count)\n"
@@ -1429,45 +1431,51 @@ void Playstation2::add_draw3d_object_constructor()
   // Allocated memory is number of points * 32 + size of header.
   fprintf(out,
     "  sll $at, $a1, 5\n"
-    "  addiu $at, $at, 112\n"
+    "  addiu $at, $at, 128\n"
     "  subu $sp, $sp, $at\n");
 
   // Set top of reg stack (return value) to allocated memory.
-  fprintf(out, "  move $v0, $sp\n");
+  fprintf(out, "  addiu $v0, $sp, 16\n");
+
+  // Store the size of the packet (size / 16).
+  fprintf(out,
+    "  sll $at, $a1, 1\n"
+    "  addiu $at, $at, 7\n"
+    "  sw $at, -16($v0)\n");
 
   // Clear out members of the structure (rotation, xyz position, etc).
   fprintf(out,
-    "  sq $0, 0($sp)\n"
-    "  sq $0, 16($sp)\n"
-    "  sq $0, 32($sp)\n"
-    "  sq $0, 48($sp)\n");
+    "  sq $0, 0($v0)\n"
+    "  sq $0, 16($v0)\n"
+    "  sq $0, 32($v0)\n"
+    "  sq $0, 48($v0)\n");
 
   // Save point count in the struct
-  fprintf(out, "  sw $a1, 48($sp)\n");
+  fprintf(out, "  sw $a1, 48($v0)\n");
 
   // Copy the default primitive tag to the new structure.
   fprintf(out,
     "  li $t8, _primitive_gif_tag\n"
     "  lq $t9, 0($t8)\n"
-    "  sq $t9, 64($sp)\n"
+    "  sq $t9, 64($v0)\n"
     "  lq $t9, 16($t8)\n"
     "  or $t9, $t9, $a0\n"
-    "  sq $t9, 80($sp)\n"
+    "  sq $t9, 80($v0)\n"
     "  lq $t9, 32($t8)\n"
     "  or $t9, $t9, $a1\n"
-    "  sq $t9, 96($sp)\n");
+    "  sq $t9, 96($v0)\n");
 
   // Set vertex size (2 for no texture and 3 for texture)
   fprintf(out,
     "  li $t9, 2\n"
-    "  sw $t9, 56($sp)\n");
+    "  sw $t9, 56($v0)\n");
 
   // a1 = count
   //fprintf(out, "  move $a1, $t%d\n", reg_point_count);
 
   // Set points and colors
   fprintf(out,
-    "  addiu $t8, $sp, 112\n"
+    "  addiu $t8, $v0, 112\n"
     "  lui $t9, 0x3f80\n"
     "  dsll32 $t9, $t9, 0\n"
     "  li $a2, REG_RGBAQ\n"
@@ -1488,19 +1496,20 @@ void Playstation2::add_draw3d_object_constructor()
 void Playstation2::add_draw3d_object_with_texture_constructor()
 {
   // Need to allocate enough space for:
-  //  0: sin512(rx), cos512(rx), sin512(ry), sin512(ry)
-  // 16: sin512(rz), cos(rz), 0, 0
-  // 32: x, y, z, 0
-  // 48: count, do_rot_x, do_rot_y, do_rot_z
-  // 64: 16 byte GIF tag
-  // 80: 16 byte primitive info
-  // 96: 16 byte GIF tag
-  //112: 16 bytes per point (for color)   REG_A_D
-  //   : 16 bytes per point (for st)      REG_ST    [texture coords]
-  //   : 16 bytes per point (for x, y, z) REG_XYZ2
+  // -16: size of packet
+  //   0: sin512(rx), cos512(rx), sin512(ry), sin512(ry)
+  //  16: sin512(rz), cos(rz), 0, 0
+  //  32: x, y, z, 0
+  //  48: count, do_rot_x, do_rot_y, do_rot_z
+  //  64: 16 byte GIF tag
+  //  80: 16 byte primitive info
+  //  96: 16 byte GIF tag
+  // 112: 16 bytes per point (for color)   REG_A_D
+  //    : 16 bytes per point (for st)      REG_ST    [texture coords]
+  //    : 16 bytes per point (for x, y, z) REG_XYZ2
   fprintf(out,
     "_draw3d_object_with_texture_constructor:\n"
-    "  ;; _draw3d_object_constructor(type, point_count)\n"
+    "  ;; _draw3d_object_with_texture_constructor(type, point_count)\n"
     "  ;; Align stack pointer, alloca() some memory\n"
     "  ;; Clear rotation and offset and set point count\n"
     "  addiu $at, $0, -16\n"
@@ -1511,45 +1520,52 @@ void Playstation2::add_draw3d_object_with_texture_constructor()
     "  sll $at, $a1, 5\n"
     "  sll $t9, $a1, 4\n"
     "  addu $at, $at, $t9\n"
-    "  addiu $at, $at, 112\n"
+    "  addiu $at, $at, 128\n"
     "  subu $sp, $sp, $at\n");
 
   // Set top of reg stack (return value) to allocated memory.
-  fprintf(out, "  move $v0, $sp\n");
+  fprintf(out, "  addiu $v0, $sp, 16\n");
+
+  // Store the size of the packet (size / 16).
+  fprintf(out,
+    "  sll $at, $a1, 1\n"
+    "  addu $at, $at, $a1\n"
+    "  addiu $at, $at, 7\n"
+    "  sw $at, -16($v0)\n");
 
   // Clear out members of the structure (rotation, xyz position, etc).
   fprintf(out,
-    "  sq $0, 0($sp)\n"
-    "  sq $0, 16($sp)\n"
-    "  sq $0, 32($sp)\n"
-    "  sq $0, 48($sp)\n");
+    "  sq $0, 0($v0)\n"
+    "  sq $0, 16($v0)\n"
+    "  sq $0, 32($v0)\n"
+    "  sq $0, 48($v0)\n");
 
   // Save point count in the struct
-  fprintf(out, "  sw $a1, 48($sp)\n");
+  fprintf(out, "  sw $a1, 48($v0)\n");
 
   // Copy the default primitive tag to the new structure.
   fprintf(out,
     "  li $t8, _primitive_with_texture_gif_tag\n"
     "  lq $t9, 0($t8)\n"
-    "  sq $t9, 64($sp)\n"
+    "  sq $t9, 64($v0)\n"
     "  lq $t9, 16($t8)\n"
     "  or $t9, $t9, $a0\n"
-    "  sq $t9, 80($sp)\n"
+    "  sq $t9, 80($v0)\n"
     "  lq $t9, 32($t8)\n"
     "  or $t9, $t9, $a1\n"
-    "  sq $t9, 96($sp)\n");
+    "  sq $t9, 96($v0)\n");
 
   // Set vertex size (2 for no texture and 3 for texture)
   fprintf(out,
     "  li $t9, 3\n"
-    "  sw $t9, 56($sp)\n");
+    "  sw $t9, 56($v0)\n");
 
   // a1 = count
   //fprintf(out, "  move $a1, $t%d\n", reg_point_count);
 
   // Set points and colors
   fprintf(out,
-    "  addiu $t8, $sp, 112\n"
+    "  addiu $t8, $v0, 112\n"
     "  lui $t9, 0x3f80\n"
     "  dsll32 $t9, $t9, 0\n"
     "  li $a2, REG_RGBAQ\n"
@@ -1573,6 +1589,7 @@ void Playstation2::add_draw3d_object_with_texture_constructor()
 void Playstation2::add_draw3d_texture_constructor()
 {
   // Need to allocate enough space for:
+  // -16: size of data
   //   0: 16 byte GIF tag (for texture info)
   //  16: BITBLTBUF
   //  32: TEX0
