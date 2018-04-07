@@ -27,14 +27,14 @@ public class PS2JavaDemo
 
     // Define all the triangle vertexes (position and color)
     // with a reference point of (0, 0).
-    picture.setPoint(0, -100.0f, -100.0f, 0.0f);
-    picture.setPoint(1, -100.0f, 100.0f, 0.0f);
-    picture.setPoint(2, 100.0f, 100.0f, 0.0f);
-    picture.setPoint(3, 100.0f, -100.0f, 0.0f);
-    picture.setPointColor(0, 0x000000ff);
-    picture.setPointColor(1, 0x0000ff00);
-    picture.setPointColor(2, 0x00ff0000);
-    picture.setPointColor(3, 0x00ff00ff);
+    picture.setPoint(0, -100.0f, 100.0f, 0.0f);
+    picture.setPoint(1, 100.0f, 100.0f, 0.0f);
+    picture.setPoint(2, 100.0f, -100.0f, 0.0f);
+    picture.setPoint(3, -100.0f, -100.0f, 0.0f);
+    picture.setPointColor(0, 0x00ffffff);
+    picture.setPointColor(1, 0x00ffffff);
+    picture.setPointColor(2, 0x00ffffff);
+    picture.setPointColor(3, 0x00ffffff);
     picture.setTextureCoord(0, 0.0f, 0.0f);
     picture.setTextureCoord(1, 0.0f, 1.0f);
     picture.setTextureCoord(2, 1.0f, 1.0f);
@@ -46,12 +46,17 @@ public class PS2JavaDemo
 
     for(n = 0; n < 64 * 64; n++)
     {
-      texture.setPixel(n, 0xff);
+      texture.setPixel(n, 0xff0000);
+    }
+
+    for(n = 64 * 30; n < 64 * 64; n++)
+    {
+      texture.setPixel(n, 0x0000ff);
     }
 
     //triangle.disableGouraudShading();
     //picture.disableTexture();
-    //picture.enableGouraudShading();
+    picture.enableGouraudShading();
 
 /*
     Playstation2.randomInit(Playstation2.performanceCountGet());

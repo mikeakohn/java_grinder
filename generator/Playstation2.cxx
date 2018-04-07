@@ -864,22 +864,12 @@ int Playstation2::draw3d_texture_setPixel_II()
   fprintf(out,
     "  ;; draw3d_texture_setPixel_II()\n"
     "  addiu $t%d, $t%d, 144\n"
-    "  addu $at, $t%d, $t%d\n"
-    "  addu $t%d, $at, $t%d\n"
+    "  sll $t%d, $t%d, 2\n"
     "  addu $t%d, $t%d, $t%d\n"
-    "  sb $t%d, 0($t%d)\n"
-    "  srl $t%d, $t%d, 8\n"
-    "  sb $t%d, 1($t%d)\n"
-    "  srl $t%d, $t%d, 8\n"
-    "  sb $t%d, 2($t%d)\n",
+    "  sw $t%d, 0($t%d)\n",
     reg_object_ref, reg_object_ref,
     reg_index, reg_index,
-    reg_index, reg_index,
     reg_object_ref, reg_object_ref, reg_index,
-    reg_color, reg_object_ref,
-    reg_color, reg_color,
-    reg_color, reg_object_ref,
-    reg_color, reg_color,
     reg_color, reg_object_ref);
 
   reg -= 3;
@@ -1396,8 +1386,8 @@ void Playstation2::add_texture_gif_tag()
     ".align 128\n"
     "_texture_gif_tag:\n"
     "  dc64 GIF_TAG(7, 0, 0, 0, FLG_PACKED, 1), REG_A_D\n"
-    "  dc64 SETREG_BITBLTBUF(0, 0, 0, 0x31f000 / 64, 0, FMT_PSMCT24), REG_BITBLTBUF\n"
-    "  dc64 SETREG_TEX0(0x31f000 / 64, 0, FMT_PSMCT24, 0, 0, 0, TEX_MODULATE, 0, 0, 0, 0, 0), REG_TEX0_1\n"
+    "  dc64 SETREG_BITBLTBUF(0, 0, 0, 0x3840, 0, FMT_PSMCT24), REG_BITBLTBUF\n"
+    "  dc64 SETREG_TEX0(0x3840, 0, FMT_PSMCT24, 0, 0, 0, TEX_MODULATE, 0, 0, 0, 0, 0), REG_TEX0_1\n"
     "  dc64 SETREG_TEX1(0, 0, FILTER_NEAREST, 0, 0, 0, 0), REG_TEX1_1\n"
     "  dc64 SETREG_TEX2(FMT_PSMCT24, 0, 0, 0, 0, 0), REG_TEX2_1\n"
     "  dc64 SETREG_TRXPOS(0, 0, 0, 0, DIR_UL_LR), REG_TRXPOS\n"
@@ -1621,9 +1611,10 @@ void Playstation2::add_draw3d_texture_constructor()
   // Allocated memory is (width * height * 3) + 144 + 16.
   fprintf(out,
     "  multu $a0, $a1\n"
-    "  mflo $a2\n"
-    "  addu $a3, $a2, $a2\n"
-    "  addu $a3, $a3, $a2\n"
+    "  mflo $a3\n"
+    //"  addu $a3, $a2, $a2\n"
+    //"  addu $a3, $a3, $a2\n"
+    "  sll $a3, $a3, 2\n"
     "  addiu $sp, $sp, -160\n"
     "  subu $sp, $sp, $a3\n"
     "  and $sp, $sp, $at\n");
@@ -1660,7 +1651,7 @@ void Playstation2::add_draw3d_texture_constructor()
   // Update TEXT0_1 in GIF packet for log2(width) / log2(height).
   fprintf(out,
     "  li $t9, 30\n"
-    "  lq $t8, 32($v0)\n"
+    "  ld $t8, 32($v0)\n"
     "  dsll $at, $at, 14\n"
     "  or $t8, $t8, $at\n"
     "  plzcw $at, $a0\n"
@@ -1673,7 +1664,7 @@ void Playstation2::add_draw3d_texture_constructor()
     "  subu $at, $t9, $at\n"
     "  dsll $at, $at, 30\n"
     "  or $t8, $t8, $at\n"
-    "  sq $t8, 32($v0)\n");
+    "  sd $t8, 32($v0)\n");
 
   // Update image GIF packet quadword count.
   fprintf(out,
