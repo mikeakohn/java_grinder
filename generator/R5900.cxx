@@ -1282,8 +1282,6 @@ int R5900::new_array(uint8_t type)
     t = reg - 1;
   }
 
-  //fprintf(out, "  move $at, $t%d\n", t);
-
   if (type == TYPE_INT || type == TYPE_FLOAT)
   {
     fprintf(out, "  sll $at, $t%d, 2\n", t);
@@ -1298,28 +1296,28 @@ int R5900::new_array(uint8_t type)
     fprintf(out, "  move $at, $%d\n", t);
   }
 
-  // $at = length * sizeof(type) + 4
-  fprintf(out, "  addiu $at, $at, 4\n");
+  // $at = length * sizeof(type) + 16 (4 bytes for length and 12 to align)
+  fprintf(out, "  addiu $at, $at, 16\n");
 
   // Allocate stack space for array
   fprintf(out, "  subu $sp, $sp, $at\n");
 
   // Align stack
   fprintf(out,
-    "  addiu $at, $0, -8\n"
+    "  addiu $at, $0, -16\n"
     "  and $sp, $sp, $at\n");
 
   // Save count at start of array
-  fprintf(out, "  sw $t%d, 0($sp)\n", t);
+  fprintf(out, "  sw $t%d, 12($sp)\n", t);
 
   if (t == 8)
   {
-    fprintf(out, "  addiu $t9, $sp, 4\n");
+    fprintf(out, "  addiu $t9, $sp, 16\n");
     STACK_PUSH(9);
   }
     else
   {
-    fprintf(out, "  addiu $t%d, $sp, 4\n", t);
+    fprintf(out, "  addiu $t%d, $sp, 16\n", t);
   }
 
   return 0;
