@@ -20,6 +20,6 @@ bin2array: bin2array.rs
 	rustc bin2array.rs
 
 clean:
-	@rm -f *.hex *.lst *.class ps2_java_demo.asm *.elf *.bin
+	@rm -f *.hex *.lst *.class ps2_java_demo.asm *.elf *.bin bin2array
 	@echo "Clean!"
 

@@ -4,7 +4,7 @@ import net.mikekohn.java_grinder.Draw3D.Draw3DObject;
 import net.mikekohn.java_grinder.Draw3D.Draw3DPoints;
 import net.mikekohn.java_grinder.Draw3D.Draw3DTriangle;
 import net.mikekohn.java_grinder.Draw3D.Draw3DTriangleFanWithTexture;
-import net.mikekohn.java_grinder.Draw3D.Draw3DTexture;
+import net.mikekohn.java_grinder.Draw3D.Draw3DTexture24;
 
 public class PS2JavaDemo
 {
@@ -41,7 +41,7 @@ public class PS2JavaDemo
 
     //Draw3DPoints points = new Draw3DPoints(5);
     Draw3DTriangle triangle = new Draw3DTriangle(3);
-    Draw3DTexture texture = new Draw3DTexture(64, 64);
+    Draw3DTexture24 texture = new Draw3DTexture24(64, 64);
     Draw3DTriangleFanWithTexture picture = new Draw3DTriangleFanWithTexture(4);
 
     // Define all the triangle vertexes (position and color)

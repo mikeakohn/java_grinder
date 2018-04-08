@@ -35,11 +35,20 @@
     return generator->draw3d_texture_##funct##sig(const_val1, const_val2); \
   }
 
+#define CHECK_FUNC_16(funct,sig) \
+  if (strcmp(#funct#sig, method_name) == 0) \
+  { \
+    return generator->draw3d_texture16_##funct##sig(); \
+  }
+
+#define CHECK_FUNC_24(funct,sig) \
+  if (strcmp(#funct#sig, method_name) == 0) \
+  { \
+    return generator->draw3d_texture24_##funct##sig(); \
+  }
+
 int draw3d_texture(JavaClass *java_class, Generator *generator, char *method_name)
 {
-  //CHECK_FUNC(Constructor,_II)
-  CHECK_FUNC(setPixel,_II)
-  CHECK_FUNC(setPixels,_IaI)
   CHECK_FUNC(enableTransparency,)
   CHECK_FUNC(disableTransparency,)
   CHECK_FUNC(upload,)
@@ -54,6 +63,22 @@ int draw3d_texture(JavaClass *java_class, Generator *generator, char *method_nam
 
 int draw3d_texture(JavaClass *java_class, Generator *generator, char *function, int const_val1, int const_val2)
 {
+  return -1;
+}
+
+int draw3d_texture16(JavaClass *java_class, Generator *generator, char *method_name)
+{
+  CHECK_FUNC_16(setPixel,_II)
+  CHECK_FUNC_16(setPixels,_IaI)
+
+  return -1;
+}
+
+int draw3d_texture24(JavaClass *java_class, Generator *generator, char *method_name)
+{
+  CHECK_FUNC_24(setPixel,_II)
+  CHECK_FUNC_24(setPixels,_IaI)
+
   return -1;
 }
 

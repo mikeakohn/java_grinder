@@ -25,6 +25,8 @@
 
 #define DRAW3D "net/mikekohn/java_grinder/Draw3D"
 #define DRAW3D_LEN (sizeof(DRAW3D) - 1)
+#define DRAW3D_TEXTURE "net/mikekohn/java_grinder/Draw3D/Draw3DTexture"
+#define DRAW3D_TEXTURE_LEN (sizeof(DRAW3D_TEXTURE) - 1)
 
 static void get_virtual_function(char *function, char *method_name, char *method_sig, char *field_name, char *field_class)
 {
@@ -158,18 +160,52 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
   {
     ret = java_lang_string(java_class, generator, function);
   }
-  else if (strcmp(method_class, "net/mikekohn/java_grinder/Draw3D/Draw3DTexture") == 0)
+  else if (strncmp(method_class, DRAW3D_TEXTURE, DRAW3D_TEXTURE_LEN) == 0)
   {
+    const char *cls = method_class + DRAW3D_LEN + 1;
+
+printf("XXXX cls=%s\n", cls);
+
     if (is_constructor == true)
     {
       if (strcmp(method_sig, "(II)V") == 0)
       {
-        ret = generator->draw3d_texture_Constructor_II();
+        if (strcmp(cls, "Draw3DTexture16") == 0)
+        {
+          ret = generator->draw3d_texture_Constructor_II(16);
+        }
+          else
+        if (strcmp(cls, "Draw3DTexture24") == 0)
+        {
+          ret = generator->draw3d_texture_Constructor_II(24);
+        }
+          else
+        {
+          ret = -1;
+        }
       }
     }
       else
     {
-      ret = draw3d_texture(java_class, generator, function);
+      do
+      {
+        ret = -1;
+
+        if (strcmp(cls, "Draw3DTexture16") == 0)
+        {
+          ret = draw3d_texture16(java_class, generator, function);
+        }
+          else
+        if (strcmp(cls, "Draw3DTexture24") == 0)
+        {
+          ret = draw3d_texture24(java_class, generator, function);
+        }
+
+        if (ret != -1) { break; }
+
+        ret = draw3d_texture(java_class, generator, function);
+
+      } while(0);
     }
   }
   else if (strncmp(method_class, DRAW3D, DRAW3D_LEN) == 0)
@@ -230,6 +266,7 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
           strcmp(cls, "Draw3DTriangleStripWithTexture") == 0 ||
           strcmp(cls, "Draw3DTriangleFanWithTexture") == 0)
       {
+#if 0
         if (strncmp(function, "setPoint", 8) == 0)
         {
           ret = draw3d_object_with_texture(java_class, generator, function);
@@ -238,6 +275,13 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
         {
           ret = draw3d_object(java_class, generator, function);
         }
+#endif
+        do
+        {
+          ret = draw3d_object_with_texture(java_class, generator, function);
+          if (ret == 0) { break; }
+          ret = draw3d_object(java_class, generator, function);
+        } while(0);
       }
     }
   }

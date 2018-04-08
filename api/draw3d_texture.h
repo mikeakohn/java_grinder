@@ -18,6 +18,8 @@
 int draw3d_texture(JavaClass *java_class, Generator *generator, char *method_name);
 int draw3d_texture(JavaClass *java_class, Generator *generator, char *method_name, int const_val);
 int draw3d_texture(JavaClass *java_class, Generator *generator, char *method_name, int const_val1, int const_val2);
+int draw3d_texture16(JavaClass *java_class, Generator *generator, char *method_name);
+int draw3d_texture24(JavaClass *java_class, Generator *generator, char *method_name);
 
 #endif
 
