@@ -7,7 +7,7 @@ grind: PS2JavaDemo.class
 	../../../naken_asm/naken_asm -I $(INCLUDE_PATH) -l -e -o ps2_java_demo.elf ps2_java_demo.asm
 
 debug:
-	naken_asm -I $(INCLUDE_PATH) -l -e -dump_symbols -o ps2_java_demo.elf ps2_java_demo.asm
+	../../../naken_asm/naken_asm -I $(INCLUDE_PATH) -l -e -dump_symbols -o ps2_java_demo.elf ps2_java_demo.asm
 
 %.class: %.java
 	javac -classpath ../../build/JavaGrinder.jar:. $*.java

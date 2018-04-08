@@ -1075,10 +1075,18 @@ int Playstation2::playstation2_vu0Start()
 
 int Playstation2::playstation2_vu0Stop()
 {
+#if 0
   fprintf(out,
     "  ;; vu0Stop()\n"
-    "  li $at, 28\n"
-    "  ctc2 $at, 1\n");
+    "  li $at, 0xf\n"
+    "  ctc2 $at, 28\n");
+#endif
+
+  fprintf(out,
+    "  ;; vu0Stop()\n"
+    "  li $v0, VIF0_FBRST\n"
+    "  li $v1, 0xf\n"
+    "  sw $v1, 0($v0)\n");
 
   return 0;
 }
@@ -1089,10 +1097,8 @@ int Playstation2::playstation2_vu0IsRunning()
     "  ;; vu0IsRunning()\n"
     "  li $v1, VIF0_STAT\n"
     "  lw $v0, ($v1)\n"
-    "  andi $t%d, $v0, 0x04\n"
-    "  xori $t%d, $t%d, 0x04\n",
-    reg,
-    reg, reg);
+    "  andi $t%d, $v0, 0x04\n",
+    reg);
 
   reg++;
 
