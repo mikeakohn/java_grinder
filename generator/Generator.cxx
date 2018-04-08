@@ -160,8 +160,6 @@ void Generator::add_newline()
 
 int Generator::insert_db(const char *name, int32_t *data, int len, uint8_t len_type)
 {
-  int n;
-
   if (len_type == TYPE_SHORT)
   {
     fprintf(out, "  dw %d   ; %s.length\n", len, name);
@@ -173,7 +171,7 @@ int Generator::insert_db(const char *name, int32_t *data, int len, uint8_t len_t
   }
   fprintf(out, "_%s:\n", name);
 
-  for (n = 0; n < len; n++)
+  for (int n = 0; n < len; n++)
   {
     if ((n % 8) == 0) { fprintf(out, "  db"); }
     else { fprintf(out, ","); }
@@ -195,8 +193,6 @@ int Generator::insert_db(const char *name, int32_t *data, int len, uint8_t len_t
 
 int Generator::insert_dw(const char *name, int32_t *data, int len, uint8_t len_type)
 {
-  int n;
-
   if (len_type == TYPE_SHORT)
   {
     fprintf(out, "  dw %d   ; %s.length\n", len, name);
@@ -208,7 +204,7 @@ int Generator::insert_dw(const char *name, int32_t *data, int len, uint8_t len_t
   }
   fprintf(out, "_%s:\n", name);
 
-  for (n = 0; n < len; n++)
+  for (int n = 0; n < len; n++)
   {
     if ((n % 8) == 0) { fprintf(out, "  dw"); }
     else { fprintf(out, ","); }
@@ -231,8 +227,6 @@ int Generator::insert_dw(const char *name, int32_t *data, int len, uint8_t len_t
 
 int Generator::insert_dc32(const char *name, int32_t *data, int len, uint8_t len_type, const char *dc32)
 {
-  int n;
-
   // FIXME: For dc32, the len_type should be dc32 always.
   if (len_type == TYPE_SHORT)
   {
@@ -246,7 +240,7 @@ int Generator::insert_dc32(const char *name, int32_t *data, int len, uint8_t len
 
   fprintf(out, "_%s:\n", name);
 
-  for (n = 0; n < len; n++)
+  for (int n = 0; n < len; n++)
   {
     if ((n % 8) == 0) { fprintf(out, "  %s", dc32); }
     else { fprintf(out, ","); }
@@ -263,8 +257,6 @@ int Generator::insert_dc32(const char *name, int32_t *data, int len, uint8_t len
 
 int Generator::insert_float(const char *name, int32_t *data, int len, uint8_t len_type, const char *dc32)
 {
-  int n;
-
   // FIXME: For dc32, the len_type should be dc32 always.
   if (len_type == TYPE_SHORT)
   {
@@ -278,7 +270,7 @@ int Generator::insert_float(const char *name, int32_t *data, int len, uint8_t le
 
   fprintf(out, "_%s:\n", name);
 
-  for (n = 0; n < len; n++)
+  for (int n = 0; n < len; n++)
   {
     if ((n % 8) == 0) { fprintf(out, "  %s", dc32); }
     else { fprintf(out, ","); }

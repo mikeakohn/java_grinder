@@ -83,6 +83,16 @@ int Playstation2::start_init()
     "  li $v0, 0x200\n"
     "  sd $v0, ($v1)\n\n"
 
+    "  ;; Reset VIF0\n"
+    "  li $v0, VIF0_STAT\n"
+    "  li $v1, 0xf\n"
+    "  sw $v1, 0x10($v0)     ; FBRST\n\n"
+
+    "  ;; Reset VIF1\n"
+    "  li $v0, VIF1_STAT\n"
+    "  li $v1, 0xf\n"
+    "  sw $v1, 0x10($v0)     ; FBRST\n\n"
+
     "  ;; Interrupt mask register\n"
     "  li $v1, GsPutIMR\n"
     "  li $a0, 0xff00\n"
@@ -877,38 +887,35 @@ int Playstation2::draw3d_texture_setPixel_II()
   return 0;
 }
 
-int Playstation2::draw3d_texture_setPixels_aI()
+int Playstation2::draw3d_texture_setPixels_IaI()
 {
   const int reg_color_array = reg - 1;
-  const int reg_object_ref = reg - 2;
+  const int reg_index = reg - 2;
+  const int reg_object_ref = reg - 3;
 
   fprintf(out,
-    "  ;; draw3d_texture_setPixel_aI()\n"
+    "  ;; draw3d_texture_setPixel_IaI()\n"
+    "  sll $t%d, $t%d, 2\n"
     "  addiu $t%d, $t%d, 144\n"
+    "  addu $t%d, $t%d, $t%d\n"
     "  lw $t9, -4($t%d)\n"
-    "draw3d_texture_setPixels_%d\n"
-    "  lb $at, 0($t%d)\n"
-    "  sb $at, 0($t%d)\n"
-    "  lb $at, 1($t%d)\n"
-    "  sb $at, 1($t%d)\n"
-    "  lb $at, 2($t%d)\n"
-    "  sb $at, 2($t%d)\n"
-    "  addui $t%d, 3\n"
-    "  addui $t%d, 3\n"
-    "  addui $t9, $t9, -1\n"
+    "draw3d_texture_setPixels_%d:\n"
+    "  lw $at, 0($t%d)\n"
+    "  sw $at, 0($t%d)\n"
+    "  addiu $t%d, $t%d, 4\n"
+    "  addiu $t%d, $t%d, 4\n"
+    "  addiu $t9, $t9, -1\n"
     "  bne $t9, $0, draw3d_texture_setPixels_%d\n"
     "  nop\n",
+    reg_index, reg_index,
     reg_object_ref, reg_object_ref,
+    reg_object_ref, reg_object_ref, reg_index,
     reg_color_array,
     label_count,
     reg_color_array,
     reg_object_ref,
-    reg_color_array,
-    reg_object_ref,
-    reg_color_array,
-    reg_object_ref,
-    reg_color_array,
-    reg_object_ref,
+    reg_color_array, reg_color_array,
+    reg_object_ref, reg_object_ref,
     label_count);
 
   label_count++;
@@ -983,22 +990,24 @@ int Playstation2::playstation2_waitVsync()
 
 int Playstation2::playstation2_vu0UploadCode_aB()
 {
+  int array = reg - 1;
+
   fprintf(out,
     "  ;; vu0UploadCode_aB()\n"
     "  li $v0, VU0_MICRO_MEM\n"
     "  lw $a1, -4($t%d)\n"
-    "  li $v1, $t%d\n"
     "vu0_upload_code_%d:\n"
-    "  lq $a0, ($v1)\n"
+    "  lq $a0, ($t%d)\n"
     "  sq $a0, ($v0)\n"
-    "  addi $v1, $v1, 16\n"
+    "  addi $t%d, $t%d, 16\n"
     "  addi $v0, $v0, 16\n"
-    "  addi $a1, $a1, -1\n"
-    "  bnez $a1, vu0_upload_code_%d\n"
+    "  addi $a1, $a1, -16\n"
+    "  bgtz $a1, vu0_upload_code_%d\n"
     "  nop\n",
-    reg - 1,
-    reg - 1,
+    array,
     label_count,
+    array,
+    array, array,
     label_count);
 
   label_count++;
@@ -1009,62 +1018,38 @@ int Playstation2::playstation2_vu0UploadCode_aB()
 
 int Playstation2::playstation2_vu0UploadData_IaB()
 {
-  fprintf(out,
-    "  ;; vu0UploadData_IaB()\n"
-    "  li $v0, VU0_VU_MEM\n"
-    "  lw $a1, -4($t%d)\n"
-    "  li $v1, $t%d\n"
-    "  sll $t%d, $t%d, 4\n"
-    "  addu $v0, $v0, $t%d\n"
-    "vu0_upload_data_%d:\n"
-    "  lq $a0, ($v1)\n"
-    "  sq $a0, ($v0)\n"
-    "  addi $v1, $v1, 16\n"
-    "  addi $v0, $v0, 16\n"
-    "  addi $a1, $a1, -1\n"
-    "  bnez $a1, vu0_upload_data_%d\n"
-    "  nop\n",
-    reg - 1,
-    reg - 1,
-    reg - 2, reg - 2,
-    reg - 2,
-    label_count,
-    label_count);
+  fprintf(out, "  ;; vu0UploadData_IaB()\n");
+  return upload_vu0_data(16);
+}
 
-  label_count++;
-  reg -= 2;
+int Playstation2::playstation2_vu0UploadData_IaI()
+{
+  fprintf(out, "  ;; vu0UploadData_IaI()\n");
+  return upload_vu0_data(4);
+}
 
-  return 0;
+int Playstation2::playstation2_vu0UploadData_IaF()
+{
+  fprintf(out, "  ;; vu0UploadData_IaF()\n");
+  return upload_vu0_data(4);
 }
 
 int Playstation2::playstation2_vu0DownloadData_IaB()
 {
-  fprintf(out,
-    "  ;; vu0DownloadData_IaB()\n"
-    "  li $v0, VU0_VU_MEM\n"
-    "  lw $a1, -4($t%d)\n"
-    "  li $v1, $t%d\n"
-    "  sll $t%d, $t%d, 4\n"
-    "  addu $v0, $v0, $t%d\n"
-    "vu0_download_data_%d:\n"
-    "  sq $a0, ($v1)\n"
-    "  lq $a0, ($v0)\n"
-    "  addi $v1, $v1, 16\n"
-    "  addi $v0, $v0, 16\n"
-    "  addi $a1, $a1, -1\n"
-    "  bnez $a1, vu0_download_data_%d\n"
-    "  nop\n",
-    reg - 1,
-    reg - 1,
-    reg - 2, reg - 2,
-    reg - 2,
-    label_count,
-    label_count);
+  fprintf(out, "  ;; vu0DownloadData_IaB()\n");
+  return download_vu0_data(16);
+}
 
-  label_count++;
-  reg -= 2;
+int Playstation2::playstation2_vu0DownloadData_IaI()
+{
+  fprintf(out, "  ;; vu0DownloadData_IaI()\n");
+  return download_vu0_data(4);
+}
 
-  return 0;
+int Playstation2::playstation2_vu0DownloadData_IaF()
+{
+  fprintf(out, "  ;; vu0DownloadData_IaF()\n");
+  return download_vu0_data(4);
 }
 
 int Playstation2::playstation2_vu0Start()
@@ -1104,8 +1089,10 @@ int Playstation2::playstation2_vu0IsRunning()
     "  ;; vu0IsRunning()\n"
     "  li $v1, VIF0_STAT\n"
     "  lw $v0, ($v1)\n"
-    "  andi $t%d, $v0, 0x04\n",
-    reg);
+    "  andi $t%d, $v0, 0x04\n"
+    "  xori $t%d, $t%d, 0x04\n",
+    reg,
+    reg, reg);
 
   reg++;
 
@@ -1202,6 +1189,72 @@ int Playstation2::playstation2_randomNext()
     reg, reg);
 
   reg++;
+
+  return 0;
+}
+
+int Playstation2::upload_vu0_data(int dec_count)
+{
+  int array = reg - 1;
+  int index = reg - 2;
+
+  fprintf(out,
+    "  li $v0, VU0_VU_MEM\n"
+    "  lw $a1, -4($t%d)\n"
+    "  sll $t%d, $t%d, 4\n"
+    "  addu $v0, $v0, $t%d\n"
+    "vu0_upload_data_%d:\n"
+    "  lq $a0, ($t%d)\n"
+    "  sq $a0, ($v0)\n"
+    "  addi $t%d, $t%d, 16\n"
+    "  addi $v0, $v0, 16\n"
+    "  addi $a1, $a1, -%d\n"
+    "  bgtz $a1, vu0_upload_data_%d\n"
+    "  nop\n",
+    array,
+    index, index,
+    index,
+    label_count,
+    array,
+    array, array,
+    dec_count,
+    label_count);
+
+  label_count++;
+  reg -= 2;
+
+  return 0;
+}
+
+int Playstation2::download_vu0_data(int dec_count)
+{
+  int array = reg - 1;
+  int index = reg - 2;
+
+  fprintf(out,
+    "  li $v0, VU0_VU_MEM\n"
+    "  lw $a1, -4($t%d)\n"
+    "  sll $t%d, $t%d, 4\n"
+    "  addu $v0, $v0, $t%d\n"
+    "vu0_download_data_%d:\n"
+    "  lq $a0, ($v0)\n"
+    "  sq $a0, ($t%d)\n"
+    "  addi $t%d, $t%d, 16\n"
+    "  addi $v0, $v0, 16\n"
+    "  addi $a1, $a1, -%d\n"
+    "  bgtz $a1, vu0_download_data_%d\n"
+    "  nop\n",
+    array,
+    index, index,
+    index,
+    label_count,
+    array,
+    array, array,
+    dec_count,
+    label_count);
+
+  label_count++;
+  reg -= 2;
 
   return 0;
 }

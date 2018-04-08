@@ -21,9 +21,16 @@ public class Draw3DTexture
    {
    }
 
+   /** Sets the color of a pixel in a texture buffer at the index
+       (x + (y * width)) provided. */
    public void setPixel(int index, int color) { }
-   public void setPixels(int[] pixels) { }
 
+   /** Sets the color of a multiple pixels in a texture buffer at the index
+       (x + (y * width)) provided. */
+   public void setPixels(int index, int[] pixels) { }
+
+   /** Uploads the texture from main memory into the Graphics Synthesizer
+       (the video chip) of the Playstation 2. */
    public void upload() { }
 }
 

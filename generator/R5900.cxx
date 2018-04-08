@@ -1327,7 +1327,8 @@ int R5900::new_array(uint8_t type)
 
 int R5900::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 {
-  fprintf(out, ".align 32\n");
+  fprintf(out, ".align 128\n");
+  fprintf(out, "  dc32 0, 0, 0\n");
 
   if (type == TYPE_BYTE)
   {

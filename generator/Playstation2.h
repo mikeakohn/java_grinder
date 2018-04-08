@@ -52,14 +52,18 @@ public:
   virtual int draw3d_object_draw();
   virtual int draw3d_texture_Constructor_II();
   virtual int draw3d_texture_setPixel_II();
-  virtual int draw3d_texture_setPixels_aI();
+  virtual int draw3d_texture_setPixels_IaI();
   virtual int draw3d_texture_upload();
 
   virtual int playstation2_clearScreen();
   virtual int playstation2_waitVsync();
   virtual int playstation2_vu0UploadCode_aB();
   virtual int playstation2_vu0UploadData_IaB();
+  virtual int playstation2_vu0UploadData_IaI();
+  virtual int playstation2_vu0UploadData_IaF();
   virtual int playstation2_vu0DownloadData_IaB();
+  virtual int playstation2_vu0DownloadData_IaI();
+  virtual int playstation2_vu0DownloadData_IaF();
   virtual int playstation2_vu0Start();
   virtual int playstation2_vu0Stop();
   virtual int playstation2_vu0IsRunning();
@@ -72,6 +76,8 @@ public:
   virtual int playstation2_randomNext();
 
 private:
+  int upload_vu0_data(int dec_count);
+  int download_vu0_data(int dec_count);
   void add_dma_reset();
   void add_dma_wait();
   void add_draw3d_object_draw();

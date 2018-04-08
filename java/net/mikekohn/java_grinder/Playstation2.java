@@ -86,16 +86,23 @@ abstract public class Playstation2
   public static void clearScreen() { }
   public static void waitVsync() { }
 
-  /** Upload program in code[] to VU0. */
+  /** Upload program in code[] to VU0.  The length of code[] must be a
+      multiple of 16 bytes. */
   public static void vu0UploadCode(byte[] code) { }
 
   /** Upload data from data[] to VU0's data RAM starting at index.
-      VU0 has 4k of RAM, so index is a number between 0 and 255. */
+      VU0 has 4k of RAM, so index is a number between 0 and 255.
+      The length of the data must be a multiple of 16 bytes. */
   public static void vu0UploadData(int index, byte[] data) { }
+  public static void vu0UploadData(int index, int[] data) { }
+  public static void vu0UploadData(int index, float[] data) { }
 
   /** Download data into data[] from VU0's data RAM starting at index.
-      VU0 has 4k of RAM, so index is a number between 0 and 255. */
+      VU0 has 4k of RAM, so index is a number between 0 and 255.
+      The length of the data must be a multiple of 16 bytes. */
   public static void vu0DownloadData(int index, byte[] data) { }
+  public static void vu0DownloadData(int index, int[] data) { }
+  public static void vu0DownloadData(int index, float[] data) { }
 
   /** Start executing code at location 0 of VU0's code RAM. */
   public static void vu0Start() { }
