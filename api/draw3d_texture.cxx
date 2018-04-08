@@ -40,6 +40,8 @@ int draw3d_texture(JavaClass *java_class, Generator *generator, char *method_nam
   //CHECK_FUNC(Constructor,_II)
   CHECK_FUNC(setPixel,_II)
   CHECK_FUNC(setPixels,_IaI)
+  CHECK_FUNC(enableTransparency,)
+  CHECK_FUNC(disableTransparency,)
   CHECK_FUNC(upload,)
 
   return -1;

@@ -873,7 +873,7 @@ int Playstation2::draw3d_texture_setPixel_II()
 
   fprintf(out,
     "  ;; draw3d_texture_setPixel_II()\n"
-    "  addiu $t%d, $t%d, 144\n"
+    "  addiu $t%d, $t%d, 160\n"
     "  sll $t%d, $t%d, 2\n"
     "  addu $t%d, $t%d, $t%d\n"
     "  sw $t%d, 0($t%d)\n",
@@ -896,7 +896,7 @@ int Playstation2::draw3d_texture_setPixels_IaI()
   fprintf(out,
     "  ;; draw3d_texture_setPixel_IaI()\n"
     "  sll $t%d, $t%d, 2\n"
-    "  addiu $t%d, $t%d, 144\n"
+    "  addiu $t%d, $t%d, 160\n"
     "  addu $t%d, $t%d, $t%d\n"
     "  lw $t9, -4($t%d)\n"
     "draw3d_texture_setPixels_%d:\n"
@@ -920,6 +920,38 @@ int Playstation2::draw3d_texture_setPixels_IaI()
 
   label_count++;
   reg -= 3;
+
+  return 0;
+}
+
+int Playstation2::draw3d_texture_enableTransparency()
+{
+  int object = reg - 1;
+
+  fprintf(out,
+    "  ;; enableTransparency()\n"
+    "  lw $t8, 112($t%d)\n"
+    "  ori $t8, $t8, 0x8000\n"
+    "  sw $t8, 112($t%d)\n",
+    object, object);
+
+  reg -= 1;
+
+  return 0;
+}
+
+int Playstation2::draw3d_texture_disableTransparency()
+{
+  int object = reg - 1;
+
+  fprintf(out,
+    "  ;; disableTransparency()\n"
+    "  lw $t8, 112($t%d)\n"
+    "  andi $t8, $t8, 0x7fff\n"
+    "  sw $t8, 112($t%d)\n",
+    object, object);
+
+  reg -= 1;
 
   return 0;
 }
@@ -1451,6 +1483,7 @@ void Playstation2::add_texture_gif_tag()
     "  dc64 SETREG_TEX2(FMT_PSMCT24, 0, 0, 0, 0, 0), REG_TEX2_1\n"
     "  dc64 SETREG_TRXPOS(0, 0, 0, 0, DIR_UL_LR), REG_TRXPOS\n"
     "  dc64 SETREG_TRXREG(0, 0), REG_TRXREG\n"
+    "  dc64 SETREG_TEXA(0, 0, 0), REG_TEXA\n"
     "  dc64 SETREG_TRXDIR(XDIR_HOST_TO_LOCAL), REG_TRXDIR\n"
     "  dc64 GIF_TAG(0, 1, 0, 0, FLG_IMAGE, 1), REG_A_D\n\n");
 }
@@ -1656,9 +1689,10 @@ void Playstation2::add_draw3d_texture_constructor()
   //  64: TEX2
   //  80: TRXPOS
   //  96: TRXREG
-  // 112: TRXDIR
-  // 128: 16 byte GIF tag (for actual image)
-  // 144: (width * height * 3) bytes of image
+  // 112: TEXA
+  // 128: TRXDIR
+  // 144: 16 byte GIF tag (for actual image)
+  // 160: (width * height * 3) bytes of image
   fprintf(out,
     "_draw3d_texture_constructor:\n"
     "  ;; _draw3d_texture_constructor(type, point_count)\n"
@@ -1674,7 +1708,7 @@ void Playstation2::add_draw3d_texture_constructor()
     //"  addu $a3, $a2, $a2\n"
     //"  addu $a3, $a3, $a2\n"
     "  sll $a3, $a3, 2\n"
-    "  addiu $sp, $sp, -160\n"
+    "  addiu $sp, $sp, -176\n"
     "  subu $sp, $sp, $a3\n"
     "  and $sp, $sp, $at\n");
 
@@ -1686,7 +1720,7 @@ void Playstation2::add_draw3d_texture_constructor()
   // Copy default GIF packet to new memory.
   fprintf(out,
     "  li $t8, _texture_gif_tag\n"
-    "  ori $t9, $0, 9\n"
+    "  ori $t9, $0, 10\n"
     "  move $v1, $v0\n"
     "_draw3d_texture_constructor_l0:\n"
     "  lq $at, 0($t8)\n"
@@ -1732,11 +1766,11 @@ void Playstation2::add_draw3d_texture_constructor()
     "  and $a3, $a3, $at\n"
     "  srl $a3, $a3, 4\n"
     "  ori $at, $a3, 0x8000\n"
-    "  sh $at, 128($v0)\n");
+    "  sh $at, 144($v0)\n");
 
   // Save the size of the GIF packets to the memory-chunk -16
   fprintf(out,
-    "  addiu $a3, $a3, 9\n"
+    "  addiu $a3, $a3, 10\n"
     "  sw $a3, -16($v0)\n");
 
   fprintf(out,

@@ -53,6 +53,8 @@ public:
   virtual int draw3d_texture_Constructor_II();
   virtual int draw3d_texture_setPixel_II();
   virtual int draw3d_texture_setPixels_IaI();
+  virtual int draw3d_texture_enableTransparency();
+  virtual int draw3d_texture_disableTransparency();
   virtual int draw3d_texture_upload();
 
   virtual int playstation2_clearScreen();

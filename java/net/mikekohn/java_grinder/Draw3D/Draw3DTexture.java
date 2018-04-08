@@ -29,6 +29,12 @@ public class Draw3DTexture
        (x + (y * width)) provided. */
    public void setPixels(int index, int[] pixels) { }
 
+   /** If the color is black (RGB=0,0,0) the pixels will be transparent. */
+   public void enableTransparency() { }
+
+   /** If the color is black (RGB=0,0,0) the pixels will be black. */
+   public void disableTransparency() { }
+
    /** Uploads the texture from main memory into the Graphics Synthesizer
        (the video chip) of the Playstation 2. */
    public void upload() { }

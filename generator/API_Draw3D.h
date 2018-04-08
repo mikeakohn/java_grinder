@@ -54,6 +54,8 @@ public:
   virtual int draw3d_texture_Constructor_II() { return -1; }
   virtual int draw3d_texture_setPixel_II() { return -1; }
   virtual int draw3d_texture_setPixels_IaI() { return -1; }
+  virtual int draw3d_texture_enableTransparency() { return -1; }
+  virtual int draw3d_texture_disableTransparency() { return -1; }
   virtual int draw3d_texture_upload() { return -1; }
 };
 
