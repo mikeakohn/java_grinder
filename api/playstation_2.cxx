@@ -37,8 +37,8 @@
 
 int playstation2(JavaClass *java_class, Generator *generator, char *method_name)
 {
-  CHECK_FUNC(clearScreen,)
   CHECK_FUNC(waitVsync,)
+  CHECK_FUNC(clearContext,_I)
   CHECK_FUNC(showContext,_I)
   CHECK_FUNC(vu0UploadCode, _aB)
   CHECK_FUNC(vu0UploadData, _IaB)

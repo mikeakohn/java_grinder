@@ -60,8 +60,8 @@ public:
   virtual int draw3d_texture_disableTransparency();
   virtual int draw3d_texture_upload();
 
-  virtual int playstation2_clearScreen();
   virtual int playstation2_waitVsync();
+  virtual int playstation2_clearContext_I();
   virtual int playstation2_showContext_I();
   virtual int playstation2_vu0UploadCode_aB();
   virtual int playstation2_vu0UploadData_IaB();

@@ -110,10 +110,46 @@ public class PS2JavaDemo
     triangle.setPosition(1900.0f, 2100.0f, 2048.0f);
     picture.setPosition(2000.0f, 2100.0f, 2048.0f);
 
-    for(n = 0; n < count; n++)
+    // Changing contexts (double buffering).
+    // Since it's interlaced, one context is odd scan lines and
+    // the other is even.
+    for (n = 0; n < count; n++)
+    {
+      // Set which context these objects need to be drawn on.
+      // The API automatically does a logical AND with the value
+      // passed in.
+      triangle.setContext(n);
+      picture.setContext(n);
+
+      // Clear the entire context of where this is going to draw.
+      Playstation2.clearContext(n);
+
+      // Draw all the objects into the memory of the context
+      triangle.draw();
+      texture.upload();
+      picture.draw();
+
+      // Rotate the triangle so the next time it draws it's rotated
+      // around the Z axis.
+      triangle.rotateZ512(n);
+
+      // Wait until the video beam is done drawing the last frame.
+      Playstation2.waitVsync();
+
+      // Tell video system which context needs to be drawn next.
+      Playstation2.showContext(n);
+    }
+
+    Playstation2.showContext(0);
+    triangle.setContext(0);
+    picture.setContext(0);
+
+    // Drawing without changing contexts.  Since there isn't much to draw
+    // there is plenty of time to do it with 1 context.
+    for (n = 0; n < count; n++)
     {
       Playstation2.waitVsync();
-      Playstation2.clearScreen();
+      Playstation2.clearContext(0);
       triangle.draw();
       texture.upload();
       picture.draw();
@@ -130,7 +166,7 @@ public class PS2JavaDemo
     while(true)
     {
       Playstation2.waitVsync();
-      Playstation2.clearScreen();
+      Playstation2.clearContext(0);
     }
   }
 }
