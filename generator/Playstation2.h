@@ -25,6 +25,7 @@ public:
   virtual int new_object(const char *object_name, int field_count);
   virtual int draw3d_object_Constructor_X(int type, bool with_texture);
   virtual int draw3d_object_Constructor_I(int type, bool with_texture);
+  virtual int draw3d_object_setContext_I();
   virtual int draw3d_object_rotateX512_I();
   virtual int draw3d_object_rotateY512_I();
   virtual int draw3d_object_rotateZ512_I();
@@ -61,6 +62,7 @@ public:
 
   virtual int playstation2_clearScreen();
   virtual int playstation2_waitVsync();
+  virtual int playstation2_showContext_I();
   virtual int playstation2_vu0UploadCode_aB();
   virtual int playstation2_vu0UploadData_IaB();
   virtual int playstation2_vu0UploadData_IaI();
@@ -82,8 +84,8 @@ public:
 private:
   int upload_vu0_data(int dec_count);
   int download_vu0_data(int dec_count);
-  void add_dma_reset();
-  void add_dma_wait();
+  void add_dma_functions();
+  void add_misc_functions();
   void add_draw3d_object_draw();
   void add_copy_vu1_code();
   void add_screen_init_clear();

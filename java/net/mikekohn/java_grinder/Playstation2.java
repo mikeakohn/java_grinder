@@ -84,7 +84,14 @@ abstract public class Playstation2
   //public static void setDisplay2(int dx, int dy, int magnify_x, int magnify_y, int dw, int dh) { }
 
   public static void clearScreen() { }
+
+  /** Wait until the video beam is done drawing this frame (really
+      half frame since the video is interlaced) and is ready to go
+      back to the top of the screen to draw the next frame. */
   public static void waitVsync() { }
+
+  /** Sets which context will be displayed when the video is drawn. */
+  public static void showContext(int context) { }
 
   /** Upload program in code[] to VU0.  The length of code[] must be a
       multiple of 16 bytes. */

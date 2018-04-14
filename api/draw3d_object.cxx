@@ -43,8 +43,7 @@
 
 int draw3d_object(JavaClass *java_class, Generator *generator, char *method_name)
 {
-  //CHECK_FUNC(Constructor,_X)
-  //CHECK_FUNC(Constructor,_I)
+  CHECK_FUNC(setContext,_I)
   CHECK_FUNC(rotateX512,_I)
   CHECK_FUNC(rotateY512,_I)
   CHECK_FUNC(rotateZ512,_I)

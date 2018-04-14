@@ -25,6 +25,7 @@ abstract public class Draw3DObject
    {
    }
 
+   public void setContext(int context) { }
    public void rotateX512(int rx) { }
    public void rotateY512(int ry) { }
    public void rotateZ512(int rz) { }

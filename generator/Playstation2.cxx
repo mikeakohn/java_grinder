@@ -30,8 +30,8 @@ Playstation2::Playstation2()
 
 Playstation2::~Playstation2()
 {
-  add_dma_reset();
-  add_dma_wait();
+  add_dma_functions();
+  add_misc_functions();
   add_screen_init_clear();
   add_draw3d_object_constructor();
   add_draw3d_object_with_texture_constructor();
@@ -148,6 +148,18 @@ int Playstation2::start_init()
     "  or $at, $at, $v0\n"
     "  sd $at, ($v1)\n\n");
 
+  fprintf(out,
+    "  ;; Set context 1 and 2 buffer pointers and such\n"
+    "  jal _dma02_wait\n"
+    "  nop\n"
+    "  li $v0, D2_CHCR\n"
+    "  li $v1, _screen_init\n"
+    "  sw $v1, 0x10($v0)         ; DMA02 ADDRESS\n"
+    "  li $v1, (_screen_init_end - _screen_init) / 16\n"
+    "  sw $v1, 0x20($v0)         ; DMA02 SIZE\n"
+    "  li $v1, 0x101\n"
+    "  sw $v1, ($v0)             ; start\n\n");
+
   add_copy_vu1_code();
 
   return 0;
@@ -225,10 +237,33 @@ int Playstation2::draw3d_object_Constructor_I(int type, bool with_texture)
   return 0;
 }
 
+int Playstation2::draw3d_object_setContext_I()
+{
+  const int object = reg - 2;
+  const int value = reg - 1;
+
+  fprintf(out,
+    "  andi $t%d, $t%d, 1\n"
+    "  sll $t%d, $t%d, 9\n"
+    "  lw $t8, 80($t%d)\n"
+    "  andi $t8, $t8, 0xfdff\n"
+    "  or $t8, $t8, $t%d\n"
+    "  sw $t8, 80($t%d)\n",
+    value, value,
+    value, value,
+    object,
+    value,
+    object);
+
+  reg -= 2;
+
+  return 0;
+}
+
 int Playstation2::draw3d_object_rotateX512_I()
 {
-  int object = reg - 2;
-  int x = reg - 1;
+  const int object = reg - 2;
+  const int x = reg - 1;
 
   fprintf(out,
     "  ;; draw3d_object_rotate512_III()\n"
@@ -262,8 +297,8 @@ int Playstation2::draw3d_object_rotateX512_I()
 
 int Playstation2::draw3d_object_rotateY512_I()
 {
-  int object = reg - 2;
-  int y = reg - 1;
+  const int object = reg - 2;
+  const int y = reg - 1;
 
   fprintf(out,
     "  ;; draw3d_object_rotate512_III()\n"
@@ -297,8 +332,8 @@ int Playstation2::draw3d_object_rotateY512_I()
 
 int Playstation2::draw3d_object_rotateZ512_I()
 {
-  int object = reg - 2;
-  int z = reg - 1;
+  const int object = reg - 2;
+  const int z = reg - 1;
 
   fprintf(out,
     "  ;; draw3d_object_rotate512_III()\n"
@@ -332,10 +367,10 @@ int Playstation2::draw3d_object_rotateZ512_I()
 
 int Playstation2::draw3d_object_setPosition_FFF()
 {
-  int object = reg - 4;
-  int x = reg - 3;
-  int y = reg - 2;
-  int z = reg - 1;
+  const int object = reg - 4;
+  const int x = reg - 3;
+  const int y = reg - 2;
+  const int z = reg - 1;
 
   fprintf(out,
     "  ;; draw3d_object_setPosition_FFF()\n"
@@ -353,11 +388,11 @@ int Playstation2::draw3d_object_setPosition_FFF()
 
 int Playstation2::draw3d_object_setPoint_IFFF()
 {
-  int object = reg - 5;
-  int index = reg - 4;
-  int x = reg - 3;
-  int y = reg - 2;
-  int z = reg - 1;
+  const int object = reg - 5;
+  const int index = reg - 4;
+  const int x = reg - 3;
+  const int y = reg - 2;
+  const int z = reg - 1;
 
   fprintf(out,
     "  ;; draw3d_object_setPointPosition_IFFF()\n"
@@ -381,9 +416,9 @@ int Playstation2::draw3d_object_setPoint_IFFF()
 
 int Playstation2::draw3d_object_setPointColor_II()
 {
-  int object = reg - 3;
-  int index = reg - 2;
-  int color = reg - 1;
+  const int object = reg - 3;
+  const int index = reg - 2;
+  const int color = reg - 1;
 
   fprintf(out,
     "  ;; draw3d_object_setPointColor_II()\n"
@@ -403,8 +438,8 @@ int Playstation2::draw3d_object_setPointColor_II()
 
 int Playstation2::draw3d_object_setPoints_aF()
 {
-  int array = reg - 1;
-  int object = reg - 2;
+  const int array = reg - 1;
+  const int object = reg - 2;
 
   fprintf(out,
     "  ;; draw3d_object_setPoints_aF()\n"
@@ -444,8 +479,8 @@ int Playstation2::draw3d_object_setPoints_aF()
 
 int Playstation2::draw3d_object_setPointColors_aI()
 {
-  int array = reg - 1;
-  int object = reg - 2;
+  const int array = reg - 1;
+  const int object = reg - 2;
 
   fprintf(out,
     "  ;; draw3d_object_setPointColors_aI()\n"
@@ -477,11 +512,11 @@ int Playstation2::draw3d_object_setPointColors_aI()
 
 int Playstation2::draw3d_object_with_texture_setPoint_IFFF()
 {
-  int object = reg - 5;
-  int index = reg - 4;
-  int x = reg - 3;
-  int y = reg - 2;
-  int z = reg - 1;
+  const int object = reg - 5;
+  const int index = reg - 4;
+  const int x = reg - 3;
+  const int y = reg - 2;
+  const int z = reg - 1;
 
   fprintf(out,
     "  ;; draw3d_object_with_texture_setPointPosition_IFFF()\n"
@@ -509,9 +544,9 @@ int Playstation2::draw3d_object_with_texture_setPoint_IFFF()
 
 int Playstation2::draw3d_object_with_texture_setPointColor_II()
 {
-  int object = reg - 3;
-  int index = reg - 2;
-  int color = reg - 1;
+  const int object = reg - 3;
+  const int index = reg - 2;
+  const int color = reg - 1;
 
   fprintf(out,
     "  ;; draw3d_object_with_texture_setPointColor_II()\n"
@@ -535,8 +570,8 @@ int Playstation2::draw3d_object_with_texture_setPointColor_II()
 
 int Playstation2::draw3d_object_with_texture_setPoints_aF()
 {
-  int array = reg - 1;
-  int object = reg - 2;
+  const int array = reg - 1;
+  const int object = reg - 2;
 
   fprintf(out,
     "  ;; draw3d_object_with_texture_setPoints_aF()\n"
@@ -575,8 +610,8 @@ int Playstation2::draw3d_object_with_texture_setPoints_aF()
 
 int Playstation2::draw3d_object_with_texture_setPointColors_aI()
 {
-  int array = reg - 1;
-  int object = reg - 2;
+  const int array = reg - 1;
+  const int object = reg - 2;
 
   fprintf(out,
     "  ;; draw3d_object_with_texture_setPointColors_aI()\n"
@@ -607,10 +642,10 @@ int Playstation2::draw3d_object_with_texture_setPointColors_aI()
 
 int Playstation2::draw3d_object_setTextureCoord_IFF()
 {
-  int object = reg - 4;
-  int index = reg - 3;
-  int coord_s = reg - 2;
-  int coord_t = reg - 1;
+  const int object = reg - 4;
+  const int index = reg - 3;
+  const int coord_s = reg - 2;
+  const int coord_t = reg - 1;
 
   fprintf(out,
     "  ;; draw3d_object_setTextureCoord_IFF()\n"
@@ -636,8 +671,8 @@ int Playstation2::draw3d_object_setTextureCoord_IFF()
 
 int Playstation2::draw3d_object_setTextureCoords_aF()
 {
-  int array = reg - 1;
-  int object = reg - 2;
+  const int array = reg - 1;
+  const int object = reg - 2;
 
   fprintf(out,
     "  ;; draw3d_object_setTextureCoords_aF()\n"
@@ -672,7 +707,7 @@ int Playstation2::draw3d_object_setTextureCoords_aF()
 
 int Playstation2::draw3d_object_disableGouraudShading()
 {
-  int object = reg - 1;
+  const int object = reg - 1;
 
   fprintf(out,
     "  ;; disableGouraudShading()\n"
@@ -688,7 +723,7 @@ int Playstation2::draw3d_object_disableGouraudShading()
 
 int Playstation2::draw3d_object_enableGouraudShading()
 {
-  int object = reg - 1;
+  const int object = reg - 1;
 
   fprintf(out,
     "  ;; enableGouraudShading()\n"
@@ -704,7 +739,7 @@ int Playstation2::draw3d_object_enableGouraudShading()
 
 int Playstation2::draw3d_object_disableFogging()
 {
-  int object = reg - 1;
+  const int object = reg - 1;
 
   fprintf(out,
     "  ;; disableFogging()\n"
@@ -720,7 +755,7 @@ int Playstation2::draw3d_object_disableFogging()
 
 int Playstation2::draw3d_object_enableFogging()
 {
-  int object = reg - 1;
+  const int object = reg - 1;
 
   fprintf(out,
     "  ;; enableFogging()\n"
@@ -736,7 +771,7 @@ int Playstation2::draw3d_object_enableFogging()
 
 int Playstation2::draw3d_object_disableTexture()
 {
-  int object = reg - 1;
+  const int object = reg - 1;
 
   fprintf(out,
     "  ;; disableTexture()\n"
@@ -752,7 +787,7 @@ int Playstation2::draw3d_object_disableTexture()
 
 int Playstation2::draw3d_object_enableTexture()
 {
-  int object = reg - 1;
+  const int object = reg - 1;
 
   fprintf(out,
     "  ;; enableTexture()\n"
@@ -768,7 +803,7 @@ int Playstation2::draw3d_object_enableTexture()
 
 int Playstation2::draw3d_object_disableAlphaBlending()
 {
-  int object = reg - 1;
+  const int object = reg - 1;
 
   fprintf(out,
     "  ;; disableAlphaBlending()\n"
@@ -784,7 +819,7 @@ int Playstation2::draw3d_object_disableAlphaBlending()
 
 int Playstation2::draw3d_object_enableAlphaBlending()
 {
-  int object = reg - 1;
+  const int object = reg - 1;
 
   fprintf(out,
     "  ;; enableAlphaBlending()\n"
@@ -800,7 +835,7 @@ int Playstation2::draw3d_object_enableAlphaBlending()
 
 int Playstation2::draw3d_object_disableAntialiasing()
 {
-  int object = reg - 1;
+  const int object = reg - 1;
 
   fprintf(out,
     "  ;; disableAntialiasing()\n"
@@ -816,7 +851,7 @@ int Playstation2::draw3d_object_disableAntialiasing()
 
 int Playstation2::draw3d_object_enableAntialiasing()
 {
-  int object = reg - 1;
+  const int object = reg - 1;
 
   fprintf(out,
     "  ;; enableAntialiasing()\n"
@@ -832,7 +867,7 @@ int Playstation2::draw3d_object_enableAntialiasing()
 
 int Playstation2::draw3d_object_draw()
 {
-  int object = reg - 1;
+  const int object = reg - 1;
 
   fprintf(out, "  ;; draw3d_object_draw()\n");
   fprintf(out, "  move $a0, $t%d\n", object);
@@ -997,7 +1032,7 @@ int Playstation2::draw3d_texture24_setPixels_IaI()
 
 int Playstation2::draw3d_texture_enableTransparency()
 {
-  int object = reg - 1;
+  const int object = reg - 1;
 
   fprintf(out,
     "  ;; enableTransparency()\n"
@@ -1013,7 +1048,7 @@ int Playstation2::draw3d_texture_enableTransparency()
 
 int Playstation2::draw3d_texture_disableTransparency()
 {
-  int object = reg - 1;
+  const int object = reg - 1;
 
   fprintf(out,
     "  ;; disableTransparency()\n"
@@ -1029,7 +1064,7 @@ int Playstation2::draw3d_texture_disableTransparency()
 
 int Playstation2::draw3d_texture_upload()
 {
-  int object = reg - 1;
+  const int object = reg - 1;
 
   fprintf(out,
     "  ;; draw3d_texture_upload()\n"
@@ -1055,14 +1090,14 @@ int Playstation2::playstation2_clearScreen()
   // at least part of it should be since it clears the display.
   fprintf(out,
     "  ;; Draw a black square over the entire screen\n"
-    "  move $at, $ra\n"
     "  jal _dma02_wait\n"
     "  nop\n"
-    "  move $ra, $at\n"
     "  li $v0, D2_CHCR\n"
-    "  li $v1, _screen_init_clear\n"
+    //"  li $v1, _screen_init_1_clear\n"
+    "  li $v1, _current_context\n"
+    "  lw $v1, ($v1)\n"
     "  sw $v1, 0x10($v0)         ; DMA02 ADDRESS\n"
-    "  li $v1, (_screen_init_clear_end - _screen_init_clear) / 16\n"
+    "  li $v1, (_screen_init_1_clear_end - _screen_init_1_clear) / 16\n"
     "  sw $v1, 0x20($v0)         ; DMA02 SIZE\n"
     "  li $v1, 0x101\n"
     "  sw $v1, ($v0)             ; start\n\n");
@@ -1091,9 +1126,25 @@ int Playstation2::playstation2_waitVsync()
   return 0;
 }
 
+int Playstation2::playstation2_showContext_I()
+{
+  const int value = reg - 1;
+
+  fprintf(out,
+    "  ;; showContext_I()\n"
+    "  move a0, t%d\n"
+    "  jal _show_context\n"
+    "  nop\n",
+    value);
+
+  reg -= 1;
+
+  return -1;
+}
+
 int Playstation2::playstation2_vu0UploadCode_aB()
 {
-  int array = reg - 1;
+  const int array = reg - 1;
 
   fprintf(out,
     "  ;; vu0UploadCode_aB()\n"
@@ -1304,8 +1355,8 @@ int Playstation2::playstation2_randomNext()
 
 int Playstation2::upload_vu0_data(int dec_count)
 {
-  int array = reg - 1;
-  int index = reg - 2;
+  const int array = reg - 1;
+  const int index = reg - 2;
 
   fprintf(out,
     "  li $v0, VU0_VU_MEM\n"
@@ -1337,8 +1388,8 @@ int Playstation2::upload_vu0_data(int dec_count)
 
 int Playstation2::download_vu0_data(int dec_count)
 {
-  int array = reg - 1;
-  int index = reg - 2;
+  const int array = reg - 1;
+  const int index = reg - 2;
 
   fprintf(out,
     "  li $v0, VU0_VU_MEM\n"
@@ -1368,7 +1419,7 @@ int Playstation2::download_vu0_data(int dec_count)
   return 0;
 }
 
-void Playstation2::add_dma_reset()
+void Playstation2::add_dma_functions()
 {
   fprintf(out,
     "_dma_reset:\n"
@@ -1414,10 +1465,7 @@ void Playstation2::add_dma_reset()
 
     "  jr $ra\n"
     "  nop\n\n");
-}
 
-void Playstation2::add_dma_wait()
-{
   fprintf(out,
     "_dma00_wait:\n"
     "  li $v1, D0_CHCR\n"
@@ -1443,6 +1491,30 @@ void Playstation2::add_dma_wait()
     "  andi $v0, $v0, 0x100\n"
     "  bnez $v0, _dma02_wait\n"
     "  nop\n"
+    "  jr $ra\n"
+    "  nop\n\n");
+}
+
+void Playstation2::add_misc_functions()
+{
+  fprintf(out,
+    "_show_context:\n"
+    "  andi $a0, $a0, 1\n"
+    "  li $t9, GS_DISPFB2\n"
+    "  li $v0, _current_context\n"
+    "  bne $a0, $0, _show_context_2\n"
+    "  nop\n"
+    "  li $v1, _screen_init_clear_1\n"
+    "  li $t8, SETREG_DISPFB(0, 10, 0, 0, 0)\n"
+    "  j _show_context_1\n"
+    "  nop\n"
+    "_show_context_2:\n"
+    "  nop\n"
+    "  li $v1, _screen_init_clear_2\n"
+    "  li $t8, SETREG_DISPFB(560, 10, 0, 0, 0)\n"
+    "_show_context_1:\n"
+    "  sw $v1, ($v0)\n"
+    "  sd $t8, ($t9)\n"
     "  jr $ra\n"
     "  nop\n\n");
 }
@@ -1502,23 +1574,48 @@ void Playstation2::add_screen_init_clear()
 {
   fprintf(out,
     ".align 128\n"
-    "_screen_init_clear:\n"
-    "  dc64 GIF_TAG(14, 1, 0, 0, FLG_PACKED, 1), REG_A_D\n"
-    "  dc64 0x00a0000, REG_FRAME_1            ; framebuffer width = 640/64\n"
-    "  dc64 0x8c, REG_ZBUF_1              ; 0-8 Zbuffer base, 24-27 Z format (32bit)\n"
+    "_screen_init:\n"
+    "  dc64 GIF_TAG(11, 1, 0, 0, FLG_PACKED, 1), REG_A_D\n"
+    "  dc64 SETREG_FRAME(0, 10, 0, 0), REG_FRAME_1\n"
+    "  dc64 SETREG_FRAME(560, 10, 0, 0), REG_FRAME_2\n"
+    "  dc64 SETREG_ZBUF(280, 0, 0), REG_ZBUF_1\n"
+    "  dc64 SETREG_ZBUF(840, 0, 0), REG_ZBUF_2\n"
     "  dc64 SETREG_XYOFFSET(1728 << 4, 1936 << 4), REG_XYOFFSET_1\n"
+    "  dc64 SETREG_XYOFFSET(1728 << 4, 1936 << 4), REG_XYOFFSET_2\n"
+    "  dc64 SETREG_SCISSOR(0,639,0,447), REG_SCISSOR_2\n"
     "  dc64 SETREG_SCISSOR(0,639,0,447), REG_SCISSOR_1\n"
-    "  dc64 1, REG_PRMODECONT                 ; refer to prim attributes\n"
+    "  dc64 1, REG_PRMODECONT\n"
     "  dc64 1, REG_COLCLAMP\n"
-    "  dc64 0, REG_DTHE                       ; Dither off\n"
-    "  dc64 0x70000, REG_TEST_1\n"
+    "  dc64 0, REG_DTHE\n"
+    "_screen_init_end:\n\n");
+
+  fprintf(out,
+    ".align 128\n"
+    "_screen_init_clear_1:\n"
+    "  dc64 GIF_TAG(6, 1, 0, 0, FLG_PACKED, 1), REG_A_D\n"
     "  dc64 0x30000, REG_TEST_1\n"
-    "  dc64 6, REG_PRIM\n"
-    "  dc64 0x3f80_0000_0000_0000, REG_RGBAQ  ; Background RGBA\n"
+    "  dc64 SETREG_PRIM(PRIM_SPRITE, 0, 0, 0, 0, 0, 0, 0, 0), REG_PRIM\n"
+    "  dc64 0x3f80_0000_0000_0000, REG_RGBAQ\n"
     "  dc64 SETREG_XYZ2(1728 << 4, 1936 << 4, 0), REG_XYZ2\n"
     "  dc64 SETREG_XYZ2(2368 << 4, 2384 << 4, 0), REG_XYZ2\n"
     "  dc64 0x70000, REG_TEST_1\n"
-    "_screen_init_clear_end:\n\n");
+    "_screen_init_clear_1_end:\n\n");
+
+  fprintf(out,
+    ".align 128\n"
+    "_screen_init_clear_2:\n"
+    "  dc64 GIF_TAG(6, 1, 0, 0, FLG_PACKED, 1), REG_A_D\n"
+    "  dc64 0x30000, REG_TEST_2\n"
+    "  dc64 SETREG_PRIM(PRIM_SPRITE, 0, 0, 0, 0, 0, 0, 1, 0), REG_PRIM\n"
+    "  dc64 0x3f80_0000_0000_0000, REG_RGBAQ\n"
+    "  dc64 SETREG_XYZ2(1728 << 4, 1936 << 4, 0), REG_XYZ2\n"
+    "  dc64 SETREG_XYZ2(2368 << 4, 2384 << 4, 0), REG_XYZ2\n"
+    "  dc64 0x70000, REG_TEST_2\n"
+    "_screen_init_clear_2_end:\n\n");
+
+  fprintf(out,
+    "_current_context:\n"
+    "  dc32 _screen_init_clear_1\n");
 }
 
 void Playstation2::add_primitive_gif_tag()

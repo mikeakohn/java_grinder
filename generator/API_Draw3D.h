@@ -25,6 +25,7 @@ class API_Draw3D
 public:
   virtual int draw3d_object_Constructor_X(int type, bool with_texture) { return -1; }
   virtual int draw3d_object_Constructor_I(int type, bool with_texture) { return -1; }
+  virtual int draw3d_object_setContext_I() { return -1; }
   virtual int draw3d_object_rotateX512_I() { return -1; }
   virtual int draw3d_object_rotateY512_I() { return -1; }
   virtual int draw3d_object_rotateZ512_I() { return -1; }
