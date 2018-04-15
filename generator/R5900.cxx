@@ -983,28 +983,29 @@ int R5900::compare_floats(int cond)
   const int float1 = reg - 1;
 
   fprintf(out,
-    "  ; compare_floats(%d)\n"
+    "  ; compare_floats(%s cond=%d)\n"
     "  mtc1 $t%d, $f0\n"
     "  mtc1 $t%d, $f1\n"
-    "  li $t%d, 1\n",
+    "  li $t%d, 0\n",
+    (cond == 0) ? "cmpl" : "cmpg",
     cond,
     float0,
     float1,
     reg - 2);
 
-  if (cond == 0)
-  {
-    fprintf(out, "  c.lt.s $f0, $f1\n");
-  }
-    else
-  {
-    fprintf(out, "  c.lt.s $f1, $f0\n");
-  }
+  fprintf(out,
+    "  c.eq.s $f0, $f1\n"
+    "  bc1t _compare_floats_%d\n",
+    label_count);
+
+  fprintf(out, "  li $t%d, -1\n", float0);
+  fprintf(out, "  c.lt.s $f0, $f1\n");
 
   fprintf(out,
-    "  bc1f not_less_than_%d\n"
-    "  li $t%d, -1\n"
-    "not_less_than_%d:\n",
+    "  bc1t _compare_floats_%d\n"
+    "  nop\n"
+    "  li $t%d, 1\n"
+    "_compare_floats_%d:\n",
     label_count,
     reg - 2,
     label_count);
