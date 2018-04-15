@@ -201,6 +201,11 @@ int R5900::push_local_var_ref(int index)
   return push_local_var_int(index);
 }
 
+int R5900::push_local_var_float(int index)
+{
+  return push_local_var_int(index);
+}
+
 int R5900::push_ref_static(const char *name, int index)
 {
   if (reg < reg_max)
@@ -413,7 +418,7 @@ int R5900::pop_local_var_int(int index)
 {
   if (stack > 0)
   {
-    STACK_POP(8); 
+    STACK_POP(8);
     fprintf(out, "  sw $t8, %d($fp) ; local_%d\n", LOCALS(index), index);
   }
     else
@@ -426,6 +431,11 @@ int R5900::pop_local_var_int(int index)
 }
 
 int R5900::pop_local_var_ref(int index)
+{
+  return pop_local_var_int(index);
+}
+
+int R5900::pop_local_var_float(int index)
 {
   return pop_local_var_int(index);
 }
@@ -778,15 +788,16 @@ int R5900::integer_to_short()
 int R5900::add_float()
 {
   fprintf(out,
+    "  ; add_float()\n"
     "  mtc1 $t%d, $f0\n"
     "  mtc1 $t%d, $f1\n"
     "  add.s $f0, $f0, $f1\n"
-    "  mfc1 $f0, $t%d\n",
+    "  mfc1 $t%d, $f0\n",
     reg - 2,
     reg - 1,
     reg - 2);
 
-  reg =- 1;
+  reg -= 1;
 
   return 0;
 }
@@ -797,12 +808,12 @@ int R5900::sub_float()
     "  mtc1 $t%d, $f0\n"
     "  mtc1 $t%d, $f1\n"
     "  sub.s $f0, $f0, $f1\n"
-    "  mfc1 $f0, $t%d\n",
+    "  mfc1 $t%d, $f0\n",
     reg - 2,
     reg - 1,
     reg - 2);
 
-  reg =- 1;
+  reg -= 1;
 
   return 0;
 }
@@ -813,12 +824,12 @@ int R5900::mul_float()
     "  mtc1 $t%d, $f0\n"
     "  mtc1 $t%d, $f1\n"
     "  mul.s $f0, $f0, $f1\n"
-    "  mfc1 $f0, $t%d\n",
+    "  mfc1 $t%d, $f0\n",
     reg - 2,
     reg - 1,
     reg - 2);
 
-  reg =- 1;
+  reg -= 1;
 
   return 0;
 }
@@ -829,12 +840,12 @@ int R5900::div_float()
     "  mtc1 $t%d, $f0\n"
     "  mtc1 $t%d, $f1\n"
     "  div.s $f0, $f0, $f1\n"
-    "  mfc1 $f0, $t%d\n",
+    "  mfc1 $t%d, $f0\n",
     reg - 2,
     reg - 1,
     reg - 2);
 
-  reg =- 1;
+  reg -= 1;
 
   return 0;
 }
@@ -844,7 +855,7 @@ int R5900::neg_float()
   fprintf(out,
     "  mtc1 $t%d, $f0\n"
     "  neg.s $f0, $f0\n"
-    "  mfc1 $f0, $t%d\n",
+    "  mfc1 $t%d, $f0\n",
     reg - 1,
     reg - 1);
 
@@ -856,7 +867,7 @@ int R5900::float_to_integer()
   fprintf(out,
     "  mtc1 $t%d, $f0\n"
     "  cvt.w.s $f0, $f0\n"
-    "  mfc1 $f0, $t%d\n",
+    "  mfc1 $t%d, $f0\n",
     reg - 1,
     reg - 1);
 
@@ -868,7 +879,7 @@ int R5900::integer_to_float()
   fprintf(out,
     "  mtc1 $t%d, $f0\n"
     "  cvt.s.w $f0, $f0\n"
-    "  mfc1 $f0, $t%d\n",
+    "  mfc1 $t%d, $f0\n",
     reg - 1,
     reg - 1);
 
@@ -964,6 +975,44 @@ int R5900::jump_cond_integer(const char *label, int cond, int distance)
   }
 
   return -1;
+}
+
+int R5900::compare_floats(int cond)
+{
+  const int float0 = reg - 2;
+  const int float1 = reg - 1;
+
+  fprintf(out,
+    "  ; compare_floats(%d)\n"
+    "  mtc1 $t%d, $f0\n"
+    "  mtc1 $t%d, $f1\n"
+    "  li $t%d, 1\n",
+    cond,
+    float0,
+    float1,
+    reg - 2);
+
+  if (cond == 0)
+  {
+    fprintf(out, "  c.lt.s $f0, $f1\n");
+  }
+    else
+  {
+    fprintf(out, "  c.lt.s $f1, $f0\n");
+  }
+
+  fprintf(out,
+    "  bc1f not_less_than_%d\n"
+    "  li $t%d, -1\n"
+    "not_less_than_%d:\n",
+    label_count,
+    reg - 2,
+    label_count);
+
+  label_count++;
+  reg -= 1;
+
+  return 0;
 }
 
 int R5900::ternary(int cond, int value_true, int value_false)
@@ -1273,12 +1322,12 @@ int R5900::new_array(uint8_t type)
   fprintf(out, "  ; new_array(%d)\n", type);
 
   if (stack > 0)
-  { 
+  {
     STACK_POP(8);
     t = 8;
   }
     else
-  { 
+  {
     t = reg - 1;
   }
 
@@ -1336,17 +1385,17 @@ int R5900::insert_array(const char *name, int32_t *data, int len, uint8_t type)
   if (type == TYPE_SHORT)
   {
     return insert_dw(name, data, len, TYPE_INT);
-  } 
+  }
     else
   if (type == TYPE_INT)
   {
     return insert_dc32(name, data, len, TYPE_INT);
-  } 
+  }
     else
   if (type == TYPE_FLOAT)
   {
     return insert_float(name, data, len, TYPE_INT);
-  } 
+  }
 
   return -1;
 }
@@ -1365,7 +1414,7 @@ int R5900::push_array_length()
     fprintf(out, "  lw $t8, 0($sp)\n"); \
     fprintf(out, "  lw $t8, -4($t8)\n");
     fprintf(out, "  sw $t8, 0($sp)\n"); \
-    STACK_PUSH(8); 
+    STACK_PUSH(8);
   }
     else
   {
@@ -1381,7 +1430,7 @@ int R5900::push_array_length(const char *name, int field_id)
 
   if (reg >= reg_max)
   {
-    STACK_PUSH(8); 
+    STACK_PUSH(8);
   }
     else
   {

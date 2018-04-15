@@ -200,7 +200,7 @@ struct table_java_instr_t table_java_instr[] =
   { "invokestatic", 3, 0, OP_TYPE_UNKNOWN }, // invokestatic (0xb8)
   { "invokeinterface", 4, 0, OP_TYPE_UNKNOWN }, // invokeinterface (0xb9)
   { "invokedynamic", 4, 0, OP_TYPE_UNKNOWN }, // invokedynamic (0xba)
-  { "new", 1, 0, OP_TYPE_UNKNOWN }, // new (0xbb)
+  { "new", 3, 0, OP_TYPE_UNKNOWN }, // new (0xbb)
   { "newarray", 2, 0, OP_TYPE_UNKNOWN }, // newarray (0xbc)
   { "anewarray", 3, 0, OP_TYPE_UNKNOWN }, // anewarray (0xbd)
   { "arraylength", 1, 0, OP_TYPE_UNKNOWN }, // arraylength (0xbe)

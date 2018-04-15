@@ -208,6 +208,8 @@ int Playstation2::new_object(const char *object_name, int field_count)
      return -1;
   }
 
+  reg++;
+
   return 0;
 }
 
@@ -277,7 +279,7 @@ int Playstation2::draw3d_object_rotateX512_I()
   const int x = reg - 1;
 
   fprintf(out,
-    "  ;; draw3d_object_rotate512_III()\n"
+    "  ;; draw3d_object_rotateX512_I()\n"
     "  andi $t%d, $t%d, 511\n"
     "  sll $t%d, $t%d, 2\n"
     "  li $v1, _sin_table_512\n"
@@ -312,7 +314,7 @@ int Playstation2::draw3d_object_rotateY512_I()
   const int y = reg - 1;
 
   fprintf(out,
-    "  ;; draw3d_object_rotate512_III()\n"
+    "  ;; draw3d_object_rotateY512_I()\n"
     "  andi $t%d, $t%d, 511\n"
     "  sll $t%d, $t%d, 2\n"
     "  li $v1, _sin_table_512\n"
@@ -347,7 +349,7 @@ int Playstation2::draw3d_object_rotateZ512_I()
   const int z = reg - 1;
 
   fprintf(out,
-    "  ;; draw3d_object_rotate512_III()\n"
+    "  ;; draw3d_object_rotateZ512_I()\n"
     "  andi $t%d, $t%d, 511\n"
     "  sll $t%d, $t%d, 2\n"
     "  li $v1, _sin_table_512\n"
