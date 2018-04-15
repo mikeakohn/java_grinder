@@ -1664,6 +1664,15 @@ void Playstation2::add_texture_gif_tag()
   // 640*480*3 = 921600
   // 0x400_000 - 921600 = 0x31f000
 
+  // 640*224*4 = 573,440
+  // zbuf = 140 * 20488 = 286,720 ?
+  // 640*224*2 = 286,720
+  // Context 1 FB = 0
+  // Context 1 Z  = 573440
+  // Context 2 FB = 1146880
+  // Context 2 Z  = 1720320
+  // Textures     = 2293760 (currently using 2867200 / 64 / 4)
+
   fprintf(out,
     ".align 128\n"
     "_texture16_gif_tag:\n"
