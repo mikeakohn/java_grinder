@@ -1603,8 +1603,8 @@ void Playstation2::add_screen_init_clear()
     "  dc64 SETREG_FRAME(560, 10, 0, 0), REG_FRAME_2\n"
     "  dc64 SETREG_ZBUF(280, 0, 0), REG_ZBUF_1\n"
     "  dc64 SETREG_ZBUF(840, 0, 0), REG_ZBUF_2\n"
-    "  dc64 SETREG_XYOFFSET(1728 << 4, 1936 << 4), REG_XYOFFSET_1\n"
-    "  dc64 SETREG_XYOFFSET(1728 << 4, 1936 << 4), REG_XYOFFSET_2\n"
+    "  dc64 SETREG_XYOFFSET(1000 << 4, 1000 << 4), REG_XYOFFSET_1\n"
+    "  dc64 SETREG_XYOFFSET(1000 << 4, 1000 << 4), REG_XYOFFSET_2\n"
     "  dc64 SETREG_SCISSOR(0,639,0,447), REG_SCISSOR_2\n"
     "  dc64 SETREG_SCISSOR(0,639,0,447), REG_SCISSOR_1\n"
     "  dc64 1, REG_PRMODECONT\n"
@@ -1619,8 +1619,8 @@ void Playstation2::add_screen_init_clear()
     "  dc64 0x30000, REG_TEST_1\n"
     "  dc64 SETREG_PRIM(PRIM_SPRITE, 0, 0, 0, 0, 0, 0, 0, 0), REG_PRIM\n"
     "  dc64 0x3f80_0000_0000_0000, REG_RGBAQ\n"
-    "  dc64 SETREG_XYZ2(1728 << 4, 1936 << 4, 0), REG_XYZ2\n"
-    "  dc64 SETREG_XYZ2(2368 << 4, 2384 << 4, 0), REG_XYZ2\n"
+    "  dc64 SETREG_XYZ2(1000 << 4, 1000 << 4, 0), REG_XYZ2\n"
+    "  dc64 SETREG_XYZ2(1640 << 4, 1448 << 4, 0), REG_XYZ2\n"
     "  dc64 0x70000, REG_TEST_1\n"
     "_screen_init_clear_1_end:\n\n");
 
@@ -1631,8 +1631,8 @@ void Playstation2::add_screen_init_clear()
     "  dc64 0x30000, REG_TEST_2\n"
     "  dc64 SETREG_PRIM(PRIM_SPRITE, 0, 0, 0, 0, 0, 0, 1, 0), REG_PRIM\n"
     "  dc64 0x3f80_0000_0000_0000, REG_RGBAQ\n"
-    "  dc64 SETREG_XYZ2(1728 << 4, 1936 << 4, 0), REG_XYZ2\n"
-    "  dc64 SETREG_XYZ2(2368 << 4, 2384 << 4, 0), REG_XYZ2\n"
+    "  dc64 SETREG_XYZ2(1000 << 4, 1000 << 4, 0), REG_XYZ2\n"
+    "  dc64 SETREG_XYZ2(1648 << 4, 1448 << 4, 0), REG_XYZ2\n"
     "  dc64 0x70000, REG_TEST_2\n"
     "_screen_init_clear_2_end:\n\n");
 
