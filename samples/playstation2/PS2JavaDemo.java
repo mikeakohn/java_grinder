@@ -48,10 +48,8 @@ public class PS2JavaDemo
     int n;
     int[] vu0_params = new int[4];
     int[] vu0_data = new int[640];
-    float z = 2048.0f;
-    float dz = 1.0f;
-    //float y = 1100.0f;
-    //float dy = 1.0f;
+    float z = 0.0f;
+    float dz = 10.0f;
 
     Draw3DTriangle triangle = new Draw3DTriangle(3);
     Draw3DTexture24 texture = new Draw3DTexture24(64, 64);
@@ -171,20 +169,14 @@ public class PS2JavaDemo
 
       // Draw the same square again further up with no rotation, but
       // move it forward and back.
-      //square.setPosition(1500.0f, 1100.0f, z);
-      square.setPosition(1500.0f, 1100.0f, z);
+      square.setPosition(1500.0f, 1100.0f, 2048.0f + z);
       square.rotateX512(0);
       square.draw();
 
-      //y = y + dy;
-
-      //if (y < 1090.0f) { dy = 1.0f; }
-      //if (y > 1110.0f) { dy = -1.0f; }
-
       z = z + dz;
 
-      if (z < 2040.0f) { dz = 1.0f; }
-      if (z > 2056.0f) { dz = -1.0f; }
+      if (z < -500.0f) { dz = 10.0f; }
+      if (z > 500.0f) { dz = -10.0f; }
 
       // Wait until the video beam is done drawing the last frame.
       Playstation2.waitVsync();

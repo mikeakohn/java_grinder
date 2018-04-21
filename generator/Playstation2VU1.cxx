@@ -163,9 +163,9 @@ void Playstation2::add_vu1_code()
   "  nop                         move.xyz vf10, vf31\n"
   "skip_rot_z:\n\n"
 
-  "  ;; Transpose point by { 0, dz, dy, dx } vector.\n"
+  "  ;; Transpose point by { 0, dz, 0, 0 } vector.\n"
   "  ;; Also subtract 1 from count.\n"
-  "  add.xyz vf10, vf10, vf02    isubiu vi03, vi03, 1\n\n"
+  "  add.z   vf10, vf10, vf02    isubiu vi03, vi03, 1\n\n"
 
   "  ;; Project 3D (x,y,z) to 2D (x,y)\n"
   "  ;; x = -d * (x / z)\n"
@@ -176,9 +176,14 @@ void Playstation2::add_vu1_code()
   "  nop                         ercpr P, vf10z\n"
   "  nop                         waitp\n"
   "  nop                         mfp.xy vf22, P\n"
-  "  itof0.xy vf20, vf20         nop\n"
+  "  itof0.xy vf20, vf20         iaddiu vi13, vi00, 4096\n"
   "  mul.xy vf10, vf10, vf20     nop\n"
-  "  mul.xy vf10, vf10, vf22     nop\n\n"
+  "  mul.xy vf10, vf10, vf22     mfir.z vf20, vi13\n"
+  "  itof0.z vf20, vf20          nop\n"
+  "  sub.z vf10, vf20, vf10      nop\n\n"
+
+  "  ;; Transpose point by { 0, 0, dy, dx } vector.\n"
+  "  add.xy vf10, vf10, vf02    nop\n\n"
 
   "  ;; Convert to X and Y to fixed point 12:4 and Z to just an integer.\n"
   "  ftoi4.xy vf10, vf10         nop\n"
