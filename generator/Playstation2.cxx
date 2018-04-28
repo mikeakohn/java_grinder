@@ -1001,16 +1001,19 @@ int Playstation2::draw3d_texture16_setPixelsRLE16_IaB()
     "  addu $t%d, $t%d, $t%d\n"
     "  lw $t9, -4($t%d)\n"
     "draw3d_textureRLE16_setPixels_%d:\n"
-    "  lh $t8, 0($t%d)\n"
+    "  lbu $t8, 0($t%d)\n"
     "  lbu $v0, 1($t%d)\n"
     "  lbu $v1, 2($t%d)\n"
     "  sll $v1, $v1, 8\n"
     "  or $v0, $v0, $v1\n"
-    "  sh $at, 0($t%d)\n"
-    "  addiu $t%d, $t%d, 3\n"
+    "draw3d_textureRLE16_setPixels_loop_%d:\n"
+    "  sh $v0, 0($t%d)\n"
     "  addiu $t%d, $t%d, 2\n"
-    "  addiu $t9, $t9, -1\n"
-    "  bne $t9, $0, draw3d_textureRLE16_setPixels_%d\n"
+    "  addiu $t8, $t8, -1\n"
+    "  bne $t8, $0, draw3d_textureRLE16_setPixels_loop_%d\n"
+    "  addiu $t9, $t9, -3\n"
+    "  addiu $t%d, $t%d, 3\n"
+    "  bgtz $t9, draw3d_textureRLE16_setPixels_%d\n"
     "  nop\n",
     reg_index, reg_index,
     reg_object_ref, reg_object_ref,
@@ -1020,9 +1023,11 @@ int Playstation2::draw3d_texture16_setPixelsRLE16_IaB()
     reg_image_array,
     reg_image_array,
     reg_image_array,
+    label_count,
     reg_object_ref,
-    reg_image_array, reg_image_array,
     reg_object_ref, reg_object_ref,
+    label_count,
+    reg_image_array, reg_image_array,
     label_count);
 
   return 0;
@@ -1718,7 +1723,7 @@ void Playstation2::add_texture_gif_tag()
     ".align 128\n"
     "_texture16_gif_tag:\n"
     "  dc64 GIF_TAG(11, 0, 0, 0, FLG_PACKED, 1), REG_A_D\n"
-    "  dc64 SETREG_BITBLTBUF(0, 0, FMT_PSMCT16, 0x2bc0, 0, FMT_PSMCT16), REG_BITBLTBUF\n"
+    "  dc64 SETREG_BITBLTBUF(0, 0, 0, 0x2bc0, 0, FMT_PSMCT16), REG_BITBLTBUF\n"
     "  dc64 SETREG_TRXREG(0, 0), REG_TRXREG\n"
     "  dc64 SETREG_TRXPOS(0, 0, 0, 0, DIR_UL_LR), REG_TRXPOS\n"
     "  dc64 SETREG_TEXA(0, 0, 0), REG_TEXA\n"
