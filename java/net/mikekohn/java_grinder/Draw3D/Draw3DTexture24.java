@@ -20,5 +20,9 @@ public class Draw3DTexture24 extends Draw3DTexture
    public Draw3DTexture24(int width, int height)
    {
    }
+
+   /** Sets the color of a multiple pixels in a texture buffer at the index
+       (x + (y * width)) provided. */
+   public void setPixels(int index, int[] pixels) { }
 }
 

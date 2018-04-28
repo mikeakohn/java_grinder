@@ -69,7 +69,8 @@ int draw3d_texture(JavaClass *java_class, Generator *generator, char *function, 
 int draw3d_texture16(JavaClass *java_class, Generator *generator, char *method_name)
 {
   CHECK_FUNC_16(setPixel,_II)
-  CHECK_FUNC_16(setPixels,_IaI)
+  CHECK_FUNC_16(setPixels,_IaS)
+  CHECK_FUNC_16(setPixelsRLE16,_IaB)
 
   return -1;
 }

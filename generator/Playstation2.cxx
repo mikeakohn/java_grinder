@@ -696,9 +696,9 @@ int Playstation2::draw3d_object_setTextureCoords_aF()
     "  sw $at, 0($t%d)\n"
     "  lw $at, 4($t%d)\n"
     "  sw $at, 4($t%d)\n"
-    "  addiu $t%d, $t%d, 4\n"
+    "  addiu $t%d, $t%d, 8\n"
     "  addiu $t%d, $t%d, 48\n"
-    "  addiu $t8, $t8, -1\n"
+    "  addiu $t8, $t8, -2\n"
     "  bne $t8, $0, _set_point_colors_%d\n"
     "  nop\n",
     array,
@@ -949,7 +949,7 @@ int Playstation2::draw3d_texture16_setPixel_II()
   return 0;
 }
 
-int Playstation2::draw3d_texture16_setPixels_IaI()
+int Playstation2::draw3d_texture16_setPixels_IaS()
 {
   const int reg_color_array = reg - 1;
   const int reg_index = reg - 2;
@@ -964,8 +964,8 @@ int Playstation2::draw3d_texture16_setPixels_IaI()
     "draw3d_texture16_setPixels_%d:\n"
     "  lh $at, 0($t%d)\n"
     "  sh $at, 0($t%d)\n"
-    "  addiu $t%d, $t%d, 4\n"
-    "  addiu $t%d, $t%d, 4\n"
+    "  addiu $t%d, $t%d, 2\n"
+    "  addiu $t%d, $t%d, 2\n"
     "  addiu $t9, $t9, -1\n"
     "  bne $t9, $0, draw3d_texture16_setPixels_%d\n"
     "  nop\n",
@@ -982,6 +982,48 @@ int Playstation2::draw3d_texture16_setPixels_IaI()
 
   label_count++;
   reg -= 3;
+
+  return 0;
+}
+
+int Playstation2::draw3d_texture16_setPixelsRLE16_IaB()
+{
+  const int reg_image_array = reg - 1;
+  const int reg_index = reg - 2;
+  const int reg_object_ref = reg - 3;
+
+  // FIXME - Make this a real function call, it's too long.
+
+  fprintf(out,
+    "  ;; draw3d_texture16_setPixelRLE16_IaB()\n"
+    "  sll $t%d, $t%d, 1\n"
+    "  addiu $t%d, $t%d, 208\n"
+    "  addu $t%d, $t%d, $t%d\n"
+    "  lw $t9, -4($t%d)\n"
+    "draw3d_textureRLE16_setPixels_%d:\n"
+    "  lh $t8, 0($t%d)\n"
+    "  lbu $v0, 1($t%d)\n"
+    "  lbu $v1, 2($t%d)\n"
+    "  sll $v1, $v1, 8\n"
+    "  or $v0, $v0, $v1\n"
+    "  sh $at, 0($t%d)\n"
+    "  addiu $t%d, $t%d, 3\n"
+    "  addiu $t%d, $t%d, 2\n"
+    "  addiu $t9, $t9, -1\n"
+    "  bne $t9, $0, draw3d_textureRLE16_setPixels_%d\n"
+    "  nop\n",
+    reg_index, reg_index,
+    reg_object_ref, reg_object_ref,
+    reg_object_ref, reg_object_ref, reg_index,
+    reg_image_array,
+    label_count,
+    reg_image_array,
+    reg_image_array,
+    reg_image_array,
+    reg_object_ref,
+    reg_image_array, reg_image_array,
+    reg_object_ref, reg_object_ref,
+    label_count);
 
   return 0;
 }
@@ -1083,9 +1125,6 @@ int Playstation2::draw3d_texture_upload()
 
   fprintf(out,
     "  ;; draw3d_texture_upload()\n"
-    //"  jal _dma02_wait\n"
-    //"  nop\n"
-    //"  li $v0, D2_CHCR\n"
     DMA02_WAIT
     "  sw $t%d, 0x10($v0)        ; DMA02 ADDRESS\n"
     "  lw $v1, -16($t%d)\n"
@@ -1679,13 +1718,13 @@ void Playstation2::add_texture_gif_tag()
     ".align 128\n"
     "_texture16_gif_tag:\n"
     "  dc64 GIF_TAG(11, 0, 0, 0, FLG_PACKED, 1), REG_A_D\n"
-    "  dc64 SETREG_BITBLTBUF(0, 0, 0, 0x2bc0, 0, FMT_PSMCT16), REG_BITBLTBUF\n"
+    "  dc64 SETREG_BITBLTBUF(0, 0, FMT_PSMCT16, 0x2bc0, 0, FMT_PSMCT16), REG_BITBLTBUF\n"
     "  dc64 SETREG_TRXREG(0, 0), REG_TRXREG\n"
     "  dc64 SETREG_TRXPOS(0, 0, 0, 0, DIR_UL_LR), REG_TRXPOS\n"
     "  dc64 SETREG_TEXA(0, 0, 0), REG_TEXA\n"
     "  dc64 SETREG_TRXDIR(XDIR_HOST_TO_LOCAL), REG_TRXDIR\n"
-    "  dc64 SETREG_TEX0(0x2bc0, 0, FMT_PSMCT24, 0, 0, 0, TEX_MODULATE, 0, 0, 0, 0, 0), REG_TEX0_1\n"
-    "  dc64 SETREG_TEX0(0x2bc0, 0, FMT_PSMCT24, 0, 0, 0, TEX_MODULATE, 0, 0, 0, 0, 0), REG_TEX0_2\n"
+    "  dc64 SETREG_TEX0(0x2bc0, 0, FMT_PSMCT16, 0, 0, 0, TEX_MODULATE, 0, 0, 0, 0, 0), REG_TEX0_1\n"
+    "  dc64 SETREG_TEX0(0x2bc0, 0, FMT_PSMCT16, 0, 0, 0, TEX_MODULATE, 0, 0, 0, 0, 0), REG_TEX0_2\n"
     "  dc64 SETREG_TEX1(0, 0, FILTER_NEAREST, 0, 0, 0, 0), REG_TEX1_1\n"
     "  dc64 SETREG_TEX1(0, 0, FILTER_NEAREST, 0, 0, 0, 0), REG_TEX1_2\n"
     "  dc64 SETREG_TEX2(FMT_PSMCT16, 0, 0, 0, 0, 0), REG_TEX2_1\n"
@@ -1919,7 +1958,7 @@ void Playstation2::add_draw3d_texture16_constructor()
   // 192: 16 byte GIF tag (for actual image)
   // 208: (width * height * 2) bytes of image
   fprintf(out,
-    "_draw3d_texture_constructor:\n"
+    "_draw3d_texture16_constructor:\n"
     "  ;; _draw3d_texture16_constructor(type, point_count)\n"
     "  ;; Align stack pointer, alloca() some memory\n"
     "  ;; Clear rotation and offset and set point count\n"

@@ -53,7 +53,8 @@ public:
   virtual int draw3d_object_draw();
   virtual int draw3d_texture_Constructor_II(int size);
   virtual int draw3d_texture16_setPixel_II();
-  virtual int draw3d_texture16_setPixels_IaI();
+  virtual int draw3d_texture16_setPixels_IaS();
+  virtual int draw3d_texture16_setPixelsRLE16_IaB();
   virtual int draw3d_texture24_setPixel_II();
   virtual int draw3d_texture24_setPixels_IaI();
   virtual int draw3d_texture_enableTransparency();

@@ -164,8 +164,6 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
   {
     const char *cls = method_class + DRAW3D_LEN + 1;
 
-printf("XXXX cls=%s\n", cls);
-
     if (is_constructor == true)
     {
       if (strcmp(method_sig, "(II)V") == 0)

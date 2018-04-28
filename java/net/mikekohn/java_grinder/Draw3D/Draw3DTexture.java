@@ -25,10 +25,6 @@ abstract public class Draw3DTexture
        (x + (y * width)) provided. */
    public void setPixel(int index, int color) { }
 
-   /** Sets the color of a multiple pixels in a texture buffer at the index
-       (x + (y * width)) provided. */
-   public void setPixels(int index, int[] pixels) { }
-
    /** If the color is black (RGB=0,0,0) the pixels will be transparent. */
    public void enableTransparency() { }
 
