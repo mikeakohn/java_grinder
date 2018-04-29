@@ -1030,6 +1030,8 @@ int Playstation2::draw3d_texture16_setPixelsRLE16_IaB()
     reg_image_array, reg_image_array,
     label_count);
 
+  reg -= 3;
+
   return 0;
 }
 
@@ -1645,8 +1647,8 @@ void Playstation2::add_screen_init_clear()
     ".align 128\n"
     "_screen_init:\n"
     "  dc64 GIF_TAG(11, 1, 0, 0, FLG_PACKED, 1), REG_A_D\n"
-    "  dc64 SETREG_FRAME(0, 10, 0, 0), REG_FRAME_1\n"
-    "  dc64 SETREG_FRAME(560, 10, 0, 0), REG_FRAME_2\n"
+    "  dc64 SETREG_FRAME(0, 10, FMT_PSMCT32, 0), REG_FRAME_1\n"
+    "  dc64 SETREG_FRAME(560, 10, FMT_PSMCT32, 0), REG_FRAME_2\n"
     "  dc64 SETREG_ZBUF(280, 0, 0), REG_ZBUF_1\n"
     "  dc64 SETREG_ZBUF(840, 0, 0), REG_ZBUF_2\n"
     "  dc64 SETREG_XYOFFSET(1000 << 4, 1000 << 4), REG_XYOFFSET_1\n"
@@ -1736,11 +1738,14 @@ void Playstation2::add_texture_gif_tag()
     "  dc64 SETREG_TEX2(FMT_PSMCT16, 0, 0, 0, 0, 0), REG_TEX2_2\n"
     "  dc64 GIF_TAG(0, 1, 0, 0, FLG_IMAGE, 1), REG_A_D\n\n");
 
+  // Note to self, PSMCT32 is wrong, but the rest of the code in
+  // Java Grinder is wrong too (stored as 4 bytes per pixel instead
+  // of 3).  Not sure if it's worth fixing.
   fprintf(out,
     ".align 128\n"
     "_texture24_gif_tag:\n"
     "  dc64 GIF_TAG(11, 0, 0, 0, FLG_PACKED, 1), REG_A_D\n"
-    "  dc64 SETREG_BITBLTBUF(0, 0, 0, 0x2bc0, 0, FMT_PSMCT24), REG_BITBLTBUF\n"
+    "  dc64 SETREG_BITBLTBUF(0, 0, 0, 0x2bc0, 0, FMT_PSMCT32), REG_BITBLTBUF\n"
     "  dc64 SETREG_TRXREG(0, 0), REG_TRXREG\n"
     "  dc64 SETREG_TRXPOS(0, 0, 0, 0, DIR_UL_LR), REG_TRXPOS\n"
     "  dc64 SETREG_TEXA(0, 0, 0), REG_TEXA\n"
@@ -2006,7 +2011,7 @@ void Playstation2::add_draw3d_texture16_constructor()
   // Update BITBLTBUF in GIF packet with width / 64 field.
   fprintf(out,
     "  srl $at, $a0, 6\n"
-    "  sh $at, 22($v0)\n");
+    "  sb $at, 22($v0)\n");
 
   // Update TEX0_1/2 in GIF packet for log2(width) / log2(height).
   fprintf(out,
@@ -2108,7 +2113,7 @@ void Playstation2::add_draw3d_texture24_constructor()
   // Update BITBLTBUF in GIF packet with width / 64 field.
   fprintf(out,
     "  srl $at, $a0, 6\n"
-    "  sh $at, 22($v0)\n");
+    "  sb $at, 22($v0)\n");
 
   // Update TEX0_1/2 in GIF packet for log2(width) / log2(height).
   fprintf(out,
