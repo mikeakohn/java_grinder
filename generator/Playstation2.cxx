@@ -47,7 +47,7 @@ Playstation2::~Playstation2()
   add_draw3d_object_with_texture_constructor();
   add_draw3d_texture_constructor(16);
   add_draw3d_texture_constructor(24);
-  //add_draw3d_texture24_constructor();
+  add_draw3d_texture_constructor(32);
   add_draw3d_object_draw();
   add_primitive_gif_tag();
   add_texture_gif_tag();
@@ -203,7 +203,8 @@ int Playstation2::new_object(const char *object_name, int field_count)
       strcmp(s, "Draw3DTriangleFanWithTexture") != 0 &&
       strcmp(s, "Draw3DTriangleSpriteWithTexture") != 0 &&
       strcmp(s, "Draw3DTexture16") != 0 &&
-      strcmp(s, "Draw3DTexture24") != 0)
+      strcmp(s, "Draw3DTexture24") != 0 &&
+      strcmp(s, "Draw3DTexture32") != 0)
   {
      printf("Error: Unknown class %s\n", object_name);
      return -1;
@@ -909,14 +910,17 @@ int Playstation2::draw3d_texture_Constructor_II(int size)
   fprintf(out, "  move $a1, $t%d\n", reg_height);
   fprintf(out, "  move $s0, $ra\n");
 
-  if (size == 16)
+  switch(size)
   {
-    fprintf(out, "  jal _draw3d_texture16_constructor\n");
-  }
-    else
-  if (size == 24)
-  {
-    fprintf(out, "  jal _draw3d_texture24_constructor\n");
+    case 16:
+      fprintf(out, "  jal _draw3d_texture16_constructor\n");
+      break;
+    case 24:
+      fprintf(out, "  jal _draw3d_texture24_constructor\n");
+      break;
+    case 32:
+      fprintf(out, "  jal _draw3d_texture32_constructor\n");
+      break;
   }
 
   fprintf(out, "  nop\n");
@@ -1048,11 +1052,19 @@ int Playstation2::draw3d_texture24_setPixel_II()
     "  sll $at, $t%d, 1\n"
     "  addu $t%d, $t%d, $at\n"
     "  addu $t%d, $t%d, $t%d\n"
-    "  sw $t%d, 0($t%d)\n",
+    "  sb $t%d, 0($t%d)\n"
+    "  srl $t%d, $t%d, 8\n"
+    "  sb $t%d, 1($t%d)\n"
+    "  srl $t%d, $t%d, 8\n"
+    "  sb $t%d, 2($t%d)\n",
     reg_object_ref, reg_object_ref,
     reg_index,
     reg_index, reg_index,
     reg_object_ref, reg_object_ref, reg_index,
+    reg_color, reg_object_ref,
+    reg_color, reg_color,
+    reg_color, reg_object_ref,
+    reg_color, reg_color,
     reg_color, reg_object_ref);
 
   reg -= 3;
@@ -1114,7 +1126,7 @@ int Playstation2::draw3d_texture32_setPixel_II()
   const int reg_object_ref = reg - 3;
 
   fprintf(out,
-    "  ;; draw3d_texture24_setPixel_II()\n"
+    "  ;; draw3d_texture32_setPixel_II()\n"
     "  addiu $t%d, $t%d, 208\n"
     "  sll $t%d, $t%d, 2\n"
     "  addu $t%d, $t%d, $t%d\n"
@@ -1136,18 +1148,18 @@ int Playstation2::draw3d_texture32_setPixels_IaI()
   const int reg_object_ref = reg - 3;
 
   fprintf(out,
-    "  ;; draw3d_texture24_setPixel_IaI()\n"
+    "  ;; draw3d_texture32_setPixel_IaI()\n"
     "  sll $t%d, $t%d, 2\n"
     "  addiu $t%d, $t%d, 208\n"
     "  addu $t%d, $t%d, $t%d\n"
     "  lw $t9, -4($t%d)\n"
-    "draw3d_texture24_setPixels_%d:\n"
+    "draw3d_texture32_setPixels_%d:\n"
     "  lw $at, 0($t%d)\n"
     "  sw $at, 0($t%d)\n"
     "  addiu $t%d, $t%d, 4\n"
     "  addiu $t%d, $t%d, 4\n"
     "  addiu $t9, $t9, -1\n"
-    "  bne $t9, $0, draw3d_texture24_setPixels_%d\n"
+    "  bne $t9, $0, draw3d_texture32_setPixels_%d\n"
     "  nop\n",
     reg_index, reg_index,
     reg_object_ref, reg_object_ref,
@@ -1836,12 +1848,12 @@ void Playstation2::add_texture_gif_tag()
     "  dc64 SETREG_TRXPOS(0, 0, 0, 0, DIR_UL_LR), REG_TRXPOS\n"
     "  dc64 SETREG_TEXA(0, 0, 0), REG_TEXA\n"
     "  dc64 SETREG_TRXDIR(XDIR_HOST_TO_LOCAL), REG_TRXDIR\n"
-    "  dc64 SETREG_TEX0(0x2bc0, 0, FMT_PSMCT24, 0, 0, 0, TEX_MODULATE, 0, 0, 0, 0, 0), REG_TEX0_1\n"
-    "  dc64 SETREG_TEX0(0x2bc0, 0, FMT_PSMCT24, 0, 0, 0, TEX_MODULATE, 0, 0, 0, 0, 0), REG_TEX0_2\n"
+    "  dc64 SETREG_TEX0(0x2bc0, 0, FMT_PSMCT32, 0, 0, 0, TEX_MODULATE, 0, 0, 0, 0, 0), REG_TEX0_1\n"
+    "  dc64 SETREG_TEX0(0x2bc0, 0, FMT_PSMCT32, 0, 0, 0, TEX_MODULATE, 0, 0, 0, 0, 0), REG_TEX0_2\n"
     "  dc64 SETREG_TEX1(0, 0, FILTER_NEAREST, 0, 0, 0, 0), REG_TEX1_1\n"
     "  dc64 SETREG_TEX1(0, 0, FILTER_NEAREST, 0, 0, 0, 0), REG_TEX1_2\n"
-    "  dc64 SETREG_TEX2(FMT_PSMCT24, 0, 0, 0, 0, 0), REG_TEX2_1\n"
-    "  dc64 SETREG_TEX2(FMT_PSMCT24, 0, 0, 0, 0, 0), REG_TEX2_2\n"
+    "  dc64 SETREG_TEX2(FMT_PSMCT32, 0, 0, 0, 0, 0), REG_TEX2_1\n"
+    "  dc64 SETREG_TEX2(FMT_PSMCT32, 0, 0, 0, 0, 0), REG_TEX2_2\n"
     "  dc64 GIF_TAG(0, 1, 0, 0, FLG_IMAGE, 1), REG_A_D\n\n");
 }
 
@@ -2071,13 +2083,13 @@ void Playstation2::add_draw3d_texture_constructor(int bit_size)
   // Allocated memory is (width * height * [2/3/4]) + 208 + 16.
   fprintf(out,
     "  multu $a0, $a1\n"
-    "  mflo $a4\n"
-    "  sll $a3, $a4, %d\n",
+    "  mflo $t9\n"
+    "  sll $a3, $t9, %d\n",
     shift_size);
 
   if (bit_size == 24)
   {
-    fprintf(out, "  addu $a3, $a3, $a4\n");
+    fprintf(out, "  addu $a3, $a3, $t9\n");
   }
 
   fprintf(out,

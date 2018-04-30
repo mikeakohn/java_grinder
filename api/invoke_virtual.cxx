@@ -178,6 +178,11 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
           ret = generator->draw3d_texture_Constructor_II(24);
         }
           else
+        if (strcmp(cls, "Draw3DTexture32") == 0)
+        {
+          ret = generator->draw3d_texture_Constructor_II(32);
+        }
+          else
         {
           ret = -1;
         }
@@ -197,6 +202,11 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
         if (strcmp(cls, "Draw3DTexture24") == 0)
         {
           ret = draw3d_texture24(java_class, generator, function);
+        }
+          else
+        if (strcmp(cls, "Draw3DTexture32") == 0)
+        {
+          ret = draw3d_texture32(java_class, generator, function);
         }
 
         if (ret != -1) { break; }
