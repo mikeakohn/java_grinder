@@ -57,6 +57,8 @@ public:
   virtual int draw3d_texture16_setPixelsRLE16_IaB();
   virtual int draw3d_texture24_setPixel_II();
   virtual int draw3d_texture24_setPixels_IaI();
+  virtual int draw3d_texture32_setPixel_II();
+  virtual int draw3d_texture32_setPixels_IaI();
   virtual int draw3d_texture_enableTransparency();
   virtual int draw3d_texture_disableTransparency();
   virtual int draw3d_texture_upload();
@@ -96,8 +98,8 @@ private:
   void add_vu1_code();
   void add_draw3d_object_constructor();
   void add_draw3d_object_with_texture_constructor();
-  void add_draw3d_texture16_constructor();
-  void add_draw3d_texture24_constructor();
+  void add_draw3d_texture_constructor(int bit_size);
+  //void add_draw3d_texture24_constructor();
 };
 
 #endif
