@@ -30,7 +30,10 @@
     "  nop\n" \
     ".ends\n"
 
-Playstation2::Playstation2()
+Playstation2::Playstation2() :
+  need_draw3d_texture16(false),
+  need_draw3d_texture24(false),
+  need_draw3d_texture32(false)
 {
   org = 0x100000;
   ram_start = 0x00000000;
@@ -45,9 +48,10 @@ Playstation2::~Playstation2()
   add_screen_init_clear();
   add_draw3d_object_constructor();
   add_draw3d_object_with_texture_constructor();
-  add_draw3d_texture_constructor(16);
-  add_draw3d_texture_constructor(24);
-  add_draw3d_texture_constructor(32);
+  if (need_draw3d_texture16) { add_draw3d_texture_constructor(16); }
+  if (need_draw3d_texture24) { add_draw3d_texture_constructor(24); }
+  if (need_draw3d_texture32) { add_draw3d_texture_constructor(32); }
+  add_draw3d_texture16_setPixelsRLE16_IaB();
   add_draw3d_object_draw();
   add_primitive_gif_tag();
   add_texture_gif_tag();
@@ -914,12 +918,15 @@ int Playstation2::draw3d_texture_Constructor_II(int size)
   {
     case 16:
       fprintf(out, "  jal _draw3d_texture16_constructor\n");
+      need_draw3d_texture16 = true;
       break;
     case 24:
       fprintf(out, "  jal _draw3d_texture24_constructor\n");
+      need_draw3d_texture24 = true;
       break;
     case 32:
       fprintf(out, "  jal _draw3d_texture32_constructor\n");
+      need_draw3d_texture32 = true;
       break;
   }
 
@@ -997,43 +1004,18 @@ int Playstation2::draw3d_texture16_setPixelsRLE16_IaB()
   const int reg_index = reg - 2;
   const int reg_object_ref = reg - 3;
 
-  // FIXME - Make this a real function call, it's too long.
-
   fprintf(out,
-    "  ;; draw3d_texture16_setPixelRLE16_IaB()\n"
-    "  sll $t%d, $t%d, 1\n"
-    "  addiu $t%d, $t%d, 208\n"
-    "  addu $t%d, $t%d, $t%d\n"
-    "  lw $t9, -4($t%d)\n"
-    "draw3d_textureRLE16_setPixels_%d:\n"
-    "  lbu $t8, 0($t%d)\n"
-    "  lbu $v0, 1($t%d)\n"
-    "  lbu $v1, 2($t%d)\n"
-    "  sll $v1, $v1, 8\n"
-    "  or $v0, $v0, $v1\n"
-    "draw3d_textureRLE16_setPixels_loop_%d:\n"
-    "  sh $v0, 0($t%d)\n"
-    "  addiu $t%d, $t%d, 2\n"
-    "  addiu $t8, $t8, -1\n"
-    "  bne $t8, $0, draw3d_textureRLE16_setPixels_loop_%d\n"
-    "  addiu $t9, $t9, -3\n"
-    "  addiu $t%d, $t%d, 3\n"
-    "  bgtz $t9, draw3d_textureRLE16_setPixels_%d\n"
-    "  nop\n",
-    reg_index, reg_index,
-    reg_object_ref, reg_object_ref,
-    reg_object_ref, reg_object_ref, reg_index,
-    reg_image_array,
-    label_count,
-    reg_image_array,
-    reg_image_array,
-    reg_image_array,
-    label_count,
+    "  ;; draw3d_texture16_setPixelsRLE16_IaB()\n"
+    "  move $a0, $t%d\n"
+    "  move $a1, $t%d\n"
+    "  move $a2, $t%d\n"
+    "  move $s0, $ra\n"
+    "  jal _draw3d_texture16_setPixelsRLE16_IaB\n"
+    "  nop\n"
+    "  move $ra, $s0\n",
     reg_object_ref,
-    reg_object_ref, reg_object_ref,
-    label_count,
-    reg_image_array, reg_image_array,
-    label_count);
+    reg_index,
+    reg_image_array);
 
   reg -= 3;
 
@@ -1567,6 +1549,7 @@ int Playstation2::download_vu0_data(int dec_count)
 void Playstation2::add_dma_functions()
 {
   fprintf(out,
+    ".align 32\n"
     "_dma_reset:\n"
     "  ;; VIF0\n"
     "  li $v1, D0_CHCR\n"
@@ -1701,7 +1684,8 @@ void Playstation2::add_draw3d_object_draw()
     "  sw $v1, 0x20($v0)         ; DMA01 SIZE\n"
     "  li $v1, 0x101\n"
     "  sw $v1, ($v0)             ; start\n\n"
-    "  jr $ra\n\n");
+    "  jr $ra\n"
+    "  nop\n");
 }
 
 void Playstation2::add_copy_vu1_code()
@@ -1866,6 +1850,39 @@ void Playstation2::add_vu0_code()
     "  dc32 (VIF_MSCAL << 24), 0, 0, 0\n");
     "_vif_vu0_end:\n\n"
 #endif
+}
+
+void Playstation2::add_draw3d_texture16_setPixelsRLE16_IaB()
+{
+  // a0 = object
+  // a1 = index
+  // a2 = array
+
+  fprintf(out,
+    "_draw3d_texture16_setPixelsRLE16_IaB:\n"
+    "  ;; draw3d_texture16_setPixelRLE16_IaB()\n"
+    "  sll $a1, $a1, 1\n"
+    "  addiu $a0, $a0, 208\n"
+    "  addu $a0, $a0, $a1\n"
+    "  lw $t9, -4($a2)\n"
+    "_draw3d_textureRLE16_setPixels_0:\n"
+    "  lbu $t8, 0($a2)\n"
+    "  lbu $v0, 1($a2)\n"
+    "  lbu $v1, 2($a2)\n"
+    "  sll $v1, $v1, 8\n"
+    "  or $v0, $v0, $v1\n"
+    "_draw3d_textureRLE16_setPixels_loop_0:\n"
+    "  sh $v0, 0($a0)\n"
+    "  addiu $a0, $a0, 2\n"
+    "  addiu $t8, $t8, -1\n"
+    "  bne $t8, $0, _draw3d_textureRLE16_setPixels_loop_0\n"
+    "  nop\n"
+    "  addiu $t9, $t9, -3\n"
+    "  addiu $a2, $a2, 3\n"
+    "  bgtz $t9, _draw3d_textureRLE16_setPixels_0\n"
+    "  nop\n"
+    "  jr $ra\n"
+    "  nop\n\n");
 }
 
 void Playstation2::add_draw3d_object_constructor()
@@ -2164,108 +2181,4 @@ void Playstation2::add_draw3d_texture_constructor(int bit_size)
     "  jr $ra\n"
     "  nop\n\n");
 }
-
-#if 0
-void Playstation2::add_draw3d_texture24_constructor()
-{
-  // Need to allocate enough space for:
-  // -16: size of data
-  //   0: 16 byte GIF tag (for texture info)
-  //  16: BITBLTBUF
-  //  32: TRXREG
-  //  48: TRXPOS
-  //  64: TEXA
-  //  80: TRXDIR
-  //  96: TEX0_1
-  // 112: TEX0_2
-  // 128: TEX1_1
-  // 144: TEX1_2
-  // 160: TEX2_1
-  // 176: TEX2_2
-  // 192: 16 byte GIF tag (for actual image)
-  // 208: (width * height * 3) bytes of image
-  fprintf(out,
-    "_draw3d_texture24_constructor:\n"
-    "  ;; _draw3d_texture_constructor(type, point_count)\n"
-    "  ;; Align stack pointer, alloca() some memory\n"
-    "  ;; Clear rotation and offset and set point count\n"
-    "  addiu $at, $0, -16\n"
-    "  and $sp, $sp, $at\n");
-
-  // Allocated memory is (width * height * 4) + 208 + 16.
-  fprintf(out,
-    "  multu $a0, $a1\n"
-    "  mflo $a3\n"
-    "  sll $a3, $a3, 2\n"
-    "  addiu $sp, $sp, -224\n"
-    "  subu $sp, $sp, $a3\n"
-    "  and $sp, $sp, $at\n");
-
-  // Set top of reg stack (return value) to allocated memory.
-  // 16 bytes before the allocated memory is the size of the
-  // DMA transfer.
-  fprintf(out, "  addiu $v0, $sp, 16\n");
-
-  // Copy default GIF packet to new memory.
-  fprintf(out,
-    "  li $t8, _texture24_gif_tag\n"
-    "  ori $t9, $0, 13\n"
-    "  move $v1, $v0\n"
-    "_draw3d_texture24_constructor_l0:\n"
-    "  lq $at, 0($t8)\n"
-    "  sq $at, 0($v1)\n"
-    "  addiu $t9, $t9, -1\n"
-    "  addiu $t8, $t8, 16\n"
-    "  addiu $v1, $v1, 16\n"
-    "  bne $t9, $0, _draw3d_texture24_constructor_l0\n"
-    "  nop\n");
-
-  // Update TRXREG in GIF packet with width, height
-  fprintf(out,
-    "  sw $a0, 32($v0)\n"
-    "  sw $a1, 36($v0)\n");
-
-  // Update BITBLTBUF in GIF packet with width / 64 field.
-  fprintf(out,
-    "  srl $at, $a0, 6\n"
-    "  sb $at, 22($v0)\n");
-
-  // Update TEX0_1/2 in GIF packet for log2(width) / log2(height).
-  fprintf(out,
-    "  li $t9, 30\n"
-    "  ld $t8, 96($v0)\n"
-    "  dsll $at, $at, 14\n"
-    "  or $t8, $t8, $at\n"
-    "  plzcw $at, $a0\n"
-    "  andi $at, $at, 0xff\n"
-    "  subu $at, $t9, $at\n"
-    "  dsll $at, $at, 26\n"
-    "  or $t8, $t8, $at\n"
-    "  plzcw $at, $a1\n"
-    "  andi $at, $at, 0xff\n"
-    "  subu $at, $t9, $at\n"
-    "  dsll $at, $at, 30\n"
-    "  or $t8, $t8, $at\n"
-    "  sd $t8, 96($v0)\n"
-    "  sd $t8, 112($v0)\n");
-
-  // Update image GIF packet quadword count.
-  fprintf(out,
-    "  addiu $a3, $a3, 15\n"
-    "  addiu $at, $0, -16\n"
-    "  and $a3, $a3, $at\n"
-    "  srl $a3, $a3, 4\n"
-    "  ori $at, $a3, 0x8000\n"
-    "  sh $at, 192($v0)\n");
-
-  // Save the size of the GIF packets to the memory-chunk -16
-  fprintf(out,
-    "  addiu $a3, $a3, 13\n"
-    "  sw $a3, -16($v0)\n");
-
-  fprintf(out,
-    "  jr $ra\n"
-    "  nop\n\n");
-}
-#endif
 

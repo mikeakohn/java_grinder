@@ -99,7 +99,10 @@ private:
   void add_draw3d_object_constructor();
   void add_draw3d_object_with_texture_constructor();
   void add_draw3d_texture_constructor(int bit_size);
-  //void add_draw3d_texture24_constructor();
+  void add_draw3d_texture16_setPixelsRLE16_IaB();
+  bool need_draw3d_texture16 : 1;
+  bool need_draw3d_texture24 : 1;
+  bool need_draw3d_texture32 : 1;
 };
 
 #endif
