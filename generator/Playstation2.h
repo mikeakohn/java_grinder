@@ -60,6 +60,7 @@ public:
   virtual int draw3d_texture32_setPixel_II();
   virtual int draw3d_texture32_setPixels_IaI();
   virtual int draw3d_texture_enableTransparency();
+  virtual int draw3d_texture_enableTransparencyOnBlack();
   virtual int draw3d_texture_disableTransparency();
   virtual int draw3d_texture_upload();
 

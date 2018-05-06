@@ -56,6 +56,7 @@
 int draw3d_texture(JavaClass *java_class, Generator *generator, char *method_name)
 {
   CHECK_FUNC(enableTransparency,)
+  CHECK_FUNC(enableTransparencyOnBlack,)
   CHECK_FUNC(disableTransparency,)
   CHECK_FUNC(upload,)
 

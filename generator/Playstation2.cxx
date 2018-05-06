@@ -1167,9 +1167,39 @@ int Playstation2::draw3d_texture_enableTransparency()
   fprintf(out,
     "  ;; enableTransparency()\n"
     "  lw $t8, 64($t%d)\n"
+    "  andi $t8, $t8, 0x7fff\n"
+    "  sw $t8, 64($t%d)\n",
+    object, object);
+
+  fprintf(out,
+    "  lw $t8, 100($t%d)\n"
+    "  ori $t8, $t8, 0x0004\n"
+    "  sw $t8, 100($t%d)\n"
+    "  sw $t8, 116($t%d)\n",
+    object, object, object);
+
+  reg -= 1;
+
+  return 0;
+}
+
+int Playstation2::draw3d_texture_enableTransparencyOnBlack()
+{
+  const int object = reg - 1;
+
+  fprintf(out,
+    "  ;; enableTransparency()\n"
+    "  lw $t8, 64($t%d)\n"
     "  ori $t8, $t8, 0x8000\n"
     "  sw $t8, 64($t%d)\n",
     object, object);
+
+  fprintf(out,
+    "  lw $t8, 100($t%d)\n"
+    "  ori $t8, $t8, 0x0004\n"
+    "  sw $t8, 100($t%d)\n"
+    "  sw $t8, 116($t%d)\n",
+    object, object, object);
 
   reg -= 1;
 
@@ -1180,12 +1210,16 @@ int Playstation2::draw3d_texture_disableTransparency()
 {
   const int object = reg - 1;
 
+  // NOTE: TEX0 sits at offsets 96 and 112, but the TCC bit is
+  // in the upper 32 bits.  Both values should always be the same.
+
   fprintf(out,
     "  ;; disableTransparency()\n"
-    "  lw $t8, 64($t%d)\n"
-    "  andi $t8, $t8, 0x7fff\n"
-    "  sw $t8, 64($t%d)\n",
-    object, object);
+    "  lw $t8, 100($t%d)\n"
+    "  andi $t8, $t8, 0xfffb\n"
+    "  sw $t8, 100($t%d)\n"
+    "  sw $t8, 116($t%d)\n",
+    object, object, object);
 
   reg -= 1;
 
@@ -1798,7 +1832,7 @@ void Playstation2::add_texture_gif_tag()
     "  dc64 SETREG_BITBLTBUF(0, 0, 0, 0x2bc0, 0, FMT_PSMCT16), REG_BITBLTBUF\n"
     "  dc64 SETREG_TRXREG(0, 0), REG_TRXREG\n"
     "  dc64 SETREG_TRXPOS(0, 0, 0, 0, DIR_UL_LR), REG_TRXPOS\n"
-    "  dc64 SETREG_TEXA(0, 0, 0), REG_TEXA\n"
+    "  dc64 SETREG_TEXA(0x80, 0, 0), REG_TEXA\n"
     "  dc64 SETREG_TRXDIR(XDIR_HOST_TO_LOCAL), REG_TRXDIR\n"
     "  dc64 SETREG_TEX0(0x2bc0, 0, FMT_PSMCT16, 0, 0, 0, TEX_MODULATE, 0, 0, 0, 0, 0), REG_TEX0_1\n"
     "  dc64 SETREG_TEX0(0x2bc0, 0, FMT_PSMCT16, 0, 0, 0, TEX_MODULATE, 0, 0, 0, 0, 0), REG_TEX0_2\n"

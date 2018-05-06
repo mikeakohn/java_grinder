@@ -25,10 +25,14 @@ abstract public class Draw3DTexture
        (x + (y * width)) provided. */
    public void setPixel(int index, int color) { }
 
-   /** If the color is black (RGB=0,0,0) the pixels will be transparent. */
+   /** The A value in the image will be used for 16/24 bit textures.
+       With 16 bit textures this is only 1 bit. */
    public void enableTransparency() { }
 
-   /** If the color is black (RGB=0,0,0) the pixels will be black. */
+   /** If the color is black (RGB=0,0,0) the pixels will be transparent. */
+   public void enableTransparencyOnBlack() { }
+
+   /** No pixels in image will be transparent. */
    public void disableTransparency() { }
 
    /** Uploads the texture from main memory into the Graphics Synthesizer
