@@ -1166,9 +1166,9 @@ int Playstation2::draw3d_texture_enableTransparency()
 
   fprintf(out,
     "  ;; enableTransparency()\n"
-    "  lw $t8, 112($t%d)\n"
+    "  lw $t8, 64($t%d)\n"
     "  ori $t8, $t8, 0x8000\n"
-    "  sw $t8, 112($t%d)\n",
+    "  sw $t8, 64($t%d)\n",
     object, object);
 
   reg -= 1;
@@ -1182,9 +1182,9 @@ int Playstation2::draw3d_texture_disableTransparency()
 
   fprintf(out,
     "  ;; disableTransparency()\n"
-    "  lw $t8, 112($t%d)\n"
+    "  lw $t8, 64($t%d)\n"
     "  andi $t8, $t8, 0x7fff\n"
-    "  sw $t8, 112($t%d)\n",
+    "  sw $t8, 64($t%d)\n",
     object, object);
 
   reg -= 1;
@@ -1714,7 +1714,7 @@ void Playstation2::add_screen_init_clear()
   fprintf(out,
     ".align 128\n"
     "_screen_init:\n"
-    "  dc64 GIF_TAG(11, 1, 0, 0, FLG_PACKED, 1), REG_A_D\n"
+    "  dc64 GIF_TAG(13, 1, 0, 0, FLG_PACKED, 1), REG_A_D\n"
     "  dc64 SETREG_FRAME(0, 10, FMT_PSMCT32, 0), REG_FRAME_1\n"
     "  dc64 SETREG_FRAME(560, 10, FMT_PSMCT32, 0), REG_FRAME_2\n"
     "  dc64 SETREG_ZBUF(280, 0, 0), REG_ZBUF_1\n"
@@ -1726,30 +1726,32 @@ void Playstation2::add_screen_init_clear()
     "  dc64 1, REG_PRMODECONT\n"
     "  dc64 1, REG_COLCLAMP\n"
     "  dc64 0, REG_DTHE\n"
+    "  dc64 SETREG_ALPHA(ALPHA_SRC, ALPHA_FB, ALPHA_SRC, ALPHA_FB, 0x80), REG_ALPHA_1\n"
+    "  dc64 SETREG_ALPHA(ALPHA_SRC, ALPHA_FB, ALPHA_SRC, ALPHA_FB, 0x80), REG_ALPHA_2\n"
     "_screen_init_end:\n\n");
 
   fprintf(out,
     ".align 128\n"
     "_screen_init_clear_1:\n"
     "  dc64 GIF_TAG(6, 1, 0, 0, FLG_PACKED, 1), REG_A_D\n"
-    "  dc64 0x30000, REG_TEST_1\n"
+    "  dc64 SETREG_TEST(0,ATST_NEVER,0x00,AFAIL_KEEP,0,0,1,ZTST_ALWAYS), REG_TEST_1\n"
     "  dc64 SETREG_PRIM(PRIM_SPRITE, 0, 0, 0, 0, 0, 0, 0, 0), REG_PRIM\n"
-    "  dc64 0x3f80_0000_0000_0000, REG_RGBAQ\n"
+    "  dc64 SETREG_RGBAQ(0,0,0,0x80,1.0), REG_RGBAQ\n"
     "  dc64 SETREG_XYZ2(1000 << 4, 1000 << 4, 0), REG_XYZ2\n"
     "  dc64 SETREG_XYZ2(1640 << 4, 1448 << 4, 0), REG_XYZ2\n"
-    "  dc64 0x70000, REG_TEST_1\n"
+    "  dc64 SETREG_TEST(0,ATST_ALWAYS,0x00,AFAIL_KEEP,0,0,1,ZTST_GREATER), REG_TEST_1\n"
     "_screen_init_clear_1_end:\n\n");
 
   fprintf(out,
     ".align 128\n"
     "_screen_init_clear_2:\n"
     "  dc64 GIF_TAG(6, 1, 0, 0, FLG_PACKED, 1), REG_A_D\n"
-    "  dc64 0x30000, REG_TEST_2\n"
+    "  dc64 SETREG_TEST(0,ATST_NEVER,0x00,AFAIL_KEEP,0,0,1,ZTST_ALWAYS), REG_TEST_2\n"
     "  dc64 SETREG_PRIM(PRIM_SPRITE, 0, 0, 0, 0, 0, 0, 1, 0), REG_PRIM\n"
     "  dc64 0x3f80_0000_0000_0000, REG_RGBAQ\n"
     "  dc64 SETREG_XYZ2(1000 << 4, 1000 << 4, 0), REG_XYZ2\n"
     "  dc64 SETREG_XYZ2(1648 << 4, 1448 << 4, 0), REG_XYZ2\n"
-    "  dc64 0x70000, REG_TEST_2\n"
+    "  dc64 SETREG_TEST(0,ATST_ALWAYS,0x00,AFAIL_KEEP,0,0,1,ZTST_GREATER), REG_TEST_2\n"
     "_screen_init_clear_2_end:\n\n");
 
   //fprintf(out,
