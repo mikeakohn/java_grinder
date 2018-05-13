@@ -536,6 +536,11 @@ int JavaCompiler::array_load(JavaClass *java_class, int constant_id, uint8_t arr
     {
       return generator->array_read_float(field_name, 0);
     }
+      else
+    if (array_type == ARRAY_TYPE_OBJECT)
+    {
+      return generator->array_read_object(field_name, 0);
+    }
   }
     else
   {
@@ -586,6 +591,11 @@ int JavaCompiler::array_store(JavaClass *java_class, int constant_id, uint8_t ar
     if (array_type == ARRAY_TYPE_FLOAT)
     {
       return generator->array_write_float(field_name, 0);
+    }
+      else
+    if (array_type == ARRAY_TYPE_OBJECT)
+    {
+      return generator->array_write_object(field_name, 0);
     }
   }
     else
@@ -1044,8 +1054,6 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         { ret = generator->array_read_float(); }
           else
         { ret = array_load(java_class, stack->pop(), ARRAY_TYPE_FLOAT); }
-
-        break;
         break;
 
       case 49: // daload (0x31)
@@ -1053,7 +1061,11 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         break;
 
       case 50: // aaload (0x32)
-        UNIMPL()
+        if (stack->length() == 0)
+        { ret = generator->array_read_object(); }
+          else
+        { ret = array_load(java_class, stack->pop(), ARRAY_TYPE_OBJECT); }
+        break;
         break;
 
       case 51: // baload (0x33)
@@ -1061,7 +1073,6 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         { ret = generator->array_read_byte(); }
           else
         { ret = array_load(java_class, stack->pop(), ARRAY_TYPE_BYTE); }
-
         break;
 
       case 52: // caload (0x34)
@@ -1073,7 +1084,6 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         { ret = generator->array_read_short(); }
           else
         { ret = array_load(java_class, stack->pop(), ARRAY_TYPE_SHORT); }
-
         break;
 
       case 54: // istore (0x36)
@@ -1192,7 +1202,6 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         { ret = generator->array_write_int(); }
           else
         { ret = array_store(java_class, stack->pop(), ARRAY_TYPE_INT); }
-
         break;
 
       case 80: // lastore (0x50)
@@ -1204,7 +1213,6 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         { ret = generator->array_write_float(); }
           else
         { ret = array_store(java_class, stack->pop(), ARRAY_TYPE_FLOAT); }
-
         break;
 
       case 82: // dastore (0x52)
@@ -1212,7 +1220,10 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         break;
 
       case 83: // aastore (0x53)
-        UNIMPL()
+        if (stack->length() == 0)
+        { ret = generator->array_write_object(); }
+          else
+        { ret = array_store(java_class, stack->pop(), ARRAY_TYPE_OBJECT); }
         break;
 
       case 84: // bastore (0x54)
@@ -1220,7 +1231,6 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         { ret = generator->array_write_byte(); }
           else
         { ret = array_store(java_class, stack->pop(), ARRAY_TYPE_BYTE); }
-
         break;
 
       case 85: // castore (0x55)
@@ -1857,7 +1867,9 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         break;
 
       case 189: // anewarray (0xbd)
-        UNIMPL()
+        index = GET_PC_UINT16(1);
+        java_class->get_class_name(class_name, sizeof(class_name), index);
+        ret = generator->new_object_array(class_name);
         break;
 
       case 190: // arraylength (0xbe)

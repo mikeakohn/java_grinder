@@ -34,7 +34,7 @@ public class SimpleTest
     }
 
     triangles[0].setPosition(1250.0f, 1250.0f, 2048.0f);
-    triangles[0].setPosition(1250.0f, 1450.0f, 2048.0f);
+    triangles[1].setPosition(1450.0f, 1250.0f, 2048.0f);
 
     n = 0;
 
@@ -53,8 +53,8 @@ public class SimpleTest
       Playstation2.clearContext(n);
 
       triangles[0].draw();
-      triangles[0].rotateZ512(n);
       triangles[1].draw();
+      triangles[0].rotateZ512(n);
       triangles[1].rotateZ512(-n);
 
       // Wait until the video beam is done drawing the last frame.

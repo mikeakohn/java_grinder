@@ -57,6 +57,7 @@
 #define ARRAY_TYPE_SHORT 9
 #define ARRAY_TYPE_INT 10
 #define ARRAY_TYPE_LONG 11
+#define ARRAY_TYPE_OBJECT 100
 
 struct generic_twoint16_t
 {

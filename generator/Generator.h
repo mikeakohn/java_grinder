@@ -144,6 +144,7 @@ public:
   virtual int brk() = 0;
   virtual int new_object(const char *object_name, int field_count);
   virtual int new_array(uint8_t type) = 0;
+  virtual int new_object_array(const char *class_name);
   virtual int insert_array(const char *name, int32_t *data, int len, uint8_t type) = 0;
   virtual int insert_string(const char *name, uint8_t *bytes, int len) = 0;
   virtual int push_array_length() = 0;
@@ -152,18 +153,22 @@ public:
   virtual int array_read_short() = 0;
   virtual int array_read_int() = 0;
   virtual int array_read_float();
+  virtual int array_read_object();
   virtual int array_read_byte(const char *name, int field_id) = 0;
   virtual int array_read_short(const char *name, int field_id) = 0;
   virtual int array_read_int(const char *name, int field_id) = 0;
   virtual int array_read_float(const char *name, int field_id);
+  virtual int array_read_object(const char *name, int field_id);
   virtual int array_write_byte() = 0;
   virtual int array_write_short() = 0;
   virtual int array_write_int() = 0;
   virtual int array_write_float();
+  virtual int array_write_object();
   virtual int array_write_byte(const char *name, int field_id) = 0;
   virtual int array_write_short(const char *name, int field_id) = 0;
   virtual int array_write_int(const char *name, int field_id) = 0;
   virtual int array_write_float(const char *name, int field_id);
+  virtual int array_write_object(const char *name, int field_id);
   //virtual void close() = 0;
 
   // CPU

@@ -1373,6 +1373,51 @@ int R5900::new_array(uint8_t type)
   return 0;
 }
 
+int R5900::new_object_array(const char *class_name)
+{
+  int t;
+
+  fprintf(out, "  ; new_object_array(%s)\n", class_name);
+
+  if (stack > 0)
+  {
+    STACK_POP(8);
+    t = 8;
+  }
+    else
+  {
+    t = reg - 1;
+  }
+
+  fprintf(out, "  sll $at, $t%d, 2\n", t);
+
+  // $at = length * sizeof(type) + 16 (4 bytes for length and 12 to align)
+  fprintf(out, "  addiu $at, $at, 16\n");
+
+  // Allocate stack space for array
+  fprintf(out, "  subu $sp, $sp, $at\n");
+
+  // Align stack
+  fprintf(out,
+    "  addiu $at, $0, -16\n"
+    "  and $sp, $sp, $at\n");
+
+  // Save count at start of array
+  fprintf(out, "  sw $t%d, 12($sp)\n", t);
+
+  if (t == 8)
+  {
+    fprintf(out, "  addiu $t9, $sp, 16\n");
+    STACK_PUSH(9);
+  }
+    else
+  {
+    fprintf(out, "  addiu $t%d, $sp, 16\n", t);
+  }
+
+  return 0;
+}
+
 int R5900::insert_array(const char *name, int32_t *data, int len, uint8_t type)
 {
   fprintf(out, ".align 128\n");
@@ -1518,6 +1563,11 @@ int R5900::array_read_float()
   return array_read_int();
 }
 
+int R5900::array_read_object()
+{
+  return array_read_int();
+}
+
 int R5900::array_read_byte(const char *name, int field_id)
 {
   int index_reg;
@@ -1590,6 +1640,11 @@ int R5900::array_read_int(const char *name, int field_id)
 }
 
 int R5900::array_read_float(const char *name, int field_id)
+{
+  return array_read_int(name, field_id);
+}
+
+int R5900::array_read_object(const char *name, int field_id)
 {
   return array_read_int(name, field_id);
 }
@@ -1669,6 +1724,11 @@ int R5900::array_write_float()
   return array_write_int();
 }
 
+int R5900::array_write_object()
+{
+  return array_write_int();
+}
+
 int R5900::array_write_byte(const char *name, int field_id)
 {
   int value_reg;
@@ -1714,6 +1774,11 @@ int R5900::array_write_int(const char *name, int field_id)
 }
 
 int R5900::array_write_float(const char *name, int field_id)
+{
+  return array_write_int(name, field_id);
+}
+
+int R5900::array_write_object(const char *name, int field_id)
 {
   return array_write_int(name, field_id);
 }
