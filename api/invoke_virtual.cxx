@@ -228,6 +228,7 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
     else if (strcmp(cls, "Draw3DTriangle") == 0) { draw3d_type = 3; }
     else if (strcmp(cls, "Draw3DTriangleStrip") == 0) { draw3d_type = 4; }
     else if (strcmp(cls, "Draw3DTriangleFan") == 0) { draw3d_type = 5; }
+    else if (strcmp(cls, "Draw3DSpritae") == 0) { draw3d_type = 6; }
     else if (strcmp(cls, "Draw3DTriangleWithTexture") == 0)
     {
       draw3d_type = 3;
@@ -241,6 +242,11 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
     else if (strcmp(cls, "Draw3DTriangleFanWithTexture") == 0)
     {
       draw3d_type = 5;
+      with_texture = true;
+    }
+    else if (strcmp(cls, "Draw3DSpriteWithTexture") == 0)
+    {
+      draw3d_type = 6;
       with_texture = true;
     }
 
@@ -265,14 +271,16 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
           strcmp(cls, "Draw3DLineStrip") == 0 ||
           strcmp(cls, "Draw3DTriangle") == 0 ||
           strcmp(cls, "Draw3DTriangleStrip") == 0 ||
-          strcmp(cls, "Draw3DTriangleFan") == 0)
+          strcmp(cls, "Draw3DTriangleFan") == 0 ||
+          strcmp(cls, "Draw3DSprite") == 0)
       {
         ret = draw3d_object(java_class, generator, function);
       }
         else
       if (strcmp(cls, "Draw3DTriangleWithTexture") == 0 ||
           strcmp(cls, "Draw3DTriangleStripWithTexture") == 0 ||
-          strcmp(cls, "Draw3DTriangleFanWithTexture") == 0)
+          strcmp(cls, "Draw3DTriangleFanWithTexture") == 0 || 
+          strcmp(cls, "Draw3DSpriteWithTexture") == 0)
       {
 #if 0
         if (strncmp(function, "setPoint", 8) == 0)

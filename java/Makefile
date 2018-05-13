@@ -30,6 +30,8 @@ JAVA_SRC=\
   $(SRC_DIR)/Draw3D/Draw3DPoints.java \
   $(SRC_DIR)/Draw3D/Draw3DLine.java \
   $(SRC_DIR)/Draw3D/Draw3DLineStrip.java \
+  $(SRC_DIR)/Draw3D/Draw3DSprite.java \
+  $(SRC_DIR)/Draw3D/Draw3DSpriteWithTexture.java \
   $(SRC_DIR)/Draw3D/Draw3DTriangle.java \
   $(SRC_DIR)/Draw3D/Draw3DTriangleWithTexture.java \
   $(SRC_DIR)/Draw3D/Draw3DTriangleStrip.java \
