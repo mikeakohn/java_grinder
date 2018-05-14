@@ -1256,7 +1256,7 @@ int Playstation2::playstation2_clearContext_I()
     "  move $s0, $ra\n"
     "  jal _clear_context\n"
     "  nop\n"
-    "  move $ra, $a0\n",
+    "  move $ra, $s0\n",
     context);
 
   reg -= 1;
