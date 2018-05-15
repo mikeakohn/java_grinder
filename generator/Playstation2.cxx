@@ -1308,15 +1308,15 @@ int Playstation2::playstation2_vu0UploadCode_aB()
   const int array = reg - 1;
 
   fprintf(out,
-    "  ;; vu0UploadCode_aB()\n"
+    "  ;; playstation2_vu0UploadCode_aB()\n"
     "  li $v0, VU0_MICRO_MEM\n"
     "  lw $a1, -4($t%d)\n"
     "vu0_upload_code_%d:\n"
     "  lq $a0, ($t%d)\n"
     "  sq $a0, ($v0)\n"
-    "  addi $t%d, $t%d, 16\n"
-    "  addi $v0, $v0, 16\n"
-    "  addi $a1, $a1, -16\n"
+    "  addiu $t%d, $t%d, 16\n"
+    "  addiu $v0, $v0, 16\n"
+    "  addiu $a1, $a1, -16\n"
     "  bgtz $a1, vu0_upload_code_%d\n"
     "  nop\n",
     array,
@@ -1333,37 +1333,37 @@ int Playstation2::playstation2_vu0UploadCode_aB()
 
 int Playstation2::playstation2_vu0UploadData_IaB()
 {
-  fprintf(out, "  ;; vu0UploadData_IaB()\n");
+  fprintf(out, "  ;; playstation2_vu0UploadData_IaB()\n");
   return upload_vu0_data(16);
 }
 
 int Playstation2::playstation2_vu0UploadData_IaI()
 {
-  fprintf(out, "  ;; vu0UploadData_IaI()\n");
+  fprintf(out, "  ;; playstation2_vu0UploadData_IaI()\n");
   return upload_vu0_data(4);
 }
 
 int Playstation2::playstation2_vu0UploadData_IaF()
 {
-  fprintf(out, "  ;; vu0UploadData_IaF()\n");
+  fprintf(out, "  ;; playstation2_vu0UploadData_IaF()\n");
   return upload_vu0_data(4);
 }
 
 int Playstation2::playstation2_vu0DownloadData_IaB()
 {
-  fprintf(out, "  ;; vu0DownloadData_IaB()\n");
+  fprintf(out, "  ;; playstation2_vu0DownloadData_IaB()\n");
   return download_vu0_data(16);
 }
 
 int Playstation2::playstation2_vu0DownloadData_IaI()
 {
-  fprintf(out, "  ;; vu0DownloadData_IaI()\n");
+  fprintf(out, "  ;; playstation2_vu0DownloadData_IaI()\n");
   return download_vu0_data(4);
 }
 
 int Playstation2::playstation2_vu0DownloadData_IaF()
 {
-  fprintf(out, "  ;; vu0DownloadData_IaF()\n");
+  fprintf(out, "  ;; playstation2_vu0DownloadData_IaF()\n");
   return download_vu0_data(4);
 }
 
@@ -1527,9 +1527,9 @@ int Playstation2::upload_vu0_data(int dec_count)
     "vu0_upload_data_%d:\n"
     "  lq $a0, ($t%d)\n"
     "  sq $a0, ($v0)\n"
-    "  addi $t%d, $t%d, 16\n"
-    "  addi $v0, $v0, 16\n"
-    "  addi $a1, $a1, -%d\n"
+    "  addiu $t%d, $t%d, 16\n"
+    "  addiu $v0, $v0, 16\n"
+    "  addiu $a1, $a1, -%d\n"
     "  bgtz $a1, vu0_upload_data_%d\n"
     "  nop\n",
     array,
@@ -1560,9 +1560,9 @@ int Playstation2::download_vu0_data(int dec_count)
     "vu0_download_data_%d:\n"
     "  lq $a0, ($v0)\n"
     "  sq $a0, ($t%d)\n"
-    "  addi $t%d, $t%d, 16\n"
-    "  addi $v0, $v0, 16\n"
-    "  addi $a1, $a1, -%d\n"
+    "  addiu $t%d, $t%d, 16\n"
+    "  addiu $v0, $v0, 16\n"
+    "  addiu $a1, $a1, -%d\n"
     "  bgtz $a1, vu0_download_data_%d\n"
     "  nop\n",
     array,
@@ -2102,7 +2102,7 @@ void Playstation2::add_draw3d_object_with_texture_constructor()
 
 void Playstation2::add_draw3d_texture_constructor(int bit_size)
 {
-  int shift_size;
+  int shift_size = 1;
 
   // Need to allocate enough space for:
   // -16: size of data
@@ -2129,9 +2129,10 @@ void Playstation2::add_draw3d_texture_constructor(int bit_size)
     "  and $sp, $sp, $at\n",
     bit_size, bit_size);
 
-  if (bit_size == 16) { shift_size = 1; }
-  else if (bit_size == 24) { shift_size = 1; }
-  else if (bit_size == 32) { shift_size = 2; }
+  // If bit_size is 16, then bytes = (width * height * 2)
+  // If bit_size is 24, then bytes = (width * height * 2) + (width * height)
+  // If bit_size is 32, then bytes = (width * height * 4)
+  if (bit_size == 32) { shift_size = 2; }
 
   // Allocated memory is (width * height * [2/3/4]) + 208 + 16.
   fprintf(out,
