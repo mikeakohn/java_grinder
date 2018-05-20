@@ -678,7 +678,7 @@ int Playstation2::draw3d_object_setTextureCoord_IFF()
     "  sll $at, $t%d, 5\n"
     "  sll $t%d, $t%d, 4\n"
     "  addu $at, $at, $t%d\n"
-    "  addiu $t%d, $t%d, 128\n"
+    "  addiu $t%d, $t%d, 144\n"
     "  addu $t%d, $t%d, $at\n"
     "  sw $t%d, 0($t%d)\n"
     "  sw $t%d, 4($t%d)\n",
@@ -703,7 +703,7 @@ int Playstation2::draw3d_object_setTextureCoords_aF()
   fprintf(out,
     "  ;; draw3d_object_setTextureCoords_aF()\n"
     "  lw $t8, -4($t%d)\n"
-    "  addiu $t%d, $t%d, 128\n"
+    "  addiu $t%d, $t%d, 144\n"
     "_set_point_colors_%d:\n"
     "  lw $at, 0($t%d)\n"
     "  sw $at, 0($t%d)\n"
@@ -737,9 +737,9 @@ int Playstation2::draw3d_object_disableGouraudShading()
 
   fprintf(out,
     "  ;; disableGouraudShading()\n"
-    "  lw $t8, 80($t%d)\n"
+    "  lw $t8, 96($t%d)\n"
     "  andi $t8, $t8, 0xfff7\n"
-    "  sw $t8, 80($t%d)\n",
+    "  sw $t8, 96($t%d)\n",
     object, object);
 
   reg -= 1;
@@ -753,9 +753,9 @@ int Playstation2::draw3d_object_enableGouraudShading()
 
   fprintf(out,
     "  ;; enableGouraudShading()\n"
-    "  lw $t8, 80($t%d)\n"
+    "  lw $t8, 96($t%d)\n"
     "  ori $t8, $t8, 0x8\n"
-    "  sw $t8, 80($t%d)\n",
+    "  sw $t8, 96($t%d)\n",
     object, object);
 
   reg -= 1;
@@ -769,9 +769,9 @@ int Playstation2::draw3d_object_disableFogging()
 
   fprintf(out,
     "  ;; disableFogging()\n"
-    "  lw $t8, 80($t%d)\n"
+    "  lw $t8, 96($t%d)\n"
     "  andi $t8, $t8, 0xffdf\n"
-    "  sw $t8, 80($t%d)\n",
+    "  sw $t8, 96($t%d)\n",
     object, object);
 
   reg -= 1;
@@ -785,9 +785,9 @@ int Playstation2::draw3d_object_enableFogging()
 
   fprintf(out,
     "  ;; enableFogging()\n"
-    "  lw $t8, 80($t%d)\n"
+    "  lw $t8, 96($t%d)\n"
     "  ori $t8, $t8, 0x20\n"
-    "  sw $t8, 80($t%d)\n",
+    "  sw $t8, 96($t%d)\n",
     object, object);
 
   reg -= 1;
@@ -801,9 +801,9 @@ int Playstation2::draw3d_object_disableTexture()
 
   fprintf(out,
     "  ;; disableTexture()\n"
-    "  lw $t8, 80($t%d)\n"
+    "  lw $t8, 96($t%d)\n"
     "  andi $t8, $t8, 0xffef\n"
-    "  sw $t8, 80($t%d)\n",
+    "  sw $t8, 96($t%d)\n",
     object, object);
 
   reg -= 1;
@@ -817,9 +817,9 @@ int Playstation2::draw3d_object_enableTexture()
 
   fprintf(out,
     "  ;; enableTexture()\n"
-    "  lw $t8, 80($t%d)\n"
+    "  lw $t8, 96($t%d)\n"
     "  ori $t8, $t8, 0x10\n"
-    "  sw $t8, 80($t%d)\n",
+    "  sw $t8, 96($t%d)\n",
     object, object);
 
   reg -= 1;
@@ -833,9 +833,9 @@ int Playstation2::draw3d_object_disableAlphaBlending()
 
   fprintf(out,
     "  ;; disableAlphaBlending()\n"
-    "  lw $t8, 80($t%d)\n"
+    "  lw $t8, 96($t%d)\n"
     "  andi $t8, $t8, 0xffbf\n"
-    "  sw $t8, 80($t%d)\n",
+    "  sw $t8, 96($t%d)\n",
     object, object);
 
   reg -= 1;
@@ -849,9 +849,9 @@ int Playstation2::draw3d_object_enableAlphaBlending()
 
   fprintf(out,
     "  ;; enableAlphaBlending()\n"
-    "  lw $t8, 80($t%d)\n"
+    "  lw $t8, 96($t%d)\n"
     "  ori $t8, $t8, 0x40\n"
-    "  sw $t8, 80($t%d)\n",
+    "  sw $t8, 96($t%d)\n",
     object, object);
 
   reg -= 1;
@@ -865,9 +865,9 @@ int Playstation2::draw3d_object_disableAntialiasing()
 
   fprintf(out,
     "  ;; disableAntialiasing()\n"
-    "  lw $t8, 80($t%d)\n"
+    "  lw $t8, 96($t%d)\n"
     "  andi $t8, $t8, 0xff7f\n"
-    "  sw $t8, 80($t%d)\n",
+    "  sw $t8, 96($t%d)\n",
     object, object);
 
   reg -= 1;
@@ -881,9 +881,9 @@ int Playstation2::draw3d_object_enableAntialiasing()
 
   fprintf(out,
     "  ;; enableAntialiasing()\n"
-    "  lw $t8, 80($t%d)\n"
+    "  lw $t8, 96($t%d)\n"
     "  ori $t8, $t8, 0x80\n"
-    "  sw $t8, 80($t%d)\n",
+    "  sw $t8, 96($t%d)\n",
     object, object);
 
   reg -= 1;

@@ -8,6 +8,8 @@
   nop                         ilw.x vi01, 0(vi00)
 
   ;; Load vf02 [ 0, 0, vu0_params[1], 0 ]
+  ;; NOTE: it's possible to do lq.xyzw here and remove a lot of the
+  ;; code below.
   nop                         lq.y vf02, 0(vi00)
 
   ;; Set vf03 to [ 0, 0, 0, 0 ] (copy vi00, which is always 0 to vf03)
