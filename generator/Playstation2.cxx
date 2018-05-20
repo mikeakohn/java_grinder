@@ -1702,10 +1702,19 @@ void Playstation2::add_misc_functions()
 
 void Playstation2::add_draw3d_object_draw()
 {
-  // This could be done with DMA.  Not sure what's better.
   fprintf(out,
     "  ;; _draw3d_object_draw()\n"
-    "  ;; Copy GIF packet to VU1's data memory segment.\n"
+    "  ;; Copy GIF packet to VU1's data memory segment.\n");
+
+  // This could be done with DMA.  Not sure what's better.
+  fprintf(out,
+    "  ; Check if VU1 is busy\n"
+    "  li $v1, VIF1_STAT\n"
+    "_draw3d_object_vu1_is_running:\n"
+    "  lw $v0, ($v1)\n"
+    "  andi $t8, $v0, 0x04\n"
+    "  bne $t8, $0, _draw3d_object_vu1_is_running\n"
+    "  nop\n"
     "_draw3d_object_draw:\n"
     "  li $v0, VU1_VU_MEM\n"
     "  lw $a1, -16($a0)\n"
