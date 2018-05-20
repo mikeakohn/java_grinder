@@ -43,6 +43,9 @@ public class SimpleTest
     // the other is even.
     while(true)
     {
+      // Tell video system which context needs to be drawn next.
+      Playstation2.showContext(n + 1);
+
       // Set which context these objects need to be drawn on.
       // The API automatically does a logical AND with the value
       // passed in.
@@ -59,9 +62,6 @@ public class SimpleTest
 
       // Wait until the video beam is done drawing the last frame.
       Playstation2.waitVsync();
-
-      // Tell video system which context needs to be drawn next.
-      Playstation2.showContext(n);
 
       n++;
     }
