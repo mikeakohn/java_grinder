@@ -6,7 +6,7 @@ grind: PS2JavaDemo.class
 	../../java_grinder -v PS2JavaDemo.class ps2_java_demo.asm playstation2
 	../../../naken_asm/naken_asm -I $(INCLUDE_PATH) -l -e -o ps2_java_demo.elf ps2_java_demo.asm
 
-simple:
+simple: SimpleTest.class
 	../../java_grinder -v SimpleTest.class simple_test.asm playstation2
 	../../../naken_asm/naken_asm -I $(INCLUDE_PATH) -l -e -o simple_test.elf simple_test.asm
 
