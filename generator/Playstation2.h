@@ -95,7 +95,7 @@ private:
   void add_screen_init_clear();
   void add_primitive_gif_tag();
   void add_texture_gif_tag();
-  void add_vu0_code();
+  //void add_vu0_code();
   void add_vu1_code();
   void add_draw3d_object_constructor();
   void add_draw3d_object_with_texture_constructor();

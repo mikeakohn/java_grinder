@@ -18,10 +18,12 @@
 
 void Playstation2::add_vu1_code()
 {
+#if 0
   fprintf(out,
     ".align 128\n"
     "vu1_start:\n"
-    "  dc64 0x0, (VIF_MSCAL << 24)\n\n");
+    "  dc32 (VIF_MSCAL << 24), 0, 0, 0\n\n");
+#endif
 
   // This is from naken_asm's samples/playstation2/rotation_vu1.asm
 

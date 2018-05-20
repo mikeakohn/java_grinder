@@ -64,7 +64,7 @@ Playstation2::~Playstation2()
   add_draw3d_object_draw();
   add_primitive_gif_tag();
   add_texture_gif_tag();
-  add_vu0_code();
+  //add_vu0_code();
   add_vu1_code();
   Math::add_sin_table(out);
   Math::add_cos_table(out);
@@ -273,10 +273,10 @@ int Playstation2::draw3d_object_setContext_I()
     "  ;; draw3d_object_setContext_I()\n"
     "  andi $t%d, $t%d, 1\n"
     "  sll $t%d, $t%d, 9\n"
-    "  lw $t8, 80($t%d)\n"
+    "  lw $t8, 96($t%d)\n"
     "  andi $t8, $t8, 0xfdff\n"
     "  or $t8, $t8, $t%d\n"
-    "  sw $t8, 80($t%d)\n",
+    "  sw $t8, 96($t%d)\n",
     value, value,
     value, value,
     object,
@@ -300,15 +300,15 @@ int Playstation2::draw3d_object_rotateX512_I()
     "  li $v1, _sin_table_512\n"
     "  addu $v1, $v1, $t%d\n"
     "  lw $v0, ($v1)\n"
-    "  sw $v0, 0($t%d)\n"
+    "  sw $v0, 16($t%d)\n"
     "  li $v1, _cos_table_512\n"
     "  addu $v1, $v1, $t%d\n"
     "  lw $v0, ($v1)\n"
-    "  sw $v0, 4($t%d)\n"
+    "  sw $v0, 20($t%d)\n"
     "  ori $v1, $0, 1\n"
-    "  lw $v1, 52($t%d)\n"
+    "  lw $v1, 68($t%d)\n"
     "  ori $v1, $v1, 1\n"
-    "  sw $v1, 52($t%d)\n",
+    "  sw $v1, 68($t%d)\n",
     x, x,
     x, x,
     x,
@@ -335,15 +335,15 @@ int Playstation2::draw3d_object_rotateY512_I()
     "  li $v1, _sin_table_512\n"
     "  addu $v1, $v1, $t%d\n"
     "  lw $v0, ($v1)\n"
-    "  sw $v0, 8($t%d)\n"
+    "  sw $v0, 24($t%d)\n"
     "  li $v1, _cos_table_512\n"
     "  addu $v1, $v1, $t%d\n"
     "  lw $v0, ($v1)\n"
-    "  sw $v0, 12($t%d)\n"
+    "  sw $v0, 28($t%d)\n"
     "  ori $v1, $0, 1\n"
-    "  lw $v1, 52($t%d)\n"
+    "  lw $v1, 68($t%d)\n"
     "  ori $v1, $v1, 2\n"
-    "  sw $v1, 52($t%d)\n",
+    "  sw $v1, 68($t%d)\n",
     y, y,
     y, y,
     y,
@@ -370,15 +370,15 @@ int Playstation2::draw3d_object_rotateZ512_I()
     "  li $v1, _sin_table_512\n"
     "  addu $v1, $v1, $t%d\n"
     "  lw $v0, ($v1)\n"
-    "  sw $v0, 16($t%d)\n"
+    "  sw $v0, 32($t%d)\n"
     "  li $v1, _cos_table_512\n"
     "  addu $v1, $v1, $t%d\n"
     "  lw $v0, ($v1)\n"
-    "  sw $v0, 20($t%d)\n"
+    "  sw $v0, 36($t%d)\n"
     "  ori $v1, $0, 1\n"
-    "  lw $v1, 52($t%d)\n"
+    "  lw $v1, 68($t%d)\n"
     "  ori $v1, $v1, 4\n"
-    "  sw $v1, 52($t%d)\n",
+    "  sw $v1, 68($t%d)\n",
     z, z,
     z, z,
     z,
@@ -402,9 +402,9 @@ int Playstation2::draw3d_object_setPosition_FFF()
 
   fprintf(out,
     "  ;; draw3d_object_setPosition_FFF()\n"
-    "  sw $t%d, 32($t%d)\n"
-    "  sw $t%d, 36($t%d)\n"
-    "  sw $t%d, 40($t%d)\n",
+    "  sw $t%d, 48($t%d)\n"
+    "  sw $t%d, 52($t%d)\n"
+    "  sw $t%d, 56($t%d)\n",
     x, object,
     y, object,
     z, object);
@@ -425,7 +425,7 @@ int Playstation2::draw3d_object_setPoint_IFFF()
   fprintf(out,
     "  ;; draw3d_object_setPointPosition_IFFF()\n"
     "  sll $t%d, $t%d, 5\n"
-    "  addiu $t%d, $t%d, 128\n"
+    "  addiu $t%d, $t%d, 160\n"
     "  addu $t%d, $t%d, $t%d\n"
     "  sw $t%d, 0($t%d)\n"
     "  sw $t%d, 4($t%d)\n"
@@ -451,7 +451,7 @@ int Playstation2::draw3d_object_setPointColor_II()
   fprintf(out,
     "  ;; draw3d_object_setPointColor_II()\n"
     "  sll $t%d, $t%d, 5\n"
-    "  addiu $t%d, $t%d, 112\n"
+    "  addiu $t%d, $t%d, 144\n"
     "  addu $t%d, $t%d, $t%d\n"
     "  sw $t%d, 0($t%d)\n",
     index, index,
@@ -472,8 +472,7 @@ int Playstation2::draw3d_object_setPoints_aF()
   fprintf(out,
     "  ;; draw3d_object_setPoints_aF()\n"
     "  lw $t8, -4($t%d)\n"
-    //"  sll $t8, $t8, 5\n"
-    "  addiu $t%d, $t%d, 128\n"
+    "  addiu $t%d, $t%d, 144\n"
     "_set_points_%d:\n"
     "  lw $at, 0($t%d)\n"
     "  sw $at, 0($t%d)\n"
@@ -513,8 +512,7 @@ int Playstation2::draw3d_object_setPointColors_aI()
   fprintf(out,
     "  ;; draw3d_object_setPointColors_aI()\n"
     "  lw $t8, -4($t%d)\n"
-    //"  sll $t8, $t8, 5\n"
-    "  addiu $t%d, $t%d, 112\n"
+    "  addiu $t%d, $t%d, 128\n"
     "_set_point_colors_%d:\n"
     "  lw $at, 0($t%d)\n"
     "  sw $at, 0($t%d)\n"
@@ -551,7 +549,7 @@ int Playstation2::draw3d_object_with_texture_setPoint_IFFF()
     "  sll $at, $t%d, 5\n"
     "  sll $t%d, $t%d, 4\n"
     "  addu $t%d, $t%d, $at\n"
-    "  addiu $t%d, $t%d, 144\n"
+    "  addiu $t%d, $t%d, 160\n"
     "  addu $t%d, $t%d, $t%d\n"
     "  sw $t%d, 0($t%d)\n"
     "  sw $t%d, 4($t%d)\n"
@@ -581,7 +579,7 @@ int Playstation2::draw3d_object_with_texture_setPointColor_II()
     "  sll $at, $t%d, 5\n"
     "  sll $t%d, $t%d, 4\n"
     "  addu $t%d, $t%d, $at\n"
-    "  addiu $t%d, $t%d, 112\n"
+    "  addiu $t%d, $t%d, 128\n"
     "  addu $t%d, $t%d, $t%d\n"
     "  sw $t%d, 0($t%d)\n",
     index,
@@ -604,7 +602,7 @@ int Playstation2::draw3d_object_with_texture_setPoints_aF()
   fprintf(out,
     "  ;; draw3d_object_with_texture_setPoints_aF()\n"
     "  lw $t8, -4($t%d)\n"
-    "  addiu $t%d, $t%d, 144\n"
+    "  addiu $t%d, $t%d, 160\n"
     "_set_points_%d:\n"
     "  lw $at, 0($t%d)\n"
     "  sw $at, 0($t%d)\n"
@@ -644,7 +642,7 @@ int Playstation2::draw3d_object_with_texture_setPointColors_aI()
   fprintf(out,
     "  ;; draw3d_object_with_texture_setPointColors_aI()\n"
     "  lw $t8, -4($t%d)\n"
-    "  addiu $t%d, $t%d, 112\n"
+    "  addiu $t%d, $t%d, 128\n"
     "_set_point_colors_%d:\n"
     "  lw $at, 0($t%d)\n"
     "  sw $at, 0($t%d)\n"
@@ -1704,8 +1702,10 @@ void Playstation2::add_draw3d_object_draw()
 {
   fprintf(out,
     "  ;; _draw3d_object_draw()\n"
-    "  ;; Copy GIF packet to VU1's data memory segment.\n");
+    "  ;; Copy GIF packet to VU1's data memory segment.\n"
+    "_draw3d_object_draw:\n");
 
+#if 0
   // This could be done with DMA.  Not sure what's better.
   fprintf(out,
     "  ; Check if VU1 is busy\n"
@@ -1733,6 +1733,24 @@ void Playstation2::add_draw3d_object_draw()
     "  li $v1, vu1_start\n"
     "  sw $v1, 0x10($v0)         ; DMA01 ADDRESS\n"
     "  li $v1, 1                 ; Length is only 1 qword\n"
+    "  sw $v1, 0x20($v0)         ; DMA01 SIZE\n"
+    "  li $v1, 0x101\n"
+    "  sw $v1, ($v0)             ; start\n\n"
+    "  jr $ra\n"
+    "  nop\n");
+#endif
+
+  fprintf(out,
+    "  ;; Wait till DMA01 is free\n"
+    "  li $v0, D1_CHCR\n"
+    "_draw_dma01_wait:\n"
+    "  lw $v1, ($v0)\n"
+    "  andi $v1, $v1, 0x100\n"
+    "  bnez $v1, _draw_dma01_wait\n"
+    "  nop\n" \
+    "  ;; Start the VU1 with a VIF packet\n"
+    "  sw $a0, 0x10($v0)         ; DMA01 ADDRESS\n"
+    "  lw $v1, -16($a0)          ; Length of VIF data\n"
     "  sw $v1, 0x20($v0)         ; DMA01 SIZE\n"
     "  li $v1, 0x101\n"
     "  sw $v1, ($v0)             ; start\n\n"
@@ -1895,16 +1913,16 @@ void Playstation2::add_texture_gif_tag()
     "  dc64 GIF_TAG(0, 1, 0, 0, FLG_IMAGE, 1), REG_A_D\n\n");
 }
 
+#if 0
 void Playstation2::add_vu0_code()
 {
-#if 0
   fprintf(out,
     ".align 128\n"
     "_vif_vu0_start:\n"
-    "  dc32 (VIF_MSCAL << 24), 0, 0, 0\n");
-    "_vif_vu0_end:\n\n"
-#endif
+    "  dc32 (VIF_MSCAL << 24), 0, 0, 0\n"
+    "_vif_vu0_end:\n\n");
 }
+#endif
 
 void Playstation2::add_draw3d_texture16_setPixelsRLE16_IaB()
 {
@@ -1943,15 +1961,17 @@ void Playstation2::add_draw3d_object_constructor()
 {
   // Need to allocate enough space for:
   // -16: size of packet
-  //   0: sin512(rx), cos512(rx), sin512(ry), sin512(ry)
-  //  16: sin512(rz), cos(rz), 0, 0
-  //  32: x, y, z, 0
-  //  48: count, do_rot_x, do_rot_y, do_rot_z
-  //  64: 16 byte GIF tag
-  //  80: 16 byte primitive info
-  //  96: 16 byte GIF tag
-  // 112: 16 bytes per point (for color)   REG_A_D
+  //   0: VIF_FLUSHE, VIF_STMOD, VIF_STCYCL, VIF_UNPACK_V4_32
+  //  16: sin512(rx), cos512(rx), sin512(ry), sin512(ry)
+  //  32: sin512(rz), cos(rz), 0, 0
+  //  48: x, y, z, 0
+  //  64: count, do_rot_xyz, vertex_size, 0
+  //  80: 16 byte GIF tag
+  //  96: 16 byte primitive info
+  // 112: 16 byte GIF tag
+  // 128: 16 bytes per point (for color)   REG_A_D
   //    : 16 bytes per point (for x, y, z) REG_XYZ2
+  //    : VIF_MSCAL, VIF_NOP, VIF_NOP, VIF_NOP
   fprintf(out,
     "_draw3d_object_constructor:\n"
     "  ;; _draw3d_object_constructor(type, point_count)\n"
@@ -1960,54 +1980,80 @@ void Playstation2::add_draw3d_object_constructor()
     "  addiu $at, $0, -16\n"
     "  and $sp, $sp, $at\n");
 
-  // Allocated memory is number of points * 32 + size of header + 16.
+  // Allocated memory is:
+  // vertex_count * 32 + size_of_header + 32 + 16
   fprintf(out,
     "  sll $at, $a1, 5\n"
-    "  addiu $at, $at, 128\n"
+    "  addiu $at, $at, 160\n"
     "  subu $sp, $sp, $at\n");
 
   // Set top of reg stack (return value) to allocated memory.
+  // 16 bytes before the allocated memory is the size of the
+  // DMA transfer.
   fprintf(out, "  addiu $v0, $sp, 16\n");
+
+  // Setup starting part VIF packet
+  fprintf(out,
+    "  li $t8, (VIF_FLUSHE << 24)\n"
+    "  sw $t8, 0($v0)\n"
+    "  li $t8, (VIF_STMOD << 24)\n"
+    "  sw $t8, 4($v0)\n"
+    "  li $t8, (VIF_STCYCL << 24)|(1 << 8)|1\n"
+    "  sw $t8, 8($v0)\n"
+    "  li $t8, (VIF_UNPACK_V4_32 << 24)\n"
+    "  addiu $t9, $at, -48\n"
+    "  sll $t9, $t9, 12\n"
+    "  or $t8, $t8, $t9\n"
+    "  sw $t8, 12($v0)\n");
+
+  // Setup ending part VIF packet
+  fprintf(out,
+    "  li $t8, (VIF_MSCAL << 24)\n"
+    "  addu $t9, $sp, $at\n"
+    "  sw $t8, -16($t9)\n"
+    "  sw $0, -12($t9)\n"
+    "  sw $0, -8($t9)\n"
+    "  sw $0, -4($t9)\n");
 
   // Store the size of the packet (size / 16).
   fprintf(out,
     "  sll $at, $a1, 1\n"
-    "  addiu $at, $at, 7\n"
+    "  addiu $at, $at, 9\n"
     "  sw $at, -16($v0)\n");
 
   // Clear out members of the structure (rotation, xyz position, etc).
   fprintf(out,
-    "  sq $0, 0($v0)\n"
     "  sq $0, 16($v0)\n"
     "  sq $0, 32($v0)\n"
-    "  sq $0, 48($v0)\n");
+    "  sq $0, 48($v0)\n"
+    "  sq $0, 64($v0)\n");
 
   // Save point count in the struct
-  fprintf(out, "  sw $a1, 48($v0)\n");
+  fprintf(out, "  sw $a1, 64($v0)\n");
 
   // Copy the default primitive tag to the new structure.
   fprintf(out,
     "  li $t8, _primitive_gif_tag\n"
     "  lq $t9, 0($t8)\n"
-    "  sq $t9, 64($v0)\n"
+    "  sq $t9, 80($v0)\n"
     "  lq $t9, 16($t8)\n"
     "  or $t9, $t9, $a0\n"
-    "  sq $t9, 80($v0)\n"
+    "  sq $t9, 96($v0)\n"
     "  lq $t9, 32($t8)\n"
     "  or $t9, $t9, $a1\n"
-    "  sq $t9, 96($v0)\n");
+    "  sq $t9, 112($v0)\n");
 
   // Set vertex size (2 for no texture and 3 for texture)
   fprintf(out,
     "  li $t9, 2\n"
-    "  sw $t9, 56($v0)\n");
+    "  sw $t9, 72($v0)\n");
 
   // a1 = count
   //fprintf(out, "  move $a1, $t%d\n", reg_point_count);
 
   // Set points and colors
   fprintf(out,
-    "  addiu $t8, $v0, 112\n"
+    "  addiu $t8, $v0, 128\n"
     "  lui $t9, 0x3f80\n"
     "  dsll32 $t9, $t9, 0\n"
     "  li $a2, REG_RGBAQ\n"
@@ -2029,16 +2075,18 @@ void Playstation2::add_draw3d_object_with_texture_constructor()
 {
   // Need to allocate enough space for:
   // -16: size of packet
-  //   0: sin512(rx), cos512(rx), sin512(ry), sin512(ry)
-  //  16: sin512(rz), cos(rz), 0, 0
-  //  32: x, y, z, 0
-  //  48: count, do_rot_x, do_rot_y, do_rot_z
-  //  64: 16 byte GIF tag
-  //  80: 16 byte primitive info
-  //  96: 16 byte GIF tag
-  // 112: 16 bytes per point (for color)   REG_A_D
+  //   0: VIF_FLUSHE, VIF_STMOD, VIF_STCYCL, VIF_UNPACK_V4_32
+  //  16: sin512(rx), cos512(rx), sin512(ry), sin512(ry)
+  //  32: sin512(rz), cos(rz), 0, 0
+  //  48: x, y, z, 0
+  //  64: count, do_rot_xyz, vertex_size, 0
+  //  80: 16 byte GIF tag
+  //  96: 16 byte primitive info
+  // 112: 16 byte GIF tag
+  // 128: 16 bytes per point (for color)   REG_A_D
   //    : 16 bytes per point (for st)      REG_ST    [texture coords]
   //    : 16 bytes per point (for x, y, z) REG_XYZ2
+  //    : VIF_MSCAL, VIF_NOP, VIF_NOP, VIF_NOP
   fprintf(out,
     "_draw3d_object_with_texture_constructor:\n"
     "  ;; _draw3d_object_with_texture_constructor(type, point_count)\n"
@@ -2047,57 +2095,81 @@ void Playstation2::add_draw3d_object_with_texture_constructor()
     "  addiu $at, $0, -16\n"
     "  and $sp, $sp, $at\n");
 
-  // Allocated memory is number of points * 48 + size of header + 16.
+  // Allocated memory is:
+  // vertex_count * 48 + size_of_header + 32 + 16
   fprintf(out,
     "  sll $at, $a1, 5\n"
     "  sll $t9, $a1, 4\n"
     "  addu $at, $at, $t9\n"
-    "  addiu $at, $at, 128\n"
+    "  addiu $at, $at, 160\n"
     "  subu $sp, $sp, $at\n");
 
   // Set top of reg stack (return value) to allocated memory.
   fprintf(out, "  addiu $v0, $sp, 16\n");
 
+  // Setup starting part VIF packet
+  fprintf(out,
+    "  li $t8, (VIF_FLUSHE << 24)\n"
+    "  sw $t8, 0($v0)\n"
+    "  li $t8, (VIF_STMOD << 24)\n"
+    "  sw $t8, 4($v0)\n"
+    "  li $t8, (VIF_STCYCL << 24)|(1 << 8)|1\n"
+    "  sw $t8, 8($v0)\n"
+    "  li $t8, (VIF_UNPACK_V4_32 << 24)\n"
+    "  addiu $t9, $at, -48\n"
+    "  sll $t9, $t9, 12\n"
+    "  or $t8, $t8, $t9\n"
+    "  sw $t8, 12($v0)\n");
+
+  // Setup ending part VIF packet
+  fprintf(out,
+    "  li $t8, (VIF_MSCAL << 24)\n"
+    "  addu $t9, $sp, $at\n"
+    "  sw $t8, -16($t9)\n"
+    "  sw $0, -12($t9)\n"
+    "  sw $0, -8($t9)\n"
+    "  sw $0, -4($t9)\n");
+
   // Store the size of the packet (size / 16).
   fprintf(out,
     "  sll $at, $a1, 1\n"
     "  addu $at, $at, $a1\n"
-    "  addiu $at, $at, 7\n"
+    "  addiu $at, $at, 9\n"
     "  sw $at, -16($v0)\n");
 
   // Clear out members of the structure (rotation, xyz position, etc).
   fprintf(out,
-    "  sq $0, 0($v0)\n"
     "  sq $0, 16($v0)\n"
     "  sq $0, 32($v0)\n"
-    "  sq $0, 48($v0)\n");
+    "  sq $0, 48($v0)\n"
+    "  sq $0, 64($v0)\n");
 
   // Save point count in the struct
-  fprintf(out, "  sw $a1, 48($v0)\n");
+  fprintf(out, "  sw $a1, 64($v0)\n");
 
   // Copy the default primitive tag to the new structure.
   fprintf(out,
     "  li $t8, _primitive_with_texture_gif_tag\n"
     "  lq $t9, 0($t8)\n"
-    "  sq $t9, 64($v0)\n"
+    "  sq $t9, 80($v0)\n"
     "  lq $t9, 16($t8)\n"
     "  or $t9, $t9, $a0\n"
-    "  sq $t9, 80($v0)\n"
+    "  sq $t9, 96($v0)\n"
     "  lq $t9, 32($t8)\n"
     "  or $t9, $t9, $a1\n"
-    "  sq $t9, 96($v0)\n");
+    "  sq $t9, 112($v0)\n");
 
   // Set vertex size (2 for no texture and 3 for texture)
   fprintf(out,
     "  li $t9, 3\n"
-    "  sw $t9, 56($v0)\n");
+    "  sw $t9, 72($v0)\n");
 
   // a1 = count
   //fprintf(out, "  move $a1, $t%d\n", reg_point_count);
 
   // Set points and colors
   fprintf(out,
-    "  addiu $t8, $v0, 112\n"
+    "  addiu $t8, $v0, 128\n"
     "  lui $t9, 0x3f80\n"
     "  dsll32 $t9, $t9, 0\n"
     "  li $a2, REG_RGBAQ\n"
