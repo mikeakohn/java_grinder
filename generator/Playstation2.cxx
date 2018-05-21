@@ -1705,6 +1705,25 @@ void Playstation2::add_draw3d_object_draw()
     "  ;; Copy GIF packet to VU1's data memory segment.\n"
     "_draw3d_object_draw:\n");
 
+  // Clear cache for this object.
+  // Find the number of quadwords (16 byte) elements in this object.
+  // Since there are 4 elements per 64 byte cache line, figure out how
+  // many cache lines need to be flushed by taking (count + 3) / 4.
+  // FIXME: Can possibly ignore the VIF commands (32 bytes)
+  fprintf(out,
+    "  ; Flush cache\n"
+    "  lw $v0, -16($a0)\n"
+    "  addiu $v0, $v0, 3\n"
+    "  move $v1, $a0\n"
+    "  srl $v0, $v0, 2\n"
+    "  sync.l\n"
+    "_draw3d_object_draw_cache_flush:\n"
+    "  addiu $v0, $v0, -1\n"
+    "  cache dhwoin, 0($v1)\n"
+    "  addiu $v1, $v1, 64\n"
+    "  bnez $v0, _draw3d_object_draw_cache_flush\n"
+    "  sync.l\n");
+
 #if 0
   // This could be done with DMA.  Not sure what's better.
   fprintf(out,

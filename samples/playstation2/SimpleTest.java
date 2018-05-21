@@ -50,15 +50,15 @@ public class SimpleTest
       // The API automatically does a logical AND with the value
       // passed in.
       triangles[0].setContext(n);
-      //triangles[1].setContext(n);
+      triangles[1].setContext(n);
 
       // Clear the entire context of where this is going to draw.
       Playstation2.clearContext(n);
 
       triangles[0].draw();
-      //triangles[1].draw();
+      triangles[1].draw();
       triangles[0].rotateZ512(n);
-      //triangles[1].rotateZ512(-n);
+      triangles[1].rotateZ512(-n);
 
       // Wait until the video beam is done drawing the last frame.
       Playstation2.waitVsync();
