@@ -1237,8 +1237,33 @@ int Playstation2::draw3d_texture_upload()
 {
   const int object = reg - 1;
 
+  // FIXME: This needs to be a function
   fprintf(out,
-    "  ;; draw3d_texture_upload()\n"
+    "  ;; draw3d_texture_upload()\n");
+
+  // Clear cache for this object.
+  // Find the number of quadwords (16 byte) elements in this object.
+  // Since there are 4 elements per 64 byte cache line, figure out how
+  // many cache lines need to be flushed by taking (count + 3) / 4.
+  fprintf(out,
+    "  ; Flush cache\n"
+    "  lw $v0, -16($t%d)\n"
+    "  addiu $v0, $v0, 3\n"
+    "  move $v1, $t%d\n"
+    "  srl $v0, $v0, 2\n"
+    "  sync.l\n"
+    ".scope\n"
+    "_draw3d_texture_upload_cache_flush:\n"
+    "  addiu $v0, $v0, -1\n"
+    "  cache dhwoin, 0($v1)\n"
+    "  addiu $v1, $v1, 64\n"
+    "  bnez $v0, _draw3d_texture_upload_cache_flush\n"
+    ".ends\n"
+    "  sync.l\n",
+    object,
+    object);
+
+  fprintf(out,
     DMA02_WAIT
     "  sw $t%d, 0x10($v0)        ; DMA02 ADDRESS\n"
     "  lw $v1, -16($t%d)\n"
@@ -2013,7 +2038,7 @@ void Playstation2::add_draw3d_object_constructor()
 
   // Setup starting part VIF packet
   fprintf(out,
-    "  li $t8, (VIF_FLUSHE << 24)\n"
+    "  li $t8, (VIF_FLUSH << 24)\n"
     "  sw $t8, 0($v0)\n"
     "  li $t8, (VIF_STMOD << 24)\n"
     "  sw $t8, 4($v0)\n"
@@ -2128,7 +2153,7 @@ void Playstation2::add_draw3d_object_with_texture_constructor()
 
   // Setup starting part VIF packet
   fprintf(out,
-    "  li $t8, (VIF_FLUSHE << 24)\n"
+    "  li $t8, (VIF_FLUSH << 24)\n"
     "  sw $t8, 0($v0)\n"
     "  li $t8, (VIF_STMOD << 24)\n"
     "  sw $t8, 4($v0)\n"
