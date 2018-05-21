@@ -451,7 +451,7 @@ int Playstation2::draw3d_object_setPointColor_II()
   fprintf(out,
     "  ;; draw3d_object_setPointColor_II()\n"
     "  sll $t%d, $t%d, 5\n"
-    "  addiu $t%d, $t%d, 144\n"
+    "  addiu $t%d, $t%d, 128\n"
     "  addu $t%d, $t%d, $t%d\n"
     "  sw $t%d, 0($t%d)\n",
     index, index,
