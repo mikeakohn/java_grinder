@@ -91,6 +91,7 @@ private:
   void add_dma_functions();
   void add_misc_functions();
   void add_draw3d_object_draw();
+  void add_draw3d_texture_upload();
   void add_copy_vu1_code();
   void add_screen_init_clear();
   void add_primitive_gif_tag();

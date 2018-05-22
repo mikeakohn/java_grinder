@@ -62,6 +62,7 @@ Playstation2::~Playstation2()
   if (need_draw3d_texture32) { add_draw3d_texture_constructor(32); }
   add_draw3d_texture16_setPixelsRLE16_IaB();
   add_draw3d_object_draw();
+  add_draw3d_texture_upload();
   add_primitive_gif_tag();
   add_texture_gif_tag();
   //add_vu0_code();
@@ -1237,40 +1238,13 @@ int Playstation2::draw3d_texture_upload()
 {
   const int object = reg - 1;
 
-  // FIXME: This needs to be a function
   fprintf(out,
-    "  ;; draw3d_texture_upload()\n");
-
-  // Clear cache for this object.
-  // Find the number of quadwords (16 byte) elements in this object.
-  // Since there are 4 elements per 64 byte cache line, figure out how
-  // many cache lines need to be flushed by taking (count + 3) / 4.
-  fprintf(out,
-    "  ; Flush cache\n"
-    "  lw $v0, -16($t%d)\n"
-    "  addiu $v0, $v0, 3\n"
-    "  move $v1, $t%d\n"
-    "  srl $v0, $v0, 2\n"
-    "  sync.l\n"
-    ".scope\n"
-    "_draw3d_texture_upload_cache_flush:\n"
-    "  addiu $v0, $v0, -1\n"
-    "  cache dhwoin, 0($v1)\n"
-    "  addiu $v1, $v1, 64\n"
-    "  bnez $v0, _draw3d_texture_upload_cache_flush\n"
-    ".ends\n"
-    "  sync.l\n",
-    object,
-    object);
-
-  fprintf(out,
-    DMA02_WAIT
-    "  sw $t%d, 0x10($v0)        ; DMA02 ADDRESS\n"
-    "  lw $v1, -16($t%d)\n"
-    "  sw $v1, 0x20($v0)         ; DMA02 SIZE\n"
-    "  li $v1, 0x101\n"
-    "  sw $v1, ($v0)             ; start\n",
-    object,
+    "  ;; draw3d_texture_upload()\n"
+    "  move $a0, $t%d\n"
+    "  move $s0, $ra\n"
+    "  jal _draw3d_texture_upload\n"
+    "  nop\n"
+    "  move $ra, $s0\n",
     object);
 
   reg -= 1;
@@ -1797,9 +1771,44 @@ void Playstation2::add_draw3d_object_draw()
     "  lw $v1, -16($a0)          ; Length of VIF data\n"
     "  sw $v1, 0x20($v0)         ; DMA01 SIZE\n"
     "  li $v1, 0x101\n"
-    "  sw $v1, ($v0)             ; start\n\n"
+    "  sw $v1, ($v0)             ; start\n"
     "  jr $ra\n"
-    "  nop\n");
+    "  nop\n\n");
+}
+
+void Playstation2::add_draw3d_texture_upload()
+{
+  fprintf(out,
+    "  ;; _draw3d_texture_upload()\n"
+    "_draw3d_texture_upload:\n");
+
+  // Clear cache for this object.
+  // Find the number of quadwords (16 byte) elements in this object.
+  // Since there are 4 elements per 64 byte cache line, figure out how
+  // many cache lines need to be flushed by taking (count + 3) / 4.
+  fprintf(out,
+    "  ; Flush cache\n"
+    "  lw $v0, -16($a0)\n"
+    "  addiu $v0, $v0, 3\n"
+    "  move $v1, $a0\n"
+    "  srl $v0, $v0, 2\n"
+    "  sync.l\n"
+    "_draw3d_texture_upload_cache_flush:\n"
+    "  addiu $v0, $v0, -1\n"
+    "  cache dhwoin, 0($v1)\n"
+    "  addiu $v1, $v1, 64\n"
+    "  bnez $v0, _draw3d_texture_upload_cache_flush\n"
+    "  sync.l\n");
+
+  fprintf(out,
+    DMA02_WAIT
+    "  sw $a0, 0x10($v0)        ; DMA02 ADDRESS\n"
+    "  lw $v1, -16($a0)\n"
+    "  sw $v1, 0x20($v0)         ; DMA02 SIZE\n"
+    "  li $v1, 0x101\n"
+    "  sw $v1, ($v0)             ; start\n"
+    "  jr $ra\n"
+    "  nop\n\n");
 }
 
 void Playstation2::add_copy_vu1_code()
