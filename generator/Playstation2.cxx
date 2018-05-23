@@ -155,7 +155,7 @@ int Playstation2::start_init()
     "  ;;           position x (dbx): 0 (0x0)\n"
     "  ;;           position y (dby): 0 (0x0)\n"
     "  li $v1, GS_DISPFB2\n"
-    "  li $v0, 0x9400\n"
+    "  li $v0, SETREG_DISPFB(0, 10, FMT_PSMCT24, 0, 0)\n"
     "  sd $v0, ($v1)\n\n");
 
   fprintf(out,
@@ -212,10 +212,10 @@ int Playstation2::new_object(const char *object_name, int field_count)
       strcmp(s, "Draw3DTriangle") != 0 &&
       strcmp(s, "Draw3DTriangleStrip") != 0 &&
       strcmp(s, "Draw3DTriangleFan") != 0 &&
-      strcmp(s, "Draw3DTriangleSprite") != 0 &&
+      strcmp(s, "Draw3DSprite") != 0 &&
       strcmp(s, "Draw3DTriangleStripWithTexture") != 0 &&
       strcmp(s, "Draw3DTriangleFanWithTexture") != 0 &&
-      strcmp(s, "Draw3DTriangleSpriteWithTexture") != 0 &&
+      strcmp(s, "Draw3DSpriteWithTexture") != 0 &&
       strcmp(s, "Draw3DTexture16") != 0 &&
       strcmp(s, "Draw3DTexture24") != 0 &&
       strcmp(s, "Draw3DTexture32") != 0)
@@ -1873,7 +1873,7 @@ void Playstation2::add_screen_init_clear()
     "  dc64 SETREG_PRIM(PRIM_SPRITE, 0, 0, 0, 0, 0, 0, 1, 0), REG_PRIM\n"
     "  dc64 SETREG_RGBAQ(0, 0, 0, 0x80, 1.0), REG_RGBAQ\n"
     "  dc64 SETREG_XYZ2(1000 << 4, 1000 << 4, 0), REG_XYZ2\n"
-    "  dc64 SETREG_XYZ2(1648 << 4, 1448 << 4, 0), REG_XYZ2\n"
+    "  dc64 SETREG_XYZ2(1640 << 4, 1448 << 4, 0), REG_XYZ2\n"
     "  dc64 SETREG_TEST(0,ATST_ALWAYS,0x00,AFAIL_KEEP,0,0,1,ZTST_GREATER), REG_TEST_2\n"
     "_screen_init_clear_2_end:\n\n");
 
@@ -2014,7 +2014,7 @@ void Playstation2::add_draw3d_object_constructor()
 {
   // Need to allocate enough space for:
   // -16: size of packet
-  //   0: VIF_FLUSHE, VIF_STMOD, VIF_STCYCL, VIF_UNPACK_V4_32
+  //   0: VIF_FLUSH, VIF_STMOD, VIF_STCYCL, VIF_UNPACK_V4_32
   //  16: sin512(rx), cos512(rx), sin512(ry), sin512(ry)
   //  32: sin512(rz), cos(rz), 0, 0
   //  48: x, y, z, 0
@@ -2128,7 +2128,7 @@ void Playstation2::add_draw3d_object_with_texture_constructor()
 {
   // Need to allocate enough space for:
   // -16: size of packet
-  //   0: VIF_FLUSHE, VIF_STMOD, VIF_STCYCL, VIF_UNPACK_V4_32
+  //   0: VIF_FLUSH, VIF_STMOD, VIF_STCYCL, VIF_UNPACK_V4_32
   //  16: sin512(rx), cos512(rx), sin512(ry), sin512(ry)
   //  32: sin512(rz), cos(rz), 0, 0
   //  48: x, y, z, 0
