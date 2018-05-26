@@ -1868,7 +1868,7 @@ void Playstation2::add_draw3d_texture_upload()
     "  nop\n"
     "  sw $0, -12($a0)\n"
     "  lw $v0, -16($a0)\n"
-    "  addiu $v0, $v0, 3\n"
+    "  addiu $v0, $v0, 7\n"
     "  move $v1, $a0\n"
     "  srl $v0, $v0, 2\n"
     "_draw3d_texture_upload_cache_flush:\n"
