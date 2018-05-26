@@ -1140,7 +1140,8 @@ int R5900::return_local(int index, int local_count)
   }
 
   fprintf(out, "  lw $v0, %d($fp) ; local_%d\n", LOCALS(index), index);
-  fprintf(out, "  addiu $sp, $fp, %d\n", local_count * 4);
+  //fprintf(out, "  addiu $sp, $fp, %d\n", local_count * 4);
+  fprintf(out, "  move $sp, $fp\n");
   fprintf(out, "  jr $ra\n");
   fprintf(out, "  nop\n");
 
@@ -1155,7 +1156,8 @@ int R5900::return_integer(int local_count)
   }
 
   fprintf(out, "  move $v0, $t0\n");
-  fprintf(out, "  addiu $sp, $fp, %d\n", local_count * 4);
+  //fprintf(out, "  addiu $sp, $fp, %d\n", local_count * 4);
+  fprintf(out, "  move $sp, $fp\n");
   fprintf(out, "  jr $ra\n");
   fprintf(out, "  nop ; Delay slot\n");
   reg--;
@@ -1170,7 +1172,8 @@ int R5900::return_void(int local_count)
     printf("Internal Error: Reg stack not empty %s:%d\n", __FILE__, __LINE__);
   }
 
-  fprintf(out, "  addiu $sp, $fp, %d\n", local_count * 4);
+  //fprintf(out, "  addiu $sp, $fp, %d\n", local_count * 4);
+  fprintf(out, "  move $sp, $fp\n");
   fprintf(out, "  jr $ra\n");
   fprintf(out, "  nop ; Delay slot\n");
   return 0;
