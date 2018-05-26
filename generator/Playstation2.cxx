@@ -1765,21 +1765,27 @@ void Playstation2::add_draw3d_object_draw()
   // Find the number of quadwords (16 byte) elements in this object.
   // Since there are 4 elements per 64 byte cache line, figure out how
   // many cache lines need to be flushed by taking (count + 3) / 4.
+  // The addresses at object + 16 to object + 96 need to be flushed
+  // if the object has changed.
+  // Not sure why all the sync.l's are needed, but it fails to work
+  // without them.
   fprintf(out,
     "  ; Flush cache\n"
     "  sync.l\n"
-    "  cache dhwoin, 16($a0)\n"
-    "  cache dhwoin, 80($a0)\n"
+    "  cache dhwoin, 0($a0)\n"
+    "  sync.l\n"
+    "  cache dhwoin, 64($a0)\n"
+    "  sync.l\n"
+    "  cache dhwoin, 128($a0)\n"
+    "  sync.l\n"
+    "  cache dhwoin, 192($a0)\n"
     "  sync.l\n"
     "  lw $v0, -12($a0)\n"
     "  beqz $v0, _draw3d_object_draw_skip_cache_flush\n"
     "  nop\n"
     "  sw $0, -12($a0)\n"
     "  lw $v0, -16($a0)\n"
-    //"  addiu $v0, $v0, -8\n"
-    //"  addiu $v0, $v0, 3\n"
-    "  addiu $v0, $v0, -5\n"
-    //"  move $v1, $a0\n"
+    "  addiu $v0, $v0, -1\n"
     "  addiu $v1, $a0, 128\n"
     "  srl $v0, $v0, 2\n"
     "_draw3d_object_draw_cache_flush:\n"
