@@ -238,13 +238,13 @@ int Playstation2::draw3d_object_Constructor_X(int type, bool with_texture)
 
 int Playstation2::draw3d_object_Constructor_I(int type, bool with_texture)
 {
-  const int reg_point_count = reg - 1;
-  //const int reg_object_dup = reg - 2;
-  const int reg_object_ref = reg - 3;
+  const int point_count = reg - 1;
+  //const int object_dup = reg - 2;
+  const int object = reg - 3;
 
   fprintf(out, "  ;; draw3d_object_Constructor_I(type=%d)\n", type);
   fprintf(out, "  li $a0, %d\n", type);
-  fprintf(out, "  move $a1, $t%d\n", reg_point_count);
+  fprintf(out, "  move $a1, $t%d\n", point_count);
   fprintf(out, "  move $s0, $ra\n");
 
   if (with_texture == false)
@@ -258,7 +258,7 @@ int Playstation2::draw3d_object_Constructor_I(int type, bool with_texture)
 
   fprintf(out, "  nop\n");
   fprintf(out, "  move $ra, $s0\n");
-  fprintf(out, "  move $t%d, $v0\n", reg_object_ref);
+  fprintf(out, "  move $t%d, $v0\n", object);
 
   reg -= 2;
 
@@ -942,14 +942,14 @@ int Playstation2::draw3d_object_draw()
 
 int Playstation2::draw3d_texture_Constructor_II(int size)
 {
-  const int reg_height = reg - 1;
-  const int reg_width = reg - 2;
-  //const int reg_object_dup = reg - 3;
-  const int reg_object_ref = reg - 4;
+  const int height = reg - 1;
+  const int width = reg - 2;
+  //const int object_dup = reg - 3;
+  const int object = reg - 4;
 
   fprintf(out, "  ;; draw3d_texture_Constructor_II()\n");
-  fprintf(out, "  move $a0, $t%d\n", reg_width);
-  fprintf(out, "  move $a1, $t%d\n", reg_height);
+  fprintf(out, "  move $a0, $t%d\n", width);
+  fprintf(out, "  move $a1, $t%d\n", height);
   fprintf(out, "  move $s0, $ra\n");
 
   switch(size)
@@ -970,7 +970,7 @@ int Playstation2::draw3d_texture_Constructor_II(int size)
 
   fprintf(out, "  nop\n");
   fprintf(out, "  move $ra, $s0\n");
-  fprintf(out, "  move $t%d, $v0\n", reg_object_ref);
+  fprintf(out, "  move $t%d, $v0\n", object);
 
   reg -= 3;
 
@@ -979,9 +979,9 @@ int Playstation2::draw3d_texture_Constructor_II(int size)
 
 int Playstation2::draw3d_texture16_setPixel_II()
 {
-  const int reg_color = reg - 1;
-  const int reg_index = reg - 2;
-  const int reg_object_ref = reg - 3;
+  const int color = reg - 1;
+  const int index = reg - 2;
+  const int object = reg - 3;
 
   fprintf(out,
     "  ;; draw3d_texture16_setPixel_II()\n"
@@ -991,11 +991,11 @@ int Playstation2::draw3d_texture16_setPixel_II()
     "  sll $t%d, $t%d, 1\n"
     "  addu $t%d, $t%d, $t%d\n"
     "  sh $t%d, 0($t%d)\n",
-    reg_object_ref,
-    reg_object_ref, reg_object_ref,
-    reg_index, reg_index,
-    reg_object_ref, reg_object_ref, reg_index,
-    reg_color, reg_object_ref);
+    object,
+    object, object,
+    index, index,
+    object, object, index,
+    color, object);
 
   reg -= 3;
 
@@ -1004,9 +1004,9 @@ int Playstation2::draw3d_texture16_setPixel_II()
 
 int Playstation2::draw3d_texture16_setPixels_IaS()
 {
-  const int reg_color_array = reg - 1;
-  const int reg_index = reg - 2;
-  const int reg_object_ref = reg - 3;
+  const int array = reg - 1;
+  const int index = reg - 2;
+  const int object = reg - 3;
 
   fprintf(out,
     "  ;; draw3d_texture16_setPixel_IaI()\n"
@@ -1024,16 +1024,16 @@ int Playstation2::draw3d_texture16_setPixels_IaS()
     "  addiu $t9, $t9, -1\n"
     "  bne $t9, $0, draw3d_texture16_setPixels_%d\n"
     "  nop\n",
-    reg_object_ref,
-    reg_index, reg_index,
-    reg_object_ref, reg_object_ref,
-    reg_object_ref, reg_object_ref, reg_index,
-    reg_color_array,
+    object,
+    index, index,
+    object, object,
+    object, object, index,
+    array,
     label_count,
-    reg_color_array,
-    reg_object_ref,
-    reg_color_array, reg_color_array,
-    reg_object_ref, reg_object_ref,
+    array,
+    object,
+    array, array,
+    object, object,
     label_count);
 
   label_count++;
@@ -1045,8 +1045,8 @@ int Playstation2::draw3d_texture16_setPixels_IaS()
 int Playstation2::draw3d_texture16_setPixelsRLE16_IaB()
 {
   const int reg_image_array = reg - 1;
-  const int reg_index = reg - 2;
-  const int reg_object_ref = reg - 3;
+  const int index = reg - 2;
+  const int object = reg - 3;
 
   fprintf(out,
     "  ;; draw3d_texture16_setPixelsRLE16_IaB()\n"
@@ -1059,9 +1059,9 @@ int Playstation2::draw3d_texture16_setPixelsRLE16_IaB()
     "  jal _draw3d_texture16_setPixelsRLE16_IaB\n"
     "  nop\n"
     "  move $ra, $s0\n",
-    reg_object_ref,
-    reg_object_ref,
-    reg_index,
+    object,
+    object,
+    index,
     reg_image_array);
 
   reg -= 3;
@@ -1071,9 +1071,9 @@ int Playstation2::draw3d_texture16_setPixelsRLE16_IaB()
 
 int Playstation2::draw3d_texture24_setPixel_II()
 {
-  const int reg_color = reg - 1;
-  const int reg_index = reg - 2;
-  const int reg_object_ref = reg - 3;
+  const int color = reg - 1;
+  const int index = reg - 2;
+  const int object = reg - 3;
 
   fprintf(out,
     "  ;; draw3d_texture24_setPixel_II()\n"
@@ -1088,16 +1088,16 @@ int Playstation2::draw3d_texture24_setPixel_II()
     "  sb $t%d, 1($t%d)\n"
     "  srl $t%d, $t%d, 8\n"
     "  sb $t%d, 2($t%d)\n",
-    reg_object_ref,
-    reg_object_ref, reg_object_ref,
-    reg_index,
-    reg_index, reg_index,
-    reg_object_ref, reg_object_ref, reg_index,
-    reg_color, reg_object_ref,
-    reg_color, reg_color,
-    reg_color, reg_object_ref,
-    reg_color, reg_color,
-    reg_color, reg_object_ref);
+    object,
+    object, object,
+    index,
+    index, index,
+    object, object, index,
+    color, object,
+    color, color,
+    color, object,
+    color, color,
+    color, object);
 
   reg -= 3;
 
@@ -1106,9 +1106,9 @@ int Playstation2::draw3d_texture24_setPixel_II()
 
 int Playstation2::draw3d_texture24_setPixels_IaI()
 {
-  const int reg_color_array = reg - 1;
-  const int reg_index = reg - 2;
-  const int reg_object_ref = reg - 3;
+  const int array = reg - 1;
+  const int index = reg - 2;
+  const int object = reg - 3;
 
   // FIXME: This should probably be a function, not inline
   fprintf(out,
@@ -1132,21 +1132,21 @@ int Playstation2::draw3d_texture24_setPixels_IaI()
     "  addiu $t9, $t9, -1\n"
     "  bne $t9, $0, draw3d_texture24_setPixels_%d\n"
     "  nop\n",
-    reg_object_ref,
-    reg_index,
-    reg_index, reg_index,
-    reg_object_ref, reg_object_ref,
-    reg_object_ref, reg_object_ref, reg_index,
-    reg_color_array,
+    object,
+    index,
+    index, index,
+    object, object,
+    object, object, index,
+    array,
     label_count,
-    reg_color_array,
-    reg_object_ref,
-    reg_color_array,
-    reg_object_ref,
-    reg_color_array,
-    reg_object_ref,
-    reg_color_array, reg_color_array,
-    reg_object_ref, reg_object_ref,
+    array,
+    object,
+    array,
+    object,
+    array,
+    object,
+    array, array,
+    object, object,
     label_count);
 
   label_count++;
@@ -1156,9 +1156,9 @@ int Playstation2::draw3d_texture24_setPixels_IaI()
 }
 int Playstation2::draw3d_texture32_setPixel_II()
 {
-  const int reg_color = reg - 1;
-  const int reg_index = reg - 2;
-  const int reg_object_ref = reg - 3;
+  const int color = reg - 1;
+  const int index = reg - 2;
+  const int object = reg - 3;
 
   fprintf(out,
     "  ;; draw3d_texture32_setPixel_II()\n"
@@ -1168,11 +1168,11 @@ int Playstation2::draw3d_texture32_setPixel_II()
     "  sll $t%d, $t%d, 2\n"
     "  addu $t%d, $t%d, $t%d\n"
     "  sw $t%d, 0($t%d)\n",
-    reg_object_ref,
-    reg_object_ref, reg_object_ref,
-    reg_index, reg_index,
-    reg_object_ref, reg_object_ref, reg_index,
-    reg_color, reg_object_ref);
+    object,
+    object, object,
+    index, index,
+    object, object, index,
+    color, object);
 
   reg -= 3;
 
@@ -1181,9 +1181,9 @@ int Playstation2::draw3d_texture32_setPixel_II()
 
 int Playstation2::draw3d_texture32_setPixels_IaI()
 {
-  const int reg_color_array = reg - 1;
-  const int reg_index = reg - 2;
-  const int reg_object_ref = reg - 3;
+  const int array = reg - 1;
+  const int index = reg - 2;
+  const int object = reg - 3;
 
   fprintf(out,
     "  ;; draw3d_texture32_setPixel_IaI()\n"
@@ -1201,16 +1201,16 @@ int Playstation2::draw3d_texture32_setPixels_IaI()
     "  addiu $t9, $t9, -1\n"
     "  bne $t9, $0, draw3d_texture32_setPixels_%d\n"
     "  nop\n",
-    reg_object_ref,
-    reg_index, reg_index,
-    reg_object_ref, reg_object_ref,
-    reg_object_ref, reg_object_ref, reg_index,
-    reg_color_array,
+    object,
+    index, index,
+    object, object,
+    object, object, index,
+    array,
     label_count,
-    reg_color_array,
-    reg_object_ref,
-    reg_color_array, reg_color_array,
-    reg_object_ref, reg_object_ref,
+    array,
+    object,
+    array, array,
+    object, object,
     label_count);
 
   label_count++;
@@ -2183,7 +2183,7 @@ void Playstation2::add_draw3d_object_constructor()
     "  sw $t9, 72($v0)\n");
 
   // a1 = count
-  //fprintf(out, "  move $a1, $t%d\n", reg_point_count);
+  //fprintf(out, "  move $a1, $t%d\n", point_count);
 
   // Set points and colors
   fprintf(out,
@@ -2305,7 +2305,7 @@ void Playstation2::add_draw3d_object_with_texture_constructor()
     "  sw $t9, 72($v0)\n");
 
   // a1 = count
-  //fprintf(out, "  move $a1, $t%d\n", reg_point_count);
+  //fprintf(out, "  move $a1, $t%d\n", point_count);
 
   // Set points and colors
   fprintf(out,
