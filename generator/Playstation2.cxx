@@ -425,12 +425,15 @@ int Playstation2::draw3d_object_setPoint_IFFF()
 
   fprintf(out,
     "  ;; draw3d_object_setPointPosition_IFFF()\n"
+    "  li $at, 1\n"
+    "  sw $at, -12($t%d)\n"
     "  sll $t%d, $t%d, 5\n"
     "  addiu $t%d, $t%d, 160\n"
     "  addu $t%d, $t%d, $t%d\n"
     "  sw $t%d, 0($t%d)\n"
     "  sw $t%d, 4($t%d)\n"
     "  sw $t%d, 8($t%d)\n",
+    object,
     index, index,
     object, object,
     object, object, index,
@@ -451,10 +454,13 @@ int Playstation2::draw3d_object_setPointColor_II()
 
   fprintf(out,
     "  ;; draw3d_object_setPointColor_II()\n"
+    "  li $at, 1\n"
+    "  sw $at, -12($t%d)\n"
     "  sll $t%d, $t%d, 5\n"
     "  addiu $t%d, $t%d, 128\n"
     "  addu $t%d, $t%d, $t%d\n"
     "  sw $t%d, 0($t%d)\n",
+    object,
     index, index,
     object, object,
     object, object, index,
@@ -472,6 +478,8 @@ int Playstation2::draw3d_object_setPoints_aF()
 
   fprintf(out,
     "  ;; draw3d_object_setPoints_aF()\n"
+    "  li $at, 1\n"
+    "  sw $at, -12($t%d)\n"
     "  lw $t8, -4($t%d)\n"
     "  addiu $t%d, $t%d, 144\n"
     "_set_points_%d:\n"
@@ -486,6 +494,7 @@ int Playstation2::draw3d_object_setPoints_aF()
     "  addiu $t8, $t8, -3\n"
     "  bne $t8, $0, _set_points_%d\n"
     "  nop\n",
+    object,
     array,
     object, object,
     label_count,
@@ -512,6 +521,8 @@ int Playstation2::draw3d_object_setPointColors_aI()
 
   fprintf(out,
     "  ;; draw3d_object_setPointColors_aI()\n"
+    "  li $at, 1\n"
+    "  sw $at, -12($t%d)\n"
     "  lw $t8, -4($t%d)\n"
     "  addiu $t%d, $t%d, 128\n"
     "_set_point_colors_%d:\n"
@@ -522,6 +533,7 @@ int Playstation2::draw3d_object_setPointColors_aI()
     "  addiu $t8, $t8, -1\n"
     "  bne $t8, $0, _set_point_colors_%d\n"
     "  nop\n",
+    object,
     array,
     object, object,
     label_count,
@@ -547,6 +559,8 @@ int Playstation2::draw3d_object_with_texture_setPoint_IFFF()
 
   fprintf(out,
     "  ;; draw3d_object_with_texture_setPointPosition_IFFF()\n"
+    "  li $at, 1\n"
+    "  sw $at, -12($t%d)\n"
     "  sll $at, $t%d, 5\n"
     "  sll $t%d, $t%d, 4\n"
     "  addu $t%d, $t%d, $at\n"
@@ -555,6 +569,7 @@ int Playstation2::draw3d_object_with_texture_setPoint_IFFF()
     "  sw $t%d, 0($t%d)\n"
     "  sw $t%d, 4($t%d)\n"
     "  sw $t%d, 8($t%d)\n",
+    object,
     index,
     index, index,
     index, index,
@@ -577,12 +592,15 @@ int Playstation2::draw3d_object_with_texture_setPointColor_II()
 
   fprintf(out,
     "  ;; draw3d_object_with_texture_setPointColor_II()\n"
+    "  li $at, 1\n"
+    "  sw $at, -12($t%d)\n"
     "  sll $at, $t%d, 5\n"
     "  sll $t%d, $t%d, 4\n"
     "  addu $t%d, $t%d, $at\n"
     "  addiu $t%d, $t%d, 128\n"
     "  addu $t%d, $t%d, $t%d\n"
     "  sw $t%d, 0($t%d)\n",
+    object,
     index,
     index, index,
     index, index,
@@ -602,6 +620,8 @@ int Playstation2::draw3d_object_with_texture_setPoints_aF()
 
   fprintf(out,
     "  ;; draw3d_object_with_texture_setPoints_aF()\n"
+    "  li $at, 1\n"
+    "  sw $at, -12($t%d)\n"
     "  lw $t8, -4($t%d)\n"
     "  addiu $t%d, $t%d, 160\n"
     "_set_points_%d:\n"
@@ -616,6 +636,7 @@ int Playstation2::draw3d_object_with_texture_setPoints_aF()
     "  addiu $t8, $t8, -3\n"
     "  bne $t8, $0, _set_points_%d\n"
     "  nop\n",
+    object,
     array,
     object, object,
     label_count,
@@ -642,6 +663,8 @@ int Playstation2::draw3d_object_with_texture_setPointColors_aI()
 
   fprintf(out,
     "  ;; draw3d_object_with_texture_setPointColors_aI()\n"
+    "  li $at, 1\n"
+    "  sw $at, -12($t%d)\n"
     "  lw $t8, -4($t%d)\n"
     "  addiu $t%d, $t%d, 128\n"
     "_set_point_colors_%d:\n"
@@ -652,6 +675,7 @@ int Playstation2::draw3d_object_with_texture_setPointColors_aI()
     "  addiu $t8, $t8, -1\n"
     "  bne $t8, $0, _set_point_colors_%d\n"
     "  nop\n",
+    object,
     array,
     object, object,
     label_count,
@@ -676,6 +700,8 @@ int Playstation2::draw3d_object_setTextureCoord_IFF()
 
   fprintf(out,
     "  ;; draw3d_object_setTextureCoord_IFF()\n"
+    "  li $at, 1\n"
+    "  sw $at, -12($t%d)\n"
     "  sll $at, $t%d, 5\n"
     "  sll $t%d, $t%d, 4\n"
     "  addu $at, $at, $t%d\n"
@@ -683,6 +709,7 @@ int Playstation2::draw3d_object_setTextureCoord_IFF()
     "  addu $t%d, $t%d, $at\n"
     "  sw $t%d, 0($t%d)\n"
     "  sw $t%d, 4($t%d)\n",
+    object,
     index,
     index, index,
     index,
@@ -703,6 +730,8 @@ int Playstation2::draw3d_object_setTextureCoords_aF()
 
   fprintf(out,
     "  ;; draw3d_object_setTextureCoords_aF()\n"
+    "  li $at, 1\n"
+    "  sw $at, -12($t%d)\n"
     "  lw $t8, -4($t%d)\n"
     "  addiu $t%d, $t%d, 144\n"
     "_set_point_colors_%d:\n"
@@ -715,6 +744,7 @@ int Playstation2::draw3d_object_setTextureCoords_aF()
     "  addiu $t8, $t8, -2\n"
     "  bne $t8, $0, _set_point_colors_%d\n"
     "  nop\n",
+    object,
     array,
     object, object,
     label_count,
@@ -955,10 +985,13 @@ int Playstation2::draw3d_texture16_setPixel_II()
 
   fprintf(out,
     "  ;; draw3d_texture16_setPixel_II()\n"
+    "  li $at, 1\n"
+    "  sw $at, -12($t%d)\n"
     "  addiu $t%d, $t%d, 208\n"
     "  sll $t%d, $t%d, 1\n"
     "  addu $t%d, $t%d, $t%d\n"
     "  sh $t%d, 0($t%d)\n",
+    reg_object_ref,
     reg_object_ref, reg_object_ref,
     reg_index, reg_index,
     reg_object_ref, reg_object_ref, reg_index,
@@ -977,6 +1010,8 @@ int Playstation2::draw3d_texture16_setPixels_IaS()
 
   fprintf(out,
     "  ;; draw3d_texture16_setPixel_IaI()\n"
+    "  li $at, 1\n"
+    "  sw $at, -12($t%d)\n"
     "  sll $t%d, $t%d, 1\n"
     "  addiu $t%d, $t%d, 208\n"
     "  addu $t%d, $t%d, $t%d\n"
@@ -989,6 +1024,7 @@ int Playstation2::draw3d_texture16_setPixels_IaS()
     "  addiu $t9, $t9, -1\n"
     "  bne $t9, $0, draw3d_texture16_setPixels_%d\n"
     "  nop\n",
+    reg_object_ref,
     reg_index, reg_index,
     reg_object_ref, reg_object_ref,
     reg_object_ref, reg_object_ref, reg_index,
@@ -1014,6 +1050,8 @@ int Playstation2::draw3d_texture16_setPixelsRLE16_IaB()
 
   fprintf(out,
     "  ;; draw3d_texture16_setPixelsRLE16_IaB()\n"
+    "  li $at, 1\n"
+    "  sw $at, -12($t%d)\n"
     "  move $a0, $t%d\n"
     "  move $a1, $t%d\n"
     "  move $a2, $t%d\n"
@@ -1021,6 +1059,7 @@ int Playstation2::draw3d_texture16_setPixelsRLE16_IaB()
     "  jal _draw3d_texture16_setPixelsRLE16_IaB\n"
     "  nop\n"
     "  move $ra, $s0\n",
+    reg_object_ref,
     reg_object_ref,
     reg_index,
     reg_image_array);
@@ -1038,6 +1077,8 @@ int Playstation2::draw3d_texture24_setPixel_II()
 
   fprintf(out,
     "  ;; draw3d_texture24_setPixel_II()\n"
+    "  li $at, 1\n"
+    "  sw $at, -12($t%d)\n"
     "  addiu $t%d, $t%d, 208\n"
     "  sll $at, $t%d, 1\n"
     "  addu $t%d, $t%d, $at\n"
@@ -1047,6 +1088,7 @@ int Playstation2::draw3d_texture24_setPixel_II()
     "  sb $t%d, 1($t%d)\n"
     "  srl $t%d, $t%d, 8\n"
     "  sb $t%d, 2($t%d)\n",
+    reg_object_ref,
     reg_object_ref, reg_object_ref,
     reg_index,
     reg_index, reg_index,
@@ -1071,6 +1113,8 @@ int Playstation2::draw3d_texture24_setPixels_IaI()
   // FIXME: This should probably be a function, not inline
   fprintf(out,
     "  ;; draw3d_texture24_setPixel_IaI()\n"
+    "  li $at, 1\n"
+    "  sw $at, -12($t%d)\n"
     "  sll $at, $t%d, 1\n"
     "  addu $t%d, $t%d, $at\n"
     "  addiu $t%d, $t%d, 208\n"
@@ -1088,6 +1132,7 @@ int Playstation2::draw3d_texture24_setPixels_IaI()
     "  addiu $t9, $t9, -1\n"
     "  bne $t9, $0, draw3d_texture24_setPixels_%d\n"
     "  nop\n",
+    reg_object_ref,
     reg_index,
     reg_index, reg_index,
     reg_object_ref, reg_object_ref,
@@ -1117,10 +1162,13 @@ int Playstation2::draw3d_texture32_setPixel_II()
 
   fprintf(out,
     "  ;; draw3d_texture32_setPixel_II()\n"
+    "  li $at, 1\n"
+    "  sw $at, -12($t%d)\n"
     "  addiu $t%d, $t%d, 208\n"
     "  sll $t%d, $t%d, 2\n"
     "  addu $t%d, $t%d, $t%d\n"
     "  sw $t%d, 0($t%d)\n",
+    reg_object_ref,
     reg_object_ref, reg_object_ref,
     reg_index, reg_index,
     reg_object_ref, reg_object_ref, reg_index,
@@ -1139,6 +1187,8 @@ int Playstation2::draw3d_texture32_setPixels_IaI()
 
   fprintf(out,
     "  ;; draw3d_texture32_setPixel_IaI()\n"
+    "  li $at, 1\n"
+    "  sw $at, -12($t%d)\n"
     "  sll $t%d, $t%d, 2\n"
     "  addiu $t%d, $t%d, 208\n"
     "  addu $t%d, $t%d, $t%d\n"
@@ -1151,6 +1201,7 @@ int Playstation2::draw3d_texture32_setPixels_IaI()
     "  addiu $t9, $t9, -1\n"
     "  bne $t9, $0, draw3d_texture32_setPixels_%d\n"
     "  nop\n",
+    reg_object_ref,
     reg_index, reg_index,
     reg_object_ref, reg_object_ref,
     reg_object_ref, reg_object_ref, reg_index,
@@ -1174,10 +1225,12 @@ int Playstation2::draw3d_texture_enableTransparency()
 
   fprintf(out,
     "  ;; enableTransparency()\n"
+    "  li $at, 1\n"
+    "  sw $at, -12($t%d)\n"
     "  lw $t8, 64($t%d)\n"
     "  andi $t8, $t8, 0x7fff\n"
     "  sw $t8, 64($t%d)\n",
-    object, object);
+    object, object, object);
 
   fprintf(out,
     "  lw $t8, 100($t%d)\n"
@@ -1197,10 +1250,12 @@ int Playstation2::draw3d_texture_enableTransparencyOnBlack()
 
   fprintf(out,
     "  ;; enableTransparency()\n"
+    "  li $at, 1\n"
+    "  sw $at, -12($t%d)\n"
     "  lw $t8, 64($t%d)\n"
     "  ori $t8, $t8, 0x8000\n"
     "  sw $t8, 64($t%d)\n",
-    object, object);
+    object, object, object);
 
   fprintf(out,
     "  lw $t8, 100($t%d)\n"
@@ -1223,11 +1278,13 @@ int Playstation2::draw3d_texture_disableTransparency()
 
   fprintf(out,
     "  ;; disableTransparency()\n"
+    "  li $at, 1\n"
+    "  sw $at, -12($t%d)\n"
     "  lw $t8, 100($t%d)\n"
     "  andi $t8, $t8, 0xfffb\n"
     "  sw $t8, 100($t%d)\n"
     "  sw $t8, 116($t%d)\n",
-    object, object, object);
+    object, object, object, object);
 
   reg -= 1;
 
@@ -1708,20 +1765,32 @@ void Playstation2::add_draw3d_object_draw()
   // Find the number of quadwords (16 byte) elements in this object.
   // Since there are 4 elements per 64 byte cache line, figure out how
   // many cache lines need to be flushed by taking (count + 3) / 4.
-  // FIXME: Can possibly ignore the VIF commands (32 bytes)
   fprintf(out,
     "  ; Flush cache\n"
-    "  lw $v0, -16($a0)\n"
-    "  addiu $v0, $v0, 3\n"
-    "  move $v1, $a0\n"
-    "  srl $v0, $v0, 2\n"
     "  sync.l\n"
+    "  cache dhwoin, 16($a0)\n"
+    "  cache dhwoin, 80($a0)\n"
+    "  sync.l\n"
+    "  lw $v0, -12($a0)\n"
+    "  beqz $v0, _draw3d_object_draw_skip_cache_flush\n"
+    "  nop\n"
+    "  sw $0, -12($a0)\n"
+    "  lw $v0, -16($a0)\n"
+    //"  addiu $v0, $v0, -8\n"
+    //"  addiu $v0, $v0, 3\n"
+    "  addiu $v0, $v0, -5\n"
+    //"  move $v1, $a0\n"
+    "  addiu $v1, $a0, 128\n"
+    "  srl $v0, $v0, 2\n"
     "_draw3d_object_draw_cache_flush:\n"
     "  addiu $v0, $v0, -1\n"
+    "  sync.l\n"
     "  cache dhwoin, 0($v1)\n"
+    "  sync.l\n"
     "  addiu $v1, $v1, 64\n"
     "  bnez $v0, _draw3d_object_draw_cache_flush\n"
-    "  sync.l\n");
+    "  nop\n"
+    "_draw3d_object_draw_skip_cache_flush:\n");
 
 #if 0
   // This could be done with DMA.  Not sure what's better.
@@ -1788,17 +1857,23 @@ void Playstation2::add_draw3d_texture_upload()
   // many cache lines need to be flushed by taking (count + 3) / 4.
   fprintf(out,
     "  ; Flush cache\n"
+    "  lw $v0, -12($a0)\n"
+    "  beqz $v0, _draw3d_texture_upload_skip_cache_flush\n"
+    "  nop\n"
+    "  sw $0, -12($a0)\n"
     "  lw $v0, -16($a0)\n"
     "  addiu $v0, $v0, 3\n"
     "  move $v1, $a0\n"
     "  srl $v0, $v0, 2\n"
-    "  sync.l\n"
     "_draw3d_texture_upload_cache_flush:\n"
     "  addiu $v0, $v0, -1\n"
+    "  sync.l\n"
     "  cache dhwoin, 0($v1)\n"
+    "  sync.l\n"
     "  addiu $v1, $v1, 64\n"
     "  bnez $v0, _draw3d_texture_upload_cache_flush\n"
-    "  sync.l\n");
+    "  nop\n"
+    "_draw3d_texture_upload_skip_cache_flush:\n");
 
   fprintf(out,
     DMA02_WAIT
@@ -2014,6 +2089,7 @@ void Playstation2::add_draw3d_object_constructor()
 {
   // Need to allocate enough space for:
   // -16: size of packet
+  // -12: cache flush object flag
   //   0: VIF_FLUSH, VIF_STMOD, VIF_STCYCL, VIF_UNPACK_V4_32
   //  16: sin512(rx), cos512(rx), sin512(ry), sin512(ry)
   //  32: sin512(rz), cos(rz), 0, 0
@@ -2074,6 +2150,11 @@ void Playstation2::add_draw3d_object_constructor()
     "  addiu $at, $at, 9\n"
     "  sw $at, -16($v0)\n");
 
+  // Put 1 (true) into cache-flush flag.
+  fprintf(out,
+    "  li $at, 1\n"
+    "  sw $at, -12($v0)\n");
+
   // Clear out members of the structure (rotation, xyz position, etc).
   fprintf(out,
     "  sq $0, 16($v0)\n"
@@ -2128,6 +2209,7 @@ void Playstation2::add_draw3d_object_with_texture_constructor()
 {
   // Need to allocate enough space for:
   // -16: size of packet
+  // -12: cache flush object flag
   //   0: VIF_FLUSH, VIF_STMOD, VIF_STCYCL, VIF_UNPACK_V4_32
   //  16: sin512(rx), cos512(rx), sin512(ry), sin512(ry)
   //  32: sin512(rz), cos(rz), 0, 0
@@ -2190,6 +2272,11 @@ void Playstation2::add_draw3d_object_with_texture_constructor()
     "  addiu $at, $at, 9\n"
     "  sw $at, -16($v0)\n");
 
+  // Put 1 (true) into cache-flush flag.
+  fprintf(out,
+    "  li $at, 1\n"
+    "  sw $at, -12($v0)\n");
+
   // Clear out members of the structure (rotation, xyz position, etc).
   fprintf(out,
     "  sq $0, 16($v0)\n"
@@ -2249,6 +2336,7 @@ void Playstation2::add_draw3d_texture_constructor(int bit_size)
 
   // Need to allocate enough space for:
   // -16: size of data
+  // -12: cache full texture flag 
   //   0: 16 byte GIF tag (for texture info)
   //  16: BITBLTBUF
   //  32: TRXREG
@@ -2356,6 +2444,11 @@ void Playstation2::add_draw3d_texture_constructor(int bit_size)
   fprintf(out,
     "  addiu $a3, $a3, 13\n"
     "  sw $a3, -16($v0)\n");
+
+  // Put 1 (true) into cache-flush flag.
+  fprintf(out,
+    "  li $at, 1\n"
+    "  sw $at, -12($v0)\n");
 
   fprintf(out,
     "  jr $ra\n"
