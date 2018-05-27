@@ -65,7 +65,7 @@ Playstation2::~Playstation2()
   add_draw3d_texture_upload();
   add_primitive_gif_tag();
   add_texture_gif_tag();
-  //add_vu0_code();
+  add_vu0_code();
   add_vu1_code();
   Math::add_sin_table(out);
   Math::add_cos_table(out);
@@ -1372,23 +1372,13 @@ int Playstation2::playstation2_vu0UploadCode_aB()
 
   fprintf(out,
     "  ;; playstation2_vu0UploadCode_aB()\n"
-    "  li $v0, VU0_MICRO_MEM\n"
-    "  lw $a1, -4($t%d)\n"
-    "vu0_upload_code_%d:\n"
-    "  lq $a0, ($t%d)\n"
-    "  sq $a0, ($v0)\n"
-    "  addiu $t%d, $t%d, 16\n"
-    "  addiu $v0, $v0, 16\n"
-    "  addiu $a1, $a1, -16\n"
-    "  bgtz $a1, vu0_upload_code_%d\n"
-    "  nop\n",
-    array,
-    label_count,
-    array,
-    array, array,
-    label_count);
+    "  move $a0, $t%d\n"
+    "  move $s0, $ra\n"
+    "  jal _vu0_upload_code\n"
+    "  nop\n"
+    "  move $ra, $s0\n",
+    array);
 
-  label_count++;
   reg--;
 
   return 0;
@@ -1396,38 +1386,128 @@ int Playstation2::playstation2_vu0UploadCode_aB()
 
 int Playstation2::playstation2_vu0UploadData_IaB()
 {
-  fprintf(out, "  ;; playstation2_vu0UploadData_IaB()\n");
-  return upload_vu0_data(16);
+  const int array = reg - 1;
+  const int index = reg - 2;
+
+  fprintf(out,
+    "  ;; playstation2_vu0UploadData_IaB()\n"
+    "  move $a0, $t%d\n"
+    "  move $a1, $t%d\n"
+    "  move $s0, $ra\n"
+    "  jal _vu0_upload_data_bytes\n"
+    "  nop\n"
+    "  move $ra, $s0\n",
+    index,
+    array);
+
+  reg -= 2;
+
+  return 0;
 }
 
 int Playstation2::playstation2_vu0UploadData_IaI()
 {
-  fprintf(out, "  ;; playstation2_vu0UploadData_IaI()\n");
-  return upload_vu0_data(4);
+  const int array = reg - 1;
+  const int index = reg - 2;
+
+  fprintf(out,
+    "  ;; playstation2_vu0UploadData_IaI()\n"
+    "  move $a0, $t%d\n"
+    "  move $a1, $t%d\n"
+    "  move $s0, $ra\n"
+    "  jal _vu0_upload_data_words\n"
+    "  nop\n"
+    "  move $ra, $s0\n",
+    index,
+    array);
+
+  reg -= 2;
+
+  return 0;
 }
 
 int Playstation2::playstation2_vu0UploadData_IaF()
 {
-  fprintf(out, "  ;; playstation2_vu0UploadData_IaF()\n");
-  return upload_vu0_data(4);
+  const int array = reg - 1;
+  const int index = reg - 2;
+
+  fprintf(out,
+    "  ;; playstation2_vu0UploadData_IaF()\n"
+    "  move $a0, $t%d\n"
+    "  move $a1, $t%d\n"
+    "  move $s0, $ra\n"
+    "  jal _vu0_upload_data_words\n"
+    "  nop\n"
+    "  move $ra, $s0\n",
+    index,
+    array);
+
+  reg -= 2;
+
+  return 0;
 }
 
 int Playstation2::playstation2_vu0DownloadData_IaB()
 {
-  fprintf(out, "  ;; playstation2_vu0DownloadData_IaB()\n");
-  return download_vu0_data(16);
+  const int array = reg - 1;
+  const int index = reg - 2;
+
+  fprintf(out,
+    "  ;; playstation2_vu0DownloadData_IaB()\n"
+    "  move $a0, $t%d\n"
+    "  move $a1, $t%d\n"
+    "  move $s0, $ra\n"
+    "  jal _vu0_download_data_bytes\n"
+    "  nop\n"
+    "  move $ra, $s0\n",
+    index,
+    array);
+
+  reg -= 2;
+
+  return 0;
 }
 
 int Playstation2::playstation2_vu0DownloadData_IaI()
 {
-  fprintf(out, "  ;; playstation2_vu0DownloadData_IaI()\n");
-  return download_vu0_data(4);
+  const int array = reg - 1;
+  const int index = reg - 2;
+
+  fprintf(out,
+    "  ;; playstation2_vu0DownloadData_IaI()\n"
+    "  move $a0, $t%d\n"
+    "  move $a1, $t%d\n"
+    "  move $s0, $ra\n"
+    "  jal _vu0_download_data_words\n"
+    "  nop\n"
+    "  move $ra, $s0\n",
+    index,
+    array);
+
+  reg -= 2;
+
+  return 0;
 }
 
 int Playstation2::playstation2_vu0DownloadData_IaF()
 {
-  fprintf(out, "  ;; playstation2_vu0DownloadData_IaF()\n");
-  return download_vu0_data(4);
+  const int array = reg - 1;
+  const int index = reg - 2;
+
+  fprintf(out,
+    "  ;; playstation2_vu0DownloadData_IaF()\n"
+    "  move $a0, $t%d\n"
+    "  move $a1, $t%d\n"
+    "  move $s0, $ra\n"
+    "  jal _vu0_download_data_words\n"
+    "  nop\n"
+    "  move $ra, $s0\n",
+    index,
+    array);
+
+  reg -= 2;
+
+  return 0;
 }
 
 int Playstation2::playstation2_vu0Start()
@@ -1573,72 +1653,6 @@ int Playstation2::playstation2_randomNext()
     reg, reg);
 
   reg++;
-
-  return 0;
-}
-
-int Playstation2::upload_vu0_data(int dec_count)
-{
-  const int array = reg - 1;
-  const int index = reg - 2;
-
-  fprintf(out,
-    "  li $v0, VU0_VU_MEM\n"
-    "  lw $a1, -4($t%d)\n"
-    "  sll $t%d, $t%d, 4\n"
-    "  addu $v0, $v0, $t%d\n"
-    "vu0_upload_data_%d:\n"
-    "  lq $a0, ($t%d)\n"
-    "  sq $a0, ($v0)\n"
-    "  addiu $t%d, $t%d, 16\n"
-    "  addiu $v0, $v0, 16\n"
-    "  addiu $a1, $a1, -%d\n"
-    "  bgtz $a1, vu0_upload_data_%d\n"
-    "  nop\n",
-    array,
-    index, index,
-    index,
-    label_count,
-    array,
-    array, array,
-    dec_count,
-    label_count);
-
-  label_count++;
-  reg -= 2;
-
-  return 0;
-}
-
-int Playstation2::download_vu0_data(int dec_count)
-{
-  const int array = reg - 1;
-  const int index = reg - 2;
-
-  fprintf(out,
-    "  li $v0, VU0_VU_MEM\n"
-    "  lw $a1, -4($t%d)\n"
-    "  sll $t%d, $t%d, 4\n"
-    "  addu $v0, $v0, $t%d\n"
-    "vu0_download_data_%d:\n"
-    "  lq $a0, ($v0)\n"
-    "  sq $a0, ($t%d)\n"
-    "  addiu $t%d, $t%d, 16\n"
-    "  addiu $v0, $v0, 16\n"
-    "  addiu $a1, $a1, -%d\n"
-    "  bgtz $a1, vu0_download_data_%d\n"
-    "  nop\n",
-    array,
-    index, index,
-    index,
-    label_count,
-    array,
-    array, array,
-    dec_count,
-    label_count);
-
-  label_count++;
-  reg -= 2;
 
   return 0;
 }
@@ -2342,7 +2356,7 @@ void Playstation2::add_draw3d_texture_constructor(int bit_size)
 
   // Need to allocate enough space for:
   // -16: size of data
-  // -12: cache full texture flag 
+  // -12: cache full texture flag
   //   0: 16 byte GIF tag (for texture info)
   //  16: BITBLTBUF
   //  32: TRXREG

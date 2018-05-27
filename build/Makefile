@@ -72,6 +72,7 @@ SYSTEMS= \
   CPC.o \
   MSX.o \
   Playstation2.o \
+  Playstation2VU0.o \
   Playstation2VU1.o \
   PIC32.o \
   SegaGenesis.o \
