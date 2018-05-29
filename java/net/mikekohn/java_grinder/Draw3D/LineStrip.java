@@ -13,18 +13,17 @@ package net.mikekohn.java_grinder.Draw3D;
 
 import net.mikekohn.java_grinder.Draw3D.Draw3DObject;
 
-public class Draw3DSprite extends Draw3DObject
+public class LineStrip extends Draw3DObject
 {
-   public Draw3DSprite()
+   public LineStrip()
    {
    }
 
-   public Draw3DSprite(String filename)
+   public LineStrip(String filename)
    {
    }
 
-   // Point count should always be 4.  Not sure what to do here.
-   public Draw3DSprite(int point_count)
+   public LineStrip(int point_count)
    {
    }
 }

@@ -27,21 +27,21 @@ JAVA_SRC=\
   $(SRC_DIR)/Propeller.java \
   $(SRC_DIR)/Draw3D/Draw3DObject.java \
   $(SRC_DIR)/Draw3D/Draw3DObjectWithTexture.java \
-  $(SRC_DIR)/Draw3D/Draw3DPoints.java \
-  $(SRC_DIR)/Draw3D/Draw3DLine.java \
-  $(SRC_DIR)/Draw3D/Draw3DLineStrip.java \
-  $(SRC_DIR)/Draw3D/Draw3DSprite.java \
-  $(SRC_DIR)/Draw3D/Draw3DSpriteWithTexture.java \
-  $(SRC_DIR)/Draw3D/Draw3DTriangle.java \
-  $(SRC_DIR)/Draw3D/Draw3DTriangleWithTexture.java \
-  $(SRC_DIR)/Draw3D/Draw3DTriangleStrip.java \
-  $(SRC_DIR)/Draw3D/Draw3DTriangleStripWithTexture.java \
-  $(SRC_DIR)/Draw3D/Draw3DTriangleFan.java \
-  $(SRC_DIR)/Draw3D/Draw3DTriangleFanWithTexture.java \
-  $(SRC_DIR)/Draw3D/Draw3DTexture.java \
-  $(SRC_DIR)/Draw3D/Draw3DTexture16.java \
-  $(SRC_DIR)/Draw3D/Draw3DTexture24.java \
-  $(SRC_DIR)/Draw3D/Draw3DTexture32.java \
+  $(SRC_DIR)/Draw3D/Points.java \
+  $(SRC_DIR)/Draw3D/Line.java \
+  $(SRC_DIR)/Draw3D/LineStrip.java \
+  $(SRC_DIR)/Draw3D/Sprite.java \
+  $(SRC_DIR)/Draw3D/SpriteWithTexture.java \
+  $(SRC_DIR)/Draw3D/Triangle.java \
+  $(SRC_DIR)/Draw3D/TriangleWithTexture.java \
+  $(SRC_DIR)/Draw3D/TriangleStrip.java \
+  $(SRC_DIR)/Draw3D/TriangleStripWithTexture.java \
+  $(SRC_DIR)/Draw3D/TriangleFan.java \
+  $(SRC_DIR)/Draw3D/TriangleFanWithTexture.java \
+  $(SRC_DIR)/Draw3D/Texture.java \
+  $(SRC_DIR)/Draw3D/Texture16.java \
+  $(SRC_DIR)/Draw3D/Texture24.java \
+  $(SRC_DIR)/Draw3D/Texture32.java \
   $(SRC_DIR)/SegaGenesis.java \
   $(SRC_DIR)/SNES.java \
   $(SRC_DIR)/SPI.java \

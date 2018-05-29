@@ -1,11 +1,10 @@
 // Rotate two triangles in opposite directions using arrays of objects.
 
 import net.mikekohn.java_grinder.Playstation2;
-import net.mikekohn.java_grinder.Draw3D.Draw3DObject;
-import net.mikekohn.java_grinder.Draw3D.Draw3DPoints;
-import net.mikekohn.java_grinder.Draw3D.Draw3DTriangle;
-import net.mikekohn.java_grinder.Draw3D.Draw3DTriangleFan;
-import net.mikekohn.java_grinder.Draw3D.Draw3DSprite;
+import net.mikekohn.java_grinder.Draw3D.Points;
+import net.mikekohn.java_grinder.Draw3D.Triangle;
+import net.mikekohn.java_grinder.Draw3D.TriangleFan;
+import net.mikekohn.java_grinder.Draw3D.Sprite;
 
 public class SimpleTest
 {
@@ -29,12 +28,12 @@ public class SimpleTest
   {
     int n;
 
-    Draw3DTriangle[] triangles = new Draw3DTriangle[2];
-    Draw3DSprite sprite = new Draw3DSprite(2);
+    Triangle[] triangles = new Triangle[2];
+    Sprite sprite = new Sprite(2);
 
     for (n = 0; n < 2; n++)
     {
-      triangles[n] = new Draw3DTriangle(3);
+      triangles[n] = new Triangle(3);
       triangles[n].setPoints(triangle_points);
       triangles[n].setContext(0);
       triangles[n].setPointColors(triangle_colors);

@@ -25,7 +25,7 @@
 
 #define DRAW3D "net/mikekohn/java_grinder/Draw3D"
 #define DRAW3D_LEN (sizeof(DRAW3D) - 1)
-#define DRAW3D_TEXTURE "net/mikekohn/java_grinder/Draw3D/Draw3DTexture"
+#define DRAW3D_TEXTURE "net/mikekohn/java_grinder/Draw3D/Texture"
 #define DRAW3D_TEXTURE_LEN (sizeof(DRAW3D_TEXTURE) - 1)
 
 static void get_virtual_function(char *function, char *method_name, char *method_sig, char *field_name, char *field_class)
@@ -168,17 +168,17 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
     {
       if (strcmp(method_sig, "(II)V") == 0)
       {
-        if (strcmp(cls, "Draw3DTexture16") == 0)
+        if (strcmp(cls, "Texture16") == 0)
         {
           ret = generator->draw3d_texture_Constructor_II(16);
         }
           else
-        if (strcmp(cls, "Draw3DTexture24") == 0)
+        if (strcmp(cls, "Texture24") == 0)
         {
           ret = generator->draw3d_texture_Constructor_II(24);
         }
           else
-        if (strcmp(cls, "Draw3DTexture32") == 0)
+        if (strcmp(cls, "Texture32") == 0)
         {
           ret = generator->draw3d_texture_Constructor_II(32);
         }
@@ -194,17 +194,17 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
       {
         ret = -1;
 
-        if (strcmp(cls, "Draw3DTexture16") == 0)
+        if (strcmp(cls, "Texture16") == 0)
         {
           ret = draw3d_texture16(java_class, generator, function);
         }
           else
-        if (strcmp(cls, "Draw3DTexture24") == 0)
+        if (strcmp(cls, "Texture24") == 0)
         {
           ret = draw3d_texture24(java_class, generator, function);
         }
           else
-        if (strcmp(cls, "Draw3DTexture32") == 0)
+        if (strcmp(cls, "Texture32") == 0)
         {
           ret = draw3d_texture32(java_class, generator, function);
         }
@@ -222,29 +222,29 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
     int draw3d_type = -1;
     bool with_texture = false;
 
-    if (strcmp(cls, "Draw3DPoints") == 0) { draw3d_type = 0; }
-    else if (strcmp(cls, "Draw3DLine") == 0) { draw3d_type = 1; }
-    else if (strcmp(cls, "Draw3DLineStrip") == 0) { draw3d_type = 2; }
-    else if (strcmp(cls, "Draw3DTriangle") == 0) { draw3d_type = 3; }
-    else if (strcmp(cls, "Draw3DTriangleStrip") == 0) { draw3d_type = 4; }
-    else if (strcmp(cls, "Draw3DTriangleFan") == 0) { draw3d_type = 5; }
-    else if (strcmp(cls, "Draw3DSprite") == 0) { draw3d_type = 6; }
-    else if (strcmp(cls, "Draw3DTriangleWithTexture") == 0)
+    if (strcmp(cls, "Points") == 0) { draw3d_type = 0; }
+    else if (strcmp(cls, "Line") == 0) { draw3d_type = 1; }
+    else if (strcmp(cls, "LineStrip") == 0) { draw3d_type = 2; }
+    else if (strcmp(cls, "Triangle") == 0) { draw3d_type = 3; }
+    else if (strcmp(cls, "TriangleStrip") == 0) { draw3d_type = 4; }
+    else if (strcmp(cls, "TriangleFan") == 0) { draw3d_type = 5; }
+    else if (strcmp(cls, "Sprite") == 0) { draw3d_type = 6; }
+    else if (strcmp(cls, "TriangleWithTexture") == 0)
     {
       draw3d_type = 3;
       with_texture = true;
     }
-    else if (strcmp(cls, "Draw3DTriangleStripWithTexture") == 0)
+    else if (strcmp(cls, "TriangleStripWithTexture") == 0)
     {
       draw3d_type = 4;
       with_texture = true;
     }
-    else if (strcmp(cls, "Draw3DTriangleFanWithTexture") == 0)
+    else if (strcmp(cls, "TriangleFanWithTexture") == 0)
     {
       draw3d_type = 5;
       with_texture = true;
     }
-    else if (strcmp(cls, "Draw3DSpriteWithTexture") == 0)
+    else if (strcmp(cls, "SpriteWithTexture") == 0)
     {
       draw3d_type = 6;
       with_texture = true;
@@ -266,21 +266,21 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
     }
       else
     {
-      if (strcmp(cls, "Draw3DPoints") == 0 ||
-          strcmp(cls, "Draw3DLine") == 0 ||
-          strcmp(cls, "Draw3DLineStrip") == 0 ||
-          strcmp(cls, "Draw3DTriangle") == 0 ||
-          strcmp(cls, "Draw3DTriangleStrip") == 0 ||
-          strcmp(cls, "Draw3DTriangleFan") == 0 ||
-          strcmp(cls, "Draw3DSprite") == 0)
+      if (strcmp(cls, "Points") == 0 ||
+          strcmp(cls, "Line") == 0 ||
+          strcmp(cls, "LineStrip") == 0 ||
+          strcmp(cls, "Triangle") == 0 ||
+          strcmp(cls, "TriangleStrip") == 0 ||
+          strcmp(cls, "TriangleFan") == 0 ||
+          strcmp(cls, "Sprite") == 0)
       {
         ret = draw3d_object(java_class, generator, function);
       }
         else
-      if (strcmp(cls, "Draw3DTriangleWithTexture") == 0 ||
-          strcmp(cls, "Draw3DTriangleStripWithTexture") == 0 ||
-          strcmp(cls, "Draw3DTriangleFanWithTexture") == 0 || 
-          strcmp(cls, "Draw3DSpriteWithTexture") == 0)
+      if (strcmp(cls, "TriangleWithTexture") == 0 ||
+          strcmp(cls, "TriangleStripWithTexture") == 0 ||
+          strcmp(cls, "TriangleFanWithTexture") == 0 || 
+          strcmp(cls, "SpriteWithTexture") == 0)
       {
 #if 0
         if (strncmp(function, "setPoint", 8) == 0)

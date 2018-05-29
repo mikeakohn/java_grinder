@@ -13,17 +13,18 @@ package net.mikekohn.java_grinder.Draw3D;
 
 import net.mikekohn.java_grinder.Draw3D.Draw3DObject;
 
-public class Draw3DTriangleFan extends Draw3DObject
+public class Sprite extends Draw3DObject
 {
-   public Draw3DTriangleFan()
+   public Sprite()
    {
    }
 
-   public Draw3DTriangleFan(String filename)
+   public Sprite(String filename)
    {
    }
 
-   public Draw3DTriangleFan(int point_count)
+   // Point count should always be 4.  Not sure what to do here.
+   public Sprite(int point_count)
    {
    }
 }

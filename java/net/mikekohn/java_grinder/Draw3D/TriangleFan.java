@@ -13,17 +13,17 @@ package net.mikekohn.java_grinder.Draw3D;
 
 import net.mikekohn.java_grinder.Draw3D.Draw3DObject;
 
-public class Draw3DTriangle extends Draw3DObject
+public class TriangleFan extends Draw3DObject
 {
-   public Draw3DTriangle()
+   public TriangleFan()
    {
    }
 
-   public Draw3DTriangle(String filename)
+   public TriangleFan(String filename)
    {
    }
 
-   public Draw3DTriangle(int point_count)
+   public TriangleFan(int point_count)
    {
    }
 }

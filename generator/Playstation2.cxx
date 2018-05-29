@@ -206,19 +206,19 @@ int Playstation2::new_object(const char *object_name, int field_count)
   while(s != object_name && *s != '/') { s--; }
   if (*s == '/') { s++; }
 
-  if (strcmp(s, "Draw3DPoints") != 0 &&
-      strcmp(s, "Draw3DLine") != 0 &&
-      strcmp(s, "Draw3DLineStrip") != 0 &&
-      strcmp(s, "Draw3DTriangle") != 0 &&
-      strcmp(s, "Draw3DTriangleStrip") != 0 &&
-      strcmp(s, "Draw3DTriangleFan") != 0 &&
-      strcmp(s, "Draw3DSprite") != 0 &&
-      strcmp(s, "Draw3DTriangleStripWithTexture") != 0 &&
-      strcmp(s, "Draw3DTriangleFanWithTexture") != 0 &&
-      strcmp(s, "Draw3DSpriteWithTexture") != 0 &&
-      strcmp(s, "Draw3DTexture16") != 0 &&
-      strcmp(s, "Draw3DTexture24") != 0 &&
-      strcmp(s, "Draw3DTexture32") != 0)
+  if (strcmp(s, "Points") != 0 &&
+      strcmp(s, "Line") != 0 &&
+      strcmp(s, "LineStrip") != 0 &&
+      strcmp(s, "Triangle") != 0 &&
+      strcmp(s, "TriangleStrip") != 0 &&
+      strcmp(s, "TriangleFan") != 0 &&
+      strcmp(s, "Sprite") != 0 &&
+      strcmp(s, "TriangleStripWithTexture") != 0 &&
+      strcmp(s, "TriangleFanWithTexture") != 0 &&
+      strcmp(s, "SpriteWithTexture") != 0 &&
+      strcmp(s, "Texture16") != 0 &&
+      strcmp(s, "Texture24") != 0 &&
+      strcmp(s, "Texture32") != 0)
   {
      printf("Error: Unknown class %s\n", object_name);
      return -1;

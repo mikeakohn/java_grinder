@@ -11,13 +11,13 @@
 
 package net.mikekohn.java_grinder.Draw3D;
 
-abstract public class Draw3DTexture
+abstract public class Texture
 {
-   public Draw3DTexture()
+   public Texture()
    {
    }
 
-   public Draw3DTexture(int width, int height)
+   public Texture(int width, int height)
    {
    }
 

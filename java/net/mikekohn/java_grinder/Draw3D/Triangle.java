@@ -13,17 +13,17 @@ package net.mikekohn.java_grinder.Draw3D;
 
 import net.mikekohn.java_grinder.Draw3D.Draw3DObject;
 
-public class Draw3DLine extends Draw3DObject
+public class Triangle extends Draw3DObject
 {
-   public Draw3DLine()
+   public Triangle()
    {
    }
 
-   public Draw3DLine(String filename)
+   public Triangle(String filename)
    {
    }
 
-   public Draw3DLine(int point_count)
+   public Triangle(int point_count)
    {
    }
 }

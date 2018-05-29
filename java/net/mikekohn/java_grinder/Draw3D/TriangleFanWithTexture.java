@@ -13,17 +13,17 @@ package net.mikekohn.java_grinder.Draw3D;
 
 import net.mikekohn.java_grinder.Draw3D.Draw3DObjectWithTexture;
 
-public class Draw3DSpriteWithTexture extends Draw3DObjectWithTexture
+public class TriangleFanWithTexture extends Draw3DObjectWithTexture
 {
-   public Draw3DSpriteWithTexture()
+   public TriangleFanWithTexture()
    {
    }
 
-   public Draw3DSpriteWithTexture(String filename)
+   public TriangleFanWithTexture(String filename)
    {
    }
 
-   public Draw3DSpriteWithTexture(int point_count)
+   public TriangleFanWithTexture(int point_count)
    {
    }
 }

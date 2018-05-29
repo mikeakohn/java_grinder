@@ -11,13 +11,13 @@
 
 package net.mikekohn.java_grinder.Draw3D;
 
-public class Draw3DTexture24 extends Draw3DTexture
+public class Texture24 extends Texture
 {
-   public Draw3DTexture24()
+   public Texture24()
    {
    }
 
-   public Draw3DTexture24(int width, int height)
+   public Texture24(int width, int height)
    {
    }
 
