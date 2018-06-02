@@ -165,7 +165,7 @@ void R5900::method_start(int local_count, int max_stack, int param_count, const 
 
   fprintf(out, "%s:\n", name);
   fprintf(out, "  ; %s(local_count=%d, max_stack=%d, param_count=%d)\n", name, local_count, max_stack, param_count);
-  fprintf(out, "  move $fp, $sp\n");
+  fprintf(out, "  addiu $fp, $sp, -4\n");
   fprintf(out, "  addiu $sp, $sp, -%d\n", local_count * 4);
 }
 
@@ -1169,7 +1169,8 @@ int R5900::return_local(int index, int local_count)
 
   fprintf(out, "  lw $v0, %d($fp) ; local_%d\n", LOCALS(index), index);
   //fprintf(out, "  addiu $sp, $fp, %d\n", local_count * 4);
-  fprintf(out, "  move $sp, $fp\n");
+  //fprintf(out, "  move $sp, $fp\n");
+  fprintf(out, "  addiu $sp, $fp, 4\n");
   fprintf(out, "  jr $ra\n");
   fprintf(out, "  nop\n");
 
@@ -1185,7 +1186,7 @@ int R5900::return_integer(int local_count)
 
   fprintf(out, "  move $v0, $t0\n");
   //fprintf(out, "  addiu $sp, $fp, %d\n", local_count * 4);
-  fprintf(out, "  move $sp, $fp\n");
+  fprintf(out, "  addiu $sp, $fp, 4\n");
   fprintf(out, "  jr $ra\n");
   fprintf(out, "  nop ; Delay slot\n");
   reg--;
@@ -1201,7 +1202,8 @@ int R5900::return_void(int local_count)
   }
 
   //fprintf(out, "  addiu $sp, $fp, %d\n", local_count * 4);
-  fprintf(out, "  move $sp, $fp\n");
+  //fprintf(out, "  move $sp, $fp\n");
+  fprintf(out, "  addiu $sp, $fp, 4\n");
   fprintf(out, "  jr $ra\n");
   fprintf(out, "  nop ; Delay slot\n");
   return 0;
@@ -1235,16 +1237,16 @@ int R5900::invoke_static_method(const char *name, int params, int is_void)
 
   // Save ra and fp
   fprintf(out, "  addiu $sp, $sp, -%d\n", save_space);
-  fprintf(out, "  sw $ra, %d($sp)\n", (save_space - 4) + 4);
-  fprintf(out, "  sw $fp, %d($sp)\n", (save_space - 8) + 4);
+  fprintf(out, "  sw $ra, %d($sp)\n", (save_space - 4));
+  fprintf(out, "  sw $fp, %d($sp)\n", (save_space - 8));
 
   // Save temp registers and parameter registers.
   for (n = 0; n < save_regs; n++)
   {
-    fprintf(out, "  sw $t%d, %d($sp)\n", n, save_space - (n * 4) + 12);
+    fprintf(out, "  sw $t%d, %d($sp)\n", n, save_space - (n * 4) + 8);
   }
 
-  param_sp = 0;
+  param_sp = -4;
 
   // Push registers that are parameters.
   // Parameters are pushed left to right.
@@ -1257,7 +1259,7 @@ int R5900::invoke_static_method(const char *name, int params, int is_void)
   // Setup parameters that are on the stack.
   for (n = 0; n < stack; n++)
   {
-    fprintf(out, "  lw $at, %d($sp)\n", save_space + (n * 4) + 4);
+    fprintf(out, "  lw $at, %d($sp)\n", save_space + (n * 4));
     fprintf(out, "  sw $at, %d($sp)\n", param_sp);
     param_sp -= 4;
   }
@@ -1268,12 +1270,12 @@ int R5900::invoke_static_method(const char *name, int params, int is_void)
   // Restore temp registers
   for (n = 0; n < save_regs; n++)
   {
-    fprintf(out, "  lw $t%d, %d($sp)\n", n, save_space - (n * 4) + 12);
+    fprintf(out, "  lw $t%d, %d($sp)\n", n, save_space - (n * 4) + 8);
   }
 
   // Restore ra and fp
-  fprintf(out, "  lw $ra, %d($sp)\n", (save_space - 4) + 4);
-  fprintf(out, "  lw $fp, %d($sp)\n", (save_space - 8) + 4);
+  fprintf(out, "  lw $ra, %d($sp)\n", (save_space - 4));
+  fprintf(out, "  lw $fp, %d($sp)\n", (save_space - 8));
   fprintf(out, "  addiu $sp, $sp, %d\n", save_space);
 
   // Decrease count on reg stack.

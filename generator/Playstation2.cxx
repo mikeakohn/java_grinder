@@ -1799,53 +1799,19 @@ void Playstation2::add_draw3d_object_draw()
     "  nop\n"
     "  sw $0, -12($a0)\n"
     "  lw $v0, -16($a0)\n"
-    "  addiu $v0, $v0, -1\n"
-    "  addiu $v1, $a0, 128\n"
+    "  addiu $v0, $v0, -8\n"
     "  srl $v0, $v0, 2\n"
+    "  addiu $v1, $a0, 128\n"
+    "  addiu $v0, $v0, 1\n"
     "_draw3d_object_draw_cache_flush:\n"
-    "  addiu $v0, $v0, -1\n"
     "  sync.l\n"
     "  cache dhwoin, 0($v1)\n"
     "  sync.l\n"
+    "  addiu $v0, $v0, -1\n"
     "  addiu $v1, $v1, 64\n"
     "  bnez $v0, _draw3d_object_draw_cache_flush\n"
     "  nop\n"
     "_draw3d_object_draw_skip_cache_flush:\n");
-
-#if 0
-  // This could be done with DMA.  Not sure what's better.
-  fprintf(out,
-    "  ; Check if VU1 is busy\n"
-    "  li $v1, VIF1_STAT\n"
-    "_draw3d_object_vu1_is_running:\n"
-    "  lw $v0, ($v1)\n"
-    "  andi $t8, $v0, 0x04\n"
-    "  bne $t8, $0, _draw3d_object_vu1_is_running\n"
-    "  nop\n"
-    "_draw3d_object_draw:\n"
-    "  li $v0, VU1_VU_MEM\n"
-    "  lw $a1, -16($a0)\n"
-    "_repeat_vu1_data_copy_0:\n"
-    "  lq $at, ($a0)\n"
-    "  sq $at, ($v0)\n"
-    "  addiu $a0, $a0, 16\n"
-    "  addiu $v0, $v0, 16\n"
-    "  addiu $a1, $a1, -1\n"
-    "  bnez $a1, _repeat_vu1_data_copy_0\n"
-    "  nop\n");
-
-  fprintf(out,
-    "  ;; Start the VU1 with a VIF packet\n"
-    "  li $v0, D1_CHCR\n"
-    "  li $v1, vu1_start\n"
-    "  sw $v1, 0x10($v0)         ; DMA01 ADDRESS\n"
-    "  li $v1, 1                 ; Length is only 1 qword\n"
-    "  sw $v1, 0x20($v0)         ; DMA01 SIZE\n"
-    "  li $v1, 0x101\n"
-    "  sw $v1, ($v0)             ; start\n\n"
-    "  jr $ra\n"
-    "  nop\n");
-#endif
 
   fprintf(out,
     "  ;; Wait till DMA01 is free\n"
@@ -2168,6 +2134,7 @@ void Playstation2::add_draw3d_object_constructor()
   fprintf(out,
     "  sll $at, $a1, 1\n"
     "  addiu $at, $at, 9\n"
+    //"  addiu $at, $at, 8\n"
     "  sw $at, -16($v0)\n");
 
   // Put 1 (true) into cache-flush flag.
