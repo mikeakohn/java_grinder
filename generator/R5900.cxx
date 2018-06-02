@@ -165,7 +165,7 @@ void R5900::method_start(int local_count, int max_stack, int param_count, const 
 
   fprintf(out, "%s:\n", name);
   fprintf(out, "  ; %s(local_count=%d, max_stack=%d, param_count=%d)\n", name, local_count, max_stack, param_count);
-  fprintf(out, "  or $fp, $0, $sp\n");
+  fprintf(out, "  move $fp, $sp\n");
   fprintf(out, "  addiu $sp, $sp, -%d\n", local_count * 4);
 }
 
@@ -777,15 +777,18 @@ int R5900::inc_integer(int index, int num)
 
 int R5900::integer_to_byte()
 {
+  fprintf(out, "  ; integer_to_byte() - sign extend byte to word\n");
+
   if (stack > 0)
   {
-    fprintf(out, "  lw $t8, 0($sp)\n");
-    fprintf(out, "  seb $t8, $t8\n");
+    fprintf(out, "  lb $t8, 0($sp)\n");
     fprintf(out, "  sw $t8, 0($sp)\n");
   }
     else
   {
-    fprintf(out, "  seb $t%d, $t%d\n", REG_STACK(reg - 1), REG_STACK(reg - 1));
+    //fprintf(out, "  seb $t%d, $t%d\n", REG_STACK(reg - 1), REG_STACK(reg - 1));
+    fprintf(out, "  sll $t%d, $t%d, 24\n", REG_STACK(reg - 1), REG_STACK(reg - 1));
+    fprintf(out, "  sra $t%d, $t%d, 24\n", REG_STACK(reg - 1), REG_STACK(reg - 1));
   }
 
   return 0;
@@ -793,15 +796,18 @@ int R5900::integer_to_byte()
 
 int R5900::integer_to_short()
 {
+  fprintf(out, "  ; integer_to_short() - sign extend halfword to word\n");
+
   if (stack > 0)
   {
-    fprintf(out, "  lw $t8, 0($sp)\n");
-    fprintf(out, "  seh $t8, $t8\n");
+    fprintf(out, "  lh $t8, 0($sp)\n");
     fprintf(out, "  sw $t8, 0($sp)\n");
   }
     else
   {
-    fprintf(out, "  seh $t%d, $t%d\n", REG_STACK(reg - 1), REG_STACK(reg - 1));
+    //fprintf(out, "  seh $t%d, $t%d\n", REG_STACK(reg - 1), REG_STACK(reg - 1));
+    fprintf(out, "  sll $t%d, $t%d, 16\n", REG_STACK(reg - 1), REG_STACK(reg - 1));
+    fprintf(out, "  sra $t%d, $t%d, 16\n", REG_STACK(reg - 1), REG_STACK(reg - 1));
   }
 
   return 0;
@@ -1229,16 +1235,16 @@ int R5900::invoke_static_method(const char *name, int params, int is_void)
 
   // Save ra and fp
   fprintf(out, "  addiu $sp, $sp, -%d\n", save_space);
-  fprintf(out, "  sw $ra, %d($sp)\n", save_space - 4);
-  fprintf(out, "  sw $fp, %d($sp)\n", save_space - 8);
+  fprintf(out, "  sw $ra, %d($sp)\n", (save_space - 4) + 4);
+  fprintf(out, "  sw $fp, %d($sp)\n", (save_space - 8) + 4);
 
   // Save temp registers and parameter registers.
   for (n = 0; n < save_regs; n++)
   {
-    fprintf(out, "  sw $t%d, %d($sp)\n", n, save_space - ((n + 3) * 4));
+    fprintf(out, "  sw $t%d, %d($sp)\n", n, save_space - (n * 4) + 12);
   }
 
-  param_sp = -4;
+  param_sp = 0;
 
   // Push registers that are parameters.
   // Parameters are pushed left to right.
@@ -1262,12 +1268,12 @@ int R5900::invoke_static_method(const char *name, int params, int is_void)
   // Restore temp registers
   for (n = 0; n < save_regs; n++)
   {
-    fprintf(out, "  lw $t%d, %d($sp)\n", n, save_space - (n * 4) + 8);
+    fprintf(out, "  lw $t%d, %d($sp)\n", n, save_space - (n * 4) + 12);
   }
 
   // Restore ra and fp
-  fprintf(out, "  lw $ra, %d($sp)\n", save_space - 4);
-  fprintf(out, "  lw $fp, %d($sp)\n", save_space - 8);
+  fprintf(out, "  lw $ra, %d($sp)\n", (save_space - 4) + 4);
+  fprintf(out, "  lw $fp, %d($sp)\n", (save_space - 8) + 4);
   fprintf(out, "  addiu $sp, $sp, %d\n", save_space);
 
   // Decrease count on reg stack.
@@ -1364,11 +1370,11 @@ int R5900::new_array(uint8_t type)
     else
   if (type == TYPE_SHORT || type == TYPE_CHAR)
   {
-    fprintf(out, "  sll $at, $%d, 1\n", t);
+    fprintf(out, "  sll $at, $t%d, 1\n", t);
   }
     else
   {
-    fprintf(out, "  move $at, $%d\n", t);
+    fprintf(out, "  move $at, $t%d\n", t);
   }
 
   // $at = length * sizeof(type) + 16 (4 bytes for length and 12 to align)
