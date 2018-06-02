@@ -1799,10 +1799,9 @@ void Playstation2::add_draw3d_object_draw()
     "  nop\n"
     "  sw $0, -12($a0)\n"
     "  lw $v0, -16($a0)\n"
-    "  addiu $v0, $v0, -8\n"
-    "  srl $v0, $v0, 2\n"
     "  addiu $v1, $a0, 128\n"
     "  addiu $v0, $v0, 1\n"
+    "  srl $v0, $v0, 2\n"
     "_draw3d_object_draw_cache_flush:\n"
     "  sync.l\n"
     "  cache dhwoin, 0($v1)\n"
@@ -2134,7 +2133,6 @@ void Playstation2::add_draw3d_object_constructor()
   fprintf(out,
     "  sll $at, $a1, 1\n"
     "  addiu $at, $at, 9\n"
-    //"  addiu $at, $at, 8\n"
     "  sw $at, -16($v0)\n");
 
   // Put 1 (true) into cache-flush flag.
