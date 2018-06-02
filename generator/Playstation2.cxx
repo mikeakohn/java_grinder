@@ -424,11 +424,11 @@ int Playstation2::draw3d_object_setPoint_IFFF()
   const int z = reg - 1;
 
   fprintf(out,
-    "  ;; draw3d_object_setPointPosition_IFFF()\n"
+    "  ;; draw3d_object_setPoint_IFFF()\n"
     "  li $at, 1\n"
     "  sw $at, -12($t%d)\n"
     "  sll $t%d, $t%d, 5\n"
-    "  addiu $t%d, $t%d, 160\n"
+    "  addiu $t%d, $t%d, 144\n"
     "  addu $t%d, $t%d, $t%d\n"
     "  sw $t%d, 0($t%d)\n"
     "  sw $t%d, 4($t%d)\n"
@@ -558,7 +558,7 @@ int Playstation2::draw3d_object_with_texture_setPoint_IFFF()
   const int z = reg - 1;
 
   fprintf(out,
-    "  ;; draw3d_object_with_texture_setPointPosition_IFFF()\n"
+    "  ;; draw3d_object_with_texture_setPoint_IFFF()\n"
     "  li $at, 1\n"
     "  sw $at, -12($t%d)\n"
     "  sll $at, $t%d, 5\n"
