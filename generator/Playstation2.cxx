@@ -1050,8 +1050,6 @@ int Playstation2::draw3d_texture16_setPixelsRLE16_IaB()
 
   fprintf(out,
     "  ;; draw3d_texture16_setPixelsRLE16_IaB()\n"
-    "  li $at, 1\n"
-    "  sw $at, -12($t%d)\n"
     "  move $a0, $t%d\n"
     "  move $a1, $t%d\n"
     "  move $a2, $t%d\n"
@@ -1059,7 +1057,6 @@ int Playstation2::draw3d_texture16_setPixelsRLE16_IaB()
     "  jal _draw3d_texture16_setPixelsRLE16_IaB\n"
     "  nop\n"
     "  move $ra, $s0\n",
-    object,
     object,
     index,
     reg_image_array);
@@ -1786,13 +1783,13 @@ void Playstation2::add_draw3d_object_draw()
   fprintf(out,
     "  ; Flush cache\n"
     "  sync.l\n"
-    "  cache dhwoin, 0($a0)\n"
+    "  cache dhwbin, 0($a0)\n"
     "  sync.l\n"
-    "  cache dhwoin, 64($a0)\n"
+    "  cache dhwbin, 64($a0)\n"
     "  sync.l\n"
-    "  cache dhwoin, 128($a0)\n"
+    "  cache dhwbin, 128($a0)\n"
     "  sync.l\n"
-    "  cache dhwoin, 192($a0)\n"
+    "  cache dhwbin, 192($a0)\n"
     "  sync.l\n"
     "  lw $v0, -12($a0)\n"
     "  beqz $v0, _draw3d_object_draw_skip_cache_flush\n"
@@ -1804,7 +1801,7 @@ void Playstation2::add_draw3d_object_draw()
     "  srl $v0, $v0, 2\n"
     "_draw3d_object_draw_cache_flush:\n"
     "  sync.l\n"
-    "  cache dhwoin, 0($v1)\n"
+    "  cache dhwbin, 0($v1)\n"
     "  sync.l\n"
     "  addiu $v0, $v0, -1\n"
     "  addiu $v1, $v1, 64\n"
@@ -1853,7 +1850,7 @@ void Playstation2::add_draw3d_texture_upload()
     "_draw3d_texture_upload_cache_flush:\n"
     "  addiu $v0, $v0, -1\n"
     "  sync.l\n"
-    "  cache dhwoin, 0($v1)\n"
+    "  cache dhwbin, 0($v1)\n"
     "  sync.l\n"
     "  addiu $v1, $v1, 64\n"
     "  bnez $v0, _draw3d_texture_upload_cache_flush\n"
@@ -2046,6 +2043,8 @@ void Playstation2::add_draw3d_texture16_setPixelsRLE16_IaB()
   fprintf(out,
     "_draw3d_texture16_setPixelsRLE16_IaB:\n"
     "  ;; draw3d_texture16_setPixelRLE16_IaB()\n"
+    "  li $at, 1\n"
+    "  sw $at, -12($a0)\n"
     "  sll $a1, $a1, 1\n"
     "  addiu $a0, $a0, 208\n"
     "  addu $a0, $a0, $a1\n"
