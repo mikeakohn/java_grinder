@@ -22,8 +22,8 @@
 
 #define DMA02_WAIT \
     ".scope\n" \
-    "_dma02_wait:\n" \
     "  li $v0, D2_CHCR\n" \
+    "_dma02_wait:\n" \
     "  lw $v1, ($v0)\n" \
     "  andi $v1, $v1, 0x100\n" \
     "  bnez $v1, _dma02_wait\n" \
@@ -1705,27 +1705,30 @@ void Playstation2::add_dma_functions()
   fprintf(out,
     "_dma00_wait:\n"
     "  li $v1, D0_CHCR\n"
+    "_dma00_wait_loop:\n"
     "  lw $v0, ($v1)\n"
     "  andi $v0, $v0, 0x100\n"
-    "  bnez $v0, _dma00_wait\n"
+    "  bnez $v0, _dma00_wait_loop\n"
     "  nop\n"
     "  jr $ra\n"
     "  nop\n\n"
 
     "_dma01_wait:\n"
     "  li $v1, D0_CHCR\n"
+    "_dma01_wait_loop:\n"
     "  lw $v0, ($v1)\n"
     "  andi $v0, $v0, 0x100\n"
-    "  bnez $v0, _dma01_wait\n"
+    "  bnez $v0, _dma01_wait_loop\n"
     "  nop\n"
     "  jr $ra\n"
     "  nop\n\n"
 
     "_dma02_wait:\n"
     "  li $v1, D2_CHCR\n"
+    "_dma02_wait_loop:\n"
     "  lw $v0, ($v1)\n"
     "  andi $v0, $v0, 0x100\n"
-    "  bnez $v0, _dma02_wait\n"
+    "  bnez $v0, _dma02_wait_loop\n"
     "  nop\n"
     "  jr $ra\n"
     "  nop\n\n");
@@ -1833,6 +1836,16 @@ void Playstation2::add_draw3d_texture_upload()
     "  ;; _draw3d_texture_upload()\n"
     "_draw3d_texture_upload:\n");
 
+  // Texture flush
+  fprintf(out,
+    DMA02_WAIT
+    "  li $v1, _texture_flush\n"
+    "  sw $v1, 0x10($v0)        ; DMA02 ADDRESS\n"
+    "  li $v1, (_texture_flush_end - _texture_flush) / 16\n"
+    "  sw $v1, 0x20($v0)         ; DMA02 SIZE\n"
+    "  li $v1, 0x101\n"
+    "  sw $v1, ($v0)             ; start\n");
+
   // Clear cache for this object.
   // Find the number of quadwords (16 byte) elements in this object.
   // Since there are 4 elements per 64 byte cache line, figure out how
@@ -1933,6 +1946,13 @@ void Playstation2::add_screen_init_clear()
     "  dc64 SETREG_XYZ2(1640 << 4, 1448 << 4, 0), REG_XYZ2\n"
     "  dc64 SETREG_TEST(0,ATST_ALWAYS,0x00,AFAIL_KEEP,0,0,1,ZTST_GREATER), REG_TEST_2\n"
     "_screen_init_clear_2_end:\n\n");
+
+  fprintf(out,
+    ".align 128\n"
+    "_texture_flush:\n"
+    "  dc64 GIF_TAG(1, 1, 0, 0, FLG_PACKED, 1), REG_A_D\n"
+    "  dc64 0, REG_TEXFLUSH\n"
+    "_texture_flush_end:\n\n");
 
   //fprintf(out,
   //  "_current_context:\n"
