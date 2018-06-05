@@ -202,7 +202,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, in
   //printf("const function: %s()\n", function);
   int ret = -1;
 
-  size_t len = sizeof("net/mikekohn/java_grinder/") - 1;
+  const size_t len = sizeof("net/mikekohn/java_grinder/") - 1;
 
   if (strncmp("net/mikekohn/java_grinder/", method_class, len)!=0)
   {
@@ -265,6 +265,78 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, in
   if (ret == 0) { return 0; }
 
   //printf("invoke static const (not found)\n");
+
+  return -1;
+}
+
+int invoke_static(JavaClass *java_class, int method_id, Generator *generator, const char *const_val)
+{
+  char method_name[128];
+  char method_sig[128];
+  char method_class[128];
+  char function[256];
+
+  if (java_class->get_class_name(method_class, sizeof(method_class), method_id) != 0 ||
+      java_class->get_ref_name_type(method_name, method_sig, sizeof(method_name), method_id) != 0)
+  {
+    printf("Error: Couldn't get name and type for method_id %d\n", method_id);
+    return -1;
+  }
+
+  get_static_function(function, method_name, method_sig);
+
+  //printf("const function: %s()\n", function);
+  int ret = -1;
+
+  const size_t len = sizeof("net/mikekohn/java_grinder/") - 1;
+
+  if (strncmp("net/mikekohn/java_grinder/", method_class, len)!=0)
+  {
+    return -1;
+  }
+
+  if (strncmp("net/mikekohn/java_grinder/", method_class, len) == 0)
+  {
+    char *cls = method_class + len;
+
+    if (strcmp(cls, "Memory") == 0)
+    {
+      if (strcmp(function, "preloadByteArray_X") == 0 ||
+          strcmp(function, "preloadIntArray_X") == 0)
+      {
+        char array_name[strlen(const_val) + 1];
+        int ptr = 0;
+        int type = TYPE_BYTE;
+
+        if (strcmp(function, "preloadIntArray_X") == 0) { type = TYPE_INT; }
+
+        while(const_val[ptr] != 0)
+        {
+          if (const_val[ptr] == '.' ||
+              const_val[ptr] == '/' ||
+              const_val[ptr] == ' ' ||
+              const_val[ptr] == '\\')
+          {
+            array_name[ptr] = '_';
+          }
+          else
+          {
+            array_name[ptr] = const_val[ptr];
+          }
+
+          ptr++;
+        }
+
+        array_name[ptr] = 0;
+
+        generator->use_array_file(const_val, array_name, type);
+
+        return memory(java_class, generator, function, array_name);
+      }
+    }
+  }
+
+  if (ret == 0) { return 0; }
 
   return -1;
 }

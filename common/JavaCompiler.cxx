@@ -376,8 +376,12 @@ int JavaCompiler::optimize_const(JavaClass *java_class, char *method_name, uint8
   if (pc + 2 < pc_end && bytes[pc] == 0xb8)
   {
     int ref = GET_PC_UINT16(1);
+
     if (invoke_static(java_class, ref, generator, &const_val, 1) != 0)
-    { return 0; }
+    {
+      return 0;
+    }
+
     return 3;
   }
 
@@ -416,6 +420,24 @@ int JavaCompiler::optimize_const(JavaClass *java_class, char *method_name, uint8
   }
 
   // FIXME - add more invoke(const,const) combinations.
+
+  return 0;
+}
+
+int JavaCompiler::optimize_const(JavaClass *java_class, char *method_name, uint8_t *bytes, int pc, int pc_end, int address, const char *const_val)
+{
+  // invokestatic with one String const
+  if (pc + 2 < pc_end && bytes[pc] == 0xb8)
+  {
+    int ref = GET_PC_UINT16(1);
+
+    if (invoke_static(java_class, ref, generator, const_val) != 0)
+    {
+      return 0;
+    }
+
+    return 3;
+  }
 
   return 0;
 }
@@ -920,11 +942,26 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         if (gen32->tag == CONSTANT_STRING)
         {
           constant_string_t *constant_string = (constant_string_t *)gen32;
-
           const_val = constant_string->string_index;
+
+          // I think this is wrong.. why use the index to the string?
+#if 0
           ret = optimize_const(java_class, method_name, bytes,
                                pc + instruction_length, pc_start + code_len,
                                address + instruction_length, const_val);
+
+          //if (ret == 0)
+#endif
+          {
+            char data[1024];
+            java_class->get_name_constant(data, sizeof(data), const_val);
+
+            ret = optimize_const(java_class, method_name, bytes,
+                                 pc + instruction_length,
+                                 pc_start + code_len,
+                                 address + instruction_length, data);
+          }
+
           if (ret == 0)
           {
             //ret = generator->push_int(const_val);

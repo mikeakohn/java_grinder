@@ -25,6 +25,8 @@ public:
   virtual int memory_allocStackBytes_I() { return -1; }
   virtual int memory_allocStackShorts_I() { return -1; }
   virtual int memory_allocStackInts_I() { return -1; }
+  virtual int memory_preloadByteArray_X(const char *array_name) { return -1; }
+  virtual int memory_preloadIntArray_X(const char *array_name) { return -1; }
 
   // CPU functions
   virtual int cpu_setClock16() { return -1; }

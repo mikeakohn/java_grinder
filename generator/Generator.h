@@ -178,7 +178,16 @@ public:
   void instruction_count_clear() { instruction_count = 0; }
   void instruction_count_inc() { instruction_count++; }
 
+  int use_array_file(const char *filename, const char *array, int type);
+  int add_array_files();
+
 protected:
+  struct ArrayFiles
+  {
+    std::string name;
+    int type;
+  };
+
   int insert_db(const char *name, int32_t *data, int len, uint8_t len_type);
   int insert_dw(const char *name, int32_t *data, int len, uint8_t len_type);
   int insert_dc32(const char *name, int32_t *data, int len, uint8_t len_type, const char *dc32 = "dc32");
@@ -190,7 +199,8 @@ protected:
   FILE *out;
   int label_count;
   int instruction_count;
-  std::map<uint32_t,int> constants_pool;
+  std::map<uint32_t, int> constants_pool;
+  std::map<std::string, ArrayFiles> preload_arrays;
 };
 
 enum
@@ -215,15 +225,6 @@ enum
   TYPE_INT=10,
   TYPE_LONG=11,
 };
-
-#if 0
-enum
-{
-  CPU_INVALID,
-  CPU_MSP430,
-  CPU_DSPIC,
-};
-#endif
 
 #endif
 

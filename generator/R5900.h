@@ -130,6 +130,8 @@ public:
   virtual int array_write_float(const char *name, int field_id);
   virtual int array_write_object(const char *name, int field_id);
   virtual int cpu_nop();
+  virtual int memory_preloadByteArray_X(const char *array_name);
+  virtual int memory_preloadIntArray_X(const char *array_name);
 
 protected:
   int reg;            // count number of registers are are using as stack

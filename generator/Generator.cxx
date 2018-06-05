@@ -12,6 +12,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "DSPIC.h"
 #include "MSP430.h"
@@ -23,6 +26,8 @@ Generator::Generator() : label_count(0)
 
 Generator::~Generator()
 {
+  add_array_files();
+
   fprintf(out, "\n");
   fclose(out);
 }
@@ -410,4 +415,43 @@ int Generator::cpu_asm_X(const char *code, int len)
   return 0;
 }
 
+int Generator::use_array_file(const char *filename, const char *array, int type)
+{
+   ArrayFiles array_file;
+   std::string key = filename;
+
+  if (preload_arrays.find(key) != preload_arrays.end()) { return 0; }
+
+  array_file.name = array;
+  array_file.type = type;
+
+  preload_arrays[key] = array_file;
+
+  return 0;
+}
+
+int Generator::add_array_files()
+{
+  struct stat statbuf;
+  std::map<std::string, ArrayFiles>::iterator iter;
+
+  for (iter = preload_arrays.begin(); iter != preload_arrays.end(); iter++)
+  {
+    if (stat(iter->first.c_str(), &statbuf) != 0)
+    {
+      printf("Error opening %s\n", iter->first.c_str());
+      return -1;
+    }
+
+    fprintf(out, ".align 128\n");
+    fprintf(out, "  dw 0, 0, 0, %d\n",
+      (int)(iter->second.type == TYPE_BYTE ?
+            statbuf.st_size : statbuf.st_size / 4));
+
+    fprintf(out, "_%s:\n", iter->second.name.c_str());
+    fprintf(out, ".binfile \"%s\"\n\n", iter->first.c_str());
+  }
+
+  return 0;
+}
 

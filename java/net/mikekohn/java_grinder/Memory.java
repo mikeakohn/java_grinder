@@ -3,9 +3,9 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.naken.cc/
- * License: GPL
+ * License: GPLv3
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2018 by Michael Kohn
  *
  */
 
@@ -38,5 +38,13 @@ public class Memory
   /** Allocate a int array on the stack.  Automatically free()'d when
       the current method ends. */
   public static int[] allocStackInts(int length) { return null; }
+
+  /** Load a file from disk (at assembler time) and return a reference
+      to it as an array of ints. Not endian safe. */
+  public static int[] preloadIntArray(String filename) { return null; }
+
+  /** Load a file from disk (at assembler time) and return a reference
+      to it as an array of ints. */
+  public static byte[] preloadByteArray(String filename) { return null; }
 }
 

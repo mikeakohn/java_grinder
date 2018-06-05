@@ -49,6 +49,7 @@ private:
   int find_external_fields(JavaClass *java_class, bool is_parent);
   void fill_label_map(uint8_t *label_map, int label_map_len, uint8_t *bytes, int code_len, int pc_start);
   int optimize_const(JavaClass *java_class, char *method_name, uint8_t *bytes, int pc, int pc_end, int address, int const_val);
+  int optimize_const(JavaClass *java_class, char *method_name, uint8_t *bytes, int pc, int pc_end, int address, const char *const_val);
   int optimize_compare(JavaClass *java_class, char *method_name, uint8_t *bytes, int pc, int pc_end, int address, int index);
   int array_load(JavaClass *java_class, int constant_id, uint8_t array_type);
   int array_store(JavaClass *java_class, int constant_id, uint8_t array_type);
@@ -63,8 +64,8 @@ private:
 
   JavaClass *java_class;  // FIXME - Why is this here?
   char classpath[128];
-  std::map<std::string,int> external_fields;
-  std::map<std::string,JavaClass *> external_classes;
+  std::map<std::string, int> external_fields;
+  std::map<std::string, JavaClass *> external_classes;
   FILE *in;
   static uint8_t cond_table[];
   static const char *type_table[];

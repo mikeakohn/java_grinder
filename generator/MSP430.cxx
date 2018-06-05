@@ -170,7 +170,7 @@ void MSP430::method_start(int local_count, int max_stack, int param_count, const
   stack = 0;
 
   this->max_stack = max_stack;
-  printf("max_stack=%d\n", max_stack);
+  //printf("max_stack=%d\n", max_stack);
 
   is_main = (strcmp(name, "main") == 0) ? 1 : 0;
   is_interrupt = (strcmp(name, "timerInterrupt") == 0) ? 1 : 0;
@@ -1132,7 +1132,7 @@ int MSP430::invoke_static_method(const char *name, int params, int is_void)
   int saved_registers;
   int n;
 
-  printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
+  fprintf(out, "  ; invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
 
   // Push all used registers on the stack except the ones that are pulled
   // out for parameters.
