@@ -16,6 +16,7 @@
 #include <stdint.h>
 
 #include <map>
+#include <string>
 
 #include "API_APPLEIIGS.h"
 #include "API_Atari2600.h"
