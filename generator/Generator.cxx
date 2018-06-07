@@ -446,7 +446,7 @@ int Generator::add_array_files()
     fprintf(out, ".align 128\n");
     fprintf(out, "  dw 0, 0, 0, %d\n",
       (int)(iter->second.type == TYPE_BYTE ?
-            statbuf.st_size : statbuf.st_size / 4));
+            statbuf.st_size : statbuf.st_size / get_int_size()));
 
     fprintf(out, "_%s:\n", iter->second.name.c_str());
     fprintf(out, ".binfile \"%s\"\n\n", iter->first.c_str());

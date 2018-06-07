@@ -135,6 +135,8 @@ public:
   virtual int memory_write8_IB();
 
 protected:
+  virtual int get_int_size() { return 1; }
+
   int stack;
   int start_org;
   int java_stack_lo;

@@ -186,6 +186,9 @@ public:
   virtual int dsp_shiftA();
   virtual int dsp_shiftB();
 
+protected:
+  virtual int get_int_size() { return 2; }
+
 private:
   int dsp_mul(const char *instr, const char *accum);
   int dsp_square(const char *instr, const char *accum);

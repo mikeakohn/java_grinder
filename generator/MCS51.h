@@ -100,6 +100,8 @@ public:
   virtual int array_write_int(const char *name, int field_id);
 
 protected:
+  virtual int get_int_size() { return 2; }
+
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 
   int stack;          // count how many things we put on the stack

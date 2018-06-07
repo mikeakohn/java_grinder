@@ -188,6 +188,7 @@ protected:
     int type;
   };
 
+  virtual int get_int_size() { return 4; }
   int insert_db(const char *name, int32_t *data, int len, uint8_t len_type);
   int insert_dw(const char *name, int32_t *data, int len, uint8_t len_type);
   int insert_dc32(const char *name, int32_t *data, int len, uint8_t len_type, const char *dc32 = "dc32");

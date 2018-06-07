@@ -101,6 +101,7 @@ public:
   virtual int array_write_int(const char *name, int field_id);
 
 protected:
+  virtual int get_int_size() { return 2; }
   void sign_extend();
   int insert_conditional(const char *label, int cond, int distance);
 

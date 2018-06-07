@@ -155,6 +155,8 @@ public:
   virtual int uart_isSendReady(int port);
 
 protected:
+  virtual int get_int_size() { return 2; }
+
   int stack;
   bool is_main:1;
   const char *include_file;

@@ -113,6 +113,7 @@ public:
   
 
 protected:
+  virtual int get_int_size() { return 2; }
   int stack_alu(int alu_op);
   int stack_alu_const(int alu_op, int num);
   void save_registers();

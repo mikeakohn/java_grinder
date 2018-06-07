@@ -187,6 +187,7 @@ public:
   virtual int memory_write16_IS();
 
 protected:
+  virtual int get_int_size() { return 2; }
   int set_periph(const char *instr, const char *periph);
   char *pop_reg();
   char *top_reg();

@@ -98,6 +98,7 @@ public:
   virtual int array_write_int(const char *name, int field_id);
 
 protected:
+  virtual int get_int_size() { return 2; }
   void add_multiply();
 
   uint16_t start_org;

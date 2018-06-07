@@ -133,6 +133,8 @@ public:
   virtual int memory_write16_IS();
 
 protected:
+  virtual int get_int_size() { return 2; }
+
   int stack;
   int start_org;
   int java_stack_lo;
