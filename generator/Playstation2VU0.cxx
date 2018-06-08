@@ -169,5 +169,11 @@ void Playstation2::add_vu0_code()
     "  nop\n"
     "  jr $ra\n"
     "  nop\n");
+
+  fprintf(out,
+    ".align 128\n"
+    "_vif_vu0_start:\n"
+    "  dc32 (VIF_MSCAL << 24), 0, 0, 0\n"
+    "_vif_vu0_end:\n\n");
 }
 

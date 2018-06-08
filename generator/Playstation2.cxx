@@ -1509,21 +1509,21 @@ int Playstation2::playstation2_vu0DownloadData_IaF()
 
 int Playstation2::playstation2_vu0Start()
 {
-#if 0
   fprintf(out,
     "  ;; Send data (VIF_UNPACK) and start VU1 (VIF_MSCAL)\n"
     "  li $v0, D0_CHCR\n"
-    "  li $v1, vif_packet_start\n"
+    "  li $v1, _vif_vu0_start\n"
     "  sw $v1, 0x10($v0)                   ; DMA00 ADDRESS\n"
     "  li $v1, ((_vif_vu0_end - _vif_vu0_start) / 16)\n"
     "  sw $v1, 0x20($v0)                   ; DMA00 SIZE\n"
     "  li $v1, 0x101\n"
     "  sw $v1, ($v0)                       ; start\n");
-#endif
 
+#if 0
   fprintf(out,
     "  ;; vu0Start()\n"
     "  vcallms 0\n");
+#endif
 
   return 0;
 }
@@ -2042,17 +2042,6 @@ void Playstation2::add_texture_gif_tag()
     "  dc64 SETREG_TEX2(FMT_PSMCT32, 0, 0, 0, 0, 0), REG_TEX2_2\n"
     "  dc64 GIF_TAG(0, 1, 0, 0, FLG_IMAGE, 1), REG_A_D\n\n");
 }
-
-#if 0
-void Playstation2::add_vu0_code()
-{
-  fprintf(out,
-    ".align 128\n"
-    "_vif_vu0_start:\n"
-    "  dc32 (VIF_MSCAL << 24), 0, 0, 0\n"
-    "_vif_vu0_end:\n\n");
-}
-#endif
 
 void Playstation2::add_draw3d_texture16_setPixelsRLE16_IaB()
 {
