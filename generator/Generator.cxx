@@ -418,14 +418,13 @@ int Generator::cpu_asm_X(const char *code, int len)
 int Generator::use_array_file(const char *filename, const char *array, int type)
 {
    ArrayFiles array_file;
-   std::string key = filename;
 
-  if (preload_arrays.find(key) != preload_arrays.end()) { return 0; }
+  if (preload_arrays.find(filename) != preload_arrays.end()) { return 0; }
 
   array_file.name = array;
   array_file.type = type;
 
-  preload_arrays[key] = array_file;
+  preload_arrays[filename] = array_file;
 
   return 0;
 }
@@ -434,6 +433,11 @@ int Generator::add_array_files()
 {
   struct stat statbuf;
   std::map<std::string, ArrayFiles>::iterator iter;
+
+  const char *constant = "dc32";
+
+  if (get_int_size() == 16) { constant = "dc16"; }
+  else if (get_int_size() == 8) { constant = "dc8"; }
 
   for (iter = preload_arrays.begin(); iter != preload_arrays.end(); iter++)
   {
@@ -444,7 +448,8 @@ int Generator::add_array_files()
     }
 
     fprintf(out, ".align 128\n");
-    fprintf(out, "  dw 0, 0, 0, %d\n",
+    fprintf(out, "  %s 0, 0, 0, %d\n",
+      constant,
       (int)(iter->second.type == TYPE_BYTE ?
             statbuf.st_size : statbuf.st_size / get_int_size()));
 
