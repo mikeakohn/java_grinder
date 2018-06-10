@@ -1509,6 +1509,7 @@ int Playstation2::playstation2_vu0DownloadData_IaF()
 
 int Playstation2::playstation2_vu0Start()
 {
+#if 0
   fprintf(out,
     "  ;; Send data (VIF_UNPACK) and start VU1 (VIF_MSCAL)\n"
     "  li $v0, D0_CHCR\n"
@@ -1518,12 +1519,11 @@ int Playstation2::playstation2_vu0Start()
     "  sw $v1, 0x20($v0)                   ; DMA00 SIZE\n"
     "  li $v1, 0x101\n"
     "  sw $v1, ($v0)                       ; start\n");
+#endif
 
-#if 0
   fprintf(out,
     "  ;; vu0Start()\n"
     "  vcallms 0\n");
-#endif
 
   return 0;
 }
@@ -1550,10 +1550,19 @@ int Playstation2::playstation2_vu0IsRunning()
 {
   fprintf(out,
     "  ;; vu0IsRunning()\n"
+    "  cfc2 $at, 29\n"
+    "  andi $t%d, $at, 0x01\n",
+    reg);
+
+#if 0
+  fprintf(out,
+    "  ;; vu0IsRunning()\n"
     "  li $v1, VIF0_STAT\n"
     "  lw $v0, ($v1)\n"
     "  andi $t%d, $v0, 0x04\n",
     reg);
+#endif
+
 
   reg++;
 
