@@ -85,6 +85,9 @@ public:
   virtual int playstation2_randomGet();
   virtual int playstation2_randomNext();
 
+  virtual int math_sin512_I();
+  virtual int math_cos512_I();
+
 private:
   int upload_vu0_data(int dec_count);
   int download_vu0_data(int dec_count);

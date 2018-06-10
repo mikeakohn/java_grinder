@@ -27,6 +27,7 @@
 #include "cpu.h"
 #include "dsp.h"
 #include "ioport.h"
+#include "math_.h"
 #include "memory.h"
 #include "msx_.h"
 #include "parallella.h"
@@ -146,6 +147,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     CHECK_WITH_PORT(SPI, spi, 1)
     CHECK_WITH_PORT(UART, uart, 0)
     CHECK_WITH_PORT(UART, uart, 1)
+    CHECK(Math, math)
     CHECK(MSX, msx)
     CHECK(Parallella, parallella)
     CHECK(Playstation2, playstation2)

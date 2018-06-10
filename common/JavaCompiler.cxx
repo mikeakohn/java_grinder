@@ -675,7 +675,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
   uint8_t *label_map;
   int ret = 0;
   char label[128];
-  char method_name[64];
+  char method_name[256];
   char class_name[256];
   _stack *stack;
   int const_val;
@@ -712,7 +712,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
 
   if (strcmp(method_name, "main") != 0)
   {
-    char method_sig[64];
+    char method_sig[256];
     java_class->get_name_constant(method_sig, sizeof(method_sig), method->descriptor_index);
 
     char *s = method_sig + 1;

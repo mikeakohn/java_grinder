@@ -1654,6 +1654,44 @@ int Playstation2::playstation2_randomNext()
   return 0;
 }
 
+int Playstation2::math_sin512_I()
+{
+  const int value = reg - 1;
+
+  fprintf(out,
+    "  ;; math_sin512_I()\n"
+    "  andi $t%d, $t%d, 511\n"
+    "  sll $t%d, $t%d, 2\n"
+    "  li $v1, _sin_table_512\n"
+    "  addu $v1, $v1, $t%d\n"
+    "  lwu $t%d, ($v1)\n",
+    value, value,
+    value, value,
+    value,
+    value);
+
+  return 0;
+}
+
+int Playstation2::math_cos512_I()
+{
+  const int value = reg - 1;
+
+  fprintf(out,
+    "  ;; math_cos512_I()\n"
+    "  andi $t%d, $t%d, 511\n"
+    "  sll $t%d, $t%d, 2\n"
+    "  li $v1, _cos_table_512\n"
+    "  addu $v1, $v1, $t%d\n"
+    "  lwu $t%d, ($v1)\n",
+    value, value,
+    value, value,
+    value,
+    value);
+
+  return 0;
+}
+
 void Playstation2::add_dma_functions()
 {
   fprintf(out,
