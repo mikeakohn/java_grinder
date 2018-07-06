@@ -141,5 +141,11 @@ abstract public class Playstation2
 
   /** Get next random number (a 23 bit integer). */
   public static int randomNext() { return 0; }
+
+  /** Initialize system to be able to do sound. */
+  public static void initSound() { }
+
+  /** Upload ADPCM sound data to the SPU. */
+  public static void uploadSoundData(byte[] data) { }
 }
 

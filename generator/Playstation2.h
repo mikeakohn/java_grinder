@@ -84,6 +84,8 @@ public:
   virtual int playstation2_randomInit_I();
   virtual int playstation2_randomGet();
   virtual int playstation2_randomNext();
+  virtual int playstation2_initSound();
+  virtual int playstation2_uploadSoundData_aB();
 
   virtual int math_sin512_I();
   virtual int math_cos512_I();
@@ -91,6 +93,8 @@ public:
 private:
   int upload_vu0_data(int dec_count);
   int download_vu0_data(int dec_count);
+  int push_registers();
+  int pop_registers();
   void add_dma_functions();
   void add_misc_functions();
   void add_draw3d_object_draw();
@@ -101,10 +105,12 @@ private:
   void add_texture_gif_tag();
   void add_vu0_code();
   void add_vu1_code();
+  void add_strings();
   void add_draw3d_object_constructor();
   void add_draw3d_object_with_texture_constructor();
   void add_draw3d_texture_constructor(int bit_size);
   void add_draw3d_texture16_setPixelsRLE16_IaB();
+
   bool need_draw3d_texture16 : 1;
   bool need_draw3d_texture24 : 1;
   bool need_draw3d_texture32 : 1;

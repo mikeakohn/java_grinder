@@ -67,6 +67,7 @@ Playstation2::~Playstation2()
   add_texture_gif_tag();
   add_vu0_code();
   add_vu1_code();
+  add_strings();
   Math::add_sin_table(out);
   Math::add_cos_table(out);
 }
@@ -120,7 +121,7 @@ int Playstation2::start_init()
     "  sw $v1, 0x10($v0)     ; FBRST\n\n"
 
     "  ;; Interrupt mask register\n"
-    "  li $v1, GsPutIMR\n"
+    "  li $v1, _GsPutIMR\n"
     "  li $a0, 0xff00\n"
     "  syscall\n"
     "  nop\n\n");
@@ -129,8 +130,8 @@ int Playstation2::start_init()
     "  ;; interlace      { PS2_NONINTERLACED = 0, PS2_INTERLACED = 1 };\n"
     "  ;; videotype      { PS2_NTSC = 2, PS2_PAL = 3 };\n"
     "  ;; frame          { PS2_FRAME = 1, PS2_FIELD = 0 };\n"
-    "  ;; SetGsCrt(s16 interlace, s16 pal_ntsc, s16 field);\n"
-    "  li $v1, SetGsCrt\n"
+    "  ;; _SetGsCrt(s16 interlace, s16 pal_ntsc, s16 field);\n"
+    "  li $v1, _SetGsCrt\n"
     "  li $a0, 1\n"
     "  li $a1, 2\n"
     "  li $a2, 0\n"
@@ -1663,6 +1664,38 @@ int Playstation2::playstation2_randomNext()
   return 0;
 }
 
+int Playstation2::playstation2_initSound()
+{
+  fprintf(out, " ;; playstation2_initSound()\n");
+
+  push_registers();
+
+  fprintf(out,
+    "  jal setupthread\n"
+    "  nop\n"
+    "  jal SifInitRpc\n"
+    "  nop\n"
+    "  li $a0, _audsrv_irx\n"
+    "  li $a1, 0\n"
+    "  li $a2, 0\n"
+    "  jal SifLoadModule\n"
+    "  nop\n");
+
+  pop_registers();
+
+  return 0;
+}
+
+int Playstation2::playstation2_uploadSoundData_aB()
+{
+  const int array = reg - 1;
+
+
+  reg--;
+
+  return -1;
+}
+
 int Playstation2::math_sin512_I()
 {
   const int value = reg - 1;
@@ -1697,6 +1730,33 @@ int Playstation2::math_cos512_I()
     value, value,
     value,
     value);
+
+  return 0;
+}
+
+int Playstation2::push_registers()
+{
+  fprintf(out,
+    "  move $s0, $sp\n"
+    "  addiu $at, $0, -16\n"
+    "  and $sp, $sp, $at\n"
+    "  addiu $sp, $0, -16\n"
+    "  sw $gp, 12($sp)\n"
+    "  sw $fp, 8($sp)\n"
+    "  sw $ra, 4($sp)\n"
+    "  sw $s0, 0($sp)\n");
+
+  return 0;
+}
+
+int Playstation2::pop_registers()
+{
+  fprintf(out,
+    "  lwu $gp, 12($sp)\n"
+    "  lwu $fp, 8($sp)\n"
+    "  lwu $ra, 4($sp)\n"
+    "  lwu $s0, 0($sp)\n"
+    "  move $sp, $s0\n");
 
   return 0;
 }
@@ -2088,6 +2148,14 @@ void Playstation2::add_texture_gif_tag()
     "  dc64 SETREG_TEX2(FMT_PSMCT32, 0, 0, 0, 0, 0), REG_TEX2_1\n"
     "  dc64 SETREG_TEX2(FMT_PSMCT32, 0, 0, 0, 0, 0), REG_TEX2_2\n"
     "  dc64 GIF_TAG(0, 1, 0, 0, FLG_IMAGE, 1), REG_A_D\n\n");
+}
+
+void Playstation2::add_strings()
+{
+  fprintf(out,
+    "_audsrv_irx:\n"
+    "  db \"host:audsrv.irx\", 0\n\n");
+    //"  db \"host0:audsrv.irx\", 0\n\n");
 }
 
 void Playstation2::add_draw3d_texture16_setPixelsRLE16_IaB()
