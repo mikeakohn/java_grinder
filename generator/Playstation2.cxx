@@ -1664,6 +1664,7 @@ int Playstation2::playstation2_randomNext()
   return 0;
 }
 
+/*
 int Playstation2::playstation2_initSound()
 {
   fprintf(out, " ;; playstation2_initSound()\n");
@@ -1685,11 +1686,25 @@ int Playstation2::playstation2_initSound()
 
   return 0;
 }
+*/
 
-int Playstation2::playstation2_uploadSoundData_aB()
+int Playstation2::playstation2_playSoundData_aB()
 {
   const int array = reg - 1;
 
+  fprintf(out,
+    ";; Send TO IOP (SIF1 sends to IOP)\n"
+    "jal _dma06_wait\n"
+    "nop\n"
+
+    "li $v0, D6_CHCR\n"
+    "li $v1, $t%d\n"
+    "sw $v1, 0x10($v0)                   ; DMA06 ADDRESS\n"
+    "li $v1, -4($t%d)\n"
+    "sw $v1, 0x20($v0)                   ; DMA06 SIZE\n"
+    "li $v1, 0x101\n"
+    "sw $v1, ($v0)                       ; start\n",
+    array, array);
 
   reg--;
 
@@ -1836,6 +1851,16 @@ void Playstation2::add_dma_functions()
     "  lw $v0, ($v1)\n"
     "  andi $v0, $v0, 0x100\n"
     "  bnez $v0, _dma02_wait_loop\n"
+    "  nop\n"
+    "  jr $ra\n"
+    "  nop\n\n"
+
+    "_dma06_wait:\n"
+    "  li $v1, D2_CHCR\n"
+    "_dma06_wait_loop:\n"
+    "  lw $v0, ($v1)\n"
+    "  andi $v0, $v0, 0x100\n"
+    "  bnez $v0, _dma06_wait_loop\n"
     "  nop\n"
     "  jr $ra\n"
     "  nop\n\n");

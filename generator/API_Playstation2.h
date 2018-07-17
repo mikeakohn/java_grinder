@@ -35,8 +35,8 @@ public:
   virtual int playstation2_randomInit_I() { return -1; }
   virtual int playstation2_randomGet() { return -1; }
   virtual int playstation2_randomNext() { return -1; }
-  virtual int playstation2_initSound() { return -1; }
-  virtual int playstation2_uploadSoundData_aB() { return -1; }
+  //virtual int playstation2_initSound() { return -1; }
+  virtual int playstation2_playSoundData_aB() { return -1; }
 };
 
 #endif

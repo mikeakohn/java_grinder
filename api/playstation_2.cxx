@@ -57,8 +57,8 @@ int playstation2(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(randomInit,_I)
   CHECK_FUNC(randomGet,)
   CHECK_FUNC(randomNext,)
-  CHECK_FUNC(initSound,)
-  CHECK_FUNC(uploadSoundData,_aB)
+  //CHECK_FUNC(initSound,)
+  CHECK_FUNC(playSoundData,_aB)
 
   return -1;
 }

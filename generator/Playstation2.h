@@ -84,8 +84,8 @@ public:
   virtual int playstation2_randomInit_I();
   virtual int playstation2_randomGet();
   virtual int playstation2_randomNext();
-  virtual int playstation2_initSound();
-  virtual int playstation2_uploadSoundData_aB();
+  //virtual int playstation2_initSound();
+  virtual int playstation2_playSoundData_aB();
 
   virtual int math_sin512_I();
   virtual int math_cos512_I();

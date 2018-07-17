@@ -143,9 +143,9 @@ abstract public class Playstation2
   public static int randomNext() { return 0; }
 
   /** Initialize system to be able to do sound. */
-  public static void initSound() { }
+  //public static void initSound() { }
 
-  /** Upload ADPCM sound data to the SPU. */
-  public static void uploadSoundData(byte[] data) { }
+  /** Upload ADPCM sound data to the SPU and play it. */
+  public static void playSoundData(byte[] data) { }
 }
 
