@@ -1664,50 +1664,53 @@ int Playstation2::playstation2_randomNext()
   return 0;
 }
 
-/*
-int Playstation2::playstation2_initSound()
+int Playstation2::playstation2_spuInit()
 {
-  fprintf(out, " ;; playstation2_initSound()\n");
+  return -1;
+}
 
-  push_registers();
+int Playstation2::playstation2_spuUploadSoundData_aB()
+{
+  return -1;
+}
+
+int Playstation2::playstation2_spuSetVolume_II()
+{
+  return -1;
+}
+
+int Playstation2::playstation2_spuSetMasterVolume_I()
+{
+  return -1;
+}
+
+int Playstation2::playstation2_spuSetPitch_II()
+{
+  const int value = reg - 1;
+  const int voice = reg - 2;
 
   fprintf(out,
-    "  jal setupthread\n"
-    "  nop\n"
-    "  jal SifInitRpc\n"
-    "  nop\n"
-    "  li $a0, _audsrv_irx\n"
-    "  li $a1, 0\n"
-    "  li $a2, 0\n"
-    "  jal SifLoadModule\n"
-    "  nop\n");
+    "  ;; playstation2_spuSetPitch_II()\n"
+    "  li $v1, 0xbf90_0000\n"
+    "  sll $t%d, $t%d, 4\n"
+    "  addu $v0, $v0, $t%d\n"
+    "  sh $t%d, 0x0004($v1)\n",
+    voice, voice,
+    voice,
+    value);
 
-  pop_registers();
+  reg -= 2;
 
   return 0;
 }
-*/
 
-int Playstation2::playstation2_playSoundData_aB()
+int Playstation2::playstation2_spuKeyOn_I()
 {
-  const int array = reg - 1;
+  return -1;
+}
 
-  fprintf(out,
-    ";; Send TO IOP (SIF1 sends to IOP)\n"
-    "jal _dma06_wait\n"
-    "nop\n"
-
-    "li $v0, D6_CHCR\n"
-    "li $v1, $t%d\n"
-    "sw $v1, 0x10($v0)                   ; DMA06 ADDRESS\n"
-    "li $v1, -4($t%d)\n"
-    "sw $v1, 0x20($v0)                   ; DMA06 SIZE\n"
-    "li $v1, 0x101\n"
-    "sw $v1, ($v0)                       ; start\n",
-    array, array);
-
-  reg--;
-
+int Playstation2::playstation2_spuKeyOff_I()
+{
   return -1;
 }
 

@@ -57,8 +57,13 @@ int playstation2(JavaClass *java_class, Generator *generator, char *method_name)
   CHECK_FUNC(randomInit,_I)
   CHECK_FUNC(randomGet,)
   CHECK_FUNC(randomNext,)
-  //CHECK_FUNC(initSound,)
-  CHECK_FUNC(playSoundData,_aB)
+  CHECK_FUNC(spuInit,)
+  CHECK_FUNC(spuUploadSoundData,_aB)
+  CHECK_FUNC(spuSetVolume,_II)
+  CHECK_FUNC(spuSetMasterVolume,_I)
+  CHECK_FUNC(spuSetPitch,_II)
+  CHECK_FUNC(spuKeyOn,_I)
+  CHECK_FUNC(spuKeyOff,_I)
 
   return -1;
 }

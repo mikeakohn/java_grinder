@@ -35,8 +35,13 @@ public:
   virtual int playstation2_randomInit_I() { return -1; }
   virtual int playstation2_randomGet() { return -1; }
   virtual int playstation2_randomNext() { return -1; }
-  //virtual int playstation2_initSound() { return -1; }
-  virtual int playstation2_playSoundData_aB() { return -1; }
+  virtual int playstation2_spuInit() { return -1; }
+  virtual int playstation2_spuUploadSoundData_aB() { return -1; }
+  virtual int playstation2_spuSetVolume_II() { return -1; }
+  virtual int playstation2_spuSetMasterVolume_I() { return -1; }
+  virtual int playstation2_spuSetPitch_II() { return -1; }
+  virtual int playstation2_spuKeyOn_I() { return -1; }
+  virtual int playstation2_spuKeyOff_I() { return -1; }
 };
 
 #endif

@@ -143,9 +143,24 @@ abstract public class Playstation2
   public static int randomNext() { return 0; }
 
   /** Initialize system to be able to do sound. */
-  //public static void initSound() { }
+  public static void spuInit() { }
 
-  /** Upload ADPCM sound data to the SPU and play it. */
-  public static void playSoundData(byte[] data) { }
+  /** Upload ADPCM sound data to SPU2 Core 0. */
+  public static void spuUploadSoundData(byte[] data) { }
+
+  /** Set voice volume on Core 0. Values between -16384 and 16383 */
+  public static void spuSetVolume(int voice, int value) { }
+
+  /** Set master volume on Core 0. Values between -16384 and 16383 */
+  public static void spuSetMasterVolume(int value) { }
+
+  /** Set pitch on Core 0. freq = (value / 4096) * f0 */
+  public static void spuSetPitch(int voice, int value) { }
+
+  /** KeyOn on Core 0. */
+  public static void spuKeyOn(int voice) { }
+
+  /** KeyOff on Core 0. */
+  public static void spuKeyOff(int voice) { }
 }
 
