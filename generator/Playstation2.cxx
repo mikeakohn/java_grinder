@@ -42,7 +42,8 @@
 Playstation2::Playstation2() :
   need_draw3d_texture16(false),
   need_draw3d_texture24(false),
-  need_draw3d_texture32(false)
+  need_draw3d_texture32(false),
+  need_spu_functions(false)
 {
   org = 0x100000;
   ram_start = 0x00000000;
@@ -60,6 +61,7 @@ Playstation2::~Playstation2()
   if (need_draw3d_texture16) { add_draw3d_texture_constructor(16); }
   if (need_draw3d_texture24) { add_draw3d_texture_constructor(24); }
   if (need_draw3d_texture32) { add_draw3d_texture_constructor(32); }
+  if (need_spu_functions) { add_spu_functions(); }
   add_draw3d_texture16_setPixelsRLE16_IaB();
   add_draw3d_object_draw();
   add_draw3d_texture_upload();
@@ -1666,22 +1668,74 @@ int Playstation2::playstation2_randomNext()
 
 int Playstation2::playstation2_spuInit()
 {
-  return -1;
+  fprintf(out,
+    "  ;; playstation2_spuInit()\n"
+    "  move $s0, $ra\n"
+    "  jal _spu_init\n"
+    "  move $ra, $s0\n"
+    "  nop\n");
+
+  need_spu_functions = true;
+
+  return 0;
 }
 
 int Playstation2::playstation2_spuUploadSoundData_aB()
 {
-  return -1;
+  const int array = reg - 1;
+
+  fprintf(out,
+    "  ;; playstation2_spuUploadSoundData_aB()\n"
+    "  move $a0, $t%d\n"
+    "  move $s0, $ra\n"
+    "  jal _upload_sound_data\n"
+    "  move $ra, $s0\n"
+    "  nop\n",
+    array);
+
+  need_spu_functions = true;
+
+  reg -= 1;
+
+  return 0;
 }
 
 int Playstation2::playstation2_spuSetVolume_II()
 {
-  return -1;
+  const int value = reg - 1;
+  const int voice = reg - 2;
+
+  fprintf(out,
+    "  ;; playstation2_spuSetVolume_II()\n"
+    "  li $v1, 0xbf90_0000\n"
+    "  sll $t%d, $t%d, 4\n"
+    "  addu $v0, $v0, $t%d\n"
+    "  sh $t%d, 0x0000($v1)\n"
+    "  sh $t%d, 0x0002($v1)\n",
+    voice, voice,
+    voice,
+    value,
+    value);
+
+  reg -= 2;
+
+  return 0;
 }
 
 int Playstation2::playstation2_spuSetMasterVolume_I()
 {
-  return -1;
+  const int value = reg - 1;
+
+  fprintf(out,
+    "  ;; playstation2_spuSetMasterVolume_I()\n"
+    "  li $v1, 0xbf90_0000\n"
+    "  sh $t%d, 0x0760($v1)\n"
+    "  sh $t%d, 0x0762($v1)\n",
+    value, value);
+
+  reg -= 1;
+
+  return 0;
 }
 
 int Playstation2::playstation2_spuSetPitch_II()
@@ -1706,12 +1760,36 @@ int Playstation2::playstation2_spuSetPitch_II()
 
 int Playstation2::playstation2_spuKeyOn_I()
 {
-  return -1;
+  const int value = reg - 1;
+
+  fprintf(out,
+    "  ;; playstation2_spuKeyOn_I()\n"
+    "  li $v1, 0xbf90_0000\n"
+    "  li $at, 1\n"
+    "  sllv $at, $at, $t%d\n"
+    "  sh $at, 0x01a0($v1)\n",
+    value);
+
+  reg -= 1;
+
+  return 0;
 }
 
 int Playstation2::playstation2_spuKeyOff_I()
 {
-  return -1;
+  const int value = reg - 1;
+
+  fprintf(out,
+    "  ;; playstation2_spuKeyOn_I()\n"
+    "  li $v1, 0xbf90_0000\n"
+    "  li $at, 1\n"
+    "  sllv $at, $at, $t%d\n"
+    "  sh $at, 0x01a4($v1)\n",
+    value);
+
+  reg -= 1;
+
+  return 0;
 }
 
 int Playstation2::math_sin512_I()
@@ -2589,5 +2667,86 @@ void Playstation2::add_draw3d_texture_constructor(int bit_size)
   fprintf(out,
     "  jr $ra\n"
     "  nop\n\n");
+}
+
+void Playstation2::add_spu_functions()
+{
+  fprintf(out,
+    "  ;; spu_init()\n"
+    "_spu_init:\n"
+    "  li $v1, 0xbf90_0000\n"
+    "  ; SPU Volume Control MVOLL,MVOLR Core 1\n"
+    "  sh $v0, 0x788($v1)\n"
+    "  sh $v0, 0x78a($v1)\n"
+    "  ; SPU Volume Control BVOLL,BVOLR\n"
+    "  li $v0, 0x7fff\n"
+    "  sh $v0, 0x76c($v1)\n"
+    "  sh $v0, 0x76e($v1)\n"
+    "  ; SPU Volume Control AVOLL,AVOLR Core 0/1\n"
+    "  sh $v0, 0x768($v1)\n"
+    "  sh $v0, 0x76a($v1)\n"
+    "  sh $v0, 0x790($v1)\n"
+    "  sh $v0, 0x792($v1)\n"
+    "  ; SPU Mixer Control MMIX\n"
+    "  li $v0, 0xf00\n"
+    "  sh $v0, 0x198($v1)\n"
+    "  li $v0, 0xf0c\n"
+    "  sh $v0, 0x598($v1)\n"
+    "  ; SPU ADSR1 06\n"
+    "  li $v0, 0x00ff\n"
+    "  sh $v0, 0x0006($v1)\n"
+    "  ; SPU ADSR2 08\n"
+    "  li $v0, 0x1fc0\n"
+    "  sh $v0, 0x0008($v1)\n"
+    "  ;; DMA Primary Control Register (0x1f80_10f0)\n"
+    "  ;; Enable DMA 4 (SPU2)\n"
+    "  li $v1, 0xbf80_10f0\n"
+    "  lw $v0, 0($v1)\n"
+    "  li $at, 0x0008_0000\n"
+    "  or $v0, $v0, $at\n"
+    "  sw $v0, 0($v1)\n"
+    "  j $ra\n"
+    "  nop\n\n");
+
+  fprintf(out,
+    "  ;; upload_sound_data(byte[] data)\n"
+    "  ;; Upload data to IOP\n"
+    "_upload_sound_data:\n"
+    "  li $v1, 0xbc01_0000 + 0x10000\n"
+    "  lw $a1, -4($a0)\n"
+    "  slr $a1, $a1, 2\n"
+    "_upload_sound_data_loop:\n"
+    "  lw $t0, ($a0)\n"
+    "  sw $t0, ($v1)\n"
+    "  addiu $a0, $a0, 4\n"
+    "  addiu $v1, $v1, 4\n"
+    "  addiu $a1, $a1, -1\n"
+    "  bnez $a1, _upload_sound_data_loop\n"
+    "  nop\n");
+
+  fprintf(out,
+    "  ;; Upload from IOP to SPU2 with DMA\n"
+    "  ;; DMA 4 D_MADR (0x1f80_10c0) source address\n"
+    "  ;; DMA 4 D_BCRL (0x1f80_10c4) block control\n"
+    "  ;; DMA 4 D_CHCR (0x1f80_10c8) channel control\n"
+    //"  li $v1, 0x1f80_10c0\n"
+    "  li $v1, 0xbf80_10c0\n"
+    "  li $at, 0x2_0000\n"
+    "  sw $at, 0($v1)\n"
+    "  ;; Block Size 16, Words * Blocks = 294 (25126 bytes total)\n"
+    "  ;; DMA send sound data.\n"
+    "  sll $a1, $a1, 14\n"
+    "  ori $a1, $a1, 4\n"
+    "  sw $a1, 4($v1)\n"
+    "  li $at, 0x0100_0201\n"
+    "  sw $at, 8($v1)\n"
+    "  li $at, 0x0100_0000\n"
+    "_wait_spu_dma:\n"
+    "  lw $v0, 8($v1)\n"
+    "  and $v0, $v0, $at\n"
+    "  bnez $v0, _wait_spu_dma\n"
+    "  nop\n\n"
+    "  j $ra\n"
+    "  nop\n");
 }
 
