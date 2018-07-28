@@ -20,6 +20,20 @@
 #define DRAW3D "net/mikekohn/java_grinder/Draw3D/"
 #define DRAW3D_LEN (sizeof(DRAW3D) - 1)
 
+#define KERNEL_ENTER \
+    "  ; Enter kernel mode\n" \
+    "  mfc0 $s1, $12\n" \
+    "  li $at, 0xffffffe3\n" \
+    "  and $v0, $s1, $at\n" \
+    "  mtc0 $v0, $12\n" \
+    "  sync.p\n"
+
+
+#define KERNEL_EXIT \
+    "  ; Exit kernel mode\n" \
+    "  mtc0 $s1, $12\n" \
+    "  sync.p\n"
+
 #define DMA02_WAIT \
     ".scope\n" \
     "  li $v0, D2_CHCR\n" \
@@ -1707,11 +1721,13 @@ int Playstation2::playstation2_spuSetVolume_II()
 
   fprintf(out,
     "  ;; playstation2_spuSetVolume_II()\n"
+    KERNEL_ENTER
     "  li $v1, 0xbf90_0000\n"
     "  sll $t%d, $t%d, 4\n"
     "  addu $v0, $v0, $t%d\n"
     "  sh $t%d, 0x0000($v1)\n"
-    "  sh $t%d, 0x0002($v1)\n",
+    "  sh $t%d, 0x0002($v1)\n"
+    KERNEL_EXIT,
     voice, voice,
     voice,
     value,
@@ -1728,9 +1744,11 @@ int Playstation2::playstation2_spuSetMasterVolume_I()
 
   fprintf(out,
     "  ;; playstation2_spuSetMasterVolume_I()\n"
+    KERNEL_ENTER
     "  li $v1, 0xbf90_0000\n"
     "  sh $t%d, 0x0760($v1)\n"
-    "  sh $t%d, 0x0762($v1)\n",
+    "  sh $t%d, 0x0762($v1)\n"
+    KERNEL_EXIT,
     value, value);
 
   reg -= 1;
@@ -1745,10 +1763,12 @@ int Playstation2::playstation2_spuSetPitch_II()
 
   fprintf(out,
     "  ;; playstation2_spuSetPitch_II()\n"
+    KERNEL_ENTER
     "  li $v1, 0xbf90_0000\n"
     "  sll $t%d, $t%d, 4\n"
     "  addu $v0, $v0, $t%d\n"
-    "  sh $t%d, 0x0004($v1)\n",
+    "  sh $t%d, 0x0004($v1)\n"
+    KERNEL_EXIT,
     voice, voice,
     voice,
     value);
@@ -1764,10 +1784,12 @@ int Playstation2::playstation2_spuKeyOn_I()
 
   fprintf(out,
     "  ;; playstation2_spuKeyOn_I()\n"
+    KERNEL_ENTER
     "  li $v1, 0xbf90_0000\n"
     "  li $at, 1\n"
     "  sllv $at, $at, $t%d\n"
-    "  sh $at, 0x01a0($v1)\n",
+    "  sh $at, 0x01a0($v1)\n"
+    KERNEL_EXIT,
     value);
 
   reg -= 1;
@@ -1781,10 +1803,12 @@ int Playstation2::playstation2_spuKeyOff_I()
 
   fprintf(out,
     "  ;; playstation2_spuKeyOn_I()\n"
+    KERNEL_ENTER
     "  li $v1, 0xbf90_0000\n"
     "  li $at, 1\n"
     "  sllv $at, $at, $t%d\n"
-    "  sh $at, 0x01a4($v1)\n",
+    "  sh $at, 0x01a4($v1)\n"
+    KERNEL_EXIT,
     value);
 
   reg -= 1;
@@ -2674,7 +2698,11 @@ void Playstation2::add_spu_functions()
   fprintf(out,
     "  ;; spu_init()\n"
     "_spu_init:\n"
+    KERNEL_ENTER
     "  li $v1, 0xbf90_0000\n"
+    "  ;; SPU2 attributes\n"
+    "  li $v0, 0x8020\n"
+    "  sh $v0, 0x019a($v1)\n"
     "  ; SPU Voice 0 Transfer Address\n"
     "  li $at, 0x2800\n"
     "  sh $zero, 0x1a8($v1)\n"
@@ -2741,6 +2769,7 @@ void Playstation2::add_spu_functions()
     "  li $at, 0x0008_0000\n"
     "  or $v0, $v0, $at\n"
     "  sw $v0, 0($v1)\n"
+    KERNEL_EXIT
     "  jr $ra\n"
     "  nop\n\n");
 
@@ -2748,6 +2777,7 @@ void Playstation2::add_spu_functions()
     "  ; upload_sound_data(byte[] data)\n"
     "  ; Upload data to IOP\n"
     "_upload_sound_data:\n"
+    KERNEL_ENTER
     "  li $v1, 0xbc01_0000 + 0x10000\n"
     "  lw $a1, -4($a0)\n"
     "  srl $at, $a1, 2\n"
@@ -2781,7 +2811,8 @@ void Playstation2::add_spu_functions()
     "  lw $v0, 8($v1)\n"
     "  and $v0, $v0, $at\n"
     "  bnez $v0, _wait_spu_dma\n"
-    "  nop\n\n"
+    "  nop\n"
+    KERNEL_EXIT
     "  jr $ra\n"
     "  nop\n");
 }
