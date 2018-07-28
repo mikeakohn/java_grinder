@@ -1672,8 +1672,8 @@ int Playstation2::playstation2_spuInit()
     "  ;; playstation2_spuInit()\n"
     "  move $s0, $ra\n"
     "  jal _spu_init\n"
-    "  move $ra, $s0\n"
-    "  nop\n");
+    "  nop\n"
+    "  move $ra, $s0\n");
 
   need_spu_functions = true;
 
@@ -1689,8 +1689,8 @@ int Playstation2::playstation2_spuUploadSoundData_aB()
     "  move $a0, $t%d\n"
     "  move $s0, $ra\n"
     "  jal _upload_sound_data\n"
-    "  move $ra, $s0\n"
-    "  nop\n",
+    "  nop\n"
+    "  move $ra, $s0\n",
     array);
 
   need_spu_functions = true;
@@ -2675,7 +2675,12 @@ void Playstation2::add_spu_functions()
     "  ;; spu_init()\n"
     "_spu_init:\n"
     "  li $v1, 0xbf90_0000\n"
+    "  ;; SPU Voice 0 Transfer Address\n"
+    "  li $at, 0x2800\n"
+    "  sh $zero, 0x1a8($v1)\n"
+    "  sh $at, 0x1aa($v1)\n"
     "  ; SPU Volume Control MVOLL,MVOLR Core 1\n"
+    "  li $v0, 0x3fff\n"
     "  sh $v0, 0x788($v1)\n"
     "  sh $v0, 0x78a($v1)\n"
     "  ; SPU Volume Control BVOLL,BVOLR\n"
@@ -2698,14 +2703,41 @@ void Playstation2::add_spu_functions()
     "  ; SPU ADSR2 08\n"
     "  li $v0, 0x1fc0\n"
     "  sh $v0, 0x0008($v1)\n"
-    "  ;; DMA Primary Control Register (0x1f80_10f0)\n"
+
+    "  ;; SPU Mixer Control VMIXL,VMIXR\n"
+    "  ;; SPU Mixer Control VMIXEL,VMIXER (set to 0)\n"
+    "  li $v0, 0x1\n"
+    "  sh $v0, 0x18a($v1)\n"
+    "  sh $v0, 0x192($v1)\n"
+    "  sh $zero, 0x18e($v1)\n"
+    "  sh $zero, 0x196($v1)\n"
+    "  sh $v0, 0x58a($v1)\n"
+    "  sh $v0, 0x592($v1)\n"
+    "  sh $v0, 0x188($v1)\n"
+    "  sh $v0, 0x190($v1)\n"
+    "  sh $zero, 0x18c($v1)\n"
+    "  sh $zero, 0x194($v1)\n"
+
+    "  ;; SPU NON, PMON, IRQA should be set to 0.\n"
+    "  sh $zero, 0x0180($v0)\n"
+    "  sh $zero, 0x0182($v0)\n"
+    "  sh $zero, 0x0184($v0)\n"
+    "  sh $zero, 0x0186($v0)\n"
+    "  sh $zero, 0x019c($v0)\n"
+    "  sh $zero, 0x019e($v0)\n"
+
+    "  ;; SPU2 KEYOFF to all 24 voices\n"
+    "  li $v0, 0xffff\n"
+    "  sh $v0, 0x01a4($v1)\n"
+    "  sh $v0, 0x01a6($v1)\n"
+    "  ;; DvA Primary Control Register (0x1f80_10f0)\n"
     "  ;; Enable DMA 4 (SPU2)\n"
     "  li $v1, 0xbf80_10f0\n"
     "  lw $v0, 0($v1)\n"
     "  li $at, 0x0008_0000\n"
     "  or $v0, $v0, $at\n"
     "  sw $v0, 0($v1)\n"
-    "  j $ra\n"
+    "  jr $ra\n"
     "  nop\n\n");
 
   fprintf(out,
@@ -2714,14 +2746,14 @@ void Playstation2::add_spu_functions()
     "_upload_sound_data:\n"
     "  li $v1, 0xbc01_0000 + 0x10000\n"
     "  lw $a1, -4($a0)\n"
-    "  slr $a1, $a1, 2\n"
+    "  srl $at, $a1, 2\n"
     "_upload_sound_data_loop:\n"
     "  lw $t0, ($a0)\n"
     "  sw $t0, ($v1)\n"
     "  addiu $a0, $a0, 4\n"
     "  addiu $v1, $v1, 4\n"
-    "  addiu $a1, $a1, -1\n"
-    "  bnez $a1, _upload_sound_data_loop\n"
+    "  addiu $at, $at, -1\n"
+    "  bnez $at, _upload_sound_data_loop\n"
     "  nop\n");
 
   fprintf(out,
@@ -2733,9 +2765,9 @@ void Playstation2::add_spu_functions()
     "  li $v1, 0xbf80_10c0\n"
     "  li $at, 0x2_0000\n"
     "  sw $at, 0($v1)\n"
-    "  ;; Block Size 16, Words * Blocks = 294 (25126 bytes total)\n"
+    "  ;; Block Size 16, Words * Blocks = $a1 / 16 ($a1 bytes total)\n"
     "  ;; DMA send sound data.\n"
-    "  sll $a1, $a1, 14\n"
+    "  sll $a1, $a1, 12\n"
     "  ori $a1, $a1, 4\n"
     "  sw $a1, 4($v1)\n"
     "  li $at, 0x0100_0201\n"
@@ -2746,7 +2778,7 @@ void Playstation2::add_spu_functions()
     "  and $v0, $v0, $at\n"
     "  bnez $v0, _wait_spu_dma\n"
     "  nop\n\n"
-    "  j $ra\n"
+    "  jr $ra\n"
     "  nop\n");
 }
 
