@@ -23,11 +23,10 @@
 #define KERNEL_ENTER \
     "  ; Enter kernel mode\n" \
     "  mfc0 $s1, $12\n" \
-    "  li $at, 0xffffffe3\n" \
-    "  and $v0, $s1, $at\n" \
-    "  mtc0 $v0, $12\n" \
+    "  li $at, 0xffffffe7\n" \
+    "  and $at, $s1, $at\n" \
+    "  mtc0 $at, $12\n" \
     "  sync.p\n"
-
 
 #define KERNEL_EXIT \
     "  ; Exit kernel mode\n" \
@@ -1724,7 +1723,7 @@ int Playstation2::playstation2_spuSetVolume_II()
     KERNEL_ENTER
     "  li $v1, 0xbf90_0000\n"
     "  sll $t%d, $t%d, 4\n"
-    "  addu $v0, $v0, $t%d\n"
+    "  addu $v1, $v1, $t%d\n"
     "  sh $t%d, 0x0000($v1)\n"
     "  sh $t%d, 0x0002($v1)\n"
     KERNEL_EXIT,
@@ -1743,7 +1742,7 @@ int Playstation2::playstation2_spuSetMasterVolume_I()
   const int value = reg - 1;
 
   fprintf(out,
-    "  ;; playstation2_spuSetMasterVolume_I()\n"
+    "  ;; playstation2_spuSetMasterVolume_I() - MVOLL/MVOLR\n"
     KERNEL_ENTER
     "  li $v1, 0xbf90_0000\n"
     "  sh $t%d, 0x0760($v1)\n"
@@ -1762,11 +1761,11 @@ int Playstation2::playstation2_spuSetPitch_II()
   const int voice = reg - 2;
 
   fprintf(out,
-    "  ;; playstation2_spuSetPitch_II()\n"
+    "  ;; playstation2_spuSetPitch_II() - PITCH\n"
     KERNEL_ENTER
     "  li $v1, 0xbf90_0000\n"
     "  sll $t%d, $t%d, 4\n"
-    "  addu $v0, $v0, $t%d\n"
+    "  addu $v1, $v1, $t%d\n"
     "  sh $t%d, 0x0004($v1)\n"
     KERNEL_EXIT,
     voice, voice,
@@ -1783,7 +1782,7 @@ int Playstation2::playstation2_spuKeyOn_I()
   const int value = reg - 1;
 
   fprintf(out,
-    "  ;; playstation2_spuKeyOn_I()\n"
+    "  ;; playstation2_spuKeyOn_I() - KON0/KON1\n"
     KERNEL_ENTER
     "  li $v1, 0xbf90_0000\n"
     "  li $at, 1\n"
@@ -1802,7 +1801,7 @@ int Playstation2::playstation2_spuKeyOff_I()
   const int value = reg - 1;
 
   fprintf(out,
-    "  ;; playstation2_spuKeyOn_I()\n"
+    "  ;; playstation2_spuKeyOn_I() - KOF0/KOF1\n"
     KERNEL_ENTER
     "  li $v1, 0xbf90_0000\n"
     "  li $at, 1\n"
@@ -2700,14 +2699,11 @@ void Playstation2::add_spu_functions()
     "_spu_init:\n"
     KERNEL_ENTER
     "  li $v1, 0xbf90_0000\n"
-    "  ;; SPU2 attributes\n"
-    "  li $v0, 0x8020\n"
+    "  ;; SPU2 attributes Core 0/1\n"
+    "  li $v0, 0x8022\n"
     "  sh $v0, 0x019a($v1)\n"
-    "  ; SPU Voice 0 Transfer Address\n"
-    "  li $at, 0x2800\n"
-    "  sh $zero, 0x1a8($v1)\n"
-    "  sh $at, 0x1aa($v1)\n"
-    "  ; SPU Voice 0 Start Address\n"
+    "  sh $v0, 0x059a($v1)\n"
+    "  ; SPU Voice 0 Start Address Core 0, Voice 0\n"
     "  li $v0, 0x2800\n"
     "  sh $zero, 0x1c0($v1)\n"
     "  sh $v0, 0x1c2($v1)\n"
@@ -2715,40 +2711,50 @@ void Playstation2::add_spu_functions()
     "  li $v0, 0x3fff\n"
     "  sh $v0, 0x788($v1)\n"
     "  sh $v0, 0x78a($v1)\n"
-    "  ; SPU Volume Control BVOLL,BVOLR\n"
+    "  ; SPU Volume Control BVOLL,BVOLR Core 0\n"
     "  li $v0, 0x7fff\n"
     "  sh $v0, 0x76c($v1)\n"
     "  sh $v0, 0x76e($v1)\n"
+
+    //"  sh $v0, 0x794($v1)\n"
+    //"  sh $v0, 0x796($v1)\n"
     "  ; SPU Volume Control AVOLL,AVOLR Core 0/1\n"
     "  sh $v0, 0x768($v1)\n"
     "  sh $v0, 0x76a($v1)\n"
     "  sh $v0, 0x790($v1)\n"
     "  sh $v0, 0x792($v1)\n"
-    "  ; SPU Mixer Control MMIX\n"
+    "  ; SPU Mixer Control MMIX Core 0/1\n"
     "  li $v0, 0xf00\n"
     "  sh $v0, 0x198($v1)\n"
     "  li $v0, 0xf0c\n"
     "  sh $v0, 0x598($v1)\n"
-    "  ; SPU ADSR1 06\n"
+    "  ; SPU ADSR1 06 Core 0 - Voice 0\n"
     "  li $v0, 0x00ff\n"
     "  sh $v0, 0x0006($v1)\n"
-    "  ; SPU ADSR2 08\n"
+    "  ; SPU ADSR2 08 Core 0 - Voice 0\n"
     "  li $v0, 0x1fc0\n"
     "  sh $v0, 0x0008($v1)\n"
 
-    "  ; SPU Mixer Control VMIXL,VMIXR\n"
-    "  ; SPU Mixer Control VMIXEL,VMIXER (set to 0)\n"
+    "  ; SPU Mixer Control VMIXL,VMIXR Core 0/1\n"
     "  li $v0, 0x1\n"
-    "  sh $v0, 0x18a($v1)\n"
-    "  sh $v0, 0x192($v1)\n"
-    "  sh $zero, 0x18e($v1)\n"
-    "  sh $zero, 0x196($v1)\n"
-    "  sh $v0, 0x58a($v1)\n"
-    "  sh $v0, 0x592($v1)\n"
     "  sh $v0, 0x188($v1)\n"
+    "  sh $v0, 0x18a($v1)\n"
     "  sh $v0, 0x190($v1)\n"
+    "  sh $v0, 0x192($v1)\n"
+    "  sh $v0, 0x588($v1)\n"
+    "  sh $v0, 0x58a($v1)\n"
+    "  sh $v0, 0x590($v1)\n"
+    "  sh $v0, 0x592($v1)\n"
+
+    "  ; SPU Mixer Control VMIXEL,VMIXER Core 0/1 (set to 0)\n"
     "  sh $zero, 0x18c($v1)\n"
+    "  sh $zero, 0x18e($v1)\n"
     "  sh $zero, 0x194($v1)\n"
+    "  sh $zero, 0x196($v1)\n"
+    "  sh $zero, 0x58c($v1)\n"
+    "  sh $zero, 0x58e($v1)\n"
+    "  sh $zero, 0x594($v1)\n"
+    "  sh $zero, 0x596($v1)\n"
 
     "  ; SPU NON, PMON, IRQA should be set to 0.\n"
     "  sh $zero, 0x0180($v1)\n"
@@ -2757,6 +2763,13 @@ void Playstation2::add_spu_functions()
     "  sh $zero, 0x0186($v1)\n"
     "  sh $zero, 0x019c($v1)\n"
     "  sh $zero, 0x019e($v1)\n"
+
+    "  ;; Work address\n"
+    "  li $at, 0x003f\n"
+    "  sh $at, 0x033c($v1)\n"
+    "  li $at, 0xffff\n"
+    "  sh $at, 0x02e0($v1)\n"
+    "  sh $at, 0x02e2($v1)\n"
 
     "  ; SPU2 KEYOFF to all 24 voices\n"
     "  li $v0, 0xffff\n"
@@ -2774,10 +2787,15 @@ void Playstation2::add_spu_functions()
     "  nop\n\n");
 
   fprintf(out,
-    "  ; upload_sound_data(byte[] data)\n"
-    "  ; Upload data to IOP\n"
+    "  ;; upload_sound_data(byte[] data)\n"
     "_upload_sound_data:\n"
     KERNEL_ENTER
+    "  ; SPU Voice 0 Transfer Address Core 0\n"
+    "  li $v1, 0xbf90_0000\n"
+    "  li $at, 0x2800\n"
+    "  sh $zero, 0x1a8($v1)\n"
+    "  sh $at, 0x1aa($v1)\n"
+    "  ; Upload data to IOP\n"
     "  li $v1, 0xbc01_0000 + 0x10000\n"
     "  lw $a1, -4($a0)\n"
     "  srl $at, $a1, 2\n"
