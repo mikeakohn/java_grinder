@@ -2327,7 +2327,7 @@ void Playstation2::add_draw3d_texture16_setPixelsRLE16_IaB()
 void Playstation2::add_draw3d_object_constructor()
 {
   // Need to allocate enough space for:
-  // -16: size of packet
+  // -16: size of packet (in 16 byte blocks)
   // -12: cache flush object flag
   //   0: VIF_FLUSH, VIF_STMOD, VIF_STCYCL, VIF_UNPACK_V4_32
   //  16: sin512(rx), cos512(rx), sin512(ry), sin512(ry)
@@ -2447,7 +2447,7 @@ void Playstation2::add_draw3d_object_constructor()
 void Playstation2::add_draw3d_object_with_texture_constructor()
 {
   // Need to allocate enough space for:
-  // -16: size of packet
+  // -16: size of packet (in 16 byte blocks)
   // -12: cache flush object flag
   //   0: VIF_FLUSH, VIF_STMOD, VIF_STCYCL, VIF_UNPACK_V4_32
   //  16: sin512(rx), cos512(rx), sin512(ry), sin512(ry)

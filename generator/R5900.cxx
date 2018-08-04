@@ -116,9 +116,15 @@ int R5900::insert_static_field_define(const char *name, const char *type, int in
 
 int R5900::init_heap(int field_count)
 {
-  fprintf(out, "  ;; Set up heap and static initializers\n");
-  fprintf(out, "  li $gp, 0x%x\n", ram_end - (field_count * 4));
-  fprintf(out, "  move $sp, $gp\n");
+  fprintf(out,
+     "  ;; Set up heap and static initializers\n"
+     "  li $gp, 0x%x\n"
+     "  move $sp, $gp\n"
+     "  ;; Align stack to 64 byte boundary\n"
+     "  li $at, -64\n"
+     "  and $sp, $sp, $at\n",
+     ram_end - (field_count * 4));
+
   return 0;
 }
 
