@@ -2711,10 +2711,10 @@ void Playstation2::add_spu_functions()
     "  sh $v0, 0x019a($v1)\n"
     "  sh $v0, 0x059a($v1)\n"
 #endif
-    "  ; SPU Voice 0 Start Address Core 0, Voice 0\n"
-    "  li $v0, 0x2800\n"
-    "  sh $zero, 0x1c0($v1)\n"
-    "  sh $v0, 0x1c2($v1)\n"
+    //"  ; SPU Voice 0 Start Address Core 0, Voice 0 - SSA\n"
+    //"  li $v0, 0x2800\n"
+    //"  sh $v0, 0x1c2($v1)\n"
+    //"  sh $zero, 0x1c0($v1)\n"
     "  ; SPU Volume Control MVOLL,MVOLR Core 1\n"
     "  li $v0, 0x3fff\n"
     "  sh $v0, 0x788($v1)\n"
@@ -2810,9 +2810,9 @@ void Playstation2::add_spu_functions()
     KERNEL_ENTER
     "  ; SPU Voice 0 Transfer Address Core 0\n"
     "  li $v1, 0xbf90_0000\n"
-    "  li $at, 0x2800\n"
-    "  sh $zero, 0x1a8($v1)\n"
+    "  li $at, 0\n"
     "  sh $at, 0x1aa($v1)\n"
+    "  sh $zero, 0x1a8($v1)\n"
     "  ; Upload data to IOP\n"
     "  li $v1, 0xbc01_0000 + 0x10000\n"
     "  lw $a1, -4($a0)\n"
@@ -2858,11 +2858,17 @@ void Playstation2::add_spu_functions()
     "  ;; upload_sound_data(byte[] data)\n"
     "_upload_sound_data:\n"
     KERNEL_ENTER
-    "  ; SPU Voice 0 Transfer Address Core 0\n"
     "  li $v1, 0xbf90_0000\n"
+    "  ; Need to set transfer mode to 0 in order to set TSA/TSA\n"
+    "  li $t9, 0xc002\n"
+    "  sh $t9, 0x019a($v1)\n"
+    "  ; SPU Voice 0 Transfer Address Core 0 - TSA\n"
     "  li $at, 0x2800\n"
     "  sh $zero, 0x1a8($v1)\n"
     "  sh $at, 0x1aa($v1)\n"
+    "  ; SPU Voice 0 Start Address Core 0, Voice 0 - SSA\n"
+    "  sh $zero, 0x1c0($v1)\n"
+    "  sh $at, 0x1c2($v1)\n"
     "  ; Upload data to IOP\n"
     "  lw $a1, -4($a0)\n"
     "  srl $at, $a1, 1\n"
@@ -2894,6 +2900,5 @@ void Playstation2::add_spu_functions()
     "  nop\n");
 
 #endif
-
 }
 
