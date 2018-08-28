@@ -1,13 +1,15 @@
 
-defauit: GasDetector.class LedScroll.class Nokia5110.class LCD.class FaceImage.class
+defauit: GasDetector.class LedScroll.class Nokia5110.class LCD.class FaceImage.class TimerTest.class
 
-grind: GasDetector.class LedScroll.class Nokia5110.class LCD.class
+grind: GasDetector.class LedScroll.class Nokia5110.class LCD.class TimerTest.class
 	../../java_grinder LCD.class lcd_msp430.asm msp430g2231
 	naken_asm -l -I ../../../naken_asm/include -o lcd_msp430.hex lcd_msp430.asm
 	../../java_grinder GasDetector.class gas_detector.asm msp430g2231
 	naken_asm -l -I ../../../naken_asm/include -o gas_detector.hex gas_detector.asm
 	../../java_grinder Nokia5110.class nokia_5110.asm msp430g2231
 	naken_asm -l -I ../../../naken_asm/include -o nokia_5110.hex nokia_5110.asm
+	../../java_grinder TimerTest.class timer_test.asm msp430g2231
+	naken_asm -l -I ../../../naken_asm/include -o timer_test.hex timer_test.asm
 
 %.class: %.java
 	javac -classpath ../../build/JavaGrinder.jar:. $*.java
