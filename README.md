@@ -4,11 +4,12 @@ Java Grinder
 Compile Java bytecode to microcontroller assembly.  Currently supporting
 MSP430, dsPIC, 6502/6510, 68000, MIPS, TMS9900, and Z80 with platforms that
 include Commodore 64, Sega Genesis, Atari 2600, Apple IIgs, ChipKit (PIC32),
-TI99, TI84 and more.
+TI99, TI84, Playstation 2, and more.
 
 Authors:
 - Michael Kohn
 - Joe Davisson
+- Carsten Dost
 
 For more info:
 [http://www.mikekohn.net/micro/java_grinder.php](http://www.mikekohn.net/micro/java_grinder.php)
@@ -22,6 +23,7 @@ Examples
 * [dsPIC](http://www.mikekohn.net/micro/dspic_mandelbrots.php)
 * [Apple IIgs](http://www.mikekohn.net/micro/apple_iigs_java.php)
 * [Parallax Propeller](http://www.mikekohn.net/micro/propeller_java.php)
+* [Playstation 2](http://www.mikekohn.net/micro/playstation2_java.php)
 
 How it works
 ------------
@@ -30,7 +32,6 @@ This is just a little blurb on how this all fits together maybe to
 help others who want to make a generator for another CPU architecture.
 Basically the code can be separated into 4 distinct modules in 4
 directories:
-
 
 * java: This directory holds all the Java code which will be compiled
 with javac into a .jar file.  Anyone who is programming against the
