@@ -177,6 +177,7 @@ public:
   virtual int watchdog_kick();
 
   // CPU functions
+  virtual int cpu_setClock8();
   virtual int cpu_setClock16();
   virtual int cpu_nop();
 

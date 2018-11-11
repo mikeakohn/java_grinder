@@ -50,6 +50,7 @@ static int cpu_asm(JavaClass *java_class, Generator *generator, int const_index)
 
 int cpu(JavaClass *java_class, Generator *generator, char *method_name)
 {
+  CHECK_FUNC(setClock8,)
   CHECK_FUNC(setClock16,)
   CHECK_FUNC(setClock25,)
   CHECK_FUNC(setClockExternal2,)

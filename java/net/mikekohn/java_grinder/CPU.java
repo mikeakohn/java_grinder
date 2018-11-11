@@ -5,7 +5,7 @@
  *     Web: http://www.naken.cc/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2018 by Michael Kohn
  *
  */
 
@@ -18,6 +18,9 @@ public class CPU
   private CPU()
   {
   }
+
+  /** Set clock speed to 8MHz (internal crystal? DCO?) */
+  public static void setClock8() { }
 
   /** Set clock speed to 16MHz (internal crystal? DCO?) */
   public static void setClock16() { }

@@ -1908,6 +1908,16 @@ int MSP430::spi_enable(int port)
 }
 
 // CPU functions
+int MSP430::cpu_setClock8()
+{
+  fprintf(out, "  ;; Set MCLK to 8 MHz with DCO\n");
+  fprintf(out, "  mov.b #DCO_5, &DCOCTL\n");
+  fprintf(out, "  mov.b #RSEL_13, &BCSCTL1\n");
+  fprintf(out, "  mov.b #0, &BCSCTL2\n\n");
+
+  return 0;
+}
+
 int MSP430::cpu_setClock16()
 {
   fprintf(out, "  ;; Set MCLK to 16 MHz with DCO\n");
