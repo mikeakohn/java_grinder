@@ -9,6 +9,7 @@
 tests/*.hex
 tests/*.lst
 samples/c64/c64_demo.prg
+unit/method_sanitize
 cfg
 nvram
 *.swp

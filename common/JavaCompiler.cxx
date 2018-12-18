@@ -17,6 +17,7 @@
 
 #include "JavaClass.h"
 #include "JavaCompiler.h"
+#include "Util.h"
 #include "execute_static.h"
 #include "invoke_static.h"
 #include "invoke_virtual.h"
@@ -355,9 +356,12 @@ int JavaCompiler::optimize_const(JavaClass *java_class, char *method_name, uint8
       char label[128];
       int byte_count = GET_PC_INT16(1);
       int jump_to = address + byte_count;
+
       sprintf(label, "%s_%d", method_name, jump_to);
+
       if (generator->jump_cond_integer(label, cond_table[bytes[pc]-159], const_val, calc_distance(bytes, pc, pc + byte_count)) == -1)
       { return 0; }
+
       return 3;
     }
     default:
@@ -399,9 +403,12 @@ int JavaCompiler::optimize_const(JavaClass *java_class, char *method_name, uint8
   {
     const_vals[0] = const_val;
     const_vals[1] = (int8_t)bytes[pc] - 3;
+
     int ref = GET_PC_UINT16(2);
+
     if (invoke_static(java_class, ref, generator, const_vals, 2) != 0)
     { return 0; }
+
     return 4;
   }
 
@@ -413,9 +420,12 @@ int JavaCompiler::optimize_const(JavaClass *java_class, char *method_name, uint8
   {
     const_vals[0] = const_val;
     const_vals[1] = (int8_t)bytes[pc + 1];
+
     int ref = GET_PC_UINT16(3);
+
     if (invoke_static(java_class, ref, generator, const_vals, 2) != 0)
     { return 0; }
+
     return 5;
   }
 
@@ -499,12 +509,15 @@ int JavaCompiler::optimize_compare(JavaClass *java_class, char *method_name, uin
     // ifne (0x9a)
     if (bytes[pc+skip_bytes] == 153 || bytes[pc+skip_bytes] == 154)
     {
-      int cond = bytes[pc+skip_bytes] - 153;
-      pc += skip_bytes;
+      int cond = bytes[pc + skip_bytes] - 153;
       char label[128];
+
+      pc += skip_bytes;
       address += skip_bytes;
+
       int byte_count = GET_PC_INT16(1);
       int jump_to = address + byte_count;
+
       sprintf(label, "%s_%d", method_name, jump_to);
 
       if (generator->jump_cond_zero(label, cond, calc_distance(bytes, pc, pc + byte_count)) != -1)
@@ -713,54 +726,10 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
   if (strcmp(method_name, "main") != 0)
   {
     char method_sig[256];
+
     java_class->get_name_constant(method_sig, sizeof(method_sig), method->descriptor_index);
 
-    char *s = method_sig + 1;
-    while(*s != ')' && *s != 0)
-    {
-      if (*s == 'L')
-      {
-        const int len = sizeof("Ljava/lang/String;") - 1;
-        if (strncmp(s, "Ljava/lang/String;", len) == 0)
-        {
-          char *end = s + len;
-          char *start = s + 1;
-          *s = 'X';
-          s++;
-          while(true)
-          {
-            *start = *end;
-            if (*end == 0) { break; }
-            start++;
-            end++;
-          }
-          continue;
-        }
-          else
-        {
-          while(*s != ';' && *s != 0)
-          {
-            if (*s == '/') { *s = '_'; }
-            s++;
-          }
-          if (*s == ';') { *s = '_'; }
-          else if (*s == 0) { s--; }
-        }
-      }
-        else
-      if (*s == '[')
-      {
-        *s = 'a';
-        s++;
-      }
-
-      param_count++;
-      s++;
-    }
-
-    *s = 0;
-    method_sig[0] = '_';
-    if (method_sig[1] != 0 ) { strcat(method_name, method_sig); }
+    Util::method_sanitize(method_name, method_sig, param_count);
 
     DEBUG_PRINT("Using method name '%s' param_count=%d\n",
                 method_name, param_count);
@@ -2455,8 +2424,8 @@ int JavaCompiler::field_type_to_int(char *field_type)
 
   for (n = 0; n < len; n++)
   {
-    if (strcmp(field_type, type_table[n]) == 0) { return n|0x80; }
-    if (strcmp(field_type, type_table[n]+1) == 0) { return n; }
+    if (strcmp(field_type, type_table[n]) == 0) { return n | 0x80; }
+    if (strcmp(field_type, type_table[n] + 1) == 0) { return n; }
   }
 
   return 0;

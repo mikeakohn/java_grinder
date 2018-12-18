@@ -82,7 +82,17 @@ SYSTEMS= \
   TRS80Coco.o \
   W65C134SXB.o \
   W65C265SXB.o
-OBJS=fileio.o Compiler.o Generator.o JavaClass.o JavaCompiler.o execute_static.o table_java_instr.o $(CPUS) $(SYSTEMS) $(API)
+
+OBJS= \
+  fileio.o \
+  Compiler.o \
+  Generator.o \
+  JavaClass.o \
+  JavaCompiler.o \
+  Util.o \
+  execute_static.o \
+  table_java_instr.o \
+  $(CPUS) $(SYSTEMS) $(API)
 
 default: $(OBJS)
 	$(CXX) -o ../java_grinder ../common/java_grinder.cxx \
