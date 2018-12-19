@@ -802,7 +802,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
       case 6: // iconst_3 (0x06)
       case 7: // iconst_4 (0x07)
       case 8: // iconst_5 (0x08)
-        const_val = uint8_t(bytes[pc])-3;
+        const_val = uint8_t(bytes[pc]) - 3;
         ret = optimize_const(java_class, method_name, bytes, pc + 1,
                              pc_start + code_len, address + 1, const_val);
         if (ret == 0)
@@ -922,13 +922,14 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
           //if (ret == 0)
 #endif
           {
-            char data[1024];
-            java_class->get_name_constant(data, sizeof(data), const_val);
+            std::string data;
+
+            java_class->get_name_constant(data, const_val);
 
             ret = optimize_const(java_class, method_name, bytes,
                                  pc + instruction_length,
                                  pc_start + code_len,
-                                 address + instruction_length, data);
+                                 address + instruction_length, data.c_str());
           }
 
           if (ret == 0)
@@ -2214,17 +2215,18 @@ int JavaCompiler::add_static_initializers()
 
   // Add static initializers for all external fields.
   std::map<std::string,JavaClass *>::iterator iter;
+
   for (iter = external_classes.begin(); iter != external_classes.end(); iter++)
   {
-    char name[128];
+    std::string name;
     JavaClass *java_class_external = iter->second;
     index = java_class_external->get_clinit_method();
 
     if (index < 0) { continue; }
 
-    java_class_external->get_method_name(name, sizeof(name), index);
+    java_class_external->get_method_name(name, index);
 
-    DEBUG_PRINT("CLASS %s.%s  index=%d\n", iter->first.c_str(), name, index);
+    DEBUG_PRINT("CLASS %s.%s  index=%d\n", iter->first.c_str(), name.c_str(), index);
 
     if (execute_static(java_class_external, index, generator, false, verbose, java_class) != 0)
     {
@@ -2272,17 +2274,19 @@ int JavaCompiler::execute_statics(int index)
 int JavaCompiler::compile_methods(bool do_main)
 {
   int method_count = java_class->get_method_count();
-  char method_name[32];
+  //char method_name[256];
+  std::string method_name;
   int index;
   bool did_execute_statics = false;
 
   for (index = 0; index < method_count; index++)
   {
-    if (java_class->get_method_name(method_name, sizeof(method_name), index) == 0)
+    if (java_class->get_method_name(method_name, index) == 0)
     {
-      if (strcmp(method_name, "main") == 0)
+      if (method_name == "main")
       {
         if (!do_main) { continue ;}
+
         if (compile_method(java_class, index) != 0)
         {
           printf("** Error compiling class.\n");
@@ -2294,7 +2298,7 @@ int JavaCompiler::compile_methods(bool do_main)
 
       if (do_main) { continue; }
 
-      if (strcmp("<clinit>", method_name) == 0)
+      if (method_name == "<clinit>")
       {
         if (execute_statics(index) != 0) { return -1; }
         did_execute_statics = true;
@@ -2341,32 +2345,28 @@ int JavaCompiler::compile_methods(bool do_main)
           return -1;
         }
 
-        char method_name[128];
-        char alt_name[256+8]; // FIXME
+        std::string method_name;
+        std::string alt_name;
 
-        if (java_class->get_method_name(method_name, sizeof(method_name), index) != 0)
+        if (java_class->get_method_name(method_name, index) != 0)
         {
           printf("Error: get_method_name(%d) failed.\n", index);
           return -1;
         }
 
-        printf("  METHOD INDEX=%d (%s)\n", index, method_name);
+        printf("  METHOD INDEX=%d (%s)\n", index, method_name.c_str());
 
-        if (strcmp(method_name, "<clinit>") == 0) { continue; }
-        if (strcmp(method_name, "<init>") == 0) { continue; }
+        if (method_name == "<clinit>") { continue; }
+        if (method_name == "<init>") { continue; }
 
-        sprintf(alt_name, "%s_%s", class_name, method_name);
+        alt_name = std::string(class_name) + "_" + method_name;
 
-#if 0
-        if (external_fields.find(alt_name) == external_fields.end())
+        DEBUG_PRINT("  compiling: %s.%s\n", class_name, method_name.c_str());
+
+        if (compile_method(java_class, index, alt_name.c_str()) != 0)
         {
-          continue;
+          return -1;
         }
-#endif
-
-        DEBUG_PRINT("  compiling: %s.%s\n", class_name, method_name);
-
-        if (compile_method(java_class, index, alt_name) != 0) { return -1; }
       }
     }
 

@@ -14,6 +14,7 @@
 
 #include <stdint.h>
 #include <map>
+#include <string>
 
 // http://java.sun.com/docs/books/jvms/second_edition/html/ClassFile.doc.html
 // http://www.brics.dk/~mis/dOvs/jvmspec/ref-Java.html
@@ -184,6 +185,10 @@ public:
   int get_method_name(char *name, int len, int index);
   int get_field_name(char *name, int len, int index);
   int get_field_type(char *name, int len, int index);
+
+  int get_name_constant(std::string &name, int index);
+  int get_method_name(std::string &name, int index);
+
   const fields_t *get_field(int index);
   int get_ref_name_type(char *name, char *type, int len, int index);
   bool is_ref_in_api(int index);
