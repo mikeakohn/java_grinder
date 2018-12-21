@@ -12,11 +12,17 @@
 #ifndef _INVOKE_H
 #define _INVOKE_H
 
+#include <string>
+
 #include "Generator.h"
 #include "JavaClass.h"
 
-void get_signature(char *signature, int *params, int *is_void);
-void get_static_function(char *function, char *method_name, char *method_sig);
+void get_signature(std::string &signature, int *params, int *is_void);
+
+void get_static_function(
+  char *function,
+  std::string &method_name,
+  std::string &method_sig);
 
 #endif
 

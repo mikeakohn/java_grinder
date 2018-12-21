@@ -73,12 +73,12 @@ int X86_64::init_heap(int field_count)
   return 0;
 }
 
-int X86_64::field_init_int(char *name, int index, int value)
+int X86_64::field_init_int(std::string &name, int index, int value)
 {
   return -1;
 }
 
-int X86_64::field_init_ref(char *name, int index)
+int X86_64::field_init_ref(std::string &name, int index)
 {
   return -1;
 }
@@ -101,7 +101,7 @@ int X86_64::push_local_var_ref(int index)
   return push_local_var_int(index);
 }
 
-int X86_64::push_ref_static(const char *name, int index)
+int X86_64::push_ref_static(std::string &name, int index)
 {
   return -1;
 }
@@ -133,7 +133,7 @@ int X86_64::push_double(double f)
 }
 #endif
 
-int X86_64::push_ref(char *name)
+int X86_64::push_ref(std::string &name)
 {
   return -1;
 }
@@ -333,12 +333,12 @@ int X86_64::invoke_static_method(const char *name, int params, int is_void)
   return -1;
 }
 
-int X86_64::put_static(const char *name, int index)
+int X86_64::put_static(std::string &name, int index)
 {
   return -1;
 }
 
-int X86_64::get_static(const char *name, int index)
+int X86_64::get_static(std::string &name, int index)
 {
   return -1;
 }
@@ -353,22 +353,28 @@ int X86_64::new_array(uint8_t type)
   return -1;
 }
 
-int X86_64::insert_array(const char *name, int32_t *data, int len, uint8_t type)
+int X86_64::insert_array(std::string &name, int32_t *data, int len, uint8_t type)
 {
   fprintf(out, ".align 32\n");
   if (type == TYPE_BYTE)
-  { return insert_db(name, data, len, TYPE_INT); }
+  {
+    return insert_db(name, data, len, TYPE_INT);
+  }
     else
   if (type == TYPE_SHORT)
-  { return insert_dw(name, data, len, TYPE_INT); } 
+  {
+    return insert_dw(name, data, len, TYPE_INT);
+  }
     else
   if (type == TYPE_INT)
-  { return insert_dc32(name, data, len, TYPE_INT); } 
+  {
+    return insert_dc32(name, data, len, TYPE_INT);
+  }
 
   return -1;
 }
 
-int X86_64::insert_string(const char *name, uint8_t *bytes, int len)
+int X86_64::insert_string(std::string &name, uint8_t *bytes, int len)
 {
   fprintf(out, ".align 32\n");
   fprintf(out, "  dc32 %d\n", len);
@@ -380,7 +386,7 @@ int X86_64::push_array_length()
   return -1;
 }
 
-int X86_64::push_array_length(const char *name, int field_id)
+int X86_64::push_array_length(std::string &name, int field_id)
 {
   return -1;
 }
@@ -400,17 +406,17 @@ int X86_64::array_read_int()
   return -1;
 }
 
-int X86_64::array_read_byte(const char *name, int field_id)
+int X86_64::array_read_byte(std::string &name, int field_id)
 {
   return -1;
 }
 
-int X86_64::array_read_short(const char *name, int field_id)
+int X86_64::array_read_short(std::string &name, int field_id)
 {
   return -1;
 }
 
-int X86_64::array_read_int(const char *name, int field_id)
+int X86_64::array_read_int(std::string &name, int field_id)
 {
   return -1;
 }
@@ -430,17 +436,17 @@ int X86_64::array_write_int()
   return -1;
 }
 
-int X86_64::array_write_byte(const char *name, int field_id)
+int X86_64::array_write_byte(std::string &name, int field_id)
 {
   return -1;
 }
 
-int X86_64::array_write_short(const char *name, int field_id)
+int X86_64::array_write_short(std::string &name, int field_id)
 {
   return -1;
 }
 
-int X86_64::array_write_int(const char *name, int field_id)
+int X86_64::array_write_int(std::string &name, int field_id)
 {
   return -1;
 }

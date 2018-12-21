@@ -141,13 +141,13 @@ int Generator::array_read_object()
   return -1;
 }
 
-int Generator::array_read_float(const char *name, int field_id)
+int Generator::array_read_float(std::string &name, int field_id)
 {
   printf("Error: Float arrays are not supported on this platform.\n");
   return -1;
 }
 
-int Generator::array_read_object(const char *name, int field_id)
+int Generator::array_read_object(std::string &name, int field_id)
 {
   printf("Error: Object arrays are not supported on this platform.\n");
   return -1;
@@ -165,13 +165,13 @@ int Generator::array_write_object()
   return -1;
 }
 
-int Generator::array_write_float(const char *name, int field_id)
+int Generator::array_write_float(std::string &name, int field_id)
 {
   printf("Error: Float arrays are not supported on this platform.\n");
   return -1;
 }
 
-int Generator::array_write_object(const char *name, int field_id)
+int Generator::array_write_object(std::string &name, int field_id)
 {
   printf("Error: Object arrays are not supported on this platform.\n");
   return -1;
@@ -193,18 +193,19 @@ void Generator::add_newline()
   fprintf(out, "\n");
 }
 
-int Generator::insert_db(const char *name, int32_t *data, int len, uint8_t len_type)
+int Generator::insert_db(std::string &name, int32_t *data, int len, uint8_t len_type)
 {
   if (len_type == TYPE_SHORT)
   {
-    fprintf(out, "  dw %d   ; %s.length\n", len, name);
+    fprintf(out, "  dw %d   ; %s.length\n", len, name.c_str());
   }
     else
   if (len_type == TYPE_INT)
   {
-    fprintf(out, "  dc32 %d   ; %s.length\n", len, name);
+    fprintf(out, "  dc32 %d   ; %s.length\n", len, name.c_str());
   }
-  fprintf(out, "_%s:\n", name);
+
+  fprintf(out, "_%s:\n", name.c_str());
 
   for (int n = 0; n < len; n++)
   {
@@ -226,18 +227,18 @@ int Generator::insert_db(const char *name, int32_t *data, int len, uint8_t len_t
   return 0;
 }
 
-int Generator::insert_dw(const char *name, int32_t *data, int len, uint8_t len_type)
+int Generator::insert_dw(std::string &name, int32_t *data, int len, uint8_t len_type)
 {
   if (len_type == TYPE_SHORT)
   {
-    fprintf(out, "  dw %d   ; %s.length\n", len, name);
+    fprintf(out, "  dw %d   ; %s.length\n", len, name.c_str());
   }
     else
   if (len_type == TYPE_INT)
   {
-    fprintf(out, "  dc32 %d   ; %s.length\n", len, name);
+    fprintf(out, "  dc32 %d   ; %s.length\n", len, name.c_str());
   }
-  fprintf(out, "_%s:\n", name);
+  fprintf(out, "_%s:\n", name.c_str());
 
   for (int n = 0; n < len; n++)
   {
@@ -260,20 +261,20 @@ int Generator::insert_dw(const char *name, int32_t *data, int len, uint8_t len_t
   return 0;
 }
 
-int Generator::insert_dc32(const char *name, int32_t *data, int len, uint8_t len_type, const char *dc32)
+int Generator::insert_dc32(std::string &name, int32_t *data, int len, uint8_t len_type, const char *dc32)
 {
   // FIXME: For dc32, the len_type should be dc32 always.
   if (len_type == TYPE_SHORT)
   {
-    fprintf(out, "  dw %d   ; %s.length\n", len, name);
+    fprintf(out, "  dw %d   ; %s.length\n", len, name.c_str());
   }
     else
   if (len_type == TYPE_INT)
   {
-    fprintf(out, "  %s %d   ; %s.length\n", dc32, len, name);
+    fprintf(out, "  %s %d   ; %s.length\n", dc32, len, name.c_str());
   }
 
-  fprintf(out, "_%s:\n", name);
+  fprintf(out, "_%s:\n", name.c_str());
 
   for (int n = 0; n < len; n++)
   {
@@ -290,20 +291,20 @@ int Generator::insert_dc32(const char *name, int32_t *data, int len, uint8_t len
   return 0;
 }
 
-int Generator::insert_float(const char *name, int32_t *data, int len, uint8_t len_type, const char *dc32)
+int Generator::insert_float(std::string &name, int32_t *data, int len, uint8_t len_type, const char *dc32)
 {
   // FIXME: For dc32, the len_type should be dc32 always.
   if (len_type == TYPE_SHORT)
   {
-    fprintf(out, "  dw %d   ; %s.length\n", len, name);
+    fprintf(out, "  dw %d   ; %s.length\n", len, name.c_str());
   }
     else
   if (len_type == TYPE_INT)
   {
-    fprintf(out, "  %s %d   ; %s.length\n", dc32, len, name);
+    fprintf(out, "  %s %d   ; %s.length\n", dc32, len, name.c_str());
   }
 
-  fprintf(out, "_%s:\n", name);
+  fprintf(out, "_%s:\n", name.c_str());
 
   for (int n = 0; n < len; n++)
   {
@@ -375,12 +376,13 @@ void Generator::insert_constants_pool()
   fprintf(out, "\n\n");
 }
 
-int Generator::insert_utf8(const char *name, uint8_t *bytes, int len)
+int Generator::insert_utf8(std::string &name, uint8_t *bytes, int len)
 {
   int n;
 
-  fprintf(out, "_%s:\n", name);
+  fprintf(out, "_%s:\n", name.c_str());
   fprintf(out, "  db \"");
+
   for (n = 0; n < len; n++)
   {
     if (bytes[n] == '\n')

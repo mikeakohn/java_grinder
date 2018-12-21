@@ -79,17 +79,17 @@ int X86::init_heap(int field_count)
   return 0;
 }
 
-int X86::field_init_int(char *name, int index, int value)
+int X86::field_init_int(std::string &name, int index, int value)
 {
   fprintf(out, "  mov eax, %d\n", value);
-  fprintf(out, "  mov [%s], eax\n", name);
+  fprintf(out, "  mov [%s], eax\n", name.c_str());
   return 0;
 }
 
-int X86::field_init_ref(char *name, int index)
+int X86::field_init_ref(std::string &name, int index)
 {
-  fprintf(out, "  mov eax, _%s\n", name);
-  fprintf(out, "  mov [%s], eax\n", name);
+  fprintf(out, "  mov eax, _%s\n", name.c_str());
+  fprintf(out, "  mov [%s], eax\n", name.c_str());
   return 0;
 }
 
@@ -168,17 +168,17 @@ int X86::push_local_var_ref(int index)
   return push_local_var_int(index);
 }
 
-int X86::push_ref_static(const char *name, int index)
+int X86::push_ref_static(std::string &name, int index)
 {
-  fprintf(out, "  ; push_ref_static(%s, %d)\n", name, index);
+  fprintf(out, "  ; push_ref_static(%s, %d)\n", name.c_str(), index);
 
   if (reg < REG_MAX)
   {
-    fprintf(out, "  mov %s, _%s\n", REG_STACK(reg++), name);
+    fprintf(out, "  mov %s, _%s\n", REG_STACK(reg++), name.c_str());
   }
     else
   {
-    fprintf(out, "  push _%s\n", name);
+    fprintf(out, "  push _%s\n", name.c_str());
     stack++;
   }
 
@@ -242,17 +242,17 @@ int X86::push_double(double f)
 }
 #endif
 
-int X86::push_ref(char *name)
+int X86::push_ref(std::string &name)
 {
-  fprintf(out, "  ; push_ref(%s)\n", name);
+  fprintf(out, "  ; push_ref(%s)\n", name.c_str());
 
   if (reg < REG_MAX)
   {
-    fprintf(out, "  mov %s, [%s]\n", REG_STACK(reg++), name);
+    fprintf(out, "  mov %s, [%s]\n", REG_STACK(reg++), name.c_str());
   }
     else
   {
-    fprintf(out, "  push [%s]\n", name);
+    fprintf(out, "  push [%s]\n", name.c_str());
     stack++;
   }
 
@@ -788,32 +788,32 @@ int X86::invoke_static_method(const char *name, int params, int is_void)
   return 0;
 }
 
-int X86::put_static(const char *name, int index)
+int X86::put_static(std::string &name, int index)
 {
   if (stack > 0)
   {
     fprintf(out, "  pop ebx\n");
-    fprintf(out, "  mov [%s], ebx\n", name);
+    fprintf(out, "  mov [%s], ebx\n", name.c_str());
     stack--;
   }
     else
   {
-    fprintf(out, "  mov [%s], %s\n", name, REG_STACK(reg - 1));
+    fprintf(out, "  mov [%s], %s\n", name.c_str(), REG_STACK(reg - 1));
     reg--;
   }
 
   return 0;
 }
 
-int X86::get_static(const char *name, int index)
+int X86::get_static(std::string &name, int index)
 {
   if (reg < REG_MAX)
   {
-    fprintf(out, "  mov %s, [%s]\n", REG_STACK(reg++), name);
+    fprintf(out, "  mov %s, [%s]\n", REG_STACK(reg++), name.c_str());
   }
     else
   {
-    fprintf(out, "  push [%s]\n", name);
+    fprintf(out, "  push [%s]\n", name.c_str());
     stack++;
   }
 
@@ -830,22 +830,28 @@ int X86::new_array(uint8_t type)
   return -1;
 }
 
-int X86::insert_array(const char *name, int32_t *data, int len, uint8_t type)
+int X86::insert_array(std::string &name, int32_t *data, int len, uint8_t type)
 {
   fprintf(out, "align 4\n");
   if (type == TYPE_BYTE)
-  { return insert_db(name, data, len, TYPE_INT); }
+  {
+    return insert_db(name, data, len, TYPE_INT);
+  }
     else
   if (type == TYPE_SHORT)
-  { return insert_dw(name, data, len, TYPE_INT); } 
+  {
+    return insert_dw(name, data, len, TYPE_INT);
+  }
     else
   if (type == TYPE_INT)
-  { return insert_dc32(name, data, len, TYPE_INT, "dd"); } 
+  {
+    return insert_dc32(name, data, len, TYPE_INT, "dd");
+  }
 
   return -1;
 }
 
-int X86::insert_string(const char *name, uint8_t *bytes, int len)
+int X86::insert_string(std::string &name, uint8_t *bytes, int len)
 {
   fprintf(out, "align 4\n");
   fprintf(out, "  dc32 %d\n", len);
@@ -867,15 +873,15 @@ int X86::push_array_length()
   return 0;
 }
 
-int X86::push_array_length(const char *name, int field_id)
+int X86::push_array_length(std::string &name, int field_id)
 {
   if (reg < REG_MAX)
   {
-    fprintf(out, "  mov %s, [%s-4]\n", REG_STACK(reg++), name);
+    fprintf(out, "  mov %s, [%s-4]\n", REG_STACK(reg++), name.c_str());
   }
     else
   {
-    fprintf(out, "  push [%s-4]\n", name);
+    fprintf(out, "  push [%s-4]\n", name.c_str());
     stack++;
   }
 
@@ -978,19 +984,19 @@ int X86::array_read_int()
   return 0;
 }
 
-int X86::array_read_byte(const char *name, int field_id)
+int X86::array_read_byte(std::string &name, int field_id)
 {
-  fprintf(out, "  ; array_read_byte(%s,%d)\n", name, field_id);
+  fprintf(out, "  ; array_read_byte(%s,%d)\n", name.c_str(), field_id);
 
   if (stack == 0)
   {
-    fprintf(out, "  mov %s, [%s+%s]\n", REG_STACK8(reg-1), name, REG_STACK(reg-1));
+    fprintf(out, "  mov %s, [%s+%s]\n", REG_STACK8(reg-1), name.c_str(), REG_STACK(reg-1));
     fprintf(out, "  movsx %s, %s\n", REG_STACK(reg-1), REG_STACK8(reg-1));
   }
     else
   {
     fprintf(out, "  pop ebx\n");
-    fprintf(out, "  mov bl, [%s+ebx]\n", name);
+    fprintf(out, "  mov bl, [%s+ebx]\n", name.c_str());
     fprintf(out, "  movsx ebx, bl\n");
     fprintf(out, "  push ebx\n");
   }
@@ -998,21 +1004,21 @@ int X86::array_read_byte(const char *name, int field_id)
   return 0;
 }
 
-int X86::array_read_short(const char *name, int field_id)
+int X86::array_read_short(std::string &name, int field_id)
 {
-  fprintf(out, "  ; array_read_short(%s,%d)\n", name, field_id);
+  fprintf(out, "  ; array_read_short(%s,%d)\n", name.c_str(), field_id);
 
   if (stack == 0)
   {
     //fprintf(out, "  sal %s, 1\n", REG_STACK8(reg-1));
-    fprintf(out, "  mov %s, [%s+%s*2]\n", REG_STACK8(reg-1), name, REG_STACK(reg-1));
+    fprintf(out, "  mov %s, [%s+%s*2]\n", REG_STACK8(reg-1), name.c_str(), REG_STACK(reg-1));
     fprintf(out, "  movsx %s, %s\n", REG_STACK(reg-1), REG_STACK8(reg-1));
   }
     else
   {
     fprintf(out, "  pop ebx\n");
     //fprintf(out, "  sal ebx, 1\n");
-    fprintf(out, "  mov bl, [%s+ebx*2]\n", name);
+    fprintf(out, "  mov bl, [%s+ebx*2]\n", name.c_str());
     fprintf(out, "  movsx ebx, bl\n");
     fprintf(out, "  push ebx\n");
   }
@@ -1020,21 +1026,21 @@ int X86::array_read_short(const char *name, int field_id)
   return 0;
 }
 
-int X86::array_read_int(const char *name, int field_id)
+int X86::array_read_int(std::string &name, int field_id)
 {
-  fprintf(out, "  ; array_read_int(%s,%d)\n", name, field_id);
+  fprintf(out, "  ; array_read_int(%s,%d)\n", name.c_str(), field_id);
 
   if (stack == 0)
   {
     //fprintf(out, "  sal %s, 2\n", REG_STACK8(reg-1));
-    fprintf(out, "  mov %s, [%s+%s*4]\n", REG_STACK8(reg-1), name, REG_STACK(reg-1));
+    fprintf(out, "  mov %s, [%s+%s*4]\n", REG_STACK8(reg-1), name.c_str(), REG_STACK(reg-1));
     fprintf(out, "  movsx %s, %s\n", REG_STACK(reg-1), REG_STACK8(reg-1));
   }
     else
   {
     fprintf(out, "  pop ebx\n");
     //fprintf(out, "  sal ebx, 2\n");
-    fprintf(out, "  mov bl, [%s+ebx*4]\n", name);
+    fprintf(out, "  mov bl, [%s+ebx*4]\n", name.c_str());
     fprintf(out, "  movsx ebx, bl\n");
     fprintf(out, "  push ebx\n");
   }
@@ -1167,20 +1173,20 @@ int X86::array_write_int()
   return 0;
 }
 
-int X86::array_write_byte(const char *name, int field_id)
+int X86::array_write_byte(std::string &name, int field_id)
 {
-  fprintf(out, "  ; array_write_byte(%s,%d)\n", name, field_id);
+  fprintf(out, "  ; array_write_byte(%s,%d)\n", name.c_str(), field_id);
 
   if (stack == 0)
   {
-    fprintf(out, "  mov [%s+%s], %s\n", name, REG_STACK(reg-2), REG_STACK8(reg-1));
+    fprintf(out, "  mov [%s+%s], %s\n", name.c_str(), REG_STACK(reg-2), REG_STACK8(reg-1));
     reg -= 2;
   }
     else
   if (stack == 1)
   {
     fprintf(out, "  pop ebx\n");
-    fprintf(out, "  mov [%s+%s], bl\n", name, REG_STACK(reg-1));
+    fprintf(out, "  mov [%s+%s], bl\n", name.c_str(), REG_STACK(reg-1));
     stack -= 1;
     reg -= 1;
   }
@@ -1189,21 +1195,21 @@ int X86::array_write_byte(const char *name, int field_id)
   {
     fprintf(out, "  pop ebx\n");
     fprintf(out, "  pop edi\n");
-    fprintf(out, "  mov [%s+edi], bl\n", name);
+    fprintf(out, "  mov [%s+edi], bl\n", name.c_str());
     stack -= 2;
   }
 
   return -1;
 }
 
-int X86::array_write_short(const char *name, int field_id)
+int X86::array_write_short(std::string &name, int field_id)
 {
-  fprintf(out, "  ; array_write_short(%s,%d)\n", name, field_id);
+  fprintf(out, "  ; array_write_short(%s,%d)\n", name.c_str(), field_id);
 
   if (stack == 0)
   {
     //fprintf(out, "  sal %s, 1\n", REG_STACK(reg-2));
-    fprintf(out, "  mov [%s+%s*2], %s\n", name, REG_STACK(reg-2), REG_STACK16(reg-1));
+    fprintf(out, "  mov [%s+%s*2], %s\n", name.c_str(), REG_STACK(reg-2), REG_STACK16(reg-1));
     reg -= 2;
   }
     else
@@ -1211,7 +1217,7 @@ int X86::array_write_short(const char *name, int field_id)
   {
     fprintf(out, "  pop ebx\n");
     //fprintf(out, "  sal %s, 1\n", REG_STACK(reg-1));
-    fprintf(out, "  mov [%s+%s*2], bx\n", name, REG_STACK(reg-1));
+    fprintf(out, "  mov [%s+%s*2], bx\n", name.c_str(), REG_STACK(reg-1));
     stack -= 1;
     reg -= 1;
   }
@@ -1221,29 +1227,27 @@ int X86::array_write_short(const char *name, int field_id)
     fprintf(out, "  pop ebx\n");
     fprintf(out, "  pop edi\n");
     //fprintf(out, "  sal edi, 1\n");
-    fprintf(out, "  mov [%s+edi*2], bx\n", name);
+    fprintf(out, "  mov [%s+edi*2], bx\n", name.c_str());
     stack -= 2;
   }
 
   return -1;
 }
 
-int X86::array_write_int(const char *name, int field_id)
+int X86::array_write_int(std::string &name, int field_id)
 {
-  fprintf(out, "  ; array_write_int(%s,%d)\n", name, field_id);
+  fprintf(out, "  ; array_write_int(%s,%d)\n", name.c_str(), field_id);
 
   if (stack == 0)
   {
-    //fprintf(out, "  sal %s, 2\n", REG_STACK(reg-2));
-    fprintf(out, "  mov [%s+%s*4], %s\n", name, REG_STACK(reg-2), REG_STACK(reg-1));
+    fprintf(out, "  mov [%s+%s*4], %s\n", name.c_str(), REG_STACK(reg-2), REG_STACK(reg-1));
     reg -= 2;
   }
     else
   if (stack == 1)
   {
     fprintf(out, "  pop ebx\n");
-    //fprintf(out, "  sal %s, 2\n", REG_STACK(reg-1));
-    fprintf(out, "  mov [%s+%s*4], ebx\n", name, REG_STACK(reg-1));
+    fprintf(out, "  mov [%s+%s*4], ebx\n", name.c_str(), REG_STACK(reg-1));
     stack -= 1;
     reg -= 1;
   }
@@ -1252,8 +1256,7 @@ int X86::array_write_int(const char *name, int field_id)
   {
     fprintf(out, "  pop ebx\n");
     fprintf(out, "  pop edi\n");
-    //fprintf(out, "  sal edi, 2\n");
-    fprintf(out, "  mov [%s+edi*4], ebx\n", name);
+    fprintf(out, "  mov [%s+edi*4], ebx\n", name.c_str());
     stack -= 2;
   }
 

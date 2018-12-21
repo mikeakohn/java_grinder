@@ -300,26 +300,26 @@ int AVR8::init_heap(int field_count)
   return 0;
 }
 
-int AVR8::field_init_int(char *name, int index, int value)
+int AVR8::field_init_int(std::string &name, int index, int value)
 {
   if (value < -32768 || value > 65535) { return -1; }
 
   fprintf(out, "; field_init_short\n");
   fprintf(out, "  ldi temp, %d\n", value & 0xff);
-  fprintf(out, "  sts %s + 0, temp\n", name);
+  fprintf(out, "  sts %s + 0, temp\n", name.c_str());
   fprintf(out, "  ldi temp, %d\n", value >> 8);
-  fprintf(out, "  sts %s + 1, temp\n", name);
+  fprintf(out, "  sts %s + 1, temp\n", name.c_str());
 
   return 0;
 }
 
-int AVR8::field_init_ref(char *name, int index)
+int AVR8::field_init_ref(std::string &name, int index)
 {
   fprintf(out, "; field_init_ref\n");
-  fprintf(out, "  ldi temp, (_%s * 2) & 0xff\n", name);
-  fprintf(out, "  sts %s + 0, temp\n", name);
-  fprintf(out, "  ldi temp, (_%s * 2) >> 8\n", name);
-  fprintf(out, "  sts %s + 1, temp\n", name);
+  fprintf(out, "  ldi temp, (_%s * 2) & 0xff\n", name.c_str());
+  fprintf(out, "  sts %s + 0, temp\n", name.c_str());
+  fprintf(out, "  ldi temp, (_%s * 2) >> 8\n", name.c_str());
+  fprintf(out, "  sts %s + 1, temp\n", name.c_str());
 
   return 0;
 }
@@ -365,7 +365,7 @@ int AVR8::push_local_var_ref(int index)
   return push_local_var_int(index);
 }
 
-int AVR8::push_ref_static(const char *name, int index)
+int AVR8::push_ref_static(std::string &name, int index)
 {
   return -1;
 }
@@ -413,12 +413,12 @@ int AVR8::push_double(double f)
 }
 #endif
 
-int AVR8::push_ref(char *name)
+int AVR8::push_ref(std::string &name)
 {
   fprintf(out, "; push_ref\n");
-  fprintf(out, "  lds temp, %s + 0\n", name);
+  fprintf(out, "  lds temp, %s + 0\n", name.c_str());
   PUSH_LO("temp");
-  fprintf(out, "  lds temp, %s + 1\n", name);
+  fprintf(out, "  lds temp, %s + 1\n", name.c_str());
   PUSH_HI("temp");
   stack++;
 
@@ -1091,27 +1091,27 @@ int stack_vars = stack;
   return 0;
 }
 
-int AVR8::put_static(const char *name, int index)
+int AVR8::put_static(std::string &name, int index)
 {
   if (stack > 0)
   {
     fprintf(out, "; put_static\n");
     POP_HI("temp");
-    fprintf(out, "  sts %s + 1, temp\n", name);
+    fprintf(out, "  sts %s + 1, temp\n", name.c_str());
     POP_LO("temp");
-    fprintf(out, "  sts %s + 0, temp\n", name);
+    fprintf(out, "  sts %s + 0, temp\n", name.c_str());
     stack--;
   }
 
   return 0;
 }
 
-int AVR8::get_static(const char *name, int index)
+int AVR8::get_static(std::string &name, int index)
 {
   fprintf(out, "; get_static\n");
-  fprintf(out, "  lds temp, %s + 0\n", name);
+  fprintf(out, "  lds temp, %s + 0\n", name.c_str());
   PUSH_LO("temp");
-  fprintf(out, "  lds temp, %s + 1\n", name);
+  fprintf(out, "  lds temp, %s + 1\n", name.c_str());
   PUSH_HI("temp");
   stack++;
 
@@ -1142,7 +1142,7 @@ int AVR8::new_array(uint8_t type)
   return 0;
 }
 
-int AVR8::insert_array(const char *name, int32_t *data, int len, uint8_t type)
+int AVR8::insert_array(std::string &name, int32_t *data, int len, uint8_t type)
 {
   fprintf(out, "; insert_array\n");
 
@@ -1167,7 +1167,7 @@ int AVR8::insert_array(const char *name, int32_t *data, int len, uint8_t type)
   return -1;
 }
 
-int AVR8::insert_string(const char *name, uint8_t *bytes, int len)
+int AVR8::insert_string(std::string &name, uint8_t *bytes, int len)
 {
   fprintf(out, ".align 16\n");
   fprintf(out, "dw %d\n", len);
@@ -1186,11 +1186,11 @@ int AVR8::push_array_length()
   return 0;
 }
 
-int AVR8::push_array_length(const char *name, int field_id)
+int AVR8::push_array_length(std::string &name, int field_id)
 {
   need_push_array_length2 = 1;
-  fprintf(out, "  lds ZL, %s + 0\n", name);
-  fprintf(out, "  lds ZH, %s + 1\n", name);
+  fprintf(out, "  lds ZL, %s + 0\n", name.c_str());
+  fprintf(out, "  lds ZH, %s + 1\n", name.c_str());
   CALL("push_array_length2");
   stack++;
 
@@ -1224,33 +1224,33 @@ int AVR8::array_read_int()
   return 0;
 }
 
-int AVR8::array_read_byte(const char *name, int field_id)
+int AVR8::array_read_byte(std::string &name, int field_id)
 {
   need_array_byte_support = 1;
 
   if (stack > 0)
   {
-    fprintf(out, "  lds ZL, %s + 0\n", name);
-    fprintf(out, "  lds ZH, %s + 1\n", name);
+    fprintf(out, "  lds ZL, %s + 0\n", name.c_str());
+    fprintf(out, "  lds ZH, %s + 1\n", name.c_str());
     CALL("array_read_byte2");
   }
 
   return 0;
 }
 
-int AVR8::array_read_short(const char *name, int field_id)
+int AVR8::array_read_short(std::string &name, int field_id)
 {
   return array_read_int(name, field_id);
 }
 
-int AVR8::array_read_int(const char *name, int field_id)
+int AVR8::array_read_int(std::string &name, int field_id)
 {
   need_array_int_support = 1;
 
   if (stack > 0)
   {
-    fprintf(out, "  lds ZL, %s + 0\n", name);
-    fprintf(out, "  lds ZH, %s + 1\n", name);
+    fprintf(out, "  lds ZL, %s + 0\n", name.c_str());
+    fprintf(out, "  lds ZH, %s + 1\n", name.c_str());
     CALL("array_read_int2");
   }
 
@@ -1282,7 +1282,7 @@ int AVR8::array_write_int()
   return 0;
 }
 
-int AVR8::array_write_byte(const char *name, int field_id)
+int AVR8::array_write_byte(std::string &name, int field_id)
 {
 //  get_values_from_stack(2);
 //  fprintf(out, "; array_write_byte2:\n");
@@ -1291,12 +1291,12 @@ int AVR8::array_write_byte(const char *name, int field_id)
   return -1;
 }
 
-int AVR8::array_write_short(const char *name, int field_id)
+int AVR8::array_write_short(std::string &name, int field_id)
 {
   return array_write_int(name, field_id);
 }
 
-int AVR8::array_write_int(const char *name, int field_id)
+int AVR8::array_write_int(std::string &name, int field_id)
 {
 //  get_values_from_stack(2);
 //  fprintf(out, "; array_write_int2:\n");

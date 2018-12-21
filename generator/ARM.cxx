@@ -97,24 +97,24 @@ int ARM::init_heap(int field_count)
   return 0;
 }
 
-int ARM::field_init_int(char *name, int index, int value)
+int ARM::field_init_int(std::string &name, int index, int value)
 {
   if (immediate_is_possible(value))
   {
     fprintf(out, "  mov r10, #%d\n", value);
-    fprintf(out, "  str r10, [r11,#%s]\n", name);
+    fprintf(out, "  str r10, [r11,#%s]\n", name.c_str());
   }
     else
   {
     int n = get_constant(value);
     fprintf(out, "  ldr r10, [r12,#%d]\n", n * 4);
-    fprintf(out, "  str r10, [r11,#%s]\n", name);
+    fprintf(out, "  str r10, [r11,#%s]\n", name.c_str());
   }
 
   return 0;
 }
 
-int ARM::field_init_ref(char *name, int index)
+int ARM::field_init_ref(std::string &name, int index)
 {
   return -1;
 }
@@ -137,7 +137,7 @@ int ARM::push_local_var_ref(int index)
   return push_local_var_int(index);
 }
 
-int ARM::push_ref_static(const char *name, int index)
+int ARM::push_ref_static(std::string &name, int index)
 {
   return -1;
 }
@@ -201,7 +201,7 @@ int ARM::push_double(double f)
 }
 #endif
 
-int ARM::push_ref(char *name)
+int ARM::push_ref(std::string &name)
 {
   // Need to move the address of name to the top of stack
   return -1;
@@ -451,12 +451,12 @@ int ARM::invoke_static_method(const char *name, int params, int is_void)
   return -1;
 }
 
-int ARM::put_static(const char *name, int index)
+int ARM::put_static(std::string &name, int index)
 {
   return -1;
 }
 
-int ARM::get_static(const char *name, int index)
+int ARM::get_static(std::string &name, int index)
 {
   return -1;
 }
@@ -471,21 +471,27 @@ int ARM::new_array(uint8_t type)
   return -1;
 }
 
-int ARM::insert_array(const char *name, int32_t *data, int len, uint8_t type)
+int ARM::insert_array(std::string &name, int32_t *data, int len, uint8_t type)
 {
   if (type == TYPE_BYTE)
-  { return insert_db(name, data, len, TYPE_INT); }
+  {
+    return insert_db(name, data, len, TYPE_INT);
+  }
     else
   if (type == TYPE_SHORT)
-  { return insert_dw(name, data, len, TYPE_INT); }
+  {
+    return insert_dw(name, data, len, TYPE_INT);
+  }
     else
   if (type == TYPE_INT)
-  { return insert_dc32(name, data, len, TYPE_INT); }
+  {
+    return insert_dc32(name, data, len, TYPE_INT);
+  }
 
   return -1;
 }
 
-int ARM::insert_string(const char *name, uint8_t *bytes, int len)
+int ARM::insert_string(std::string &name, uint8_t *bytes, int len)
 {
   return -1;
 }
@@ -495,7 +501,7 @@ int ARM::push_array_length()
   return -1;
 }
 
-int ARM::push_array_length(const char *name, int field_id)
+int ARM::push_array_length(std::string &name, int field_id)
 {
   return -1;
 }
@@ -515,17 +521,17 @@ int ARM::array_read_int()
   return -1;
 }
 
-int ARM::array_read_byte(const char *name, int field_id)
+int ARM::array_read_byte(std::string &name, int field_id)
 {
   return -1;
 }
 
-int ARM::array_read_short(const char *name, int field_id)
+int ARM::array_read_short(std::string &name, int field_id)
 {
   return -1;
 }
 
-int ARM::array_read_int(const char *name, int field_id)
+int ARM::array_read_int(std::string &name, int field_id)
 {
   return -1;
 }
@@ -545,17 +551,17 @@ int ARM::array_write_int()
   return -1;
 }
 
-int ARM::array_write_byte(const char *name, int field_id)
+int ARM::array_write_byte(std::string &name, int field_id)
 {
   return -1;
 }
 
-int ARM::array_write_short(const char *name, int field_id)
+int ARM::array_write_short(std::string &name, int field_id)
 {
   return -1;
 }
 
-int ARM::array_write_int(const char *name, int field_id)
+int ARM::array_write_int(std::string &name, int field_id)
 {
   return -1;
 }

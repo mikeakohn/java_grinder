@@ -86,7 +86,7 @@ JavaClass::JavaClass(FILE *in, bool is_main_class) :
     read_attributes(in);
   }
 
-  get_class_name(class_name, sizeof(class_name), this_class);
+  get_class_name(class_name, this_class);
 }
 
 JavaClass::~JavaClass()
@@ -474,16 +474,16 @@ const fields_t *JavaClass::get_field(int index)
   return field;
 }
 
-int JavaClass::get_ref_name_type(char *name, char *type, int len, int index)
+int JavaClass::get_ref_name_type(
+  std::string &name,
+  std::string &type,
+  int index)
 {
   struct constant_fieldref_t *constant_fieldref;
   struct constant_methodref_t *constant_methodref;
   struct constant_nameandtype_t *constant_nameandtype;
   int tag,offset;
   void *heap;
-
-  name[0] = 0;
-  type[0] = 0;
 
   while(1)
   {
@@ -503,9 +503,8 @@ int JavaClass::get_ref_name_type(char *name, char *type, int len, int index)
       if (constant_fieldref->class_index != this_class ||
           use_full_method_name())
       {
-        get_class_name(name, len, constant_fieldref->class_index);
-        //printf("  class_name='%s' %d\n", name, constant_fieldref->class_index);
-        strcat(name, "_");
+        get_class_name(name, constant_fieldref->class_index);
+        name += "_";
       }
     }
       else
@@ -519,14 +518,13 @@ int JavaClass::get_ref_name_type(char *name, char *type, int len, int index)
       if (constant_methodref->class_index != this_class ||
           use_full_method_name())
       {
-        get_class_name(name, len, constant_methodref->class_index);
-        //printf("  class_name='%s' %d\n", name, constant_methodref->class_index);
-        strcat(name, "_");
+        get_class_name(name, constant_methodref->class_index);
+        name += "_";
 
         // Is this needed?
-        if (strncmp(name, "java/", 5) == 0 ||
-            strncmp(name, "net/mikekohn/java_grinder/",
-                   sizeof("net/mikekohn/java_grinder/") -1) == 0)
+        if (strncmp(name.c_str(), "java/", 5) == 0 ||
+            strncmp(name.c_str(), "net/mikekohn/java_grinder/",
+                    sizeof("net/mikekohn/java_grinder/") -1) == 0)
         {
           name[0] = 0;
         }
@@ -536,9 +534,16 @@ int JavaClass::get_ref_name_type(char *name, char *type, int len, int index)
     if (tag == CONSTANT_NAMEANDTYPE)
     {
       constant_nameandtype = (constant_nameandtype_t *)heap;
-      int class_name_len = strlen(name);
-      get_name_constant(name + class_name_len, len - class_name_len, constant_nameandtype->name_index);
-      get_name_constant(type, len, constant_nameandtype->descriptor_index);
+      std::string temp;
+
+      //int class_name_len = name.length();
+
+      //get_name_constant(name + class_name_len, len - class_name_len, constant_nameandtype->name_index);
+      get_name_constant(temp, constant_nameandtype->name_index);
+      name += temp;
+
+      get_name_constant(type, constant_nameandtype->descriptor_index);
+
       return 0;
     }
       else
@@ -552,13 +557,13 @@ int JavaClass::get_ref_name_type(char *name, char *type, int len, int index)
 
 bool JavaClass::is_ref_in_api(int index)
 {
-  char name[128];
+  std::string name;
 
-  if (get_class_name(name, sizeof(name), index) == -1) { return true; }
+  if (get_class_name(name, index) == -1) { return true; }
 
-  if (strncmp(name, "java/", 5) == 0) { return true; }
-  if (strncmp(name, "net/mikekohn/java_grinder/",
-             sizeof("net/mikekohn/java_grinder/") -1) == 0)
+  if (strncmp(name.c_str(), "java/", 5) == 0) { return true; }
+  if (strncmp(name.c_str(), "net/mikekohn/java_grinder/",
+              sizeof("net/mikekohn/java_grinder/") -1) == 0)
   {
     return true;
   }
@@ -566,15 +571,13 @@ bool JavaClass::is_ref_in_api(int index)
   return false;
 }
 
-int JavaClass::get_class_name(char *name, int len, int index)
+int JavaClass::get_class_name(std::string &name, int index)
 {
   struct constant_fieldref_t *constant_fieldref;
   struct constant_methodref_t *constant_methodref;
   struct constant_class_t *constant_class;
   int tag,offset;
   void *heap;
-
-  name[0] = 0;
 
   while(1)
   {
@@ -599,7 +602,9 @@ int JavaClass::get_class_name(char *name, int len, int index)
     if (tag == CONSTANT_CLASS)
     {
       constant_class = (constant_class_t *)heap;
-      get_name_constant(name, len, constant_class->name_index);
+
+      get_name_constant(name, constant_class->name_index);
+
       return 0;
     }
       else
@@ -611,12 +616,11 @@ int JavaClass::get_class_name(char *name, int len, int index)
   return -1;
 }
 
-int JavaClass::get_field_index(const char *field_name)
+int JavaClass::get_field_index(std::string &field_name)
 {
   struct attributes_t *attribute;
   struct fields_t *field;
   int count,r,n;
-  //char name[256];
   std::string name;
 
   //printf("----- FieldCount: %d\n", fields_count);
@@ -625,7 +629,9 @@ int JavaClass::get_field_index(const char *field_name)
   {
     field = (struct fields_t *)(fields_heap + fields[count]);
     get_name_constant(name, field->name_index);
-    if (strcmp(field_name, name.c_str()) == 0) { return count; }
+
+    if (field_name == name) { return count; }
+
     //get_name_constant(desc, sizeof(desc), field->descriptor_index);
     //printf("                ----- %d -----\n", count);
     //printf("         access_flags: %d", field->access_flags);
@@ -636,6 +642,7 @@ int JavaClass::get_field_index(const char *field_name)
     //printf("      attribute_count: %d\n", field->attribute_count);
 
     n = 8;
+
     for (r = 0; r < field->attribute_count; r++)
     {
       attribute=(struct attributes_t *)(fields_heap + fields[count]+n);
@@ -727,7 +734,7 @@ void JavaClass::print_access(int a)
 
 void JavaClass::print()
 {
-  char name[128];
+  std::string name;
   int r;
 
   printf("   MagicNumber: 0x%02x%02x%02x%02x\n",((magic>>24)&0xff),
@@ -753,10 +760,9 @@ void JavaClass::print()
   print_access(access_flags);
   printf("\n");
 
-  //get_class_name(name, sizeof(name), this_class);
-  printf("     ThisClass: %s (%d)\n", class_name, this_class);
-  get_class_name(name, sizeof(name), super_class);
-  printf("    SuperClass: %s (%d)\n", name, super_class);
+  printf("     ThisClass: %s (%d)\n", class_name.c_str(), this_class);
+  get_class_name(name, super_class);
+  printf("    SuperClass: %s (%d)\n", name.c_str(), super_class);
   printf("InterfaceCount: %d\n", interfaces_count);
   for (r = 0; r < interfaces_count; r++)
   {

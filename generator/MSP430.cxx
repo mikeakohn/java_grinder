@@ -151,16 +151,16 @@ int MSP430::init_heap(int field_count)
   return 0;
 }
 
-int MSP430::field_init_int(char *name, int index, int value)
+int MSP430::field_init_int(std::string &name, int index, int value)
 {
   if (value < -32768 || value > 65535) { return -1; }
-  fprintf(out, "  mov.w #%d, &%s\n", value, name);
+  fprintf(out, "  mov.w #%d, &%s\n", value, name.c_str());
   return 0;
 }
 
-int MSP430::field_init_ref(char *name, int index)
+int MSP430::field_init_ref(std::string &name, int index)
 {
-  fprintf(out, "  mov.w #_%s, &%s\n", name, name);
+  fprintf(out, "  mov.w #_%s, &%s\n", name.c_str(), name.c_str());
   return 0;
 }
 
@@ -232,16 +232,16 @@ int MSP430::push_local_var_ref(int index)
   return push_local_var_int(index);
 }
 
-int MSP430::push_ref_static(const char *name, int index)
+int MSP430::push_ref_static(std::string &name, int index)
 {
   if (reg < reg_max)
   {
-    fprintf(out, "  mov.w #_%s, r%d\n", name, REG_STACK(reg));
+    fprintf(out, "  mov.w #_%s, r%d\n", name.c_str(), REG_STACK(reg));
     reg++;
   }
     else
   {
-    fprintf(out, "  push #_%s\n", name);
+    fprintf(out, "  push #_%s\n", name.c_str());
     stack++;
   }
 
@@ -296,16 +296,16 @@ int MSP430::push_double(double f)
 }
 #endif
 
-int MSP430::push_ref(char *name)
+int MSP430::push_ref(std::string &name)
 {
   if (reg < reg_max)
   {
-    fprintf(out, "  mov.w &%s, r%d\n", name, REG_STACK(reg));
+    fprintf(out, "  mov.w &%s, r%d\n", name.c_str(), REG_STACK(reg));
     reg++;
   }
     else
   {
-    fprintf(out, "  push &%s\n", name);
+    fprintf(out, "  push &%s\n", name.c_str());
     stack++;
   }
 
@@ -1209,35 +1209,33 @@ int MSP430::invoke_static_method(const char *name, int params, int is_void)
   return 0;
 }
 
-int MSP430::put_static(const char *name, int index)
+int MSP430::put_static(std::string &name, int index)
 {
   if (stack > 0)
   {
     fprintf(out, "  pop r15\n");
-    //fprintf(out, "  mov r15, &ram_start+%d\n", (index + 1) * 2);
-    fprintf(out, "  mov.w r15, &%s\n", name);
+    fprintf(out, "  mov.w r15, &%s\n", name.c_str());
     stack--;
   }
     else
   {
-    //fprintf(out, "  mov r%d, &ram_start+%d\n", REG_STACK(reg-1), (index + 1) * 2);
-    fprintf(out, "  mov.w r%d, &%s\n", REG_STACK(reg-1), name);
+    fprintf(out, "  mov.w r%d, &%s\n", REG_STACK(reg-1), name.c_str());
     reg--;
   }
 
   return 0;
 }
 
-int MSP430::get_static(const char *name, int index)
+int MSP430::get_static(std::string &name, int index)
 {
   if (reg < reg_max)
   {
-    fprintf(out, "  mov.w &%s, r%d\n", name, REG_STACK(reg));
+    fprintf(out, "  mov.w &%s, r%d\n", name.c_str(), REG_STACK(reg));
     reg++;
   }
     else
   {
-    fprintf(out, "  push &%s\n", name);
+    fprintf(out, "  push &%s\n", name.c_str());
     stack++;
   }
 
@@ -1326,7 +1324,7 @@ int MSP430::new_array(uint8_t type)
   return 0;
 }
 
-int MSP430::insert_array(const char *name, int32_t *data, int len, uint8_t type)
+int MSP430::insert_array(std::string &name, int32_t *data, int len, uint8_t type)
 {
   fprintf(out, ".align 16\n");
 
@@ -1348,7 +1346,7 @@ int MSP430::insert_array(const char *name, int32_t *data, int len, uint8_t type)
   return -1;
 }
 
-int MSP430::insert_string(const char *name, uint8_t *bytes, int len)
+int MSP430::insert_string(std::string &name, uint8_t *bytes, int len)
 {
   fprintf(out, ".align 16\n");
   fprintf(out, "  dw %d\n", len);
@@ -1371,10 +1369,10 @@ int MSP430::push_array_length()
   return 0;
 }
 
-int MSP430::push_array_length(const char *name, int field_id)
+int MSP430::push_array_length(std::string &name, int field_id)
 {
   //fprintf(out, "  mov.w #%s-2, r13\n", name);
-  fprintf(out, "  mov.w &%s, r13  ; push %s.length\n", name, name);
+  fprintf(out, "  mov.w &%s, r13  ; push %s.length\n", name.c_str(), name.c_str());
 
   if (reg < reg_max)
   {
@@ -1403,7 +1401,7 @@ int MSP430::array_read_byte()
   if (reg < reg_max)
   {
     fprintf(out, "  mov.b @r%d, r%d\n", ref_reg, REG_STACK(reg));
-    fprintf(out, "  sxt r%d\n", REG_STACK(reg)); 
+    fprintf(out, "  sxt r%d\n", REG_STACK(reg));
     reg++;
   }
     else
@@ -1445,9 +1443,9 @@ int MSP430::array_read_int()
   return array_read_short();
 }
 
-int MSP430::array_read_byte(const char *name, int field_id)
+int MSP430::array_read_byte(std::string &name, int field_id)
 {
-  fprintf(out, "  mov.w &%s, r13\n", name);
+  fprintf(out, "  mov.w &%s, r13\n", name.c_str());
 
   if (stack > 0)
   {
@@ -1467,9 +1465,9 @@ int MSP430::array_read_byte(const char *name, int field_id)
   return 0;
 }
 
-int MSP430::array_read_short(const char *name, int field_id)
+int MSP430::array_read_short(std::string &name, int field_id)
 {
-  fprintf(out, "  mov.w &%s, r13\n", name);
+  fprintf(out, "  mov.w &%s, r13\n", name.c_str());
 
   if (stack > 0)
   {
@@ -1488,7 +1486,7 @@ int MSP430::array_read_short(const char *name, int field_id)
   return 0;
 }
 
-int MSP430::array_read_int(const char *name, int field_id)
+int MSP430::array_read_int(std::string &name, int field_id)
 {
   return array_read_short(name, field_id);
 }
@@ -1525,20 +1523,20 @@ int MSP430::array_write_int()
   return array_write_short();
 }
 
-int MSP430::array_write_byte(const char *name, int field_id)
+int MSP430::array_write_byte(std::string &name, int field_id)
 {
   int value_reg;
   int index_reg;
 
   get_values_from_stack(&value_reg, &index_reg);
 
-  fprintf(out, "  add.w &%s, r%d\n", name, index_reg);
+  fprintf(out, "  add.w &%s, r%d\n", name.c_str(), index_reg);
   fprintf(out, "  mov.b r%d, 0(r%d)\n", value_reg, index_reg);
 
   return 0;
 }
 
-int MSP430::array_write_short(const char *name, int field_id)
+int MSP430::array_write_short(std::string &name, int field_id)
 {
   int value_reg;
   int index_reg;
@@ -1546,13 +1544,13 @@ int MSP430::array_write_short(const char *name, int field_id)
   get_values_from_stack(&value_reg, &index_reg);
 
   fprintf(out, "  rla.w r%d\n", index_reg);
-  fprintf(out, "  add.w &%s, r%d\n", name, index_reg);
+  fprintf(out, "  add.w &%s, r%d\n", name.c_str(), index_reg);
   fprintf(out, "  mov.w r%d, 0(r%d)\n", value_reg, index_reg);
 
   return 0;
 }
 
-int MSP430::array_write_int(const char *name, int field_id)
+int MSP430::array_write_int(std::string &name, int field_id)
 {
   return array_write_short(name, field_id);
 }
@@ -2004,7 +2002,7 @@ int MSP430::timer_setInterval_II(int cycles, int divider)
 {
   if (cycles > 0xffff)
   {
-    printf("** Error cycles is more than 16 bit\n"); 
+    printf("** Error cycles is more than 16 bit\n");
     return -1;
   }
 

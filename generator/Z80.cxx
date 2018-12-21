@@ -110,18 +110,18 @@ int Z80::init_heap(int field_count)
   return 0;
 }
 
-int Z80::field_init_int(char *name, int index, int value)
+int Z80::field_init_int(std::string &name, int index, int value)
 {
   if (value < -32768 || value > 65535) { return -1; }
   fprintf(out, "  ld hl, %d\n", value);
-  fprintf(out, "  ld (%s), hl\n", name);
+  fprintf(out, "  ld (%s), hl\n", name.c_str());
   return 0;
 }
 
-int Z80::field_init_ref(char *name, int index)
+int Z80::field_init_ref(std::string &name, int index)
 {
-  fprintf(out, "  ld hl, _%s\n", name);
-  fprintf(out, "  ld (%s), hl\n", name);
+  fprintf(out, "  ld hl, _%s\n", name.c_str());
+  fprintf(out, "  ld (%s), hl\n", name.c_str());
   return 0;
 }
 
@@ -166,10 +166,10 @@ int Z80::push_local_var_ref(int index)
   return push_local_var_int(index);
 }
 
-int Z80::push_ref_static(const char *name, int index)
+int Z80::push_ref_static(std::string &name, int index)
 {
   fprintf(out, "  ;; push_ref_static(%d)\n", index);
-  fprintf(out, "  ld hl, _%s\n", name);
+  fprintf(out, "  ld hl, _%s\n", name.c_str());
   fprintf(out, "  push hl\n");
   stack++;
 
@@ -228,10 +228,10 @@ int Z80::push_double(double f)
 }
 #endif
 
-int Z80::push_ref(char *name)
+int Z80::push_ref(std::string &name)
 {
-  fprintf(out, "  ;; push_short(%s)\n", name);
-  fprintf(out, "  ld hl, (%s)\n", name);
+  fprintf(out, "  ;; push_short(%s)\n", name.c_str());
+  fprintf(out, "  ld hl, (%s)\n", name.c_str());
   fprintf(out, "  push hl\n");
   stack++;
 
@@ -768,16 +768,16 @@ int n;
   return 0;
 }
 
-int Z80::put_static(const char *name, int index)
+int Z80::put_static(std::string &name, int index)
 {
   fprintf(out, "  pop hl\n");
-  fprintf(out, "  ld (%s), hl\n", name);
+  fprintf(out, "  ld (%s), hl\n", name.c_str());
   return 0;
 }
 
-int Z80::get_static(const char *name, int index)
+int Z80::get_static(std::string &name, int index)
 {
-  fprintf(out, "  ld hl, (%s)\n", name);
+  fprintf(out, "  ld hl, (%s)\n", name.c_str());
   fprintf(out, "  push hl\n");
   return 0;
 }
@@ -820,22 +820,28 @@ int Z80::new_array(uint8_t type)
   return 0;
 }
 
-int Z80::insert_array(const char *name, int32_t *data, int len, uint8_t type)
+int Z80::insert_array(std::string &name, int32_t *data, int len, uint8_t type)
 {
   fprintf(out, ".align 16\n");
   if (type == TYPE_BYTE)
-  { return insert_db(name, data, len, TYPE_INT); }
+  {
+    return insert_db(name, data, len, TYPE_INT);
+  }
     else
   if (type == TYPE_SHORT)
-  { return insert_dw(name, data, len, TYPE_INT); }
+  {
+    return insert_dw(name, data, len, TYPE_INT);
+  }
     else
   if (type == TYPE_INT)
-  { return insert_dc32(name, data, len, TYPE_INT); }
+  {
+    return insert_dc32(name, data, len, TYPE_INT);
+  }
 
   return -1;
 }
 
-int Z80::insert_string(const char *name, uint8_t *bytes, int len)
+int Z80::insert_string(std::string &name, uint8_t *bytes, int len)
 {
   fprintf(out, ".align 16\n");
   fprintf(out, "  dc16 %d\n", len);
@@ -855,9 +861,9 @@ int Z80::push_array_length()
   return 0;
 }
 
-int Z80::push_array_length(const char *name, int field_id)
+int Z80::push_array_length(std::string &name, int field_id)
 {
-  fprintf(out, "  ld hl, (%s-2)\n", name);
+  fprintf(out, "  ld hl, (%s-2)\n", name.c_str());
   fprintf(out, "  push hl\n");
   return 0;
 }
@@ -901,11 +907,11 @@ int Z80::array_read_int()
   return array_read_short();
 }
 
-int Z80::array_read_byte(const char *name, int field_id)
+int Z80::array_read_byte(std::string &name, int field_id)
 {
   fprintf(out, "  ;; array_read_byte(name,field_id);\n");
   fprintf(out, "  pop bc\n");
-  fprintf(out, "  ld hl, (%s)\n", name);
+  fprintf(out, "  ld hl, (%s)\n", name.c_str());
   fprintf(out, "  and a\n");
   fprintf(out, "  adc hl, bc\n");
   fprintf(out, "  ld c, (hl)\n");
@@ -919,13 +925,13 @@ int Z80::array_read_byte(const char *name, int field_id)
   return 0;
 }
 
-int Z80::array_read_short(const char *name, int field_id)
+int Z80::array_read_short(std::string &name, int field_id)
 {
   fprintf(out, "  ;; array_read_short()\n");
   fprintf(out, "  pop bc\n");
   fprintf(out, "  sla c\n");
   fprintf(out, "  rlc b\n");
-  fprintf(out, "  ld hl, (%s)\n", name);
+  fprintf(out, "  ld hl, (%s)\n", name.c_str());
   fprintf(out, "  and a\n");
   fprintf(out, "  adc hl, bc\n");
   fprintf(out, "  ld c, (hl)\n");
@@ -935,7 +941,7 @@ int Z80::array_read_short(const char *name, int field_id)
   return 0;
 }
 
-int Z80::array_read_int(const char *name, int field_id)
+int Z80::array_read_int(std::string &name, int field_id)
 {
   return array_read_short(name, field_id);
 }
@@ -973,24 +979,24 @@ int Z80::array_write_int()
   return array_write_short();
 }
 
-int Z80::array_write_byte(const char *name, int field_id)
+int Z80::array_write_byte(std::string &name, int field_id)
 {
   fprintf(out, "  ;; array_write_byte(name,field_id)\n");
   fprintf(out, "  pop de\n");
   fprintf(out, "  pop bc\n");
-  fprintf(out, "  ld hl, (%s)\n", name);
+  fprintf(out, "  ld hl, (%s)\n", name.c_str());
   fprintf(out, "  and a\n");
   fprintf(out, "  adc hl, bc\n");
   fprintf(out, "  ld (hl), e\n");
   return 0;
 }
 
-int Z80::array_write_short(const char *name, int field_id)
+int Z80::array_write_short(std::string &name, int field_id)
 {
   fprintf(out, "  ;; array_write_byte(name,field_id)\n");
   fprintf(out, "  pop de\n");
   fprintf(out, "  pop bc\n");
-  fprintf(out, "  ld hl, (%s)\n", name);
+  fprintf(out, "  ld hl, (%s)\n", name.c_str());
   fprintf(out, "  and a\n");
   fprintf(out, "  adc hl, bc\n");
   fprintf(out, "  ld (hl), e\n");
@@ -999,7 +1005,7 @@ int Z80::array_write_short(const char *name, int field_id)
   return 0;
 }
 
-int Z80::array_write_int(const char *name, int field_id)
+int Z80::array_write_int(std::string &name, int field_id)
 {
   return array_write_short(name, field_id);
 }

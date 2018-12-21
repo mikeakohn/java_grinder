@@ -44,7 +44,7 @@ static int string_charAt_I(JavaClass *java_class, Generator *generator)
   return 0;
 }
 
-int java_lang_string(JavaClass *java_class, Generator *generator, char *function, char *field_name, int field_id)
+int java_lang_string(JavaClass *java_class, Generator *generator, const char *function, const char *field_name, int field_id)
 {
   CHECK_FUNC(length)
   CHECK_FUNC(charAt_I)
@@ -52,7 +52,7 @@ int java_lang_string(JavaClass *java_class, Generator *generator, char *function
   return -1;
 }
 
-int java_lang_string(JavaClass *java_class, Generator *generator, char *method_name)
+int java_lang_string(JavaClass *java_class, Generator *generator, const char *method_name)
 {
   CHECK_FUNC_PUSHED(length,,push_array_length)
   CHECK_FUNC_PUSHED(charAt,_I,array_read_byte)

@@ -127,25 +127,25 @@ int DSPIC::init_heap(int field_count)
   return 0;
 }
 
-int DSPIC::field_init_int(char *name, int index, int value)
+int DSPIC::field_init_int(std::string &name, int index, int value)
 {
   if (value < -32768 || value > 65535) { return -1; }
   if (value == 0)
   {
-    fprintf(out, "  clr %s\n", name);
+    fprintf(out, "  clr %s\n", name.c_str());
   }
     else
   {
     fprintf(out, "  mov #%d, w0\n", value);
-    fprintf(out, "  mov w0, %s\n", name);
+    fprintf(out, "  mov w0, %s\n", name.c_str());
   }
   return 0;
 }
 
-int DSPIC::field_init_ref(char *name, int index)
+int DSPIC::field_init_ref(std::string &name, int index)
 {
-  fprintf(out, "  mov #_%s, w0\n", name);
-  fprintf(out, "  mov w0, %s\n", name);
+  fprintf(out, "  mov #_%s, w0\n", name.c_str());
+  fprintf(out, "  mov w0, %s\n", name.c_str());
   return 0;
 }
 
@@ -204,7 +204,7 @@ int DSPIC::push_local_var_ref(int index)
   return push_local_var_int(index);
 }
 
-int DSPIC::push_ref_static(const char *name, int index)
+int DSPIC::push_ref_static(std::string &name, int index)
 {
   return -1;
 }
@@ -258,17 +258,17 @@ int DSPIC::push_double(double f)
 }
 #endif
 
-int DSPIC::push_ref(char *name)
+int DSPIC::push_ref(std::string &name)
 {
   if (reg < reg_max)
   {
-    fprintf(out, "  mov #%s, w0\n", name);
+    fprintf(out, "  mov #%s, w0\n", name.c_str());
     fprintf(out, "  mov [w0], w%d\n", REG_STACK(reg));
     reg++;
   }
     else
   {
-    fprintf(out, "  mov #%s, w0\n", name);
+    fprintf(out, "  mov #%s, w0\n", name.c_str());
     fprintf(out, "  push [w0]\n");
     stack++;
   }
@@ -708,12 +708,12 @@ int n;
   return 0;
 }
 
-int DSPIC::put_static(const char *name, int index)
+int DSPIC::put_static(std::string &name, int index)
 {
   return -1;
 }
 
-int DSPIC::get_static(const char *name, int index)
+int DSPIC::get_static(std::string &name, int index)
 {
   return -1;
 }
@@ -728,7 +728,7 @@ int DSPIC::new_array(uint8_t type)
   return -1;
 }
 
-int DSPIC::insert_array(const char *name, int32_t *data, int len, uint8_t type)
+int DSPIC::insert_array(std::string &name, int32_t *data, int len, uint8_t type)
 {
   fprintf(out, ".align 16\n");
 
@@ -746,7 +746,7 @@ int DSPIC::insert_array(const char *name, int32_t *data, int len, uint8_t type)
   return -1;
 }
 
-int DSPIC::insert_string(const char *name, uint8_t *bytes, int len)
+int DSPIC::insert_string(std::string &name, uint8_t *bytes, int len)
 {
   fprintf(out, ".align 16\n");
   fprintf(out, "  dw %d\n", len);
@@ -770,9 +770,9 @@ int DSPIC::push_array_length()
   return 0;
 }
 
-int DSPIC::push_array_length(const char *name, int field_id)
+int DSPIC::push_array_length(std::string &name, int field_id)
 {
-  fprintf(out, "  mov %s, w13\n", name);
+  fprintf(out, "  mov %s, w13\n", name.c_str());
 
   if (reg < reg_max)
   {
@@ -837,9 +837,9 @@ int DSPIC::array_read_int()
   return array_read_short();
 }
 
-int DSPIC::array_read_byte(const char *name, int field_id)
+int DSPIC::array_read_byte(std::string &name, int field_id)
 {
-  fprintf(out, "  mov %s, w6\n", name);
+  fprintf(out, "  mov %s, w6\n", name.c_str());
 
   if (stack > 0)
   {
@@ -859,9 +859,9 @@ int DSPIC::array_read_byte(const char *name, int field_id)
   return 0;
 }
 
-int DSPIC::array_read_short(const char *name, int field_id)
+int DSPIC::array_read_short(std::string &name, int field_id)
 {
-  fprintf(out, "  mov %s, w6\n", name);
+  fprintf(out, "  mov %s, w6\n", name.c_str());
 
   if (stack > 0)
   {
@@ -880,7 +880,7 @@ int DSPIC::array_read_short(const char *name, int field_id)
   return 0;
 }
 
-int DSPIC::array_read_int(const char *name, int field_id)
+int DSPIC::array_read_int(std::string &name, int field_id)
 {
   return array_read_short(name, field_id);
 }
@@ -918,7 +918,7 @@ int DSPIC::array_write_int()
   return array_write_short();
 }
 
-int DSPIC::array_write_byte(const char *name, int field_id)
+int DSPIC::array_write_byte(std::string &name, int field_id)
 {
 int value_reg;
 int index_reg;
@@ -926,13 +926,13 @@ int index_reg;
   get_values_from_stack(&value_reg, &index_reg);
 
   fprintf(out, "  sl w%d\n", index_reg);
-  fprintf(out, "  add %s, w%d\n", name, index_reg);
+  fprintf(out, "  add %s, w%d\n", name.c_str(), index_reg);
   fprintf(out, "  mov.b w%d, [w%d]\n", value_reg, index_reg);
 
   return 0;
 }
 
-int DSPIC::array_write_short(const char *name, int field_id)
+int DSPIC::array_write_short(std::string &name, int field_id)
 {
 int value_reg;
 int index_reg;
@@ -940,17 +940,16 @@ int index_reg;
   get_values_from_stack(&value_reg, &index_reg);
 
   fprintf(out, "  sl w%d\n", index_reg);
-  fprintf(out, "  add %s, w%d\n", name, index_reg);
+  fprintf(out, "  add %s, w%d\n", name.c_str(), index_reg);
   fprintf(out, "  mov w%d, [w%d]\n", value_reg, index_reg);
 
   return 0;
 }
 
-int DSPIC::array_write_int(const char *name, int field_id)
+int DSPIC::array_write_int(std::string &name, int field_id)
 {
   return array_write_short(name, field_id);
 }
-
 
 #if 0
 void DSPIC::close()

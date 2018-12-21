@@ -150,20 +150,20 @@ int M6502_8::insert_field_init_short(char *name, int index, int value)
 }
 #endif
 
-int M6502_8::field_init_int(char *name, int index, int value)
+int M6502_8::field_init_int(std::string &name, int index, int value)
 {
   if (value < -32768 || value > 65535) { return -1; }
 
   fprintf(out, "; field_init_short\n");
-  fprintf(out, "%s equ _%s\n", name, name);
+  fprintf(out, "%s equ _%s\n", name.c_str(), name.c_str());
 
   return 0;
 }
 
-int M6502_8::field_init_ref(char *name, int index)
+int M6502_8::field_init_ref(std::string &name, int index)
 {
   fprintf(out, "; field_init_ref\n");
-  fprintf(out, "%s equ _%s\n", name, name);
+  fprintf(out, "%s equ _%s\n", name.c_str(), name.c_str());
 
   return 0;
 }
@@ -215,7 +215,7 @@ int M6502_8::push_local_var_ref(int index)
   return push_local_var_int(index);
 }
 
-int M6502_8::push_ref_static(const char *name, int index)
+int M6502_8::push_ref_static(std::string &name, int index)
 {
   printf("push_ref_static not supported.\n");
   return -1;
@@ -294,16 +294,16 @@ int M6502_8::push_short(int16_t s)
 }
 #endif
 
-int M6502_8::push_ref(char *name)
+int M6502_8::push_ref(std::string &name)
 {
   fprintf(out, "; push_ref\n");
-  fprintf(out, "  lda #(%s & 0xff)\n", name);
+  fprintf(out, "  lda #(%s & 0xff)\n", name.c_str());
   PUSH_LO();
-  fprintf(out, "  lda #(%s >> 8)\n", name);
+  fprintf(out, "  lda #(%s >> 8)\n", name.c_str());
   PUSH_HI();
-//  fprintf(out, "  lda %s + 0\n", name);
+//  fprintf(out, "  lda %s + 0\n", name.c_str());
 //  PUSH_LO();
-//  fprintf(out, "  lda %s + 1\n", name);
+//  fprintf(out, "  lda %s + 1\n", name.c_str());
 //  PUSH_HI();
   stack++;
 
@@ -790,28 +790,28 @@ int M6502_8::invoke_static_method(const char *name, int params, int is_void)
   return 0;
 }
 
-int M6502_8::put_static(const char *name, int index)
+int M6502_8::put_static(std::string &name, int index)
 {
   if (stack > 0)
   {
     POP_HI();
-    fprintf(out, "  sta %s + 1\n", name);
+    fprintf(out, "  sta %s + 1\n", name.c_str());
     POP_LO();
-    fprintf(out, "  sta %s + 0\n", name);
+    fprintf(out, "  sta %s + 0\n", name.c_str());
     stack--;
   }
 
   return 0;
 }
 
-int M6502_8::get_static(const char *name, int index)
+int M6502_8::get_static(std::string &name, int index)
 {
   if (stack > 0)
   {
     POP_HI();
-    fprintf(out, "  sta %s + 1\n", name);
+    fprintf(out, "  sta %s + 1\n", name.c_str());
     POP_LO();
-    fprintf(out, "  sta %s + 0\n", name);
+    fprintf(out, "  sta %s + 0\n", name.c_str());
     stack--;
   }
 
@@ -830,7 +830,7 @@ int M6502_8::new_array(uint8_t type)
   return -1;
 }
 
-int M6502_8::insert_array(const char *name, int32_t *data, int len, uint8_t type)
+int M6502_8::insert_array(std::string &name, int32_t *data, int len, uint8_t type)
 {
   fprintf(out, "; insert_array\n");
 
@@ -855,7 +855,7 @@ int M6502_8::insert_array(const char *name, int32_t *data, int len, uint8_t type
   return -1;
 }
 
-int M6502_8::insert_string(const char *name, uint8_t *bytes, int len)
+int M6502_8::insert_string(std::string &name, uint8_t *bytes, int len)
 {
   printf("insert_string not supported.\n");
   return -1;
@@ -869,7 +869,7 @@ int M6502_8::push_array_length()
   return 0;
 }
 
-int M6502_8::push_array_length(const char *name, int field_id)
+int M6502_8::push_array_length(std::string &name, int field_id)
 {
   return -1;
 }
@@ -894,17 +894,17 @@ int M6502_8::array_read_int()
   return array_read_byte();
 }
 
-int M6502_8::array_read_byte(const char *name, int field_id)
+int M6502_8::array_read_byte(std::string &name, int field_id)
 {
   return -1;
 }
 
-int M6502_8::array_read_short(const char *name, int field_id)
+int M6502_8::array_read_short(std::string &name, int field_id)
 {
   return -1;
 }
 
-int M6502_8::array_read_int(const char *name, int field_id)
+int M6502_8::array_read_int(std::string &name, int field_id)
 {
   return -1;
 }
@@ -924,17 +924,17 @@ int M6502_8::array_write_int()
   return -1;
 }
 
-int M6502_8::array_write_byte(const char *name, int field_id)
+int M6502_8::array_write_byte(std::string &name, int field_id)
 {
   return -1;
 }
 
-int M6502_8::array_write_short(const char *name, int field_id)
+int M6502_8::array_write_short(std::string &name, int field_id)
 {
   return -1;
 }
 
-int M6502_8::array_write_int(const char *name, int field_id)
+int M6502_8::array_write_int(std::string &name, int field_id)
 {
   return -1;
 }

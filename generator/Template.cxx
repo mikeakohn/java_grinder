@@ -68,12 +68,12 @@ int Template::init_heap(int field_count)
   return -1;
 }
 
-int Template::field_init_int(char *name, int index, int value)
+int Template::field_init_int(std::string &name, int index, int value)
 {
   return -1;
 }
 
-int Template::field_init_ref(char *name, int index)
+int Template::field_init_ref(std::string &name, int index)
 {
   return -1;
 }
@@ -96,7 +96,7 @@ int Template::push_local_var_ref(int index)
   return push_local_var_int(index);
 }
 
-int Template::push_ref_static(const char *name, int index)
+int Template::push_ref_static(std::string &name, int index)
 {
   return -1;
 }
@@ -128,7 +128,7 @@ int Template::push_double(double f)
 }
 #endif
 
-int Template::push_ref(char *name)
+int Template::push_ref(std::string &name)
 {
   // Need to move the address of name to the top of stack
   return -1;
@@ -324,12 +324,12 @@ int Template::invoke_static_method(const char *name, int params, int is_void)
   return -1;
 }
 
-int Template::put_static(const char *name, int index)
+int Template::put_static(std::string &name, int index)
 {
   return -1;
 }
 
-int Template::get_static(const char *name, int index)
+int Template::get_static(std::string &name, int index)
 {
   return -1;
 }
@@ -344,21 +344,27 @@ int Template::new_array(uint8_t type)
   return -1;
 }
 
-int Template::insert_array(const char *name, int32_t *data, int len, uint8_t type)
+int Template::insert_array(std::string &name, int32_t *data, int len, uint8_t type)
 {
   if (type == TYPE_BYTE)
-  { return insert_db(name, data, len, TYPE_INT); }
+  {
+    return insert_db(name, data, len, TYPE_INT);
+  }
     else
   if (type == TYPE_SHORT)
-  { return insert_dw(name, data, len, TYPE_INT); }
+  {
+    return insert_dw(name, data, len, TYPE_INT);
+  }
     else
   if (type == TYPE_INT)
-  { return insert_dc32(name, data, len, TYPE_INT); }
+  {
+    return insert_dc32(name, data, len, TYPE_INT);
+  }
 
   return -1;
 }
 
-int Template::insert_string(const char *name, uint8_t *bytes, int len)
+int Template::insert_string(std::string &name, uint8_t *bytes, int len)
 {
   return -1;
 }
@@ -368,7 +374,7 @@ int Template::push_array_length()
   return -1;
 }
 
-int Template::push_array_length(const char *name, int field_id)
+int Template::push_array_length(std::string &name, int field_id)
 {
   return -1;
 }
@@ -388,17 +394,17 @@ int Template::array_read_int()
   return -1;
 }
 
-int Template::array_read_byte(const char *name, int field_id)
+int Template::array_read_byte(std::string &name, int field_id)
 {
   return -1;
 }
 
-int Template::array_read_short(const char *name, int field_id)
+int Template::array_read_short(std::string &name, int field_id)
 {
   return -1;
 }
 
-int Template::array_read_int(const char *name, int field_id)
+int Template::array_read_int(std::string &name, int field_id)
 {
   return -1;
 }
@@ -418,17 +424,17 @@ int Template::array_write_int()
   return -1;
 }
 
-int Template::array_write_byte(const char *name, int field_id)
+int Template::array_write_byte(std::string &name, int field_id)
 {
   return -1;
 }
 
-int Template::array_write_short(const char *name, int field_id)
+int Template::array_write_short(std::string &name, int field_id)
 {
   return -1;
 }
 
-int Template::array_write_int(const char *name, int field_id)
+int Template::array_write_int(std::string &name, int field_id)
 {
   return -1;
 }

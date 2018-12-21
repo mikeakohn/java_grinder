@@ -73,23 +73,23 @@ public:
   //virtual int field_init_boolean(char *name, int index, int value) = 0;
   //virtual int field_init_byte(char *name, int index, int value) = 0;
   //virtual int field_init_short(char *name, int index, int value) = 0;
-  virtual int field_init_int(char *name, int index, int value) = 0;
-  virtual int field_init_ref(char *name, int index) = 0;
+  virtual int field_init_int(std::string &name, int index, int value) = 0;
+  virtual int field_init_ref(std::string &name, int index) = 0;
   virtual void method_start(int local_count, int max_stack, int param_count, const char *name) = 0;
   virtual void method_end(int local_count) = 0;
   virtual int push_local_var_int(int index) = 0;
   virtual int push_local_var_ref(int index) = 0;
   virtual int push_local_var_float(int index);
-  virtual int push_ref_static(const char *name, int index) = 0;
+  virtual int push_ref_static(std::string &name, int index) = 0;
   virtual int push_fake() { return -1; } // move stack ptr without push
   virtual int set_integer_local(int index, int value) { return -1; }
   virtual int set_float_local(int index, float value);
-  virtual int set_ref_local(int index, char *name) { return -1; }
+  virtual int set_ref_local(int index, const char *name) { return -1; }
   virtual int push_int(int32_t n) = 0;
   virtual int push_long(int64_t n);
   virtual int push_float(float f);
   virtual int push_double(double f);
-  virtual int push_ref(char *name) = 0;
+  virtual int push_ref(std::string &name) = 0;
   virtual int pop_local_var_int(int index) = 0;
   virtual int pop_local_var_ref(int index) = 0;
   virtual int pop_local_var_float(int index) { return -1; }
@@ -140,36 +140,36 @@ public:
   virtual int jump(const char *name, int distance) = 0;
   virtual int call(const char *name) = 0;
   virtual int invoke_static_method(const char *name, int params, int is_void) = 0;
-  virtual int put_static(const char *name, int index) = 0;
-  virtual int get_static(const char *name, int index) = 0;
+  virtual int put_static(std::string &name, int index) = 0;
+  virtual int get_static(std::string &name, int index) = 0;
   virtual int brk() = 0;
   virtual int new_object(const char *object_name, int field_count);
   virtual int new_array(uint8_t type) = 0;
   virtual int new_object_array(const char *class_name);
-  virtual int insert_array(const char *name, int32_t *data, int len, uint8_t type) = 0;
-  virtual int insert_string(const char *name, uint8_t *bytes, int len) = 0;
+  virtual int insert_array(std::string &name, int32_t *data, int len, uint8_t type) = 0;
+  virtual int insert_string(std::string &name, uint8_t *bytes, int len) = 0;
   virtual int push_array_length() = 0;
-  virtual int push_array_length(const char *name, int field_id) = 0;
+  virtual int push_array_length(std::string &name, int field_id) = 0;
   virtual int array_read_byte() = 0;
   virtual int array_read_short() = 0;
   virtual int array_read_int() = 0;
   virtual int array_read_float();
   virtual int array_read_object();
-  virtual int array_read_byte(const char *name, int field_id) = 0;
-  virtual int array_read_short(const char *name, int field_id) = 0;
-  virtual int array_read_int(const char *name, int field_id) = 0;
-  virtual int array_read_float(const char *name, int field_id);
-  virtual int array_read_object(const char *name, int field_id);
+  virtual int array_read_byte(std::string &name, int field_id) = 0;
+  virtual int array_read_short(std::string &name, int field_id) = 0;
+  virtual int array_read_int(std::string &name, int field_id) = 0;
+  virtual int array_read_float(std::string &name, int field_id);
+  virtual int array_read_object(std::string &name, int field_id);
   virtual int array_write_byte() = 0;
   virtual int array_write_short() = 0;
   virtual int array_write_int() = 0;
   virtual int array_write_float();
   virtual int array_write_object();
-  virtual int array_write_byte(const char *name, int field_id) = 0;
-  virtual int array_write_short(const char *name, int field_id) = 0;
-  virtual int array_write_int(const char *name, int field_id) = 0;
-  virtual int array_write_float(const char *name, int field_id);
-  virtual int array_write_object(const char *name, int field_id);
+  virtual int array_write_byte(std::string &name, int field_id) = 0;
+  virtual int array_write_short(std::string &name, int field_id) = 0;
+  virtual int array_write_int(std::string &name, int field_id) = 0;
+  virtual int array_write_float(std::string &name, int field_id);
+  virtual int array_write_object(std::string &name, int field_id);
   //virtual void close() = 0;
 
   // CPU
@@ -190,13 +190,13 @@ protected:
   };
 
   virtual int get_int_size() { return 4; }
-  int insert_db(const char *name, int32_t *data, int len, uint8_t len_type);
-  int insert_dw(const char *name, int32_t *data, int len, uint8_t len_type);
-  int insert_dc32(const char *name, int32_t *data, int len, uint8_t len_type, const char *dc32 = "dc32");
-  int insert_float(const char *name, int32_t *data, int len, uint8_t len_type, const char *dc32 = "dc32");
+  int insert_db(std::string &name, int32_t *data, int len, uint8_t len_type);
+  int insert_dw(std::string &name, int32_t *data, int len, uint8_t len_type);
+  int insert_dc32(std::string &name, int32_t *data, int len, uint8_t len_type, const char *dc32 = "dc32");
+  int insert_float(std::string &name, int32_t *data, int len, uint8_t len_type, const char *dc32 = "dc32");
   int get_constant(uint32_t constant);
   void insert_constants_pool();
-  int insert_utf8(const char *name, uint8_t *bytes, int len);
+  int insert_utf8(std::string &name, uint8_t *bytes, int len);
 
   FILE *out;
   int label_count;

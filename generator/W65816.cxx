@@ -170,22 +170,22 @@ int W65816::init_heap(int field_count)
   return 0;
 }
 
-int W65816::field_init_int(char *name, int index, int value)
+int W65816::field_init_int(std::string &name, int index, int value)
 {
   if (value < -32768 || value > 65535) { return -1; }
 
   fprintf(out, "; field_init_short\n");
   fprintf(out, "  lda #%d\n", (uint16_t)value);
-  fprintf(out, "  sta %s\n", name);
+  fprintf(out, "  sta %s\n", name.c_str());
 
   return 0;
 }
 
-int W65816::field_init_ref(char *name, int index)
+int W65816::field_init_ref(std::string &name, int index)
 {
   fprintf(out, "; field_init_ref\n");
-  fprintf(out, "  lda #_%s\n", name);
-  fprintf(out, "  sta %s\n", name);
+  fprintf(out, "  lda #_%s\n", name.c_str());
+  fprintf(out, "  sta %s\n", name.c_str());
 
   return 0;
 }
@@ -233,10 +233,10 @@ int W65816::push_local_var_ref(int index)
   return push_local_var_int(index);
 }
 
-int W65816::push_ref_static(const char *name, int index)
+int W65816::push_ref_static(std::string &name, int index)
 {
   fprintf(out, "; push_ref_static\n");
-  fprintf(out, "  lda #_%s\n", name);
+  fprintf(out, "  lda #_%s\n", name.c_str());
   PUSH();
   stack++;
 
@@ -288,10 +288,10 @@ int W65816::push_double(double f)
 }
 #endif
 
-int W65816::push_ref(char *name)
+int W65816::push_ref(std::string &name)
 {
   fprintf(out, "; push_ref\n");
-  fprintf(out, "  lda %s\n", name);
+  fprintf(out, "  lda %s\n", name.c_str());
   PUSH();
   stack++;
 
@@ -879,18 +879,18 @@ int stack_vars = stack;
   return 0;
 }
 
-int W65816::put_static(const char *name, int index)
+int W65816::put_static(std::string &name, int index)
 {
-  fprintf(out, "  lda %s\n", name);
+  fprintf(out, "  lda %s\n", name.c_str());
   PUSH();
   stack++;
 
   return 0;
 }
 
-int W65816::get_static(const char *name, int index)
+int W65816::get_static(std::string &name, int index)
 {
-  fprintf(out, "  lda %s\n", name);
+  fprintf(out, "  lda %s\n", name.c_str());
   PUSH();
   stack++;
 
@@ -921,7 +921,7 @@ int W65816::new_array(uint8_t type)
   return 0;
 }
 
-int W65816::insert_array(const char *name, int32_t *data, int len, uint8_t type)
+int W65816::insert_array(std::string &name, int32_t *data, int len, uint8_t type)
 {
   if (type == TYPE_BYTE)
   {
@@ -941,7 +941,7 @@ int W65816::insert_array(const char *name, int32_t *data, int len, uint8_t type)
   return 0;
 }
 
-int W65816::insert_string(const char *name, uint8_t *bytes, int len)
+int W65816::insert_string(std::string &name, uint8_t *bytes, int len)
 {
   fprintf(out, "dw %d\n", len);
   return insert_utf8(name, bytes, len);
@@ -958,10 +958,10 @@ int W65816::push_array_length()
   return 0;
 }
 
-int W65816::push_array_length(const char *name, int field_id)
+int W65816::push_array_length(std::string &name, int field_id)
 {
   need_push_array_length2 = 1;
-  fprintf(out, "  lda %s\n", name);
+  fprintf(out, "  lda %s\n", name.c_str());
   fprintf(out, "  jsr push_array_length2\n");
   stack++;
 
@@ -993,12 +993,12 @@ int W65816::array_read_int()
   return 0;
 }
 
-int W65816::array_read_byte(const char *name, int field_id)
+int W65816::array_read_byte(std::string &name, int field_id)
 {
   if(stack > 0)
   {
     need_array_byte_support = 1;
-    fprintf(out, "  lda %s\n", name);
+    fprintf(out, "  lda %s\n", name.c_str());
     fprintf(out, "  sta address\n");
     fprintf(out, "  jsr array_read_byte2\n");
   }
@@ -1006,17 +1006,17 @@ int W65816::array_read_byte(const char *name, int field_id)
   return 0;
 }
 
-int W65816::array_read_short(const char *name, int field_id)
+int W65816::array_read_short(std::string &name, int field_id)
 {
   return array_read_int(name, field_id);
 }
 
-int W65816::array_read_int(const char *name, int field_id)
+int W65816::array_read_int(std::string &name, int field_id)
 {
   if(stack > 0)
   {
     need_array_int_support = 1;
-    fprintf(out, "  lda %s\n", name);
+    fprintf(out, "  lda %s\n", name.c_str());
     fprintf(out, "  sta address\n");
     fprintf(out, "  jsr array_read_int2\n");
   }
@@ -1047,14 +1047,14 @@ int W65816::array_write_int()
   return 0;
 }
 
-int W65816::array_write_byte(const char *name, int field_id)
+int W65816::array_write_byte(std::string &name, int field_id)
 {
   need_array_byte_support = 1;
   get_values_from_stack(2);
   fprintf(out, "; array_write_byte2\n");
   fprintf(out, "  clc\n");
   fprintf(out, "  lda value2\n");
-  fprintf(out, "  adc %s\n", name);
+  fprintf(out, "  adc %s\n", name.c_str());
   fprintf(out, "  sta address\n");
   fprintf(out, "  lda value1\n");
   fprintf(out, "  sep #0x20\n");
@@ -1064,19 +1064,19 @@ int W65816::array_write_byte(const char *name, int field_id)
   return 0;
 }
 
-int W65816::array_write_short(const char *name, int field_id)
+int W65816::array_write_short(std::string &name, int field_id)
 {
   return array_write_int(name, field_id);
 }
 
-int W65816::array_write_int(const char *name, int field_id)
+int W65816::array_write_int(std::string &name, int field_id)
 {
   need_array_int_support = 1;
   get_values_from_stack(2);
   fprintf(out, "; array_write_int2\n");
   fprintf(out, "  clc\n");
   fprintf(out, "  lda value2\n");
-  fprintf(out, "  adc %s\n", name);
+  fprintf(out, "  adc %s\n", name.c_str());
   fprintf(out, "  sta address\n");
   fprintf(out, "  lda value1\n");
   fprintf(out, "  sta (address)\n");

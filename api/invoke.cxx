@@ -68,36 +68,38 @@
       ret = b(java_class, generator, function, const_vals[0], const_vals[1]); \
     }
 
-void get_signature(char *signature, int *params, int *is_void)
+void get_signature(std::string &signature, int *params, int *is_void)
 {
+  const char *s = signature.c_str();
+
   *params = 0;
   *is_void = 0;
 
-  while(*signature != 0)
+  while(*s != 0)
   {
-    if (*signature == '(')
+    if (*s == '(')
     {
     }
       else
-    if (*signature == ')')
+    if (*s == ')')
     {
-      *is_void = (signature[1] == 'V') ? 1 : 0;
+      *is_void = (s[1] == 'V') ? 1 : 0;
       break;
     }
       else
-    if (*signature == '[')
+    if (*s == '[')
     {
       // The next char (or set of chars) should be the array type...
       // don't think anything else really needs to be done here.
     }
       else
-    if (*signature == 'L')
+    if (*s == 'L')
     {
-      while(*signature != ';' && *signature != 0)
+      while(*s != ';' && *s != 0)
       {
-        signature++; 
+        s++; 
       }
-      if (*signature == 0) { signature--; }
+      if (*s == 0) { s--; }
 
       (*params)++;
     }
@@ -106,16 +108,20 @@ void get_signature(char *signature, int *params, int *is_void)
       (*params)++;
     }
 
-    signature++;
+    s++;
   }
 }
 
-void get_static_function(char *function, char *method_name, char *method_sig)
+void get_static_function(
+  char *function,
+  std::string &method_name,
+  std::string &method_sig)
 {
-char *s;
-int ptr = 0;
+  const char *s;
+  int ptr = 0;
 
-  s = method_name;
+  s = method_name.c_str();
+
   while (*s != 0)
   {
     function[ptr++] = *s;
@@ -123,7 +129,9 @@ int ptr = 0;
   }
 
   function[ptr++] = '_';
-  s = method_sig + 1;
+
+  s = method_sig.c_str() + 1;
+
   while(*s != 0)
   {
     if (*s == ')') { break; }
@@ -148,6 +156,7 @@ int ptr = 0;
   }
 
   if (ptr > 1 && function[ptr-1] == '_') { function[ptr-1] = 0; }
+
   function[ptr] = 0;
 }
 

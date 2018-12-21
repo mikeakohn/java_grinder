@@ -128,7 +128,7 @@ int R5900::init_heap(int field_count)
   return 0;
 }
 
-int R5900::field_init_int(char *name, int index, int value)
+int R5900::field_init_int(std::string &name, int index, int value)
 {
   uint32_t n = (uint32_t)value;
 
@@ -149,17 +149,17 @@ int R5900::field_init_int(char *name, int index, int value)
     fprintf(out, "  li $t8, 0x%04x\n", n);
   }
 
-  fprintf(out, "  sw $t8, 0x%04x($t9) ; static %s\n", index * 4, name);
+  fprintf(out, "  sw $t8, 0x%04x($t9) ; static %s\n", index * 4, name.c_str());
 
   return 0;
 }
 
-int R5900::field_init_ref(char *name, int index)
+int R5900::field_init_ref(std::string &name, int index)
 {
   fprintf(out, "  ; static init\n");
-  fprintf(out, "  li $t8, _%s\n", name);
-  //fprintf(out, "  li $t8, _%s + voffset\n", name);
-  fprintf(out, "  li $t9, %s\n", name);
+  fprintf(out, "  li $t8, _%s\n", name.c_str());
+  //fprintf(out, "  li $t8, _%s + voffset\n", name.c_str());
+  fprintf(out, "  li $t9, %s\n", name.c_str());
   fprintf(out, "  sw $t8, ($t9)\n");
 
   return 0;
@@ -212,7 +212,7 @@ int R5900::push_local_var_float(int index)
   return push_local_var_int(index);
 }
 
-int R5900::push_ref_static(const char *name, int index)
+int R5900::push_ref_static(std::string &name, int index)
 {
   if (reg < reg_max)
   {
@@ -401,10 +401,10 @@ int R5900::push_double(double f)
 }
 #endif
 
-int R5900::push_ref(char *name)
+int R5900::push_ref(std::string &name)
 {
-  fprintf(out, "  ; push_ref(%s)\n", name);
-  fprintf(out, "  li $t8, %s\n", name);
+  fprintf(out, "  ; push_ref(%s)\n", name.c_str());
+  fprintf(out, "  li $t8, %s\n", name.c_str());
 
   if (reg < reg_max)
   {
@@ -1314,9 +1314,9 @@ int R5900::invoke_static_method(const char *name, int params, int is_void)
   return 0;
 }
 
-int R5900::put_static(const char *name, int index)
+int R5900::put_static(std::string &name, int index)
 {
-  fprintf(out, "  ; put_static(%s, %d)\n", name, index);
+  fprintf(out, "  ; put_static(%s, %d)\n", name.c_str(), index);
 
   if (stack > 0)
   {
@@ -1332,9 +1332,9 @@ int R5900::put_static(const char *name, int index)
   return 0;
 }
 
-int R5900::get_static(const char *name, int index)
+int R5900::get_static(std::string &name, int index)
 {
-  fprintf(out, "  ; get_static(%s, %d)\n", name, index);
+  fprintf(out, "  ; get_static(%s, %d)\n", name.c_str(), index);
 
   if (reg < reg_max)
   {
@@ -1457,7 +1457,7 @@ int R5900::new_object_array(const char *class_name)
   return 0;
 }
 
-int R5900::insert_array(const char *name, int32_t *data, int len, uint8_t type)
+int R5900::insert_array(std::string &name, int32_t *data, int len, uint8_t type)
 {
   fprintf(out, ".align 128\n");
   fprintf(out, "  dc32 0, 0, 0\n");
@@ -1485,7 +1485,7 @@ int R5900::insert_array(const char *name, int32_t *data, int len, uint8_t type)
   return -1;
 }
 
-int R5900::insert_string(const char *name, uint8_t *bytes, int len)
+int R5900::insert_string(std::string &name, uint8_t *bytes, int len)
 {
   fprintf(out, ".align 32\n");
   fprintf(out, "  dc32 %d\n", len);
@@ -1509,9 +1509,9 @@ int R5900::push_array_length()
   return 0;
 }
 
-int R5900::push_array_length(const char *name, int field_id)
+int R5900::push_array_length(std::string &name, int field_id)
 {
-  fprintf(out, "  lw $t8, 0x%04x($s1) ; static %s\n", field_id * 4, name);
+  fprintf(out, "  lw $t8, 0x%04x($s1) ; static %s\n", field_id * 4, name.c_str());
 
   if (reg >= reg_max)
   {
@@ -1607,7 +1607,7 @@ int R5900::array_read_object()
   return array_read_int();
 }
 
-int R5900::array_read_byte(const char *name, int field_id)
+int R5900::array_read_byte(std::string &name, int field_id)
 {
   int index_reg;
 
@@ -1630,7 +1630,7 @@ int R5900::array_read_byte(const char *name, int field_id)
   return 0;
 }
 
-int R5900::array_read_short(const char *name, int field_id)
+int R5900::array_read_short(std::string &name, int field_id)
 {
   int index_reg;
 
@@ -1654,7 +1654,7 @@ int R5900::array_read_short(const char *name, int field_id)
   return 0;
 }
 
-int R5900::array_read_int(const char *name, int field_id)
+int R5900::array_read_int(std::string &name, int field_id)
 {
   int index_reg;
 
@@ -1678,12 +1678,12 @@ int R5900::array_read_int(const char *name, int field_id)
   return 0;
 }
 
-int R5900::array_read_float(const char *name, int field_id)
+int R5900::array_read_float(std::string &name, int field_id)
 {
   return array_read_int(name, field_id);
 }
 
-int R5900::array_read_object(const char *name, int field_id)
+int R5900::array_read_object(std::string &name, int field_id)
 {
   return array_read_int(name, field_id);
 }
@@ -1768,7 +1768,7 @@ int R5900::array_write_object()
   return array_write_int();
 }
 
-int R5900::array_write_byte(const char *name, int field_id)
+int R5900::array_write_byte(std::string &name, int field_id)
 {
   int value_reg;
   int index_reg;
@@ -1782,7 +1782,7 @@ int R5900::array_write_byte(const char *name, int field_id)
   return 0;
 }
 
-int R5900::array_write_short(const char *name, int field_id)
+int R5900::array_write_short(std::string &name, int field_id)
 {
   int value_reg;
   int index_reg;
@@ -1797,7 +1797,7 @@ int R5900::array_write_short(const char *name, int field_id)
   return 0;
 }
 
-int R5900::array_write_int(const char *name, int field_id)
+int R5900::array_write_int(std::string &name, int field_id)
 {
   int value_reg;
   int index_reg;
@@ -1812,12 +1812,12 @@ int R5900::array_write_int(const char *name, int field_id)
   return 0;
 }
 
-int R5900::array_write_float(const char *name, int field_id)
+int R5900::array_write_float(std::string &name, int field_id)
 {
   return array_write_int(name, field_id);
 }
 
-int R5900::array_write_object(const char *name, int field_id)
+int R5900::array_write_object(std::string &name, int field_id)
 {
   return array_write_int(name, field_id);
 }

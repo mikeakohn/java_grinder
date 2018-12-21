@@ -94,15 +94,15 @@ int MC68000::init_heap(int field_count)
   return 0;
 }
 
-int MC68000::field_init_int(char *name, int index, int value)
+int MC68000::field_init_int(std::string &name, int index, int value)
 {
-  fprintf(out, "  move.l #%d, (%s)\n", value, name);
+  fprintf(out, "  move.l #%d, (%s)\n", value, name.c_str());
   return 0;
 }
 
-int MC68000::field_init_ref(char *name, int index)
+int MC68000::field_init_ref(std::string &name, int index)
 {
-  fprintf(out, "  move.l #_%s, (%s)\n", name, name);
+  fprintf(out, "  move.l #_%s, (%s)\n", name.c_str(), name.c_str());
   return 0;
 }
 
@@ -150,9 +150,9 @@ int MC68000::push_local_var_ref(int index)
   return push_local_var_int(index);
 }
 
-int MC68000::push_ref_static(const char *name, int index)
+int MC68000::push_ref_static(std::string &name, int index)
 {
-  fprintf(out, "  move.l #_%s, %s\n", name, push_reg());
+  fprintf(out, "  move.l #_%s, %s\n", name.c_str(), push_reg());
   return 0;
 }
 
@@ -203,9 +203,9 @@ int MC68000::push_double(double f)
 }
 #endif
 
-int MC68000::push_ref(char *name)
+int MC68000::push_ref(std::string &name)
 {
-  fprintf(out, "  movea.l #%s, a2\n", name);
+  fprintf(out, "  movea.l #%s, a2\n", name.c_str());
   fprintf(out, "  move.l (a2), %s\n", push_reg());
   return 0;
 }
@@ -702,15 +702,15 @@ int MC68000::invoke_static_method(const char *name, int params, int is_void)
   return 0;
 }
 
-int MC68000::put_static(const char *name, int index)
+int MC68000::put_static(std::string &name, int index)
 {
-  fprintf(out, "  move.l %s, %s\n", pop_reg(), name);
+  fprintf(out, "  move.l %s, %s\n", pop_reg(), name.c_str());
   return 0;
 }
 
-int MC68000::get_static(const char *name, int index)
+int MC68000::get_static(std::string &name, int index)
 {
-  fprintf(out, "  move.l %s, %s\n", name, push_reg());
+  fprintf(out, "  move.l %s, %s\n", name.c_str(), push_reg());
   return 0;
 }
 
@@ -768,22 +768,29 @@ int MC68000::new_array(uint8_t type)
   return 0;
 }
 
-int MC68000::insert_array(const char *name, int32_t *data, int len, uint8_t type)
+int MC68000::insert_array(std::string &name, int32_t *data, int len, uint8_t type)
 {
   fprintf(out, ".align 32\n");
+
   if (type == TYPE_BYTE)
-  { return insert_db(name, data, len, TYPE_INT); }
+  {
+    return insert_db(name, data, len, TYPE_INT);
+  }
     else
   if (type == TYPE_SHORT)
-  { return insert_dw(name, data, len, TYPE_INT); }
+  {
+    return insert_dw(name, data, len, TYPE_INT);
+  }
     else
   if (type == TYPE_INT)
-  { return insert_dc32(name, data, len, TYPE_INT); }
+  {
+    return insert_dc32(name, data, len, TYPE_INT);
+  }
 
   return -1;
 }
 
-int MC68000::insert_string(const char *name, uint8_t *bytes, int len)
+int MC68000::insert_string(std::string &name, uint8_t *bytes, int len)
 {
   fprintf(out, ".align 32\n");
   fprintf(out, "  dc32 %d\n", len);
@@ -809,10 +816,10 @@ int MC68000::push_array_length()
   return 0;
 }
 
-int MC68000::push_array_length(const char *name, int field_id)
+int MC68000::push_array_length(std::string &name, int field_id)
 {
-  fprintf(out, "  ;; push array length (%s)\n", name);
-  fprintf(out, "  movea.l (%s,a4), a2\n", name);
+  fprintf(out, "  ;; push array length (%s)\n", name.c_str());
+  fprintf(out, "  movea.l (%s,a4), a2\n", name.c_str());
 
   if (reg < reg_max)
   {
@@ -909,9 +916,9 @@ int MC68000::array_read_int()
   return 0;
 }
 
-int MC68000::array_read_byte(const char *name, int field_id)
+int MC68000::array_read_byte(std::string &name, int field_id)
 {
-  fprintf(out, "  movea.l (%s,a4), a2\n", name);
+  fprintf(out, "  movea.l (%s,a4), a2\n", name.c_str());
 
   if (stack > 0)
   {
@@ -931,9 +938,9 @@ int MC68000::array_read_byte(const char *name, int field_id)
   return 0;
 }
 
-int MC68000::array_read_short(const char *name, int field_id)
+int MC68000::array_read_short(std::string &name, int field_id)
 {
-  fprintf(out, "  movea.l (%s,a4), a2\n", name);
+  fprintf(out, "  movea.l (%s,a4), a2\n", name.c_str());
 
   if (stack > 0)
   {
@@ -954,12 +961,12 @@ int MC68000::array_read_short(const char *name, int field_id)
   return 0;
 }
 
-int MC68000::array_read_int(const char *name, int field_id)
+int MC68000::array_read_int(std::string &name, int field_id)
 {
   // FIXME - All array code can be heavily optimized.  This is the
   // worst possible way to do this.
   // A better way is with (a2,d7.l)
-  fprintf(out, "  movea.l (%s,a4), a2\n", name);
+  fprintf(out, "  movea.l (%s,a4), a2\n", name.c_str());
 
   if (stack > 0)
   {
@@ -1024,20 +1031,20 @@ int MC68000::array_write_int()
   return 0;
 }
 
-int MC68000::array_write_byte(const char *name, int field_id)
+int MC68000::array_write_byte(std::string &name, int field_id)
 {
   int value_reg;
   int index_reg;
 
   get_values_from_stack(&value_reg, &index_reg);
 
-  fprintf(out, "  move.l (%s,a4), a2\n", name);
+  fprintf(out, "  move.l (%s,a4), a2\n", name.c_str());
   fprintf(out, "  move.b d%d, (0,a2,d%d.b)\n", value_reg, index_reg);
 
   return 0;
 }
 
-int MC68000::array_write_short(const char *name, int field_id)
+int MC68000::array_write_short(std::string &name, int field_id)
 {
   int value_reg;
   int index_reg;
@@ -1045,13 +1052,13 @@ int MC68000::array_write_short(const char *name, int field_id)
   get_values_from_stack(&value_reg, &index_reg);
 
   fprintf(out, "  lsl.l #1, d%d\n", index_reg);
-  fprintf(out, "  move.l (%s,a4), a2\n", name);
+  fprintf(out, "  move.l (%s,a4), a2\n", name.c_str());
   fprintf(out, "  move.w d%d, (0,a2,d%d.w)\n", value_reg, index_reg);
 
   return 0;
 }
 
-int MC68000::array_write_int(const char *name, int field_id)
+int MC68000::array_write_int(std::string &name, int field_id)
 {
   int value_reg;
   int index_reg;
@@ -1059,7 +1066,7 @@ int MC68000::array_write_int(const char *name, int field_id)
   get_values_from_stack(&value_reg, &index_reg);
 
   fprintf(out, "  lsl.l #2, d%d\n", index_reg);
-  fprintf(out, "  move.l (%s,a4), a2\n", name);
+  fprintf(out, "  move.l (%s,a4), a2\n", name.c_str());
   fprintf(out, "  move.l d%d, (0,a2,d%d.l)\n", value_reg, index_reg);
 
   return 0;
