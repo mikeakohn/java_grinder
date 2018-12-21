@@ -181,12 +181,12 @@ int MIPS32::field_init_ref(std::string &name, int index)
   return 0;
 }
 
-void MIPS32::method_start(int local_count, int max_stack, int param_count, const char *name)
+void MIPS32::method_start(int local_count, int max_stack, int param_count, std::string &name)
 {
-  is_main = (strcmp(name, "main") == 0) ? 1 : 0;
+  is_main = (name == "main") ? 1 : 0;
 
-  fprintf(out, "%s:\n", name);
-  fprintf(out, "  ; %s(local_count=%d, max_stack=%d, param_count=%d)\n", name, local_count, max_stack, param_count);
+  fprintf(out, "%s:\n", name.c_str());
+  fprintf(out, "  ; %s(local_count=%d, max_stack=%d, param_count=%d)\n", name.c_str(), local_count, max_stack, param_count);
   fprintf(out, "  addiu $fp, $sp, -4\n");
   fprintf(out, "  addiu $sp, $sp, -%d\n", (local_count * 4) + 4);
 }
@@ -717,34 +717,34 @@ int MIPS32::integer_to_short()
   return 0;
 }
 
-int MIPS32::jump_cond(const char *label, int cond, int distance)
+int MIPS32::jump_cond(std::string &label, int cond, int distance)
 {
-  fprintf(out, "  ; jump_cond(%s, %d, %d)\n", label, cond, distance);
+  fprintf(out, "  ; jump_cond(%s, %d, %d)\n", label.c_str(), cond, distance);
 
   switch(cond)
   {
     case COND_EQUAL:
-      fprintf(out, "  beq $t%d, $0, %s\n", --reg, label);
+      fprintf(out, "  beq $t%d, $0, %s\n", --reg, label.c_str());
       fprintf(out, "  nop\n");
       return 0;
     case COND_NOT_EQUAL:
-      fprintf(out, "  bne $t%d, $0, %s\n", --reg, label);
+      fprintf(out, "  bne $t%d, $0, %s\n", --reg, label.c_str());
       fprintf(out, "  nop\n");
       return 0;
     case COND_LESS:
-      fprintf(out, "  bltz $t%d, %s\n", --reg, label);
+      fprintf(out, "  bltz $t%d, %s\n", --reg, label.c_str());
       fprintf(out, "  nop\n");
       return 0;
     case COND_LESS_EQUAL:
-      fprintf(out, "  blez $t%d, %s\n", --reg, label);
+      fprintf(out, "  blez $t%d, %s\n", --reg, label.c_str());
       fprintf(out, "  nop\n");
       return 0;
     case COND_GREATER:
-      fprintf(out, "  bgtz $t%d, %s\n", --reg, label);
+      fprintf(out, "  bgtz $t%d, %s\n", --reg, label.c_str());
       fprintf(out, "  nop\n");
       return 0;
     case COND_GREATER_EQUAL:
-      fprintf(out, "  bgez $t%d, %s\n", --reg, label);
+      fprintf(out, "  bgez $t%d, %s\n", --reg, label.c_str());
       fprintf(out, "  nop\n");
       return 0;
     default:
@@ -754,9 +754,9 @@ int MIPS32::jump_cond(const char *label, int cond, int distance)
   return -1;
 }
 
-int MIPS32::jump_cond_integer(const char *label, int cond, int distance)
+int MIPS32::jump_cond_integer(std::string &label, int cond, int distance)
 {
-  fprintf(out, "  ; jump_cond_integer(%s, %d, %d)\n", label, cond, distance);
+  fprintf(out, "  ; jump_cond_integer(%s, %d, %d)\n", label.c_str(), cond, distance);
 
   // I think this should never happen
   if (stack != 0)
@@ -768,36 +768,36 @@ int MIPS32::jump_cond_integer(const char *label, int cond, int distance)
   switch(cond)
   {
     case COND_EQUAL:
-      fprintf(out, "  beq $t%d, $t%d, %s\n", reg - 2, reg - 1, label);
+      fprintf(out, "  beq $t%d, $t%d, %s\n", reg - 2, reg - 1, label.c_str());
       fprintf(out, "  nop\n");
       reg -= 2;
       return 0;
     case COND_NOT_EQUAL:
-      fprintf(out, "  bne $t%d, $t%d, %s\n", reg - 2, reg - 1, label);
+      fprintf(out, "  bne $t%d, $t%d, %s\n", reg - 2, reg - 1, label.c_str());
       fprintf(out, "  nop\n");
       reg -= 2;
       return 0;
     case COND_LESS:
       fprintf(out, "  subu $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
-      fprintf(out, "  bltz $t%d, %s\n", reg - 2, label);
+      fprintf(out, "  bltz $t%d, %s\n", reg - 2, label.c_str());
       fprintf(out, "  nop\n");
       reg -= 2;
       return 0;
     case COND_LESS_EQUAL:
       fprintf(out, "  subu $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
-      fprintf(out, "  blez $t%d, %s\n", reg - 2, label);
+      fprintf(out, "  blez $t%d, %s\n", reg - 2, label.c_str());
       fprintf(out, "  nop\n");
       reg -= 2;
       return 0;
     case COND_GREATER:
       fprintf(out, "  subu $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
-      fprintf(out, "  bgtz $t%d, %s\n", reg - 2, label);
+      fprintf(out, "  bgtz $t%d, %s\n", reg - 2, label.c_str());
       fprintf(out, "  nop\n");
       reg -= 2;
       return 0;
     case COND_GREATER_EQUAL:
       fprintf(out, "  subu $t%d, $t%d, $t%d\n", reg - 2, reg - 2, reg - 1);
-      fprintf(out, "  bgez $t%d, %s\n", reg - 2, label);
+      fprintf(out, "  bgez $t%d, %s\n", reg - 2, label.c_str());
       fprintf(out, "  nop\n");
       reg -= 2;
       return 0;
@@ -968,15 +968,15 @@ int MIPS32::return_void(int local_count)
   return 0;
 }
 
-int MIPS32::jump(const char *name, int distance)
+int MIPS32::jump(std::string &name, int distance)
 {
-  fprintf(out, "  b %s\n", name);
+  fprintf(out, "  b %s\n", name.c_str());
   fprintf(out, "  nop ; Delay slot\n");
 
   return 0;
 }
 
-int MIPS32::call(const char *name)
+int MIPS32::call(std::string &name)
 {
   return -1;
 }

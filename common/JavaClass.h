@@ -188,6 +188,8 @@ public:
 
   int get_name_constant(std::string &name, int index);
   int get_method_name(std::string &name, int index);
+  //int get_field_name(std::string &name, int len, int index);
+  //int get_field_type(std::string &name, int len, int index);
 
   const fields_t *get_field(int index);
   int get_ref_name_type(std::string &name, std::string &type, int index);

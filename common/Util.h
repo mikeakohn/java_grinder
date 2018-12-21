@@ -12,10 +12,12 @@
 #ifndef _UTIL_H
 #define _UTIL_H
 
+#include <string>
+
 class Util
 {
 public:
-  static void method_sanitize(char *method_name, char *method_sig, int &param_count);
+  static void method_sanitize(std::string &method_name, std::string &method_sig, int &param_count);
 
 private:
   Util();

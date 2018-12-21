@@ -115,11 +115,11 @@ int TMS9900::field_init_ref(std::string &name, int index)
   return 0;
 }
 
-void TMS9900::method_start(int local_count, int max_stack, int param_count, const char *name)
+void TMS9900::method_start(int local_count, int max_stack, int param_count, std::string &name)
 {
-  is_main = (strcmp(name, "main") == 0) ? 1 : 0;
+  is_main = (name == "main") ? 1 : 0;
 
-  fprintf(out, "%s:\n", name);
+  fprintf(out, "%s:\n", name.c_str());
 
   if (is_main)
   {
@@ -561,7 +561,7 @@ int TMS9900::integer_to_short()
   return 0;
 }
 
-int TMS9900::jump_cond(const char *label, int cond, int distance)
+int TMS9900::jump_cond(std::string &label, int cond, int distance)
 {
   fprintf(out, "  ci r%d, 0\n", REG_STACK(reg-1));
   reg--;
@@ -608,7 +608,7 @@ int TMS9900::jump_cond(const char *label, int cond, int distance)
   return insert_conditional(label, cond, distance);
 }
 
-int TMS9900::jump_cond_integer(const char *label, int cond, int distance)
+int TMS9900::jump_cond_integer(std::string &label, int cond, int distance)
 {
   fprintf(out, "  c r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
   reg -= 2;
@@ -692,23 +692,23 @@ int TMS9900::return_void(int local_count)
   return 0;
 }
 
-int TMS9900::jump(const char *name, int distance)
+int TMS9900::jump(std::string &name, int distance)
 {
-  fprintf(out, "  ;; jump(%s,%d)\n", name, distance);
+  fprintf(out, "  ;; jump(%s,%d)\n", name.c_str(), distance);
 
   if (distance < 50)
   {
-    fprintf(out, "  jmp %s\n", name);
+    fprintf(out, "  jmp %s\n", name.c_str());
   }
     else
   {
-    fprintf(out, "  b @%s\n", name);
+    fprintf(out, "  b @%s\n", name.c_str());
   }
 
   return 0;
 }
 
-int TMS9900::call(const char *name)
+int TMS9900::call(std::string &name)
 {
   return -1;
 }
@@ -960,7 +960,7 @@ void TMS9900::sign_extend()
   label_count++;
 }
 
-int TMS9900::insert_conditional(const char *label, int cond, int distance)
+int TMS9900::insert_conditional(std::string &label, int cond, int distance)
 {
   bool reverse_cond = false;
 
@@ -983,14 +983,14 @@ int TMS9900::insert_conditional(const char *label, int cond, int distance)
   {
     if (!reverse_cond)
     {
-      fprintf(out, "  jlt %s\n", label);
-      fprintf(out, "  jeq %s\n", label);
+      fprintf(out, "  jlt %s\n", label.c_str());
+      fprintf(out, "  jeq %s\n", label.c_str());
     }
       else
     {
       fprintf(out, "  jlt _label_%d\n", label_count);
       fprintf(out, "  jeq _label_%d\n", label_count);
-      fprintf(out, "  b @%s\n", label);
+      fprintf(out, "  b @%s\n", label.c_str());
       fprintf(out, "_label_%d:\n", label_count);
       label_count++;
     }
@@ -1000,14 +1000,14 @@ int TMS9900::insert_conditional(const char *label, int cond, int distance)
   {
     if (!reverse_cond)
     {
-      fprintf(out, "  jgt %s\n", label);
-      fprintf(out, "  jeq %s\n", label);
+      fprintf(out, "  jgt %s\n", label.c_str());
+      fprintf(out, "  jeq %s\n", label.c_str());
     }
       else
     {
       fprintf(out, "  jgt _label_%d\n", label_count);
       fprintf(out, "  jeq _label_%d\n", label_count);
-      fprintf(out, "  b @%s\n", label);
+      fprintf(out, "  b @%s\n", label.c_str());
       fprintf(out, "_label_%d:\n", label_count);
       label_count++;
     }
@@ -1016,12 +1016,12 @@ int TMS9900::insert_conditional(const char *label, int cond, int distance)
   {
     if (!reverse_cond)
     {
-      fprintf(out, "  %s %s\n", cond_str[cond], label);
+      fprintf(out, "  %s %s\n", cond_str[cond], label.c_str());
     }
       else
     {
       fprintf(out, "  %s _label_%d\n", cond_str[cond], label_count);
-      fprintf(out, "  b @%s\n", label);
+      fprintf(out, "  b @%s\n", label.c_str());
       fprintf(out, "_label_%d:\n", label_count);
       label_count++;
     }

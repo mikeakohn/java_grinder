@@ -78,7 +78,7 @@ int Template::field_init_ref(std::string &name, int index)
   return -1;
 }
 
-void Template::method_start(int local_count, int max_stack, int param_count, const char *name)
+void Template::method_start(int local_count, int max_stack, int param_count, std::string &name)
 {
 }
 
@@ -279,12 +279,12 @@ int Template::integer_to_short()
   return -1;
 }
 
-int Template::jump_cond(const char *label, int cond, int distance)
+int Template::jump_cond(std::string &label, int cond, int distance)
 {
   return -1;
 }
 
-int Template::jump_cond_integer(const char *label, int cond, int distance)
+int Template::jump_cond_integer(std::string &label, int cond, int distance)
 {
   return -1;
 }
@@ -309,12 +309,12 @@ int Template::return_void(int local_count)
   return -1;
 }
 
-int Template::jump(const char *name, int distance)
+int Template::jump(std::string &name, int distance)
 {
   return -1;
 }
 
-int Template::call(const char *name)
+int Template::call(std::string &name)
 {
   return -1;
 }

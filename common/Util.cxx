@@ -13,9 +13,12 @@
 
 #include "Util.h"
 
-void Util::method_sanitize(char *method_name, char *method_sig, int &param_count)
+void Util::method_sanitize(std::string &method_name, std::string &method_sig, int &param_count)
 {
-  char *s = method_sig + 1;
+  char data[method_sig.length() + 1];
+  char *s = data + 1;
+
+  memcpy(data, method_sig.c_str(), sizeof(data));
 
   param_count = 0;
 
@@ -83,8 +86,11 @@ void Util::method_sanitize(char *method_name, char *method_sig, int &param_count
 
   *s = 0;
 
-  method_sig[0] = '_';
+  data[0] = '_';
 
-  if (method_sig[1] != 0 ) { strcat(method_name, method_sig); }
+  if (data[1] != 0 )
+  {
+    method_name += data;
+  }
 }
 

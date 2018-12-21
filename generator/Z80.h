@@ -27,7 +27,7 @@ public:
   virtual int init_heap(int field_count);
   virtual int field_init_int(std::string &name, int index, int value);
   virtual int field_init_ref(std::string &name, int index);
-  virtual void method_start(int local_count, int max_stack, int param_count, const char *name);
+  virtual void method_start(int local_count, int max_stack, int param_count, std::string &name);
   virtual void method_end(int local_count);
   virtual int push_local_var_int(int index);
   virtual int push_local_var_ref(int index);
@@ -68,15 +68,15 @@ public:
   virtual int inc_integer(int index, int num);
   virtual int integer_to_byte();
   virtual int integer_to_short();
-  virtual int jump_cond(const char *label, int cond, int distance);
-  virtual int jump_cond_integer(const char *label, int cond, int distance);
+  virtual int jump_cond(std::string &label, int cond, int distance);
+  virtual int jump_cond_integer(std::string &label, int cond, int distance);
   virtual int ternary(int cond, int value_true, int value_false);
   virtual int ternary(int cond, int compare, int value_true, int value_false);
   virtual int return_local(int index, int local_count);
   virtual int return_integer(int local_count);
   virtual int return_void(int local_count);
-  virtual int jump(const char *name, int distance);
-  virtual int call(const char *name);
+  virtual int jump(std::string &name, int distance);
+  virtual int call(std::string &name);
   virtual int invoke_static_method(const char *name, int params, int is_void);
   virtual int put_static(std::string &name, int index);
   virtual int get_static(std::string &name, int index);

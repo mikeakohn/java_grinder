@@ -125,13 +125,13 @@ int Z80::field_init_ref(std::string &name, int index)
   return 0;
 }
 
-void Z80::method_start(int local_count, int max_stack, int param_count, const char *name)
+void Z80::method_start(int local_count, int max_stack, int param_count, std::string &name)
 {
   stack = 0;
 
-  is_main = (strcmp(name, "main") == 0) ? 1 : 0;
+  is_main = (name == "main") ? 1 : 0;
 
-  fprintf(out, "%s:\n", name);
+  fprintf(out, "%s:\n", name.c_str());
   fprintf(out, "  ;; Save iy if needed.  iy = alloca(params * 2)\n");
   if (is_main)
   {
@@ -524,9 +524,10 @@ int Z80::integer_to_short()
   return 0;
 }
 
-int Z80::jump_cond(const char *label, int cond, int distance)
+int Z80::jump_cond(std::string &label, int cond, int distance)
 {
-  fprintf(out, "  ;; jump_cond(%s, %s)\n", label, cond_str[cond]);
+  fprintf(out, "  ;; jump_cond(%s, %s)\n", label.c_str(), cond_str[cond]);
+
   if (cond == COND_GREATER)
   {
     fprintf(out, "  pop bc\n");
@@ -551,7 +552,7 @@ int Z80::jump_cond(const char *label, int cond, int distance)
     case COND_EQUAL:
       fprintf(out, "  and a\n");  // clear carry
       fprintf(out, "  sbc hl, bc\n");
-      fprintf(out, "  jp z, %s\n", label);
+      fprintf(out, "  jp z, %s\n", label.c_str());
       //fprintf(out, "  cp d\n");
       //fprintf(out, "  jr nz, label_%d\n", label_count);
       //fprintf(out, "  cp e\n");
@@ -562,7 +563,7 @@ int Z80::jump_cond(const char *label, int cond, int distance)
     case COND_NOT_EQUAL:
       fprintf(out, "  and a\n");  // clear carry
       fprintf(out, "  sbc hl, bc\n");
-      fprintf(out, "  jp nz, %s\n", label);
+      fprintf(out, "  jp nz, %s\n", label.c_str());
       //fprintf(out, "  cp d\n");
       //fprintf(out, "  jr z, label_%d\n", label_count);
       //fprintf(out, "  cp e\n");
@@ -578,7 +579,7 @@ int Z80::jump_cond(const char *label, int cond, int distance)
       fprintf(out, "  ld a, l\n");
       //fprintf(out, "  ld a, f\n");
       fprintf(out, "  and 0x84\n");
-      fprintf(out, "  jp po, %s\n", label);
+      fprintf(out, "  jp po, %s\n", label.c_str());
       //fprintf(out, "  cp d\n");
       //fprintf(out, "  jr z %s\n", label);  // if d=0 try lower
       //fprintf(out, "  ld a, f\n");
@@ -599,7 +600,7 @@ int Z80::jump_cond(const char *label, int cond, int distance)
       fprintf(out, "  ld a, l\n");
       //fprintf(out, "  ld a, f\n");
       fprintf(out, "  and 0x84\n");
-      fprintf(out, "  jp pe, %s\n", label);
+      fprintf(out, "  jp pe, %s\n", label.c_str());
       break;
     default:
       return -1;
@@ -609,9 +610,9 @@ int Z80::jump_cond(const char *label, int cond, int distance)
   return 0;
 }
 
-int Z80::jump_cond_integer(const char *label, int cond, int distance)
+int Z80::jump_cond_integer(std::string &label, int cond, int distance)
 {
-  fprintf(out, "  ;; jump_cond_integer(%s,%s)\n", label, cond_str[cond]);
+  fprintf(out, "  ;; jump_cond_integer(%s,%s)\n", label.c_str(), cond_str[cond]);
   if (cond == COND_GREATER)
   {
     fprintf(out, "  pop hl\n");
@@ -636,12 +637,12 @@ int Z80::jump_cond_integer(const char *label, int cond, int distance)
     case COND_EQUAL:
       fprintf(out, "  and a\n");  // clear carry
       fprintf(out, "  sbc hl, bc\n");
-      fprintf(out, "  jp z, %s\n", label);
+      fprintf(out, "  jp z, %s\n", label.c_str());
       break;
     case COND_NOT_EQUAL:
       fprintf(out, "  and a\n");  // clear carry
       fprintf(out, "  sbc hl, bc\n");
-      fprintf(out, "  jp nz, %s\n", label);
+      fprintf(out, "  jp nz, %s\n", label.c_str());
       label_count++;
       break;
     case COND_LESS:
@@ -652,7 +653,7 @@ int Z80::jump_cond_integer(const char *label, int cond, int distance)
       fprintf(out, "  ld a, l\n");
       //fprintf(out, "  ld a, f\n");
       fprintf(out, "  and 0x84\n");
-      fprintf(out, "  jp po, %s\n", label);
+      fprintf(out, "  jp po, %s\n", label.c_str());
       break;
     case COND_LESS_EQUAL:
       return -1;
@@ -666,13 +667,14 @@ int Z80::jump_cond_integer(const char *label, int cond, int distance)
       fprintf(out, "  ld a, l\n");
       //fprintf(out, "  ld a, f\n");
       fprintf(out, "  and 0x84\n");
-      fprintf(out, "  jp pe, %s\n", label);
+      fprintf(out, "  jp pe, %s\n", label.c_str());
       break;
     default:
       return -1;
   }
 
   stack -= 2;
+
   return 0;
 }
 
@@ -720,13 +722,13 @@ int Z80::return_void(int local_count)
   return 0;
 }
 
-int Z80::jump(const char *name, int distance)
+int Z80::jump(std::string &name, int distance)
 {
-  fprintf(out, "  jp %s\n", name);
+  fprintf(out, "  jp %s\n", name.c_str());
   return 0;
 }
 
-int Z80::call(const char *name)
+int Z80::call(std::string &name)
 {
   return -1;
 }

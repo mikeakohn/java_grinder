@@ -149,15 +149,16 @@ int DSPIC::field_init_ref(std::string &name, int index)
   return 0;
 }
 
-void DSPIC::method_start(int local_count, int max_stack, int param_count, const char *name)
+void DSPIC::method_start(int local_count, int max_stack, int param_count, std::string &name)
 {
   reg = 0;
   stack = 0;
 
-  is_main = (strcmp(name, "main") == 0) ? true : false;
+  is_main = (name == "main") ? true : false;
 
   // main() function goes here
-  fprintf(out, "%s:\n", name);
+  fprintf(out, "%s:\n", name.c_str());
+
   if (!is_main)
   {
     //fprintf(out, "  push w14\n");
@@ -517,7 +518,7 @@ int DSPIC::integer_to_short()
   return 0;
 }
 
-int DSPIC::jump_cond(const char *label, int cond, int distance)
+int DSPIC::jump_cond(std::string &label, int cond, int distance)
 {
   if (stack > 0)
   {
@@ -532,11 +533,11 @@ int DSPIC::jump_cond(const char *label, int cond, int distance)
     reg--;
   }
 
-  fprintf(out, "  bra %s, %s\n", cond_str[cond], label);
+  fprintf(out, "  bra %s, %s\n", cond_str[cond], label.c_str());
   return 0;
 }
 
-int DSPIC::jump_cond_integer(const char *label, int cond, int distance)
+int DSPIC::jump_cond_integer(std::string &label, int cond, int distance)
 {
   if (stack > 1)
   {
@@ -561,7 +562,7 @@ int DSPIC::jump_cond_integer(const char *label, int cond, int distance)
     reg -= 2;
   }
 
-  fprintf(out, "  bra %s, %s\n", cond_str[cond], label);
+  fprintf(out, "  bra %s, %s\n", cond_str[cond], label.c_str());
 
   return 0;
 }
@@ -617,15 +618,15 @@ int DSPIC::return_void(int local_count)
   return 0;
 }
 
-int DSPIC::jump(const char *name, int distance)
+int DSPIC::jump(std::string &name, int distance)
 {
-  fprintf(out, "  bra %s\n", name);
+  fprintf(out, "  bra %s\n", name.c_str());
   return 0;
 }
 
-int DSPIC::call(const char *name)
+int DSPIC::call(std::string &name)
 {
-  fprintf(out, "  call %s\n", name);
+  fprintf(out, "  call %s\n", name.c_str());
   return 0;
 }
 

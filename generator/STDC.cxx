@@ -93,17 +93,17 @@ int STDC::field_init_ref(std::string &name, int index)
   return 0;
 }
 
-void STDC::method_start(int local_count, int max_stack, int param_count, const char *name)
+void STDC::method_start(int local_count, int max_stack, int param_count, std::string &name)
 {
 int n;
 
-  if (strcmp(name, "main") == 0)
+  if (name == "main")
   {
     fprintf(out, "}\n\n");
     is_main = true;
   }
 
-  fprintf(out, "int32_t %s(", name);
+  fprintf(out, "int32_t %s(", name.c_str());
   for (n = 0; n < param_count; n++)
   {
     if (n != 0) { fprintf(out, ", "); }
@@ -419,16 +419,16 @@ int STDC::integer_to_short()
   return 0;
 }
 
-int STDC::jump_cond(const char *label, int cond, int distance)
+int STDC::jump_cond(std::string &label, int cond, int distance)
 {
-  fprintf(out, "  if (stack_%d %s 0) { goto %s; }\n", stack--, cond_str[cond], label);
+  fprintf(out, "  if (stack_%d %s 0) { goto %s; }\n", stack--, cond_str[cond], label.c_str());
 
   return 0;
 }
 
-int STDC::jump_cond_integer(const char *label, int cond, int distance)
+int STDC::jump_cond_integer(std::string &label, int cond, int distance)
 {
-  fprintf(out, "  if (stack_%d %s stack_%d) { goto %s; }\n", stack - 2, cond_str[cond], stack - 1, label);
+  fprintf(out, "  if (stack_%d %s stack_%d) { goto %s; }\n", stack - 2, cond_str[cond], stack - 1, label.c_str());
   stack -= 2;
 
   return 0;
@@ -465,14 +465,14 @@ int STDC::return_void(int local_count)
   return 0;
 }
 
-int STDC::jump(const char *name, int distance)
+int STDC::jump(std::string &name, int distance)
 {
-  fprintf(out, "  goto %s;\n", name);
+  fprintf(out, "  goto %s;\n", name.c_str());
 
   return 0;
 }
 
-int STDC::call(const char *name)
+int STDC::call(std::string &name)
 {
   //fprintf(out, "  stack_%d = %s();\n", stack++, name);
 

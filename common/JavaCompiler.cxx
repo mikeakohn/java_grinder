@@ -281,7 +281,7 @@ void JavaCompiler::fill_label_map(uint8_t *label_map, int label_map_len, uint8_t
 }
 
 // FIXME - Too many parameters :(.
-int JavaCompiler::optimize_const(JavaClass *java_class, char *method_name, uint8_t *bytes, int pc, int pc_end, int address, int const_val)
+int JavaCompiler::optimize_const(JavaClass *java_class, std::string &method_name, uint8_t *bytes, int pc, int pc_end, int address, int const_val)
 {
   int const_vals[2];
 
@@ -344,14 +344,16 @@ int JavaCompiler::optimize_const(JavaClass *java_class, char *method_name, uint8
         return ret + 3;
       }
 
-      char label[128];
+      std::string label;
       int byte_count = GET_PC_INT16(1);
       int jump_to = address + byte_count;
 
-      sprintf(label, "%s_%d", method_name, jump_to);
+      label = method_name + "_" + std::to_string(jump_to);
 
       if (generator->jump_cond_integer(label, cond_table[bytes[pc]-159], const_val, calc_distance(bytes, pc, pc + byte_count)) == -1)
-      { return 0; }
+      {
+        return 0;
+      }
 
       return 3;
     }
@@ -425,7 +427,7 @@ int JavaCompiler::optimize_const(JavaClass *java_class, char *method_name, uint8
   return 0;
 }
 
-int JavaCompiler::optimize_const(JavaClass *java_class, char *method_name, uint8_t *bytes, int pc, int pc_end, int address, const char *const_val)
+int JavaCompiler::optimize_const(JavaClass *java_class, std::string &method_name, uint8_t *bytes, int pc, int pc_end, int address, const char *const_val)
 {
   // invokestatic with one String const
   if (pc + 2 < pc_end && bytes[pc] == 0xb8)
@@ -443,7 +445,7 @@ int JavaCompiler::optimize_const(JavaClass *java_class, char *method_name, uint8
   return 0;
 }
 
-int JavaCompiler::optimize_compare(JavaClass *java_class, char *method_name, uint8_t *bytes, int pc, int pc_end, int address, int index)
+int JavaCompiler::optimize_compare(JavaClass *java_class, std::string &method_name, uint8_t *bytes, int pc, int pc_end, int address, int index)
 {
   int local_index = -1;
   bool check_for_compare = false;
@@ -501,7 +503,7 @@ int JavaCompiler::optimize_compare(JavaClass *java_class, char *method_name, uin
     if (bytes[pc+skip_bytes] == 153 || bytes[pc+skip_bytes] == 154)
     {
       int cond = bytes[pc + skip_bytes] - 153;
-      char label[128];
+      std::string label;
 
       pc += skip_bytes;
       address += skip_bytes;
@@ -509,7 +511,7 @@ int JavaCompiler::optimize_compare(JavaClass *java_class, char *method_name, uin
       int byte_count = GET_PC_INT16(1);
       int jump_to = address + byte_count;
 
-      sprintf(label, "%s_%d", method_name, jump_to);
+      label = method_name + "_" + std::to_string(jump_to);
 
       if (generator->jump_cond_zero(label, cond, calc_distance(bytes, pc, pc + byte_count)) != -1)
       {
@@ -684,8 +686,8 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
   struct constant_float_t *constant_float;
   uint8_t *label_map;
   int ret = 0;
-  char label[128];
-  char method_name[256];
+  std::string label;
+  std::string method_name;
   std::string class_name;
   _stack *stack;
   int const_val;
@@ -693,16 +695,17 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
   int index;
   int instruction_length;
 
-  if (java_class->get_method_name(method_name, sizeof(method_name), method_id) != 0)
+  if (java_class->get_method_name(method_name, method_id) != 0)
   {
-    strcpy(method_name, "error");
+    method_name = "error";
   }
 
-  if (alt_name != NULL) { strcpy(method_name, alt_name); }
+  if (alt_name != NULL) { method_name = alt_name; }
 
-  DEBUG_PRINT("--- Compiling method '%s' method_id=%d\n", method_name, method_id);
+  DEBUG_PRINT("--- Compiling method '%s' method_id=%d\n",
+    method_name.c_str(), method_id);
 
-  if (strcmp(method_name, "<init>") == 0 || method_name[0] == 0)
+  if (method_name == "<init>" || method_name == "")
   {
     DEBUG_PRINT("Skipping method <--\n");
 
@@ -720,16 +723,16 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
 
   param_count = 0;
 
-  if (strcmp(method_name, "main") != 0)
+  if (method_name != "main")
   {
-    char method_sig[256];
+    std::string method_sig;
 
-    java_class->get_name_constant(method_sig, sizeof(method_sig), method->descriptor_index);
+    java_class->get_name_constant(method_sig, method->descriptor_index);
 
     Util::method_sanitize(method_name, method_sig, param_count);
 
     DEBUG_PRINT("Using method name '%s' param_count=%d\n",
-                method_name, param_count);
+                method_name.c_str(), param_count);
   }
     else
   {
@@ -774,7 +777,8 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
     //if ((label_map[address / 8] & (1 << (address % 8))) != 0)
     if (needs_label(label_map, pc, pc_start))
     {
-      sprintf(label, "%s_%d", method_name, address);
+      //sprintf(label, "%s_%d", method_name, address);
+      label = method_name + "_" + std::to_string(address);
       generator->label(label);
     }
 
@@ -1610,8 +1614,10 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
 
         int byte_count = GET_PC_INT16(1);
         int jump_to = address + byte_count;
-        sprintf(label, "%s_%d", method_name, jump_to);
-        ret = generator->jump_cond(label, cond_table[bytes[pc]-153], calc_distance(bytes, pc, pc + byte_count));
+
+        label = method_name + "_" + std::to_string(jump_to);
+
+        ret = generator->jump_cond(label, cond_table[bytes[pc] - 153], calc_distance(bytes, pc, pc + byte_count));
         break;
       }
       case 159: // if_icmpeq (0x9f)
@@ -1632,7 +1638,9 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
 
         int byte_count = GET_PC_INT16(1);
         int jump_to = address + byte_count;
-        sprintf(label, "%s_%d", method_name, jump_to);
+
+        label = method_name + "_" + std::to_string(jump_to);
+
         ret = generator->jump_cond_integer(label, cond_table[bytes[pc]-159], calc_distance(bytes, pc, pc + byte_count));
 
         break;
@@ -1649,12 +1657,15 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
       {
         int byte_count = GET_PC_INT16(1);
         int jump_to = address + byte_count;
-        sprintf(label, "%s_%d", method_name, jump_to);
+
+        label = method_name + "_" + std::to_string(jump_to);
+
         ret = generator->jump(label, calc_distance(bytes, pc, pc + byte_count));
         break;
       }
       case 168: // jsr (0xa8)
-        sprintf(label, "%s_%d", method_name, address + GET_PC_INT16(1));
+        label = method_name + "_" + std::to_string(address + GET_PC_INT16(1));
+
         ret = generator->call(label);
         break;
 
@@ -1961,7 +1972,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         int byte_count = GET_PC_INT16(1);
         int jump_to = address + byte_count;
 
-        sprintf(label, "%s_%d", method_name, jump_to);
+        label = method_name + "_" + std::to_string(jump_to);
 
         ret = generator->jump_cond_zero(label, COND_EQUAL, calc_distance(bytes, pc, pc + byte_count));
         break;
@@ -1980,7 +1991,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         int byte_count = GET_PC_INT16(1);
         int jump_to = address + byte_count;
 
-        sprintf(label, "%s_%d", method_name, jump_to);
+        label = method_name + "_" + std::to_string(jump_to);
 
         ret = generator->jump_cond_zero(label, COND_NOT_EQUAL, calc_distance(bytes, pc, pc + byte_count));
         break;
@@ -1989,14 +2000,18 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
       {
         int byte_count = GET_PC_INT32(1);
         int jump_to = address + byte_count;
-        sprintf(label, "%s_%d", method_name, jump_to);
+
+        label = method_name + "_" + std::to_string(jump_to);
+
         ret = generator->jump(label, calc_distance(bytes, pc, pc + byte_count));
         break;
       }
       case 201: // jsr_w (0xc9)
         //PUSH_INTEGER(pc+5);
         //pc += GET_PC_INT32(1);
-        sprintf(label, "%s_%d", method_name, address + GET_PC_INT32(1));
+
+        label = method_name + "_" + std::to_string(address + GET_PC_INT32(1));
+
         ret = generator->call(label);
         break;
 
@@ -2272,7 +2287,6 @@ int JavaCompiler::execute_statics(int index)
 int JavaCompiler::compile_methods(bool do_main)
 {
   int method_count = java_class->get_method_count();
-  //char method_name[256];
   std::string method_name;
   int index;
   bool did_execute_statics = false;

@@ -158,11 +158,11 @@ int Propeller::field_init_ref(std::string &name, int index)
   return -1;
 }
 
-void Propeller::method_start(int local_count, int max_stack, int param_count, const char *name)
+void Propeller::method_start(int local_count, int max_stack, int param_count, std::string &name)
 {
   method_name = name;
 
-  is_main = (strcmp(name, "main") == 0);
+  is_main = (name == "main");
 
   if (is_main)
   {
@@ -180,7 +180,7 @@ void Propeller::method_start(int local_count, int max_stack, int param_count, co
   }
 
   fprintf(out, "  ;; method_start() local_count=%d is_main=%d\n", local_count, is_main);
-  fprintf(out, "%s:\n", name);
+  fprintf(out, "%s:\n", name.c_str());
 
   if (extra_stack != 0)
   {
@@ -609,19 +609,19 @@ int Propeller::integer_to_short()
   return -1;
 }
 
-int Propeller::jump_cond(const char *label, int cond, int distance)
+int Propeller::jump_cond(std::string &label, int cond, int distance)
 {
-  fprintf(out, "  ;; jump_cond(%s, %d)\n", label, cond);
+  fprintf(out, "  ;; jump_cond(%s, %d)\n", label.c_str(), cond);
 
   if (cond == COND_EQUAL)
   {
-    fprintf(out, "  tjz reg_%d, #%s\n", --reg, label);
+    fprintf(out, "  tjz reg_%d, #%s\n", --reg, label.c_str());
     return 0;
   }
 
   if (cond == COND_NOT_EQUAL)
   {
-    fprintf(out, "  tjnz reg_%d, #%s\n", --reg, label);
+    fprintf(out, "  tjnz reg_%d, #%s\n", --reg, label.c_str());
     return 0;
   }
 
@@ -630,16 +630,16 @@ int Propeller::jump_cond(const char *label, int cond, int distance)
   switch(cond)
   {
     case COND_LESS:
-      fprintf(out, "  if_b jmp #%s\n", label);
+      fprintf(out, "  if_b jmp #%s\n", label.c_str());
       break;
     case COND_LESS_EQUAL:
-      fprintf(out, "  if_be jmp #%s\n", label);
+      fprintf(out, "  if_be jmp #%s\n", label.c_str());
       break;
     case COND_GREATER:
-      fprintf(out, "  if_a jmp #%s\n", label);
+      fprintf(out, "  if_a jmp #%s\n", label.c_str());
       break;
     case COND_GREATER_EQUAL:
-      fprintf(out, "  if_ae jmp #%s\n", label);
+      fprintf(out, "  if_ae jmp #%s\n", label.c_str());
       break;
     default:
       return -1;
@@ -648,9 +648,9 @@ int Propeller::jump_cond(const char *label, int cond, int distance)
   return 0;
 }
 
-int Propeller::jump_cond_integer(const char *label, int cond, int distance)
+int Propeller::jump_cond_integer(std::string &label, int cond, int distance)
 {
-  fprintf(out, "  ;; jump_cond_integer(%s, %d)\n", label, cond);
+  fprintf(out, "  ;; jump_cond_integer(%s, %d)\n", label.c_str(), cond);
 
   fprintf(out, "  cmps reg_%d, reg_%d, wc wz\n", reg - 2, reg - 1);
   reg -= 2;
@@ -658,29 +658,28 @@ int Propeller::jump_cond_integer(const char *label, int cond, int distance)
   switch(cond)
   {
     case COND_EQUAL:
-      fprintf(out, "  if_e jmp #%s\n", label);
+      fprintf(out, "  if_e jmp #%s\n", label.c_str());
       break;
     case COND_NOT_EQUAL:
-      fprintf(out, "  if_ne jmp #%s\n", label);
+      fprintf(out, "  if_ne jmp #%s\n", label.c_str());
       break;
     case COND_LESS:
-      fprintf(out, "  if_b jmp #%s\n", label);
+      fprintf(out, "  if_b jmp #%s\n", label.c_str());
       break;
     case COND_LESS_EQUAL:
-      fprintf(out, "  if_be jmp #%s\n", label);
+      fprintf(out, "  if_be jmp #%s\n", label.c_str());
       break;
     case COND_GREATER:
-      fprintf(out, "  if_a jmp #%s\n", label);
+      fprintf(out, "  if_a jmp #%s\n", label.c_str());
       break;
     case COND_GREATER_EQUAL:
-      fprintf(out, "  if_ae jmp #%s\n", label);
+      fprintf(out, "  if_ae jmp #%s\n", label.c_str());
       break;
     default:
       return -1;
   }
 
   return 0;
-
 }
 
 int Propeller::ternary(int cond, int value_true, int value_false)
@@ -767,13 +766,13 @@ int Propeller::return_void(int local_count)
   return 0;
 }
 
-int Propeller::jump(const char *name, int distance)
+int Propeller::jump(std::string &name, int distance)
 {
-  fprintf(out, "  jmp #%s\n", name);
+  fprintf(out, "  jmp #%s\n", name.c_str());
   return 0;
 }
 
-int Propeller::call(const char *name)
+int Propeller::call(std::string &name)
 {
   return -1;
 }

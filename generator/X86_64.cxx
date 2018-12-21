@@ -83,7 +83,7 @@ int X86_64::field_init_ref(std::string &name, int index)
   return -1;
 }
 
-void X86_64::method_start(int local_count, int max_stack, int param_count, const char *name)
+void X86_64::method_start(int local_count, int max_stack, int param_count, std::string &name)
 {
 }
 
@@ -283,12 +283,12 @@ int X86_64::integer_to_short()
   return -1;
 }
 
-int X86_64::jump_cond(const char *label, int cond, int distance)
+int X86_64::jump_cond(std::string &label, int cond, int distance)
 {
   return -1;
 }
 
-int X86_64::jump_cond_integer(const char *label, int cond, int distance)
+int X86_64::jump_cond_integer(std::string &label, int cond, int distance)
 {
   return -1;
 }
@@ -318,12 +318,12 @@ int X86_64::return_void(int local_count)
   return -1;
 }
 
-int X86_64::jump(const char *name, int distance)
+int X86_64::jump(std::string &name, int distance)
 {
   return -1;
 }
 
-int X86_64::call(const char *name)
+int X86_64::call(std::string &name)
 {
   return -1;
 }

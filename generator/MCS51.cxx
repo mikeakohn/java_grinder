@@ -86,13 +86,13 @@ int MCS51::field_init_ref(std::string &name, int index)
   return -1;
 }
 
-void MCS51::method_start(int local_count, int max_stack, int param_count, const char *name)
+void MCS51::method_start(int local_count, int max_stack, int param_count, std::string &name)
 {
   stack = 0;
 
-  is_main = (strcmp(name, "main") == 0) ? 1 : 0;
+  is_main = (name == "main") ? 1 : 0;
 
-  fprintf(out, "%s:\n", name);
+  fprintf(out, "%s:\n", name.c_str());
 
   // main() function goes here
   if (!is_main)
@@ -346,12 +346,12 @@ int MCS51::integer_to_short()
   return -1;
 }
 
-int MCS51::jump_cond(const char *label, int cond, int distance)
+int MCS51::jump_cond(std::string &label, int cond, int distance)
 {
   return -1;
 }
 
-int MCS51::jump_cond_integer(const char *label, int cond, int distance)
+int MCS51::jump_cond_integer(std::string &label, int cond, int distance)
 {
   return -1;
 }
@@ -390,12 +390,12 @@ int MCS51::return_void(int local_count)
   return 0;
 }
 
-int MCS51::jump(const char *name, int distance)
+int MCS51::jump(std::string &name, int distance)
 {
   return -1;
 }
 
-int MCS51::call(const char *name)
+int MCS51::call(std::string &name)
 {
   return -1;
 }

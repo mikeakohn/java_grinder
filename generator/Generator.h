@@ -66,7 +66,7 @@ public:
   virtual int open(const char *filename);
   virtual int add_functions() { return 0; }
   virtual int get_cpu_byte_alignment() { return 2; }
-  void label(char *name);
+  void label(std::string &name);
   virtual int start_init() = 0;
   virtual int insert_static_field_define(const char *name, const char *type, int index) = 0;
   virtual int init_heap(int field_count) = 0;
@@ -75,7 +75,7 @@ public:
   //virtual int field_init_short(char *name, int index, int value) = 0;
   virtual int field_init_int(std::string &name, int index, int value) = 0;
   virtual int field_init_ref(std::string &name, int index) = 0;
-  virtual void method_start(int local_count, int max_stack, int param_count, const char *name) = 0;
+  virtual void method_start(int local_count, int max_stack, int param_count, std::string &name) = 0;
   virtual void method_end(int local_count) = 0;
   virtual int push_local_var_int(int index) = 0;
   virtual int push_local_var_ref(int index) = 0;
@@ -127,18 +127,18 @@ public:
   virtual int neg_float();
   virtual int float_to_integer();
   virtual int integer_to_float();
-  virtual int jump_cond(const char *label, int cond, int distance) = 0;
-  virtual int jump_cond_zero(const char *label, int cond, int distance) { return -1; }
-  virtual int jump_cond_integer(const char *label, int cond, int distance) = 0;
-  virtual int jump_cond_integer(const char *label, int cond, int const_val, int distance) { return -1; } 
+  virtual int jump_cond(std::string &label, int cond, int distance) = 0;
+  virtual int jump_cond_zero(std::string &label, int cond, int distance) { return -1; }
+  virtual int jump_cond_integer(std::string &label, int cond, int distance) = 0;
+  virtual int jump_cond_integer(std::string &label, int cond, int const_val, int distance) { return -1; } 
   virtual int compare_floats(int cond);
   virtual int ternary(int cond, int value_true, int value_false) = 0;
   virtual int ternary(int cond, int compare, int value_true, int value_false) = 0;
   virtual int return_local(int index, int local_count) = 0;
   virtual int return_integer(int local_count) = 0;
   virtual int return_void(int local_count) = 0;
-  virtual int jump(const char *name, int distance) = 0;
-  virtual int call(const char *name) = 0;
+  virtual int jump(std::string &name, int distance) = 0;
+  virtual int call(std::string &name) = 0;
   virtual int invoke_static_method(const char *name, int params, int is_void) = 0;
   virtual int put_static(std::string &name, int index) = 0;
   virtual int get_static(std::string &name, int index) = 0;

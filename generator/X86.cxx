@@ -93,7 +93,7 @@ int X86::field_init_ref(std::string &name, int index)
   return 0;
 }
 
-void X86::method_start(int local_count, int max_stack, int param_count, const char *name)
+void X86::method_start(int local_count, int max_stack, int param_count, std::string &name)
 {
   int i;
 
@@ -104,7 +104,7 @@ void X86::method_start(int local_count, int max_stack, int param_count, const ch
 
   method_count++;
 
-  fprintf(out, "; int %s(", name);
+  fprintf(out, "; int %s(", name.c_str());
   for (i = 0; i < param_count; i++)
   {
     if (i != 0) { fprintf(out, ", "); }
@@ -112,8 +112,8 @@ void X86::method_start(int local_count, int max_stack, int param_count, const ch
   }
   fprintf(out, ");\n");
 
-  fprintf(out, "global %s\n", name);
-  fprintf(out, "%s:\n", name);
+  fprintf(out, "global %s\n", name.c_str());
+  fprintf(out, "%s:\n", name.c_str());
 
   fprintf(out, "  push ebx\n");
   fprintf(out, "  push esi\n");
@@ -571,9 +571,9 @@ int X86::integer_to_short()
   return 0;
 }
 
-int X86::jump_cond(const char *label, int cond, int distance)
+int X86::jump_cond(std::string &label, int cond, int distance)
 {
-  fprintf(out, "  ; jump_cond(%s, %d, %d)\n", label, cond, distance);
+  fprintf(out, "  ; jump_cond(%s, %d, %d)\n", label.c_str(), cond, distance);
 
   if (stack > 0)
   {
@@ -586,14 +586,14 @@ int X86::jump_cond(const char *label, int cond, int distance)
     fprintf(out, "  cmp %s, 0\n", REG_STACK(--reg));
   }
 
-  fprintf(out, "  %s %s\n", cond_str[cond], label);
+  fprintf(out, "  %s %s\n", cond_str[cond], label.c_str());
 
   return 0;
 }
 
-int X86::jump_cond_integer(const char *label, int cond, int distance)
+int X86::jump_cond_integer(std::string &label, int cond, int distance)
 {
-  fprintf(out, "  ; jump_cond_integer(%s, %d, %d)\n", label, cond, distance);
+  fprintf(out, "  ; jump_cond_integer(%s, %d, %d)\n", label.c_str(), cond, distance);
 
   if (stack == 1)
   {
@@ -615,7 +615,7 @@ int X86::jump_cond_integer(const char *label, int cond, int distance)
     reg -= 2;
   }
 
-  fprintf(out, "  %s %s\n", cond_str[cond], label);
+  fprintf(out, "  %s %s\n", cond_str[cond], label.c_str());
 
   return 0;
 }
@@ -689,14 +689,14 @@ int X86::return_void(int local_count)
   return 0;
 }
 
-int X86::jump(const char *name, int distance)
+int X86::jump(std::string &name, int distance)
 {
-  fprintf(out, "  jmp %s\n", name);
+  fprintf(out, "  jmp %s\n", name.c_str());
 
   return 0;
 }
 
-int X86::call(const char *name)
+int X86::call(std::string &name)
 {
   return -1;
 }

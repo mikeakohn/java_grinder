@@ -197,15 +197,15 @@ int Epiphany::field_init_ref(std::string &name, int index)
   return -1;
 }
 
-void Epiphany::method_start(int local_count, int max_stack, int param_count, const char *name)
+void Epiphany::method_start(int local_count, int max_stack, int param_count, std::string &name)
 {
   this->max_stack = max_stack;
   printf("max_stack=%d\n", max_stack);
 
-  is_interrupt = (strcmp(name, "userInterrupt") == 0) ? 1 : 0;
+  is_interrupt = (name == "userInterrupt") ? 1 : 0;
 
   // main() function goes here
-  fprintf(out, "%s:\n", name);
+  fprintf(out, "%s:\n", name.c_str());
 
   if (is_interrupt)
   {
@@ -601,23 +601,23 @@ int Epiphany::mul_float()
   return 0;
 }
 
-int Epiphany::jump_cond(const char *label, int cond, int distance)
+int Epiphany::jump_cond(std::string &label, int cond, int distance)
 {
   fprintf(out, "  ;; Compare r%d with 0\n", REG_STACK(reg-1));
   fprintf(out, "  sub r7, r%d, #0\n", REG_STACK(reg-1));
   reg--;
 
-  fprintf(out, "  b%s %s\n", cond_str[cond], label);
+  fprintf(out, "  b%s %s\n", cond_str[cond], label.c_str());
   return 0;
 }
 
-int Epiphany::jump_cond_integer(const char *label, int cond, int distance)
+int Epiphany::jump_cond_integer(std::string &label, int cond, int distance)
 {
   fprintf(out, "  ;; Compare r%d with r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
   fprintf(out, "  sub r7, r%d, r%d\n", REG_STACK(reg-2), REG_STACK(reg-1));
   reg -= 2;
 
-  fprintf(out, "  b%s %s\n", cond_str[cond], label);
+  fprintf(out, "  b%s %s\n", cond_str[cond], label.c_str());
   return 0;
 }
 
@@ -710,13 +710,13 @@ int Epiphany::return_void(int local_count)
   return 0;
 }
 
-int Epiphany::jump(const char *name, int distance)
+int Epiphany::jump(std::string &name, int distance)
 {
-  fprintf(out, "  b %s\n", name);
+  fprintf(out, "  b %s\n", name.c_str());
   return 0;
 }
 
-int Epiphany::call(const char *name)
+int Epiphany::call(std::string &name)
 {
   return -1;
 }

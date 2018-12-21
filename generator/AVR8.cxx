@@ -324,13 +324,13 @@ int AVR8::field_init_ref(std::string &name, int index)
   return 0;
 }
 
-void AVR8::method_start(int local_count, int max_stack, int param_count, const char *name)
+void AVR8::method_start(int local_count, int max_stack, int param_count, std::string &name)
 {
   stack = 0;
 
-  is_main = (strcmp(name, "main") == 0) ? 1 : 0;
+  is_main = (name == "main") ? 1 : 0;
 
-  fprintf(out, "%s:\n", name);
+  fprintf(out, "%s:\n", name.c_str());
 
   // main() function goes here
   if (!is_main)
@@ -774,7 +774,7 @@ int AVR8::integer_to_short()
   return 0;
 }
 
-int AVR8::jump_cond(const char *label, int cond, int distance)
+int AVR8::jump_cond(std::string &label, int cond, int distance)
 {
   bool reverse = false;
 
@@ -807,7 +807,7 @@ int AVR8::jump_cond(const char *label, int cond, int distance)
         fprintf(out, "  brne %s\n", label_skip);
         fprintf(out, "  cp value11, zero\n");
         fprintf(out, "  brne %s\n", label_skip);
-        JUMP(label);
+        JUMP(label.c_str());
         fprintf(out, "%s:\n", label_skip);
         break;
       case COND_NOT_EQUAL:
@@ -816,7 +816,7 @@ int AVR8::jump_cond(const char *label, int cond, int distance)
         fprintf(out, "  cp value11, zero\n");
         fprintf(out, "  breq %s\n", label_skip);
         fprintf(out, "%s:\n", label_jump);
-        JUMP(label);
+        JUMP(label.c_str());
         fprintf(out, "%s:\n", label_skip);
         break;
       case COND_LESS:
@@ -825,7 +825,7 @@ int AVR8::jump_cond(const char *label, int cond, int distance)
           fprintf(out, "  cp value10, zero\n");
           fprintf(out, "  cpc value11, zero\n");
           fprintf(out, "  brge %s\n", label_skip);
-          JUMP(label);
+          JUMP(label.c_str());
           fprintf(out, "%s:\n", label_skip);
         }
           else
@@ -833,7 +833,7 @@ int AVR8::jump_cond(const char *label, int cond, int distance)
           fprintf(out, "  cp zero, value10\n");
           fprintf(out, "  cpc zero, value11\n");
           fprintf(out, "  brge %s\n", label_skip);
-          JUMP(label);
+          JUMP(label.c_str());
           fprintf(out, "%s:\n", label_skip);
         }
         break;
@@ -843,7 +843,7 @@ int AVR8::jump_cond(const char *label, int cond, int distance)
           fprintf(out, "  cp value10, zero\n");
           fprintf(out, "  cpc value11, zero\n");
           fprintf(out, "  brlt %s\n", label_skip);
-          JUMP(label);
+          JUMP(label.c_str());
           fprintf(out, "%s:\n", label_skip);
         }
           else
@@ -851,7 +851,7 @@ int AVR8::jump_cond(const char *label, int cond, int distance)
           fprintf(out, "  cp zero, value10\n");
           fprintf(out, "  cpc zero, value11\n");
           fprintf(out, "  brlt %s\n", label_skip);
-          JUMP(label);
+          JUMP(label.c_str());
           fprintf(out, "%s:\n", label_skip);
         }
         break;
@@ -863,7 +863,7 @@ int AVR8::jump_cond(const char *label, int cond, int distance)
   return 0;
 }
 
-int AVR8::jump_cond_integer(const char *label, int cond, int distance)
+int AVR8::jump_cond_integer(std::string &label, int cond, int distance)
 {
   bool reverse = false;
 
@@ -896,7 +896,7 @@ int AVR8::jump_cond_integer(const char *label, int cond, int distance)
         fprintf(out, "  brne %s\n", label_skip);
         fprintf(out, "  cp value11, value21\n");
         fprintf(out, "  brne %s\n", label_skip);
-        JUMP(label);
+        JUMP(label.c_str());
         fprintf(out, "%s:\n", label_skip);
         break;
       case COND_NOT_EQUAL:
@@ -905,7 +905,7 @@ int AVR8::jump_cond_integer(const char *label, int cond, int distance)
         fprintf(out, "  cp value11, value21\n");
         fprintf(out, "  breq %s\n", label_skip);
         fprintf(out, "%s:\n", label_jump);
-        JUMP(label);
+        JUMP(label.c_str());
         fprintf(out, "%s:\n", label_skip);
         break;
       case COND_LESS:
@@ -914,7 +914,7 @@ int AVR8::jump_cond_integer(const char *label, int cond, int distance)
           fprintf(out, "  cp value10, value20\n");
           fprintf(out, "  cpc value11, value21\n");
           fprintf(out, "  brge %s\n", label_skip);
-          JUMP(label);
+          JUMP(label.c_str());
           fprintf(out, "%s:\n", label_skip);
         }
           else
@@ -922,7 +922,7 @@ int AVR8::jump_cond_integer(const char *label, int cond, int distance)
           fprintf(out, "  cp value20, value10\n");
           fprintf(out, "  cpc value21, value11\n");
           fprintf(out, "  brge %s\n", label_skip);
-          JUMP(label);
+          JUMP(label.c_str());
           fprintf(out, "%s:\n", label_skip);
         }
         break;
@@ -932,7 +932,7 @@ int AVR8::jump_cond_integer(const char *label, int cond, int distance)
           fprintf(out, "  cp value10, value20\n");
           fprintf(out, "  cpc value11, value21\n");
           fprintf(out, "  brlt %s\n", label_skip);
-          JUMP(label);
+          JUMP(label.c_str());
           fprintf(out, "%s:\n", label_skip);
         }
           else
@@ -940,7 +940,7 @@ int AVR8::jump_cond_integer(const char *label, int cond, int distance)
           fprintf(out, "  cp value20, value10\n");
           fprintf(out, "  cpc value21, value11\n");
           fprintf(out, "  brlt %s\n", label_skip);
-          JUMP(label);
+          JUMP(label.c_str());
           fprintf(out, "%s:\n", label_skip);
         }
         break;
@@ -1024,16 +1024,16 @@ int AVR8::return_void(int local_count)
   return 0;
 }
 
-int AVR8::jump(const char *name, int distance)
+int AVR8::jump(std::string &name, int distance)
 {
-  JUMP(name);
+  JUMP(name.c_str());
 
   return 0;
 }
 
-int AVR8::call(const char *name)
+int AVR8::call(std::string &name)
 {
-  CALL(name);
+  CALL(name.c_str());
 
   return 0;
 }

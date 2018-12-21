@@ -190,13 +190,13 @@ int W65816::field_init_ref(std::string &name, int index)
   return 0;
 }
 
-void W65816::method_start(int local_count, int max_stack, int param_count, const char *name)
+void W65816::method_start(int local_count, int max_stack, int param_count, std::string &name)
 {
   stack = 0;
 
-  is_main = (strcmp(name, "main") == 0) ? 1 : 0;
+  is_main = (name == "main") ? 1 : 0;
 
-  fprintf(out, "%s:\n", name);
+  fprintf(out, "%s:\n", name.c_str());
 
   // main() function goes here
   if (!is_main)
@@ -590,7 +590,7 @@ int W65816::integer_to_short()
   return 0;
 }
 
-int W65816::jump_cond(const char *label, int cond, int distance)
+int W65816::jump_cond(std::string &label, int cond, int distance)
 {
   bool reverse = false;
 
@@ -617,13 +617,13 @@ int W65816::jump_cond(const char *label, int cond, int distance)
         fprintf(out, "  lda stack,x\n");
         fprintf(out, "  cmp #0\n");
         fprintf(out, "  bne label_%d\n", label_count);
-        fprintf(out, "  jmp %s\n", label);
+        fprintf(out, "  jmp %s\n", label.c_str());
         break;
       case COND_NOT_EQUAL:
         fprintf(out, "  lda stack,x\n");
         fprintf(out, "  cmp #0\n");
         fprintf(out, "  beq label_%d\n", label_count);
-        fprintf(out, "  jmp %s\n", label);
+        fprintf(out, "  jmp %s\n", label.c_str());
         break;
       case COND_LESS:
         if(reverse == false)
@@ -631,14 +631,14 @@ int W65816::jump_cond(const char *label, int cond, int distance)
           fprintf(out, "  lda stack,x\n");
           fprintf(out, "  cmp #0\n");
           fprintf(out, "  bpl label_%d\n", label_count);
-          fprintf(out, "  jmp %s\n", label);
+          fprintf(out, "  jmp %s\n", label.c_str());
         }
           else
         {
           fprintf(out, "  lda #0\n");
           fprintf(out, "  cmp stack,x\n");
           fprintf(out, "  bpl label_%d\n", label_count);
-          fprintf(out, "  jmp %s\n", label);
+          fprintf(out, "  jmp %s\n", label.c_str());
         }
         break;
       case COND_GREATER_EQUAL:
@@ -647,14 +647,14 @@ int W65816::jump_cond(const char *label, int cond, int distance)
           fprintf(out, "  lda stack,x\n");
           fprintf(out, "  cmp #0\n");
           fprintf(out, "  bmi lalbe_%d\n", label_count);
-          fprintf(out, "  jmp %s\n", label);
+          fprintf(out, "  jmp %s\n", label.c_str());
         }
           else
         {
           fprintf(out, "  lda #0\n");
           fprintf(out, "  cmp stack,x\n");
           fprintf(out, "  bmi label_%d\n", label_count);
-          fprintf(out, "  jmp %s\n", label);
+          fprintf(out, "  jmp %s\n", label.c_str());
         }
         break;
     }
@@ -668,7 +668,7 @@ int W65816::jump_cond(const char *label, int cond, int distance)
   return 0;
 }
 
-int W65816::jump_cond_integer(const char *label, int cond, int distance)
+int W65816::jump_cond_integer(std::string &label, int cond, int distance)
 {
   bool reverse = false;
 
@@ -698,13 +698,13 @@ int W65816::jump_cond_integer(const char *label, int cond, int distance)
         fprintf(out, "  lda stack - 0,x\n");
         fprintf(out, "  cmp stack - 2,x\n");
         fprintf(out, "  bne label_%d\n", label_count);
-        fprintf(out, "  jmp %s\n", label);
+        fprintf(out, "  jmp %s\n", label.c_str());
         break;
       case COND_NOT_EQUAL:
         fprintf(out, "  lda stack - 0,x\n");
         fprintf(out, "  cmp stack - 2,x\n");
         fprintf(out, "  beq label_%d\n", label_count);
-        fprintf(out, "  jmp %s\n", label);
+        fprintf(out, "  jmp %s\n", label.c_str());
         break;
       case COND_LESS:
         if(reverse == false)
@@ -712,14 +712,14 @@ int W65816::jump_cond_integer(const char *label, int cond, int distance)
           fprintf(out, "  lda stack - 0,x\n");
           fprintf(out, "  cmp stack - 2,x\n");
           fprintf(out, "  bpl label_%d\n", label_count);
-          fprintf(out, "  jmp %s\n", label);
+          fprintf(out, "  jmp %s\n", label.c_str());
         }
           else
         {
           fprintf(out, "  lda stack - 2,x\n");
           fprintf(out, "  cmp stack - 0,x\n");
           fprintf(out, "  bpl label_%d\n", label_count);
-          fprintf(out, "  jmp %s\n", label);
+          fprintf(out, "  jmp %s\n", label.c_str());
         }
         break;
       case COND_GREATER_EQUAL:
@@ -728,14 +728,14 @@ int W65816::jump_cond_integer(const char *label, int cond, int distance)
           fprintf(out, "  lda stack - 0,x\n");
           fprintf(out, "  cmp stack - 2,x\n");
           fprintf(out, "  bmi label_%d\n", label_count);
-          fprintf(out, "  jmp %s\n", label);
+          fprintf(out, "  jmp %s\n", label.c_str());
         }
           else
         {
           fprintf(out, "  lda stack - 2,x\n");
           fprintf(out, "  cmp stack - 0,x\n");
           fprintf(out, "  bmi label_%d\n", label_count);
-          fprintf(out, "  jmp %s\n", label);
+          fprintf(out, "  jmp %s\n", label.c_str());
         }
         break;
     }
@@ -820,16 +820,16 @@ int W65816::return_void(int local_count)
   return 0;
 }
 
-int W65816::jump(const char *name, int distance)
+int W65816::jump(std::string &name, int distance)
 {
-  fprintf(out, "  jmp %s\n", name);
+  fprintf(out, "  jmp %s\n", name.c_str());
 
   return 0;
 }
 
-int W65816::call(const char *name)
+int W65816::call(std::string &name)
 {
-  fprintf(out, "  jsr %s\n", name);
+  fprintf(out, "  jsr %s\n", name.c_str());
 
   return 0;
 }

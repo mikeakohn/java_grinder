@@ -183,9 +183,9 @@ int Generator::new_object(const char *object_name, int field_count)
   return -1;
 }
 
-void Generator::label(char *name)
+void Generator::label(std::string &name)
 {
-  fprintf(out, "%s:\n", name);
+  fprintf(out, "%s:\n", name.c_str());
 }
 
 void Generator::add_newline()

@@ -164,7 +164,7 @@ int MSP430::field_init_ref(std::string &name, int index)
   return 0;
 }
 
-void MSP430::method_start(int local_count, int max_stack, int param_count, const char *name)
+void MSP430::method_start(int local_count, int max_stack, int param_count, std::string &name)
 {
   reg = 0;
   stack = 0;
@@ -172,11 +172,11 @@ void MSP430::method_start(int local_count, int max_stack, int param_count, const
   this->max_stack = max_stack;
   //printf("max_stack=%d\n", max_stack);
 
-  is_main = (strcmp(name, "main") == 0) ? 1 : 0;
-  is_interrupt = (strcmp(name, "timerInterrupt") == 0) ? 1 : 0;
+  is_main = (name == "main") ? 1 : 0;
+  is_interrupt = (name == "timerInterrupt") ? 1 : 0;
 
   // main() function goes here
-  fprintf(out, "%s:\n", name);
+  fprintf(out, "%s:\n", name.c_str());
 
   if (is_interrupt)
   {
@@ -765,11 +765,11 @@ int MSP430::integer_to_short()
   return 0;
 }
 
-int MSP430::jump_cond(const char *label, int cond, int distance)
+int MSP430::jump_cond(std::string &label, int cond, int distance)
 {
   bool reverse = false;
 
-  fprintf(out, "  ;; jump_cond(%s, cond=%d, distance=%d)\n", label, cond, distance);
+  fprintf(out, "  ;; jump_cond(%s, cond=%d, distance=%d)\n", label.c_str(), cond, distance);
 
   // MSP430 doesn't have LESS_EQUAL or GREATER so change them
   if (cond == COND_LESS_EQUAL)
@@ -802,14 +802,14 @@ int MSP430::jump_cond(const char *label, int cond, int distance)
     reg--;
   }
 
-  fprintf(out, "  %s %s\n", cond_str[cond], label);
+  fprintf(out, "  %s %s\n", cond_str[cond], label.c_str());
 
   return 0;
 }
 
-int MSP430::jump_cond_zero(const char *label, int cond, int distance)
+int MSP430::jump_cond_zero(std::string &label, int cond, int distance)
 {
-  fprintf(out, "  ;; jump_cond_zero(%s, cond=%d, distance=%d)\n", label, cond, distance);
+  fprintf(out, "  ;; jump_cond_zero(%s, cond=%d, distance=%d)\n", label.c_str(), cond, distance);
 
   if (stack > 0)
   {
@@ -824,24 +824,24 @@ int MSP430::jump_cond_zero(const char *label, int cond, int distance)
 
   if (cond == COND_EQUAL)
   {
-    fprintf(out, "  jeq %s\n", label);
+    fprintf(out, "  jeq %s\n", label.c_str());
     return 0;
   }
     else
   if (cond == COND_NOT_EQUAL)
   {
-    fprintf(out, "  jne %s\n", label);
+    fprintf(out, "  jne %s\n", label.c_str());
     return 0;
   }
 
   return -1;
 }
 
-int MSP430::jump_cond_integer(const char *label, int cond, int distance)
+int MSP430::jump_cond_integer(std::string &label, int cond, int distance)
 {
   bool reverse = false;
 
-  fprintf(out, "  ;; jump_cond_integer(%s, cond=%d, distance=%d)\n", label, cond, distance);
+  fprintf(out, "  ;; jump_cond_integer(%s, cond=%d, distance=%d)\n", label.c_str(), cond, distance);
 
   // MSP430 doesn't have LESS_EQUAL or GREATER so change them
   if (cond == COND_LESS_EQUAL)
@@ -891,16 +891,16 @@ int MSP430::jump_cond_integer(const char *label, int cond, int distance)
     reg -= 2;
   }
 
-  fprintf(out, "  %s %s\n", cond_str[cond], label);
+  fprintf(out, "  %s %s\n", cond_str[cond], label.c_str());
 
   return 0;
 }
 
-int MSP430::jump_cond_integer(const char *label, int cond, int const_val, int distance)
+int MSP430::jump_cond_integer(std::string &label, int cond, int const_val, int distance)
 {
   bool reverse = false;
 
-  fprintf(out, "  ;; jump_cond_integer(%s, cond=%d, const_val=%d, distance=%d)\n", label, cond, const_val, distance);
+  fprintf(out, "  ;; jump_cond_integer(%s, cond=%d, const_val=%d, distance=%d)\n", label.c_str(), cond, const_val, distance);
 
   // MSP430 doesn't have LESS_EQUAL or GREATER so change them
   if (cond == COND_LESS_EQUAL)
@@ -934,7 +934,7 @@ int MSP430::jump_cond_integer(const char *label, int cond, int const_val, int di
     reg -= 1;
   }
 
-  fprintf(out, "  %s %s\n", cond_str[cond], label);
+  fprintf(out, "  %s %s\n", cond_str[cond], label.c_str());
 
   return 0;
 }
@@ -1110,17 +1110,17 @@ int MSP430::return_void(int local_count)
   return 0;
 }
 
-int MSP430::jump(const char *name, int distance)
+int MSP430::jump(std::string &name, int distance)
 {
-  fprintf(out, "  jmp %s\n", name);
+  fprintf(out, "  jmp %s\n", name.c_str());
   return 0;
 }
 
-int MSP430::call(const char *name)
+int MSP430::call(std::string &name)
 {
-  // FIXME - do we need to push the register stack?
+  // FIXME - does this need to push the register stack?
   // This is for the Java instruction jsr.
-  fprintf(out, "  call #%s\n", name);
+  fprintf(out, "  call #%s\n", name.c_str());
   return 0;
 }
 

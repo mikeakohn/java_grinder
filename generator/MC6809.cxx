@@ -102,13 +102,13 @@ int MC6809::field_init_ref(std::string &name, int index)
   return 0;
 }
 
-void MC6809::method_start(int local_count, int max_stack, int param_count, const char *name)
+void MC6809::method_start(int local_count, int max_stack, int param_count, std::string &name)
 {
   int n;
 
-  is_main = (strcmp(name, "main") == 0) ? 1 : 0;
+  is_main = (name == "main") ? 1 : 0;
 
-  fprintf(out, "%s:\n", name);
+  fprintf(out, "%s:\n", name.c_str());
 
   fprintf(out, "  pshs u\n");    // really only needed when not main()
 
@@ -520,19 +520,19 @@ int MC6809::integer_to_short()
   return 0;
 }
 
-int MC6809::jump_cond(const char *label, int cond, int distance)
+int MC6809::jump_cond(std::string &label, int cond, int distance)
 {
   bool use_long = distance > 30;
 
   fprintf(out, "  ; jump_cond()\n");
   fprintf(out, "  puls a,b\n");
   fprintf(out, "  cmpd #0\n");
-  fprintf(out, "  %s%s %s\n", use_long ? "l":"", branch[cond], label);
+  fprintf(out, "  %s%s %s\n", use_long ? "l":"", branch[cond], label.c_str());
 
   return 0;
 }
 
-int MC6809::jump_cond_integer(const char *label, int cond, int distance)
+int MC6809::jump_cond_integer(std::string &label, int cond, int distance)
 {
   bool use_long = distance > 30;
 
@@ -540,7 +540,7 @@ int MC6809::jump_cond_integer(const char *label, int cond, int distance)
   fprintf(out, "  puls y\n");
   fprintf(out, "  puls a,b\n");
   fprintf(out, "  cmpd -4,s\n");
-  fprintf(out, "  %s%s %s\n", use_long ? "l":"", branch[cond], label);
+  fprintf(out, "  %s%s %s\n", use_long ? "l":"", branch[cond], label.c_str());
 
   return 0;
 }
@@ -595,21 +595,21 @@ int MC6809::return_void(int local_count)
   return 0;
 }
 
-int MC6809::jump(const char *name, int distance)
+int MC6809::jump(std::string &name, int distance)
 {
   if (distance < 20)
   {
-    fprintf(out, "  bra %s\n", name);
+    fprintf(out, "  bra %s\n", name.c_str());
   }
     else
   {
-    fprintf(out, "  jmp %s\n", name);
+    fprintf(out, "  jmp %s\n", name.c_str());
   }
 
   return 0;
 }
 
-int MC6809::call(const char *name)
+int MC6809::call(std::string &name)
 {
   return -1;
 }

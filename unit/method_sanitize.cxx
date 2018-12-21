@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "Util.h"
 
@@ -8,19 +9,22 @@ static int errors = 0;
 
 int test(const char *method_name, const char *method_sig, const char *expected, int expected_param_count)
 {
-  char a[1024];
-  char b[1024];
+  std::string a;
+  std::string b;
   int param_count;
 
-  strcpy(a, method_name);
-  strcpy(b, method_sig);
+  a = method_name;
+  b = method_sig;
+
+  //strcpy(a, method_name);
+  //strcpy(b, method_sig);
 
   Util::method_sanitize(a, b, param_count);
 
-  if (strcmp(a, expected) != 0)
+  if (a != expected)
   {
     printf("Error: method=%s%s expected=%s output=%s\n",
-      method_name, method_sig, expected, a);
+      method_name, method_sig, expected, a.c_str());
     errors++;
     return -1;
   }

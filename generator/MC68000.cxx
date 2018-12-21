@@ -106,15 +106,15 @@ int MC68000::field_init_ref(std::string &name, int index)
   return 0;
 }
 
-void MC68000::method_start(int local_count, int max_stack, int param_count, const char *name)
+void MC68000::method_start(int local_count, int max_stack, int param_count, std::string &name)
 {
   reg = 0;
   stack = 0;
 
-  is_main = (strcmp(name, "main") == 0) ? true : false;
+  is_main = (name == "main") ? true : false;
 
   // main() function goes here
-  fprintf(out, "%s:\n", name);
+  fprintf(out, "%s:\n", name.c_str());
 
   if (local_count != 0)
   {
@@ -539,16 +539,16 @@ int MC68000::integer_to_short()
   return 0;
 }
 
-int MC68000::jump_cond(const char *label, int cond, int distance)
+int MC68000::jump_cond(std::string &label, int cond, int distance)
 {
   char size = get_jump_size(distance);
 
   fprintf(out, "  cmp.l #0, %s\n", pop_reg());
-  fprintf(out, "  b%s.%c %s  ; distance=%d\n", cond_str[cond], size, label, distance);
+  fprintf(out, "  b%s.%c %s  ; distance=%d\n", cond_str[cond], size, label.c_str(), distance);
   return 0;
 }
 
-int MC68000::jump_cond_integer(const char *label, int cond, int distance)
+int MC68000::jump_cond_integer(std::string &label, int cond, int distance)
 {
   char size = get_jump_size(distance);
 
@@ -574,7 +574,7 @@ int MC68000::jump_cond_integer(const char *label, int cond, int distance)
     reg -= 2;
   }
 
-  fprintf(out, "  b%s.%c %s  ; distance=%d\n", cond_str[cond], size, label, distance);
+  fprintf(out, "  b%s.%c %s  ; distance=%d\n", cond_str[cond], size, label.c_str(), distance);
 
   return 0;
 
@@ -611,19 +611,19 @@ int MC68000::return_void(int local_count)
   return 0;
 }
 
-int MC68000::jump(const char *name, int distance)
+int MC68000::jump(std::string &name, int distance)
 {
   char size = get_jump_size(distance);
 
-  fprintf(out, "  bra.%c %s  ; distance=%d\n", size, name, distance);
+  fprintf(out, "  bra.%c %s  ; distance=%d\n", size, name.c_str(), distance);
 
   return 0;
 }
 
-int MC68000::call(const char *name)
+int MC68000::call(std::string &name)
 {
   // REVIEW - Should this be callm?
-  fprintf(out, "  jsr %s\n", name);
+  fprintf(out, "  jsr %s\n", name.c_str());
   return 0;
 }
 

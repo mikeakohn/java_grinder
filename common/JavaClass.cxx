@@ -665,14 +665,14 @@ int JavaClass::get_field_index(std::string &field_name)
 int JavaClass::get_clinit_method()
 {
   int method_count = get_method_count();
-  char method_name[128];
+  std::string method_name;
   int index;
 
   for (index = 0; index < method_count; index++)
   {
-    if (get_method_name(method_name, sizeof(method_name), index) == 0)
+    if (get_method_name(method_name, index) == 0)
     {
-      if (strcmp("<clinit>", method_name) == 0)
+      if (method_name == "<clinit>")
       {
         return index;
       }
