@@ -94,9 +94,6 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
   std::string method_name;
   std::string method_sig;
   std::string method_class;
-  //char method_name[128];
-  //char method_sig[128];
-  //char method_class[128];
   char function[256];
 
   //printf("invoke_static()\n");
@@ -108,8 +105,8 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     return -1;
   }
 
-  //printf("method: '%s as %s' from %s\n",
-  //  method_name.c_str(), method_sig.c_str(), method_class);
+  //printf("method: [%d] '%s' as %s' from %s\n",
+  //  method_id, method_name.c_str(), method_sig.c_str(), method_class.c_str());
 
   get_static_function(function, method_name, method_sig);
 

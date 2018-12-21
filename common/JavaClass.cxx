@@ -526,7 +526,7 @@ int JavaClass::get_ref_name_type(
             strncmp(name.c_str(), "net/mikekohn/java_grinder/",
                     sizeof("net/mikekohn/java_grinder/") -1) == 0)
         {
-          name[0] = 0;
+          name = "";
         }
       }
     }
@@ -536,10 +536,8 @@ int JavaClass::get_ref_name_type(
       constant_nameandtype = (constant_nameandtype_t *)heap;
       std::string temp;
 
-      //int class_name_len = name.length();
-
-      //get_name_constant(name + class_name_len, len - class_name_len, constant_nameandtype->name_index);
       get_name_constant(temp, constant_nameandtype->name_index);
+
       name += temp;
 
       get_name_constant(type, constant_nameandtype->descriptor_index);
