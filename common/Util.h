@@ -17,7 +17,16 @@
 class Util
 {
 public:
-  static void method_sanitize(std::string &method_name, std::string &method_sig, int &param_count);
+  static void method_sanitize(
+    std::string &method_name,
+    std::string &method_sig,
+    int &param_count);
+
+  static std::string get_virtual_function(
+    std::string &method_name,
+    std::string &method_sig,
+    std::string &field_name,
+    std::string &field_class);
 
 private:
   Util();

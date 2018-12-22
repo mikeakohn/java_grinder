@@ -48,7 +48,7 @@ static int cpu_asm(JavaClass *java_class, Generator *generator, int const_index)
   return generator->cpu_asm_X((const char *)constant_utf8->bytes, constant_utf8->length);
 }
 
-int cpu(JavaClass *java_class, Generator *generator, char *method_name)
+int cpu(JavaClass *java_class, Generator *generator, const char *method_name)
 {
   CHECK_FUNC(setClock8,)
   CHECK_FUNC(setClock16,)
@@ -60,7 +60,7 @@ int cpu(JavaClass *java_class, Generator *generator, char *method_name)
   return -1;
 }
 
-int cpu(JavaClass *java_class, Generator *generator, char *method_name, int const_val)
+int cpu(JavaClass *java_class, Generator *generator, const char *method_name, int const_val)
 {
   CHECK_FUNC_CONST_STRING(asm,_X)
   return -1;

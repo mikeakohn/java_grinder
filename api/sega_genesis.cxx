@@ -35,7 +35,7 @@
     return generator->sega_genesis_##funct##sig(const_val1, const_val2); \
   }
 
-int sega_genesis(JavaClass *java_class, Generator *generator, char *method_name)
+int sega_genesis(JavaClass *java_class, Generator *generator, const char *method_name)
 {
   CHECK_FUNC(setPalettePointer,_I)
   CHECK_FUNC(setPaletteColor,_I)
@@ -79,7 +79,7 @@ int sega_genesis(JavaClass *java_class, Generator *generator, char *method_name)
   return -1;
 }
 
-int sega_genesis(JavaClass *java_class, Generator *generator, char *method_name, int const_val)
+int sega_genesis(JavaClass *java_class, Generator *generator, const char *method_name, int const_val)
 {
   CHECK_FUNC_CONST(setPalettePointer,_I)
   CHECK_FUNC_CONST(setPaletteColor,_I)
@@ -89,7 +89,7 @@ int sega_genesis(JavaClass *java_class, Generator *generator, char *method_name,
   return -1;
 }
 
-int sega_genesis(JavaClass *java_class, Generator *generator, char *function, int const_val1, int const_val2)
+int sega_genesis(JavaClass *java_class, Generator *generator, const char *function, int const_val1, int const_val2)
 {
   CHECK_FUNC_CONST_2(setCursor,_II)
 

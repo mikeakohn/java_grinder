@@ -35,7 +35,7 @@
     return generator->propeller_##funct##sig(const_val1, const_val2); \
   }
 
-int propeller(JavaClass *java_class, Generator *generator, char *method_name)
+int propeller(JavaClass *java_class, Generator *generator, const char *method_name)
 {
   CHECK_FUNC(setClock_I,)
   CHECK_FUNC(getCogId,)
@@ -47,7 +47,7 @@ int propeller(JavaClass *java_class, Generator *generator, char *method_name)
   return -1;
 }
 
-int propeller(JavaClass *java_class, Generator *generator, char *method_name, int const_val)
+int propeller(JavaClass *java_class, Generator *generator, const char *method_name, int const_val)
 {
   CHECK_FUNC_CONST(waitCount,_II)
   CHECK_FUNC_CONST(waitPinsEqual,_II)
@@ -56,7 +56,7 @@ int propeller(JavaClass *java_class, Generator *generator, char *method_name, in
   return -1;
 }
 
-int propeller(JavaClass *java_class, Generator *generator, char *function, int const_val1, int const_val2)
+int propeller(JavaClass *java_class, Generator *generator, const char *function, int const_val1, int const_val2)
 {
   //CHECK_FUNC_CONST_2(someFunction,_II)
 

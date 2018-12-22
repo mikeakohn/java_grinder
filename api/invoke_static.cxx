@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <algorithm>
 
 #include "JavaClass.h"
 #include "JavaCompiler.h"
@@ -47,46 +48,43 @@
 #define CHECK_WITH_PORT(a,b,c) \
     if (strcmp(cls, #a#c) == 0) \
     { \
-      ret = b(java_class, generator, function, c); \
+      ret = b(java_class, generator, function.c_str(), c); \
     }
 
 #define CHECK(a,b) \
     if (strcmp(cls, #a) == 0) \
     { \
-      ret = b(java_class, generator, function); \
+      ret = b(java_class, generator, function.c_str()); \
     }
 
 #define CHECK_WITH_PORT_CONST(a,b,c) \
     if (strcmp(cls, #a#c) == 0) \
     { \
-      ret = b(java_class, generator, function, c, const_vals[0]); \
+      ret = b(java_class, generator, function.c_str(), c, const_vals[0]); \
     }
 
 #define CHECK_CONST(a,b) \
     if (strcmp(cls, #a) == 0) \
     { \
-      ret = b(java_class, generator, function, const_vals[0]); \
+      ret = b(java_class, generator, function.c_str(), const_vals[0]); \
     }
 
 #define CHECK_WITH_PORT_CONST_2(a,b,c) \
     if (strcmp(cls, #a#c) == 0) \
     { \
-      ret = b(java_class, generator, function, c, const_vals[0], const_vals[1]); \
+      ret = b(java_class, generator, function.c_str(), c, const_vals[0], const_vals[1]); \
     }
 
 #define CHECK_CONST_2(a,b) \
     if (strcmp(cls, #a) == 0) \
     { \
-      ret = b(java_class, generator, function, const_vals[0], const_vals[1]); \
+      ret = b(java_class, generator, function.c_str(), const_vals[0], const_vals[1]); \
     }
 
-static void remove_illegal_chars(char *function)
+static void remove_illegal_chars(std::string &function)
 {
-  while(*function != 0)
-  {
-    if (*function == '/' || *function == ';') { *function = '_'; }
-    function++;
-  }
+  std::replace(function.begin(), function.end(), '/', '_');
+  std::replace(function.begin(), function.end(), ';', '_');
 }
 
 int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
@@ -94,7 +92,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
   std::string method_name;
   std::string method_sig;
   std::string method_class;
-  char function[256];
+  std::string function;
 
   //printf("invoke_static()\n");
 
@@ -108,9 +106,9 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
   //printf("method: [%d] '%s' as %s' from %s\n",
   //  method_id, method_name.c_str(), method_sig.c_str(), method_class.c_str());
 
-  get_static_function(function, method_name, method_sig);
+  function = get_static_function(method_name, method_sig);
 
-  //printf("function: %s()\n", function);
+  //printf("function: %s()\n", function.c_str());
   int ret = -1;
 
   const size_t len = sizeof("net/mikekohn/java_grinder/") - 1;
@@ -175,23 +173,29 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
 
       remove_illegal_chars(function);
 
-      ret = generator->invoke_static_method(function, params, is_void);
+      ret = generator->invoke_static_method(function.c_str(), params, is_void);
     }
   }
 
   if (ret == 0) { return 0; }
 
-  printf("--> Function not implemented '%s' %s:%d\n", function, __FILE__, __LINE__);
+  printf("--> Function not implemented '%s' %s:%d\n",
+    function.c_str(), __FILE__, __LINE__);
 
   return -1;
 }
 
-int invoke_static(JavaClass *java_class, int method_id, Generator *generator, int *const_vals, int const_count)
+int invoke_static(
+  JavaClass *java_class,
+  int method_id,
+  Generator *generator,
+  int *const_vals,
+  int const_count)
 {
   std::string method_name;
   std::string method_sig;
   std::string method_class;
-  char function[256];
+  std::string function;
 
   //printf("const invoke_static() const_count=%d\n", const_count);
 
@@ -206,9 +210,9 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, in
   //  method_name.c_str(), method_sig.c_str(), method_class.c_str(),
   //  const_count);
 
-  get_static_function(function, method_name, method_sig);
+  function = get_static_function(method_name, method_sig);
 
-  //printf("const function: %s()\n", function);
+  //printf("const function: %s()\n", function.c_str());
   int ret = -1;
 
   const size_t len = sizeof("net/mikekohn/java_grinder/") - 1;
@@ -283,7 +287,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, co
   std::string method_name;
   std::string method_sig;
   std::string method_class;
-  char function[256];
+  std::string function;
 
   if (java_class->get_class_name(method_class, method_id) != 0 ||
       java_class->get_ref_name_type(method_name, method_sig, method_id) != 0)
@@ -292,9 +296,9 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, co
     return -1;
   }
 
-  get_static_function(function, method_name, method_sig);
+  function = get_static_function(method_name, method_sig);
 
-  //printf("const function: %s()\n", function);
+  //printf("const function: %s()\n", function.c_str());
   int ret = -1;
 
   const size_t len = sizeof("net/mikekohn/java_grinder/") - 1;
@@ -310,14 +314,14 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, co
 
     if (strcmp(cls, "Memory") == 0)
     {
-      if (strcmp(function, "preloadByteArray_X") == 0 ||
-          strcmp(function, "preloadIntArray_X") == 0)
+      if (function == "preloadByteArray_X" ||
+          function == "preloadIntArray_X")
       {
         char array_name[strlen(const_val) + 1];
         int ptr = 0;
         int type = TYPE_BYTE;
 
-        if (strcmp(function, "preloadIntArray_X") == 0) { type = TYPE_INT; }
+        if (function == "preloadIntArray_X") { type = TYPE_INT; }
 
         while(const_val[ptr] != 0)
         {
@@ -340,7 +344,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator, co
 
         generator->use_array_file(const_val, array_name, type);
 
-        return memory(java_class, generator, function, array_name);
+        return memory(java_class, generator, function.c_str(), array_name);
       }
     }
   }

@@ -20,12 +20,12 @@
 #include "Generator.h"
 #include "JavaClass.h"
 
-int msx(JavaClass *java_class, Generator *generator, char *method_name);
+int msx(JavaClass *java_class, Generator *generator, const char *method_name);
 
-//int msx(JavaClass *java_class, Generator *generator, char *method_name, char const_val);
+//int msx(JavaClass *java_class, Generator *generator, const char *method_name, char const_val);
 
-int msx(JavaClass *java_class, Generator *generator, char *method_name, int const_val);
+int msx(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);
 
-int msx(JavaClass *java_class, Generator *generator, char *method_name, int const_val1, int const_val2);
+int msx(JavaClass *java_class, Generator *generator, const char *method_name, int const_val1, int const_val2);
 
 #endif

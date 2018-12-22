@@ -113,7 +113,7 @@ static int c64_sid_clear(JavaClass *java_class, Generator *generator)
   return generator->c64_sid_clear();
 }
 
-int c64_sid(JavaClass *java_class, Generator *generator, char *function)
+int c64_sid(JavaClass *java_class, Generator *generator, const char *function)
 {
   CHECK_FUNC(voice1_frequency)
   CHECK_FUNC(voice1_pulse_width)

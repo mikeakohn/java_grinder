@@ -15,9 +15,9 @@
 #include "Generator.h"
 #include "JavaClass.h"
 
-int trs80_coco(JavaClass *java_class, Generator *generator, char *method_name);
-int trs80_coco(JavaClass *java_class, Generator *generator, char *method_name, int const_val);
-int trs80_coco(JavaClass *java_class, Generator *generator, char *method_name, int const_val1, int const_val2);
+int trs80_coco(JavaClass *java_class, Generator *generator, const char *method_name);
+int trs80_coco(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);
+int trs80_coco(JavaClass *java_class, Generator *generator, const char *method_name, int const_val1, int const_val2);
 
 #endif
 

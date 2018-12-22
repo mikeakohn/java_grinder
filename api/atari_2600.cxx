@@ -35,7 +35,7 @@
     return generator->atari2600_##funct##sig(const_val1, const_val2); \
   }
 
-int atari_2600(JavaClass *java_class, Generator *generator, char *method_name)
+int atari_2600(JavaClass *java_class, Generator *generator, const char *method_name)
 {
   CHECK_FUNC(waitHsync,_I)
   CHECK_FUNC(waitHsync,)
@@ -149,7 +149,7 @@ int atari_2600(JavaClass *java_class, Generator *generator, char *method_name)
   return -1;
 }
 
-int atari_2600(JavaClass *java_class, Generator *generator, char *method_name, int const_val)
+int atari_2600(JavaClass *java_class, Generator *generator, const char *method_name, int const_val)
 {
   CHECK_FUNC_CONST(waitHsync,_I)
 
@@ -175,7 +175,7 @@ int atari_2600(JavaClass *java_class, Generator *generator, char *method_name, i
   return -1;
 }
 
-int atari_2600(JavaClass *java_class, Generator *generator, char *function, int const_val1, int const_val2)
+int atari_2600(JavaClass *java_class, Generator *generator, const char *function, int const_val1, int const_val2)
 {
   //CHECK_FUNC_CONST_2(someFunction,_II)
 

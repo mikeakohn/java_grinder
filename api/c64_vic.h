@@ -15,7 +15,7 @@
 #include "Generator.h"
 #include "JavaClass.h"
 
-int c64_vic(JavaClass *java_class, Generator *generator, char *method_name);
+int c64_vic(JavaClass *java_class, Generator *generator, const char *method_name);
 
 #endif
 

@@ -35,7 +35,7 @@
     return generator->math_##funct##sig(const_val1, const_val2); \
   }
 
-int math(JavaClass *java_class, Generator *generator, char *method_name)
+int math(JavaClass *java_class, Generator *generator, const char *method_name)
 {
   CHECK_FUNC(abs,_I)
   CHECK_FUNC(xor,_I)
@@ -48,14 +48,14 @@ int math(JavaClass *java_class, Generator *generator, char *method_name)
 }
 
 #if 0
-int math(JavaClass *java_class, Generator *generator, char *method_name, int const_val)
+int math(JavaClass *java_class, Generator *generator, const char *method_name, int const_val)
 {
   //CHECK_FUNC_CONST(stopCog,_I)
 
   return -1;
 }
 
-int math(JavaClass *java_class, Generator *generator, char *function, int const_val1, int const_val2)
+int math(JavaClass *java_class, Generator *generator, const char *function, int const_val1, int const_val2)
 {
   //CHECK_FUNC_CONST_2(someFunction,_II)
 

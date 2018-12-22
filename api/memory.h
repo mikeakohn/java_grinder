@@ -15,9 +15,9 @@
 #include "Generator.h"
 #include "JavaClass.h"
 
-int memory(JavaClass *java_class, Generator *generator, char *method_name);
-int memory(JavaClass *java_class, Generator *generator, char *method_name, int const_val);
-int memory(JavaClass *java_class, Generator *generator, char *function, const char *const_val);
+int memory(JavaClass *java_class, Generator *generator, const char *method_name);
+int memory(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);
+int memory(JavaClass *java_class, Generator *generator, const char *function, const char *const_val);
 
 #endif
 

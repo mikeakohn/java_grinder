@@ -17,9 +17,9 @@
 #include "Generator.h"
 #include "JavaClass.h"
 
-int cpc(JavaClass *java_class, Generator *generator, char *method_name);
-int cpc(JavaClass *java_class, Generator *generator, char *method_name, int const_val);
-int cpc(JavaClass *java_class, Generator *generator, char *method_name, int const_val1, int const_val2);
+int cpc(JavaClass *java_class, Generator *generator, const char *method_name);
+int cpc(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);
+int cpc(JavaClass *java_class, Generator *generator, const char *method_name, int const_val1, int const_val2);
 
 #endif
 

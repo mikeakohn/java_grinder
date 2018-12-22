@@ -9,7 +9,8 @@ static int errors = 0;
 
 int test(const char *method_name, const char *method_sig, const char *expected)
 {
-  char function[256];
+  //char function[256];
+  std::string function;
   std::string a;
   std::string b;
 
@@ -20,15 +21,14 @@ int test(const char *method_name, const char *method_sig, const char *expected)
   //strcpy(b, method_sig);
 
   //Util::method_sanitize(a, b, param_count);
-  get_static_function(function, a, b);
+  function = get_static_function(a, b);
 
-  //if (function != expected)
-  if (strcmp(function, expected) != 0)
+  if (function != expected)
   {
     printf("Error: method=%s%s\n"
            "     expected=%s\n"
            "       output=%s\n",
-      method_name, method_sig, expected, function);
+      method_name, method_sig, expected, function.c_str());
     errors++;
     return -1;
   }

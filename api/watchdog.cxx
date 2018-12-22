@@ -35,7 +35,7 @@
     return generator->watchdog_##funct##sig(const_val1, const_val2); \
   }
 
-int watchdog(JavaClass *java_class, Generator *generator, char *method_name)
+int watchdog(JavaClass *java_class, Generator *generator, const char *method_name)
 {
   CHECK_FUNC(enable,)
   CHECK_FUNC(disable,)
@@ -44,12 +44,12 @@ int watchdog(JavaClass *java_class, Generator *generator, char *method_name)
   return -1;
 }
 
-int watchdog(JavaClass *java_class, Generator *generator, char *method_name, int const_val)
+int watchdog(JavaClass *java_class, Generator *generator, const char *method_name, int const_val)
 {
   return -1;
 }
 
-int watchdog(JavaClass *java_class, Generator *generator, char *function, int const_val1, int const_val2)
+int watchdog(JavaClass *java_class, Generator *generator, const char *function, int const_val1, int const_val2)
 {
   return -1;
 }

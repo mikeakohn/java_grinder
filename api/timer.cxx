@@ -35,7 +35,7 @@
     return generator->timer_##funct##sig(const_val1, const_val2); \
   }
 
-int timer(JavaClass *java_class, Generator *generator, char *function)
+int timer(JavaClass *java_class, Generator *generator, const char *function)
 {
   CHECK_FUNC(setInterval,_II)
   CHECK_FUNC(setListener,_Z)
@@ -45,14 +45,14 @@ int timer(JavaClass *java_class, Generator *generator, char *function)
   return -1;
 }
 
-int timer(JavaClass *java_class, Generator *generator, char *function, int const_val)
+int timer(JavaClass *java_class, Generator *generator, const char *function, int const_val)
 {
   CHECK_FUNC_CONST_1(setListener,_Z)
   CHECK_FUNC_CONST_1(setValue,_I)
   return -1;
 }
 
-int timer(JavaClass *java_class, Generator *generator, char *function, int const_val1, int const_val2)
+int timer(JavaClass *java_class, Generator *generator, const char *function, int const_val1, int const_val2)
 {
   CHECK_FUNC_CONST_2(setInterval,_II)
   return -1;

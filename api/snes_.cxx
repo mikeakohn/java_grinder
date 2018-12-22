@@ -37,19 +37,19 @@
     return generator->snes_##funct##sig(const_val1, const_val2); \
   }
 
-int snes(JavaClass *java_class, Generator *generator, char *method_name)
+int snes(JavaClass *java_class, Generator *generator, const char *method_name)
 {
   CHECK_FUNC(setBackgroundColor,_I)
 
   return -1;
 }
 
-int snes(JavaClass *java_class, Generator *generator, char *method_name, int const_val)
+int snes(JavaClass *java_class, Generator *generator, const char *method_name, int const_val)
 {
   return -1;
 }
 
-int snes(JavaClass *java_class, Generator *generator, char *function, int const_val1, int const_val2)
+int snes(JavaClass *java_class, Generator *generator, const char *function, int const_val1, int const_val2)
 {
   return -1;
 }

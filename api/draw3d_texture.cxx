@@ -53,7 +53,7 @@
     return generator->draw3d_texture32_##funct##sig(); \
   }
 
-int draw3d_texture(JavaClass *java_class, Generator *generator, char *method_name)
+int draw3d_texture(JavaClass *java_class, Generator *generator, const char *method_name)
 {
   CHECK_FUNC(enableTransparency,)
   CHECK_FUNC(enableTransparencyOnBlack,)
@@ -63,17 +63,17 @@ int draw3d_texture(JavaClass *java_class, Generator *generator, char *method_nam
   return -1;
 }
 
-int draw3d_texture(JavaClass *java_class, Generator *generator, char *method_name, int const_val)
+int draw3d_texture(JavaClass *java_class, Generator *generator, const char *method_name, int const_val)
 {
   return -1;
 }
 
-int draw3d_texture(JavaClass *java_class, Generator *generator, char *function, int const_val1, int const_val2)
+int draw3d_texture(JavaClass *java_class, Generator *generator, const char *function, int const_val1, int const_val2)
 {
   return -1;
 }
 
-int draw3d_texture16(JavaClass *java_class, Generator *generator, char *method_name)
+int draw3d_texture16(JavaClass *java_class, Generator *generator, const char *method_name)
 {
   CHECK_FUNC_16(setPixel,_II)
   CHECK_FUNC_16(setPixels,_IaS)
@@ -82,7 +82,7 @@ int draw3d_texture16(JavaClass *java_class, Generator *generator, char *method_n
   return -1;
 }
 
-int draw3d_texture24(JavaClass *java_class, Generator *generator, char *method_name)
+int draw3d_texture24(JavaClass *java_class, Generator *generator, const char *method_name)
 {
   CHECK_FUNC_24(setPixel,_II)
   CHECK_FUNC_24(setPixels,_IaI)
@@ -90,7 +90,7 @@ int draw3d_texture24(JavaClass *java_class, Generator *generator, char *method_n
   return -1;
 }
 
-int draw3d_texture32(JavaClass *java_class, Generator *generator, char *method_name)
+int draw3d_texture32(JavaClass *java_class, Generator *generator, const char *method_name)
 {
   CHECK_FUNC_32(setPixel,_II)
   CHECK_FUNC_32(setPixels,_IaI)

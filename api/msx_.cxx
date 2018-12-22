@@ -44,7 +44,7 @@
     return generator->msx_##funct##sig(const_val1, const_val2); \
   }
 
-int msx(JavaClass *java_class, Generator *generator, char *method_name)
+int msx(JavaClass *java_class, Generator *generator, const char *method_name)
 {
   //CHECK_FUNC(someFunction,_I)
   CHECK_FUNC(cls,)
@@ -63,7 +63,7 @@ int msx(JavaClass *java_class, Generator *generator, char *method_name)
 }
 
 /*
-int msx(JavaClass *java_class, Generator *generator, char *method_name, char const_val)
+int msx(JavaClass *java_class, Generator *generator, const char *method_name, const char const_val)
 {
   //CHECK_FUNC_CONST(someFunction,_C)
   CHECK_FUNC_CONST(putChar,_C)
@@ -72,14 +72,14 @@ int msx(JavaClass *java_class, Generator *generator, char *method_name, char con
 }
 */
 
-int msx(JavaClass *java_class, Generator *generator, char *method_name, int const_val)
+int msx(JavaClass *java_class, Generator *generator, const char *method_name, int const_val)
 {
   //CHECK_FUNC_CONST(someFunction,_I)
 
   return -1;
 }
 
-int msx(JavaClass *java_class, Generator *generator, char *function, int const_val1, int const_val2)
+int msx(JavaClass *java_class, Generator *generator, const char *function, int const_val1, int const_val2)
 {
   //CHECK_FUNC_CONST_2(someFunction,_II)
 

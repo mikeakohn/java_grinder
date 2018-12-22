@@ -112,13 +112,17 @@ void get_signature(std::string &signature, int *params, int *is_void)
   }
 }
 
-void get_static_function(
-  char *function,
+std::string get_static_function(
   std::string &method_name,
   std::string &method_sig)
 {
   const char *s;
   int ptr = 0;
+
+  // function name length should be length of method_name plus 1 char
+  // for the _ in between plus method_sig length plus a NULL terminator
+  // at maximum.
+  char function[method_name.length() + method_sig.length() + 2];
 
   s = method_name.c_str();
 
@@ -158,5 +162,7 @@ void get_static_function(
   if (ptr > 1 && function[ptr-1] == '_') { function[ptr-1] = 0; }
 
   function[ptr] = 0;
+
+  return std::string(function);
 }
 

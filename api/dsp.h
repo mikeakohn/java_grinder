@@ -15,7 +15,7 @@
 #include "Generator.h"
 #include "JavaClass.h"
 
-int dsp(JavaClass *java_class, Generator *generator, char *method_name);
+int dsp(JavaClass *java_class, Generator *generator, const char *method_name);
 
 #endif
 

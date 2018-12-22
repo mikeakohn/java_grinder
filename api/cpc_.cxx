@@ -37,7 +37,7 @@ if (strcmp(#funct#sig, function) == 0) \
 return generator->cpc_##funct##sig(const_val1, const_val2); \
 }
 
-int cpc(JavaClass *java_class, Generator *generator, char *method_name)
+int cpc(JavaClass *java_class, Generator *generator, const char *method_name)
 {
   // call with variable
   CHECK_FUNC(beep,)
@@ -62,7 +62,7 @@ int cpc(JavaClass *java_class, Generator *generator, char *method_name)
   return -1;
 }
 
-int cpc(JavaClass *java_class, Generator *generator, char *method_name, int const_val)
+int cpc(JavaClass *java_class, Generator *generator, const char *method_name, int const_val)
 {
   // call with one constant
   CHECK_FUNC_CONST(setTxtPen,_I) 
@@ -76,7 +76,7 @@ int cpc(JavaClass *java_class, Generator *generator, char *method_name, int cons
   return -1;
 }
 
-int cpc(JavaClass *java_class, Generator *generator, char *function, int const_val1, int const_val2)
+int cpc(JavaClass *java_class, Generator *generator, const char *function, int const_val1, int const_val2)
 {
    // call with two constants
   //CHECK_FUNC_CONST_2(someFunction,_II)

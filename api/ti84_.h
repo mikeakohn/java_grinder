@@ -15,7 +15,7 @@
 #include "Generator.h"
 #include "JavaClass.h"
 
-int ti84(JavaClass *java_class, Generator *generator, char *method_name);
+int ti84(JavaClass *java_class, Generator *generator, const char *method_name);
 
 #endif
 

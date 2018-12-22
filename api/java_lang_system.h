@@ -15,7 +15,7 @@
 #include "Generator.h"
 #include "JavaClass.h"
 
-int java_lang_system(JavaClass *java_class, Generator *generator, char *function);
+int java_lang_system(JavaClass *java_class, Generator *generator, const char *function);
 
 #endif
 

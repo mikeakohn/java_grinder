@@ -16,6 +16,7 @@
 
 #include "JavaClass.h"
 #include "JavaCompiler.h"
+#include "Util.h"
 #include "invoke.h"
 #include "invoke_virtual.h"
 #include "java_lang_string.h"
@@ -28,46 +29,10 @@
 #define DRAW3D_TEXTURE "net/mikekohn/java_grinder/Draw3D/Texture"
 #define DRAW3D_TEXTURE_LEN (sizeof(DRAW3D_TEXTURE) - 1)
 
-static void get_virtual_function(
-  char *function,
-  std::string &method_name,
-  std::string &method_sig,
-  std::string &field_name,
-  std::string &field_class)
-{
-  const char *s = field_class.c_str();
-  int ptr = 0;
-
-  while(*s != 0)
-  {
-    if (*s == '/') { ptr = 0; s++; continue; }
-    function[ptr++] = *s | 32;
-    s++;
-  }
-
-  function[ptr++] = '_';
-  s = field_name.c_str();
-
-  while (*s != 0) { function[ptr++] = *s; s++; }
-
-  function[ptr++] = '_';
-  s = method_name.c_str();
-
-  while (*s != 0) { function[ptr++] = *s; s++; }
-
-  function[ptr++] = '_';
-  s = method_sig.c_str() + 1;
-
-  while(*s != 0)
-  {
-    if (*s == ')') { break; }
-    function[ptr++] = *s;
-    s++;
-  }
-
-  function[ptr] = 0;
-}
-
+// FIXME: Is this function ever called?  This looks like it was made to
+// deal with stuff like System.out.println() where System is the class,
+// out is the field_name / field_type, and println() is the method_name /
+// method_sig.
 int invoke_virtual(JavaClass *java_class, int method_id, int field_id, Generator *generator)
 {
   std::string field_name;
@@ -76,7 +41,7 @@ int invoke_virtual(JavaClass *java_class, int method_id, int field_id, Generator
   std::string method_name;
   std::string method_sig;
   std::string method_class;
-  char function[256];
+  std::string function;
 
   printf("invoke_virtual() (static)\n");
 
@@ -99,30 +64,30 @@ int invoke_virtual(JavaClass *java_class, int method_id, int field_id, Generator
   printf("method: '%s as %s' from %s\n",
     method_name.c_str(), method_sig.c_str(), method_class.c_str());
 
-  get_virtual_function(function, method_name, method_sig, field_name, field_class);
+  function = Util::get_virtual_function(method_name, method_sig, field_name, field_class);
 
-  printf("function: %s()\n", function);
+  //printf("function: %s()\n", function);
 
   int ret = -1;
 
   if (field_class == "java/lang/System")
   {
-    ret = java_lang_system(java_class, generator, function);
+    ret = java_lang_system(java_class, generator, function.c_str());
   }
 
-  get_static_function(function, method_name, method_sig);
+  function = get_static_function(method_name, method_sig);
 
   printf("function=%s  %s field_class=%s\n",
-    function, field_name.c_str(), method_class.c_str());
+    function.c_str(), field_name.c_str(), method_class.c_str());
 
   if (method_class == "java/lang/String")
   {
-    ret = java_lang_string(java_class, generator, function, field_name.c_str(), field_id);
+    ret = java_lang_string(java_class, generator, function.c_str(), field_name.c_str(), field_id);
   }
 
   if (ret == 0) { return 0; }
 
-  printf("--> Function not implemented '%s'\n", function);
+  printf("--> Function not implemented '%s'\n", function.c_str());
 
   return -1;
 }
@@ -132,7 +97,7 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
   std::string method_name;
   std::string method_sig;
   std::string method_class;
-  char function[256];
+  std::string function;
   bool is_constructor = false;
 
   printf("invoke_virtual() (pushed)\n");
@@ -153,9 +118,9 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
     is_constructor = true;
   }
 
-  get_static_function(function, method_name, method_sig);
+  function = get_static_function(method_name, method_sig);
 
-  printf("virtual function: %s()\n", function);
+  //printf("virtual function: %s()\n", function.c_str());
 
   int ret = -1;
 
@@ -166,12 +131,11 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
   }
 #endif
 
-  //get_static_function(function, method_name, method_sig);
-  printf("function=%s  method_class=%s\n", function, method_class.c_str());
+  //printf("function=%s  method_class=%s\n", function.c_str(), method_class.c_str());
 
   if (method_class == "java/lang/String")
   {
-    ret = java_lang_string(java_class, generator, function);
+    ret = java_lang_string(java_class, generator, function.c_str());
   }
   else if (strncmp(method_class.c_str(), DRAW3D_TEXTURE, DRAW3D_TEXTURE_LEN) == 0)
   {
@@ -209,22 +173,22 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
 
         if (strcmp(cls, "Texture16") == 0)
         {
-          ret = draw3d_texture16(java_class, generator, function);
+          ret = draw3d_texture16(java_class, generator, function.c_str());
         }
           else
         if (strcmp(cls, "Texture24") == 0)
         {
-          ret = draw3d_texture24(java_class, generator, function);
+          ret = draw3d_texture24(java_class, generator, function.c_str());
         }
           else
         if (strcmp(cls, "Texture32") == 0)
         {
-          ret = draw3d_texture32(java_class, generator, function);
+          ret = draw3d_texture32(java_class, generator, function.c_str());
         }
 
         if (ret != -1) { break; }
 
-        ret = draw3d_texture(java_class, generator, function);
+        ret = draw3d_texture(java_class, generator, function.c_str());
 
       } while(0);
     }
@@ -287,7 +251,7 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
           strcmp(cls, "TriangleFan") == 0 ||
           strcmp(cls, "Sprite") == 0)
       {
-        ret = draw3d_object(java_class, generator, function);
+        ret = draw3d_object(java_class, generator, function.c_str());
       }
         else
       if (strcmp(cls, "TriangleWithTexture") == 0 ||
@@ -307,9 +271,9 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
 #endif
         do
         {
-          ret = draw3d_object_with_texture(java_class, generator, function);
+          ret = draw3d_object_with_texture(java_class, generator, function.c_str());
           if (ret == 0) { break; }
-          ret = draw3d_object(java_class, generator, function);
+          ret = draw3d_object(java_class, generator, function.c_str());
         } while(0);
       }
     }
@@ -317,7 +281,7 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
 
   if (ret == 0) { return 0; }
 
-  printf("--> Function not implemented '%s'\n", function);
+  printf("--> Function not implemented '%s'\n", function.c_str());
 
   return -1;
 }

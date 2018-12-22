@@ -248,7 +248,7 @@ static int c64_vic_color_ram_clear(JavaClass *java_class, Generator *generator)
   return generator->c64_vic_color_ram_clear();
 }
 
-int c64_vic(JavaClass *java_class, Generator *generator, char *function)
+int c64_vic(JavaClass *java_class, Generator *generator, const char *function)
 {
   CHECK_FUNC(sprite0pos)
   CHECK_FUNC(sprite1pos)

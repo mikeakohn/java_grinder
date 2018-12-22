@@ -17,8 +17,8 @@
 #include "Generator.h"
 #include "JavaClass.h"
 
-int sxb(JavaClass *java_class, Generator *generator, char *method_name);
-int sxb(JavaClass *java_class, Generator *generator, char *method_name, int const_val);
+int sxb(JavaClass *java_class, Generator *generator, const char *method_name);
+int sxb(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);
 
 #endif
 

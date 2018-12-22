@@ -207,7 +207,7 @@ static int dsp_shiftB(JavaClass *java_class, Generator *generator)
   return generator->dsp_shiftB();
 }
 
-int dsp(JavaClass *java_class, Generator *generator, char *function)
+int dsp(JavaClass *java_class, Generator *generator, const char *function)
 {
   CHECK_FUNC(getA)
   CHECK_FUNC(getB)

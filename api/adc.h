@@ -15,8 +15,8 @@
 #include "Generator.h"
 #include "JavaClass.h"
 
-int adc(JavaClass *java_class, Generator *generator, char *method_name);
-int adc(JavaClass *java_class, Generator *generator, char *method_name, int const_val);
+int adc(JavaClass *java_class, Generator *generator, const char *method_name);
+int adc(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);
 
 #endif
 

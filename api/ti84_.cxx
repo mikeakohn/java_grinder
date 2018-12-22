@@ -25,7 +25,7 @@
     return generator->ti84_##funct(); \
   }
 
-int ti84(JavaClass *java_class, Generator *generator, char *function)
+int ti84(JavaClass *java_class, Generator *generator, const char *function)
 {
   CHECK_FUNC(clearScreen)
   CHECK_FUNC(clearRect)

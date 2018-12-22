@@ -667,7 +667,10 @@ int JavaCompiler::push_ref(int index, _stack *stack)
   return ret;
 }
 
-int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const char *alt_name)
+int JavaCompiler::compile_method(
+   JavaClass *java_class,
+   int method_id,
+   const char *alt_name)
 {
   struct methods_t *method = java_class->get_method(method_id);
   uint8_t *bytes = method->attributes[0].info;

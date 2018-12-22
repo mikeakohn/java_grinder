@@ -29,7 +29,7 @@
     return generator->ioport_##funct##sig(port, const_val); \
   }
 
-int ioport(JavaClass *java_class, Generator *generator, char *method_name, int port)
+int ioport(JavaClass *java_class, Generator *generator, const char *method_name, int port)
 {
   CHECK_FUNC(setPinsAsInput,_I)
   CHECK_FUNC(setPinsAsOutput,_I)
@@ -48,7 +48,7 @@ int ioport(JavaClass *java_class, Generator *generator, char *method_name, int p
   return -1;
 }
 
-int ioport(JavaClass *java_class, Generator *generator, char *method_name, int port, int const_val)
+int ioport(JavaClass *java_class, Generator *generator, const char *method_name, int port, int const_val)
 {
   CHECK_FUNC_CONST(setPinsAsInput,_I)
   CHECK_FUNC_CONST(setPinsAsOutput,_I)

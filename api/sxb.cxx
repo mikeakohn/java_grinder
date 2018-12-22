@@ -31,7 +31,7 @@
     return generator->sxb_##funct##sig(const_val); \
   }
 
-int sxb(JavaClass *java_class, Generator *generator, char *method_name)
+int sxb(JavaClass *java_class, Generator *generator, const char *method_name)
 {
   CHECK_FUNC(getChar,)
   CHECK_FUNC(putChar,_C)
@@ -44,7 +44,7 @@ int sxb(JavaClass *java_class, Generator *generator, char *method_name)
   return -1;
 }
 
-int sxb(JavaClass *java_class, Generator *generator, char *method_name, int const_val)
+int sxb(JavaClass *java_class, Generator *generator, const char *method_name, int const_val)
 {
   return -1;
 }

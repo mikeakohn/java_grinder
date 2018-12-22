@@ -15,8 +15,8 @@
 #include "Generator.h"
 #include "JavaClass.h"
 
-int appleiigs(JavaClass *java_class, Generator *generator, char *method_name);
-int appleiigs(JavaClass *java_class, Generator *generator, char *method_name, int const_val);
+int appleiigs(JavaClass *java_class, Generator *generator, const char *method_name);
+int appleiigs(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);
 
 #endif
 

@@ -58,7 +58,7 @@ static int adc_read(JavaClass *java_class, Generator *generator)
 }
 #endif
 
-int adc(JavaClass *java_class, Generator *generator, char *function)
+int adc(JavaClass *java_class, Generator *generator, const char *function)
 {
   CHECK_FUNC(enable,)
   CHECK_FUNC(disable,)
@@ -68,7 +68,7 @@ int adc(JavaClass *java_class, Generator *generator, char *function)
   return -1;
 }
 
-int adc(JavaClass *java_class, Generator *generator, char *function, int const_val)
+int adc(JavaClass *java_class, Generator *generator, const char *function, int const_val)
 {
   CHECK_FUNC_CONST_1(setChannel,_I)
   return -1;

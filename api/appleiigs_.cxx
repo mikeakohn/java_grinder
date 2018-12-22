@@ -29,7 +29,7 @@
     return generator->appleiigs_##funct##sig(const_val); \
   }
 
-int appleiigs(JavaClass *java_class, Generator *generator, char *function)
+int appleiigs(JavaClass *java_class, Generator *generator, const char *function)
 {
   CHECK_FUNC(plotChar,_IC)
   CHECK_FUNC(printChar,_C)
@@ -55,7 +55,7 @@ int appleiigs(JavaClass *java_class, Generator *generator, char *function)
   return -1;
 }
 
-int appleiigs(JavaClass *java_class, Generator *generator, char *function, int const_val)
+int appleiigs(JavaClass *java_class, Generator *generator, const char *function, int const_val)
 {
   return -1;
 }

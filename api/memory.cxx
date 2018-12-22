@@ -35,7 +35,7 @@
     return generator->memory_##funct##sig(const_val); \
   }
 
-int memory(JavaClass *java_class, Generator *generator, char *function)
+int memory(JavaClass *java_class, Generator *generator, const char *function)
 {
   CHECK_FUNC(read8,_I)
   CHECK_FUNC(write8,_IB)
@@ -48,7 +48,7 @@ int memory(JavaClass *java_class, Generator *generator, char *function)
   return -1;
 }
 
-int memory(JavaClass *java_class, Generator *generator, char *function, int const_val)
+int memory(JavaClass *java_class, Generator *generator, const char *function, int const_val)
 {
   CHECK_FUNC_CONST(read8,_I)
   CHECK_FUNC_CONST(read16,_I)
@@ -56,7 +56,7 @@ int memory(JavaClass *java_class, Generator *generator, char *function, int cons
   return -1;
 }
 
-int memory(JavaClass *java_class, Generator *generator, char *function, const char *const_val)
+int memory(JavaClass *java_class, Generator *generator, const char *function, const char *const_val)
 {
   CHECK_FUNC_STRING(preloadByteArray,_X)
   CHECK_FUNC_STRING(preloadIntArray,_X)
