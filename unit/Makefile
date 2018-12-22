@@ -8,6 +8,6 @@ default:
 	g++ -o get_virtual_function get_virtual_function.cxx $(CFLAGS) $(OBJECTS)
 
 clean:
-	@rm -f method_sanitize get_static_function
+	@rm -f method_sanitize get_static_function get_virtual_function
 	@echo "Clean!"
 
