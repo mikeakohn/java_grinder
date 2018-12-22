@@ -83,9 +83,9 @@ int ARM::start_init()
   return 0;
 }
 
-int ARM::insert_static_field_define(const char *name, const char *type, int index)
+int ARM::insert_static_field_define(std::string &name, std::string &type, int index)
 {
-  fprintf(out, "%s equ %d\n", name, (index + 1) * 4);
+  fprintf(out, "%s equ %d\n", name.c_str(), (index + 1) * 4);
   return 0;
 }
 

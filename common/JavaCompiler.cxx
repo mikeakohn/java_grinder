@@ -2181,13 +2181,15 @@ void JavaCompiler::insert_static_field_defines()
   // Add all fields from this class
   for (index = 0; index < field_count; index++)
   {
-    char field_name[64];
-    char field_type[64];
+    std::string field_name;
+    std::string field_type;
+
     field = java_class->get_field(index);
     if ((field->access_flags & ACC_STATIC) == 0) { continue; }
 
-    java_class->get_field_name(field_name, sizeof(field_name), index);
-    java_class->get_field_type(field_type, sizeof(field_type), index);
+    java_class->get_field_name(field_name, index);
+    java_class->get_field_type(field_type, index);
+
     generator->insert_static_field_define(field_name, field_type, index);
   }
 
@@ -2195,9 +2197,15 @@ void JavaCompiler::insert_static_field_defines()
 
   // Add all fields from any external classes
   std::map<std::string,int>::iterator iter;
+
   for (iter = external_fields.begin(); iter != external_fields.end(); iter++)
   {
-    generator->insert_static_field_define(iter->first.c_str(), field_type_from_int(iter->second), external_index++);
+    std::string type = field_type_from_int(iter->second);
+
+    // :(
+    std::string field_name = iter->first;
+
+    generator->insert_static_field_define(field_name, type, external_index++);
   }
 }
 

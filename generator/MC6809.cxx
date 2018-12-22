@@ -71,9 +71,9 @@ int MC6809::start_init()
   return 0;
 }
 
-int MC6809::insert_static_field_define(const char *name, const char *type, int index)
+int MC6809::insert_static_field_define(std::string &name, std::string &type, int index)
 {
-  fprintf(out, "%s equ ram_start+%d\n", name, index * 2);
+  fprintf(out, "%s equ ram_start+%d\n", name.c_str(), index * 2);
 
   return 0;
 }

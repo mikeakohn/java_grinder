@@ -65,10 +65,9 @@ int X86::start_init()
   return 0;
 }
 
-int X86::insert_static_field_define(const char *name, const char *type, int index)
+int X86::insert_static_field_define(std::string &name, std::string &type, int index)
 {
-  //fprintf(out, "%s: resb 32\n", name);
-  fprintf(out, "%s: resb 4\n", name);
+  fprintf(out, "%s: resb 4\n", name.c_str());
   return 0;
 }
 

@@ -158,9 +158,9 @@ int Epiphany::start_init()
   return 0;
 }
 
-int Epiphany::insert_static_field_define(const char *name, const char *type, int index)
+int Epiphany::insert_static_field_define(std::string &name, std::string &type, int index)
 {
-  fprintf(out, "%s:\n", name);
+  fprintf(out, "%s:\n", name.c_str());
   fprintf(out, "  dw 0\n");
 
   return 0;

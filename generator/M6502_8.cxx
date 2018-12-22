@@ -117,7 +117,7 @@ int M6502_8::start_init()
   return 0;
 }
 
-int M6502_8::insert_static_field_define(const char *name, const char *type, int index)
+int M6502_8::insert_static_field_define(std::string &name, std::string &type, int index)
 {
   // do nothing, using equ instead of heap to save RAM
   return 0;

@@ -43,7 +43,7 @@ public:
   virtual int open(const char *filename);
   virtual int add_functions();
   virtual int start_init();
-  virtual int insert_static_field_define(const char *name, const char *type, int index);
+  virtual int insert_static_field_define(std::string &name, std::string &type, int index);
   virtual int init_heap(int field_count);
   //virtual int field_init_boolean(char *name, int index, int value);
   //virtual int field_init_byte(char *name, int index, int value);

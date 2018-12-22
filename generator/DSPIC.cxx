@@ -110,10 +110,10 @@ int DSPIC::start_init()
   return 0;
 }
 
-int DSPIC::insert_static_field_define(const char *name, const char *type, int index)
+int DSPIC::insert_static_field_define(std::string &name, std::string &type, int index)
 {
   if (type[0] == '[') { need_tables = true; }
-  fprintf(out, "%s equ ram_end-%d\n", name, (index + 2) * 2);
+  fprintf(out, "%s equ ram_end-%d\n", name.c_str(), (index + 2) * 2);
 
   return 0;
 }

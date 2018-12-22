@@ -57,9 +57,9 @@ int STDC::start_init()
   return 0;
 }
 
-int STDC::insert_static_field_define(const char *name, const char *type, int index)
+int STDC::insert_static_field_define(std::string &name, std::string &type, int index)
 {
-  fprintf(out, "static int32_t %s;\n", name);
+  fprintf(out, "static int32_t %s;\n", name.c_str());
 
   return 0;
 }

@@ -282,9 +282,9 @@ int AVR8::start_init()
   return 0;
 }
 
-int AVR8::insert_static_field_define(const char *name, const char *type, int index)
+int AVR8::insert_static_field_define(std::string &name, std::string &type, int index)
 {
-  fprintf(out, "%s equ ram_start + %d\n", name, (index + 1) * 2);
+  fprintf(out, "%s equ ram_start + %d\n", name.c_str(), (index + 1) * 2);
 
   return 0;
 }

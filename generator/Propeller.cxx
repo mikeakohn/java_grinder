@@ -132,9 +132,9 @@ int Propeller::start_init()
   return 0;
 }
 
-int Propeller::insert_static_field_define(const char *name, const char *type, int index)
+int Propeller::insert_static_field_define(std::string &name, std::string &type, int index)
 {
-  statics.push_back(name);
+  statics.push_back(name.c_str());
 
   return 0;
 }

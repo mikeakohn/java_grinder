@@ -68,7 +68,7 @@ public:
   virtual int get_cpu_byte_alignment() { return 2; }
   void label(std::string &name);
   virtual int start_init() = 0;
-  virtual int insert_static_field_define(const char *name, const char *type, int index) = 0;
+  virtual int insert_static_field_define(std::string &name, std::string &type, int index) = 0;
   virtual int init_heap(int field_count) = 0;
   //virtual int field_init_boolean(char *name, int index, int value) = 0;
   //virtual int field_init_byte(char *name, int index, int value) = 0;

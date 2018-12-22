@@ -107,9 +107,9 @@ int R5900::start_init()
   return 0;
 }
 
-int R5900::insert_static_field_define(const char *name, const char *type, int index)
+int R5900::insert_static_field_define(std::string &name, std::string &type, int index)
 {
-  fprintf(out, "  %s equ 0x%x\n", name, ram_end - (index + 1) * 4);
+  fprintf(out, "  %s equ 0x%x\n", name.c_str(), ram_end - (index + 1) * 4);
   return 0;
 }
 

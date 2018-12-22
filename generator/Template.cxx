@@ -55,7 +55,7 @@ int Template::start_init()
   return 0;
 }
 
-int Template::insert_static_field_define(const char *name, const char *type, int index)
+int Template::insert_static_field_define(std::string &name, std::string &type, int index)
 {
   return -1;
 }

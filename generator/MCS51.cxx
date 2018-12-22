@@ -63,7 +63,7 @@ int MCS51::start_init()
   return 0;
 }
 
-int MCS51::insert_static_field_define(const char *name, const char *type, int index)
+int MCS51::insert_static_field_define(std::string &name, std::string &type, int index)
 {
   return -1;
 }

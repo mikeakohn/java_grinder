@@ -367,6 +367,7 @@ void JavaClass::read_constant_pool(FILE *in)
  * can see dead people.  That's what you get for reading my source
  * code!  :)  */
 
+#if 0
 int JavaClass::get_name_constant(char *name, int len, int index)
 {
   struct constant_utf8_t *constant_utf8;
@@ -389,6 +390,7 @@ int JavaClass::get_name_constant(char *name, int len, int index)
 
   return 0;
 }
+#endif
 
 int JavaClass::get_name_constant(std::string &name, int index)
 {
@@ -396,6 +398,7 @@ int JavaClass::get_name_constant(std::string &name, int index)
   int tag,offset;
   void *heap;
 
+  name = "";
   if (index > constant_pool_count) { return -1; }
 
   offset = constant_pool[index];
@@ -411,6 +414,7 @@ int JavaClass::get_name_constant(std::string &name, int index)
   return 0;
 }
 
+#if 0
 int JavaClass::get_method_name(char *name, int len, int index)
 {
   struct methods_t *method;
@@ -423,11 +427,13 @@ int JavaClass::get_method_name(char *name, int len, int index)
 
   return 0;
 }
+#endif
 
 int JavaClass::get_method_name(std::string &name, int index)
 {
   struct methods_t *method;
 
+  name = "";
   if (index >= methods_count) { return -1; }
 
   method = (struct methods_t *)(methods_heap + methods[index]);
@@ -437,41 +443,30 @@ int JavaClass::get_method_name(std::string &name, int index)
   return 0;
 }
 
-int JavaClass::get_field_name(char *name, int len, int index)
+int JavaClass::get_field_name(std::string &name, int index)
 {
   struct fields_t *field;
 
-  name[0] = 0;
+  name = "";
   if (index >= fields_count) { return -1; }
 
   field = (struct fields_t *)(fields_heap + fields[index]);
-  get_name_constant(name, len, field->name_index);
+  get_name_constant(name, field->name_index);
 
   return 0;
 }
 
-int JavaClass::get_field_type(char *type, int len, int index)
+int JavaClass::get_field_type(std::string &type, int index)
 {
   struct fields_t *field;
 
-  type[0] = 0;
+  type = "";
   if (index >= fields_count) { return -1; }
 
   field = (struct fields_t *)(fields_heap + fields[index]);
-  get_name_constant(type, len, field->descriptor_index);
+  get_name_constant(type, field->descriptor_index);
 
   return 0;
-}
-
-const fields_t *JavaClass::get_field(int index)
-{
-  struct fields_t *field;
-
-  if (index >= fields_count) { return NULL; }
-
-  field = (struct fields_t *)(fields_heap + fields[index]);
-
-  return field;
 }
 
 int JavaClass::get_ref_name_type(
@@ -553,22 +548,6 @@ int JavaClass::get_ref_name_type(
   return -1;
 }
 
-bool JavaClass::is_ref_in_api(int index)
-{
-  std::string name;
-
-  if (get_class_name(name, index) == -1) { return true; }
-
-  if (strncmp(name.c_str(), "java/", 5) == 0) { return true; }
-  if (strncmp(name.c_str(), "net/mikekohn/java_grinder/",
-              sizeof("net/mikekohn/java_grinder/") -1) == 0)
-  {
-    return true;
-  }
-
-  return false;
-}
-
 int JavaClass::get_class_name(std::string &name, int index)
 {
   struct constant_fieldref_t *constant_fieldref;
@@ -612,6 +591,33 @@ int JavaClass::get_class_name(std::string &name, int index)
   }
 
   return -1;
+}
+
+const fields_t *JavaClass::get_field(int index)
+{
+  struct fields_t *field;
+
+  if (index >= fields_count) { return NULL; }
+
+  field = (struct fields_t *)(fields_heap + fields[index]);
+
+  return field;
+}
+
+bool JavaClass::is_ref_in_api(int index)
+{
+  std::string name;
+
+  if (get_class_name(name, index) == -1) { return true; }
+
+  if (strncmp(name.c_str(), "java/", 5) == 0) { return true; }
+  if (strncmp(name.c_str(), "net/mikekohn/java_grinder/",
+              sizeof("net/mikekohn/java_grinder/") -1) == 0)
+  {
+    return true;
+  }
+
+  return false;
 }
 
 int JavaClass::get_field_index(std::string &field_name)

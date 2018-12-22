@@ -181,20 +181,15 @@ public:
   JavaClass(FILE *in, bool is_main_class=true);
   ~JavaClass();
   void print();
-  int get_name_constant(char *name, int len, int index);
-  int get_method_name(char *name, int len, int index);
-  int get_field_name(char *name, int len, int index);
-  int get_field_type(char *name, int len, int index);
-
   int get_name_constant(std::string &name, int index);
   int get_method_name(std::string &name, int index);
-  //int get_field_name(std::string &name, int len, int index);
-  //int get_field_type(std::string &name, int len, int index);
+  int get_field_name(std::string &name, int index);
+  int get_field_type(std::string &type, int index);
+  int get_ref_name_type(std::string &name, std::string &type, int index);
+  int get_class_name(std::string &name, int index);
 
   const fields_t *get_field(int index);
-  int get_ref_name_type(std::string &name, std::string &type, int index);
   bool is_ref_in_api(int index);
-  int get_class_name(std::string &name, int index);
   void *get_constant(int index);
   struct methods_t *get_method(int index);
   int get_method_count() { return methods_count; }
