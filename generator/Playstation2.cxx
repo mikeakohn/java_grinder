@@ -208,20 +208,21 @@ int Playstation2::start_init()
   return 0;
 }
 
-int Playstation2::new_object(const char *object_name, int field_count)
+int Playstation2::new_object(std::string &object_name, int field_count)
 {
-  fprintf(out, "  ;; new_object(%s, field_count=%d)\n", object_name, field_count);
+  fprintf(out, "  ;; new_object(%s, field_count=%d)\n",
+    object_name.c_str(), field_count);
 
-  if (strncmp(object_name, DRAW3D, DRAW3D_LEN) != 0)
+  if (strncmp(object_name.c_str(), DRAW3D, DRAW3D_LEN) != 0)
   {
-     printf("Error: Unsupported class %s\n", object_name);
+     printf("Error: Unsupported class %s\n", object_name.c_str());
      return -1;
   }
 
-  const char *s = object_name;
+  const char *s = object_name.c_str();
 
   while(*s != 0) { s++; }
-  while(s != object_name && *s != '/') { s--; }
+  while(s != object_name.c_str() && *s != '/') { s--; }
   if (*s == '/') { s++; }
 
   if (strcmp(s, "Points") != 0 &&
@@ -238,7 +239,7 @@ int Playstation2::new_object(const char *object_name, int field_count)
       strcmp(s, "Texture24") != 0 &&
       strcmp(s, "Texture32") != 0)
   {
-     printf("Error: Unknown class %s\n", object_name);
+     printf("Error: Unknown class %s\n", object_name.c_str());
      return -1;
   }
 

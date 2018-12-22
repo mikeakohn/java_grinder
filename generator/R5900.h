@@ -104,7 +104,7 @@ public:
   virtual int get_static(std::string &name, int index);
   virtual int brk();
   virtual int new_array(uint8_t type);
-  virtual int new_object_array(const char *class_name);
+  virtual int new_object_array(std::string &class_name);
   virtual int insert_array(std::string &name, int32_t *data, int len, uint8_t type);
   virtual int insert_string(std::string &name, uint8_t *bytes, int len);
   virtual int push_array_length();

@@ -651,7 +651,7 @@ int JavaCompiler::push_ref(int index, _stack *stack)
   // Try to set local variable directly to the address of the static
   if (optimize)
   {
-    ret = generator->set_ref_local(index, field_name.c_str());
+    ret = generator->set_ref_local(index, field_name);
   }
     else
   {
@@ -1874,7 +1874,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
         // FIXME - Field count is 0 here.  This needs to be filled in and
         // class needs to be loaded and compiled in order to support user
         // defined classes.  Only API classes can be new'd right now.
-        ret = generator->new_object(class_name.c_str(), 0);
+        ret = generator->new_object(class_name, 0);
         break;
 
       case 188: // newarray (0xbc)
@@ -1884,7 +1884,7 @@ int JavaCompiler::compile_method(JavaClass *java_class, int method_id, const cha
       case 189: // anewarray (0xbd)
         index = GET_PC_UINT16(1);
         java_class->get_class_name(class_name, index);
-        ret = generator->new_object_array(class_name.c_str());
+        ret = generator->new_object_array(class_name);
         break;
 
       case 190: // arraylength (0xbe)

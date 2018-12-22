@@ -22,7 +22,7 @@ public:
 
   virtual int open(const char *filename);
   virtual int start_init();
-  virtual int new_object(const char *object_name, int field_count);
+  virtual int new_object(std::string &object_name, int field_count);
   virtual int draw3d_object_Constructor_X(int type, bool with_texture);
   virtual int draw3d_object_Constructor_I(int type, bool with_texture);
   virtual int draw3d_object_setContext_I();

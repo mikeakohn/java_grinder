@@ -348,9 +348,10 @@ int MSP430::set_integer_local(int index, int value)
   return 0;
 }
 
-int MSP430::set_ref_local(int index, char *name)
+int MSP430::set_ref_local(int index, std::string &name)
 {
-  fprintf(out, "  mov.w &%s, -%d(r12) ; local_%d = %s\n", name, LOCALS(index), index, name);
+  fprintf(out, "  mov.w &%s, -%d(r12) ; local_%d = %s\n",
+    name.c_str(), LOCALS(index), index, name.c_str());
 
   return 0;
 }

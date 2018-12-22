@@ -84,7 +84,7 @@ public:
   virtual int push_fake() { return -1; } // move stack ptr without push
   virtual int set_integer_local(int index, int value) { return -1; }
   virtual int set_float_local(int index, float value);
-  virtual int set_ref_local(int index, const char *name) { return -1; }
+  virtual int set_ref_local(int index, std::string &name) { return -1; }
   virtual int push_int(int32_t n) = 0;
   virtual int push_long(int64_t n);
   virtual int push_float(float f);
@@ -143,9 +143,9 @@ public:
   virtual int put_static(std::string &name, int index) = 0;
   virtual int get_static(std::string &name, int index) = 0;
   virtual int brk() = 0;
-  virtual int new_object(const char *object_name, int field_count);
+  virtual int new_object(std::string &object_name, int field_count);
   virtual int new_array(uint8_t type) = 0;
-  virtual int new_object_array(const char *class_name);
+  virtual int new_object_array(std::string &class_name);
   virtual int insert_array(std::string &name, int32_t *data, int len, uint8_t type) = 0;
   virtual int insert_string(std::string &name, uint8_t *bytes, int len) = 0;
   virtual int push_array_length() = 0;

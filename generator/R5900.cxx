@@ -1412,11 +1412,11 @@ int R5900::new_array(uint8_t type)
   return 0;
 }
 
-int R5900::new_object_array(const char *class_name)
+int R5900::new_object_array(std::string &class_name)
 {
   int t;
 
-  fprintf(out, "  ; new_object_array(%s)\n", class_name);
+  fprintf(out, "  ; new_object_array(%s)\n", class_name.c_str());
 
   if (stack > 0)
   {

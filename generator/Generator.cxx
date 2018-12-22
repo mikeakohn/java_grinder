@@ -45,7 +45,7 @@ int Generator::open(const char *filename)
   return 0;
 }
 
-int Generator::new_object_array(const char *class_name)
+int Generator::new_object_array(std::string &class_name)
 {
   printf("Error: Object arrays are not supported on this platform.\n");
   return -1;
@@ -177,7 +177,7 @@ int Generator::array_write_object(std::string &name, int field_id)
   return -1;
 }
 
-int Generator::new_object(const char *object_name, int field_count)
+int Generator::new_object(std::string &object_name, int field_count)
 {
   printf("Error: Object instantiation is not supported on this platform.\n");
   return -1;

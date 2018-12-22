@@ -41,7 +41,7 @@ public:
   virtual int push_ref_static(std::string &name, int index);
   virtual int push_fake();
   virtual int set_integer_local(int index, int value);
-  virtual int set_ref_local(int index, char *name);
+  virtual int set_ref_local(int index, std::string &name);
   virtual int push_int(int32_t n);
   //virtual int push_long(int64_t n);
   //virtual int push_float(float f);
