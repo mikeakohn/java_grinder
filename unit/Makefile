@@ -1,11 +1,12 @@
 
-CFLAGS=-O3 -Wall -I../common
-OBJECTS=../build/Util.o
+CFLAGS=-O3 -Wall -I../common -I../api
+OBJECTS=../build/Util.o ../build/invoke.o
 
 default:
 	g++ -o method_sanitize method_sanitize.cxx $(CFLAGS) $(OBJECTS)
+	g++ -o get_static_function get_static_function.cxx $(CFLAGS) $(OBJECTS)
 
 clean:
-	@rm -f method_sanitize
+	@rm -f method_sanitize get_static_function
 	@echo "Clean!"
 
