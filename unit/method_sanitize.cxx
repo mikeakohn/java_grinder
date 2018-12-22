@@ -23,7 +23,9 @@ int test(const char *method_name, const char *method_sig, const char *expected, 
 
   if (a != expected)
   {
-    printf("Error: method=%s%s expected=%s output=%s\n",
+    printf("Error: method=%s%s\n"
+           "     expected=%s\n"
+           "       output=%s\n",
       method_name, method_sig, expected, a.c_str());
     errors++;
     return -1;
@@ -31,7 +33,9 @@ int test(const char *method_name, const char *method_sig, const char *expected, 
 
   if (expected_param_count != param_count)
   {
-    printf("Error: method=%s%s expected=%d param_count=%d\n",
+    printf("Error: method=%s%s\n"
+           "     expected=%d\n"
+           "  param_count=%d\n",
       method_name, method_sig, expected_param_count, param_count);
     errors++;
     return -1;
@@ -53,7 +57,7 @@ int main(int argc, char *argv[])
   test("SquareRing_run", "()V", "SquareRing_run", 0);
   test("Stars_animateStars", "([SLnet/mikekohn/java_grinder/Draw3D/Points;)V", "Stars_animateStars_aSLnet_mikekohn_java_grinder_Draw3D_Points_", 2);
   test("Stars_run", "()V", "Stars_run", 0);
-  test("add_letters", "(Ljava/lang/String;)I", "add_letters_X", 0);
+  test("add_letters", "(Ljava/lang/String;)I", "add_letters_X", 1);
 
   return errors == 0 ? 0 : -1;
 }
