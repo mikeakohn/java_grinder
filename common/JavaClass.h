@@ -188,25 +188,20 @@ public:
   int get_ref_name_type(std::string &name, std::string &type, int index);
   int get_class_name(std::string &name, int index);
 
+  int get_method_count() { return methods_count; }
+  int get_field_count() { return fields_count; }
+  int get_constant_count() { return constant_pool_count; }
+
   const fields_t *get_field(int index);
   bool is_ref_in_api(int index);
   void *get_constant(int index);
   struct methods_t *get_method(int index);
-  int get_method_count() { return methods_count; }
-  int get_field_count() { return fields_count; }
-  int get_constant_count() { return constant_pool_count; }
   int get_field_index(std::string &field_name);
   int get_clinit_method();
   static const char *tag_as_string(int tag);
   bool use_full_method_name() { return is_main_class == false; }
-  const char *get_class_name() { return class_name.c_str(); }
-
-  int32_t magic;
-  int16_t minor_version;
-  int16_t major_version;
-  int16_t access_flags;
-  int16_t this_class;
-  int16_t super_class;
+  const char *get_this_class_name() { return class_name.c_str(); }
+  uint16_t get_this_class() { return this_class; }
 
   // Keep track of constants that need to be defined.
   std::map<int,int> needed_constants;
@@ -247,6 +242,13 @@ private:
   uint8_t *attributes_heap;
 
   bool is_main_class : 1;
+
+  int32_t magic;
+  int16_t minor_version;
+  int16_t major_version;
+  int16_t access_flags;
+  int16_t this_class;
+  int16_t super_class;
 };
 
 #endif

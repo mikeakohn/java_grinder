@@ -135,7 +135,8 @@ int JavaCompiler::find_external_fields(JavaClass *java_class, bool is_parent)
         constant_fieldref->tag == CONSTANT_METHODREF)
     {
       // Ignore fields that are in the parent class
-      if (is_parent && constant_fieldref->class_index == java_class->this_class)
+      if (is_parent &&
+          constant_fieldref->class_index == java_class->get_this_class())
       {
         continue;
       }
@@ -156,7 +157,7 @@ int JavaCompiler::find_external_fields(JavaClass *java_class, bool is_parent)
       DEBUG_PRINT("CLASSNAME '%s' field='%s'\n", class_name.c_str(), field_name.c_str());
 
       // If this field / method exists outside of this class...
-      if (strcmp(class_name.c_str(), java_class->get_class_name()) != 0)
+      if (class_name == java_class->get_this_class_name())
       {
         // If this reference is to something outside of this class,
         // recursively load this class.
