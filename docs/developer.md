@@ -84,6 +84,7 @@ If this is something that needs all new APIs, then steps would be:
 * Edit build/Makefile to add the new system to the SYSTEM= list matching filenames of what will be added to the generator directory.
 * Add a new generator/*.cxx and generator/*.h file that extends the CPU class needed.
 * Add API files to java/net/mikekohn/java_grinder/ .. functions added here should be empty function definitions or just return something if needed.  No code added here would be used by Java Grinder.
+* Edit build/Makefile and add to API= list if any new api/* file are added.
 * Edit java/Makefile for the new API.
 * If needed add a generator/API_* file into generator and make sure generator/Generator.h inherits from it.  All functions should be virtual and return -1.
 * Add files to api/* for the new API.

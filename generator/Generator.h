@@ -18,6 +18,7 @@
 #include <map>
 #include <string>
 
+#include "API_Amiga.h"
 #include "API_APPLEIIGS.h"
 #include "API_Atari2600.h"
 #include "API_C64.h"
@@ -39,6 +40,7 @@
 #include "API_TRS80_Coco.h"
 
 class Generator :
+  public API_Amiga,
   public API_AppleIIgs,
   public API_Atari2600,
   public API_C64,

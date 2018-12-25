@@ -9,6 +9,7 @@ VPATH=../generator:../common:../api
 
 API= \
   adc.o \
+  amiga.o \
   appleiigs_.o \
   atari_2600.o \
   c64_sid.o \
@@ -66,6 +67,7 @@ CPUS= \
   Z80.o
 
 SYSTEMS= \
+  Amiga.o \
   AppleIIgs.o \
   Atari2600.o \
   C64.o \
