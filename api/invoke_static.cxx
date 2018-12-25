@@ -20,6 +20,7 @@
 #include "invoke.h"
 #include "invoke_static.h"
 #include "adc.h"
+#include "amiga.h"
 #include "appleiigs_.h"
 #include "atari_2600.h"
 #include "c64_sid.h"
@@ -139,6 +140,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     CHECK(Memory, memory)
     CHECK(DSP, dsp)
     CHECK(AppleIIgs, appleiigs)
+    CHECK(Amiga, amiga)
     CHECK(Atari2600, atari_2600)
     CHECK(ADC, adc)
     CHECK(CPC, cpc)

@@ -17,6 +17,7 @@
 #include "Compiler.h"
 #include "JavaCompiler.h"
 #include "execute_static.h"
+#include "Amiga.h"
 #include "AppleIIgs.h"
 #include "ARM.h"
 #include "Atari2600.h"
@@ -62,6 +63,10 @@ static Generator *new_generator(const char *chip_type)
     generator = new MCS51();
   }
     else
+  if (strcasecmp("amiga", chip_type) == 0)
+  {
+    generator = new Amiga();
+  }
   if (strcasecmp("appleiigs", chip_type) == 0)
   {
     generator = new AppleIIgs();
