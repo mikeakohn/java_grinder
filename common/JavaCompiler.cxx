@@ -157,7 +157,7 @@ int JavaCompiler::find_external_fields(JavaClass *java_class, bool is_parent)
       DEBUG_PRINT("CLASSNAME '%s' field='%s'\n", class_name.c_str(), field_name.c_str());
 
       // If this field / method exists outside of this class...
-      if (class_name == java_class->get_this_class_name())
+      if (class_name != java_class->get_this_class_name())
       {
         // If this reference is to something outside of this class,
         // recursively load this class.
