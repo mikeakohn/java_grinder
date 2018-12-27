@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_APPLEIIGS_H
-#define _API_APPLEIIGS_H
+#ifndef API_APPLEIIGS_H
+#define API_APPLEIIGS_H
 
 class API_AppleIIgs
 {

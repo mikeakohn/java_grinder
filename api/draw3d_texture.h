@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _DRAW3D_TEXTURE_API_H
-#define _DRAW3D_TEXTURE_API_H
+#ifndef DRAW3D_TEXTURE_API_H
+#define DRAW3D_TEXTURE_API_H
 
 #include "Generator.h"
 #include "JavaClass.h"

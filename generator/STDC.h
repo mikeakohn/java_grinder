@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _STDC_H
-#define _STDC_H
+#ifndef STDC_H
+#define STDC_H
 
 #include "Generator.h"
 

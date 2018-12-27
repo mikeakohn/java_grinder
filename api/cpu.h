@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _CPU_H
-#define _CPU_H
+#ifndef CPU_H
+#define CPU_H
 
 #include "Generator.h"
 #include "JavaClass.h"

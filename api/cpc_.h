@@ -11,8 +11,8 @@
  *
  */
  
-#ifndef _CPC_H
-#define _CPC_H
+#ifndef CPC_H
+#define CPC_H
 
 #include "Generator.h"
 #include "JavaClass.h"

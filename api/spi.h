@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _SPI_H
-#define _SPI_H
+#ifndef SPI_H
+#define SPI_H
 
 #include "Generator.h"
 #include "JavaClass.h"

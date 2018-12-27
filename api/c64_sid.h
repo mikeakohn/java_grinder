@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _C64_SID_H
-#define _C64_SID_H
+#ifndef C64_SID_H
+#define C64_SID_H
 
 #include "Generator.h"
 #include "JavaClass.h"

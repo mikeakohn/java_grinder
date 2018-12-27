@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _TMS9900_H
-#define _TMS9900_H
+#ifndef TMS9900_H
+#define TMS9900_H
 
 #include "Generator.h"
 

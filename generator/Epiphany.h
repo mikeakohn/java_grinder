@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _EPIPHANY_H
-#define _EPIPHANY_H
+#ifndef EPIPHANY_H
+#define EPIPHANY_H
 
 #include "Generator.h"
 

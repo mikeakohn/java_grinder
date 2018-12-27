@@ -14,8 +14,8 @@
  *                  Emiliano Fraga - https://github.com/efraga-msx
  */
 
-#ifndef _MSX_H
-#define _MSX_H
+#ifndef MSX_H
+#define MSX_H
 
 #include "Z80.h"
 

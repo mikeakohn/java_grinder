@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _UTIL_H
-#define _UTIL_H
+#ifndef UTIL_H
+#define UTIL_H
 
 #include <string>
 

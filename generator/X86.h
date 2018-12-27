@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _X86_H
-#define _X86_H
+#ifndef X86_H
+#define X86_H
 
 #include "Generator.h"
 

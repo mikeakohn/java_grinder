@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_SEGA_GENESIS_H
-#define _API_SEGA_GENESIS_H
+#ifndef API_SEGA_GENESIS_H
+#define API_SEGA_GENESIS_H
 
 class API_SegaGenesis
 {

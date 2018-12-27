@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _INVOKE_VIRTUAL_H
-#define _INVOKE_VIRTUAL_H
+#ifndef INVOKE_VIRTUAL_H
+#define INVOKE_VIRTUAL_H
 
 #include "Generator.h"
 #include "JavaClass.h"

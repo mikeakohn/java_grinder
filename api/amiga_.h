@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _AMIGA_API_H
-#define _AMIGA_API_H
+#ifndef AMIGA_API_H
+#define AMIGA_API_H
 
 #include "Generator.h"
 #include "JavaClass.h"

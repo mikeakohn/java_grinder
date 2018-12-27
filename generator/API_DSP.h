@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_DSP_H
-#define _API_DSP_H
+#ifndef API_DSP_H
+#define API_DSP_H
 
 class API_DSP
 {

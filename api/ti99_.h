@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _TI99_H
-#define _TI99_H
+#ifndef TI99_H
+#define TI99_H
 
 #include "Generator.h"
 #include "JavaClass.h"

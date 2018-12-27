@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _WATCHDOG_H
-#define _WATCHDOG_H
+#ifndef WATCHDOG_H
+#define WATCHDOG_H
 
 #include "Generator.h"
 #include "JavaClass.h"

@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _JAVA_CLASS_H
-#define _JAVA_CLASS_H
+#ifndef JAVA_CLASS_H
+#define JAVA_CLASS_H
 
 #include <stdint.h>
 #include <map>

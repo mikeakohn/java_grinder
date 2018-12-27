@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _PROPELLER_H
-#define _PROPELLER_H
+#ifndef PROPELLER_H
+#define PROPELLER_H
 
 #include "Generator.h"
 #include "JavaClass.h"

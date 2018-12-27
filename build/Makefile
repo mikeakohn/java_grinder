@@ -2,14 +2,14 @@ CC?=gcc
 CXX?=g++
 DEBUG=-DDEBUG -g
 INCLUDES=-I../common -I../generator -I../api
-CFLAGS=-Wall -O3 $(DEBUG) $(INCLUDES)
+CFLAGS=-Wall -O3 $(DEBUG) $(INCLUDES) -std=c++0x
 #CFLAGS=-Wall $(DEBUG) $(INCLUDES)
 LDFLAGS=
 VPATH=../generator:../common:../api
 
 API= \
   adc.o \
-  amiga.o \
+  amiga_.o \
   appleiigs_.o \
   atari_2600.o \
   c64_sid.o \
@@ -41,7 +41,7 @@ API= \
   trs80_coco.o \
   uart.o \
   watchdog.o \
-  Math.o
+  MathUtil.o
 
 CPUS= \
   ARM.o \

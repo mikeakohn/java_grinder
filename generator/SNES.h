@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _SNES_H
-#define _SNES_H
+#ifndef SNES_H
+#define SNES_H
 
 #include "W65816.h"
 

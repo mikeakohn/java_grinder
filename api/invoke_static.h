@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _INVOKE_STATIC_H
-#define _INVOKE_STATIC_H
+#ifndef INVOKE_STATIC_H
+#define INVOKE_STATIC_H
 
 #include "Generator.h"
 #include "JavaClass.h"

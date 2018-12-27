@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _M6502_8_H
-#define _M6502_8_H
+#ifndef M6502_8_H
+#define M6502_8_H
 
 #include "Generator.h"
 

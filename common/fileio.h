@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _FILEIO_H
-#define _FILEIO_H
+#ifndef FILEIO_H
+#define FILEIO_H
 
 int16_t read_int16(FILE *in);
 int32_t read_int32(FILE *in);

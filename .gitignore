@@ -21,3 +21,5 @@ snap
 *.d64
 *.srec
 *.elf
+java_grinder.dSYM
+java_grinder

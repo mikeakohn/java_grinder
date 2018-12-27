@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_PARALLELLA_H
-#define _API_PARALLELLA_H
+#ifndef API_PARALLELLA_H
+#define API_PARALLELLA_H
 
 class API_Parallella
 {

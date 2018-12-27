@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_TI99_H
-#define _API_TI99_H
+#ifndef API_TI99_H
+#define API_TI99_H
 
 class API_TI99
 {

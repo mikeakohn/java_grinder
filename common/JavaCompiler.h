@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _JAVA_COMPILER_H
-#define _JAVA_COMPILER_H
+#ifndef JAVA_COMPILER_H
+#define JAVA_COMPILER_H
 
 #include <map>
 #include <string>

@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_PROPELLER_H
-#define _API_PROPELLER_H
+#ifndef API_PROPELLER_H
+#define API_PROPELLER_H
 
 class API_Propeller
 {

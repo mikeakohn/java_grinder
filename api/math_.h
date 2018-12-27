@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _MATH_H
-#define _MATH_H
+#ifndef MATH_H
+#define MATH_H
 
 #include "Generator.h"
 #include "JavaClass.h"

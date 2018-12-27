@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _PARALLELLA_H
-#define _PARALLELLA_H
+#ifndef PARALLELLA_H
+#define PARALLELLA_H
 
 #include "Generator.h"
 #include "JavaClass.h"

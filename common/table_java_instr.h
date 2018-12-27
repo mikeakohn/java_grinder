@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _TABLE_JAVA_INSTR
-#define _TABLE_JAVA_INSTR
+#ifndef TABLE_JAVA_INSTR
+#define TABLE_JAVA_INSTR
 
 #include <stdint.h>
 

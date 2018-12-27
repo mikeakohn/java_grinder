@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _MSP430X_H
-#define _MSP430X_H
+#ifndef MSP430X_H
+#define MSP430X_H
 
 #include "Generator.h"
 #include "MSP430.h"

@@ -9,18 +9,19 @@
  *
  */
 
-#ifndef _MATH_H
-#define _MATH_H
 
-class Math
+#ifndef MATHUTIL_H
+#define MATHUTIL_H
+
+class MathUtil
 {
 public:
   static void add_sin_table(FILE *out);
   static void add_cos_table(FILE *out);
 
 private:
-  Math() { }
-  ~Math() { }
+  MathUtil() { }
+  ~MathUtil() { }
 };
 
 #endif

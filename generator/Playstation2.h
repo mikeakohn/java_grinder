@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _PLAYSTATION_2_H
-#define _PLAYSTATION_2_H
+#ifndef PLAYSTATION_2_H
+#define PLAYSTATION_2_H
 
 #include "R5900.h"
 

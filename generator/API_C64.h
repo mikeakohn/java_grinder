@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_C64_H
-#define _API_C64_H
+#ifndef API_C64_H
+#define API_C64_H
 
 class API_C64
 {

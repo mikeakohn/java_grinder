@@ -20,7 +20,7 @@
 #include "invoke.h"
 #include "invoke_static.h"
 #include "adc.h"
-#include "amiga.h"
+#include "amiga_.h"
 #include "appleiigs_.h"
 #include "atari_2600.h"
 #include "c64_sid.h"

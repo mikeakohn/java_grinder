@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_SYSTEM_H
-#define _API_SYSTEM_H
+#ifndef API_SYSTEM_H
+#define API_SYSTEM_H
 
 class API_System
 {

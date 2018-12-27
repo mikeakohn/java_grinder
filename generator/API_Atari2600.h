@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_ATARI_2600_H
-#define _API_ATARI_2600_H
+#ifndef API_ATARI_2600_H
+#define API_ATARI_2600_H
 
 class API_Atari2600
 {

@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _AVR8_H
-#define _AVR8_H
+#ifndef AVR8_H
+#define AVR8_H
 
 #include "Generator.h"
 

@@ -1,4 +1,3 @@
-
 #JOBJS=$(shell ls *.java | sed 's/\.java/\.class/')
 
 default:

@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _APPLE_II_GS_H
-#define _APPLE_II_GS_H
+#ifndef APPLE_II_GS_H
+#define APPLE_II_GS_H
 
 #include "W65816.h"
 

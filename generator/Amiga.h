@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _AMIGA_H
-#define _AMIGA_H
+#ifndef AMIGA_H
+#define AMIGA_H
 
 #include "MC68000.h"
 

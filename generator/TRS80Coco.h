@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _TRS80_COCO_H
-#define _TRS80_COCO_H
+#ifndef TRS80_COCO_H
+#define TRS80_COCO_H
 
 #include "MC6809.h"
 

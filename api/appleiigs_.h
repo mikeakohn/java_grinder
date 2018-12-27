@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _APPLEIIGS_H
-#define _APPLEIIGS_H
+#ifndef APPLEIIGS_H
+#define APPLEIIGS_H
 
 #include "Generator.h"
 #include "JavaClass.h"

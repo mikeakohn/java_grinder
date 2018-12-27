@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _SEGA_GENESIS_H
-#define _SEGA_GENESIS_H
+#ifndef SEGA_GENESIS_H
+#define SEGA_GENESIS_H
 
 #include "MC68000.h"
 

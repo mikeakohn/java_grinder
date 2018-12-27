@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _PIC32_H
-#define _PIC32_H
+#ifndef PIC32_H
+#define PIC32_H
 
 #include "MIPS32.h"
 

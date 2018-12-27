@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _PLAYSTATION_2_API_H
-#define _PLAYSTATION_2_API_H
+#ifndef PLAYSTATION_2_API_H
+#define PLAYSTATION_2_API_H
 
 #include "Generator.h"
 #include "JavaClass.h"

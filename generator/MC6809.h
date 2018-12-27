@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _MC6809_H
-#define _MC6809_H
+#ifndef MC6809_H
+#define MC6809_H
 
 #include "Generator.h"
 

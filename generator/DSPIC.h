@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _DSPIC_H
-#define _DSPIC_H
+#ifndef DSPIC_H
+#define DSPIC_H
 
 #include "Generator.h"
 

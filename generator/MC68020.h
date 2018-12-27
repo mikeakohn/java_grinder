@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _MC68020_H
-#define _MC68020_H
+#ifndef MC68020_H
+#define MC68020_H
 
 #include "MC68000.h"
 

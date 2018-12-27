@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_MATH_H
-#define _API_MATH_H
+#ifndef API_MATH_H
+#define API_MATH_H
 
 class API_Math
 {

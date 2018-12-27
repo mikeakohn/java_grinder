@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _GENERATOR_H
-#define _GENERATOR_H
+#ifndef GENERATOR_H
+#define GENERATOR_H
 
 #include <stdio.h>
 #include <stdint.h>

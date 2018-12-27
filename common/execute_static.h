@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _EXECUTE_STATIC_H
-#define _EXECUTE_STATIC_H
+#ifndef EXECUTE_STATIC_H
+#define EXECUTE_STATIC_H
 
 #include "Generator.h"
 #include "JavaClass.h"

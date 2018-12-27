@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _TEMPLATE_H
-#define _TEMPLATE_H
+#ifndef TEMPLATE_H
+#define TEMPLATE_H
 
 #include "Generator.h"
 

@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _API_SXB_H
-#define _API_SXB_H
+#ifndef API_SXB_H
+#define API_SXB_H
 
 class API_SXB
 {

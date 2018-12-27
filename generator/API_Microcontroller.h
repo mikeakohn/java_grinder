@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_MICROCONTROLLER_H
-#define _API_MICROCONTROLLER_H
+#ifndef API_MICROCONTROLLER_H
+#define API_MICROCONTROLLER_H
 
 class API_Microcontroller
 {

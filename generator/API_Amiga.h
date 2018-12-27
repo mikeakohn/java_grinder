@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_AMIGA_H
-#define _API_AMIGA_H
+#ifndef API_AMIGA_H
+#define API_AMIGA_H
 
 class API_Amiga
 {

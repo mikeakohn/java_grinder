@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "Math.h"
+#include "MathUtil.h"
 #include "Playstation2.h"
 
 //#define USE_SPU2_DMA
@@ -85,8 +85,8 @@ Playstation2::~Playstation2()
   add_vu0_code();
   add_vu1_code();
   add_strings();
-  Math::add_sin_table(out);
-  Math::add_cos_table(out);
+  MathUtil::add_sin_table(out);
+  MathUtil::add_cos_table(out);
 }
 
 int Playstation2::open(const char *filename)

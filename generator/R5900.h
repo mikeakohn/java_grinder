@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _R5900_H
-#define _R5900_H
+#ifndef R5900_H
+#define R5900_H
 
 #include "Generator.h"
 

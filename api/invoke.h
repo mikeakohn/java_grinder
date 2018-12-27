@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _INVOKE_H
-#define _INVOKE_H
+#ifndef INVOKE_H
+#define INVOKE_H
 
 #include <string>
 

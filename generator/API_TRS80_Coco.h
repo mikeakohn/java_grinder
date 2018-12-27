@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_TRS80_COCO_H
-#define _API_TRS80_COCO_H
+#ifndef API_TRS80_COCO_H
+#define API_TRS80_COCO_H
 
 class API_TRS80_Coco
 {

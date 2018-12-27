@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_PLAYSTATION2_H
-#define _API_PLAYSTATION2_H
+#ifndef API_PLAYSTATION2_H
+#define API_PLAYSTATION2_H
 
 class API_Playstation2
 {

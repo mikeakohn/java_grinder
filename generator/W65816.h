@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _W65816_H
-#define _W65816_H
+#ifndef W65816_H
+#define W65816_H
 
 #include "Generator.h"
 

@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _MIPS32_H
-#define _MIPS32_H
+#ifndef MIPS32_H
+#define MIPS32_H
 
 #include "Generator.h"
 

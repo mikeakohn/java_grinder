@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _API_SNES_H
-#define _API_SNES_H
+#ifndef API_SNES_H
+#define API_SNES_H
 
 class API_SNES
 {

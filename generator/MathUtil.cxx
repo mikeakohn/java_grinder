@@ -13,9 +13,9 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "Math.h"
+#include "MathUtil.h"
 
-void Math::add_sin_table(FILE *out)
+void MathUtil::add_sin_table(FILE *out)
 {
   fprintf(out,
     ".align 32\n"
@@ -150,7 +150,7 @@ void Math::add_sin_table(FILE *out)
     "  dc32 -0.0522, -0.0400, -0.0277, -0.0155,\n\n");
 }
 
-void Math::add_cos_table(FILE *out)
+void MathUtil::add_cos_table(FILE *out)
 {
   fprintf(out,
     ".align 32\n"

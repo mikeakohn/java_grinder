@@ -14,8 +14,8 @@
  *                  Emiliano Fraga - https://github.com/efraga-msx
  */
 
-#ifndef _API_MSX_H
-#define _API_MSX_H
+#ifndef API_MSX_H
+#define API_MSX_H
 
 class API_MSX
 {

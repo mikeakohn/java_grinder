@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _W65C265SXB_H
-#define _W65C265SXB_H
+#ifndef W65C265SXB_H
+#define W65C265SXB_H
 
 #include "W65816.h"
 

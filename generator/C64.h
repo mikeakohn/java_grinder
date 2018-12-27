@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _C64_H
-#define _C64_H
+#ifndef C64_H
+#define C64_H
 
 #include "M6502.h"
 

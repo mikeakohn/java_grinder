@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _SXB_H
-#define _SXB_H
+#ifndef SXB_H
+#define SXB_H
 
 #include "Generator.h"
 #include "JavaClass.h"

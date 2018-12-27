@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _M6502_H
-#define _M6502_H
+#ifndef M6502_H
+#define M6502_H
 
 #include "Generator.h"
 

@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_TI84_H
-#define _API_TI84_H
+#ifndef API_TI84_H
+#define API_TI84_H
 
 class API_TI84
 {

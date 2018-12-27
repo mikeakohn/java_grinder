@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _ADC_H
-#define _ADC_H
+#ifndef ADC_H
+#define ADC_H
 
 #include "Generator.h"
 #include "JavaClass.h"

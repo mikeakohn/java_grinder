@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _MC68000_H
-#define _MC68000_H
+#ifndef MC68000_H
+#define MC68000_H
 
 #include "Generator.h"
 

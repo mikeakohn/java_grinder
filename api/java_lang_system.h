@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _JAVA_LANG_SYSTEM_H
-#define _JAVA_LANG_SYSTEM_H
+#ifndef JAVA_LANG_SYSTEM_H
+#define JAVA_LANG_SYSTEM_H
 
 #include "Generator.h"
 #include "JavaClass.h"
