@@ -21,6 +21,7 @@ public:
   virtual ~Amiga();
 
   virtual int open(const char *filename);
+  virtual int start_init();
   virtual int amiga_setPalette_II();
 
 private:

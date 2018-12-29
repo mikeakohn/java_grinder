@@ -112,16 +112,28 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
   //printf("function: %s()\n", function.c_str());
   int ret = -1;
 
-  const size_t len = sizeof("net/mikekohn/java_grinder/") - 1;
-  const size_t len_c64 = sizeof("net/mikekohn/java_grinder/c64/") - 1;
+  #define PACKAGE_C64 "net/mikekohn/java_grinder/c64/"
+  #define PACKAGE_AMIGA "net/mikekohn/java_grinder/amiga/"
 
-  if (strncmp("net/mikekohn/java_grinder/c64/",
-      method_class.c_str(), len_c64) == 0)
+  const size_t len = sizeof("net/mikekohn/java_grinder/") - 1;
+  const size_t len_c64 = sizeof(PACKAGE_C64) - 1;
+  const size_t len_amiga = sizeof(PACKAGE_AMIGA) - 1;
+
+  if (strncmp(PACKAGE_C64, method_class.c_str(), len_c64) == 0)
   {
     const char *cls = method_class.c_str() + len_c64;
 
     CHECK(SID, c64_sid);
     CHECK(VIC, c64_vic);
+  }
+    else
+  if (strncmp(PACKAGE_AMIGA, method_class.c_str(), len_amiga) == 0)
+  {
+    const char *cls = method_class.c_str() + len_amiga;
+
+    CHECK(Amiga, amiga);
+    //CHECK(Copper, amiga_copper);
+    //CHECK(Blitter, amiga_blitter);
   }
     else
   if (strncmp("net/mikekohn/java_grinder/", method_class.c_str(), len) == 0)
@@ -140,7 +152,6 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     CHECK(Memory, memory)
     CHECK(DSP, dsp)
     CHECK(AppleIIgs, appleiigs)
-    CHECK(Amiga, amiga)
     CHECK(Atari2600, atari_2600)
     CHECK(ADC, adc)
     CHECK(CPC, cpc)

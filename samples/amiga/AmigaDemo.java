@@ -1,7 +1,7 @@
 
-import net.mikekohn.java_grinder.Amiga.Amiga;
-import net.mikekohn.java_grinder.Amiga.Blitter;
-import net.mikekohn.java_grinder.Amiga.Copper;
+import net.mikekohn.java_grinder.amiga.Amiga;
+import net.mikekohn.java_grinder.amiga.Blitter;
+import net.mikekohn.java_grinder.amiga.Copper;
 
 public class AmigaDemo
 {
