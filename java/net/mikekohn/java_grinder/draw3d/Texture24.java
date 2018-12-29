@@ -9,7 +9,7 @@
  *
  */
 
-package net.mikekohn.java_grinder.Draw3D;
+package net.mikekohn.java_grinder.draw3d;
 
 public class Texture24 extends Texture
 {

@@ -9,9 +9,9 @@
  *
  */
 
-package net.mikekohn.java_grinder.Draw3D;
+package net.mikekohn.java_grinder.draw3d;
 
-import net.mikekohn.java_grinder.Draw3D.Draw3DObjectWithTexture;
+import net.mikekohn.java_grinder.draw3d.Draw3DObjectWithTexture;
 
 public class TriangleFanWithTexture extends Draw3DObjectWithTexture
 {

@@ -9,7 +9,7 @@
  *
  */
 
-package net.mikekohn.java_grinder.Draw3D;
+package net.mikekohn.java_grinder.draw3d;
 
 abstract public class Draw3DObjectWithTexture extends Draw3DObject
 {

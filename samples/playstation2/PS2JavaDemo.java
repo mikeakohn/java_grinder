@@ -1,10 +1,10 @@
 
 import net.mikekohn.java_grinder.Playstation2;
-import net.mikekohn.java_grinder.Draw3D.Points;
-import net.mikekohn.java_grinder.Draw3D.Triangle;
-import net.mikekohn.java_grinder.Draw3D.TriangleFan;
-import net.mikekohn.java_grinder.Draw3D.TriangleFanWithTexture;
-import net.mikekohn.java_grinder.Draw3D.Texture32;
+import net.mikekohn.java_grinder.draw3d.Points;
+import net.mikekohn.java_grinder.draw3d.Triangle;
+import net.mikekohn.java_grinder.draw3d.TriangleFan;
+import net.mikekohn.java_grinder.draw3d.TriangleFanWithTexture;
+import net.mikekohn.java_grinder.draw3d.Texture32;
 
 public class PS2JavaDemo
 {

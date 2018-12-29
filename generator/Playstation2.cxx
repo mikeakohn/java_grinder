@@ -19,7 +19,7 @@
 
 //#define USE_SPU2_DMA
 
-#define DRAW3D "net/mikekohn/java_grinder/Draw3D/"
+#define DRAW3D "net/mikekohn/java_grinder/draw3d/"
 #define DRAW3D_LEN (sizeof(DRAW3D) - 1)
 
 #define KERNEL_ENTER \

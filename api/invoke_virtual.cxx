@@ -24,9 +24,9 @@
 #include "common/JavaCompiler.h"
 #include "common/Util.h"
 
-#define DRAW3D "net/mikekohn/java_grinder/Draw3D"
+#define DRAW3D "net/mikekohn/java_grinder/draw3d"
 #define DRAW3D_LEN (sizeof(DRAW3D) - 1)
-#define DRAW3D_TEXTURE "net/mikekohn/java_grinder/Draw3D/Texture"
+#define DRAW3D_TEXTURE "net/mikekohn/java_grinder/draw3d/Texture"
 #define DRAW3D_TEXTURE_LEN (sizeof(DRAW3D_TEXTURE) - 1)
 
 // FIXME: Is this function ever called?  This looks like it was made to

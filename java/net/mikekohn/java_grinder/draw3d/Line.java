@@ -9,9 +9,9 @@
  *
  */
 
-package net.mikekohn.java_grinder.Draw3D;
+package net.mikekohn.java_grinder.draw3d;
 
-import net.mikekohn.java_grinder.Draw3D.Draw3DObject;
+import net.mikekohn.java_grinder.draw3d.Draw3DObject;
 
 public class Line extends Draw3DObject
 {

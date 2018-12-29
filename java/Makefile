@@ -28,23 +28,23 @@ JAVA_SRC=\
   $(SRC_DIR)/Parallella.java \
   $(SRC_DIR)/Playstation2.java \
   $(SRC_DIR)/Propeller.java \
-  $(SRC_DIR)/Draw3D/Draw3DObject.java \
-  $(SRC_DIR)/Draw3D/Draw3DObjectWithTexture.java \
-  $(SRC_DIR)/Draw3D/Points.java \
-  $(SRC_DIR)/Draw3D/Line.java \
-  $(SRC_DIR)/Draw3D/LineStrip.java \
-  $(SRC_DIR)/Draw3D/Sprite.java \
-  $(SRC_DIR)/Draw3D/SpriteWithTexture.java \
-  $(SRC_DIR)/Draw3D/Triangle.java \
-  $(SRC_DIR)/Draw3D/TriangleWithTexture.java \
-  $(SRC_DIR)/Draw3D/TriangleStrip.java \
-  $(SRC_DIR)/Draw3D/TriangleStripWithTexture.java \
-  $(SRC_DIR)/Draw3D/TriangleFan.java \
-  $(SRC_DIR)/Draw3D/TriangleFanWithTexture.java \
-  $(SRC_DIR)/Draw3D/Texture.java \
-  $(SRC_DIR)/Draw3D/Texture16.java \
-  $(SRC_DIR)/Draw3D/Texture24.java \
-  $(SRC_DIR)/Draw3D/Texture32.java \
+  $(SRC_DIR)/draw3d/Draw3DObject.java \
+  $(SRC_DIR)/draw3d/Draw3DObjectWithTexture.java \
+  $(SRC_DIR)/draw3d/Points.java \
+  $(SRC_DIR)/draw3d/Line.java \
+  $(SRC_DIR)/draw3d/LineStrip.java \
+  $(SRC_DIR)/draw3d/Sprite.java \
+  $(SRC_DIR)/draw3d/SpriteWithTexture.java \
+  $(SRC_DIR)/draw3d/Triangle.java \
+  $(SRC_DIR)/draw3d/TriangleWithTexture.java \
+  $(SRC_DIR)/draw3d/TriangleStrip.java \
+  $(SRC_DIR)/draw3d/TriangleStripWithTexture.java \
+  $(SRC_DIR)/draw3d/TriangleFan.java \
+  $(SRC_DIR)/draw3d/TriangleFanWithTexture.java \
+  $(SRC_DIR)/draw3d/Texture.java \
+  $(SRC_DIR)/draw3d/Texture16.java \
+  $(SRC_DIR)/draw3d/Texture24.java \
+  $(SRC_DIR)/draw3d/Texture32.java \
   $(SRC_DIR)/SegaGenesis.java \
   $(SRC_DIR)/SNES.java \
   $(SRC_DIR)/SPI.java \
