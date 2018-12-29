@@ -166,20 +166,15 @@ int JavaCompiler::find_external_fields(JavaClass *java_class, bool is_parent)
         iter = external_classes.find(class_name.c_str());
         if (iter == external_classes.end())
         {
-          char filename[1024];
+          std::string filename = classpath + class_name + ".class";
 
-          // This should be safe from earlier restrictions on string sizes.
-          strcpy(filename, classpath);
-          strcat(filename, class_name.c_str());
-          strcat(filename, ".class");
+          DEBUG_PRINT("find_external_fields: fopen('%s')\n", filename.c_str());
 
-          DEBUG_PRINT("find_external_fields: fopen('%s')\n", filename);
-
-          FILE *in = fopen(filename, "rb");
+          FILE *in = fopen(filename.c_str(), "rb");
 
           if (in == NULL)
           {
-            printf("Cannot open '%s'\n", filename);
+            printf("Cannot open '%s'\n", filename.c_str());
             return -1;
           }
 
