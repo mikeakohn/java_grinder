@@ -903,7 +903,7 @@ int M6502::invoke_static_method(const char *name, int params, int is_void)
 int local;
 int stack_vars = stack;
 
-  printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
+  //printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
 
   fprintf(out, "; invoke_static_method\n");
 

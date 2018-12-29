@@ -737,7 +737,7 @@ int Z80::invoke_static_method(const char *name, int params, int is_void)
 {
 int n;
 
-  printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
+  //printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
   fprintf(out, "  ;; invoke_static_method(%s,%d,%d)\n", name, params, is_void);
 
   // Pop all params off stack

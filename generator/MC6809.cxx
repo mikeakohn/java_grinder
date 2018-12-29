@@ -616,7 +616,7 @@ int MC6809::call(std::string &name)
 
 int MC6809::invoke_static_method(const char *name, int params, int is_void)
 {
-  printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
+  //printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
 
   fprintf(out, "  ; invoke_static_method() params=%d\n", params);
   fprintf(out, "  jsr %s\n", name);

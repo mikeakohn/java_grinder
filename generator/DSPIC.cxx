@@ -632,13 +632,13 @@ int DSPIC::call(std::string &name)
 
 int DSPIC::invoke_static_method(const char *name, int params, int is_void)
 {
-int local;
-int stack_vars = stack;
-int reg_vars = reg;
-int saved_registers;
-int n;
+  int local;
+  int stack_vars = stack;
+  int reg_vars = reg;
+  int saved_registers;
+  int n;
 
-  printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
+  //printf("invoke_static_method() name=%s params=%d is_void=%d\n", name, params, is_void);
 
   // Push all used registers on the stack except the ones that are pulled
   // out for parameters.
