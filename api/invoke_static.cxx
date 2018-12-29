@@ -113,9 +113,9 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
   int ret = -1;
 
   const size_t len = sizeof("net/mikekohn/java_grinder/") - 1;
-  const size_t len_c64 = sizeof("net/mikekohn/java_grinder/C64/") - 1;
+  const size_t len_c64 = sizeof("net/mikekohn/java_grinder/c64/") - 1;
 
-  if (strncmp("net/mikekohn/java_grinder/C64/",
+  if (strncmp("net/mikekohn/java_grinder/c64/",
       method_class.c_str(), len_c64) == 0)
   {
     const char *cls = method_class.c_str() + len_c64;

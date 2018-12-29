@@ -62,7 +62,7 @@ clean:
 	@rm -f java/*.class samples/*.class build/*.jar
 	@cd samples && make clean
 	@cd unit && make clean
-	@rm -rf build/net
+	@rm -rf build/net build/java
 	@rm -rf javadoc
 	@echo "Clean!"
 

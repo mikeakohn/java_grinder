@@ -9,7 +9,7 @@
  *
  */
 
-package net.mikekohn.java_grinder.C64;
+package net.mikekohn.java_grinder.c64;
 
 public class SID
 {

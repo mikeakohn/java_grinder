@@ -2,14 +2,14 @@ PKG_DIR=net/mikekohn/java_grinder
 
 SRC_DIR=net/mikekohn/java_grinder
 JAVA_SRC=\
-  $(SRC_DIR)/Amiga/Amiga.java \
-  $(SRC_DIR)/Amiga/Blitter.java \
-  $(SRC_DIR)/Amiga/Copper.java \
+  $(SRC_DIR)/amiga/Amiga.java \
+  $(SRC_DIR)/amiga/Blitter.java \
+  $(SRC_DIR)/amiga/Copper.java \
   $(SRC_DIR)/AppleIIgs.java \
   $(SRC_DIR)/Atari2600.java \
   $(SRC_DIR)/ADC.java \
-  $(SRC_DIR)/C64/SID.java \
-  $(SRC_DIR)/C64/VIC.java \
+  $(SRC_DIR)/c64/SID.java \
+  $(SRC_DIR)/c64/VIC.java \
   $(SRC_DIR)/CPC.java \
   $(SRC_DIR)/CPU.java \
   $(SRC_DIR)/DSP.java \
@@ -73,6 +73,4 @@ asdf: $(JOBJS)
 clean:
 	@rm -f *.class
 	@rm -f *.jar
-	@rm -rf net
-
 

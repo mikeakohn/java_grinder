@@ -9,7 +9,7 @@
  *
  */
 
-package net.mikekohn.java_grinder.Amiga;
+package net.mikekohn.java_grinder.amiga;
 
 abstract public class Copper
 {

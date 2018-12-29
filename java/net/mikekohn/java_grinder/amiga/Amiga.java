@@ -9,11 +9,11 @@
  *
  */
 
-package net.mikekohn.java_grinder.Amiga;
+package net.mikekohn.java_grinder.amiga;
 
-abstract public class Blitter
+abstract public class Amiga
 {
-  /** Placeholder. */
-  public static void setNothing() { }
+  /** Sets one of the color palettes. */
+  public static void setPalette(int index, int color) { }
 }
 

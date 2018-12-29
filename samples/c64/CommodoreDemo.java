@@ -1,5 +1,5 @@
 import net.mikekohn.java_grinder.Memory;
-import net.mikekohn.java_grinder.C64.*;
+import net.mikekohn.java_grinder.c64.*;
 
 public class CommodoreDemo
 {
