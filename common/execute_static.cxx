@@ -43,7 +43,13 @@
           break; \
         }
 
-int execute_static(JavaClass *java_class, int method_id, Generator *generator, bool do_arrays, bool verbose, JavaClass *parent_class)
+int execute_static(
+  JavaClass *java_class,
+  int method_id,
+  Generator *generator,
+  bool do_arrays,
+  bool verbose,
+  JavaClass *parent_class)
 {
   struct methods_t *method = java_class->get_method(method_id);
   uint8_t *bytes = method->attributes[0].info;
@@ -436,6 +442,7 @@ int execute_static(JavaClass *java_class, int method_id, Generator *generator, b
         DEBUG_PRINT("id=%d index=%d\n", temp, index);
 
         //stack_ptr--;  // <-- this is our made up index which here is always 0
+
         if (java_class->get_ref_name_type(field_name, type, index) != 0)
         {
           printf("Error retrieving field name %d\n", temp);

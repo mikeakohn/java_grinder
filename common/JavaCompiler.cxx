@@ -2224,6 +2224,7 @@ int JavaCompiler::add_static_initializers()
 
   // Add all the static initializers
   index = java_class->get_clinit_method();
+
   if (index != -1)
   {
     if (execute_static(java_class, index, generator, false, verbose) != 0)

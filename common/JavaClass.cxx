@@ -367,31 +367,6 @@ void JavaClass::read_constant_pool(FILE *in)
  * can see dead people.  That's what you get for reading my source
  * code!  :)  */
 
-#if 0
-int JavaClass::get_name_constant(char *name, int len, int index)
-{
-  struct constant_utf8_t *constant_utf8;
-  int tag,offset;
-  void *heap;
-
-  name[0] = 0;
-  if (index > constant_pool_count) { return -1; }
-
-  offset = constant_pool[index];
-  heap = (void *)(((uint8_t *)constants_heap) + offset);
-  tag = constants_heap[offset];
-
-  if (tag != CONSTANT_UTF8) { return -1; }
-
-  constant_utf8 = (constant_utf8_t *)heap;
-  if (len < constant_utf8->length - 1) { return -1; }
-  memcpy(name, constant_utf8->bytes, constant_utf8->length);
-  name[constant_utf8->length] = 0;
-
-  return 0;
-}
-#endif
-
 int JavaClass::get_name_constant(std::string &name, int index)
 {
   struct constant_utf8_t *constant_utf8;
@@ -480,6 +455,9 @@ int JavaClass::get_ref_name_type(
   int tag,offset;
   void *heap;
 
+  name = "";
+  type = "";
+
   while(1)
   {
     if (index > constant_pool_count) { return -1; }
@@ -555,6 +533,8 @@ int JavaClass::get_class_name(std::string &name, int index)
   struct constant_class_t *constant_class;
   int tag,offset;
   void *heap;
+
+  name = "";
 
   while(1)
   {
