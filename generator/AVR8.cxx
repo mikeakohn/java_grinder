@@ -15,7 +15,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "AVR8.h"
+#include "generator/AVR8.h"
 
 // ABI is:
 // r0 result0

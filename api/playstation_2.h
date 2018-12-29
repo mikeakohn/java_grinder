@@ -12,8 +12,8 @@
 #ifndef _PLAYSTATION_2_API_H
 #define _PLAYSTATION_2_API_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int playstation2(JavaClass *java_class, Generator *generator, const char *method_name);
 int playstation2(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);

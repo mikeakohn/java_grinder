@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "ARM.h"
+#include "generator/ARM.h"
 
 #define REG_STACK(a) (a)
 #define LOCALS(i) (i * 4)

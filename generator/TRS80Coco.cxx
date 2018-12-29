@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "TRS80Coco.h"
+#include "generator/TRS80Coco.h"
 
 TRS80Coco::TRS80Coco() :
   need_plot_lores(0),

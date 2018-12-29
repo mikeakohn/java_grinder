@@ -14,8 +14,8 @@
 #ifndef _CPC_H
 #define _CPC_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int cpc(JavaClass *java_class, Generator *generator, const char *method_name);
 int cpc(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);

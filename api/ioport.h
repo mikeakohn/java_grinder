@@ -12,8 +12,8 @@
 #ifndef _IOPORT_H
 #define _IOPORT_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int ioport(JavaClass *java_class, Generator *generator, const char *method_name, int port);
 int ioport(JavaClass *java_class, Generator *generator, const char *method_name, int port, int const_val);

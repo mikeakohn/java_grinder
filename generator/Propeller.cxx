@@ -14,7 +14,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "Propeller.h"
+#include "generator/Propeller.h"
 
 #define PUSH_IMMEDIATE(a) \
   fprintf(out, "  mov reg_%d, #%d\n", reg++, a & 0x1ff); \

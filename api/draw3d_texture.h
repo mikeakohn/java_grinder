@@ -12,8 +12,8 @@
 #ifndef _DRAW3D_TEXTURE_API_H
 #define _DRAW3D_TEXTURE_API_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int draw3d_texture(JavaClass *java_class, Generator *generator, const char *method_name);
 int draw3d_texture(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);

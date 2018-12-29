@@ -14,8 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "JavaClass.h"
-#include "watchdog.h"
+#include "api/watchdog.h"
 
 #define CHECK_FUNC(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \

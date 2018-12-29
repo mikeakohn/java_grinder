@@ -12,7 +12,7 @@
 #ifndef _ARM_H
 #define _ARM_H
 
-#include "Generator.h"
+#include "generator/Generator.h"
 
 class ARM : public Generator
 {

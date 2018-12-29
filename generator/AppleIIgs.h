@@ -12,7 +12,7 @@
 #ifndef _APPLE_II_GS_H
 #define _APPLE_II_GS_H
 
-#include "W65816.h"
+#include "generator/W65816.h"
 
 class AppleIIgs : public W65816
 {

@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "W65C265SXB.h"
+#include "generator/W65C265SXB.h"
 
 #define PUSH() \
   fprintf(out, "; PUSH\n"); \

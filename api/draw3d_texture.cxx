@@ -14,8 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "JavaClass.h"
-#include "draw3d_texture.h"
+#include "api/draw3d_texture.h"
 
 #define CHECK_FUNC(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \

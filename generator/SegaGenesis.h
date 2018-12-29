@@ -12,7 +12,7 @@
 #ifndef _SEGA_GENESIS_H
 #define _SEGA_GENESIS_H
 
-#include "MC68000.h"
+#include "generator/MC68000.h"
 
 class SegaGenesis : public MC68000
 {

@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "AppleIIgs.h"
+#include "generator/AppleIIgs.h"
 
 #define PUSH() \
   fprintf(out, "; PUSH\n"); \

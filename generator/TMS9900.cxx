@@ -15,7 +15,7 @@
 #include <stdint.h>
 #include <typeinfo>
 
-#include "TMS9900.h"
+#include "generator/TMS9900.h"
 
 #define LOCALS(i) (i * 2)
 #define CHECK_STACK() \

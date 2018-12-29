@@ -14,7 +14,7 @@
 #ifndef _CPC_H
 #define _CPC_H
 
-#include "Z80.h"
+#include "generator/Z80.h"
 
 class CPC : public Z80
 {

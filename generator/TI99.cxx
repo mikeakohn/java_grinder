@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "TI99.h"
+#include "generator/TI99.h"
 
 // http://www.nouspikel.com/ti99/titechpages.htm
 

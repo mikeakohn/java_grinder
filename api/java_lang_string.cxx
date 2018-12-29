@@ -14,9 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "JavaClass.h"
-#include "JavaCompiler.h"
-#include "java_lang_string.h"
+#include "api/java_lang_string.h"
 
 // FIXME: This should be changed to just the "pushed" versions
 

@@ -12,8 +12,8 @@
 #ifndef _C64_SID_H
 #define _C64_SID_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int c64_sid(JavaClass *java_class, Generator *generator, const char *method_name);
 

@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "Amiga.h"
+#include "generator/Amiga.h"
 
 Amiga::Amiga()
 {

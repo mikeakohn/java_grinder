@@ -12,7 +12,7 @@
 #ifndef _MSP430_H
 #define _MSP430_H
 
-#include "Generator.h"
+#include "generator/Generator.h"
 
 enum
 {

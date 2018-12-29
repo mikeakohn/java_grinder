@@ -14,7 +14,7 @@
 #ifndef _W65C134SXB_H
 #define _W65C134SXB_H
 
-#include "M6502.h"
+#include "generator/M6502.h"
 
 class W65C134SXB : public M6502
 {

@@ -14,8 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "JavaClass.h"
-#include "memory.h"
+#include "api/memory.h"
 
 #define CHECK_FUNC(funct,sig) \
   if (strcmp(#funct#sig, function) == 0) \

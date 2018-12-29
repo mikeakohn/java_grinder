@@ -12,8 +12,8 @@
 #ifndef _TIMER_H
 #define _TIMER_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int timer(JavaClass *java_class, Generator *generator, const char *method_name);
 int timer(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);

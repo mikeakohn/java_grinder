@@ -19,8 +19,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "JavaClass.h"
-#include "msx_.h"
+#include "api/msx_.h"
 
 // Trace Emiliano
 #define CHECK_FUNC(funct,sig) \

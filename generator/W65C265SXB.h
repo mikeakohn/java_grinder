@@ -14,7 +14,7 @@
 #ifndef _W65C265SXB_H
 #define _W65C265SXB_H
 
-#include "W65816.h"
+#include "generator/W65816.h"
 
 class W65C265SXB : public W65816
 {

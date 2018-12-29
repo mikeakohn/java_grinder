@@ -14,8 +14,8 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "TI84.h"
-#include "Z80.h"
+#include "generator/TI84.h"
+#include "generator/Z80.h"
 
 #define BCALL(a) \
   save_registers(); \

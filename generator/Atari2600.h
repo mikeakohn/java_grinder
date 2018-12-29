@@ -12,7 +12,7 @@
 #ifndef _ATARI_2600_H
 #define _ATARI_2600_H
 
-#include "M6502_8.h"
+#include "generator/M6502_8.h"
 
 class Atari2600 : public M6502_8
 {

@@ -14,7 +14,7 @@
 #ifndef _W65816_H
 #define _W65816_H
 
-#include "Generator.h"
+#include "generator/Generator.h"
 
 class W65816 : public Generator
 {

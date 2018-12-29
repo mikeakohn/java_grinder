@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "Atari2600.h"
+#include "generator/Atari2600.h"
 
 // http://www.alienbill.com/2600/101/docs/stella.html
 // http://problemkaputt.de/2k6specs.htm

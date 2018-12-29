@@ -17,7 +17,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 
-#include "DSPIC.h"
+#include "generator/DSPIC.h"
 
 #define REG_STACK(a) (stack_regs[a])
 #define LOCALS(i) (i * 2)

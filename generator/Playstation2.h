@@ -12,7 +12,7 @@
 #ifndef _PLAYSTATION_2_H
 #define _PLAYSTATION_2_H
 
-#include "R5900.h"
+#include "generator/R5900.h"
 
 class Playstation2 : public R5900
 {

@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "R5900.h"
+#include "generator/R5900.h"
 
 #define REG_STACK(a) (a)
 #define LOCALS(i) (-(i * 4))

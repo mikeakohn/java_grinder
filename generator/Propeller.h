@@ -15,7 +15,7 @@
 #include <vector>
 #include <string>
 
-#include "Generator.h"
+#include "generator/Generator.h"
 
 class Propeller : public Generator
 {

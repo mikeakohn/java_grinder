@@ -12,7 +12,7 @@
 #ifndef _TRS80_COCO_H
 #define _TRS80_COCO_H
 
-#include "MC6809.h"
+#include "generator/MC6809.h"
 
 class TRS80Coco : public MC6809
 {

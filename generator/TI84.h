@@ -12,7 +12,7 @@
 #ifndef _TI84_H
 #define _TI84_H
 
-#include "Z80.h"
+#include "generator/Z80.h"
 
 class TI84 : public Z80
 {

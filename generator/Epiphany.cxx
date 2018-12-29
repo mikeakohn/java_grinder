@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "Epiphany.h"
+#include "generator/Epiphany.h"
 
 #define REG_STACK(a) (reg_stack[a])
 #define LOCALS(i) (i * 4)

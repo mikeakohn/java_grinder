@@ -12,8 +12,8 @@
 #ifndef _TRS80_COCO_H
 #define _TRS80_COCO_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int trs80_coco(JavaClass *java_class, Generator *generator, const char *method_name);
 int trs80_coco(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);

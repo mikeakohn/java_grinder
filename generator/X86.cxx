@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "X86.h"
+#include "generator/X86.h"
 
 #define REG_STACK(a) (registers[a])
 #define REG_STACK8(a) (registers8[a])

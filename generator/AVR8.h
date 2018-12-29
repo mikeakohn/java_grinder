@@ -14,7 +14,7 @@
 #ifndef _AVR8_H
 #define _AVR8_H
 
-#include "Generator.h"
+#include "generator/Generator.h"
 
 enum
 {

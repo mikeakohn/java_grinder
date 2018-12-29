@@ -15,10 +15,10 @@
 #include <map>
 #include <string>
 
-#include "Compiler.h"
-#include "Generator.h"
-#include "JavaClass.h"
-#include "stack.h"
+#include "common/Compiler.h"
+#include "common/JavaClass.h"
+#include "common/stack.h"
+#include "generator/Generator.h"
 
 #define GET_PC_INT16(a) ((int16_t)(((uint16_t)bytes[pc+a+0])<<8|bytes[pc+a+1]))
 #define GET_PC_UINT16(a) (((uint16_t)bytes[pc+a+0])<<8|bytes[pc+a+1])

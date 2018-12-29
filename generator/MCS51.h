@@ -14,7 +14,7 @@
 #ifndef _TEMPLATE_H
 #define _TEMPLATE_H
 
-#include "Generator.h"
+#include "generator/Generator.h"
 
 class MCS51 : public Generator
 {

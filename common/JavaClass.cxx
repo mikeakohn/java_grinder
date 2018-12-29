@@ -17,8 +17,8 @@
 #include <inttypes.h>
 #include <string.h>
 
-#include "fileio.h"
-#include "JavaClass.h"
+#include "common/fileio.h"
+#include "common/JavaClass.h"
 
 JavaClass::JavaClass(FILE *in, bool is_main_class) :
   constant_pool(NULL),

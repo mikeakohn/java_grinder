@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "MC6809.h"
+#include "generator/MC6809.h"
 
 #define LOCALS(i) (i * 2)
 

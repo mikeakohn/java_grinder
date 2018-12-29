@@ -12,8 +12,8 @@
 #ifndef _ADC_H
 #define _ADC_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int adc(JavaClass *java_class, Generator *generator, const char *method_name);
 int adc(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);

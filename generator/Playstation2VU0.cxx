@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "Playstation2.h"
+#include "generator/Playstation2.h"
 
 void Playstation2::add_vu0_code()
 {

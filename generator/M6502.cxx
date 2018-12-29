@@ -16,7 +16,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "M6502.h"
+#include "generator/M6502.h"
 
 // ABI is:
 // A - accumulator

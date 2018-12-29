@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "MIPS32.h"
+#include "generator/MIPS32.h"
 
 #define REG_STACK(a) (a)
 #define LOCALS(i) (-(i * 4))

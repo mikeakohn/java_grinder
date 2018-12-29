@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "Math.h"
+#include "generator/Math.h"
 
 void Math::add_sin_table(FILE *out)
 {

@@ -14,10 +14,10 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "Generator.h"
-#include "JavaClass.h"
-#include "stack.h"
-#include "table_java_instr.h"
+#include "common/JavaClass.h"
+#include "common/stack.h"
+#include "common/table_java_instr.h"
+#include "generator/Generator.h"
 
 #define DEBUG_PRINT(a, ...) if (verbose == 1) { printf(a, ##__VA_ARGS__); }
 

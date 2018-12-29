@@ -12,8 +12,8 @@
 #ifndef _INVOKE_STATIC_H
 #define _INVOKE_STATIC_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int invoke_static(JavaClass *java_class, int method_id, Generator *generator);
 int invoke_static(JavaClass *java_class, int method_id, Generator *generator, int *const_vals, int const_count);

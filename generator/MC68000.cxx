@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "MC68000.h"
+#include "generator/MC68000.h"
 
 #define REG_STACK(a) (a)
 #define LOCALS(i) ((i + 1) * 4)

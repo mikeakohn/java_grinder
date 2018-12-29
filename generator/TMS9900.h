@@ -12,7 +12,7 @@
 #ifndef _TMS9900_H
 #define _TMS9900_H
 
-#include "Generator.h"
+#include "generator/Generator.h"
 
 #define REG_START 2
 #define REG_STACK(a) (a+REG_START)

@@ -12,8 +12,8 @@
 #ifndef _DSP_H
 #define _DSP_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int dsp(JavaClass *java_class, Generator *generator, const char *method_name);
 

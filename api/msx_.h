@@ -17,8 +17,8 @@
 #ifndef _MSX_H
 #define _MSX_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int msx(JavaClass *java_class, Generator *generator, const char *method_name);
 

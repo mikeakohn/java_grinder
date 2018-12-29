@@ -12,7 +12,7 @@
 #ifndef _Z80_H
 #define _Z80_H
 
-#include "Generator.h"
+#include "generator/Generator.h"
 
 class Z80 : public Generator
 {

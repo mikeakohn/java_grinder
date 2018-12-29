@@ -14,7 +14,7 @@
 #ifndef _C64_H
 #define _C64_H
 
-#include "M6502.h"
+#include "generator/M6502.h"
 
 class C64 : public M6502
 {

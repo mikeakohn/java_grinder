@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "MSP430X.h"
+#include "generator/MSP430X.h"
 
 // ABI is:
 // r4 top of stack

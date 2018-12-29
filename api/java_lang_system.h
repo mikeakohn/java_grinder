@@ -12,8 +12,8 @@
 #ifndef _JAVA_LANG_SYSTEM_H
 #define _JAVA_LANG_SYSTEM_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int java_lang_system(JavaClass *java_class, Generator *generator, const char *function);
 

@@ -14,8 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "MSP430.h"
-#include "MSP430X.h"
+#include "generator/MSP430X.h"
 
 // ABI is:
 // r4 top of stack

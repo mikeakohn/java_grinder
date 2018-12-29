@@ -12,7 +12,7 @@
 #ifndef _MIPS32_H
 #define _MIPS32_H
 
-#include "Generator.h"
+#include "generator/Generator.h"
 
 // Stack points to the last used slot.
 // push = subtract 4, then place value

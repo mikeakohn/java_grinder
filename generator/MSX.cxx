@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "MSX.h"
+#include "generator/MSX.h"
 
 MSX::MSX() :
   need_ldirvv(false)

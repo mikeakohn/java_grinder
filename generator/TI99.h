@@ -12,7 +12,7 @@
 #ifndef _TI99_H
 #define _TI99_H
 
-#include "TMS9900.h"
+#include "generator/TMS9900.h"
 
 class TI99 : public TMS9900
 {

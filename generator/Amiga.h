@@ -12,7 +12,7 @@
 #ifndef _AMIGA_H
 #define _AMIGA_H
 
-#include "MC68000.h"
+#include "generator/MC68000.h"
 
 class Amiga : public MC68000
 {

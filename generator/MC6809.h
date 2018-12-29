@@ -12,7 +12,7 @@
 #ifndef _MC6809_H
 #define _MC6809_H
 
-#include "Generator.h"
+#include "generator/Generator.h"
 
 class MC6809 : public Generator
 {

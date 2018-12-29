@@ -12,8 +12,8 @@
 #ifndef _MEMORY_H
 #define _MEMORY_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int memory(JavaClass *java_class, Generator *generator, const char *method_name);
 int memory(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);

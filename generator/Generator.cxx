@@ -16,9 +16,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-//#include "DSPIC.h"
-//#include "MSP430.h"
-#include "Generator.h"
+#include "generator/Generator.h"
 
 Generator::Generator() : label_count(0)
 {

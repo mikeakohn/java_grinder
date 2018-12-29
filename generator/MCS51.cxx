@@ -16,7 +16,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "MCS51.h"
+#include "generator/MCS51.h"
 
 #define REG_STACK(a) (a)
 #define LOCALS(i) (i * 2)

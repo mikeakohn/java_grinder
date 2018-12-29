@@ -12,8 +12,8 @@
 #ifndef _EXECUTE_STATIC_H
 #define _EXECUTE_STATIC_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int execute_static(JavaClass *java_class, int method_id, Generator *generator, bool do_arrays, bool verbose, JavaClass *parent_class=NULL);
 

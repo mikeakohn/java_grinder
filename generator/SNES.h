@@ -14,7 +14,7 @@
 #ifndef _SNES_H
 #define _SNES_H
 
-#include "W65816.h"
+#include "generator/W65816.h"
 
 class SNES : public W65816
 {

@@ -14,15 +14,15 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "JavaClass.h"
-#include "JavaCompiler.h"
-#include "Util.h"
-#include "invoke.h"
-#include "invoke_virtual.h"
-#include "java_lang_string.h"
-#include "java_lang_system.h"
-#include "draw3d_object.h"
-#include "draw3d_texture.h"
+#include "api/invoke.h"
+#include "api/invoke_virtual.h"
+#include "api/java_lang_string.h"
+#include "api/java_lang_system.h"
+#include "api/draw3d_object.h"
+#include "api/draw3d_texture.h"
+#include "common/JavaClass.h"
+#include "common/JavaCompiler.h"
+#include "common/Util.h"
 
 #define DRAW3D "net/mikekohn/java_grinder/Draw3D"
 #define DRAW3D_LEN (sizeof(DRAW3D) - 1)

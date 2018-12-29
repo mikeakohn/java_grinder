@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "PIC32.h"
+#include "generator/PIC32.h"
 
 #define CHECK_PORT_SPI() \
   if (port > 1) { printf("Illegal SPI port\n"); return -1; } \

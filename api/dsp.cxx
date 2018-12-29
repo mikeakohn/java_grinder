@@ -14,8 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "JavaClass.h"
-#include "dsp.h"
+#include "api/dsp.h"
 
 #define CHECK_FUNC(funct) \
   if (strncmp(#funct, function, sizeof(#funct)-1) == 0) \

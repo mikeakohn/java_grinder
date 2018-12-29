@@ -12,8 +12,8 @@
 #ifndef _TI99_H
 #define _TI99_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int ti99(JavaClass *java_class, Generator *generator, const char *method_name);
 int ti99(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);

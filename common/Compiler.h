@@ -12,7 +12,7 @@
 #ifndef _COMPILER_H
 #define _COMPILER_H
 
-#include "Generator.h"
+#include "generator/Generator.h"
 
 #define DEBUG_PRINT(a, ...) if (verbose == 1) { printf(a, ##__VA_ARGS__); }
 

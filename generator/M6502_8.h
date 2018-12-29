@@ -12,7 +12,7 @@
 #ifndef _M6502_8_H
 #define _M6502_8_H
 
-#include "Generator.h"
+#include "generator/Generator.h"
 
 #define PUSH_LO() \
   fprintf(out, "; PUSH_LO\n"); \

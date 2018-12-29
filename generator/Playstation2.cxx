@@ -14,8 +14,8 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "Math.h"
-#include "Playstation2.h"
+#include "generator/Math.h"
+#include "generator/Playstation2.h"
 
 //#define USE_SPU2_DMA
 

@@ -12,7 +12,7 @@
 #ifndef _EPIPHANY_H
 #define _EPIPHANY_H
 
-#include "Generator.h"
+#include "generator/Generator.h"
 
 class Epiphany : public Generator
 {

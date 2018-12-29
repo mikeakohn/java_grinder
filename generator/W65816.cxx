@@ -16,7 +16,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "W65816.h"
+#include "generator/W65816.h"
 
 #define PUSH() \
   fprintf(out, "; PUSH\n"); \

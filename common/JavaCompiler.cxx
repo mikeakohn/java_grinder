@@ -15,13 +15,13 @@
 #include <stdint.h>
 #include <assert.h>
 
-#include "JavaClass.h"
-#include "JavaCompiler.h"
-#include "Util.h"
-#include "execute_static.h"
-#include "invoke_static.h"
-#include "invoke_virtual.h"
-#include "table_java_instr.h"
+#include "common/JavaClass.h"
+#include "common/JavaCompiler.h"
+#include "common/Util.h"
+#include "common/execute_static.h"
+#include "common/table_java_instr.h"
+#include "api/invoke_static.h"
+#include "api/invoke_virtual.h"
 
 // http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html
 

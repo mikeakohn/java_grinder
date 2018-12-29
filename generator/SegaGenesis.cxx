@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "SegaGenesis.h"
+#include "generator/SegaGenesis.h"
 
 // Notes:
 // Screen size: 32x28 cells (or 256 x 224)

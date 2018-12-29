@@ -12,8 +12,8 @@
 #ifndef _SEGA_GENESIS_H
 #define _SEGA_GENESIS_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int sega_genesis(JavaClass *java_class, Generator *generator, const char *method_name);
 int sega_genesis(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);

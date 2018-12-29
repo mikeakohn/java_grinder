@@ -17,7 +17,7 @@
 #ifndef _MSX_H
 #define _MSX_H
 
-#include "Z80.h"
+#include "generator/Z80.h"
 
 class MSX : public Z80
 {

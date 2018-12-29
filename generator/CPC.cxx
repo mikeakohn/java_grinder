@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "CPC.h"
+#include "generator/CPC.h"
 
 CPC::CPC()
 {

@@ -12,8 +12,8 @@
 #ifndef _SPI_H
 #define _SPI_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int spi(JavaClass *java_class, Generator *generator, const char *method_name, int port);
 int spi(JavaClass *java_class, Generator *generator, const char *method_name, int port, int const_val);

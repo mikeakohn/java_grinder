@@ -12,8 +12,8 @@
 #ifndef _AMIGA_API_H
 #define _AMIGA_API_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int amiga(JavaClass *java_class, Generator *generator, const char *method_name);
 int amiga(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);

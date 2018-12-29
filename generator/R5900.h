@@ -12,7 +12,7 @@
 #ifndef _R5900_H
 #define _R5900_H
 
-#include "Generator.h"
+#include "generator/Generator.h"
 
 // Stack points to the last used slot.
 // push = subtract 4, then place value

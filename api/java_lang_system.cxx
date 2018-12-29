@@ -14,8 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "JavaClass.h"
-#include "JavaCompiler.h"
+#include "java_lang_system.h"
 
 static int system_out_println(JavaClass *java_class, Generator *generator)
 {

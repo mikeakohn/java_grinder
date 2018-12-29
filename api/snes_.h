@@ -14,8 +14,8 @@
 #ifndef _SNES_API_H
 #define _SNES_API_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int snes(JavaClass *java_class, Generator *generator, const char *method_name);
 int snes(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);

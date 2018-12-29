@@ -16,7 +16,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "C64.h"
+#include "generator/C64.h"
 
 #define POKE(dst) \
   POP_HI(); \

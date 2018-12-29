@@ -14,8 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "JavaClass.h"
-#include "cpu.h"
+#include "api/cpu.h"
 
 // FIXME - strncmp?  why?
 

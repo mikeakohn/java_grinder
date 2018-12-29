@@ -1,7 +1,8 @@
 
-#JOBJS=$(shell ls *.java | sed 's/\.java/\.class/')
-
 default:
+	@mkdir -p build/api
+	@mkdir -p build/common
+	@mkdir -p build/generator
 	@+make -C build
 
 .PHONY: samples
@@ -57,6 +58,7 @@ javadoc:
 
 clean:
 	@rm -f *.o java_grinder build/*.o *.asm *.lst *.hex *.prg
+	@rm -rf build/api build/common build/generator
 	@rm -f java/*.class samples/*.class build/*.jar
 	@cd samples && make clean
 	@cd unit && make clean

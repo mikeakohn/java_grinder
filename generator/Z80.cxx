@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "Z80.h"
+#include "generator/Z80.h"
 
 #define REG_STACK(a) (stack_regs[a])
 #define LOCALS(i) (i * 4)

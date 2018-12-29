@@ -9,7 +9,7 @@
  *
  */
 
-#include "table_java_instr.h"
+#include "common/table_java_instr.h"
 
 struct table_java_instr_t table_java_instr[] =
 {

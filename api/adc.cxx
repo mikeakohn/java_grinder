@@ -14,10 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "JavaClass.h"
-#include "adc.h"
-  //if (strncmp(#funct#sig, function, sizeof(#funct#sig)-1) == 0)
-  //if (strncmp(#funct#sig, function, sizeof(#funct#sig)-1) == 0)
+#include "api/adc.h"
 
 #define CHECK_FUNC(funct,sig) \
   if (strcmp(#funct#sig, function) == 0) \

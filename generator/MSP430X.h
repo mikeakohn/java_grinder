@@ -12,8 +12,7 @@
 #ifndef _MSP430X_H
 #define _MSP430X_H
 
-#include "Generator.h"
-#include "MSP430.h"
+#include "generator/MSP430.h"
 
 class MSP430X : public MSP430
 {

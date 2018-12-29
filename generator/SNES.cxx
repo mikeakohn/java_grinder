@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "SNES.h"
+#include "generator/SNES.h"
 
 SNES::SNES()
 {

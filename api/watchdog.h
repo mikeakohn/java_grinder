@@ -12,8 +12,8 @@
 #ifndef _WATCHDOG_H
 #define _WATCHDOG_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int watchdog(JavaClass *java_class, Generator *generator, const char *method_name);
 int watchdog(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);

@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "X86_64.h"
+#include "generator/X86_64.h"
 
 #define REG_STACK(a) (a)
 #define LOCALS(i) (i * 4)

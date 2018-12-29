@@ -12,7 +12,7 @@
 #ifndef _PIC32_H
 #define _PIC32_H
 
-#include "MIPS32.h"
+#include "generator/MIPS32.h"
 
 class PIC32 : public MIPS32
 {

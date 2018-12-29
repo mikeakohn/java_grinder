@@ -12,8 +12,8 @@
 #ifndef _TI84_H
 #define _TI84_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int ti84(JavaClass *java_class, Generator *generator, const char *method_name);
 

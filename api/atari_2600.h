@@ -12,8 +12,8 @@
 #ifndef _ATARI_2600_H
 #define _ATARI_2600_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int atari_2600(JavaClass *java_class, Generator *generator, const char *method_name);
 int atari_2600(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);

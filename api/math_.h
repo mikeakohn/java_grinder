@@ -12,8 +12,8 @@
 #ifndef _MATH_H
 #define _MATH_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int math(JavaClass *java_class, Generator *generator, const char *method_name);
 //int math(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);

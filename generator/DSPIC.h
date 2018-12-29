@@ -12,7 +12,7 @@
 #ifndef _DSPIC_H
 #define _DSPIC_H
 
-#include "Generator.h"
+#include "generator/Generator.h"
 
 enum
 {

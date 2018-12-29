@@ -12,8 +12,8 @@
 #ifndef _UART_H
 #define _UART_H
 
-#include "Generator.h"
-#include "JavaClass.h"
+#include "common/JavaClass.h"
+#include "generator/Generator.h"
 
 int uart(JavaClass *java_class, Generator *generator, const char *method_name, int port);
 int uart(JavaClass *java_class, Generator *generator, const char *method_name, int port, int const_val);

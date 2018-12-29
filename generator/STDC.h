@@ -12,7 +12,7 @@
 #ifndef _STDC_H
 #define _STDC_H
 
-#include "Generator.h"
+#include "generator/Generator.h"
 
 class STDC : public Generator
 {
