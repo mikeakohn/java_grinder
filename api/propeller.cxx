@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "api/propeller_.h"
+#include "api/propeller.h"
 
 #define CHECK_FUNC(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \

@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "api/math_.h"
+#include "api/math.h"
 
 #define CHECK_FUNC(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \

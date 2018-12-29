@@ -16,7 +16,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "api/snes_.h"
+#include "api/snes.h"
 
 #define CHECK_FUNC(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \

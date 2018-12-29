@@ -10,11 +10,11 @@ VPATH=../api:../common:../generator:..
 API= \
   api/adc.o \
   api/amiga.o \
-  api/appleiigs_.o \
+  api/appleiigs.o \
   api/atari_2600.o \
   api/c64_sid.o \
   api/c64_vic.o \
-  api/cpc_.o \
+  api/cpc.o \
   api/cpu.o \
   api/dsp.o \
   api/draw3d_object.o \
@@ -25,18 +25,18 @@ API= \
   api/ioport.o \
   api/java_lang_system.o \
   api/java_lang_string.o \
-  api/math_.o \
+  api/math.o \
   api/memory.o \
-  api/msx_.o \
+  api/msx.o \
   api/parallella.o \
   api/playstation_2.o \
-  api/propeller_.o \
+  api/propeller.o \
   api/sega_genesis.o \
-  api/snes_.o \
+  api/snes.o \
   api/spi.o \
   api/sxb.o \
-  api/ti84_.o \
-  api/ti99_.o \
+  api/ti84.o \
+  api/ti99.o \
   api/timer.o \
   api/trs80_coco.o \
   api/uart.o \

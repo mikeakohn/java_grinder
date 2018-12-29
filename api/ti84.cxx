@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "api/cpu.h"
+#include "api/ti84.h"
 
 // FIXME - strncmp?  why?
 
