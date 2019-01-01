@@ -1,5 +1,5 @@
 
-NAKEN_INCLUDE=../../../naken_asm/include/amiga
+NAKEN_INCLUDE=../../../naken_asm/include
 
 default: AmigaDemo.class
 

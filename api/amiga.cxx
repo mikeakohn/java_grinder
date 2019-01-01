@@ -37,6 +37,10 @@
 int amiga(JavaClass *java_class, Generator *generator, const char *method_name)
 {
   CHECK_FUNC(setPalette,_II)
+  CHECK_FUNC(disableMultitasking,)
+  CHECK_FUNC(enableMultitasking,)
+  CHECK_FUNC(disableInterrupts,)
+  CHECK_FUNC(enableInterrupts,)
 
   return -1;
 }

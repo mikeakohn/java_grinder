@@ -23,6 +23,10 @@ public:
   virtual int open(const char *filename);
   virtual int start_init();
   virtual int amiga_setPalette_II();
+  virtual int amiga_disableMultitasking();
+  virtual int amiga_enableMultitasking();
+  virtual int amiga_disableInterrupts();
+  virtual int amiga_enableInterrupts();
 
 private:
 };

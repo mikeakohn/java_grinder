@@ -45,7 +45,10 @@ int Amiga::start_init()
   // Add any set up items (stack, registers, etc).
   //MC68000::start_init();
 
-  fprintf(out, ".include \"amiga.inc\"\n");
+  fprintf(out,
+    ".include \"amiga/hardware.inc\"\n"
+    ".include \"amiga/exec.inc\"\n"
+  );
 
   fprintf(out,
     "\n"
@@ -71,9 +74,51 @@ int Amiga::start_init()
 int Amiga::amiga_setPalette_II()
 {
   fprintf(out, "  ;; amiga_setPalette_II()\n");
-  fprintf(out, "  move.w d%d, (COLOR00, a3)\n", reg - 1);
+  fprintf(out, "  lea (COLOR00, a3), a2\n");
+  fprintf(out, "  lsl.w #1, d%d\n", reg - 2);
+  fprintf(out, "  move.w d%d, (0, a2, d%d)\n", reg - 1, reg - 2);
 
-  reg--;
+  reg -= 2;
+
+  return 0;
+}
+
+int Amiga::amiga_disableMultitasking()
+{
+  fprintf(out,
+    "  ;; amiga_disableMultitasking()\n"
+    "  movea.l (ExecBase), a2\n"
+    "  jsr (Forbid,a2)\n");
+
+  return 0;
+}
+
+int Amiga::amiga_enableMultitasking()
+{
+  fprintf(out,
+    "  ;; amiga_enableMultitasking()\n"
+    "  movea.l (ExecBase), a2\n"
+    "  jsr (Permit,a2)\n");
+
+  return 0;
+}
+
+int Amiga::amiga_disableInterrupts()
+{
+  fprintf(out,
+    "  ;; amiga_disableInterrupts()\n"
+    "  movea.l (ExecBase), a2\n"
+    "  jsr (Disable,a2)\n");
+
+  return 0;
+}
+
+int Amiga::amiga_enableInterrupts()
+{
+  fprintf(out,
+    "  ;; amiga_enableInterrupts()\n"
+    "  movea.l (ExecBase), a2\n"
+    "  jsr (Enable,a2)\n");
 
   return 0;
 }
