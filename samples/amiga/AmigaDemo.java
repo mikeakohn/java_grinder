@@ -7,9 +7,10 @@ public class AmigaDemo
 {
   static public void main(String args[])
   {
-    Amiga.setPalette(0, 0xfff);
-
-    while(true);
+    while(true)
+    {
+      Amiga.setPalette(0, 0xf0f);
+    }
   }
 }
 
