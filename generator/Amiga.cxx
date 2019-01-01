@@ -71,18 +71,6 @@ int Amiga::start_init()
   return 0;
 }
 
-int Amiga::amiga_setPalette_II()
-{
-  fprintf(out, "  ;; amiga_setPalette_II()\n");
-  fprintf(out, "  lea (COLOR00, a3), a2\n");
-  fprintf(out, "  lsl.w #1, d%d\n", reg - 2);
-  fprintf(out, "  move.w d%d, (0, a2, d%d)\n", reg - 1, reg - 2);
-
-  reg -= 2;
-
-  return 0;
-}
-
 int Amiga::amiga_disableMultitasking()
 {
   fprintf(out,
@@ -119,6 +107,130 @@ int Amiga::amiga_enableInterrupts()
     "  ;; amiga_enableInterrupts()\n"
     "  movea.l (ExecBase), a2\n"
     "  jsr (Enable,a2)\n");
+
+  return 0;
+}
+
+int Amiga::amiga_setPalette_II()
+{
+  fprintf(out,
+    "  ;; amiga_setPalette_II()\n"
+    "  lea (COLOR00,a3), a2\n"
+    "  lsl.w #1, d%d\n"
+    "  move.w d%d, (0,a2,d%d)\n",
+    reg - 2, reg - 1, reg - 2);
+
+  reg -= 2;
+
+  return 0;
+}
+
+int Amiga::amiga_setSpriteImage_IAJ()
+{
+  fprintf(out,
+    "  ;; amiga_setSpriteImage_IAJ()\n"
+    "  andi.w #0x7, d%d\n"
+    "  lsl.l #2, d%d\n"
+    "  add.w #SPR0PTH, d%d\n"
+    "  move.l d%d, (0,a3,d%d)\n",
+    reg - 2,
+    reg - 2,
+    reg - 2,
+    reg - 1,
+    reg - 2
+  );
+
+  reg -= 2;
+
+  return 0;
+}
+
+int Amiga::amiga_setSpritePosition_IIII()
+{
+  // Clean up input first:
+  // index = (index & 7) * 4  <- make sure index is 0 to 7 and multiply by 8
+
+  fprintf(out,
+    "  ;; amiga_setSpritePosition_IIII()\n"
+    "  andi.w #0x7, d%d\n"
+    "  lsl.l #3, d%d\n"
+    "  andi.w #0x1ff, d%d\n"
+    "  andi.w #0x1ff, d%d\n"
+    "  andi.w #0x1ff, d%d\n",
+    reg - 4,
+    reg - 4,
+    reg - 3,
+    reg - 2,
+    reg - 1
+  );
+
+  // Need to fit data in:
+  // SPR0POS 0x140
+  //   15 to 8: VSTART low  8 bits
+  //    7 to 0: HSTART high 8 bits
+  // SPR0CTL 0x142
+  //   15 to 8: VSTOP  low  8 bits
+  //         2: VSTART high 1 bit
+  //         1: VSTOP  high 1 bit
+  //         0: HSTART low  1 bit
+
+  // hstart = hstart >> 1
+  // d5     = hstart & 1
+
+  fprintf(out,
+    "  move.w d%d, d5\n"
+    "  lsr.w #1, d5\n"
+    "  andi.w #1, d%d\n",
+    reg - 3,
+    reg - 3
+  );
+
+  // vstart = vstart & 0xff
+  // d6     = (vstart & 0x100) >> 6
+  // d5     = d5 | d6
+
+  fprintf(out,
+    "  move.w d%d, d6\n"
+    "  andi.w #0x100, d6\n"
+    "  lsr.w #6, d6\n"
+    "  andi.w #0xff, d%d\n"
+    "  or.w d5, d6\n",
+    reg - 2,
+    reg - 2
+  );
+
+  // SPRxPOS = (vstart << 8) | hstart
+
+  fprintf(out,
+    "  addi.w #SPR0POS, d%d\n"
+    "  or.w d%d, d%d\n"
+    "  move.w d%d, (0,a3,d%d)",
+    reg - 4,
+    reg - 3, reg - 2,
+    reg - 2, reg - 4);
+
+  // temp |= (vstop & 0x100) >> 7
+  // vstop = vstop & 0xff
+  // temp |= (vstop << 8)
+  // SPR0CTL = temp
+
+  fprintf(out,
+    "  move.w d%d, d6\n"
+    "  andi.w #0x100, d6\n"
+    "  lsr.w #7, d6\n"
+    "  andi.w #0xff, d%d\n"
+    "  or.w d6, d5\n"
+    "  lsl.w #8, d%d\n"
+    "  or.w d%d, d5\n"
+    "  move.w d5, (2,a3,d%d)\n",
+    reg - 1,
+    reg - 1,
+    reg - 1,
+    reg - 1,
+    reg - 1
+  );
+
+  reg -= 4;
 
   return 0;
 }
