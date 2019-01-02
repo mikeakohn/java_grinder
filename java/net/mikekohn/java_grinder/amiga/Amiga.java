@@ -5,7 +5,7 @@
  *     Web: http://www.naken.cc/
  * License: GPL
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2019 by Michael Kohn
  *
  */
 
@@ -35,6 +35,6 @@ abstract public class Amiga
       hstart is 0 to 511.
       vstart is 0 to 511.
       vstop is 0 to 511.  */
-  public static void setSpritePostion(int index, int hstart, int vstart, int vstop) { }
+  public static void setSpritePosition(int index, int hstart, int vstart, int vstop) { }
 }
 

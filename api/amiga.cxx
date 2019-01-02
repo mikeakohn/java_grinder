@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2019 by Michael Kohn
  *
  */
 
@@ -41,7 +41,7 @@ int amiga(JavaClass *java_class, Generator *generator, const char *method_name)
   CHECK_FUNC(disableInterrupts,)
   CHECK_FUNC(enableInterrupts,)
   CHECK_FUNC(setPalette,_II)
-  CHECK_FUNC(setSpriteImage,_IAJ)
+  CHECK_FUNC(setSpriteImage,_IaI)
   CHECK_FUNC(setSpritePosition,_IIII)
 
   return -1;

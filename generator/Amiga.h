@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2019 by Michael Kohn
  *
  */
 
@@ -27,7 +27,7 @@ public:
   virtual int amiga_disableInterrupts();
   virtual int amiga_enableInterrupts();
   virtual int amiga_setPalette_II();
-  virtual int amiga_setSpriteImage_IAJ();
+  virtual int amiga_setSpriteImage_IaI();
   virtual int amiga_setSpritePosition_IIII();
 
 private:

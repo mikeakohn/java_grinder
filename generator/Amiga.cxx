@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2019 by Michael Kohn
  *
  */
 
@@ -59,7 +59,9 @@ int Amiga::start_init()
     "  dc32 0x0000_0000  ; first_hunk\n"
     "  dc32 0x0000_0000  ; last_hunk\n"
     "  dc32 (_amiga_grind_end - _amiga_grind_start) / 4\n"
-    "  dc32 0x0000_03e9  ; hunk_code\n\n"
+    // FIXME: Statics need to be in chip RAM if the custom chips use them
+    //"  dc32 0x0000_03e9  ; hunk_code\n\n"
+    "  dc32 0x4000_03e9  ; hunk_code\n\n"
     "  dc32 (_amiga_grind_end - _amiga_grind_start) / 4\n"
     "_amiga_grind_start:\n"
   );
@@ -125,12 +127,12 @@ int Amiga::amiga_setPalette_II()
   return 0;
 }
 
-int Amiga::amiga_setSpriteImage_IAJ()
+int Amiga::amiga_setSpriteImage_IaI()
 {
   fprintf(out,
-    "  ;; amiga_setSpriteImage_IAJ()\n"
-    "  andi.w #0x7, d%d\n"
-    "  lsl.l #2, d%d\n"
+    "  ;; amiga_setSpriteImage_IaI()\n"
+    "  andi.l #0x7, d%d\n"
+    "  lsl.w #2, d%d\n"
     "  add.w #SPR0PTH, d%d\n"
     "  move.l d%d, (0,a3,d%d)\n",
     reg - 2,
@@ -152,8 +154,8 @@ int Amiga::amiga_setSpritePosition_IIII()
 
   fprintf(out,
     "  ;; amiga_setSpritePosition_IIII()\n"
-    "  andi.w #0x7, d%d\n"
-    "  lsl.l #3, d%d\n"
+    "  andi.l #0x7, d%d\n"
+    "  lsl.w #3, d%d\n"
     "  andi.w #0x1ff, d%d\n"
     "  andi.w #0x1ff, d%d\n"
     "  andi.w #0x1ff, d%d\n",
@@ -204,7 +206,7 @@ int Amiga::amiga_setSpritePosition_IIII()
   fprintf(out,
     "  addi.w #SPR0POS, d%d\n"
     "  or.w d%d, d%d\n"
-    "  move.w d%d, (0,a3,d%d)",
+    "  move.w d%d, (0,a3,d%d)\n",
     reg - 4,
     reg - 3, reg - 2,
     reg - 2, reg - 4);
