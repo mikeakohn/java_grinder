@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _ATARI_2600_H
-#define _ATARI_2600_H
+#ifndef JAVA_GRINDER_GENERATOR_ATARI_2600_H
+#define JAVA_GRINDER_GENERATOR_ATARI_2600_H
 
 #include "generator/M6502_8.h"
 

@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _APPLEIIGS_H
-#define _APPLEIIGS_H
+#ifndef JAVA_GRINDER_API_APPLEIIGS_H
+#define JAVA_GRINDER_API_APPLEIIGS_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"

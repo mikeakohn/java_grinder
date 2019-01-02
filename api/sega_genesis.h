@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _SEGA_GENESIS_H
-#define _SEGA_GENESIS_H
+#ifndef JAVA_GRINDER_API_SEGA_GENESIS_H
+#define JAVA_GRINDER_API_SEGA_GENESIS_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"

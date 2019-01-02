@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _M6502_H
-#define _M6502_H
+#ifndef JAVA_GRINDER_GENERATOR_M6502_H
+#define JAVA_GRINDER_GENERATOR_M6502_H
 
 #include "generator/Generator.h"
 

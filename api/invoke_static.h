@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _INVOKE_STATIC_H
-#define _INVOKE_STATIC_H
+#ifndef JAVA_GRINDER_API_INVOKE_STATIC_H
+#define JAVA_GRINDER_API_INVOKE_STATIC_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"

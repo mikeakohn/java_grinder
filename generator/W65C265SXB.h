@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _W65C265SXB_H
-#define _W65C265SXB_H
+#ifndef JAVA_GRINDER_GENERATOR_W65C265SXB_H
+#define JAVA_GRINDER_GENERATOR_W65C265SXB_H
 
 #include "generator/W65816.h"
 

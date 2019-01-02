@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _MIPS32_H
-#define _MIPS32_H
+#ifndef JAVA_GRINDER_GENERATOR_MIPS32_H
+#define JAVA_GRINDER_GENERATOR_MIPS32_H
 
 #include "generator/Generator.h"
 

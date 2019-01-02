@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _SXB_H
-#define _SXB_H
+#ifndef JAVA_GRINDER_API_SXB_H
+#define JAVA_GRINDER_API_SXB_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"

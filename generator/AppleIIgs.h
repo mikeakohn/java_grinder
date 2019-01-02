@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _APPLE_II_GS_H
-#define _APPLE_II_GS_H
+#ifndef JAVA_GRINDER_GENERATOR_APPLE_II_GS_H
+#define JAVA_GRINDER_GENERATOR_APPLE_II_GS_H
 
 #include "generator/W65816.h"
 

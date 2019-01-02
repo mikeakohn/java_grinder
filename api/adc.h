@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _ADC_H
-#define _ADC_H
+#ifndef JAVA_GRINDER_API_ADC_H
+#define JAVA_GRINDER_API_ADC_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"

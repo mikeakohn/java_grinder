@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_TI84_H
-#define _API_TI84_H
+#ifndef JAVA_GRINDER_GENERATOR_API_TI84_H
+#define JAVA_GRINDER_GENERATOR_API_TI84_H
 
 class API_TI84
 {

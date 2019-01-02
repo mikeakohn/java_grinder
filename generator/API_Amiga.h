@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_AMIGA_H
-#define _API_AMIGA_H
+#ifndef JAVA_GRINDER_GENERATOR_API_AMIGA_H
+#define JAVA_GRINDER_GENERATOR_API_AMIGA_H
 
 class API_Amiga
 {

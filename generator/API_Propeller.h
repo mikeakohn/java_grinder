@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_PROPELLER_H
-#define _API_PROPELLER_H
+#ifndef JAVA_GRINDER_GENERATOR_API_PROPELLER_H
+#define JAVA_GRINDER_GENERATOR_API_PROPELLER_H
 
 class API_Propeller
 {

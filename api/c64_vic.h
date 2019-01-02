@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _C64_VIC_H
-#define _C64_VIC_H
+#ifndef JAVA_GRINDER_API_C64_VIC_H
+#define JAVA_GRINDER_API_C64_VIC_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"

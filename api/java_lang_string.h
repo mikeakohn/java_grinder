@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _JAVA_LANG_STRING_H
-#define _JAVA_LANG_STRING_H
+#ifndef JAVA_GRINDER_API_JAVA_LANG_STRING_H
+#define JAVA_GRINDER_API_JAVA_LANG_STRING_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"

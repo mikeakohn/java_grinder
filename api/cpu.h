@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _CPU_H
-#define _CPU_H
+#ifndef JAVA_GRINDER_API_CPU_H
+#define JAVA_GRINDER_API_CPU_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"

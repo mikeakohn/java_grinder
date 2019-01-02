@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _TMS9900_H
-#define _TMS9900_H
+#ifndef JAVA_GRINDER_GENERATOR_TMS9900_H
+#define JAVA_GRINDER_GENERATOR_TMS9900_H
 
 #include "generator/Generator.h"
 

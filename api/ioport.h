@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _IOPORT_H
-#define _IOPORT_H
+#ifndef JAVA_GRINDER_API_IOPORT_H
+#define JAVA_GRINDER_API_IOPORT_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"

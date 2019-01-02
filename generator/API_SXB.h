@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _API_SXB_H
-#define _API_SXB_H
+#ifndef JAVA_GRINDER_GENERATOR_API_SXB_H
+#define JAVA_GRINDER_GENERATOR_API_SXB_H
 
 class API_SXB
 {

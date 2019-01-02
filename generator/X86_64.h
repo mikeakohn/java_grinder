@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _X86_64_H
-#define _X86_64_H
+#ifndef JAVA_GRINDER_GENERATOR_X86_64_H
+#define JAVA_GRINDER_GENERATOR_X86_64_H
 
 #include "generator/Generator.h"
 

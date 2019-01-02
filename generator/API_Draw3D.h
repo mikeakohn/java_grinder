@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_DRAW_3D_H
-#define _API_DRAW_3D_H
+#ifndef JAVA_GRINDER_GENERATOR_API_DRAW_3D_H
+#define JAVA_GRINDER_GENERATOR_API_DRAW_3D_H
 
 #define DRAW3D_TYPE_POINT equ 0
 #define DRAW3D_TYPE_LINE equ 1

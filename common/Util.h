@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _UTIL_H
-#define _UTIL_H
+#ifndef JAVA_GRINDER_COMMON_UTIL_H
+#define JAVA_GRINDER_COMMON_UTIL_H
 
 #include <string>
 

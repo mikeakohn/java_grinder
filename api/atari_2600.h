@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _ATARI_2600_H
-#define _ATARI_2600_H
+#ifndef JAVA_GRINDER_API_ATARI_2600_H
+#define JAVA_GRINDER_API_ATARI_2600_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"

@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_DSP_H
-#define _API_DSP_H
+#ifndef JAVA_GRINDER_GENERATOR_API_DSP_H
+#define JAVA_GRINDER_GENERATOR_API_DSP_H
 
 class API_DSP
 {

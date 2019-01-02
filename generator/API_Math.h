@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_MATH_H
-#define _API_MATH_H
+#ifndef JAVA_GRINDER_GENERATOR_API_MATH_H
+#define JAVA_GRINDER_GENERATOR_API_MATH_H
 
 class API_Math
 {

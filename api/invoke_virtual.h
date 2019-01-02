@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _INVOKE_VIRTUAL_H
-#define _INVOKE_VIRTUAL_H
+#ifndef JAVA_GRINDER_API_INVOKE_VIRTUAL_H
+#define JAVA_GRINDER_API_INVOKE_VIRTUAL_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"

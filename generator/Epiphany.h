@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _EPIPHANY_H
-#define _EPIPHANY_H
+#ifndef JAVA_GRINDER_GENERATOR_EPIPHANY_H
+#define JAVA_GRINDER_GENERATOR_EPIPHANY_H
 
 #include "generator/Generator.h"
 

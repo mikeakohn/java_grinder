@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _TRS80_COCO_H
-#define _TRS80_COCO_H
+#ifndef JAVA_GRINDER_API_TRS80_COCO_H
+#define JAVA_GRINDER_API_TRS80_COCO_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"

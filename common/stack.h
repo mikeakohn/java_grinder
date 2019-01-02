@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _STACK_H
-#define _STACK_H
+#ifndef JAVA_GRINDER_COMMON_STACK_H
+#define JAVA_GRINDER_COMMON_STACK_H
 
 struct _stack
 {
