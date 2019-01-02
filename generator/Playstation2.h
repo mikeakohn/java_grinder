@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _PLAYSTATION_2_H
-#define _PLAYSTATION_2_H
+#ifndef JAVA_GRINDER_GENERATOR_PLAYSTATION_2_H
+#define JAVA_GRINDER_GENERATOR_PLAYSTATION_2_H
 
 #include "generator/R5900.h"
 

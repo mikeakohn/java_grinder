@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _AMIGA_H
-#define _AMIGA_H
+#ifndef JAVA_GRINDER_GENERATOR_AMIGA_H
+#define JAVA_GRINDER_GENERATOR_AMIGA_H
 
 #include "generator/MC68000.h"
 

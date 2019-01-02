@@ -11,8 +11,8 @@
  *
  */
  
-#ifndef _CPC_H
-#define _CPC_H
+#ifndef JAVA_GRINDER_API_CPC_H
+#define JAVA_GRINDER_API_CPC_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"

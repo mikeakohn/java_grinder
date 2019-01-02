@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _ARM_H
-#define _ARM_H
+#ifndef JAVA_GRINDER_GENERATOR_ARM_H
+#define JAVA_GRINDER_GENERATOR_ARM_H
 
 #include "generator/Generator.h"
 

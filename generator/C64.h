@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _C64_H
-#define _C64_H
+#ifndef JAVA_GRINDER_GENERATOR_C64_H
+#define JAVA_GRINDER_GENERATOR_C64_H
 
 #include "generator/M6502.h"
 

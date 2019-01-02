@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _R5900_H
-#define _R5900_H
+#ifndef JAVA_GRINDER_GENERATOR_R5900_H
+#define JAVA_GRINDER_GENERATOR_R5900_H
 
 #include "generator/Generator.h"
 

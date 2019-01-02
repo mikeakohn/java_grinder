@@ -14,8 +14,8 @@
  *                  Emiliano Fraga - https://github.com/efraga-msx
  */
 
-#ifndef _MSX_H
-#define _MSX_H
+#ifndef JAVA_GRINDER_GENERATOR_MSX_H
+#define JAVA_GRINDER_GENERATOR_MSX_H
 
 #include "generator/Z80.h"
 

@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _TEMPLATE_H
-#define _TEMPLATE_H
+#ifndef JAVA_GRINDER_GENERATOR_TEMPLATE_H
+#define JAVA_GRINDER_GENERATOR_TEMPLATE_H
 
 #include "generator/Generator.h"
 

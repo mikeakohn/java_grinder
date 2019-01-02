@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _PROPELLER_H
-#define _PROPELLER_H
+#ifndef JAVA_GRINDER_GENERATOR_PROPELLER_H
+#define JAVA_GRINDER_GENERATOR_PROPELLER_H
 
 #include <vector>
 #include <string>

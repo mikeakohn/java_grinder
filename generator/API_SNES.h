@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _API_SNES_H
-#define _API_SNES_H
+#ifndef JAVA_GRINDER_GENERATOR_API_SNES_H
+#define JAVA_GRINDER_GENERATOR_API_SNES_H
 
 class API_SNES
 {

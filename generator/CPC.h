@@ -11,8 +11,8 @@
 *
 */
 
-#ifndef _CPC_H
-#define _CPC_H
+#ifndef JAVA_GRINDER_GENERATOR_CPC_H
+#define JAVA_GRINDER_GENERATOR_CPC_H
 
 #include "generator/Z80.h"
 

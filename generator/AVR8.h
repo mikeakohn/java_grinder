@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _AVR8_H
-#define _AVR8_H
+#ifndef JAVA_GRINDER_GENERATOR_AVR8_H
+#define JAVA_GRINDER_GENERATOR_AVR8_H
 
 #include "generator/Generator.h"
 

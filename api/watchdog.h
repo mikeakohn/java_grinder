@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _WATCHDOG_H
-#define _WATCHDOG_H
+#ifndef JAVA_GRINDER_API_WATCHDOG_H
+#define JAVA_GRINDER_API_WATCHDOG_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"

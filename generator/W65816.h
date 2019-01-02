@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _W65816_H
-#define _W65816_H
+#ifndef JAVA_GRINDER_GENERATOR_W65816_H
+#define JAVA_GRINDER_GENERATOR_W65816_H
 
 #include "generator/Generator.h"
 

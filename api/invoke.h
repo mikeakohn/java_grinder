@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _INVOKE_H
-#define _INVOKE_H
+#ifndef JAVA_GRINDER_API_INVOKE_H
+#define JAVA_GRINDER_API_INVOKE_H
 
 #include <string>
 

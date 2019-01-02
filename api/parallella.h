@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _PARALLELLA_H
-#define _PARALLELLA_H
+#ifndef JAVA_GRINDER_API_PARALLELLA_H
+#define JAVA_GRINDER_API_PARALLELLA_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"

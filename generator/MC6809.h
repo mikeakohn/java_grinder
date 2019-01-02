@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _MC6809_H
-#define _MC6809_H
+#ifndef JAVA_GRINDER_GENERATOR_MC6809_H
+#define JAVA_GRINDER_GENERATOR_MC6809_H
 
 #include "generator/Generator.h"
 

@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _TI99_H
-#define _TI99_H
+#ifndef JAVA_GRINDER_API_TI99_H
+#define JAVA_GRINDER_API_TI99_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"

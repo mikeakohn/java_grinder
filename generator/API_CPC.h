@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _API_CPC_H
-#define _API_CPC_H
+#ifndef JAVA_GRINDER_GENERATOR_API_CPC_H
+#define JAVA_GRINDER_GENERATOR_API_CPC_H
 
 class API_CPC
 {

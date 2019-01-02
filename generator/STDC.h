@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _STDC_H
-#define _STDC_H
+#ifndef JAVA_GRINDER_GENERATOR_STDC_H
+#define JAVA_GRINDER_GENERATOR_STDC_H
 
 #include "generator/Generator.h"
 

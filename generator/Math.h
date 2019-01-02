@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _MATH_H
-#define _MATH_H
+#ifndef JAVA_GRINDER_GENERATOR_MATH_H
+#define JAVA_GRINDER_GENERATOR_MATH_H
 
 class Math
 {

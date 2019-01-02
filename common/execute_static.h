@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _EXECUTE_STATIC_H
-#define _EXECUTE_STATIC_H
+#ifndef JAVA_GRINDER_COMMON_EXECUTE_STATIC_H
+#define JAVA_GRINDER_COMMON_EXECUTE_STATIC_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"

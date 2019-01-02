@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _GENERATOR_H
-#define _GENERATOR_H
+#ifndef JAVA_GRINDER_GENERATOR_GENERATOR_H
+#define JAVA_GRINDER_GENERATOR_GENERATOR_H
 
 #include <stdio.h>
 #include <stdint.h>

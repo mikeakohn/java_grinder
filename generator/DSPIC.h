@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _DSPIC_H
-#define _DSPIC_H
+#ifndef JAVA_GRINDER_GENERATOR_DSPIC_H
+#define JAVA_GRINDER_GENERATOR_DSPIC_H
 
 #include "generator/Generator.h"
 

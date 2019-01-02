@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _COMPILER_H
-#define _COMPILER_H
+#ifndef JAVA_GRINDER_COMMON_COMPILER_H
+#define JAVA_GRINDER_COMMON_COMPILER_H
 
 #include "generator/Generator.h"
 

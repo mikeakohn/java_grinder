@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _SNES_H
-#define _SNES_H
+#ifndef JAVA_GRINDER_GENERATOR_SNES_H
+#define JAVA_GRINDER_GENERATOR_SNES_H
 
 #include "generator/W65816.h"
 

@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _PLAYSTATION_2_API_H
-#define _PLAYSTATION_2_API_H
+#ifndef JAVA_GRINDER_API_PLAYSTATION_2_API_H
+#define JAVA_GRINDER_API_PLAYSTATION_2_API_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"

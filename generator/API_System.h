@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_SYSTEM_H
-#define _API_SYSTEM_H
+#ifndef JAVA_GRINDER_GENERATOR_API_SYSTEM_H
+#define JAVA_GRINDER_GENERATOR_API_SYSTEM_H
 
 class API_System
 {

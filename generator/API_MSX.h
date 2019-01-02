@@ -14,8 +14,8 @@
  *                  Emiliano Fraga - https://github.com/efraga-msx
  */
 
-#ifndef _API_MSX_H
-#define _API_MSX_H
+#ifndef JAVA_GRINDER_GENERATOR_API_MSX_H
+#define JAVA_GRINDER_GENERATOR_API_MSX_H
 
 class API_MSX
 {

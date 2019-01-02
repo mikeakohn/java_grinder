@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _SNES_API_H
-#define _SNES_API_H
+#ifndef JAVA_GRINDER_API_SNES_API_H
+#define JAVA_GRINDER_API_SNES_API_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"

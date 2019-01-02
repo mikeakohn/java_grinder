@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _Z80_H
-#define _Z80_H
+#ifndef JAVA_GRINDER_GENERATOR_Z80_H
+#define JAVA_GRINDER_GENERATOR_Z80_H
 
 #include "generator/Generator.h"
 

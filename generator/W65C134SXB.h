@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _W65C134SXB_H
-#define _W65C134SXB_H
+#ifndef JAVA_GRINDER_GENERATOR_W65C134SXB_H
+#define JAVA_GRINDER_GENERATOR_W65C134SXB_H
 
 #include "generator/M6502.h"
 

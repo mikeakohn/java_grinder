@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _MEMORY_H
-#define _MEMORY_H
+#ifndef JAVA_GRINDER_API_MEMORY_H
+#define JAVA_GRINDER_API_MEMORY_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"

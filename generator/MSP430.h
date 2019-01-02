@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _MSP430_H
-#define _MSP430_H
+#ifndef JAVA_GRINDER_GENERATOR_MSP430_H
+#define JAVA_GRINDER_GENERATOR_MSP430_H
 
 #include "generator/Generator.h"
 

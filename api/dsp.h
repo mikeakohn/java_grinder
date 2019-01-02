@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _DSP_H
-#define _DSP_H
+#ifndef JAVA_GRINDER_API_DSP_H
+#define JAVA_GRINDER_API_DSP_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"

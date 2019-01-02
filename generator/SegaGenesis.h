@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _SEGA_GENESIS_H
-#define _SEGA_GENESIS_H
+#ifndef JAVA_GRINDER_GENERATOR_SEGA_GENESIS_H
+#define JAVA_GRINDER_GENERATOR_SEGA_GENESIS_H
 
 #include "generator/MC68000.h"
 

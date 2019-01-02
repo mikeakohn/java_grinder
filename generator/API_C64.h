@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _API_C64_H
-#define _API_C64_H
+#ifndef JAVA_GRINDER_GENERATOR_API_C64_H
+#define JAVA_GRINDER_GENERATOR_API_C64_H
 
 class API_C64
 {

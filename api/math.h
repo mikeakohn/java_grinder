@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _MATH_H
-#define _MATH_H
+#ifndef JAVA_GRINDER_API_MATH_H
+#define JAVA_GRINDER_API_MATH_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"

@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef _UART_H
-#define _UART_H
+#ifndef JAVA_GRINDER_API_UART_H
+#define JAVA_GRINDER_API_UART_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"
