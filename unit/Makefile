@@ -1,5 +1,5 @@
 
-CFLAGS=-O3 -Wall -I../common -I../api
+CFLAGS=-O3 -Wall -I../common -I../api -std=c++11
 OBJECTS=../build/Util.o ../build/invoke.o
 
 default:
