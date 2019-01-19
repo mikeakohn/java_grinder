@@ -93,12 +93,16 @@ int X86_64::init_heap(int field_count)
 
 int X86_64::field_init_int(std::string &name, int index, int value)
 {
-  return -1;
+  fprintf(out, "  mov eax, %d\n", value);
+  fprintf(out, "  mov [%s], eax\n", name.c_str());
+  return 0;
 }
 
 int X86_64::field_init_ref(std::string &name, int index)
 {
-  return -1;
+  fprintf(out, "  mov rax, _%s\n", name.c_str());
+  fprintf(out, "  mov [%s], rax\n", name.c_str());
+  return 0;
 }
 
 void X86_64::method_start(int local_count, int max_stack, int param_count, std::string &name)
@@ -415,17 +419,17 @@ int X86_64::sub_integer(int num)
 
 int X86_64::mul_integer()
 {
-  return -1;
+  return stack_alu("imul");
 }
 
 int X86_64::div_integer()
 {
-  return -1;
+  return stack_div(true);
 }
 
 int X86_64::mod_integer()
 {
-  return -1;
+  return stack_div(false);
 }
 
 int X86_64::neg_integer()
@@ -677,12 +681,38 @@ int X86_64::invoke_static_method(const char *name, int params, int is_void)
 
 int X86_64::put_static(std::string &name, int index)
 {
-  return -1;
+  printf("  ; put_static(%s index=%d)\n", name.c_str(), index);
+
+  if (stack > 0)
+  {
+    fprintf(out, "  pop rbx\n");
+    fprintf(out, "  mov [%s], ebx\n", name.c_str());
+    stack--;
+  }
+    else
+  {
+    fprintf(out, "  mov [%s], %s\n", name.c_str(), REG_STACK(reg - 1));
+    reg--;
+  }
+
+  return 0;
 }
 
 int X86_64::get_static(std::string &name, int index)
 {
-  return -1;
+  printf("  ; get_static(%s index=%d)\n", name.c_str(), index);
+
+  if (reg < REG_MAX)
+  {
+    fprintf(out, "  mov %s, [%s]\n", REG_STACK(reg++), name.c_str());
+  }
+    else
+  {
+    fprintf(out, "  push [%s]\n", name.c_str());
+    stack++;
+  }
+
+  return 0;
 }
 
 int X86_64::brk()
@@ -875,6 +905,101 @@ int X86_64::stack_shift(const char *instr)
   {
     printf("Internal Error: Wrong registers on stack\n");
     return -1;
+  }
+
+  return 0;
+}
+
+int X86_64::stack_div(bool is_quotient)
+{
+  fprintf(out, "  ; div reg=%d stack=%d is_quotient=%d\n", reg, stack, is_quotient);
+
+  if (stack == 1)
+  {
+    // This should be pretty rare.
+    fprintf(out, "  pop rbx\n");
+    fprintf(out, "  push rax\n");
+    fprintf(out, "  push rdx\n");
+
+    fprintf(out, "  mov eax, %s\n", REG_STACK(reg - 1));
+    fprintf(out, "  xor edx, edx\n");
+    fprintf(out, "  idiv ebx\n");
+
+    if (is_quotient)
+    {
+      fprintf(out, "  mov %s, eax\n", REG_STACK(reg - 1));
+    }
+      else
+    {
+      fprintf(out, "  mov %s, edx\n", REG_STACK(reg - 1));
+    }
+
+    fprintf(out, "  pop rdx\n");
+    fprintf(out, "  pop rax\n");
+    stack--;
+  }
+    else
+  if (stack > 1)
+  {
+    // This should be pretty rare.
+    fprintf(out, "  push rax\n");
+    fprintf(out, "  push rdx\n");
+    fprintf(out, "  mov eax, [rsp+24]\n");
+    fprintf(out, "  mov ebx, [rsp+16]\n");
+    fprintf(out, "  xor edx, edx\n");
+
+    fprintf(out, "  idiv ebx\n");
+
+    if (is_quotient)
+    {
+      fprintf(out, "  mov [rsp+24], rax\n");
+    }
+      else
+    {
+      fprintf(out, "  mov [rsp+24], rdx\n");
+    }
+
+    fprintf(out, "  pop rdx\n");
+    fprintf(out, "  pop rax\n");
+    fprintf(out, "  pop rbx\n");
+    stack--;
+  }
+    else
+  {
+    if (reg > 2)
+    {
+      fprintf(out, "  push rdx\n");
+      fprintf(out, "  mov ebx, eax\n");
+      fprintf(out, "  mov eax, %s\n", REG_STACK(reg - 2));
+      fprintf(out, "  xor edx, edx\n");
+      fprintf(out, "  idiv %s\n", REG_STACK(reg - 1));
+    }
+    else
+    {
+      fprintf(out, "  mov ebx, edx\n");
+      fprintf(out, "  xor edx, edx\n");
+      fprintf(out, "  idiv ebx\n");
+    }
+
+    if (is_quotient)
+    {
+      if (reg > 2)
+      {
+        fprintf(out, "  mov %s, eax\n", REG_STACK(reg - 2));
+      }
+    }
+    else
+    {
+      fprintf(out, "  mov %s, edx\n", REG_STACK(reg - 2));
+    }
+
+    if (reg > 2)
+    {
+      fprintf(out, "  pop rdx\n");
+      fprintf(out, "  mov eax, ebx\n");
+    }
+
+    reg--;
   }
 
   return 0;
