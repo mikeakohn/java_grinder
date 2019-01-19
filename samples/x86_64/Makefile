@@ -1,9 +1,11 @@
 
+FLAGS=-Wall -g
+
 default: Test.class test.asm test.o
-	gcc -o test_java test_java.c test.o -Wall -g
+	gcc -o test_java test_java.c test.o $(FLAGS)
 
 test.o: test.asm
-	nasm -f elf test.asm
+	nasm -f elf64 test.asm
 
 Test.class: Test.java
 	javac Test.java

@@ -59,6 +59,8 @@ int X86_64::open(const char *filename)
   if (Generator::open(filename) != 0) { return -1; }
 
   fprintf(out, "BITS 64\n");
+  fprintf(out, "default rel\n");
+  fprintf(out, "SECTION .bss\n");
 
   // Set where RAM starts / ends
   // FIXME - Not sure what to set this to right now
@@ -132,8 +134,12 @@ void X86_64::method_start(int local_count, int max_stack, int param_count, std::
 
   if (local_count != 0)
   {
+    int aligned_space = local_count * 4;
+
+    if ((aligned_space & 0x7) != 0) { aligned_space += 4; }
+
     fprintf(out, "  ; Allocate space for %d local variables\n", local_count);
-    fprintf(out, "  sub rsp, %d\n", local_count * 4);
+    fprintf(out, "  sub rsp, %d\n", aligned_space);
   }
 
   // This looks awkward but was done this way to preserve C compatibility.
@@ -143,8 +149,8 @@ void X86_64::method_start(int local_count, int max_stack, int param_count, std::
 
     for (i = 0; i < param_count; i++)
     {
-      fprintf(out, "  mov eax, [ebp+%d]\n", (i * 4) + 8 + 12);
-      fprintf(out, "  mov [ebp-%d], eax\n", LOCALS(i));
+      fprintf(out, "  mov eax, [rbp+%d]\n", (i * 4) + 8 + 12);
+      fprintf(out, "  mov [rbp-%d], eax\n", LOCALS(i));
     }
   }
 }
