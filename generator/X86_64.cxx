@@ -16,6 +16,7 @@
 
 #include "generator/X86_64.h"
 
+#define ABI_PARAM_REG(a) (registers_params[a])
 #define REG_STACK64(a) (registers64[a])
 #define REG_STACK(a) (registers[a])
 #define REG_STACK8(a) (registers8[a])
@@ -37,6 +38,8 @@ static const char *registers64[] = { "rax", "rcx", "rdx", "r8",  "r9",  "r10", "
 static const char *registers[] =   { "eax", "ecx", "edx", "r8d", "r9d", "r10d", "r11d" };
 static const char *registers8[] =  {  "al",  "cl",  "dl", "r8b", "r9b", "r10b", "r11b" };
 static const char *registers16[] = {  "ax",  "cx",  "dx", "r8w", "r9w", "r10w", "r11w" };
+
+static const char *registers_params[] = { "edi", "esi", "edx", "ecx", "r8d", "r9d" };
 
 //                                 EQ    NE     LESS  LESS-EQ GR   GR-E
 static const char *cond_str[] = { "je", "jne", "jl", "jle", "jg", "jge" };
@@ -149,8 +152,16 @@ void X86_64::method_start(int local_count, int max_stack, int param_count, std::
 
     for (i = 0; i < param_count; i++)
     {
-      fprintf(out, "  mov eax, [rbp+%d]\n", (i * 4) + 8 + 12);
-      fprintf(out, "  mov [rbp-%d], eax\n", LOCALS(i));
+      if (i < 6)
+      {
+        fprintf(out, "  mov [rbp-%d], %s\n", LOCALS(i), ABI_PARAM_REG(i));
+      }
+        else
+      {
+        // Previously pushed 2 things on the stack plus return address.
+        fprintf(out, "  mov eax, [rbp+%d]\n", ((i - 6) * 8) + 8 + 16);
+        fprintf(out, "  mov [rbp-%d], eax\n", LOCALS(i));
+      }
     }
   }
 }
@@ -623,8 +634,12 @@ int X86_64::return_integer(int local_count)
 {
   if (local_count != 0)
   {
+    int aligned_space = local_count * 4;
+
+    if ((aligned_space & 0x7) != 0) { aligned_space += 4; }
+
     fprintf(out, "  ; Free stack space for %d local variables\n", local_count);
-    fprintf(out, "  add rsp, %d\n", local_count * 4);
+    fprintf(out, "  add rsp, %d\n", aligned_space);
   }
 
   fprintf(out, "  pop rbp\n");
@@ -657,8 +672,12 @@ int X86_64::return_void(int local_count)
 {
   if (local_count != 0)
   {
+    int aligned_space = local_count * 4;
+
+    if ((aligned_space & 0x7) != 0) { aligned_space += 4; }
+
     fprintf(out, "  ; Free stack space for %d local variables\n", local_count);
-    fprintf(out, "  add rsp, %d\n", local_count * 4);
+    fprintf(out, "  add rsp, %d\n", aligned_space);
   }
 
   fprintf(out, "  pop rbp\n");
@@ -729,7 +748,7 @@ int X86_64::invoke_static_method(const char *name, int params, int is_void)
   if (params != 0)
   {
     fprintf(out, "  ; pop %d params off the stack\n", params);
-    fprintf(out, "  add rsp, %d\n", (params * 4) + (stack_params * 4));
+    fprintf(out, "  add rsp, %d\n", (params * 8) + (stack_params * 8));
 
     stack -= stack_params;
   }
