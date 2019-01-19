@@ -2143,10 +2143,12 @@ int JavaCompiler::load_class(const char *filename)
 
   java_class = new JavaClass(in);
 
+#ifdef DEBUG
   if (verbose)
   {
     java_class->print();
   }
+#endif
 
   int external_field_count = find_external_fields(java_class, true);
 
