@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2019 by Michael Kohn
  *
  */
 
@@ -258,7 +258,7 @@ static Generator *new_generator(const char *chip_type)
     else
   if (strcasecmp("x86_64", chip_type) == 0)
   {
-    generator = new X86();
+    generator = new X86_64();
   }
     else
   if (strcasecmp("z80", chip_type) == 0)
@@ -304,7 +304,7 @@ int main(int argc, char *argv[])
            "     sega_genesis\n"
            "     ti99\n"
            "     w65c134sxb, w65c265sxb\n"
-           "     x86\n"
+           "     x86, x86_64\n"
            "     z80, cpc, msx, ti84plus\n", argv[0]);
     exit(0);
   }
