@@ -9,7 +9,7 @@ Test.class: Test.java
 	javac Test.java
 
 test.asm: Test.class
-	../../java_grinder Test.class test.asm x86_64
+	../../java_grinder -v Test.class test.asm x86_64
 
 clean:
 	@rm -f *.class *.o test.asm test_java
