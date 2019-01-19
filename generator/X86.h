@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2019 by Michael Kohn
  *
  */
 
@@ -100,7 +100,7 @@ public:
 
 protected:
   int reg;            // count number of registers are are using as stack
-  int stack;          // count how many things we put on the stack
+  int stack;          // count how many things put on the stack
   int method_count;   // count the number of methods being outputted
   bool is_main : 1;
 

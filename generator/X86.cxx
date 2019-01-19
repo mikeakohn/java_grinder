@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2019 by Michael Kohn
  *
  */
 
@@ -74,7 +74,7 @@ int X86::insert_static_field_define(std::string &name, std::string &type, int in
 
 int X86::init_heap(int field_count)
 {
-  // Don't think we need a heap?
+  // Don't think a heap is needed?
   return 0;
 }
 
@@ -348,6 +348,7 @@ int X86::dup2()
 
     stack += 2;
   }
+
   return 0;
 }
 
@@ -371,7 +372,7 @@ int X86::swap()
   if (stack == 1)
   {
     fprintf(out, "  mov ebx, [esp]\n");
-    fprintf(out, "  mov [esp], ebx\n");
+    fprintf(out, "  mov [esp], %s\n", REG_STACK(reg - 1));
     fprintf(out, "  mov %s, ebx\n", REG_STACK(reg - 1));
   }
     else
