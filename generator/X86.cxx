@@ -188,7 +188,7 @@ int X86::push_fake()
 {
   if (reg < REG_MAX)
   {
-    reg++;  
+    reg++;
   }
     else
   {
