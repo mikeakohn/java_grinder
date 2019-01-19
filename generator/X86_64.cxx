@@ -498,7 +498,7 @@ int X86_64::or_integer(int num)
 
 int X86_64::xor_integer()
 {
-  return stack_alu("xor"); 
+  return stack_alu("xor");
 }
 
 int X86_64::xor_integer(int num)
@@ -527,7 +527,7 @@ int X86_64::integer_to_byte()
   {
     fprintf(out, "  movsx %s, %s\n", REG_STACK(reg-1), REG_STACK8(reg-1));
   }
-  
+
   return 0;
 }
 
@@ -560,7 +560,7 @@ int X86_64::jump_cond(std::string &label, int cond, int distance)
     stack--;
   }
     else
-  { 
+  {
     fprintf(out, "  cmp %s, 0\n", REG_STACK(--reg));
   }
 
@@ -658,7 +658,7 @@ int X86_64::return_void(int local_count)
   fprintf(out, "  pop rbp\n");
   fprintf(out, "  pop rbx\n");
   fprintf(out, "  ret\n");
-  
+
   return 0;
 }
 
@@ -676,7 +676,94 @@ int X86_64::call(std::string &name)
 
 int X86_64::invoke_static_method(const char *name, int params, int is_void)
 {
-  return -1;
+  //bool push_rbx = false;
+  int saved_register_count;
+  int stack_params = 0;
+  int n;
+
+  fprintf(out, "  ; invoke_static_method() name=%s params=%d is_void=%d reg=%d stack=%d\n", name, params, is_void, reg, stack);
+
+  // Save all registers except parameters
+  //saved_register_count = reg - (params - stack) < 0 ? 0 : reg - params;
+  saved_register_count = reg - (params - stack);
+
+  if (saved_register_count != 0)
+  {
+    fprintf(out, "  ; save %d registers\n", saved_register_count);
+
+    for (n = 0; n < saved_register_count; n++)
+    {
+      fprintf(out, "  push %s\n", REG_STACK64(n));
+    }
+  }
+
+  if (params != 0)
+  {
+    fprintf(out, "  ; push %d params on the stack\n", params);
+    stack_params = params - (reg - saved_register_count);
+    int distance = (stack_params * 4) - 4;
+
+    fprintf(out, "  ; %d params are already on the stack\n", stack_params);
+
+    for (n = 0; n < stack_params; n++)
+    {
+      fprintf(out, "  mov ebx, [rsp+%d]\n", distance);
+      fprintf(out, "  push rbx\n");
+    }
+
+    fprintf(out, "  ; %d params are in registers\n", reg - saved_register_count);
+    for (n = reg; n > saved_register_count; n--)
+    {
+      fprintf(out, "  push %s\n", REG_STACK64(n - 1));
+    }
+  }
+
+  fprintf(out, "  call %s\n", name);
+
+  if (params != 0)
+  {
+    fprintf(out, "  ; pop %d params off the stack\n", params);
+    fprintf(out, "  add rsp, %d\n", (params * 4) + (stack_params * 4));
+
+    stack -= stack_params;
+  }
+
+  // FIXME - is this right?
+  reg = saved_register_count;
+
+  if (is_void == false)
+  {
+    if (reg == 0)
+    {
+      fprintf(out, "  ; mov eax, eax\n");
+      reg++;
+    }
+      else
+    if (reg < REG_MAX)
+    {
+      fprintf(out, "  mov %s, eax\n", REG_STACK(reg++));
+    }
+      else
+    {
+      fprintf(out, "  mov ebx, eax\n");
+    }
+  }
+
+  // Restore all registers
+  for (n = saved_register_count - 1; n >= 0; n--)
+  {
+    fprintf(out, "  pop %s\n", REG_STACK64(n));
+  }
+
+#if 0
+  if (push_rbx)
+  {
+    fprintf(out, "  push rbx\n");
+    stack++;
+  }
+#endif
+
+  return 0;
 }
 
 int X86_64::put_static(std::string &name, int index)
