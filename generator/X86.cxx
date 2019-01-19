@@ -790,6 +790,8 @@ int X86::invoke_static_method(const char *name, int params, int is_void)
 
 int X86::put_static(std::string &name, int index)
 {
+  printf("  ; put_static(%s index=%d)\n", name.c_str(), index);
+
   if (stack > 0)
   {
     fprintf(out, "  pop ebx\n");
@@ -807,6 +809,8 @@ int X86::put_static(std::string &name, int index)
 
 int X86::get_static(std::string &name, int index)
 {
+  printf("  ; get_static(%s index=%d)\n", name.c_str(), index);
+
   if (reg < REG_MAX)
   {
     fprintf(out, "  mov %s, [%s]\n", REG_STACK(reg++), name.c_str());
