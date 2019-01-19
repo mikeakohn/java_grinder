@@ -984,16 +984,17 @@ int X86_64::array_read_byte(std::string &name, int field_id)
 
   if (stack == 0)
   {
-    fprintf(out, "  mov %s, [%s+%s]\n",
+    fprintf(out, "  mov rdi, %s\n", name.c_str());
+    fprintf(out, "  mov %s, [rdi+%s]\n",
       REG_STACK8(reg - 1),
-      name.c_str(),
       REG_STACK64(reg - 1));
     fprintf(out, "  movsx %s, %s\n", REG_STACK(reg - 1), REG_STACK8(reg - 1));
   }
     else
   {
     fprintf(out, "  pop rbx\n");
-    fprintf(out, "  mov bl, [%s+rbx]\n", name.c_str());
+    fprintf(out, "  mov rdi, %s\n", name.c_str());
+    fprintf(out, "  mov bl, [rdi+rbx]\n");
     fprintf(out, "  movsx ebx, bl\n");
     fprintf(out, "  push rbx\n");
   }
@@ -1007,16 +1008,17 @@ int X86_64::array_read_short(std::string &name, int field_id)
 
   if (stack == 0)
   {
-    fprintf(out, "  mov %s, [%s+%s*2]\n",
+    fprintf(out, "  mov rdi, %s\n", name.c_str());
+    fprintf(out, "  mov %s, [rdi+%s*2]\n",
       REG_STACK8(reg - 1),
-      name.c_str(),
       REG_STACK64(reg - 1));
     fprintf(out, "  movsx %s, %s\n", REG_STACK(reg - 1), REG_STACK8(reg - 1));
   }
     else
   {
     fprintf(out, "  pop rbx\n");
-    fprintf(out, "  mov bl, [%s+rbx*2]\n", name.c_str());
+    fprintf(out, "  mov rdi, %s\n", name.c_str());
+    fprintf(out, "  mov bl, [rdi+rbx*2]\n");
     fprintf(out, "  movsx ebx, bl\n");
     fprintf(out, "  push rbx\n");
   }
@@ -1030,16 +1032,17 @@ int X86_64::array_read_int(std::string &name, int field_id)
 
   if (stack == 0)
   {
-    fprintf(out, "  mov %s, [%s+%s*4]\n",
+    fprintf(out, "  mov rdi, %s\n", name.c_str());
+    fprintf(out, "  mov %s, [rdi+%s*4]\n",
       REG_STACK8(reg - 1),
-      name.c_str(),
       REG_STACK64(reg - 1));
     fprintf(out, "  movsx %s, %s\n", REG_STACK(reg - 1), REG_STACK8(reg - 1));
   }
     else
   {
     fprintf(out, "  pop rbx\n");
-    fprintf(out, "  mov bl, [%s+rbx*4]\n", name.c_str());
+    fprintf(out, "  mov rdi, %s\n", name.c_str());
+    fprintf(out, "  mov bl, [rdi+rbx*4]\n");
     fprintf(out, "  movsx ebx, bl\n");
     fprintf(out, "  push rbx\n");
   }
