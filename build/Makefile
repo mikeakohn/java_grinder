@@ -46,6 +46,7 @@ API= \
 CPUS= \
   generator/ARM.o \
   generator/AVR8.o \
+  generator/DotNet.o \
   generator/DSPIC.o \
   generator/Epiphany.o \
   generator/M6502.o \

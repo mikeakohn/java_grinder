@@ -24,6 +24,7 @@
 #include "generator/AVR8.h"
 #include "generator/C64.h"
 #include "generator/CPC.h"
+#include "generator/DotNet.h"
 #include "generator/DSPIC.h"
 #include "generator/Epiphany.h"
 #include "generator/M6502.h"
@@ -119,6 +120,11 @@ static Generator *new_generator(const char *chip_type)
   if (strcasecmp("cpc", chip_type) == 0)
   {
     generator = new CPC();
+  }
+    else
+  if (strcasecmp("dotnet", chip_type) == 0)
+  {
+    generator = new DotNet();
   }
     else
   if (strcasecmp("dspic30f3012", chip_type) == 0)
