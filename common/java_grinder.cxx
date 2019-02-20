@@ -48,6 +48,7 @@
 #include "generator/W65816.h"
 #include "generator/W65C134SXB.h"
 #include "generator/W65C265SXB.h"
+#include "generator/WebAssembly.h"
 #include "generator/X86.h"
 #include "generator/X86_64.h"
 #include "generator/Z80.h"
@@ -255,6 +256,11 @@ static Generator *new_generator(const char *chip_type)
   if (strcasecmp("w65c265sxb", chip_type) == 0)
   {
     generator = new W65C265SXB();
+  }
+    else
+  if (strcasecmp("webasm", chip_type) == 0)
+  {
+    generator = new WebAssembly();
   }
     else
   if (strcasecmp("x86", chip_type) == 0)

@@ -63,6 +63,7 @@ CPUS= \
   generator/STDC.o \
   generator/TMS9900.o \
   generator/W65816.o \
+  generator/WebAssembly.o \
   generator/X86.o \
   generator/X86_64.o \
   generator/Z80.o
