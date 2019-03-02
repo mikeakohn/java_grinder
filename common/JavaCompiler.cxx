@@ -2081,7 +2081,11 @@ int JavaCompiler::compile_method(
         break;
     }
 
-    if (ret != 0) { break; }
+    if (ret != 0)
+    {
+      printf("** Error with %s (0x%02x) instruction\n", table_java_instr[bytes[pc]].name, bytes[pc]);
+      break;
+    }
 
     if (wide == 1)
     {
