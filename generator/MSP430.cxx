@@ -1764,8 +1764,10 @@ int MSP430::spi_init_II(int port)
   if (port != 0) { return -1; }
 
   char dst[16];
-  fprintf(out, "  ;; Set up SPI\n");
-  fprintf(out, "  mov.b #(USIPE7|USIPE6|USIPE5|USIMST|USIOE|USISWRST), &USICTL0\n");
+  fprintf(out, "  ;; spi_init_II(port=%d)\n", port);
+  fprintf(out, "  bis.b #0xe0, &P1SEL\n");
+  fprintf(out, "  bic.b #0xe0, &P1SEL2\n");
+  fprintf(out, "  mov.b #USIPE7|USIPE6|USIPE5|USIMST|USIOE|USISWRST, &USICTL0\n");
   pop_reg(dst);
   fprintf(out, "  mov.b %s, r14\n", dst);
   fprintf(out, "  rrc.b r14\n");
@@ -1799,8 +1801,11 @@ int MSP430::spi_init_II(int port)
 
 int MSP430::spi_init_II(int port, int clock_divisor, int mode)
 {
-  fprintf(out, "  ;; Set up SPI\n");
-  fprintf(out, "  mov.b #(USIPE7|USIPE6|USIPE5|USIMST|USIOE|USISWRST), &USICTL0\n");
+  fprintf(out, "  ;; spi_init_II(port=%d, divisor=%d, mode=%d)\n",
+    port, clock_divisor, mode);
+  fprintf(out, "  bis.b #0xe0, &P1SEL\n");
+  fprintf(out, "  bic.b #0xe0, &P1SEL2\n");
+  fprintf(out, "  mov.b #USIPE7|USIPE6|USIPE5|USIMST|USIOE|USISWRST, &USICTL0\n");
   fprintf(out, "  mov.b #%s, &USICTL1\n",
     (mode & 1) == 0 ? "0":"USICKPH");
   fprintf(out, "  mov.b #USIDIV_%d|USISSEL_2%s, &USICKCTL\n",
@@ -1831,6 +1836,13 @@ int MSP430::spi_send_I(int port)
   fprintf(out, "  ;; spi_send_I()\n");
   fprintf(out, "  mov.b %s, &USISRL\n", dst);
   fprintf(out, "  mov.b #8, &USICNT\n");
+  fprintf(out,
+    "spi_transfer_busy_%d:\n"
+    "  bit.b #USIIFG, &USICTL1\n"
+    "  jz spi_transfer_busy_%d\n",
+    label_count, label_count);
+
+  label_count++;
 
   return 0;
 }
@@ -1845,6 +1857,13 @@ int MSP430::spi_send16_I(int port)
   fprintf(out, "  ;; spi_send16_I()\n");
   fprintf(out, "  mov.w %s, &USISRL\n", dst);
   fprintf(out, "  mov.b #16, &USICNT\n");
+  fprintf(out,
+    "spi_transfer_busy_%d:\n"
+    "  bit.b #USIIFG, &USICTL1\n"
+    "  jz spi_transfer_busy_%d\n",
+    label_count, label_count);
+
+  label_count++;
 
   return 0;
 }
@@ -1936,12 +1955,14 @@ int MSP430::cpu_nop()
 // ADC
 int MSP430::adc_enable()
 {
+  fprintf(out, "  ;; adc_enable()\n");
   fprintf(out, "  mov.w #ADC10ON|ADC10SHT_3, &ADC10CTL0 ; ADC On\n");
   return 0;
 }
 
 int MSP430::adc_disable()
 {
+  fprintf(out, "  ;; adc_disable()\n");
   fprintf(out, "  mov.w #0, &ADC10CTL0 ; ADC Off\n");
   return 0;
 }
