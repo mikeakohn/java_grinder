@@ -19,7 +19,7 @@ then
   extra="-aviwrite out.avi"
 fi
 
-mess coco2 -window -rompath ${ROMPATH} \
+mame coco2 -window -rompath ${ROMPATH} \
   -resolution0 640x480 \
   -cart1 java_trs80_demo.bin \
   ${extra}
