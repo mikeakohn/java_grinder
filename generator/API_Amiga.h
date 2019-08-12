@@ -22,6 +22,9 @@ public:
   virtual int amiga_setPalette_II() { return -1; }
   virtual int amiga_setSpriteImage_IaI() { return -1; }
   virtual int amiga_setSpritePosition_IIII() { return -1; }
+  virtual int amiga_setVideoMode_IBBB() { return -1; }
+  virtual int amiga_setPlayfieldScroll_II() { return -1; }
+  virtual int amiga_setPlayfieldPriority_IIB() { return -1; }
 };
 
 #endif

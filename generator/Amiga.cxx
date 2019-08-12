@@ -237,3 +237,89 @@ int Amiga::amiga_setSpritePosition_IIII()
   return 0;
 }
 
+int Amiga::amiga_setVideoMode_IBBB()
+{
+  // BPU2-BPU0 = shift to bit position 12
+  fprintf(out,
+    "  ;; amiga_setVideoMode_IBBB()\n"
+    "  and.w #7, d%d\n"
+    "  lsl.w #8, d%d\n"
+    "  lsl.w #4, d%d\n",
+    reg - 4,
+    reg - 4,
+    reg - 4);
+
+  // HIRES=15, HOMOD=11, DBLPF=10
+  fprintf(out,
+    "  lsl.w #8, d%d\n"
+    "  lsl.w #7, d%d\n"
+    "  lsl.w #8, d%d\n"
+    "  lsl.w #3, d%d\n"
+    "  lsl.w #8, d%d\n"
+    "  lsl.w #2, d%d\n",
+    reg - 3,
+    reg - 3,
+    reg - 2,
+    reg - 2,
+    reg - 1,
+    reg - 1);
+
+  fprintf(out,
+    "  or.w d%d, d%d\n"
+    "  or.w d%d, d%d\n"
+    "  or.w d%d, d%d\n"
+    "  mov.w d%d, (BPLCON0)\n",
+    reg - 3, reg - 4,
+    reg - 2, reg - 4,
+    reg - 1, reg - 4,
+    reg - 4);
+
+  reg -= 4;
+
+  return 0;
+}
+
+int Amiga::amiga_setPlayfieldScroll_II()
+{
+  fprintf(out,
+    "  ;; amiga_setPlayfieldScroll_II()\n"
+    "  and.w #0xf, d%d\n"
+    "  and.w #0xf, d%d\n"
+    "  lsl.w #4, d%d\n"
+    "  or.w d%d, d%d\n"
+    "  mov.w d%d, (BPLCON1)\n",
+    reg - 1,
+    reg - 2,
+    reg - 1,
+    reg - 1, reg - 2,
+    reg - 2);
+
+  reg -= 2;
+
+  return 0;
+}
+
+int Amiga::amiga_setPlayfieldPriority_IIB()
+{
+  fprintf(out,
+    "  ;; amiga_setPlayfieldPriority_IIB()\n"
+    "  and.w #0x7, d%d\n"
+    "  and.w #0x7, d%d\n"
+    "  lsl.w #3, d%d\n"
+    "  lsl.w #6, d%d\n"
+    "  or.w d%d, d%d\n"
+    "  or.w d%d, d%d\n"
+    "  mov.w d%d, (BPLCON1)\n",
+    reg - 2,
+    reg - 3,
+    reg - 2,
+    reg - 1,
+    reg - 3, reg - 1,
+    reg - 2, reg - 1,
+    reg - 1);
+
+  reg -= 2;
+
+  return 0;
+}
+

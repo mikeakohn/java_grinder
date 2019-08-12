@@ -43,6 +43,9 @@ int amiga(JavaClass *java_class, Generator *generator, const char *method_name)
   CHECK_FUNC(setPalette,_II)
   CHECK_FUNC(setSpriteImage,_IaI)
   CHECK_FUNC(setSpritePosition,_IIII)
+  CHECK_FUNC(setVideoMode,_IBBB)
+  CHECK_FUNC(setPlayfieldScroll,_II)
+  CHECK_FUNC(setPlayfieldPriority,_IIB)
 
   return -1;
 }
