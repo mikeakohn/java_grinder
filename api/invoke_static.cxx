@@ -132,7 +132,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     const char *cls = method_class.c_str() + len_amiga;
 
     CHECK(Amiga, amiga);
-    //CHECK(Copper, amiga_copper);
+    CHECK(Copper, copper);
     //CHECK(Blitter, amiga_blitter);
   }
     else

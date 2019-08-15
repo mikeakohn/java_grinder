@@ -723,6 +723,8 @@ int MC68000::new_array(uint8_t type)
 {
   int array_length_reg;
 
+  fprintf(out, "  ; new_array()\n");
+
   // ref = heap + 4
   // heap = heap + sizeof(array) + 4 (to hold the length of the array)
 

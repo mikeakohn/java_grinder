@@ -33,6 +33,13 @@ public:
   virtual int amiga_setPlayfieldScroll_II();
   virtual int amiga_setPlayfieldPriority_IIB();
 
+  virtual int copper_setWait_aIIII();
+  virtual int copper_setColor_aIIII();
+  virtual int copper_setBitplane_aIIII();
+  virtual int copper_setMove_aIIII();
+  virtual int copper_setSkip_aIIII();
+  virtual int copper_setWaitEnd_aII();
+
 private:
 };
 

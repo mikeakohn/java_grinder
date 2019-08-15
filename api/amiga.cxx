@@ -34,6 +34,12 @@
     return generator->amiga_##funct##sig(const_val1, const_val2); \
   }
 
+#define CHECK_FUNC_COPPER(funct,sig) \
+  if (strcmp(#funct#sig, method_name) == 0) \
+  { \
+    return generator->copper_##funct##sig(); \
+  }
+
 int amiga(JavaClass *java_class, Generator *generator, const char *method_name)
 {
   CHECK_FUNC(disableMultitasking,)
@@ -46,7 +52,6 @@ int amiga(JavaClass *java_class, Generator *generator, const char *method_name)
   CHECK_FUNC(setVideoMode,_IBBB)
   CHECK_FUNC(setPlayfieldScroll,_II)
   CHECK_FUNC(setPlayfieldPriority,_IIB)
-
   return -1;
 }
 
@@ -57,6 +62,18 @@ int amiga(JavaClass *java_class, Generator *generator, const char *method_name, 
 
 int amiga(JavaClass *java_class, Generator *generator, const char *function, int const_val1, int const_val2)
 {
+  return -1;
+}
+
+int copper(JavaClass *java_class, Generator *generator, const char *method_name)
+{
+  CHECK_FUNC_COPPER(setWait,_aIIII)
+  CHECK_FUNC_COPPER(setColor,_aIIII)
+  CHECK_FUNC_COPPER(setBitplane,_aIIII)
+  CHECK_FUNC_COPPER(setMove,_aIIII)
+  CHECK_FUNC_COPPER(setSkip,_aIIII)
+  CHECK_FUNC_COPPER(setWaitEnd,_aII)
+
   return -1;
 }
 

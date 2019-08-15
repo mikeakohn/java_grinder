@@ -19,5 +19,7 @@ int amiga(JavaClass *java_class, Generator *generator, const char *method_name);
 int amiga(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);
 int amiga(JavaClass *java_class, Generator *generator, const char *method_name, int const_val1, int const_val2);
 
+int copper(JavaClass *java_class, Generator *generator, const char *method_name);
+
 #endif
 

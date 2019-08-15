@@ -15,6 +15,8 @@
 
 #include "generator/Amiga.h"
 
+#define HEAP_SIZE 100 * 1024
+
 // NOTE: a3 points to Amiga hardware registers.
 
 Amiga::Amiga()
@@ -24,6 +26,15 @@ Amiga::Amiga()
 
 Amiga::~Amiga()
 {
+  fprintf(out,
+    "  ;; Mem(100k, CHIP_MEM=2)\n"
+    "  movea.l (ExecBase), a2\n"
+    "  move.l #%d, d0\n"
+    "  move.l #2, d1\n"
+    "  jsr (FreeMem,a2)\n"
+    "  move.l d0, a5\n",
+    HEAP_SIZE);
+
   fprintf(out,
     ".align_bytes 4\n"
     "_amiga_grind_end:\n\n"
@@ -69,6 +80,15 @@ int Amiga::start_init()
   fprintf(out,
     "  ;; a3 points to custom chips.\n"
     "  movea.l #0xdff000, a3\n");
+
+  fprintf(out,
+    "  ;; heap = AllocMem(100k, CHIP_MEM=2)\n"
+    "  movea.l (ExecBase), a2\n"
+    "  move.l #%d, d0\n"
+    "  move.l #2, d1\n"
+    "  jsr (AllocMem,a2)\n"
+    "  movea.l d0, a5\n",
+    HEAP_SIZE);
 
   return 0;
 }
@@ -268,7 +288,7 @@ int Amiga::amiga_setVideoMode_IBBB()
     "  or.w d%d, d%d\n"
     "  or.w d%d, d%d\n"
     "  or.w d%d, d%d\n"
-    "  mov.w d%d, (BPLCON0)\n",
+    "  mov.w d%d, (BPLCON0,a3)\n",
     reg - 3, reg - 4,
     reg - 2, reg - 4,
     reg - 1, reg - 4,
@@ -287,7 +307,7 @@ int Amiga::amiga_setPlayfieldScroll_II()
     "  and.w #0xf, d%d\n"
     "  lsl.w #4, d%d\n"
     "  or.w d%d, d%d\n"
-    "  mov.w d%d, (BPLCON1)\n",
+    "  mov.w d%d, (BPLCON1,a3)\n",
     reg - 1,
     reg - 2,
     reg - 1,
@@ -309,7 +329,7 @@ int Amiga::amiga_setPlayfieldPriority_IIB()
     "  lsl.w #6, d%d\n"
     "  or.w d%d, d%d\n"
     "  or.w d%d, d%d\n"
-    "  mov.w d%d, (BPLCON1)\n",
+    "  mov.w d%d, (BPLCON2,a3)\n",
     reg - 2,
     reg - 3,
     reg - 2,
@@ -320,6 +340,39 @@ int Amiga::amiga_setPlayfieldPriority_IIB()
 
   reg -= 2;
 
+  return 0;
+}
+
+int Amiga::copper_setWait_aIIII()
+{
+  fprintf(out,
+    "  ;; copper_setWait_aIIII()\n");
+
+  return 0;
+}
+
+int Amiga::copper_setColor_aIIII()
+{
+  return 0;
+}
+
+int Amiga::copper_setBitplane_aIIII()
+{
+  return 0;
+}
+
+int Amiga::copper_setMove_aIIII()
+{
+  return 0;
+}
+
+int Amiga::copper_setSkip_aIIII()
+{
+  return 0;
+}
+
+int Amiga::copper_setWaitEnd_aII()
+{
   return 0;
 }
 
