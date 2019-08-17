@@ -32,7 +32,7 @@ Amiga::~Amiga()
     "  move.l #%d, d0\n"
     "  move.l #2, d1\n"
     "  jsr (FreeMem,a2)\n"
-    "  move.l d0, a5\n",
+    "  movea.l d0, a5\n",
     HEAP_SIZE);
 
   fprintf(out,

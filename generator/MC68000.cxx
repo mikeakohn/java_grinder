@@ -748,6 +748,9 @@ int MC68000::new_array(uint8_t type)
   // sizeof(array) + 4 (for array size)
   fprintf(out, "  addq.l #4, a5\n");
 
+  // Store the size so it can be added back to heap pointer.
+  fprintf(out, "  move.l d%d, d5\n", REG_STACK(reg));
+
   // Top of Java stack should equal where the heap is currently pointing
   if (reg < reg_max)
   {
@@ -761,11 +764,14 @@ int MC68000::new_array(uint8_t type)
   }
 
   // Add the length of the array to heap pointer
-  fprintf(out, "  add.l d%d, a5\n", array_length_reg);
+  fprintf(out, "  add.l a5, d5\n");
 
   // Need to align heap
-  fprintf(out, "  addq.l #3, a5\n");
-  fprintf(out, "  and.l #0xfffffffc, a5\n");
+  fprintf(out, "  addq.l #3, d5\n");
+  fprintf(out, "  andi.l #0xfffffffc, d5\n");
+
+  // Update heap pointer.
+  fprintf(out, "  movea.l d5, a5\n");
 
   return 0;
 }
