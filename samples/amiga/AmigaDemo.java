@@ -17,12 +17,15 @@ public class AmigaDemo
 
   static public void main(String args[])
   {
-    int[] copper_code = new int[20];
+    //int[] copper_code = new int[20];
+    Copper copper = new Copper(20);
 
     Amiga.disableMultitasking();
     Amiga.disableInterrupts();
 
-    Copper.setWait(copper_code, 0, 10, 10);
+    //Copper.setWait(copper_code, 0, 10, 10);
+    //copper.appendWait(10, 10);
+    copper.appendInstruction(0x12349876);
 
     while(true)
     {

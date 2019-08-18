@@ -67,12 +67,23 @@ int amiga(JavaClass *java_class, Generator *generator, const char *function, int
 
 int copper(JavaClass *java_class, Generator *generator, const char *method_name)
 {
+#if 0
   CHECK_FUNC_COPPER(setWait,_aIIII)
   CHECK_FUNC_COPPER(setColor,_aIIII)
   CHECK_FUNC_COPPER(setBitplane,_aIIII)
   CHECK_FUNC_COPPER(setMove,_aIIII)
   CHECK_FUNC_COPPER(setSkip,_aIIII)
   CHECK_FUNC_COPPER(setWaitEnd,_aII)
+#endif
+
+  CHECK_FUNC_COPPER(appendInstruction,_I)
+  CHECK_FUNC_COPPER(appendWait,_II)
+  CHECK_FUNC_COPPER(appendSkip,_II)
+  CHECK_FUNC_COPPER(appendSetColor,_II)
+  CHECK_FUNC_COPPER(appendSetBitplane,_II)
+  CHECK_FUNC_COPPER(appendEnd,)
+  CHECK_FUNC_COPPER(resetIndex,)
+  CHECK_FUNC_COPPER(setIndex,_I)
 
   return -1;
 }

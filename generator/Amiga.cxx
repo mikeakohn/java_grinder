@@ -93,6 +93,35 @@ int Amiga::start_init()
   return 0;
 }
 
+int Amiga::new_object(std::string &object_name, int field_count)
+{
+  fprintf(out, "  ; new_object(object_name=%s field_count=%d)\n",
+    object_name.c_str(), field_count);
+
+  if (object_name != "net/mikekohn/java_grinder/amiga/Copper")
+  {
+     printf("Error: Unknown class %s\n", object_name.c_str());
+     return -1;
+  }
+
+#if 0
+  fprintf(out,
+    "  move.l #0, (a5)\n"
+    "  lsl.l #2, d%d\n"
+    "  add.l #%d, a5\n"
+    "  add.l d%d, a5\n",
+    reg - 1,
+    field_count * 4,
+    reg - 1);
+
+  reg -= 2;
+#endif
+
+  reg++;
+
+  return 0;
+}
+
 int Amiga::amiga_disableMultitasking()
 {
   fprintf(out,
@@ -343,6 +372,7 @@ int Amiga::amiga_setPlayfieldPriority_IIB()
   return 0;
 }
 
+#if 0
 int Amiga::copper_setWait_aIIII()
 {
   fprintf(out,
@@ -375,4 +405,198 @@ int Amiga::copper_setWaitEnd_aII()
 {
   return 0;
 }
+#endif
 
+int Amiga::copper_Constructor_I()
+{
+  fprintf(out,
+    "  ;; copper_Constructor_I()\n");
+
+  // Push address of Copper onto the stack.
+  fprintf(out,
+    "  move.l a5, d%d\n"
+    "  add.l #4, d%d\n",
+    reg - 3,
+    reg - 3);
+
+  // Allocate memory from the heap.
+  fprintf(out,
+    "  move.l #0, (a5)\n"
+    "  lsl.l #2, d%d\n"
+    "  add.l #4, a5\n"
+    "  add.l d%d, a5\n",
+    reg - 1,
+    reg - 1);
+
+  reg -= 2;
+
+  return 0;
+}
+
+int Amiga::copper_appendInstruction_I()
+{
+  const int object = reg - 2;
+  const int value = reg - 1;
+
+  fprintf(out, "  ;; copper_appendInstruction()\n");
+
+  copper_getNextIndexAndIncrement(object);
+
+  fprintf(out,
+    "  move.l d%d, (0,a2,d5)\n",
+    value);
+
+  reg -= 2;
+
+  return 0;
+}
+
+int Amiga::copper_appendWait_II()
+{
+  const int object = reg - 3;
+  const int horizontal = reg - 2;
+  const int vertical = reg - 1;
+
+  fprintf(out, "  ;; copper_appendWait_II()\n");
+
+  copper_getNextIndexAndIncrement(object);
+
+  fprintf(out,
+    "  and.l #0x3f, d%d\n"
+    "  and.l #0x3f, d%d\n"
+    "  lsl.l #1, d%d\n"
+    "  lsl.l #8, d%d\n"
+    "  or.l d%d, d%d\n"
+    "  or.l #1, d%d\n"
+    "  swap d%d\n"
+    "  or.w #0xfffe, d%d\n"
+    "  move.l d%d, (0,a2,d5)\n",
+    horizontal,
+    vertical,
+    horizontal,
+    vertical,
+    horizontal, vertical,
+    vertical,
+    vertical,
+    vertical,
+    vertical);
+
+  reg -= 3;
+
+  return 0;
+}
+
+int Amiga::copper_appendSkip_II()
+{
+  const int object = reg - 3;
+  const int horizontal = reg - 2;
+  const int vertical = reg - 1;
+
+  fprintf(out, "  ;; copper_appendWait_II()\n");
+
+  copper_getNextIndexAndIncrement(object);
+
+  fprintf(out,
+    "  and.l #0x3f, d%d\n"
+    "  and.l #0x3f, d%d\n"
+    "  lsl.l #1, d%d\n"
+    "  lsl.l #8, d%d\n"
+    "  or.l d%d, d%d\n"
+    "  or.l #1, d%d\n"
+    "  swap d%d\n"
+    "  or.w #0xffff, d%d\n"
+    "  move.l d%d, (0,a2,d5)\n",
+    horizontal,
+    vertical,
+    horizontal,
+    vertical,
+    horizontal, vertical,
+    vertical,
+    vertical,
+    vertical,
+    vertical);
+
+  reg -= 3;
+
+  return 0;
+}
+
+int Amiga::copper_appendSetColor_II()
+{
+  const int object = reg - 3;
+  const int index = reg - 2;
+  const int value = reg - 1;
+
+  fprintf(out, "  ;; copper_appendSetColor_II()\n");
+
+  copper_getNextIndexAndIncrement(object);
+
+  fprintf(out,
+    "  move.l #COLOR00, d5\n"
+    "  lsl.w #1, d%d\n"
+    "  move.w d%d, (0,a2,d5)\n",
+    index,
+    value);
+
+  reg -= 3;
+
+  return 0;
+}
+
+int Amiga::copper_appendSetBitplane_II()
+{
+  const int object = reg - 3;
+  const int index = reg - 2;
+  const int value = reg - 1;
+
+  fprintf(out, "  ;; copper_appendSetColor_II()\n");
+
+  copper_getNextIndexAndIncrement(object);
+
+  fprintf(out,
+    "  move.l #BPL1PTH, d5\n"
+    "  lsl.w #2, d%d\n"
+    "  move.w d%d, (0,a2,d5)\n",
+    index,
+    value);
+
+  reg -= 3;
+
+  return 0;
+}
+
+int Amiga::copper_appendEnd()
+{
+  const int object = reg - 1;
+
+  fprintf(out, "  ;; copper_appendInstruction()\n");
+
+  copper_getNextIndexAndIncrement(object);
+
+  fprintf(out, "  move.l #0xfffffffe, (0,a3,d5)\n");
+
+  reg -= 2;
+
+  return 0;
+}
+
+int Amiga::copper_resetIndex()
+{
+  return -1;
+}
+
+int Amiga::copper_setIndex_I()
+{
+  return -1;
+}
+
+int Amiga::copper_getNextIndexAndIncrement(int reg)
+{
+  fprintf(out,
+    "  movea.l d%d, a2\n"
+    "  move.l (-4,a2), d5\n"
+    "  add.l #4, (-4,a2)\n",
+    reg);
+
+  return 0;
+}

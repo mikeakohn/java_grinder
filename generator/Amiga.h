@@ -22,6 +22,7 @@ public:
 
   virtual int open(const char *filename);
   virtual int start_init();
+  virtual int new_object(std::string &object_name, int field_count);
   virtual int amiga_disableMultitasking();
   virtual int amiga_enableMultitasking();
   virtual int amiga_disableInterrupts();
@@ -33,14 +34,26 @@ public:
   virtual int amiga_setPlayfieldScroll_II();
   virtual int amiga_setPlayfieldPriority_IIB();
 
+#if 0
   virtual int copper_setWait_aIIII();
   virtual int copper_setColor_aIIII();
   virtual int copper_setBitplane_aIIII();
   virtual int copper_setMove_aIIII();
   virtual int copper_setSkip_aIIII();
   virtual int copper_setWaitEnd_aII();
+#endif
+  virtual int copper_Constructor_I();
+  virtual int copper_appendInstruction_I();
+  virtual int copper_appendWait_II();
+  virtual int copper_appendSkip_II();
+  virtual int copper_appendSetColor_II();
+  virtual int copper_appendSetBitplane_II();
+  virtual int copper_appendEnd();
+  virtual int copper_resetIndex();
+  virtual int copper_setIndex_I();
 
 private:
+  int copper_getNextIndexAndIncrement(int reg);
 };
 
 #endif

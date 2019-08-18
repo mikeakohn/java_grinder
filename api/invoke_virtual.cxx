@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2019 by Michael Kohn
  *
  */
 
@@ -18,6 +18,7 @@
 #include "api/invoke_virtual.h"
 #include "api/java_lang_string.h"
 #include "api/java_lang_system.h"
+#include "api/amiga.h"
 #include "api/draw3d_object.h"
 #include "api/draw3d_texture.h"
 #include "common/JavaClass.h"
@@ -28,6 +29,8 @@
 #define DRAW3D_LEN (sizeof(DRAW3D) - 1)
 #define DRAW3D_TEXTURE "net/mikekohn/java_grinder/draw3d/Texture"
 #define DRAW3D_TEXTURE_LEN (sizeof(DRAW3D_TEXTURE) - 1)
+#define COPPER "net/mikekohn/java_grinder/amiga/Copper"
+#define COPPER_LEN (sizeof(COPPER) - 1)
 
 // FIXME: Is this function ever called?  This looks like it was made to
 // deal with stuff like System.out.println() where System is the class,
@@ -137,7 +140,8 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
   {
     ret = java_lang_string(java_class, generator, function.c_str());
   }
-  else if (strncmp(method_class.c_str(), DRAW3D_TEXTURE, DRAW3D_TEXTURE_LEN) == 0)
+    else
+  if (strncmp(method_class.c_str(), DRAW3D_TEXTURE, DRAW3D_TEXTURE_LEN) == 0)
   {
     const char *cls = method_class.c_str() + DRAW3D_LEN + 1;
 
@@ -193,7 +197,8 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
       } while(0);
     }
   }
-  else if (strncmp(method_class.c_str(), DRAW3D, DRAW3D_LEN) == 0)
+    else
+  if (strncmp(method_class.c_str(), DRAW3D, DRAW3D_LEN) == 0)
   {
     const char *cls = method_class.c_str() + DRAW3D_LEN + 1;
     int draw3d_type = -1;
@@ -276,6 +281,21 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
           ret = draw3d_object(java_class, generator, function.c_str());
         } while(0);
       }
+    }
+  }
+    else
+  if (strncmp(method_class.c_str(), COPPER, COPPER_LEN) == 0)
+  {
+    if (is_constructor == true)
+    {
+      if (method_sig == "(I)V")
+      {
+        ret = generator->copper_Constructor_I();
+      }
+    }
+      else
+    {
+      ret = copper(java_class, generator, function.c_str());
     }
   }
 
