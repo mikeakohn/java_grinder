@@ -15,7 +15,8 @@
 
 #include "generator/Amiga.h"
 
-#define HEAP_SIZE 100 * 1024
+//#define HEAP_SIZE 100 * 1024
+#define HEAP_SIZE 1024
 
 // NOTE: a3 points to Amiga hardware registers.
 
@@ -26,14 +27,17 @@ Amiga::Amiga()
 
 Amiga::~Amiga()
 {
+#if 0
   fprintf(out,
     "  ;; Mem(100k, CHIP_MEM=2)\n"
-    "  movea.l (ExecBase), a2\n"
+    "  move.l a6, (a7)-\n"
+    "  movea.l (ExecBase), a6\n"
     "  move.l #%d, d0\n"
     "  move.l #2, d1\n"
-    "  jsr (FreeMem,a2)\n"
-    "  movea.l d0, a5\n",
+    "  jsr (FreeMem,a6)\n"
+    "  movea.l (a7)+, a6\n",
     HEAP_SIZE);
+#endif
 
   fprintf(out,
     ".align_bytes 4\n"
@@ -71,6 +75,7 @@ int Amiga::start_init()
     "  dc32 0x0000_0000  ; last_hunk\n"
     "  dc32 (_amiga_grind_end - _amiga_grind_start) / 4\n"
     // FIXME: Statics need to be in chip RAM if the custom chips use them
+    // 0x4000 = flags, 0x03e9 = code
     //"  dc32 0x0000_03e9  ; hunk_code\n\n"
     "  dc32 0x4000_03e9  ; hunk_code\n\n"
     "  dc32 (_amiga_grind_end - _amiga_grind_start) / 4\n"
@@ -81,12 +86,21 @@ int Amiga::start_init()
     "  ;; a3 points to custom chips.\n"
     "  movea.l #0xdff000, a3\n");
 
+  return 0;
+}
+
+int Amiga::init_heap(int field_count)
+{
+  fprintf(out, "  ;; Setup heap and static initializers\n");
+
   fprintf(out,
     "  ;; heap = AllocMem(100k, CHIP_MEM=2)\n"
-    "  movea.l (ExecBase), a2\n"
+    "  move.l a6, -(a7)\n"
+    "  movea.l (ExecBase), a6\n"
     "  move.l #%d, d0\n"
-    "  move.l #2, d1\n"
-    "  jsr (AllocMem,a2)\n"
+    "  moveq #2, d1\n"
+    "  jsr (AllocMem,a6)\n"
+    "  movea.l (a7)+, a6\n"
     "  movea.l d0, a5\n",
     HEAP_SIZE);
 
@@ -126,8 +140,10 @@ int Amiga::amiga_disableMultitasking()
 {
   fprintf(out,
     "  ;; amiga_disableMultitasking()\n"
-    "  movea.l (ExecBase), a2\n"
-    "  jsr (Forbid,a2)\n");
+    "  move.l a6, -(a7)\n"
+    "  movea.l (ExecBase), a6\n"
+    "  jsr (Forbid,a6)\n"
+    "  movea.l (a7)+, a6\n");
 
   return 0;
 }
@@ -136,8 +152,10 @@ int Amiga::amiga_enableMultitasking()
 {
   fprintf(out,
     "  ;; amiga_enableMultitasking()\n"
-    "  movea.l (ExecBase), a2\n"
-    "  jsr (Permit,a2)\n");
+    "  move.l a6, -(a7)\n"
+    "  movea.l (ExecBase), a6\n"
+    "  jsr (Permit,a6)\n"
+    "  movea.l (a7)+, a6\n");
 
   return 0;
 }
@@ -146,8 +164,10 @@ int Amiga::amiga_disableInterrupts()
 {
   fprintf(out,
     "  ;; amiga_disableInterrupts()\n"
-    "  movea.l (ExecBase), a2\n"
-    "  jsr (Disable,a2)\n");
+    "  move.l a6, -(a7)\n"
+    "  movea.l (ExecBase), a6\n"
+    "  jsr (Disable,a6)\n"
+    "  movea.l (a7)+, a6\n");
 
   return 0;
 }
@@ -156,8 +176,10 @@ int Amiga::amiga_enableInterrupts()
 {
   fprintf(out,
     "  ;; amiga_enableInterrupts()\n"
-    "  movea.l (ExecBase), a2\n"
-    "  jsr (Enable,a2)\n");
+    "  move.l a6, -(a7)\n"
+    "  movea.l (ExecBase), a6\n"
+    "  jsr (Enable,a6)\n"
+    "  movea.l (a7)+, a6\n");
 
   return 0;
 }
@@ -438,7 +460,7 @@ int Amiga::copper_appendInstruction_I()
   const int object = reg - 2;
   const int value = reg - 1;
 
-  fprintf(out, "  ;; copper_appendInstruction()\n");
+  fprintf(out, "  ;; copper_appendInstruction_I()\n");
 
   copper_getNextIndexAndIncrement(object);
 
@@ -532,9 +554,12 @@ int Amiga::copper_appendSetColor_II()
   copper_getNextIndexAndIncrement(object);
 
   fprintf(out,
-    "  move.l #COLOR00, d5\n"
     "  lsl.w #1, d%d\n"
-    "  move.w d%d, (0,a2,d5)\n",
+    "  add.l #COLOR00, d%d\n"
+    "  move.w d%d, (0,a2,d5)\n"
+    "  move.w d%d, (2,a2,d5)\n",
+    index,
+    index,
     index,
     value);
 
@@ -569,13 +594,13 @@ int Amiga::copper_appendEnd()
 {
   const int object = reg - 1;
 
-  fprintf(out, "  ;; copper_appendInstruction()\n");
+  fprintf(out, "  ;; copper_appendEnd()\n");
 
   copper_getNextIndexAndIncrement(object);
 
   fprintf(out, "  move.l #0xfffffffe, (0,a3,d5)\n");
 
-  reg -= 2;
+  reg -= 1;
 
   return 0;
 }

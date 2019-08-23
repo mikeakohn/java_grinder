@@ -22,6 +22,7 @@ public:
 
   virtual int open(const char *filename);
   virtual int start_init();
+  virtual int init_heap(int field_count);
   virtual int new_object(std::string &object_name, int field_count);
   virtual int amiga_disableMultitasking();
   virtual int amiga_enableMultitasking();

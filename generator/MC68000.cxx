@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2019 by Michael Kohn
  *
  */
 
@@ -88,7 +88,7 @@ int MC68000::insert_static_field_define(std::string &name, std::string &type, in
 
 int MC68000::init_heap(int field_count)
 {
-  fprintf(out, "  ;; Set up heap and static initializers\n");
+  fprintf(out, "  ;; Setup heap and static initializers\n");
   //fprintf(out, "  move.l #ram_start+%d, &ram_start\n", (field_count + 1) * 2);
   fprintf(out, "  movea.l #ram_start+%d, a5\n", field_count * 4);
   return 0;
