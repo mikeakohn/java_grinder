@@ -1300,10 +1300,9 @@ int MC68000::get_ref_from_stack()
 
 int MC68000::get_jump_size(int distance)
 {
-  if (distance < 25) { return 's'; }
+  if (distance < 20) { return 's'; }
   if (distance < 20000) { return 'w'; }
 
   return 'l';
 }
-
 

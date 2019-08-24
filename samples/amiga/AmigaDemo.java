@@ -17,22 +17,18 @@ public class AmigaDemo
 
   static public void main(String args[])
   {
-    //int[] copper_code = new int[20];
-    //Copper copper = new Copper(20);
+    Copper copper = new Copper(20);
 
     Amiga.disableMultitasking();
     Amiga.disableInterrupts();
 
-    //Copper.setWait(copper_code, 0, 10, 10);
-    //copper.appendWait(10, 10);
-    //copper.appendInstruction(0x12349876);
-
-    //copper.appendSetColor(0, 0x000);
-    //copper.appendWait(0, 50);
-    //copper.appendSetColor(0, 0xf00);
-    //copper.appendWait(0, 70);
-    //copper.appendSetColor(0, 0x0f0);
-    //copper.appendEnd();
+    copper.appendSetColor(0, 0x00f);
+    copper.appendWait(0, 100);
+    copper.appendSetColor(0, 0xf00);
+    copper.appendWait(0, 150);
+    copper.appendSetColor(0, 0x0f0);
+    copper.appendEnd();
+    copper.run();
 
     while(true)
     {
@@ -44,8 +40,8 @@ public class AmigaDemo
       Amiga.setPalette(18, 0xfff);
       Amiga.setPalette(19, 0xfff);
 
-      Amiga.setPalette(0, 0xf0f);
-      Amiga.setPalette(1, 0x000);
+      //Amiga.setPalette(0, 0xf0f);
+      //Amiga.setPalette(1, 0x000);
     }
   }
 }

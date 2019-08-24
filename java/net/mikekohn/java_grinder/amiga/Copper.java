@@ -3,7 +3,7 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.naken.cc/
- * License: GPL
+ * License: GPLv3
  *
  * Copyright 2014-2019 by Michael Kohn
  *
@@ -19,38 +19,34 @@ public class Copper
 
   public void appendInstruction(int instruction) { }
 
+  /** Wait till video beam hits x,y coordinates. */
   public void appendWait(int x, int y) { }
 
+  /** Skip next instruction if video beam already hit x,y coordinates. */
   public void appendSkip(int x, int y) { }
 
-  public void appendSetColor(int pallette, int color) { }
+  /** Add instruction to set the color of a palette . */
+  public void appendSetColor(int palette, int color) { }
 
-  public void appendSetBitplane(int bitplane, int address) { }
+  /** Add instruction to set the bitplane to an address. */
+  public void appendSetBitplane(int bitplane, byte[] address) { }
 
+  /** Add instruction stop the copper until the next vertical blank. */
   public void appendEnd() { }
 
+  /** Reset internal instruction index so the copper instruction list
+      can be reloaded. */
   public void resetIndex() { }
 
+  /** Reset internal instruction list index. */
   public void setIndex(int index) { }
 
-  /** Wait till video beam hits x,y coordinates. */
-  public static void setWait(int[] code, int index, int x, int y) { }
+  /** Run this Copper program. */
+  public void run() { }
 
-  /** Set one of the color palettes. */
-  public static void setColor(int[] code, int index, int palette, int value) { }
+  /** Stop the Copper. */
+  public void stop() { }
 
-  /** Set the bitplane to point to an array of memory. */
-  public static void setBitplane(int[] code, int index, int bitplane, int value) { }
-
-  /** Move immediate value to hardware register. */
-  public static void setMove(int[] code, int index, int register, int value) { }
-
-  /** Skip next instruction if video beam already passed x,y coordinates. */
-  public static void setSkip(int[] code, int index, int x, int y) { }
-
-  /** Waits till the video beam reaches the end of the screen. */
-  public static void setWaitEnd(int[] code, int index) { }
-
-  public int index;
+  private int index;
 }
 

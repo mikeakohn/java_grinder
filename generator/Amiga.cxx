@@ -394,41 +394,6 @@ int Amiga::amiga_setPlayfieldPriority_IIB()
   return 0;
 }
 
-#if 0
-int Amiga::copper_setWait_aIIII()
-{
-  fprintf(out,
-    "  ;; copper_setWait_aIIII()\n");
-
-  return 0;
-}
-
-int Amiga::copper_setColor_aIIII()
-{
-  return 0;
-}
-
-int Amiga::copper_setBitplane_aIIII()
-{
-  return 0;
-}
-
-int Amiga::copper_setMove_aIIII()
-{
-  return 0;
-}
-
-int Amiga::copper_setSkip_aIIII()
-{
-  return 0;
-}
-
-int Amiga::copper_setWaitEnd_aII()
-{
-  return 0;
-}
-#endif
-
 int Amiga::copper_Constructor_I()
 {
   fprintf(out,
@@ -484,8 +449,8 @@ int Amiga::copper_appendWait_II()
   copper_getNextIndexAndIncrement(object);
 
   fprintf(out,
-    "  and.l #0x3f, d%d\n"
-    "  and.l #0x3f, d%d\n"
+    "  and.l #0x7f, d%d\n"
+    "  and.l #0xff, d%d\n"
     "  lsl.l #1, d%d\n"
     "  lsl.l #8, d%d\n"
     "  or.l d%d, d%d\n"
@@ -519,8 +484,8 @@ int Amiga::copper_appendSkip_II()
   copper_getNextIndexAndIncrement(object);
 
   fprintf(out,
-    "  and.l #0x3f, d%d\n"
-    "  and.l #0x3f, d%d\n"
+    "  and.l #0x7f, d%d\n"
+    "  and.l #0xff, d%d\n"
     "  lsl.l #1, d%d\n"
     "  lsl.l #8, d%d\n"
     "  or.l d%d, d%d\n"
@@ -607,12 +572,53 @@ int Amiga::copper_appendEnd()
 
 int Amiga::copper_resetIndex()
 {
-  return -1;
+  fprintf(out,
+    "  ;; copper_resetIndex()\n"
+    "  movea.l d%d, a2\n"
+    "  move.l #0, (-4,a2)\n",
+    reg - 1);
+
+  reg -= 1;
+
+  return 0;
 }
 
 int Amiga::copper_setIndex_I()
 {
-  return -1;
+  fprintf(out,
+    "  ;; copper_resetIndex()\n"
+    "  movea.l d%d, a2\n"
+    "  move.l d%d, (-4,a2)\n",
+    reg - 2,
+    reg - 1);
+
+  reg -= 2;
+
+  return 0;
+}
+
+int Amiga::copper_run()
+{
+  fprintf(out,
+    "  ;; copper_run()\n"
+    "  move.l d%d, (COP1LCH,a3)\n"
+    "  move.w #0x8080, (DMACON,a3)\n",
+    reg - 1);
+
+  reg -= 1;
+
+  return 0;
+}
+
+int Amiga::copper_stop()
+{
+  fprintf(out,
+    "  ;; copper_run()\n"
+    "  move.w #0x0080, (DMACON,a3)\n");
+
+  reg -= 1;
+
+  return 0;
 }
 
 int Amiga::copper_getNextIndexAndIncrement(int reg)

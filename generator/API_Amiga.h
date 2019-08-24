@@ -26,15 +26,6 @@ public:
   virtual int amiga_setPlayfieldScroll_II() { return -1; }
   virtual int amiga_setPlayfieldPriority_IIB() { return -1; }
 
-#if 0
-  virtual int copper_setWait_aIIII() { return -1; }
-  virtual int copper_setColor_aIIII() { return -1; }
-  virtual int copper_setBitplane_aIIII() { return -1; }
-  virtual int copper_setMove_aIIII() { return -1; }
-  virtual int copper_setSkip_aIIII() { return -1; }
-  virtual int copper_setWaitEnd_aII() { return -1; }
-#endif
-
   virtual int copper_Constructor_I() { return -1; }
   virtual int copper_appendInstruction_I() { return -1; }
   virtual int copper_appendWait_II() { return -1; }
@@ -44,6 +35,8 @@ public:
   virtual int copper_appendEnd() { return -1; }
   virtual int copper_resetIndex() { return -1; }
   virtual int copper_setIndex_I() { return -1; }
+  virtual int copper_run() { return -1; }
+  virtual int copper_stop() { return -1; }
 };
 
 #endif
