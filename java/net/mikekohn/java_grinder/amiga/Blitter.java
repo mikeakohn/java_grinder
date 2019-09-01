@@ -3,7 +3,7 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.naken.cc/
- * License: GPL
+ * License: GPLv3
  *
  * Copyright 2014-2019 by Michael Kohn
  *
@@ -11,7 +11,7 @@
 
 package net.mikekohn.java_grinder.amiga;
 
-abstract public class Blitter
+public class Blitter
 {
   //public static final int FILL_OPTIONS_LINE = 0x01;
   public static final int FILL_OPTIONS_DESC = 0x02;
@@ -43,6 +43,10 @@ abstract public class Blitter
   public static final int LINE_TYPE_TEXTURE = 0x8000;
   public static final int LINE_TYPE_SOLID = 0xff;
 
+  public Blitter()
+  {
+  }
+
   /** Set source A. */
   public void setSourceA(byte[] data) { }
 
@@ -52,26 +56,26 @@ abstract public class Blitter
   /** Set source C. */
   public void setSourceC(byte[] data) { }
 
-  /** Set source D. */
-  public void setSourceD(byte[] data) { }
+  /** Set destination D. */
+  public void setDestination(byte[] data) { }
 
   /** Set modulo A. */
-  public void setModuloA(short value) { }
+  public void setModuloA(int value) { }
 
   /** Set modulo B. */
-  public void setModuloB(short value) { }
+  public void setModuloB(int value) { }
 
   /** Set modulo C. */
-  public void setModuloC(short value) { }
+  public void setModuloC(int value) { }
 
-  /** Set modulo D. */
-  public void setModuloD(short value) { }
+  /** Set modulo destination D. */
+  public void setModuloDestination(int value) { }
 
   /** Set shift value A. */
-  public void setShiftA(short value) { }
+  public void setShiftA(int value) { }
 
   /** Set shift value B. */
-  public void setShiftB(short value) { }
+  public void setShiftB(int value) { }
 
   /** Blitter channel A masks. */
   public void setChannelAMasks(int first_word, int last_word) { }

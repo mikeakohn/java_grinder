@@ -17,7 +17,9 @@ public class AmigaDemo
 
   static public void main(String args[])
   {
+    byte[] blitter_a = new byte[128];
     Copper copper = new Copper(20);
+    Blitter blitter = new Blitter();
 
     Amiga.disableMultitasking();
     Amiga.disableInterrupts();
@@ -29,6 +31,8 @@ public class AmigaDemo
     copper.appendSetColor(0, 0x0f0);
     copper.appendEnd();
     copper.run();
+
+    blitter.setSourceA(blitter_a);
 
     while(true)
     {

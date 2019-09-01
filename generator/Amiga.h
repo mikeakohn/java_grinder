@@ -35,14 +35,6 @@ public:
   virtual int amiga_setPlayfieldScroll_II();
   virtual int amiga_setPlayfieldPriority_IIB();
 
-#if 0
-  virtual int copper_setWait_aIIII();
-  virtual int copper_setColor_aIIII();
-  virtual int copper_setBitplane_aIIII();
-  virtual int copper_setMove_aIIII();
-  virtual int copper_setSkip_aIIII();
-  virtual int copper_setWaitEnd_aII();
-#endif
   virtual int copper_Constructor_I();
   virtual int copper_appendInstruction_I();
   virtual int copper_appendWait_II();
@@ -56,6 +48,32 @@ public:
   virtual int copper_stop();
   virtual int copper_getArrayAsInt();
   virtual int copper_getArrayAsChar();
+
+  virtual int blitter_Constructor();
+  virtual int blitter_setSourceA_aB();
+  virtual int blitter_setSourceB_aB();
+  virtual int blitter_setSourceC_aB();
+  virtual int blitter_setDestination_aB();
+  virtual int blitter_setModuloA_I();
+  virtual int blitter_setModuloB_I();
+  virtual int blitter_setModuloC_I();
+  virtual int blitter_setModuloDestination_I();
+  virtual int blitter_setShiftA_I();
+  virtual int blitter_setShiftB_I();
+  virtual int blitter_setChannelAMasks_II();
+  virtual int blitter_enableChannels_I();
+  virtual int blitter_setAsFillMode_I();
+  virtual int blitter_setAsLineMode_I();
+  virtual int blitter_setLogicalFunction_I();
+  virtual int blitter_setDescMode_Z();
+  virtual int blitter_setSize_II();
+  virtual int blitter_setLineTypeA_I();
+  virtual int blitter_setLineTypeB_I();
+  virtual int blitter_setLineTypeC_I();
+  virtual int blitter_setLineTexture_I();
+  virtual int blitter_setLineStart_I();
+  virtual int blitter_runCopy_II();
+  virtual int blitter_drawLine_I();
 
 private:
   int copper_getNextIndexAndIncrement(int reg);

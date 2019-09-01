@@ -112,7 +112,8 @@ int Amiga::new_object(std::string &object_name, int field_count)
   fprintf(out, "  ; new_object(object_name=%s field_count=%d)\n",
     object_name.c_str(), field_count);
 
-  if (object_name != "net/mikekohn/java_grinder/amiga/Copper")
+  if (object_name != "net/mikekohn/java_grinder/amiga/Copper" &&
+      object_name != "net/mikekohn/java_grinder/amiga/Blitter")
   {
      printf("Error: Unknown class %s\n", object_name.c_str());
      return -1;
@@ -633,6 +634,200 @@ int Amiga::copper_getArrayAsChar()
   fprintf(out, "  ;; copper_getArrayAsChar()\n");
 
   return 0;
+}
+
+int Amiga::blitter_Constructor()
+{
+  fprintf(out,
+    "  ;; blitter_Constructor()\n");
+
+  // Push address of Blitter onto the stack.
+  fprintf(out, "  move.l a5, d%d\n", reg - 2);
+
+  // Allocate memory from the heap.
+  fprintf(out,
+    "  move.l #0, (a5)\n"
+    "  add.l #4, a5\n");
+
+  reg -= 1;
+
+  return 0;
+}
+
+int Amiga::blitter_setSourceA_aB()
+{
+  fprintf(out,
+    "  ;; blitter_setSourceA_aB()\n"
+    "  move.l d%d, (BLTAPTH, a3)\n",
+    reg - 1);
+
+  reg -= 1;
+
+  return 0;
+}
+
+int Amiga::blitter_setSourceB_aB()
+{
+  fprintf(out,
+    "  ;; blitter_setSourceB_aB()\n"
+    "  move.l d%d, (BLTBPTH, a3)\n",
+    reg - 1);
+
+  reg -= 1;
+
+  return 0;
+}
+
+int Amiga::blitter_setSourceC_aB()
+{
+  fprintf(out,
+    "  ;; blitter_setSourceC_aB()\n"
+    "  move.l d%d, (BLTCPTH, a3)\n",
+    reg - 1);
+
+  reg -= 1;
+
+  return 0;
+}
+
+int Amiga::blitter_setDestination_aB()
+{
+  fprintf(out,
+    "  ;; blitter_setDestination_aB()\n"
+    "  move.l d%d, (BLTDPTH, a3)\n",
+    reg - 1);
+
+  reg -= 1;
+
+  return 0;
+}
+
+int Amiga::blitter_setModuloA_I()
+{
+  fprintf(out,
+    "  ;; blitter_setModuloA_I()\n"
+    "  move.w d%d, (BLTAMOD, a3)\n",
+    reg - 1);
+
+  reg -= 1;
+
+  return 0;
+}
+
+int Amiga::blitter_setModuloB_I()
+{
+  fprintf(out,
+    "  ;; blitter_setModuloB_I()\n"
+    "  move.w d%d, (BLTBMOD, a3)\n",
+    reg - 1);
+
+  reg -= 1;
+
+  return 0;
+}
+
+int Amiga::blitter_setModuloC_I()
+{
+  fprintf(out,
+    "  ;; blitter_setModuloC_I()\n"
+    "  move.w d%d, (BLTCMOD, a3)\n",
+    reg - 1);
+
+  reg -= 1;
+
+  return 0;
+}
+
+int Amiga::blitter_setModuloDestination_I()
+{
+  fprintf(out,
+    "  ;; blitter_setModuloD_I()\n"
+    "  move.w d%d, (BLTDMOD, a3)\n",
+    reg - 1);
+
+  reg -= 1;
+
+  return 0;
+}
+
+int Amiga::blitter_setShiftA_I()
+{
+  return -1;
+}
+
+int Amiga::blitter_setShiftB_I()
+{
+  return -1;
+}
+
+int Amiga::blitter_setChannelAMasks_II()
+{
+  return -1;
+}
+
+int Amiga::blitter_enableChannels_I()
+{
+  return -1;
+}
+
+int Amiga::blitter_setAsFillMode_I()
+{
+  return -1;
+}
+
+int Amiga::blitter_setAsLineMode_I()
+{
+  return -1;
+}
+
+int Amiga::blitter_setLogicalFunction_I()
+{
+  return -1;
+}
+
+int Amiga::blitter_setDescMode_Z()
+{
+  return -1;
+}
+
+int Amiga::blitter_setSize_II()
+{
+  return -1;
+}
+
+int Amiga::blitter_setLineTypeA_I()
+{
+  return -1;
+}
+
+int Amiga::blitter_setLineTypeB_I()
+{
+  return -1;
+}
+
+int Amiga::blitter_setLineTypeC_I()
+{
+  return -1;
+}
+
+int Amiga::blitter_setLineTexture_I()
+{
+  return -1;
+}
+
+int Amiga::blitter_setLineStart_I()
+{
+  return -1;
+}
+
+int Amiga::blitter_runCopy_II()
+{
+  return -1;
+}
+
+int Amiga::blitter_drawLine_I()
+{
+  return -1;
 }
 
 int Amiga::copper_getNextIndexAndIncrement(int reg)

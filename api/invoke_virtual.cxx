@@ -31,6 +31,8 @@
 #define DRAW3D_TEXTURE_LEN (sizeof(DRAW3D_TEXTURE) - 1)
 #define COPPER "net/mikekohn/java_grinder/amiga/Copper"
 #define COPPER_LEN (sizeof(COPPER) - 1)
+#define BLITTER "net/mikekohn/java_grinder/amiga/Blitter"
+#define BLITTER_LEN (sizeof(BLITTER) - 1)
 
 // FIXME: Is this function ever called?  This looks like it was made to
 // deal with stuff like System.out.println() where System is the class,
@@ -296,6 +298,21 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
       else
     {
       ret = copper(java_class, generator, function.c_str());
+    }
+  }
+    else
+  if (strncmp(method_class.c_str(), BLITTER, BLITTER_LEN) == 0)
+  {
+    if (is_constructor == true)
+    {
+      if (method_sig == "()V")
+      {
+        ret = generator->blitter_Constructor();
+      }
+    }
+      else
+    {
+      ret = blitter(java_class, generator, function.c_str());
     }
   }
 

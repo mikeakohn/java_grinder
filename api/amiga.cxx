@@ -40,6 +40,12 @@
     return generator->copper_##funct##sig(); \
   }
 
+#define CHECK_FUNC_BLITTER(funct,sig) \
+  if (strcmp(#funct#sig, method_name) == 0) \
+  { \
+    return generator->blitter_##funct##sig(); \
+  }
+
 int amiga(JavaClass *java_class, Generator *generator, const char *method_name)
 {
   CHECK_FUNC(disableMultitasking,)
@@ -77,6 +83,36 @@ int copper(JavaClass *java_class, Generator *generator, const char *method_name)
   CHECK_FUNC_COPPER(setIndex,_I)
   CHECK_FUNC_COPPER(run,)
   CHECK_FUNC_COPPER(stop,)
+
+  return -1;
+}
+
+int blitter(JavaClass *java_class, Generator *generator, const char *method_name)
+{
+  CHECK_FUNC_BLITTER(setSourceA,_aB)
+  CHECK_FUNC_BLITTER(setSourceB,_aB)
+  CHECK_FUNC_BLITTER(setSourceC,_aB)
+  CHECK_FUNC_BLITTER(setDestination,_aB)
+  CHECK_FUNC_BLITTER(setModuloA,_I)
+  CHECK_FUNC_BLITTER(setModuloB,_I)
+  CHECK_FUNC_BLITTER(setModuloC,_I)
+  CHECK_FUNC_BLITTER(setModuloDestination,_I)
+  CHECK_FUNC_BLITTER(setShiftA,_I)
+  CHECK_FUNC_BLITTER(setShiftB,_I)
+  CHECK_FUNC_BLITTER(setChannelAMasks,_II)
+  CHECK_FUNC_BLITTER(enableChannels,_I)
+  CHECK_FUNC_BLITTER(setAsFillMode,_I)
+  CHECK_FUNC_BLITTER(setAsLineMode,_I)
+  CHECK_FUNC_BLITTER(setLogicalFunction,_I)
+  CHECK_FUNC_BLITTER(setDescMode,_Z)
+  CHECK_FUNC_BLITTER(setSize,_II)
+  CHECK_FUNC_BLITTER(setLineTypeA,_I)
+  CHECK_FUNC_BLITTER(setLineTypeB,_I)
+  CHECK_FUNC_BLITTER(setLineTypeC,_I)
+  CHECK_FUNC_BLITTER(setLineTexture,_I)
+  CHECK_FUNC_BLITTER(setLineStart,_I)
+  CHECK_FUNC_BLITTER(runCopy,_II)
+  CHECK_FUNC_BLITTER(drawLine,_I)
 
   return -1;
 }
