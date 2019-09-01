@@ -65,14 +65,13 @@ public:
   virtual int blitter_setAsFillMode_I();
   virtual int blitter_setAsLineMode_I();
   virtual int blitter_setLogicalFunction_I();
-  virtual int blitter_setDescMode_Z();
   virtual int blitter_setSize_II();
   virtual int blitter_setLineTypeA_I();
   virtual int blitter_setLineTypeB_I();
   virtual int blitter_setLineTypeC_I();
   virtual int blitter_setLineTexture_I();
   virtual int blitter_setLineStart_I();
-  virtual int blitter_runCopy_II();
+  virtual int blitter_runFill_II();
   virtual int blitter_drawLine_I();
 
   virtual int memory_clearArray_aB();

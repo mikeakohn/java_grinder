@@ -56,14 +56,13 @@ public:
   virtual int blitter_setAsFillMode_I() { return -1; }
   virtual int blitter_setAsLineMode_I() { return -1; }
   virtual int blitter_setLogicalFunction_I() { return -1; }
-  virtual int blitter_setDescMode_Z() { return -1; }
   virtual int blitter_setSize_II() { return -1; }
   virtual int blitter_setLineTypeA_I() { return -1; }
   virtual int blitter_setLineTypeB_I() { return -1; }
   virtual int blitter_setLineTypeC_I() { return -1; }
   virtual int blitter_setLineTexture_I() { return -1; }
   virtual int blitter_setLineStart_I() { return -1; }
-  virtual int blitter_runCopy_II() { return -1; }
+  virtual int blitter_runFill_II() { return -1; }
   virtual int blitter_drawLine_I() { return -1; }
 };
 

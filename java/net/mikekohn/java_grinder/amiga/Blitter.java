@@ -92,9 +92,6 @@ public class Blitter
   /** Set the logical function mode of the blittler. */
   public void setLogicalFunction(int mask) { }
 
-  /** Line mode. */
-  public void setDescMode(boolean enabled) { }
-
   /** No idea what this is (BLTSIZH, BLTSIZV). */
   public void setSize(int horizontal, int vertical) { }
 
@@ -115,18 +112,27 @@ public class Blitter
 
   /** Execute current blitter settings with passed in width in
       words and height in pixels. */
-  public void runCopy(int width, int height) { }
+  public void runFill(int width, int height) { }
 
   /** Execute the current blitter settings as a line draw. */
   public void drawLine(int length) { }
 
-  private int modulo_a;
-  private int modulo_b;
-  private int modulo_c;
-  private int modulo_d;
-  private byte[] source_a;
-  private byte[] source_b;
+  private short control_0;
+  private short control_1;
+  private short mask_word_first;
+  private short mask_word_last;
   private byte[] source_c;
+  private byte[] source_b;
+  private byte[] source_a;
   private byte[] source_d;
+  private short size_v;
+  private short size_h;
+  private short modulo_c;
+  private short modulo_b;
+  private short modulo_a;
+  private short modulo_d;
+  private short source_data_c;
+  private short source_data_b;
+  private short source_data_a;
 }
 

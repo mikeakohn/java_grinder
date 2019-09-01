@@ -35,6 +35,7 @@ public class AmigaDemo
 
     Memory.clearArray(blitter_a);
     blitter.setSourceA(blitter_a);
+    blitter.runFill(10, 10);
 
     while(true)
     {

@@ -104,14 +104,13 @@ int blitter(JavaClass *java_class, Generator *generator, const char *method_name
   CHECK_FUNC_BLITTER(setAsFillMode,_I)
   CHECK_FUNC_BLITTER(setAsLineMode,_I)
   CHECK_FUNC_BLITTER(setLogicalFunction,_I)
-  CHECK_FUNC_BLITTER(setDescMode,_Z)
   CHECK_FUNC_BLITTER(setSize,_II)
   CHECK_FUNC_BLITTER(setLineTypeA,_I)
   CHECK_FUNC_BLITTER(setLineTypeB,_I)
   CHECK_FUNC_BLITTER(setLineTypeC,_I)
   CHECK_FUNC_BLITTER(setLineTexture,_I)
   CHECK_FUNC_BLITTER(setLineStart,_I)
-  CHECK_FUNC_BLITTER(runCopy,_II)
+  CHECK_FUNC_BLITTER(runFill,_II)
   CHECK_FUNC_BLITTER(drawLine,_I)
 
   return -1;
