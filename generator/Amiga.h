@@ -75,6 +75,10 @@ public:
   virtual int blitter_runCopy_II();
   virtual int blitter_drawLine_I();
 
+  virtual int memory_clearArray_aB();
+  virtual int memory_clearArray_aS();
+  virtual int memory_clearArray_aI();
+
 private:
   int copper_getNextIndexAndIncrement(int reg);
 };

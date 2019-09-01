@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2019 by Michael Kohn
  *
  */
 
@@ -43,6 +43,9 @@ int memory(JavaClass *java_class, Generator *generator, const char *function)
   CHECK_FUNC(allocStackBytes,_I)
   CHECK_FUNC(allocStackShorts,_I)
   CHECK_FUNC(allocStackInts,_I)
+  CHECK_FUNC(clearArray,_aB)
+  CHECK_FUNC(clearArray,_aS)
+  CHECK_FUNC(clearArray,_aI)
 
   return -1;
 }

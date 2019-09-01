@@ -1,4 +1,5 @@
 
+import net.mikekohn.java_grinder.Memory;
 import net.mikekohn.java_grinder.amiga.Amiga;
 import net.mikekohn.java_grinder.amiga.Blitter;
 import net.mikekohn.java_grinder.amiga.Copper;
@@ -32,6 +33,7 @@ public class AmigaDemo
     copper.appendEnd();
     copper.run();
 
+    Memory.clearArray(blitter_a);
     blitter.setSourceA(blitter_a);
 
     while(true)

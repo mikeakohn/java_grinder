@@ -5,7 +5,7 @@
  *     Web: http://www.naken.cc/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2019 by Michael Kohn
  *
  */
 
@@ -46,5 +46,14 @@ public class Memory
   /** Load a file from disk (at assembler time) and return a reference
       to it as an array of ints. */
   public static byte[] preloadByteArray(String filename) { return null; }
+
+  /** Clear an array of bytes. */
+  public static void clearArray(byte[] array) { }
+
+  /** Clear an array of short. */
+  public static void clearArray(short[] array) { }
+
+  /** Clear an array of int. */
+  public static void clearArray(int[] array) { }
 }
 

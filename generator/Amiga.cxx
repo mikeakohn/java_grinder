@@ -15,8 +15,7 @@
 
 #include "generator/Amiga.h"
 
-//#define HEAP_SIZE 100 * 1024
-#define HEAP_SIZE 1024
+#define HEAP_SIZE 250 * 1024
 
 // NOTE: a3 points to Amiga hardware registers.
 
@@ -828,6 +827,66 @@ int Amiga::blitter_runCopy_II()
 int Amiga::blitter_drawLine_I()
 {
   return -1;
+}
+
+int Amiga::memory_clearArray_aB()
+{
+  fprintf(out,
+    "  ;; memory_clearArray_aB()\n"
+    "  movea.l d%d, a2\n"
+    "  move.l d5, (-4,a2)\n"
+    "_clear_array_loop_%d:\n"
+    "  move.b #0, (a2)+\n"
+    "  subq.l #1, d5\n"
+    "  bne.s _clear_array_loop_%d\n",
+    reg - 1,
+    label_count,
+    label_count);
+
+  label_count++;
+  reg -= 1;
+
+  return 0;
+}
+
+int Amiga::memory_clearArray_aS()
+{
+  fprintf(out,
+    "  ;; memory_clearArray_aB()\n"
+    "  movea.l d%d, a2\n"
+    "  move.l d5, (-4,a2)\n"
+    "_clear_array_loop_%d:\n"
+    "  move.w #0, (a2)+\n"
+    "  subq.l #1, d5\n"
+    "  bne.s _clear_array_loop_%d\n",
+    reg - 1,
+    label_count,
+    label_count);
+
+  label_count++;
+  reg -= 1;
+
+  return 0;
+}
+
+int Amiga::memory_clearArray_aI()
+{
+  fprintf(out,
+    "  ;; memory_clearArray_aB()\n"
+    "  movea.l d%d, a2\n"
+    "  move.l d5, (-4,a2)\n"
+    "_clear_array_loop_%d:\n"
+    "  move.l #0, (a2)+\n"
+    "  subq.l #1, d5\n"
+    "  bne.s _clear_array_loop_%d\n",
+    reg - 1,
+    label_count,
+    label_count);
+
+  label_count++;
+  reg -= 1;
+
+  return 0;
 }
 
 int Amiga::copper_getNextIndexAndIncrement(int reg)
