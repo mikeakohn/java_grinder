@@ -54,6 +54,8 @@ public:
   virtual int copper_setIndex_I();
   virtual int copper_run();
   virtual int copper_stop();
+  virtual int copper_getArrayAsInt();
+  virtual int copper_getArrayAsChar();
 
 private:
   int copper_getNextIndexAndIncrement(int reg);

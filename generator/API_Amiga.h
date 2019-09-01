@@ -37,6 +37,8 @@ public:
   virtual int copper_setIndex_I() { return -1; }
   virtual int copper_run() { return -1; }
   virtual int copper_stop() { return -1; }
+  virtual int copper_getArrayAsInt() { return -1; }
+  virtual int copper_getArrayAsChar() { return -1; }
 };
 
 #endif

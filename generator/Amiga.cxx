@@ -621,6 +621,20 @@ int Amiga::copper_stop()
   return 0;
 }
 
+int Amiga::copper_getArrayAsInt()
+{
+  fprintf(out, "  ;; copper_getArrayAsInt()\n");
+
+  return 0;
+}
+
+int Amiga::copper_getArrayAsChar()
+{
+  fprintf(out, "  ;; copper_getArrayAsChar()\n");
+
+  return 0;
+}
+
 int Amiga::copper_getNextIndexAndIncrement(int reg)
 {
   fprintf(out,

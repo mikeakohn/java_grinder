@@ -47,6 +47,12 @@ public class Copper
   /** Stop the Copper. */
   public void stop() { }
 
+  /** Get the Copper list as an array of int. */
+  public int[] getArrayAsInt() { return null; }
+
+  /** Get the Copper list as an array of char. */
+  public char[] getArrayAsChar() { return null; }
+
   private int index;
 }
 
