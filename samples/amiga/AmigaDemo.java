@@ -18,14 +18,19 @@ public class AmigaDemo
 
   static public void main(String args[])
   {
+    byte[] bitplane_1 = new byte[16000];
     byte[] blitter_a = new byte[128];
     Copper copper = new Copper(20);
     Blitter blitter = new Blitter();
 
-    Amiga.disableMultitasking();
-    Amiga.disableInterrupts();
+    for (int i = 0; i < 16000; i++) { bitplane_1[i] = 0x0f; }
 
+    Amiga.disableMultitasking();
+    //Amiga.disableInterrupts();
+
+    copper.appendSetBitplane(0, bitplane_1);
     copper.appendSetColor(0, 0x00f);
+    copper.appendSetColor(1, 0xff0);
     copper.appendWait(0, 100);
     copper.appendSetColor(0, 0xf00);
     copper.appendWait(0, 150);
@@ -33,9 +38,23 @@ public class AmigaDemo
     copper.appendEnd();
     copper.run();
 
+    Amiga.setVideoMode(
+      //Amiga.VIDEO_MODE_HIRES |
+      Amiga.VIDEO_MODE_BITPLANE_COUNT_1 |
+      Amiga.VIDEO_MODE_COLOR);
+
+    Amiga.setPlayfieldScroll(0, 0);
+    Amiga.setPlayfieldPriority(4, 4, false);
+    Amiga.setBitplaneModuloEven(0);
+    Amiga.setBitplaneModuloOdd(0);
+    Amiga.setDisplayWindowStart(129, 44);
+    Amiga.setDisplayWindowStop(193, 244);
+    Amiga.setDisplayBitplaneStart(56);
+    Amiga.setDisplayBitplaneStop(208);
+
     Memory.clearArray(blitter_a);
     blitter.setSourceA(blitter_a);
-    blitter.runFill(10, 10);
+    //blitter.runFill(10, 10);
 
     while(true)
     {

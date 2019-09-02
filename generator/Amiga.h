@@ -31,16 +31,22 @@ public:
   virtual int amiga_setPalette_II();
   virtual int amiga_setSpriteImage_IaI();
   virtual int amiga_setSpritePosition_IIII();
-  virtual int amiga_setVideoMode_IBBB();
+  virtual int amiga_setVideoMode_I();
   virtual int amiga_setPlayfieldScroll_II();
-  virtual int amiga_setPlayfieldPriority_IIB();
+  virtual int amiga_setPlayfieldPriority_IIZ();
+  virtual int amiga_setBitplaneModuloEven_I();
+  virtual int amiga_setBitplaneModuloOdd_I();
+  virtual int amiga_setDisplayWindowStart_II();
+  virtual int amiga_setDisplayWindowStop_II();
+  virtual int amiga_setDisplayBitplaneStart_I();
+  virtual int amiga_setDisplayBitplaneStop_I();
 
   virtual int copper_Constructor_I();
   virtual int copper_appendInstruction_I();
   virtual int copper_appendWait_II();
   virtual int copper_appendSkip_II();
   virtual int copper_appendSetColor_II();
-  virtual int copper_appendSetBitplane_II();
+  virtual int copper_appendSetBitplane_IaB();
   virtual int copper_appendEnd();
   virtual int copper_resetIndex();
   virtual int copper_setIndex_I();

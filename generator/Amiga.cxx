@@ -308,44 +308,14 @@ int Amiga::amiga_setSpritePosition_IIII()
   return 0;
 }
 
-int Amiga::amiga_setVideoMode_IBBB()
+int Amiga::amiga_setVideoMode_I()
 {
-  // BPU2-BPU0 = shift to bit position 12
   fprintf(out,
-    "  ;; amiga_setVideoMode_IBBB()\n"
-    "  and.w #7, d%d\n"
-    "  lsl.w #8, d%d\n"
-    "  lsl.w #4, d%d\n",
-    reg - 4,
-    reg - 4,
-    reg - 4);
-
-  // HIRES=15, HOMOD=11, DBLPF=10
-  fprintf(out,
-    "  lsl.w #8, d%d\n"
-    "  lsl.w #7, d%d\n"
-    "  lsl.w #8, d%d\n"
-    "  lsl.w #3, d%d\n"
-    "  lsl.w #8, d%d\n"
-    "  lsl.w #2, d%d\n",
-    reg - 3,
-    reg - 3,
-    reg - 2,
-    reg - 2,
-    reg - 1,
+    "  ;; amiga_setVideoMode_I()\n"
+    "  move.w d%d, (BPLCON0,a3)\n",
     reg - 1);
 
-  fprintf(out,
-    "  or.w d%d, d%d\n"
-    "  or.w d%d, d%d\n"
-    "  or.w d%d, d%d\n"
-    "  mov.w d%d, (BPLCON0,a3)\n",
-    reg - 3, reg - 4,
-    reg - 2, reg - 4,
-    reg - 1, reg - 4,
-    reg - 4);
-
-  reg -= 4;
+  reg -= 1;
 
   return 0;
 }
@@ -358,7 +328,7 @@ int Amiga::amiga_setPlayfieldScroll_II()
     "  and.w #0xf, d%d\n"
     "  lsl.w #4, d%d\n"
     "  or.w d%d, d%d\n"
-    "  mov.w d%d, (BPLCON1,a3)\n",
+    "  move.w d%d, (BPLCON1,a3)\n",
     reg - 1,
     reg - 2,
     reg - 1,
@@ -370,17 +340,17 @@ int Amiga::amiga_setPlayfieldScroll_II()
   return 0;
 }
 
-int Amiga::amiga_setPlayfieldPriority_IIB()
+int Amiga::amiga_setPlayfieldPriority_IIZ()
 {
   fprintf(out,
-    "  ;; amiga_setPlayfieldPriority_IIB()\n"
+    "  ;; amiga_setPlayfieldPriority_IIZ()\n"
     "  and.w #0x7, d%d\n"
     "  and.w #0x7, d%d\n"
     "  lsl.w #3, d%d\n"
     "  lsl.w #6, d%d\n"
     "  or.w d%d, d%d\n"
     "  or.w d%d, d%d\n"
-    "  mov.w d%d, (BPLCON2,a3)\n",
+    "  move.w d%d, (BPLCON2,a3)\n",
     reg - 2,
     reg - 3,
     reg - 2,
@@ -390,6 +360,92 @@ int Amiga::amiga_setPlayfieldPriority_IIB()
     reg - 1);
 
   reg -= 2;
+
+  return 0;
+}
+
+int Amiga::amiga_setBitplaneModuloEven_I()
+{
+  fprintf(out,
+    "  ;; amiga_setVideoMode_I()\n"
+    "  move.w d%d, (BPL1MOD,a3)\n",
+    reg - 1);
+
+  reg -= 1;
+
+  return 0;
+}
+
+int Amiga::amiga_setBitplaneModuloOdd_I()
+{
+  fprintf(out,
+    "  ;; amiga_setVideoMode_I()\n"
+    "  move.w d%d, (BPL2MOD,a3)\n",
+    reg - 1);
+
+  reg -= 1;
+
+  return 0;
+}
+
+int Amiga::amiga_setDisplayWindowStart_II()
+{
+  const int horizontal = reg - 1;
+  const int vertical = reg - 2;
+
+  fprintf(out,
+    "  ;; amiga_setDisplayWindowStart_II()\n"
+    "  lsl.w #8, d%d\n"
+    "  or.w d%d, d%d\n"
+    "  move.w d%d, (DIWSTRT,a3)\n",
+    vertical,
+    vertical, horizontal,
+    horizontal);
+
+  reg -= 2;
+
+  return 0;
+}
+
+int Amiga::amiga_setDisplayWindowStop_II()
+{
+  const int horizontal = reg - 1;
+  const int vertical = reg - 2;
+
+  fprintf(out,
+    "  ;; amiga_setDisplayWindowStop_II()\n"
+    "  lsl.w #8, d%d\n"
+    "  or.w d%d, d%d\n"
+    "  move.w d%d, (DIWSTRT,a3)\n",
+    vertical,
+    vertical, horizontal,
+    horizontal);
+
+  reg -= 2;
+
+  return 0;
+}
+
+int Amiga::amiga_setDisplayBitplaneStart_I()
+{
+  fprintf(out,
+    "  ;; amiga_setDisplayBitplaneStart_I()\n"
+    "  move.w d%d, (DDFSTRT,a3)\n",
+    reg - 1);
+
+  reg -= 1;
+
+  return 0;
+}
+
+int Amiga::amiga_setDisplayBitplaneStop_I()
+{
+  fprintf(out,
+    "  ;; amiga_setDisplayBitplaneStop_I()\n"
+    "  move.w d%d, (DDFSTOP,a3)\n",
+    reg - 1);
+
+  reg -= 1;
 
   return 0;
 }
@@ -533,20 +589,23 @@ int Amiga::copper_appendSetColor_II()
   return 0;
 }
 
-int Amiga::copper_appendSetBitplane_II()
+int Amiga::copper_appendSetBitplane_IaB()
 {
   const int object = reg - 3;
   const int index = reg - 2;
   const int value = reg - 1;
 
-  fprintf(out, "  ;; copper_appendSetColor_II()\n");
+  fprintf(out, "  ;; copper_appendSetBitplane_IaB()\n");
 
   copper_getNextIndexAndIncrement(object);
 
   fprintf(out,
-    "  move.l #BPL1PTH, d5\n"
     "  lsl.w #2, d%d\n"
-    "  move.w d%d, (0,a2,d5)\n",
+    "  add.l #BPL1PTH, d%d\n"
+    "  move.w d%d, (0,a2,d5)\n"
+    "  move.w d%d, (2,a2,d5)\n",
+    index,
+    index,
     index,
     value);
 
@@ -995,28 +1054,17 @@ int Amiga::blitter_runFill_II()
   fprintf(out,
     "  ;; blitter_runFill_II()\n"
     "  movea.l d%d, a2\n"
-    "  move.l (a2), d5\n"
-    "  move.l d5, (BLTCON0,a3)\n"
-    "  move.l (4,a2), d5\n"
-    "  move.l d5, (BLTAFWM,a3)\n"
-    "  move.l (8,a2), d5\n"
-    "  move.l d5, (BLTCPTH,a3)\n"
-    "  move.l (12,a2), d5\n"
-    "  move.l d5, (BLTBPTH,a3)\n"
-    "  move.l (16,a2), d5\n"
-    "  move.l d5, (BLTAPTH,a3)\n"
-    "  move.l (20,a2), d5\n"
-    "  move.l d5, (BLTDPTH,a3)\n"
-    "  move.l (24,a2), d5\n"
-    "  move.l d5, (BLTDPTH,a3)\n"
-    "  move.l (28,a2), d5\n"
-    "  move.l d5, (BLTCMOD,a3)\n"
-    "  move.l (32,a2), d5\n"
-    "  move.l d5, (BLTAMOD,a3)\n"
-    "  move.l (36,a2), d5\n"
-    "  move.l d5, (BLTCDAT,a3)\n"
-    "  move.w (38,a2), d5\n"
-    "  move.l d5, (BLTADAT,a3)\n",
+    "  move.l (a2), (BLTCON0,a3)\n"
+    "  move.l (4,a2), (BLTAFWM,a3)\n"
+    "  move.l (8,a2), (BLTCPTH,a3)\n"
+    "  move.l (12,a2), (BLTBPTH,a3)\n"
+    "  move.l (16,a2), (BLTAPTH,a3)\n"
+    "  move.l (20,a2), (BLTDPTH,a3)\n"
+    "  move.l (24,a2), (BLTDPTH,a3)\n"
+    "  move.l (28,a2), (BLTCMOD,a3)\n"
+    "  move.l (32,a2), (BLTAMOD,a3)\n"
+    "  move.l (36,a2), (BLTCDAT,a3)\n"
+    "  move.w (38,a2), (BLTADAT,a3)\n",
     reg - 2);
 
   fprintf(out,
@@ -1038,28 +1086,17 @@ int Amiga::blitter_drawLine_I()
   fprintf(out,
     "  ;; blitter_drawLine_I()\n"
     "  movea.l d%d, a2\n"
-    "  move.l (a2), d5\n"
-    "  move.l d5, (BLTCON0,a3)\n"
-    "  move.l (4,a2), d5\n"
-    "  move.l d5, (BLTAFWM,a3)\n"
-    "  move.l (8,a2), d5\n"
-    "  move.l d5, (BLTCPTH,a3)\n"
-    "  move.l (12,a2), d5\n"
-    "  move.l d5, (BLTBPTH,a3)\n"
-    "  move.l (16,a2), d5\n"
-    "  move.l d5, (BLTAPTH,a3)\n"
-    "  move.l (20,a2), d5\n"
-    "  move.l d5, (BLTDPTH,a3)\n"
-    "  move.l (24,a2), d5\n"
-    "  move.l d5, (BLTDPTH,a3)\n"
-    "  move.l (28,a2), d5\n"
-    "  move.l d5, (BLTCMOD,a3)\n"
-    "  move.l (32,a2), d5\n"
-    "  move.l d5, (BLTAMOD,a3)\n"
-    "  move.l (36,a2), d5\n"
-    "  move.l d5, (BLTCDAT,a3)\n"
-    "  move.w (38,a2), d5\n"
-    "  move.l d5, (BLTADAT,a3)\n",
+    "  move.l (a2), (BLTCON0,a3)\n"
+    "  move.l (4,a2), (BLTAFWM,a3)\n"
+    "  move.l (8,a2), (BLTCPTH,a3)\n"
+    "  move.l (12,a2), (BLTBPTH,a3)\n"
+    "  move.l (16,a2), (BLTAPTH,a3)\n"
+    "  move.l (20,a2), (BLTDPTH,a3)\n"
+    "  move.l (24,a2), (BLTDPTH,a3)\n"
+    "  move.l (28,a2), (BLTCMOD,a3)\n"
+    "  move.l (32,a2), (BLTAMOD,a3)\n"
+    "  move.l (36,a2), (BLTCDAT,a3)\n"
+    "  move.w (38,a2), (BLTADAT,a3)\n",
     reg - 2);
 
   fprintf(out,
