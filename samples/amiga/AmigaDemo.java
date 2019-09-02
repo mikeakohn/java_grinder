@@ -28,6 +28,11 @@ public class AmigaDemo
     Amiga.disableMultitasking();
     //Amiga.disableInterrupts();
 
+    //Amiga.clearDMA(Amiga.DMA_BITPLANE | Amiga.DMA_COPPER);
+
+    copper.appendInstruction(0x01001200);
+    //copper.appendInstruction(0x00e00001);
+    //copper.appendInstruction(0x00e20060);
     copper.appendSetBitplane(0, bitplane_1);
     copper.appendSetColor(0, 0x00f);
     copper.appendSetColor(1, 0xff0);
@@ -72,8 +77,14 @@ public class AmigaDemo
       Amiga.setPalette(18, 0xfff);
       Amiga.setPalette(19, 0xfff);
 
-      //Amiga.setPalette(0, 0xf0f);
-      //Amiga.setPalette(1, 0x000);
+/*
+    Amiga.setVideoMode(
+      //Amiga.VIDEO_MODE_HIRES |
+      Amiga.VIDEO_MODE_BITPLANE_COUNT_1 |
+      Amiga.VIDEO_MODE_COLOR);
+*/
+
+      //Amiga.setPalette(0, 0x000);
     }
   }
 }

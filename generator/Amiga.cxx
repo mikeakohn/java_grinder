@@ -625,15 +625,27 @@ int Amiga::copper_appendSetBitplane_IaB()
 
   fprintf(out, "  ;; copper_appendSetBitplane_IaB()\n");
 
-  copper_getNextIndexAndIncrement(object);
+  fprintf(out,
+    "  movea.l d%d, a2\n"
+    "  move.l (-4,a2), d5\n"
+    "  add.l #8, (-4,a2)\n",
+    object);
 
   fprintf(out,
     "  lsl.w #2, d%d\n"
     "  add.w #BPL1PTH, d%d\n"
     "  move.w d%d, (0,a2,d5)\n"
-    "  move.w d%d, (2,a2,d5)\n",
+    "  move.l d%d, (2,a2,d5)\n"
+    "  addq.w #2, d%d\n"
+    //"  swap d%d\n"
+    "  move.w d%d, (4,a2,d5)\n"
+    "  move.w d%d, (6,a2,d5)\n",
     index,
     index,
+    index,
+    value,
+    index,
+    //value,
     index,
     value);
 
@@ -689,7 +701,8 @@ int Amiga::copper_run()
   fprintf(out,
     "  ;; copper_run()\n"
     "  move.l d%d, (COP1LCH,a3)\n"
-    "  move.w #0x8080, (DMACON,a3)\n",
+    "  move.w #0x8080, (DMACON,a3)\n"
+    "  move.w d5, (COPJMP1,a3)\n",
     reg - 1);
 
   reg -= 1;
