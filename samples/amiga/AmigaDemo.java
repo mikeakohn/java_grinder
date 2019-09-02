@@ -52,6 +52,12 @@ public class AmigaDemo
     Amiga.setDisplayBitplaneStart(56);
     Amiga.setDisplayBitplaneStop(208);
 
+    Amiga.setDMA(
+      Amiga.DMA_SPRITE |
+      Amiga.DMA_BLITTER |
+      Amiga.DMA_COPPER |
+      Amiga.DMA_BITPLANE);
+
     Memory.clearArray(blitter_a);
     blitter.setSourceA(blitter_a);
     //blitter.runFill(10, 10);

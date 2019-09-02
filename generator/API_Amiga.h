@@ -31,6 +31,8 @@ public:
   virtual int amiga_setDisplayWindowStop_II() { return -1; }
   virtual int amiga_setDisplayBitplaneStart_I() { return -1; }
   virtual int amiga_setDisplayBitplaneStop_I() { return -1; }
+  virtual int amiga_setDMA_I() { return -1; }
+  virtual int amiga_clearDMA_I() { return -1; }
 
   virtual int copper_Constructor_I() { return -1; }
   virtual int copper_appendInstruction_I() { return -1; }

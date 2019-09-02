@@ -344,6 +344,7 @@ int Amiga::amiga_setPlayfieldPriority_IIZ()
 {
   fprintf(out,
     "  ;; amiga_setPlayfieldPriority_IIZ()\n"
+    "  and.w #0x1, d%d\n"
     "  and.w #0x7, d%d\n"
     "  and.w #0x7, d%d\n"
     "  lsl.w #3, d%d\n"
@@ -351,6 +352,7 @@ int Amiga::amiga_setPlayfieldPriority_IIZ()
     "  or.w d%d, d%d\n"
     "  or.w d%d, d%d\n"
     "  move.w d%d, (BPLCON2,a3)\n",
+    reg - 1,
     reg - 2,
     reg - 3,
     reg - 2,
@@ -359,7 +361,7 @@ int Amiga::amiga_setPlayfieldPriority_IIZ()
     reg - 2, reg - 1,
     reg - 1);
 
-  reg -= 2;
+  reg -= 3;
 
   return 0;
 }
@@ -367,7 +369,7 @@ int Amiga::amiga_setPlayfieldPriority_IIZ()
 int Amiga::amiga_setBitplaneModuloEven_I()
 {
   fprintf(out,
-    "  ;; amiga_setVideoMode_I()\n"
+    "  ;; amiga_setBitplaneModuloEven_I()\n"
     "  move.w d%d, (BPL1MOD,a3)\n",
     reg - 1);
 
@@ -379,7 +381,7 @@ int Amiga::amiga_setBitplaneModuloEven_I()
 int Amiga::amiga_setBitplaneModuloOdd_I()
 {
   fprintf(out,
-    "  ;; amiga_setVideoMode_I()\n"
+    "  ;; amiga_BitplaneModuloOdd_I()\n"
     "  move.w d%d, (BPL2MOD,a3)\n",
     reg - 1);
 
@@ -390,8 +392,8 @@ int Amiga::amiga_setBitplaneModuloOdd_I()
 
 int Amiga::amiga_setDisplayWindowStart_II()
 {
-  const int horizontal = reg - 1;
-  const int vertical = reg - 2;
+  const int horizontal = reg - 2;
+  const int vertical = reg - 1;
 
   fprintf(out,
     "  ;; amiga_setDisplayWindowStart_II()\n"
@@ -409,14 +411,14 @@ int Amiga::amiga_setDisplayWindowStart_II()
 
 int Amiga::amiga_setDisplayWindowStop_II()
 {
-  const int horizontal = reg - 1;
-  const int vertical = reg - 2;
+  const int horizontal = reg - 2;
+  const int vertical = reg - 1;
 
   fprintf(out,
     "  ;; amiga_setDisplayWindowStop_II()\n"
     "  lsl.w #8, d%d\n"
     "  or.w d%d, d%d\n"
-    "  move.w d%d, (DIWSTRT,a3)\n",
+    "  move.w d%d, (DIWSTOP,a3)\n",
     vertical,
     vertical, horizontal,
     horizontal);
@@ -443,6 +445,32 @@ int Amiga::amiga_setDisplayBitplaneStop_I()
   fprintf(out,
     "  ;; amiga_setDisplayBitplaneStop_I()\n"
     "  move.w d%d, (DDFSTOP,a3)\n",
+    reg - 1);
+
+  reg -= 1;
+
+  return 0;
+}
+
+int Amiga::amiga_setDMA_I()
+{
+  fprintf(out,
+    "  ;; amiga_setDMA_I()\n"
+    "  or.w #0x8000, d%d\n"
+    "  move.w d%d, (DMACON,a3)\n",
+    reg - 1,
+    reg - 1);
+
+  reg -= 1;
+
+  return 0;
+}
+
+int Amiga::amiga_clearDMA_I()
+{
+  fprintf(out,
+    "  ;; amiga_clearDMA_I()\n"
+    "  move.w d%d, (DMACON,a3)\n",
     reg - 1);
 
   reg -= 1;
@@ -576,7 +604,7 @@ int Amiga::copper_appendSetColor_II()
 
   fprintf(out,
     "  lsl.w #1, d%d\n"
-    "  add.l #COLOR00, d%d\n"
+    "  add.w #COLOR00, d%d\n"
     "  move.w d%d, (0,a2,d5)\n"
     "  move.w d%d, (2,a2,d5)\n",
     index,
@@ -601,7 +629,7 @@ int Amiga::copper_appendSetBitplane_IaB()
 
   fprintf(out,
     "  lsl.w #2, d%d\n"
-    "  add.l #BPL1PTH, d%d\n"
+    "  add.w #BPL1PTH, d%d\n"
     "  move.w d%d, (0,a2,d5)\n"
     "  move.w d%d, (2,a2,d5)\n",
     index,

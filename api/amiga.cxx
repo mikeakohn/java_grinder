@@ -64,6 +64,8 @@ int amiga(JavaClass *java_class, Generator *generator, const char *method_name)
   CHECK_FUNC(setDisplayWindowStop,_II)
   CHECK_FUNC(setDisplayBitplaneStart,_I)
   CHECK_FUNC(setDisplayBitplaneStop,_I)
+  CHECK_FUNC(setDMA,_I)
+  CHECK_FUNC(clearDMA,_I)
 
   return -1;
 }

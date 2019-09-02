@@ -26,6 +26,16 @@ abstract public class Amiga
   public static final int VIDEO_MODE_COLOR = 0x0200;
   public static final int VIDEO_MODE_INTERLACE = 0x0004;
 
+  public static final int DMA_AUDIO0 = 0x01;
+  public static final int DMA_AUDIO1 = 0x02;
+  public static final int DMA_AUDIO2 = 0x04;
+  public static final int DMA_AUDIO3 = 0x08;
+  public static final int DMA_DISK = 0x10;
+  public static final int DMA_SPRITE = 0x20;
+  public static final int DMA_BLITTER = 0x40;
+  public static final int DMA_COPPER = 0x80;
+  public static final int DMA_BITPLANE = 0x100;
+
   /** Disable task switching in the OS. exec.library: Forbid(). */
   public static void disableMultitasking() { }
 
@@ -89,5 +99,11 @@ abstract public class Amiga
   /** Display data fetch end.  Controls the horizontal timing of the
       end of the bitplane display DMA fetch. */
   public static void setDisplayBitplaneStop(int horizontal) { }
+
+  /** Turn on DMA based on mask while ignoring DMA not set by mask. */
+  public static void setDMA(int mask) { }
+
+  /** Turn off  DMA based on mask while ignoring DMA not set by mask. */
+  public static void clearDMA(int mask) { }
 }
 

@@ -40,6 +40,8 @@ public:
   virtual int amiga_setDisplayWindowStop_II();
   virtual int amiga_setDisplayBitplaneStart_I();
   virtual int amiga_setDisplayBitplaneStop_I();
+  virtual int amiga_setDMA_I();
+  virtual int amiga_clearDMA_I();
 
   virtual int copper_Constructor_I();
   virtual int copper_appendInstruction_I();
