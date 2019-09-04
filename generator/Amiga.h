@@ -40,6 +40,12 @@ public:
   virtual int amiga_setDisplayWindowStop_II();
   virtual int amiga_setDisplayBitplaneStart_I();
   virtual int amiga_setDisplayBitplaneStop_I();
+  virtual int amiga_setAudioData_IaB();
+  virtual int amiga_setAudioLength_II();
+  virtual int amiga_setAudioPeriod_II();
+  virtual int amiga_setAudioVolume_II();
+  virtual int amiga_setAudioModulation_I();
+  virtual int amiga_clearAudioModulation_I();
   virtual int amiga_setDMA_I();
   virtual int amiga_clearDMA_I();
 
@@ -49,6 +55,7 @@ public:
   virtual int copper_appendSkip_II();
   virtual int copper_appendSetColor_II();
   virtual int copper_appendSetBitplane_IaB();
+  virtual int copper_appendSetSprite_IaB();
   virtual int copper_appendEnd();
   virtual int copper_resetIndex();
   virtual int copper_setIndex_I();

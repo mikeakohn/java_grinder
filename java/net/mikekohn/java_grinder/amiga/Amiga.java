@@ -36,6 +36,15 @@ abstract public class Amiga
   public static final int DMA_COPPER = 0x80;
   public static final int DMA_BITPLANE = 0x100;
 
+  public static final int AUDIO_MOD_VOLUME_CHANNEL_0_TO_1 = 0x01;
+  public static final int AUDIO_MOD_VOLUME_CHANNEL_1_TO_2 = 0x02;
+  public static final int AUDIO_MOD_VOLUME_CHANNEL_2_TO_3 = 0x04;
+  public static final int AUDIO_MOD_VOLUME_CHANNEL_3_TO_NONE = 0x08;
+  public static final int AUDIO_MOD_PERIOD_CHANNEL_0_TO_1 = 0x10;
+  public static final int AUDIO_MOD_PERIOD_CHANNEL_1_TO_2 = 0x20;
+  public static final int AUDIO_MOD_PERIOD_CHANNEL_2_TO_3 = 0x40;
+  public static final int AUDIO_MOD_PERIOD_CHANNEL_3_TO_NONE = 0x80;
+
   /** Disable task switching in the OS. exec.library: Forbid(). */
   public static void disableMultitasking() { }
 
@@ -51,7 +60,8 @@ abstract public class Amiga
   /** Set one of the color palettes. */
   public static void setPalette(int index, int color) { }
 
-  /** Set one of the 8 sprite's data to specified array. */
+  /** Set one of the 8 sprite's data to specified array.  Probably better
+      to do this in the Copper. */
   public static void setSpriteImage(int index, int[] data) { }
 
   /** Set one of the 8 sprite's position on the screen.
@@ -100,10 +110,30 @@ abstract public class Amiga
       end of the bitplane display DMA fetch. */
   public static void setDisplayBitplaneStop(int horizontal) { }
 
+  /** Set the sound data for audio channel 0 to 3. */
+  public static void setAudioData(int channel, short[] data) { }
+
+  /** Set the rate of the length in unsigned words (samples) for audio
+      channel 0 to 3. */
+  public static void setAudioLength(int channel, int value) { }
+
+  /** Set the rate of the audio output for channel 0 to 3.
+      Minimum value is 124 color clocks.  */
+  public static void setAudioPeriod(int channel, int value) { }
+
+  /** Set the volume of the audio output for channel 0 to 3. */
+  public static void setAudioVolume(int channel, int value) { }
+
+  /** Set audio modulation.  This is register ADKCON. */
+  public static void setAudioModulation(int mask) { }
+
+  /** Turn off audio modulation.  This is register ADKCON. */
+  public static void clearAudioModulation(int mask) { }
+
   /** Turn on DMA based on mask while ignoring DMA not set by mask. */
   public static void setDMA(int mask) { }
 
-  /** Turn off  DMA based on mask while ignoring DMA not set by mask. */
+  /** Turn off DMA based on mask while ignoring DMA not set by mask. */
   public static void clearDMA(int mask) { }
 }
 

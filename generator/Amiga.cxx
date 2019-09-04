@@ -452,6 +452,88 @@ int Amiga::amiga_setDisplayBitplaneStop_I()
   return 0;
 }
 
+int Amiga::amiga_setAudioData_IaB()
+{
+  fprintf(out,
+    "  ;; amiga_setAudioData_IaB()\n"
+    "  lea (AUD0LCH,a3), a2\n"
+    "  lsl.w #2, d%d\n"
+    "  move.w d%d, (0,a2,d%d)\n",
+    reg - 2, reg - 1, reg - 2);
+
+  reg -= 2;
+
+  return 0;
+}
+
+int Amiga::amiga_setAudioLength_II()
+{
+  fprintf(out,
+    "  ;; amiga_setAudioLength_II()\n"
+    "  lea (AUD0LEN,a3), a2\n"
+    "  lsl.w #1, d%d\n"
+    "  move.w d%d, (0,a2,d%d)\n",
+    reg - 2, reg - 1, reg - 2);
+
+  reg -= 2;
+
+  return 0;
+}
+
+int Amiga::amiga_setAudioPeriod_II()
+{
+  fprintf(out,
+    "  ;; amiga_setAudioPeriod_II()\n"
+    "  lea (AUD0PER,a3), a2\n"
+    "  lsl.w #1, d%d\n"
+    "  move.w d%d, (0,a2,d%d)\n",
+    reg - 2, reg - 1, reg - 2);
+
+  reg -= 2;
+
+  return 0;
+}
+
+int Amiga::amiga_setAudioVolume_II()
+{
+  fprintf(out,
+    "  ;; amiga_setAudioVolume_II()\n"
+    "  lea (AUD0VOL,a3), a2\n"
+    "  lsl.w #1, d%d\n"
+    "  move.w d%d, (0,a2,d%d)\n",
+    reg - 2, reg - 1, reg - 2);
+
+  reg -= 2;
+
+  return 0;
+}
+
+int Amiga::amiga_setAudioModulation_I()
+{
+  fprintf(out,
+    "  ;; amiga_setAudioModulation_I()\n"
+    "  or.w #0x8000, d%d\n"
+    "  move.w d%d, (ADKCON,a3)\n",
+    reg - 1,
+    reg - 1);
+
+  reg -= 1;
+
+  return 0;
+}
+
+int Amiga::amiga_clearAudioModulation_I()
+{
+  fprintf(out,
+    "  ;; amiga_clearAudioModulation_I()\n"
+    "  move.w d%d, (ADKCON,a3)\n",
+    reg - 1);
+
+  reg -= 1;
+
+  return 0;
+}
+
 int Amiga::amiga_setDMA_I()
 {
   fprintf(out,
@@ -637,7 +719,6 @@ int Amiga::copper_appendSetBitplane_IaB()
     "  move.w d%d, (0,a2,d5)\n"
     "  move.l d%d, (2,a2,d5)\n"
     "  addq.w #2, d%d\n"
-    //"  swap d%d\n"
     "  move.w d%d, (4,a2,d5)\n"
     "  move.w d%d, (6,a2,d5)\n",
     index,
@@ -645,7 +726,41 @@ int Amiga::copper_appendSetBitplane_IaB()
     index,
     value,
     index,
-    //value,
+    index,
+    value);
+
+  reg -= 3;
+
+  return 0;
+}
+
+int Amiga::copper_appendSetSprite_IaB()
+{
+  const int object = reg - 3;
+  const int index = reg - 2;
+  const int value = reg - 1;
+
+  fprintf(out, "  ;; copper_appendSetSprite_IaB()\n");
+
+  fprintf(out,
+    "  movea.l d%d, a2\n"
+    "  move.l (-4,a2), d5\n"
+    "  add.l #8, (-4,a2)\n",
+    object);
+
+  fprintf(out,
+    "  lsl.w #2, d%d\n"
+    "  add.w #SPR0PTH, d%d\n"
+    "  move.w d%d, (0,a2,d5)\n"
+    "  move.l d%d, (2,a2,d5)\n"
+    "  addq.w #2, d%d\n"
+    "  move.w d%d, (4,a2,d5)\n"
+    "  move.w d%d, (6,a2,d5)\n",
+    index,
+    index,
+    index,
+    value,
+    index,
     index,
     value);
 

@@ -1,6 +1,6 @@
 /**
  *  Java Grinder
- *  Author: Joe Davisson
+ *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
@@ -31,6 +31,12 @@ public:
   virtual int amiga_setDisplayWindowStop_II() { return -1; }
   virtual int amiga_setDisplayBitplaneStart_I() { return -1; }
   virtual int amiga_setDisplayBitplaneStop_I() { return -1; }
+  virtual int amiga_setAudioData_IaB() { return -1; }
+  virtual int amiga_setAudioLength_II() { return -1; }
+  virtual int amiga_setAudioPeriod_II() { return -1; }
+  virtual int amiga_setAudioVolume_II() { return -1; }
+  virtual int amiga_setAudioModulation_I() { return -1; }
+  virtual int amiga_clearAudioModulation_I() { return -1; }
   virtual int amiga_setDMA_I() { return -1; }
   virtual int amiga_clearDMA_I() { return -1; }
 
@@ -40,6 +46,7 @@ public:
   virtual int copper_appendSkip_II() { return -1; }
   virtual int copper_appendSetColor_II() { return -1; }
   virtual int copper_appendSetBitplane_IaB() { return -1; }
+  virtual int copper_appendSetSprite_IaB() { return -1; }
   virtual int copper_appendEnd() { return -1; }
   virtual int copper_resetIndex() { return -1; }
   virtual int copper_setIndex_I() { return -1; }

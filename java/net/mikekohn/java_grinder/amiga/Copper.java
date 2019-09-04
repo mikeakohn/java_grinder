@@ -28,8 +28,11 @@ public class Copper
   /** Add instruction to set the color of a palette . */
   public void appendSetColor(int palette, int color) { }
 
-  /** Add instruction to set the bitplane to an address. */
-  public void appendSetBitplane(int bitplane, byte[] address) { }
+  /** Add instruction to set the bitplane to a byte array. */
+  public void appendSetBitplane(int bitplane, byte[] data) { }
+
+  /** Add instruction to set the bitplane to a byte array. */
+  public void appendSetSprite(int index, byte[] data) { }
 
   /** Add instruction stop the copper until the next vertical blank. */
   public void appendEnd() { }
