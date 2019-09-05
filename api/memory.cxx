@@ -46,6 +46,9 @@ int memory(JavaClass *java_class, Generator *generator, const char *function)
   CHECK_FUNC(clearArray,_aB)
   CHECK_FUNC(clearArray,_aS)
   CHECK_FUNC(clearArray,_aI)
+  CHECK_FUNC(addressOf,_aB)
+  CHECK_FUNC(addressOf,_aS)
+  CHECK_FUNC(addressOf,_aI)
 
   return -1;
 }

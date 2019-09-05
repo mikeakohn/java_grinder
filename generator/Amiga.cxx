@@ -19,13 +19,16 @@
 
 // NOTE: a3 points to Amiga hardware registers.
 
-Amiga::Amiga()
+Amiga::Amiga() :
+  need_set_sprite_position(false)
 {
   //start_org = 0x8000;
 }
 
 Amiga::~Amiga()
 {
+  if (need_set_sprite_position) { add_set_sprite_position(); }
+
 #if 0
   fprintf(out,
     "  ;; Mem(100k, CHIP_MEM=2)\n"
@@ -198,10 +201,10 @@ int Amiga::amiga_setPalette_II()
   return 0;
 }
 
-int Amiga::amiga_setSpriteImage_IaI()
+int Amiga::amiga_setSpriteImage_IaS()
 {
   fprintf(out,
-    "  ;; amiga_setSpriteImage_IaI()\n"
+    "  ;; amiga_setSpriteImage_IaS()\n"
     "  andi.l #0x7, d%d\n"
     "  lsl.w #2, d%d\n"
     "  add.w #SPR0PTH, d%d\n"
@@ -220,88 +223,21 @@ int Amiga::amiga_setSpriteImage_IaI()
 
 int Amiga::amiga_setSpritePosition_IIII()
 {
-  // Clean up input first:
-  // index = (index & 7) * 4  <- make sure index is 0 to 7 and multiply by 8
-
   fprintf(out,
     "  ;; amiga_setSpritePosition_IIII()\n"
-    "  andi.l #0x7, d%d\n"
-    "  lsl.w #3, d%d\n"
-    "  andi.w #0x1ff, d%d\n"
-    "  andi.w #0x1ff, d%d\n"
-    "  andi.w #0x1ff, d%d\n",
-    reg - 4,
-    reg - 4,
-    reg - 3,
-    reg - 2,
-    reg - 1
-  );
-
-  // Need to fit data in:
-  // SPR0POS 0x140
-  //   15 to 8: VSTART low  8 bits
-  //    7 to 0: HSTART high 8 bits
-  // SPR0CTL 0x142
-  //   15 to 8: VSTOP  low  8 bits
-  //         2: VSTART high 1 bit
-  //         1: VSTOP  high 1 bit
-  //         0: HSTART low  1 bit
-
-  // hstart = hstart >> 1
-  // d5     = hstart & 1
-
-  fprintf(out,
-    "  move.w d%d, d5\n"
-    "  lsr.w #1, d5\n"
-    "  andi.w #1, d%d\n",
-    reg - 3,
-    reg - 3
-  );
-
-  // vstart = vstart & 0xff
-  // d6     = (vstart & 0x100) >> 6
-  // d5     = d5 | d6
-
-  fprintf(out,
-    "  move.w d%d, d6\n"
-    "  andi.w #0x100, d6\n"
-    "  lsr.w #6, d6\n"
-    "  andi.w #0xff, d%d\n"
-    "  or.w d5, d6\n",
-    reg - 2,
-    reg - 2
-  );
-
-  // SPRxPOS = (vstart << 8) | hstart
-
-  fprintf(out,
-    "  addi.w #SPR0POS, d%d\n"
-    "  or.w d%d, d%d\n"
-    "  move.w d%d, (0,a3,d%d)\n",
-    reg - 4,
-    reg - 3, reg - 2,
-    reg - 2, reg - 4);
-
-  // temp |= (vstop & 0x100) >> 7
-  // vstop = vstop & 0xff
-  // temp |= (vstop << 8)
-  // SPR0CTL = temp
-
-  fprintf(out,
-    "  move.w d%d, d6\n"
-    "  andi.w #0x100, d6\n"
-    "  lsr.w #7, d6\n"
-    "  andi.w #0xff, d%d\n"
-    "  or.w d6, d5\n"
     "  lsl.w #8, d%d\n"
-    "  or.w d%d, d5\n"
-    "  move.w d5, (2,a3,d%d)\n",
-    reg - 1,
-    reg - 1,
-    reg - 1,
-    reg - 1,
-    reg - 1
-  );
+    "  lea (0,a3,d%d), a5\n"
+    "  move.l d%d, d5\n"
+    "  move.l d%d, d6\n"
+    "  move.l d%d, d7\n"
+    "  jsr (_set_sprite_position).l\n",
+    reg - 4,
+    reg - 4,
+    reg - 3,
+    reg - 2,
+    reg - 1);
+
+  need_set_sprite_position = true;
 
   reg -= 4;
 
@@ -734,13 +670,13 @@ int Amiga::copper_appendSetBitplane_IaB()
   return 0;
 }
 
-int Amiga::copper_appendSetSprite_IaB()
+int Amiga::copper_appendSetSprite_IaS()
 {
   const int object = reg - 3;
   const int index = reg - 2;
   const int value = reg - 1;
 
-  fprintf(out, "  ;; copper_appendSetSprite_IaB()\n");
+  fprintf(out, "  ;; copper_appendSetSprite_IaS()\n");
 
   fprintf(out,
     "  movea.l d%d, a2\n"
@@ -1328,6 +1264,27 @@ int Amiga::memory_clearArray_aI()
   return 0;
 }
 
+int Amiga::memory_addressOf_aB()
+{
+  fprintf(out, "  ;; memory_addressOf_aB()\n");
+
+  return 0;
+}
+
+int Amiga::memory_addressOf_aS()
+{
+  fprintf(out, "  ;; memory_addressOf_aS()\n");
+
+  return 0;
+}
+
+int Amiga::memory_addressOf_aI()
+{
+  fprintf(out, "  ;; memory_addressOf_aI()\n");
+
+  return 0;
+}
+
 int Amiga::copper_getNextIndexAndIncrement(int reg)
 {
   fprintf(out,
@@ -1338,3 +1295,60 @@ int Amiga::copper_getNextIndexAndIncrement(int reg)
 
   return 0;
 }
+
+int Amiga::add_set_sprite_position()
+{
+  fprintf(out,
+    "  ;; amiga_setSpritePosition()\n"
+    "_set_sprite_position:\n");
+
+  // Clean up input first:
+  // index = (index & 7) * 4  <- make sure index is 0 to 7 and multiply by 8
+  fprintf(out,
+    "  andi.w #0x1ff, d5\n"
+    "  andi.w #0x1ff, d6\n"
+    "  andi.w #0x1ff, d7\n");
+
+  // Need to fit data in:
+  // SPR0POS 0x140
+  //   15 to 8: VSTART low  8 bits
+  //    7 to 0: HSTART high 8 bits
+  // SPR0CTL 0x142
+  //   15 to 8: VSTOP  low  8 bits
+  //         2: VSTART high 1 bit
+  //         1: VSTOP  high 1 bit
+  //         0: HSTART low  1 bit
+
+  // hstart = hstart >> 1
+  // d5     = hstart & 1
+
+  // Start by rolling vend (9 bit number) 8 bits left.  The upper bit
+  // ends up in position 0, so rotate just the lower byte left by 1 bit.
+  fprintf(out,
+    "  rol.w #8, d7\n"
+    "  rol.b #1, d7\n");
+
+  // Roll vertical the same way, but the upper bit goes into bit position
+  // 2 of d7.
+  fprintf(out,
+    "  rol.w #8, d6\n"
+    "  rol.b #2, d6\n"
+    "  or.b d6, d7\n"
+    "  and.b #0, d6\n");
+
+  // Copy bottom 8 bits of start horizontal to d6 and upper bit 8 to
+  // d7 position 1.
+  fprintf(out,
+    "  or.b d5, d6\n"
+    "  lsr.w #8, d5\n"
+    "  or.b d5, d7\n");
+
+  // Put d6 and d7 into SPRxPOS and SPRxCTL.
+  fprintf(out,
+    "  move.w d6, (a5)\n"
+    "  move.w d7, (2,a5)\n"
+    "  rts\n");
+
+  return 0;
+}
+

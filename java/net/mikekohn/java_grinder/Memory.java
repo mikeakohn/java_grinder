@@ -55,5 +55,14 @@ public class Memory
 
   /** Clear an array of int. */
   public static void clearArray(int[] array) { }
+
+  /** Return the address of a byte[] as an int. */
+  public static int addressOf(byte[] array) { return 0; }
+
+  /** Return the address of a short[] as an int. */
+  public static int addressOf(short[] array) { return 0; }
+
+  /** Return the address of a int[] as an int. */
+  public static int addressOf(int[] array) { return 0; }
 }
 

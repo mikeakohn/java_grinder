@@ -62,7 +62,7 @@ abstract public class Amiga
 
   /** Set one of the 8 sprite's data to specified array.  Probably better
       to do this in the Copper. */
-  public static void setSpriteImage(int index, int[] data) { }
+  public static void setSpriteImage(int index, short[] data) { }
 
   /** Set one of the 8 sprite's position on the screen.
       hstart is 0 to 511.

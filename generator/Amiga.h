@@ -29,7 +29,7 @@ public:
   virtual int amiga_disableInterrupts();
   virtual int amiga_enableInterrupts();
   virtual int amiga_setPalette_II();
-  virtual int amiga_setSpriteImage_IaI();
+  virtual int amiga_setSpriteImage_IaS();
   virtual int amiga_setSpritePosition_IIII();
   virtual int amiga_setVideoMode_I();
   virtual int amiga_setPlayfieldScroll_II();
@@ -55,7 +55,7 @@ public:
   virtual int copper_appendSkip_II();
   virtual int copper_appendSetColor_II();
   virtual int copper_appendSetBitplane_IaB();
-  virtual int copper_appendSetSprite_IaB();
+  virtual int copper_appendSetSprite_IaS();
   virtual int copper_appendEnd();
   virtual int copper_resetIndex();
   virtual int copper_setIndex_I();
@@ -92,9 +92,15 @@ public:
   virtual int memory_clearArray_aB();
   virtual int memory_clearArray_aS();
   virtual int memory_clearArray_aI();
+  virtual int memory_addressOf_aB();
+  virtual int memory_addressOf_aS();
+  virtual int memory_addressOf_aI();
 
 private:
   int copper_getNextIndexAndIncrement(int reg);
+  int add_set_sprite_position();
+
+  bool need_set_sprite_position : 1;
 };
 
 #endif

@@ -30,6 +30,9 @@ public:
   virtual int memory_clearArray_aB() { return -1; }
   virtual int memory_clearArray_aS() { return -1; }
   virtual int memory_clearArray_aI() { return -1; }
+  virtual int memory_addressOf_aB() { return -1; }
+  virtual int memory_addressOf_aS() { return -1; }
+  virtual int memory_addressOf_aI() { return -1; }
 
   // CPU functions
   virtual int cpu_setClock16() { return -1; }

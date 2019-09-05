@@ -6,14 +6,14 @@ import net.mikekohn.java_grinder.amiga.Copper;
 
 public class AmigaDemo
 {
-  static int[] sprite =
+  static short[] sprite =
   {
-    0x00000a0a,
-    0x00000a0a,
-    0x00000a0a,
-    0x00000a05,
-    0x00000a05,
-    0x00000a05,
+    0x00f0, 0x000f,
+    0x00f0, 0x000f,
+    0x00f0, 0x0a0f,
+    0x00f0, 0x000f,
+    0x00f0, 0x000f,
+    0x00f0, 0x000f,
   };
 
   static public void main(String args[])
@@ -30,10 +30,9 @@ public class AmigaDemo
 
     //Amiga.clearDMA(Amiga.DMA_BITPLANE | Amiga.DMA_COPPER);
 
-    copper.appendInstruction(0x01001200);
-    //copper.appendInstruction(0x00e00001);
-    //copper.appendInstruction(0x00e20060);
+    //copper.appendInstruction(Copper.MOVE_BPLCON0 | 0x1200);
     copper.appendSetBitplane(0, bitplane_1);
+    copper.appendSetSprite(0, sprite);
     copper.appendSetColor(0, 0x00f);
     copper.appendSetColor(1, 0xff0);
     copper.appendWait(0, 100);
@@ -69,7 +68,6 @@ public class AmigaDemo
 
     while(true)
     {
-      Amiga.setSpriteImage(0, sprite);
       Amiga.setSpritePosition(0, 100, 100, 105);
 
       Amiga.setPalette(16, 0xfff);

@@ -20,7 +20,7 @@ public:
   virtual int amiga_disableInterrupts() { return -1; }
   virtual int amiga_enableInterrupts() { return -1; }
   virtual int amiga_setPalette_II() { return -1; }
-  virtual int amiga_setSpriteImage_IaI() { return -1; }
+  virtual int amiga_setSpriteImage_IaS() { return -1; }
   virtual int amiga_setSpritePosition_IIII() { return -1; }
   virtual int amiga_setVideoMode_I() { return -1; }
   virtual int amiga_setPlayfieldScroll_II() { return -1; }
@@ -46,7 +46,7 @@ public:
   virtual int copper_appendSkip_II() { return -1; }
   virtual int copper_appendSetColor_II() { return -1; }
   virtual int copper_appendSetBitplane_IaB() { return -1; }
-  virtual int copper_appendSetSprite_IaB() { return -1; }
+  virtual int copper_appendSetSprite_IaS() { return -1; }
   virtual int copper_appendEnd() { return -1; }
   virtual int copper_resetIndex() { return -1; }
   virtual int copper_setIndex_I() { return -1; }
