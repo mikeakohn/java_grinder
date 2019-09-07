@@ -6,9 +6,9 @@ import net.mikekohn.java_grinder.amiga.Copper;
 
 public class AmigaDemo
 {
-  static short[] sprite =
+  static char[] sprite_old =
   {
-    0x00f0, 0x000f,
+    0x5555, 0x5900,
     0x00f0, 0x000f,
     0x00f0, 0x0a0f,
     0x00f0, 0x000f,
@@ -20,10 +20,19 @@ public class AmigaDemo
   {
     byte[] bitplane_1 = new byte[16000];
     byte[] blitter_a = new byte[128];
-    Copper copper = new Copper(20);
+    char[] sprite = new char[12];
+    char[] sprite_blank = new char[4];
+    Copper copper = new Copper(80);
     Blitter blitter = new Blitter();
 
+    sprite_blank[0] = 0;
+    sprite_blank[1] = 0;
+
     for (int i = 0; i < 16000; i++) { bitplane_1[i] = 0x0f; }
+    for (int i = 0; i < 12; i += 2) { sprite[i] = 0x0f; sprite[i + 1] = 0xf0; }
+
+    sprite[0] = 0x5555;
+    sprite[1] = 0x5900;
 
     Amiga.disableMultitasking();
     //Amiga.disableInterrupts();
@@ -32,9 +41,18 @@ public class AmigaDemo
 
     //copper.appendInstruction(Copper.MOVE_BPLCON0 | 0x1200);
     copper.appendSetBitplane(0, bitplane_1);
-    copper.appendSetSprite(0, sprite);
+    copper.appendSetSprite(0, sprite_old);
+    copper.appendSetSprite(1, sprite_blank);
+    copper.appendSetSprite(2, sprite_blank);
+    copper.appendSetSprite(3, sprite_blank);
+    copper.appendSetSprite(4, sprite_blank);
+    copper.appendSetSprite(5, sprite_blank);
+    copper.appendSetSprite(6, sprite_blank);
+    copper.appendSetSprite(7, sprite_blank);
+    //copper.appendInstruction(Copper.MOVE_SPR0POS | 0x5555);
+    //copper.appendInstruction(Copper.MOVE_SPR0CTL | 0x5900);
     copper.appendSetColor(0, 0x00f);
-    copper.appendSetColor(1, 0xff0);
+    copper.appendSetColor(1, 0x700);
     copper.appendWait(0, 100);
     copper.appendSetColor(0, 0xf00);
     copper.appendWait(0, 150);
@@ -68,12 +86,12 @@ public class AmigaDemo
 
     while(true)
     {
-      Amiga.setSpritePosition(0, 100, 100, 105);
+      //Amiga.setSpritePosition(0, 100, 100, 105);
 
       Amiga.setPalette(16, 0xfff);
-      Amiga.setPalette(17, 0xfff);
-      Amiga.setPalette(18, 0xfff);
-      Amiga.setPalette(19, 0xfff);
+      Amiga.setPalette(17, 0x0ff);
+      Amiga.setPalette(18, 0xf0f);
+      Amiga.setPalette(19, 0xff0);
 
 /*
     Amiga.setVideoMode(

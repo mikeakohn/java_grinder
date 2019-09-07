@@ -268,8 +268,9 @@ public class Copper
   /** Add instruction to set the bitplane to a byte array. */
   public void appendSetBitplane(int bitplane, byte[] data) { }
 
-  /** Add instruction to set the bitplane to a short array. */
-  public void appendSetSprite(int index, short[] data) { }
+  /** Add instruction to set 1 of 8 sprites to a char array
+      (unsigned 16 bit words). */
+  public void appendSetSprite(int index, char[] data) { }
 
   /** Add instruction stop the copper until the next vertical blank. */
   public void appendEnd() { }

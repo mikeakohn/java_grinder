@@ -317,7 +317,8 @@ int execute_static(
         stack->pop();
         break;
       case 85: // castore (0x55)
-        UNIMPL();
+        //UNIMPL();
+        // This should be the same as sastore?  It's just unsigned.
       case 86: // sastore (0x56)
         CHECK_STACK(3);
         value = stack->pop();

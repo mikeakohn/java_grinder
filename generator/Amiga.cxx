@@ -79,12 +79,25 @@ int Amiga::start_init()
     // FIXME: Statics need to be in chip RAM if the custom chips use them
     // 0x4000 = flags, 0x03e9 = code
     //"  dc32 0x0000_03e9  ; hunk_code\n\n"
-    "  dc32 0x4000_03e9  ; hunk_code\n\n"
+    "  dc32 0x8000_03e9  ; hunk_code\n\n"
     "  dc32 (_amiga_grind_end - _amiga_grind_start) / 4\n"
-    "_amiga_grind_start:\n"
+    "_amiga_grind_start:\n\n"
   );
 
+  fprintf(out, "  bra.w _start\n\n");
+
+  for (auto static_field : static_fields)
+  {
+    fprintf(out,
+      "%s:\n"
+      "  dw 0\n",
+      static_field.c_str());
+  }
+
+  if (static_fields.size() != 0) { fprintf(out, "\n"); }
+
   fprintf(out,
+    "_start:\n"
     "  ;; a3 points to custom chips.\n"
     "  movea.l #0xdff000, a3\n");
 
@@ -105,6 +118,101 @@ int Amiga::init_heap(int field_count)
     "  movea.l (a7)+, a6\n"
     "  movea.l d0, a5\n",
     HEAP_SIZE);
+
+  return 0;
+}
+
+int Amiga::insert_static_field_define(
+  std::string &name,
+  std::string &type,
+  int index)
+{
+  static_fields.insert(name);
+
+  return 0;
+}
+
+int Amiga::field_init_int(std::string &name, int index, int value)
+{
+  //fprintf(out, "  move.l #%d, (%s)\n", value, name.c_str());
+
+  fprintf(out,
+    "  lea (0,pc), a2\n"
+    "  suba.l #%s-$, a2\n"
+    "  move.l #0x%02x, (a2)\n",
+    name.c_str(),
+    value);
+
+  return 0;
+}
+
+int Amiga::field_init_ref(std::string &name, int index)
+{
+  //fprintf(out, "  move.l #_%s, (%s)\n", name.c_str(), name.c_str());
+
+  fprintf(out,
+    "  lea (0,pc), a2\n"
+    "  adda.l #%s-$, a2\n"
+    "  move.l (_%s,pc), (a2)\n",
+    name.c_str(),
+    name.c_str());
+
+  return 0;
+}
+
+int Amiga::push_ref_static(std::string &name, int index)
+{
+  // REVIEW: Shouldn't this be (a2) with #%s?
+  fprintf(out,
+    "  ;; push_ref_static(%s, %d)\n"
+    "  lea (0,pc), a2\n"
+    "  adda.l #_%s-$+2, a2\n"
+    "  move.l a2, d%s\n",
+    name.c_str(), index,
+    name.c_str(),
+    push_reg());
+
+  return 0;
+}
+
+int Amiga::put_static(std::string &name, int index)
+{
+  fprintf(out,
+    "  ;; put_static(%s,%d)\n"
+    "  lea (0,pc), a2\n"
+    "  adda.l #_%s-$, a2\n"
+    "  move.l %s, (a2)\n",
+    name.c_str(), index,
+    name.c_str(),
+    pop_reg());
+
+  return 0;
+}
+
+int Amiga::get_static(std::string &name, int index)
+{
+  fprintf(out,
+    "  ;; get_static(%s,%d)\n"
+    "  lea (0,pc), a2\n"
+    "  adda.l #_%s-$, a2\n"
+    "  move.l (a2), %s\n",
+    name.c_str(), index,
+    name.c_str(),
+    push_reg());
+
+  return 0;
+}
+
+int Amiga::push_ref(std::string &name)
+{
+  fprintf(out,
+    "  ;; push_ref(%s)\n"
+    "  lea (0,pc), a2\n"
+    "  adda.l #_%s-$+2, a2\n"
+    "  move.l a2, %s\n",
+    name.c_str(),
+    name.c_str(),
+    push_reg());
 
   return 0;
 }
@@ -226,7 +334,7 @@ int Amiga::amiga_setSpritePosition_IIII()
   fprintf(out,
     "  ;; amiga_setSpritePosition_IIII()\n"
     "  lsl.w #8, d%d\n"
-    "  lea (0,a3,d%d), a5\n"
+    "  lea (0,a3,d%d), a2\n"
     "  move.l d%d, d5\n"
     "  move.l d%d, d6\n"
     "  move.l d%d, d7\n"
@@ -670,13 +778,13 @@ int Amiga::copper_appendSetBitplane_IaB()
   return 0;
 }
 
-int Amiga::copper_appendSetSprite_IaS()
+int Amiga::copper_appendSetSprite_IaC()
 {
   const int object = reg - 3;
   const int index = reg - 2;
   const int value = reg - 1;
 
-  fprintf(out, "  ;; copper_appendSetSprite_IaS()\n");
+  fprintf(out, "  ;; copper_appendSetSprite_IaC()\n");
 
   fprintf(out,
     "  movea.l d%d, a2\n"
@@ -688,16 +796,18 @@ int Amiga::copper_appendSetSprite_IaS()
     "  lsl.w #2, d%d\n"
     "  add.w #SPR0PTH, d%d\n"
     "  move.w d%d, (0,a2,d5)\n"
-    "  move.l d%d, (2,a2,d5)\n"
     "  addq.w #2, d%d\n"
     "  move.w d%d, (4,a2,d5)\n"
-    "  move.w d%d, (6,a2,d5)\n",
+    "  move.w d%d, (6,a2,d5)\n"
+    "  swap d%d\n"
+    "  move.w d%d, (2,a2,d5)\n",
+    index,
+    index,
     index,
     index,
     index,
     value,
-    index,
-    index,
+    value,
     value);
 
   reg -= 3;
@@ -1278,6 +1388,13 @@ int Amiga::memory_addressOf_aS()
   return 0;
 }
 
+int Amiga::memory_addressOf_aC()
+{
+  fprintf(out, "  ;; memory_addressOf_aC()\n");
+
+  return 0;
+}
+
 int Amiga::memory_addressOf_aI()
 {
   fprintf(out, "  ;; memory_addressOf_aI()\n");
@@ -1345,8 +1462,8 @@ int Amiga::add_set_sprite_position()
 
   // Put d6 and d7 into SPRxPOS and SPRxCTL.
   fprintf(out,
-    "  move.w d6, (a5)\n"
-    "  move.w d7, (2,a5)\n"
+    "  move.w d6, (a2)\n"
+    "  move.w d7, (2,a2)\n"
     "  rts\n");
 
   return 0;

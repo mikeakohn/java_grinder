@@ -12,6 +12,8 @@
 #ifndef JAVA_GRINDER_GENERATOR_AMIGA_H
 #define JAVA_GRINDER_GENERATOR_AMIGA_H
 
+#include <set>
+
 #include "generator/MC68000.h"
 
 class Amiga : public MC68000
@@ -23,6 +25,13 @@ public:
   virtual int open(const char *filename);
   virtual int start_init();
   virtual int init_heap(int field_count);
+  virtual int insert_static_field_define(std::string &name, std::string &type, int index);
+  virtual int field_init_int(std::string &name, int index, int value);
+  virtual int field_init_ref(std::string &name, int index);
+  virtual int push_ref_static(std::string &name, int index);
+  virtual int put_static(std::string &name, int index);
+  virtual int get_static(std::string &name, int index);
+  virtual int push_ref(std::string &name);
   virtual int new_object(std::string &object_name, int field_count);
   virtual int amiga_disableMultitasking();
   virtual int amiga_enableMultitasking();
@@ -55,7 +64,7 @@ public:
   virtual int copper_appendSkip_II();
   virtual int copper_appendSetColor_II();
   virtual int copper_appendSetBitplane_IaB();
-  virtual int copper_appendSetSprite_IaS();
+  virtual int copper_appendSetSprite_IaC();
   virtual int copper_appendEnd();
   virtual int copper_resetIndex();
   virtual int copper_setIndex_I();
@@ -94,12 +103,14 @@ public:
   virtual int memory_clearArray_aI();
   virtual int memory_addressOf_aB();
   virtual int memory_addressOf_aS();
+  virtual int memory_addressOf_aC();
   virtual int memory_addressOf_aI();
 
 private:
   int copper_getNextIndexAndIncrement(int reg);
   int add_set_sprite_position();
 
+  std::set<std::string> static_fields;
   bool need_set_sprite_position : 1;
 };
 

@@ -46,7 +46,7 @@ public:
   virtual int copper_appendSkip_II() { return -1; }
   virtual int copper_appendSetColor_II() { return -1; }
   virtual int copper_appendSetBitplane_IaB() { return -1; }
-  virtual int copper_appendSetSprite_IaS() { return -1; }
+  virtual int copper_appendSetSprite_IaC() { return -1; }
   virtual int copper_appendEnd() { return -1; }
   virtual int copper_resetIndex() { return -1; }
   virtual int copper_setIndex_I() { return -1; }

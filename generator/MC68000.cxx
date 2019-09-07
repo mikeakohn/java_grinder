@@ -89,8 +89,8 @@ int MC68000::insert_static_field_define(std::string &name, std::string &type, in
 int MC68000::init_heap(int field_count)
 {
   fprintf(out, "  ;; Setup heap and static initializers\n");
-  //fprintf(out, "  move.l #ram_start+%d, &ram_start\n", (field_count + 1) * 2);
   fprintf(out, "  movea.l #ram_start+%d, a5\n", field_count * 4);
+
   return 0;
 }
 
