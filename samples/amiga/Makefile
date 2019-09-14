@@ -5,7 +5,7 @@ default: AmigaDemo.class
 
 grind: AmigaDemo.class
 	../../java_grinder -v AmigaDemo.class amiga_demo.asm amiga
-	../../../naken_asm/naken_asm -I $(NAKEN_INCLUDE) -l -b -o amiga_demo amiga_demo.asm
+	../../../naken_asm/naken_asm -I $(NAKEN_INCLUDE) -l -amiga -o amiga_demo amiga_demo.asm
 
 %.class: %.java
 	javac -classpath ../../build/JavaGrinder.jar:. $*.java

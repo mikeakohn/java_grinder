@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2019 by Michael Kohn
  *
  */
 
@@ -18,7 +18,7 @@
 
 #include "generator/Generator.h"
 
-Generator::Generator() : label_count(0)
+Generator::Generator() : label_count(0), preload_array_align(32)
 {
 }
 
@@ -436,8 +436,14 @@ int Generator::add_array_files()
 
   const char *constant = "dc32";
 
-  if (get_int_size() == 16) { constant = "dc16"; }
-  else if (get_int_size() == 8) { constant = "dc8"; }
+  if (get_int_size() == 16)
+  {
+    constant = "dc16";
+  }
+  else if (get_int_size() == 8)
+  {
+    constant = "dc8";
+  }
 
   for (iter = preload_arrays.begin(); iter != preload_arrays.end(); iter++)
   {
@@ -447,11 +453,22 @@ int Generator::add_array_files()
       return -1;
     }
 
-    fprintf(out, ".align 128\n");
-    fprintf(out, "  %s 0, 0, 0, %d\n",
-      constant,
-      (int)(iter->second.type == TYPE_BYTE ?
-            statbuf.st_size : statbuf.st_size / get_int_size()));
+    if (preload_array_align == 128)
+    {
+      fprintf(out, ".align 128\n");
+      fprintf(out, "  %s 0, 0, 0, %d\n",
+        constant,
+        (int)(iter->second.type == TYPE_BYTE ?
+              statbuf.st_size : statbuf.st_size / get_int_size()));
+    }
+      else
+    {
+      fprintf(out, ".align 32\n");
+      fprintf(out, "  %s %d\n",
+        constant,
+        (int)(iter->second.type == TYPE_BYTE ?
+              statbuf.st_size : statbuf.st_size / get_int_size()));
+    }
 
     fprintf(out, "_%s:\n", iter->second.name.c_str());
     fprintf(out, ".binfile \"%s\"\n\n", iter->first.c_str());

@@ -66,6 +66,7 @@ public:
   virtual ~Generator();
 
   virtual int open(const char *filename);
+  //virtual void close() = 0;
   virtual int add_functions() { return 0; }
   virtual int get_cpu_byte_alignment() { return 2; }
   void label(std::string &name);
@@ -172,7 +173,6 @@ public:
   virtual int array_write_int(std::string &name, int field_id) = 0;
   virtual int array_write_float(std::string &name, int field_id);
   virtual int array_write_object(std::string &name, int field_id);
-  //virtual void close() = 0;
 
   // CPU
   virtual int cpu_asm_X(const char *code, int len);
@@ -182,7 +182,6 @@ public:
   void instruction_count_inc() { instruction_count++; }
 
   int use_array_file(const char *filename, const char *array, int type);
-  int add_array_files();
 
 protected:
   struct ArrayFiles
@@ -191,6 +190,7 @@ protected:
     int type;
   };
 
+  int add_array_files();
   virtual int get_int_size() { return 4; }
   int insert_db(std::string &name, int32_t *data, int len, uint8_t len_type);
   int insert_dw(std::string &name, int32_t *data, int len, uint8_t len_type);
@@ -203,6 +203,7 @@ protected:
   FILE *out;
   int label_count;
   int instruction_count;
+  int preload_array_align;
   std::map<uint32_t, int> constants_pool;
   std::map<std::string, ArrayFiles> preload_arrays;
 };

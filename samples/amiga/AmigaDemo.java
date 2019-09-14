@@ -24,6 +24,17 @@ public class AmigaDemo
     char[] sprite_blank = new char[4];
     Copper copper = new Copper(80);
     Blitter blitter = new Blitter();
+    byte[] song = Memory.preloadByteArray("commodore.bin");
+    byte[] sound = new byte[8];
+
+    sound[0] = 0;
+    sound[1] = 90;
+    sound[2] = 127;
+    sound[3] = 90;
+    sound[4] = 0;
+    sound[5] = -90;
+    sound[6] = -128;
+    sound[7] = -90;
 
     sprite_blank[0] = 0;
     sprite_blank[1] = 0;
@@ -83,6 +94,16 @@ public class AmigaDemo
     Memory.clearArray(blitter_a);
     blitter.setSourceA(blitter_a);
     //blitter.runFill(10, 10);
+
+    //Amiga.setAudioData(0, song);
+    //Amiga.setAudioLength(0, song.length >> 1);
+    //Amiga.setAudioPeriod(0, 892);
+    Amiga.setAudioData(0, sound);
+    Amiga.setAudioLength(0, sound.length >> 1);
+    Amiga.setAudioPeriod(0, 892);
+    Amiga.setAudioVolume(0, 63);
+    //Amiga.setDMA(Amiga.DMA_AUDIO_0 | Amiga.DMA_ENABLE);
+    Amiga.setDMA(Amiga.DMA_AUDIO_0);
 
     while(true)
     {

@@ -26,15 +26,16 @@ abstract public class Amiga
   public static final int VIDEO_MODE_COLOR = 0x0200;
   public static final int VIDEO_MODE_INTERLACE = 0x0004;
 
-  public static final int DMA_AUDIO0 = 0x01;
-  public static final int DMA_AUDIO1 = 0x02;
-  public static final int DMA_AUDIO2 = 0x04;
-  public static final int DMA_AUDIO3 = 0x08;
+  public static final int DMA_AUDIO_0 = 0x01;
+  public static final int DMA_AUDIO_1 = 0x02;
+  public static final int DMA_AUDIO_2 = 0x04;
+  public static final int DMA_AUDIO_3 = 0x08;
   public static final int DMA_DISK = 0x10;
   public static final int DMA_SPRITE = 0x20;
   public static final int DMA_BLITTER = 0x40;
   public static final int DMA_COPPER = 0x80;
   public static final int DMA_BITPLANE = 0x100;
+  public static final int DMA_ENABLE = 0x200;
 
   public static final int AUDIO_MOD_VOLUME_CHANNEL_0_TO_1 = 0x01;
   public static final int AUDIO_MOD_VOLUME_CHANNEL_1_TO_2 = 0x02;
@@ -111,17 +112,21 @@ abstract public class Amiga
   public static void setDisplayBitplaneStop(int horizontal) { }
 
   /** Set the sound data for audio channel 0 to 3. */
-  public static void setAudioData(int channel, short[] data) { }
+  public static void setAudioData(int channel, byte[] data) { }
 
   /** Set the rate of the length in unsigned words (samples) for audio
       channel 0 to 3. */
   public static void setAudioLength(int channel, int value) { }
 
   /** Set the rate of the audio output for channel 0 to 3.
-      Minimum value is 124 color clocks.  */
+      Minimum value is 124 color clocks. Thisi s the number
+      of CPU ticks between samples.  For example on an NTSC
+      Amiga to play 8000 samples a second this is calculated
+      as 7,140,000 / 8000 = 892. */
   public static void setAudioPeriod(int channel, int value) { }
 
-  /** Set the volume of the audio output for channel 0 to 3. */
+  /** Set the volume of the audio output for channel 0 to 3. 
+      Value can be 0 to 63. */
   public static void setAudioVolume(int channel, int value) { }
 
   /** Set audio modulation.  This is register ADKCON. */

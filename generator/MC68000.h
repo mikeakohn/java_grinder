@@ -105,8 +105,11 @@ public:
   virtual int memory_allocStackBytes_I();
   virtual int memory_allocStackShorts_I();
   virtual int memory_allocStackInts_I();
+  virtual int memory_preloadByteArray_X(const char *array_name);
+  virtual int memory_preloadIntArray_X(const char *array_name);
 
 protected:
+  virtual int add_array_files();
   const char *pop_reg();
   const char *push_reg();
   const char *top_reg();

@@ -41,12 +41,14 @@ Amiga::~Amiga()
     HEAP_SIZE);
 #endif
 
+#if 0
   fprintf(out,
     ".align_bytes 4\n"
     "_amiga_grind_end:\n\n"
     "  ;; Hunk file end\n"
     "  dc32 0x0000_03f2\n\n"
   );
+#endif
 
 }
 
@@ -67,6 +69,7 @@ int Amiga::start_init()
     ".include \"amiga/exec.inc\"\n"
   );
 
+#if 0
   fprintf(out,
     "\n"
     "  ;; Hunk file header\n"
@@ -83,6 +86,7 @@ int Amiga::start_init()
     "  dc32 (_amiga_grind_end - _amiga_grind_start) / 4\n"
     "_amiga_grind_start:\n\n"
   );
+#endif
 
   fprintf(out, "  bra.w _start\n\n");
 
@@ -138,7 +142,7 @@ int Amiga::field_init_int(std::string &name, int index, int value)
 
   fprintf(out,
     "  lea (0,pc), a2\n"
-    "  suba.l #%s-$, a2\n"
+    "  suba.l #%s-$+2, a2\n"
     "  move.l #0x%02x, (a2)\n",
     name.c_str(),
     value);
@@ -152,7 +156,7 @@ int Amiga::field_init_ref(std::string &name, int index)
 
   fprintf(out,
     "  lea (0,pc), a2\n"
-    "  adda.l #%s-$, a2\n"
+    "  adda.l #%s-$+2, a2\n"
     "  move.l (_%s,pc), (a2)\n",
     name.c_str(),
     name.c_str());
@@ -180,7 +184,7 @@ int Amiga::put_static(std::string &name, int index)
   fprintf(out,
     "  ;; put_static(%s,%d)\n"
     "  lea (0,pc), a2\n"
-    "  adda.l #_%s-$, a2\n"
+    "  adda.l #_%s-$+2, a2\n"
     "  move.l %s, (a2)\n",
     name.c_str(), index,
     name.c_str(),
@@ -194,7 +198,7 @@ int Amiga::get_static(std::string &name, int index)
   fprintf(out,
     "  ;; get_static(%s,%d)\n"
     "  lea (0,pc), a2\n"
-    "  adda.l #_%s-$, a2\n"
+    "  adda.l #_%s-$+2, a2\n"
     "  move.l (a2), %s\n",
     name.c_str(), index,
     name.c_str(),
@@ -498,12 +502,17 @@ int Amiga::amiga_setDisplayBitplaneStop_I()
 
 int Amiga::amiga_setAudioData_IaB()
 {
+  const int channel = reg - 2;
+  const int address = reg - 1;
+
   fprintf(out,
     "  ;; amiga_setAudioData_IaB()\n"
     "  lea (AUD0LCH,a3), a2\n"
-    "  lsl.w #2, d%d\n"
-    "  move.w d%d, (0,a2,d%d)\n",
-    reg - 2, reg - 1, reg - 2);
+    "  lsl.w #4, d%d\n"
+    "  move.l d%d, (0,a2,d%d)\n",
+    channel,
+    address,
+    channel);
 
   reg -= 2;
 
@@ -512,12 +521,17 @@ int Amiga::amiga_setAudioData_IaB()
 
 int Amiga::amiga_setAudioLength_II()
 {
+  const int channel = reg - 2;
+  const int value = reg - 1;
+
   fprintf(out,
     "  ;; amiga_setAudioLength_II()\n"
     "  lea (AUD0LEN,a3), a2\n"
-    "  lsl.w #1, d%d\n"
+    "  lsl.w #4, d%d\n"
     "  move.w d%d, (0,a2,d%d)\n",
-    reg - 2, reg - 1, reg - 2);
+    channel,
+    value,
+    channel);
 
   reg -= 2;
 
@@ -526,12 +540,17 @@ int Amiga::amiga_setAudioLength_II()
 
 int Amiga::amiga_setAudioPeriod_II()
 {
+  const int channel = reg - 2;
+  const int value = reg - 1;
+
   fprintf(out,
     "  ;; amiga_setAudioPeriod_II()\n"
     "  lea (AUD0PER,a3), a2\n"
-    "  lsl.w #1, d%d\n"
+    "  lsl.w #4, d%d\n"
     "  move.w d%d, (0,a2,d%d)\n",
-    reg - 2, reg - 1, reg - 2);
+    channel,
+    value,
+    channel);
 
   reg -= 2;
 
@@ -540,12 +559,17 @@ int Amiga::amiga_setAudioPeriod_II()
 
 int Amiga::amiga_setAudioVolume_II()
 {
+  const int channel = reg - 2;
+  const int value = reg - 1;
+
   fprintf(out,
     "  ;; amiga_setAudioVolume_II()\n"
     "  lea (AUD0VOL,a3), a2\n"
-    "  lsl.w #1, d%d\n"
+    "  lsl.w #4, d%d\n"
     "  move.w d%d, (0,a2,d%d)\n",
-    reg - 2, reg - 1, reg - 2);
+    channel,
+    value,
+    channel);
 
   reg -= 2;
 

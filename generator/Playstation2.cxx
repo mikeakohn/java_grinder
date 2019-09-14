@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2019 by Michael Kohn
  *
  */
 
@@ -64,6 +64,7 @@ Playstation2::Playstation2() :
   ram_start = 0x00000000;
   ram_end = 32 * 1024 * 1024;
   physical_address = 0x0;
+  preload_array_align = 128;
 }
 
 Playstation2::~Playstation2()

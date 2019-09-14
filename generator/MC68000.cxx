@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <sys/stat.h>
 
 #include "generator/MC68000.h"
 
@@ -1304,5 +1305,70 @@ int MC68000::get_jump_size(int distance)
   if (distance < 20000) { return 'w'; }
 
   return 'l';
+}
+
+int MC68000::memory_preloadByteArray_X(const char *array_name)
+{
+  fprintf(out,
+    "  ;; memory_preloadByteArray_X(%s)\n"
+    "  lea (0,pc), a2\n"
+    "  adda.l #_%s-$+2, a2\n"
+    "  move.l a2, %s\n",
+    array_name,
+    array_name,
+    push_reg());
+
+  return 0;
+}
+
+int MC68000::memory_preloadIntArray_X(const char *array_name)
+{
+  fprintf(out,
+    "  ;; memory_preloadIntArray_X(%s)\n"
+    "  lea (0,pc), a2\n"
+    "  adda.l #_%s-$+2, a2\n"
+    "  move.l a2, %s\n",
+    array_name,
+    array_name,
+    push_reg());
+
+  return 0;
+}
+
+int MC68000::add_array_files()
+{
+  struct stat statbuf;
+  std::map<std::string, ArrayFiles>::iterator iter;
+
+  const char *constant = "dc32";
+
+  if (get_int_size() == 16)
+  {
+    constant = "dc16";
+  }
+  else if (get_int_size() == 8)
+  {
+    constant = "dc8";
+  }
+
+  for (iter = preload_arrays.begin(); iter != preload_arrays.end(); iter++)
+  {
+    if (stat(iter->first.c_str(), &statbuf) != 0)
+    {
+      printf("Error opening %s\n", iter->first.c_str());
+      return -1;
+    }
+
+    fprintf(out, ".align 32\n");
+    fprintf(out, "  %s %d\n",
+      constant,
+      (int)(iter->second.type == TYPE_BYTE ?
+            statbuf.st_size : statbuf.st_size / get_int_size()));
+
+    fprintf(out, "_%s:\n", iter->second.name.c_str());
+    fprintf(out, ".binfile \"%s\"\n\n", iter->first.c_str());
+  }
+
+  return 0;
 }
 
