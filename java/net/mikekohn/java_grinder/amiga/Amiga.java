@@ -119,10 +119,10 @@ abstract public class Amiga
   public static void setAudioLength(int channel, int value) { }
 
   /** Set the rate of the audio output for channel 0 to 3.
-      Minimum value is 124 color clocks. Thisi s the number
-      of CPU ticks between samples.  For example on an NTSC
+      Minimum value is 124 color clocks. This is the number
+      of color ticks between samples.  For example on an NTSC
       Amiga to play 8000 samples a second this is calculated
-      as 7,140,000 / 8000 = 892. */
+      as 3,579,545 / 8000 = 447. */
   public static void setAudioPeriod(int channel, int value) { }
 
   /** Set the volume of the audio output for channel 0 to 3. 
