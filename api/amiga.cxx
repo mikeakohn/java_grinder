@@ -105,6 +105,7 @@ int copper(JavaClass *java_class, Generator *generator, const char *method_name)
 
 int blitter(JavaClass *java_class, Generator *generator, const char *method_name)
 {
+  CHECK_FUNC_BLITTER(waitBusy,)
   CHECK_FUNC_BLITTER(setSourceA,_aB)
   CHECK_FUNC_BLITTER(setSourceB,_aB)
   CHECK_FUNC_BLITTER(setSourceC,_aB)

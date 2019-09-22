@@ -47,6 +47,9 @@ public class Blitter
   {
   }
 
+  /** Wait until the Blitter is ready for more data. */
+  static public void waitBusy() { }
+
   /** Set source A. */
   public void setSourceA(byte[] data) { }
 

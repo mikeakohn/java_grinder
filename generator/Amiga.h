@@ -74,6 +74,7 @@ public:
   virtual int copper_getArrayAsChar();
 
   virtual int blitter_Constructor();
+  virtual int blitter_waitBusy();
   virtual int blitter_setSourceA_aB();
   virtual int blitter_setSourceB_aB();
   virtual int blitter_setSourceC_aB();

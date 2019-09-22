@@ -95,12 +95,12 @@ public class AmigaDemo
     blitter.setSourceA(blitter_a);
     //blitter.runFill(10, 10);
 
-    //Amiga.setAudioData(0, song);
-    //Amiga.setAudioLength(0, song.length >> 1);
+    Amiga.setAudioData(0, song);
+    Amiga.setAudioLength(0, song.length >> 1);
+    Amiga.setAudioPeriod(0, 447);
+    //Amiga.setAudioData(0, sound);
+    //Amiga.setAudioLength(0, sound.length >> 1);
     //Amiga.setAudioPeriod(0, 892);
-    Amiga.setAudioData(0, sound);
-    Amiga.setAudioLength(0, sound.length >> 1);
-    Amiga.setAudioPeriod(0, 892);
     Amiga.setAudioVolume(0, 63);
     //Amiga.setDMA(Amiga.DMA_AUDIO_0 | Amiga.DMA_ENABLE);
     Amiga.setDMA(Amiga.DMA_AUDIO_0);

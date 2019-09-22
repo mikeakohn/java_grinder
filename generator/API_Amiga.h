@@ -56,6 +56,7 @@ public:
   virtual int copper_getArrayAsChar() { return -1; }
 
   virtual int blitter_Constructor() { return -1; }
+  virtual int blitter_waitBusy() { return -1; }
   virtual int blitter_setSourceA_aB() { return -1; }
   virtual int blitter_setSourceB_aB() { return -1; }
   virtual int blitter_setSourceC_aB() { return -1; }
