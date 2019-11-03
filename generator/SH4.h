@@ -9,16 +9,16 @@
  *
  */
 
-#ifndef JAVA_GRINDER_GENERATOR_TEMPLATE_H
-#define JAVA_GRINDER_GENERATOR_TEMPLATE_H
+#ifndef JAVA_GRINDER_GENERATOR_SH4_H
+#define JAVA_GRINDER_GENERATOR_SH4_H
 
 #include "generator/Generator.h"
 
-class Template : public Generator
+class SH4 : public Generator
 {
 public:
-  Template();
-  virtual ~Template();
+  SH4();
+  virtual ~SH4();
 
   virtual int open(const char *filename);
   virtual int start_init();
@@ -30,15 +30,17 @@ public:
   virtual void method_end(int local_count);
   virtual int push_local_var_int(int index);
   virtual int push_local_var_ref(int index);
+  virtual int push_local_var_float(int index);
   virtual int push_ref_static(std::string &name, int index);
   virtual int push_fake();
   virtual int push_int(int32_t n);
   //virtual int push_long(int64_t n);
-  //virtual int push_float(float f);
+  virtual int push_float(float f);
   //virtual int push_double(double f);
   virtual int push_ref(std::string &name);
   virtual int pop_local_var_int(int index);
   virtual int pop_local_var_ref(int index);
+  virtual int pop_local_var_float(int index);
   virtual int pop();
   virtual int dup();
   virtual int dup2();
@@ -66,8 +68,16 @@ public:
   virtual int inc_integer(int index, int num);
   virtual int integer_to_byte();
   virtual int integer_to_short();
+  virtual int add_float();
+  virtual int sub_float();
+  virtual int mul_float();
+  virtual int div_float();
+  virtual int neg_float();
+  virtual int float_to_integer();
+  virtual int integer_to_float();
   virtual int jump_cond(std::string &label, int cond, int distance);
   virtual int jump_cond_integer(std::string &label, int cond, int distance);
+  virtual int compare_floats(int cond);
   virtual int ternary(int cond, int value_true, int value_false);
   virtual int ternary(int cond, int compare, int value_true, int value_false);
   virtual int return_local(int index, int local_count);
@@ -87,15 +97,23 @@ public:
   virtual int array_read_byte();
   virtual int array_read_short();
   virtual int array_read_int();
+  virtual int array_read_float();
+  virtual int array_read_object();
   virtual int array_read_byte(std::string &name, int field_id);
   virtual int array_read_short(std::string &name, int field_id);
   virtual int array_read_int(std::string &name, int field_id);
+  virtual int array_read_float(std::string &name, int field_id);
+  virtual int array_read_object(std::string &name, int field_id);
   virtual int array_write_byte();
   virtual int array_write_short();
   virtual int array_write_int();
+  virtual int array_write_float();
+  virtual int array_write_object();
   virtual int array_write_byte(std::string &name, int field_id);
   virtual int array_write_short(std::string &name, int field_id);
   virtual int array_write_int(std::string &name, int field_id);
+  virtual int array_write_float(std::string &name, int field_id);
+  virtual int array_write_object(std::string &name, int field_id);
 
 protected:
   int reg;            // count number of registers are are using as stack
