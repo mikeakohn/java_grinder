@@ -261,8 +261,8 @@ int MC68000::dup()
 
 int MC68000::dup2()
 {
-  char reg1[8];
-  char reg2[8];
+  char reg1[16];
+  char reg2[16];
 
   fprintf(out, "  ;; dup2\n");
 

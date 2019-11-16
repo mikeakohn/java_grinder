@@ -122,7 +122,7 @@ protected:
 
   uint32_t ram_start;
   uint32_t stack_start;
-  char reg_string[8];
+  char reg_string[16];
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 
   int stack;          // count how many things we put on the stack

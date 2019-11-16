@@ -11,13 +11,21 @@
 
 package net.mikekohn.java_grinder.amiga;
 
+// NOTE: Some documenation says blitter load order should be:
+// 1) Data
+// 2) Mask
+// 3) Modulos
+// 4) Channel pointers
+//
+// Don't forget to call waitBusy() to make sure blitter is okay to use.
+
 public class Blitter
 {
   //public static final int FILL_OPTIONS_LINE = 0x01;
   public static final int FILL_OPTIONS_DESC = 0x02;
   public static final int FILL_OPTIONS_FILL_CARRY_INPUT = 0x04;
-  public static final int FILL_OPTIONS_INCLUSIVE_FILL = 0x08;
-  public static final int FILL_OPTIONS_EXCLUSIVE_FILL = 0x10;
+  public static final int FILL_OPTIONS_INCLUSIVE = 0x08;
+  public static final int FILL_OPTIONS_EXCLUSIVE = 0x10;
 
   //public static final int LINE_OPTIONS_LINE = 0x01;
   public static final int LINE_OPTIONS_SINGLE_BIT = 0x02;
@@ -35,10 +43,10 @@ public class Blitter
   public static final int LINE_FUNCTION_ABNC = 0x40;
   public static final int LINE_FUNCTION_ABC = 0x80;
 
-  public static final int ENABLE_CHANNEL_A = 0x08;
-  public static final int ENABLE_CHANNEL_B = 0x04;
-  public static final int ENABLE_CHANNEL_C = 0x02;
-  public static final int ENABLE_CHANNEL_D = 0x01;
+  public static final int MASK_ENABLE_A = 0x08;
+  public static final int MASK_ENABLE_B = 0x04;
+  public static final int MASK_ENABLE_C = 0x02;
+  public static final int MASK_ENABLE_D = 0x01;
 
   public static final int LINE_TYPE_TEXTURE = 0x8000;
   public static final int LINE_TYPE_SOLID = 0xff;
@@ -62,25 +70,31 @@ public class Blitter
   /** Set destination D. */
   public void setDestination(byte[] data) { }
 
-  /** Set modulo A. */
+  /** Set modulo A.  The paramter "value" is automatically added to
+      the address at the end of each line. */
   public void setModuloA(int value) { }
 
-  /** Set modulo B. */
+  /** Set modulo B.  The paramter "value" is automatically added to
+      the address at the end of each line. */
   public void setModuloB(int value) { }
 
-  /** Set modulo C. */
+  /** Set modulo C.  The paramter "value" is automatically added to
+      the address at the end of each line. */
   public void setModuloC(int value) { }
 
-  /** Set modulo destination D. */
+  /** Set modulo destination D.  The paramter "value" is automatically added to
+      the address at the end of each line. */
   public void setModuloDestination(int value) { }
 
-  /** Set shift value A. */
+  /** Set shift value A.  The parameter "value" can be between 0 and 15. */
   public void setShiftA(int value) { }
 
-  /** Set shift value B. */
+  /** Set shift value B.  The parameter "value" can be between 0 and 15. */
   public void setShiftB(int value) { }
 
-  /** Blitter channel A masks. */
+  /** Blitter channel A masks.  The values in the two paramters are
+      ANDed with the first and last words of the data from source A
+      into the blitter. */
   public void setChannelAMasks(int first_word, int last_word) { }
 
   /** Enable channels (bit mask A=8, B=4, C=2, D=1). */

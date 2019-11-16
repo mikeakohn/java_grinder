@@ -91,10 +91,6 @@ public class AmigaDemo
       Amiga.DMA_COPPER |
       Amiga.DMA_BITPLANE);
 
-    Memory.clearArray(blitter_a);
-    blitter.setSourceA(blitter_a);
-    //blitter.runFill(10, 10);
-
     Amiga.setAudioData(0, song);
     Amiga.setAudioLength(0, song.length >> 1);
     Amiga.setAudioPeriod(0, 447);
@@ -104,6 +100,21 @@ public class AmigaDemo
     Amiga.setAudioVolume(0, 63);
     //Amiga.setDMA(Amiga.DMA_AUDIO_0 | Amiga.DMA_ENABLE);
     Amiga.setDMA(Amiga.DMA_AUDIO_0);
+
+    Memory.clearArray(blitter_a);
+    blitter.setSourceA(blitter_a);
+    blitter.setModuloA(0);
+    blitter.setModuloDestination(624);
+    blitter.setDestination(bitplane_1);
+    blitter.setShiftA(0);
+    blitter.setShiftB(0);
+    blitter.enableChannels(Blitter.MASK_ENABLE_A | Blitter.MASK_ENABLE_D);
+    blitter.setChannelAMasks(0xffff, 0xffff);
+    blitter.setAsFillMode(Blitter.FILL_OPTIONS_INCLUSIVE);
+    //blitter.setLogicalFunction(LINE_FUNCTION_ABC);
+
+    Blitter.waitBusy();
+    blitter.runFill(16, 16);
 
     while(true)
     {
