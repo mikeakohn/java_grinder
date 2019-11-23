@@ -372,8 +372,8 @@ int Amiga::amiga_setPlayfieldScroll_II()
 {
   fprintf(out,
     "  ;; amiga_setPlayfieldScroll_II()\n"
-    "  and.w #0xf, d%d\n"
-    "  and.w #0xf, d%d\n"
+    "  andi.w #0xf, d%d\n"
+    "  andi.w #0xf, d%d\n"
     "  lsl.w #4, d%d\n"
     "  or.w d%d, d%d\n"
     "  move.w d%d, (BPLCON1,a3)\n",
@@ -392,9 +392,9 @@ int Amiga::amiga_setPlayfieldPriority_IIZ()
 {
   fprintf(out,
     "  ;; amiga_setPlayfieldPriority_IIZ()\n"
-    "  and.w #0x1, d%d\n"
-    "  and.w #0x7, d%d\n"
-    "  and.w #0x7, d%d\n"
+    "  andi.w #0x1, d%d\n"
+    "  andi.w #0x7, d%d\n"
+    "  andi.w #0x7, d%d\n"
     "  lsl.w #3, d%d\n"
     "  lsl.w #6, d%d\n"
     "  or.w d%d, d%d\n"
@@ -968,9 +968,9 @@ int Amiga::blitter_waitBusy()
 {
   fprintf(out,
     "  ;; blitter_waitBusy()\n"
-    "  tst DMACONR(a3)\n"
+    "  tst.w (DMACONR,a3)\n"
     "label_%d:\n"
-    "  btst #6, DMACONR(a3)\n"
+    "  btst #6, (DMACONR,a3)\n"
     "  bne.s label_%d\n",
     label_count,
     label_count);
@@ -1126,7 +1126,7 @@ int Amiga::blitter_setShiftA_I()
     "  movea.l d%d, a2\n"
     "  lsl.w #8, d%d\n"
     "  lsl.w #4, d%d\n"
-    "  and.w 0x0fff, (a2)\n"
+    "  andi.w #0x0fff, (a2)\n"
     "  or.w d%d, (a2)\n",
     object,
     value,
@@ -1148,7 +1148,7 @@ int Amiga::blitter_setShiftB_I()
     "  movea.l d%d, a2\n"
     "  lsl.w #8, d%d\n"
     "  lsl.w #4, d%d\n"
-    "  and.w 0x0fff, (2,a2)\n"
+    "  andi.w #0x0fff, (2,a2)\n"
     "  or.w d%d, (2,a2)\n",
     object,
     value,
@@ -1189,8 +1189,8 @@ int Amiga::blitter_enableChannels_I()
     "  ;; blitter_enableChannels_I()\n"
     "  movea.l d%d, a2\n"
     "  lsl.w #8, d%d\n"
-    "  and.w 0xf0ff, (2,a2)\n"
-    "  or.w d%d, (2,a2)\n",
+    "  andi.w #0xf0ff, (0,a2)\n"
+    "  or.w d%d, (0,a2)\n",
     object,
     mask,
     mask);
@@ -1208,7 +1208,7 @@ int Amiga::blitter_setAsFillMode_I()
   fprintf(out,
     "  ;; blitter_setAsFillMode_I()\n"
     "  movea.l d%d, a2\n"
-    "  and.w 0xf000, (2,a2)\n"
+    "  andi.w #0xf000, (2,a2)\n"
     "  or.w d%d, (2,a2)\n",
     object,
     options);
@@ -1226,9 +1226,9 @@ int Amiga::blitter_setAsLineMode_I()
   fprintf(out,
     "  ;; blitter_setAsLineMode_I()\n"
     "  movea.l d%d, a2\n"
-    "  and.w 0xf0ff, (a2)\n"
-    "  or.w 0x0b00, (a2)\n"
-    "  and.w 0xf000, (2,a2)\n"
+    "  andi.w #0xf0ff, (a2)\n"
+    "  ori.w #0x0b00, (a2)\n"
+    "  andi.w #0xf000, (2,a2)\n"
     "  or.w d%d, (2,a2)\n",
     object,
     options);
@@ -1246,7 +1246,7 @@ int Amiga::blitter_setLogicalFunction_I()
   fprintf(out,
     "  ;; blitter_setLogicalFunction_I()\n"
     "  movea.l d%d, a2\n"
-    "  and.w 0xff00, (a2)\n"
+    "  andi.w #0xff00, (a2)\n"
     "  or.w d%d, (a2)\n",
     object,
     mask);
@@ -1335,7 +1335,7 @@ int Amiga::blitter_setLineTexture_I()
   fprintf(out,
     "  ;; blitter_setLineTexture_I()\n"
     "  movea.l d%d, a2\n"
-    "  and.w 0x0fff, (2,a2)\n"
+    "  andi.w #0x0fff, (2,a2)\n"
     "  or.w d%d, (2,a2)\n",
     object,
     value);
@@ -1353,7 +1353,7 @@ int Amiga::blitter_setLineStart_I()
   fprintf(out,
     "  ;; blitter_setLineStart_I(int value)\n"
     "  movea.l d%d, a2\n"
-    "  and.w 0x0fff, (a2)\n"
+    "  andi.w #0x0fff, (a2)\n"
     "  or.w d%d, (a2)\n",
     object,
     value);
@@ -1378,11 +1378,11 @@ int Amiga::blitter_runFill_II()
     "  move.l (12,a2), (BLTBPTH,a3)\n"
     "  move.l (16,a2), (BLTAPTH,a3)\n"
     "  move.l (20,a2), (BLTDPTH,a3)\n"
-    "  move.l (24,a2), (BLTDPTH,a3)\n"
+    "  move.l (24,a2), (BLTSIZV,a3)\n"
     "  move.l (28,a2), (BLTCMOD,a3)\n"
-    "  move.l (32,a2), (BLTAMOD,a3)\n"
-    "  move.l (36,a2), (BLTCDAT,a3)\n"
-    "  move.w (38,a2), (BLTADAT,a3)\n",
+    "  move.l (32,a2), (BLTAMOD,a3)\n",
+    //"  move.l (36,a2), (BLTCDAT,a3)\n"
+    //"  move.w (38,a2), (BLTADAT,a3)\n",
     object);
 
   fprintf(out,

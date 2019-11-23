@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2019 by Michael Kohn
  *
  */
 
@@ -133,7 +133,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
 
     CHECK(Amiga, amiga);
     //CHECK(Copper, copper);
-    //CHECK(Blitter, amiga_blitter);
+    CHECK(Blitter, blitter);
   }
     else
   if (strncmp("net/mikekohn/java_grinder/", method_class.c_str(), len) == 0)

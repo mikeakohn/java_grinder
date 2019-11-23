@@ -18,7 +18,7 @@ public class AmigaDemo
 
   static public void main(String args[])
   {
-    byte[] bitplane_1 = new byte[16000];
+    byte[] bitplane_1 = new byte[8000];
     byte[] blitter_a = new byte[128];
     char[] sprite = new char[12];
     char[] sprite_blank = new char[4];
@@ -39,7 +39,7 @@ public class AmigaDemo
     sprite_blank[0] = 0;
     sprite_blank[1] = 0;
 
-    for (int i = 0; i < 16000; i++) { bitplane_1[i] = 0x0f; }
+    for (int i = 0; i < 8000; i++) { bitplane_1[i] = 0x0f; }
     for (int i = 0; i < 12; i += 2) { sprite[i] = 0x0f; sprite[i + 1] = 0xf0; }
 
     sprite[0] = 0x5555;
@@ -71,6 +71,7 @@ public class AmigaDemo
     copper.appendEnd();
     copper.run();
 
+    // Setup 320x200 display.
     Amiga.setVideoMode(
       //Amiga.VIDEO_MODE_HIRES |
       Amiga.VIDEO_MODE_BITPLANE_COUNT_1 |
@@ -98,23 +99,26 @@ public class AmigaDemo
     //Amiga.setAudioLength(0, sound.length >> 1);
     //Amiga.setAudioPeriod(0, 892);
     Amiga.setAudioVolume(0, 63);
-    //Amiga.setDMA(Amiga.DMA_AUDIO_0 | Amiga.DMA_ENABLE);
-    Amiga.setDMA(Amiga.DMA_AUDIO_0);
+    //Amiga.setDMA(Amiga.DMA_AUDIO_0);
 
-    Memory.clearArray(blitter_a);
+    //Memory.clearArray(blitter_a);
+
+    for (int n = 0; n < 128; n++) { blitter_a[n] = -1; }
+
     blitter.setSourceA(blitter_a);
     blitter.setModuloA(0);
-    blitter.setModuloDestination(624);
+    blitter.setModuloDestination(38);
     blitter.setDestination(bitplane_1);
     blitter.setShiftA(0);
     blitter.setShiftB(0);
+    //blitter.setSize(32, 32);
     blitter.enableChannels(Blitter.MASK_ENABLE_A | Blitter.MASK_ENABLE_D);
     blitter.setChannelAMasks(0xffff, 0xffff);
     blitter.setAsFillMode(Blitter.FILL_OPTIONS_INCLUSIVE);
     //blitter.setLogicalFunction(LINE_FUNCTION_ABC);
 
     Blitter.waitBusy();
-    blitter.runFill(16, 16);
+    blitter.runFill(1, 16);
 
     while(true)
     {
