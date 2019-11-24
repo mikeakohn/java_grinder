@@ -802,6 +802,11 @@ int Amiga::copper_appendSetBitplane_IaB()
   return 0;
 }
 
+int Amiga::copper_appendSetBitplane_II()
+{
+  return copper_appendSetBitplane_IaB();
+}
+
 int Amiga::copper_appendSetSprite_IaC()
 {
   const int object = reg - 3;

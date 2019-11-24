@@ -64,6 +64,7 @@ public:
   virtual int copper_appendSkip_II();
   virtual int copper_appendSetColor_II();
   virtual int copper_appendSetBitplane_IaB();
+  virtual int copper_appendSetBitplane_II();
   virtual int copper_appendSetSprite_IaC();
   virtual int copper_appendEnd();
   virtual int copper_resetIndex();
