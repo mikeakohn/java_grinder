@@ -15,10 +15,26 @@
 
 #include "generator/SH4.h"
 
-#define REG_STACK(a) (a)
+#define REG_STACK(a) (a - 1)
 #define LOCALS(i) (i * 4)
 
 // ABI is:
+// r0 is temp, return value
+// r1 top of stack
+// r2
+// r3
+// r4
+// r5
+// r6
+// r7
+// r8
+// r9
+// r10 end of stack
+// r11 is temp
+// r12 is temp
+// r13 is temp
+// r14 points to locals
+// r15 points to constants
 
 SH4::SH4() :
   reg(0),
@@ -31,6 +47,14 @@ SH4::SH4() :
 
 SH4::~SH4()
 {
+  fprintf(out,
+    "  ;; If this function is right before the constants pool it should\n"
+    "  ;; the displacement should be 0 (PC + 4)\n"
+    "_load_constants_pool:\n"
+    "  mov.l @(0,PC), r15\n"
+    "  rts\n\n");
+
+  insert_constants_pool();
 }
 
 int SH4::open(const char *filename)
@@ -70,7 +94,19 @@ int SH4::init_heap(int field_count)
 
 int SH4::field_init_int(std::string &name, int index, int value)
 {
-  return -1;
+  int offset = get_constant(value);
+
+  if (offset == -1) { return -1; }
+
+  fprintf(out,
+    "  ;; field_init_int(%s,%d,%d)\n"
+    "  mov.l @(%d,r15), r15\n"
+    "  mov.l r15, @(%d,GBR)\n",
+    name.c_str(), index, value,
+    constant,
+    index * 4);
+
+  return 0;
 }
 
 int SH4::field_init_ref(std::string &name, int index)
@@ -113,7 +149,15 @@ int SH4::push_fake()
 
 int SH4::push_int(int32_t n)
 {
-  return -1;
+  int offset = get_constant(n);
+
+  if (offset == -1) { return -1; }
+
+  fprintf(out, "  mov.l (%d, r15), r%d\n", offset * 4, REG(reg));
+
+  reg++;
+
+  return 0;
 }
 
 #if 0
@@ -158,12 +202,18 @@ int SH4::pop_local_var_float(int index)
 
 int SH4::pop()
 {
-  return -1;
+  reg--;
+
+  return 0;
 }
 
 int SH4::dup()
 {
-  return -1;
+  fprintf(out, "  mov.l r%d, r%d\n", REG(reg - 1), REG(reg));
+
+  reg++:
+
+  return 0;
 }
 
 int SH4::dup2()
@@ -173,32 +223,62 @@ int SH4::dup2()
 
 int SH4::swap()
 {
-  return -1;
+  fprintf(out,
+    "  mov.l r%d, r15\n"
+    "  mov.l r%d, r%d\n"
+    "  mov.l r15, r%d\n",
+    REG(reg - 2),
+    REG(reg - 1), REG(reg - 2),
+    REG(reg - 1));
+
+  return 0;
 }
 
 int SH4::add_integer()
 {
-  return -1;
+  fprintf(out, "  add r%d, r%d\n", REG(reg - 1), REG(reg - 2));
+
+  reg--;
+
+  return 0;
 }
 
 int SH4::add_integer(int num)
 {
-  return -1;
+  if (num < -128 || num > 127) { return -1; }
+
+  fprintf(out, "  add #%d, r%d\n", num, REG(reg - 1));
+
+  return 0;
 }
 
 int SH4::sub_integer()
 {
-  return -1;
+  fprintf(out, "  sub r%d, r%d\n", REG(reg - 1), REG(reg - 2));
+
+  reg--;
+
+  return 0;
 }
 
 int SH4::sub_integer(int num)
 {
+  // FIXME: Can use DT and some other optimizations?
+
   return -1;
 }
 
 int SH4::mul_integer()
 {
-  return -1;
+  fprintf(out,
+    "  mul r%d, r%d\n"
+    "  sts MACL, r%d\n",
+    REG(reg - 1), REG(reg - 2),
+    REG(reg - 2));
+
+  reg--;
+
+  return 0;
 }
 
 int SH4::div_integer()
@@ -213,7 +293,9 @@ int SH4::mod_integer()
 
 int SH4::neg_integer()
 {
-  return -1;
+  fprintf("  neg r%d, r%d\n", REG(reg - 1), REG(reg - 1));
+
+  return 0;
 }
 
 int SH4::shift_left_integer()

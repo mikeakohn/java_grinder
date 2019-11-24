@@ -342,7 +342,7 @@ int Generator::get_constant(uint32_t value)
     return index;
   }
 
-  //printf("Error: Constant pool exhausted.\n");
+  printf("Error: Constant pool exhausted.\n");
 
   return -1;
 }
