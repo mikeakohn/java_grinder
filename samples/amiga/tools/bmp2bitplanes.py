@@ -123,7 +123,7 @@ for color in palette:
   out.write(" 0x%03x," % (color))
   count += 1
 
-out.write("\n  }\n\n")
+out.write("\n  };\n\n")
 
 count = 0
 n = 0
@@ -152,37 +152,37 @@ while n < image_size:
     bitplanes[r].append(current[r])
 
 for n in range(0, len(bitplanes)):
-  out.write("  static public short[] bitplane_" + str(n) + " =\n")
+  out.write("  static public byte[] bitplane_" + str(n) + " =\n")
   out.write("  {")
 
   count = 0
 
   for data in bitplanes[n]:
-    if (count % 8) == 0: out.write("\n    ")
+    if (count % 8) == 0: out.write("\n   ")
 
     if (data & 0x80) != 0:
       data = -((data ^ 0xff) + 1)
 
-    out.write("%d," % (data));
+    out.write(" %d," % (data));
 
     count += 1
 
-  out.write("\n  }\n\n")
+  out.write("\n  };\n\n")
 
 out.write("  static public void show(Copper copper)\n")
 out.write("  {\n")
-out.write("    copper.stop()\n")
-out.write("    copper.resetIndex()\n")
+out.write("    copper.stop();\n")
+out.write("    copper.resetIndex();\n")
 
 for n in range(0, len(bitplanes)):
-  out.write("    copper.appendSetBitplane(" + str(n) + ", bitplanes_" + str(n) + ");\n")
+  out.write("    copper.appendSetBitplane(" + str(n) + ", bitplane_" + str(n) + ");\n")
 
 for n in range(0, colors):
   out.write("    copper.appendSetColor(" + str(n) + ", palette[" + str(n) + "]);\n")
 
-out.write("    copper.end()\n")
-out.write("    copper.start()\n")
-out.write("  }")
+out.write("    copper.appendEnd();\n")
+out.write("    copper.run();\n")
+out.write("  }\n")
 
 out.write("}\n\n")
 
