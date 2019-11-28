@@ -112,7 +112,9 @@ for i in range(0, bitplane_count):
 print(bitplanes)
 
 java.write("\n")
+java.write("import net.mikekohn.java_grinder.Memory;\n")
 java.write("import net.mikekohn.java_grinder.amiga.Copper;\n")
+java.write("import net.mikekohn.java_grinder.amiga.Amiga;\n")
 java.write("\n")
 java.write("public class " + image_name + "\n")
 java.write("{\n")
@@ -147,7 +149,7 @@ while n < image_size:
     c = palette_map[color]
 
     for r in range(0, 5):
-      current[r] = c
+      current[r] |= ((c & 1) << (7 - i))
       c = c >> 1
 
     n = n + 3
@@ -155,22 +157,34 @@ while n < image_size:
   for r in range(0, len(bitplanes)):
     bitplanes[r].append(current[r])
 
-java.write("  static public byte[] bitplanes = Memory.preloadByteArray(\"" + filename_bin + "\");\n")
+java.write("  static public byte[] bitplanes = null;\n")
 
 for n in range(0, len(bitplanes)):
   for data in bitplanes[n]:
-    out.write(bytes(data));
+    out.write(bytes([data]));
 
 java.write("  static public void show(Copper copper)\n")
 java.write("  {\n")
+java.write("    int n;\n")
+java.write("    bitplanes = Memory.preloadByteArray(\"" + filename_bin + "\");\n\n")
+
+java.write("    Amiga.setVideoMode(\n")
+java.write("      Amiga.VIDEO_MODE_BITPLANE_COUNT_" + str(len(bitplanes)) + " |\n")
+java.write("      Amiga.VIDEO_MODE_COLOR);\n\n")
+
 java.write("    copper.stop();\n")
 java.write("    copper.resetIndex();\n")
 
 for n in range(0, len(bitplanes)):
   java.write("    copper.appendSetBitplane(" + str(n) + ", Memory.addressOf(bitplanes) + " + str(n * 8000) + ");\n")
 
-for n in range(0, colors):
-  java.write("    copper.appendSetColor(" + str(n) + ", palette[" + str(n) + "]);\n")
+java.write("    for (n = 0; n < palette.length; n++)\n")
+java.write("    {\n")
+java.write("      copper.appendSetColor(n, palette[n]);\n")
+java.write("    }\n")
+
+#for n in range(0, colors):
+#  java.write("    copper.appendSetColor(" + str(n) + ", palette[" + str(n) + "]);\n")
 
 java.write("    copper.appendEnd();\n")
 java.write("    copper.run();\n")
