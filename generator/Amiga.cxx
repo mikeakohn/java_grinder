@@ -852,7 +852,7 @@ int Amiga::copper_appendEnd()
 
   copper_getNextIndexAndIncrement(object);
 
-  fprintf(out, "  move.l #0xfffffffe, (0,a3,d5)\n");
+  fprintf(out, "  move.l #0xfffffffe, (0,a2,d5)\n");
 
   reg -= 1;
 
