@@ -96,6 +96,7 @@ palette_len = int(math.pow(2, bitplane_count))
 print("Total Colors: " + str(colors))
 print("   Bitplanes: " + str(bitplane_count))
 print(" Palette Len: " + str(palette_len))
+print("Image Offset: " + str(image_offset))
 
 if colors > 32:
   print("Amiga only supports 32 colors\n")
@@ -134,9 +135,16 @@ java.write("\n  };\n\n")
 count = 0
 n = 0
 
-while n < image_size:
+x = 0
+y = 199
+
+byte_width = width * 3
+
+while y >=  0:
 
   current = [ 0, 0, 0, 0, 0 ]
+
+  n = y * byte_width + x * 3
 
   for i in range(0, 8):
     index = image_offset + n
@@ -153,6 +161,11 @@ while n < image_size:
       c = c >> 1
 
     n = n + 3
+    x = x + 1
+
+    if x == width:
+      y -= 1
+      x = 0
 
   for r in range(0, len(bitplanes)):
     bitplanes[r].append(current[r])
