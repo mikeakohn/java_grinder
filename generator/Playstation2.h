@@ -21,7 +21,7 @@ public:
   virtual ~Playstation2();
 
   virtual int open(const char *filename);
-  virtual int add_functions();
+  virtual int finish();
   virtual int start_init();
   virtual int new_object(std::string &object_name, int field_count);
   virtual int draw3d_object_Constructor_X(int type, bool with_texture);

@@ -401,10 +401,13 @@ int main(int argc, char *argv[])
     if (compiler->add_constants() == -1) { ret = -1; break; }
   } while(0);
 
-  // Add any extra hardcoded functions needed at the end.
-  generator->add_functions();
+  // Any subclass (CPU / system) in the Generator can add any extra
+  // functions and data sections needed to the assembly source before
+  // closing the file.
+  generator->finish();
 
-  // Add any extra data sections to the end of file and close.
+  // The main generator super class can add any extra functions or
+  // data sections before the file is close.
   generator->close();
 
   delete generator;

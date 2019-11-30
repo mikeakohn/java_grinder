@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2019 by Michael Kohn
  *
  */
 
@@ -21,7 +21,7 @@ public:
   virtual ~Z80();
 
   virtual int open(const char *filename);
-  virtual int add_functions();
+  virtual int finish();
   virtual int start_init();
   virtual int insert_static_field_define(std::string &name, std::string &type, int index);
   virtual int init_heap(int field_count);

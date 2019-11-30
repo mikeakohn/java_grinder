@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn, Joe Davisson
+ * Copyright 2014-2019 by Michael Kohn, Joe Davisson
  *
  */
 
@@ -92,7 +92,7 @@ int M6502_8::open(const char *filename)
   return 0;
 }
 
-int M6502_8::add_functions()
+int M6502_8::finish()
 {
   if(need_swap) { insert_swap(); }
   if(need_add_integer) { insert_add_integer(); }

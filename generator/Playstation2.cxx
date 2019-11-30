@@ -88,7 +88,7 @@ int Playstation2::open(const char *filename)
   return 0;
 }
 
-int Playstation2::add_functions()
+int Playstation2::finish()
 {
   add_dma_functions();
   add_misc_functions();

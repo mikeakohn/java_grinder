@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2019 by Michael Kohn
  *
  */
 
@@ -71,7 +71,7 @@ int Z80::open(const char *filename)
   return 0;
 }
 
-int Z80::add_functions()
+int Z80::finish()
 {
   // Math
   if(need_mul16_integer) { insert_mul16_integer(); }
@@ -100,7 +100,6 @@ int Z80::insert_static_field_define(std::string &name, std::string &type, int in
   fprintf(out, "%s equ ram_start+%d\n", name.c_str(), (index + 1) * 2);
   return 0;
 }
-
 
 int Z80::init_heap(int field_count)
 {

@@ -67,7 +67,7 @@ public:
 
   virtual int open(const char *filename);
   void close();
-  virtual int add_functions() { return 0; }
+  virtual int finish() { return 0; }
   virtual int get_cpu_byte_alignment() { return 2; }
   void label(std::string &name);
   virtual int start_init() = 0;

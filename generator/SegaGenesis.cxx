@@ -103,7 +103,7 @@ int SegaGenesis::open(const char *filename)
   return 0;
 }
 
-int SegaGenesis::add_functions()
+int SegaGenesis::finish()
 {
   add_vdp_reg_init();
 
