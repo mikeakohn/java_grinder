@@ -19,7 +19,7 @@ then
   extra="-aviwrite out.avi"
 fi
 
-mess ti99_4a -window -rompath ${ROMPATH} \
+mame ti99_4a -window -rompath ${ROMPATH} \
   -resolution0 640x480 \
   -cart1 grinder_demo_ti99.rpk \
   ${extra}
