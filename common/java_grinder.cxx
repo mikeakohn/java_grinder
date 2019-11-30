@@ -404,6 +404,9 @@ int main(int argc, char *argv[])
   // Add any extra hardcoded functions needed at the end.
   generator->add_functions();
 
+  // Add any extra data sections to the end of file and close.
+  generator->close();
+
   delete generator;
   delete compiler;
 

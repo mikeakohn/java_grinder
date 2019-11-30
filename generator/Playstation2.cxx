@@ -69,6 +69,27 @@ Playstation2::Playstation2() :
 
 Playstation2::~Playstation2()
 {
+}
+
+int Playstation2::open(const char *filename)
+{
+  if (R5900::open(filename) != 0) { return -1; }
+
+  fprintf(out,
+    ".include \"macros.inc\"\n"
+    ".include \"registers_gs_gp.inc\"\n"
+    ".include \"system_calls.inc\"\n"
+    ".include \"registers_ee.inc\"\n"
+    ".include \"registers_gs_priv.inc\"\n"
+    ".include \"vif.inc\"\n\n"
+    ".entry_point start\n"
+    ".export start\n\n");
+
+  return 0;
+}
+
+int Playstation2::add_functions()
+{
   add_dma_functions();
   add_misc_functions();
   add_screen_init_clear();
@@ -88,21 +109,6 @@ Playstation2::~Playstation2()
   add_strings();
   Math::add_sin_table(out);
   Math::add_cos_table(out);
-}
-
-int Playstation2::open(const char *filename)
-{
-  if (R5900::open(filename) != 0) { return -1; }
-
-  fprintf(out,
-    ".include \"macros.inc\"\n"
-    ".include \"registers_gs_gp.inc\"\n"
-    ".include \"system_calls.inc\"\n"
-    ".include \"registers_ee.inc\"\n"
-    ".include \"registers_gs_priv.inc\"\n"
-    ".include \"vif.inc\"\n\n"
-    ".entry_point start\n"
-    ".export start\n\n");
 
   return 0;
 }

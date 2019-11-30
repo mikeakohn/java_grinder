@@ -80,21 +80,6 @@ SegaGenesis::SegaGenesis() :
 
 SegaGenesis::~SegaGenesis()
 {
-  add_vdp_reg_init();
-
-  if (need_print_string) { add_print_string(); }
-  if (need_load_fonts) { add_load_fonts(); }
-  if (need_clear_text) { add_clear_text(); }
-  if (need_load_z80) { add_load_z80(); }
-  if (need_set_pattern_table) { add_set_pattern_table(); }
-  if (need_set_image_data) { add_set_image_data(); }
-  if (need_set_palette_colors) { add_set_palette_colors(); }
-  if (need_set_palette_colors_at_index) { add_set_palette_colors_at_index(); }
-  if (need_init_bitmap) { add_init_bitmap(); }
-  if (need_clear_bitmap) { add_clear_bitmap(); }
-  if (need_clear_pattern) { add_clear_pattern(); }
-  if (need_plot) { add_plot(); }
-  if (need_set_plot_address) { add_set_plot_address(); }
 }
 
 int SegaGenesis::open(const char *filename)
@@ -114,6 +99,27 @@ int SegaGenesis::open(const char *filename)
   add_exception_vectors();
   add_cartridge_info_header();
   add_exception_handler();
+
+  return 0;
+}
+
+int SegaGenesis::add_functions()
+{
+  add_vdp_reg_init();
+
+  if (need_print_string) { add_print_string(); }
+  if (need_load_fonts) { add_load_fonts(); }
+  if (need_clear_text) { add_clear_text(); }
+  if (need_load_z80) { add_load_z80(); }
+  if (need_set_pattern_table) { add_set_pattern_table(); }
+  if (need_set_image_data) { add_set_image_data(); }
+  if (need_set_palette_colors) { add_set_palette_colors(); }
+  if (need_set_palette_colors_at_index) { add_set_palette_colors_at_index(); }
+  if (need_init_bitmap) { add_init_bitmap(); }
+  if (need_clear_bitmap) { add_clear_bitmap(); }
+  if (need_clear_pattern) { add_clear_pattern(); }
+  if (need_plot) { add_plot(); }
+  if (need_set_plot_address) { add_set_plot_address(); }
 
   return 0;
 }

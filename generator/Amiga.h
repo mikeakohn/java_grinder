@@ -108,6 +108,9 @@ public:
   virtual int memory_addressOf_aC();
   virtual int memory_addressOf_aI();
 
+protected:
+  virtual int add_array_files();
+
 private:
   int copper_getNextIndexAndIncrement(int reg);
   int add_set_sprite_position();

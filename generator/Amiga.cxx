@@ -12,6 +12,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "generator/Amiga.h"
 
@@ -1521,6 +1524,32 @@ int Amiga::memory_addressOf_aC()
 int Amiga::memory_addressOf_aI()
 {
   fprintf(out, "  ;; memory_addressOf_aI()\n");
+
+  return 0;
+}
+
+int Amiga::add_array_files()
+{
+  struct stat statbuf;
+  std::map<std::string, ArrayFiles>::iterator iter;
+
+  for (iter = preload_arrays.begin(); iter != preload_arrays.end(); iter++)
+  {
+    if (stat(iter->first.c_str(), &statbuf) != 0)
+    {
+      printf("Error opening %s\n", iter->first.c_str());
+      return -1;
+    }
+
+    fprintf(out, ".align_bytes 40\n");
+    fprintf(out, "  resb 36\n");
+    fprintf(out, "  dc32 %d\n",
+      (int)(iter->second.type == TYPE_BYTE ?
+            statbuf.st_size : statbuf.st_size / get_int_size()));
+
+    fprintf(out, "_%s:\n", iter->second.name.c_str());
+    fprintf(out, ".binfile \"%s\"\n\n", iter->first.c_str());
+  }
 
   return 0;
 }

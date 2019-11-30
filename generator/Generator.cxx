@@ -24,8 +24,6 @@ Generator::Generator() : label_count(0), preload_array_align(32)
 
 Generator::~Generator()
 {
-  add_array_files();
-
   fprintf(out, "\n");
   fclose(out);
 }
@@ -41,6 +39,11 @@ int Generator::open(const char *filename)
   }
 
   return 0;
+}
+
+void Generator::close()
+{
+  add_array_files();
 }
 
 int Generator::new_object_array(std::string &class_name)

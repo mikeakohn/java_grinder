@@ -21,6 +21,7 @@ public:
   virtual ~SegaGenesis();
 
   virtual int open(const char *filename);
+  virtual int add_functions();
   virtual int start_init();
 
   virtual int sega_genesis_setPalettePointer_I();

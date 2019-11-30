@@ -66,7 +66,7 @@ public:
   virtual ~Generator();
 
   virtual int open(const char *filename);
-  //virtual void close() = 0;
+  void close();
   virtual int add_functions() { return 0; }
   virtual int get_cpu_byte_alignment() { return 2; }
   void label(std::string &name);
@@ -190,7 +190,7 @@ protected:
     int type;
   };
 
-  int add_array_files();
+  virtual int add_array_files();
   virtual int get_int_size() { return 4; }
   int insert_db(std::string &name, int32_t *data, int len, uint8_t len_type);
   int insert_dw(std::string &name, int32_t *data, int len, uint8_t len_type);
