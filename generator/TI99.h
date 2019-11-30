@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2019 by Michael Kohn
  *
  */
 
@@ -22,6 +22,7 @@ public:
 
   virtual int open(const char *filename);
   virtual int start_init();
+  virtual int finish();
   virtual int ti99_print_X();
   virtual int ti99_printChar_C();
   virtual int ti99_printChar_C(int c);

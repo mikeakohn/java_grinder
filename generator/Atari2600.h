@@ -5,7 +5,9 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn, Joe Davisson
+ * Copyright 2014-2019 by Michael Kohn, Joe Davisson
+ *
+ * Atari 2600 written by Joe Davisson
  *
  */
 
@@ -21,6 +23,7 @@ public:
   virtual ~Atari2600();
 
   virtual int open(const char *filename);
+  virtual int finish();
   virtual int atari2600_waitHsync_I();
   virtual int atari2600_waitHsync_I(int lines);
   virtual int atari2600_waitHsync();

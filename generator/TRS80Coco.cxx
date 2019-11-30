@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2019 by Michael Kohn
  *
  */
 
@@ -31,12 +31,6 @@ TRS80Coco::TRS80Coco() :
 
 TRS80Coco::~TRS80Coco()
 {
-  if (need_plot_lores) { add_plot_lores(); }
-  if (need_plot_midres) { add_plot_midres(); }
-  if (need_clear_screen_lores) { add_clear_screen_lores(); }
-  if (need_clear_screen_midres) { add_clear_screen_midres(); }
-  if (need_print) { add_print(); }
-  if (need_set_sound) { add_set_sound(); }
 }
 
 int TRS80Coco::open(const char *filename)
@@ -50,6 +44,20 @@ int TRS80Coco::open(const char *filename)
   //fprintf(out, "  ldd 0xff02\n");
   //fprintf(out, "  orb #0x06\n");
   //fprintf(out, "  std 0xff02\n");
+
+  return 0;
+}
+
+int TRS80Coco::finish()
+{
+  if (need_plot_lores) { add_plot_lores(); }
+  if (need_plot_midres) { add_plot_midres(); }
+  if (need_clear_screen_lores) { add_clear_screen_lores(); }
+  if (need_clear_screen_midres) { add_clear_screen_midres(); }
+  if (need_print) { add_print(); }
+  if (need_set_sound) { add_set_sound(); }
+
+  MC6809::finish();
 
   return 0;
 }

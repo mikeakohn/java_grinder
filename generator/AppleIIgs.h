@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2019 by Michael Kohn
  *
  */
 
@@ -21,6 +21,7 @@ public:
   virtual ~AppleIIgs();
 
   virtual int open(const char *filename);
+  virtual int finish();
   virtual int appleiigs_plotChar_IC();
   virtual int appleiigs_printChar_C();
   virtual int appleiigs_hiresEnable_I();

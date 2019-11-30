@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2019 by Michael Kohn
  *
  */
 
@@ -92,10 +92,6 @@ MSP430::MSP430(uint8_t chip_type) :
 
 MSP430::~MSP430()
 {
-  if (need_read_spi) { insert_read_spi(); }
-  if (need_mul_integers) { insert_mul_integers(); }
-  if (need_div_integers) { insert_div_integers(); }
-
   if (need_timer_interrupt)
   {
     fprintf(out, ".org 0x%04x\n", vector_timer);
@@ -119,6 +115,15 @@ int MSP430::open(const char *filename)
   // Set where RAM starts
   fprintf(out, "ram_start equ 0x%04x\n", ram_start);
   fprintf(out, "heap_ptr equ ram_start\n");
+
+  return 0;
+}
+
+int MSP430::finish()
+{
+  if (need_read_spi) { insert_read_spi(); }
+  if (need_mul_integers) { insert_mul_integers(); }
+  if (need_div_integers) { insert_div_integers(); }
 
   return 0;
 }

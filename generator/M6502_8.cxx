@@ -94,20 +94,20 @@ int M6502_8::open(const char *filename)
 
 int M6502_8::finish()
 {
-  if(need_swap) { insert_swap(); }
-  if(need_add_integer) { insert_add_integer(); }
-  if(need_sub_integer) { insert_sub_integer(); }
-  if(need_neg_integer) { insert_neg_integer(); }
-  if(need_shift_left_integer) { insert_shift_left_integer(); }
-  if(need_shift_right_integer) { insert_shift_right_integer(); }
-  if(need_shift_right_uinteger) { insert_shift_right_uinteger(); }
-  if(need_and_integer) { insert_and_integer(); }
-  if(need_or_integer) { insert_or_integer(); }
-  if(need_xor_integer) { insert_xor_integer(); }
-  if(need_push_array_length) { insert_push_array_length(); }
-  if(need_array_read_byte) { insert_array_read_byte(); }
-  if(need_memory_read8) { insert_memory_read8(); }
-  if(need_memory_write8) { insert_memory_write8(); }
+  if (need_swap) { insert_swap(); }
+  if (need_add_integer) { insert_add_integer(); }
+  if (need_sub_integer) { insert_sub_integer(); }
+  if (need_neg_integer) { insert_neg_integer(); }
+  if (need_shift_left_integer) { insert_shift_left_integer(); }
+  if (need_shift_right_integer) { insert_shift_right_integer(); }
+  if (need_shift_right_uinteger) { insert_shift_right_uinteger(); }
+  if (need_and_integer) { insert_and_integer(); }
+  if (need_or_integer) { insert_or_integer(); }
+  if (need_xor_integer) { insert_xor_integer(); }
+  if (need_push_array_length) { insert_push_array_length(); }
+  if (need_array_read_byte) { insert_array_read_byte(); }
+  if (need_memory_read8) { insert_memory_read8(); }
+  if (need_memory_write8) { insert_memory_write8(); }
 
   return 0;
 }
@@ -977,7 +977,7 @@ void M6502_8::insert_swap()
 
   fprintf(out, "  lda result + 0\n");
   fprintf(out, "  sta stack_lo - 1,x\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, "  rts\n\n");
 }
 
 void M6502_8::insert_add_integer()
@@ -989,7 +989,7 @@ void M6502_8::insert_add_integer()
   fprintf(out, "  clc\n");
   fprintf(out, "  adc result + 0\n");
   PUSH();
-  fprintf(out, "  rts\n");
+  fprintf(out, "  rts\n\n");
 }
 
 void M6502_8::insert_sub_integer()
@@ -1001,7 +1001,7 @@ void M6502_8::insert_sub_integer()
   fprintf(out, "  sec\n");
   fprintf(out, "  sbc result + 0\n");
   PUSH();
-  fprintf(out, "  rts\n");
+  fprintf(out, "  rts\n\n");
 }
 
 void M6502_8::insert_neg_integer()
@@ -1018,7 +1018,7 @@ void M6502_8::insert_shift_left_integer()
   fprintf(out, "  dey\n");
   fprintf(out, "  bne #-4\n");
   PUSH();
-  fprintf(out, "  rts\n");
+  fprintf(out, "  rts\n\n");
 }
 
 void M6502_8::insert_shift_right_integer()
@@ -1032,7 +1032,7 @@ void M6502_8::insert_shift_right_integer()
   fprintf(out, "  dey\n");
   fprintf(out, "  bne #-6\n");
   PUSH();
-  fprintf(out, "  rts\n");
+  fprintf(out, "  rts\n\n");
 }
 
 void M6502_8::insert_shift_right_uinteger()
@@ -1045,7 +1045,7 @@ void M6502_8::insert_shift_right_uinteger()
   fprintf(out, "  dey\n");
   fprintf(out, "  bne #-4\n");
   PUSH();
-  fprintf(out, "  rts\n");
+  fprintf(out, "  rts\n\n");
 }
 
 void M6502_8::insert_and_integer()
@@ -1056,7 +1056,7 @@ void M6502_8::insert_and_integer()
   POP();
   fprintf(out, "  and result + 0\n");
   PUSH();
-  fprintf(out, "  rts\n");
+  fprintf(out, "  rts\n\n");
 }
 
 void M6502_8::insert_or_integer()
@@ -1067,7 +1067,7 @@ void M6502_8::insert_or_integer()
   POP();
   fprintf(out, "  ora result + 0\n");
   PUSH();
-  fprintf(out, "  rts\n");
+  fprintf(out, "  rts\n\n");
 }
 
 void M6502_8::insert_xor_integer()
@@ -1078,7 +1078,7 @@ void M6502_8::insert_xor_integer()
   POP();
   fprintf(out, "  eor result + 0\n");
   PUSH();
-  fprintf(out, "  rts\n");
+  fprintf(out, "  rts\n\n");
 }
 
 void M6502_8::insert_push_array_length()
@@ -1112,7 +1112,7 @@ void M6502_8::insert_push_array_length()
   PUSH_LO();
   fprintf(out, "  lda result + 1\n");
   PUSH_HI();
-  fprintf(out, "  rts\n");
+  fprintf(out, "  rts\n\n");
 }
 
 void M6502_8::insert_array_read_byte()
@@ -1137,7 +1137,7 @@ void M6502_8::insert_array_read_byte()
   fprintf(out, "  ldy #0\n");
   fprintf(out, "  lda (value2),y\n");
   PUSH();
-  fprintf(out, "  rts\n");
+  fprintf(out, "  rts\n\n");
 }
 
 void M6502_8::insert_memory_read8()
@@ -1150,7 +1150,7 @@ void M6502_8::insert_memory_read8()
   fprintf(out, "  ldy #0\n");
   fprintf(out, "  lda (address),y\n");
   PUSH();
-  fprintf(out, "  rts\n");
+  fprintf(out, "  rts\n\n");
 }
 
 void M6502_8::insert_memory_write8()
@@ -1165,6 +1165,6 @@ void M6502_8::insert_memory_write8()
   fprintf(out, "  ldy #0\n");
   fprintf(out, "  lda result\n");
   fprintf(out, "  sta (address),y\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, "  rts\n\n");
 }
 

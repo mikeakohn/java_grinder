@@ -5,7 +5,9 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn, Joe Davisson
+ * Copyright 2014-2019 by Michael Kohn, Joe Davisson
+ *
+ * Atari 2600 written by Joe Davisson
  *
  */
 
@@ -33,12 +35,7 @@ Atari2600::Atari2600() :
 
 Atari2600::~Atari2600()
 {
-  if(need_game_draw) { insert_game_draw(); }
-  if(need_title_draw) { insert_title_draw(); }
-
-  insert_functions();
-
-  if(need_set_bank) { insert_set_bank(); }
+  if (need_set_bank) { insert_set_bank(); }
 
   fprintf(out, ".org 0xfffa\n");
   fprintf(out, "; NMI\n");
@@ -81,6 +78,18 @@ int Atari2600::open(const char *filename)
 
   fprintf(out, "; set java stack pointer (x register)\n");
   fprintf(out, "  ldx #23\n\n");
+
+  return 0;
+}
+
+int Atari2600::finish()
+{
+  M6502_8::finish();
+
+  if (need_game_draw) { insert_game_draw(); }
+  if (need_title_draw) { insert_title_draw(); }
+
+  insert_functions();
 
   return 0;
 }

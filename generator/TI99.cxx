@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2019 by Michael Kohn
  *
  */
 
@@ -35,17 +35,6 @@ TI99::TI99() :
 
 TI99::~TI99()
 {
-  if (need_vdp_command) { insert_vdp_command(); }
-  if (need_print_string) { insert_print_string(); }
-  if (need_clear_screen) { insert_clear_screen(); }
-  if (need_plot) { insert_plot(); }
-  if (need_set_colors) { insert_set_colors(); }
-  if (need_set_sound_freq) { insert_set_sound_freq(); }
-  if (need_set_sound_volume) { insert_set_sound_volume(); }
-  if (need_set_sprite_visible) { insert_set_sprite_visible(); }
-  if (need_set_sprite_image) { insert_set_sprite_image(); }
-  if (need_set_sprite_pos) { insert_set_sprite_pos(); }
-  if (need_set_sprite_color) { insert_set_sprite_color(); }
 }
 
 int TI99::open(const char *filename)
@@ -66,6 +55,23 @@ int TI99::open(const char *filename)
     else if (app_name[n] >= 'a' && app_name[n] <= 'z') { app_name[n] &= 0xdf; }
     else if (app_name[n] == 0) { break; }
   }
+
+  return 0;
+}
+
+int TI99::finish()
+{
+  if (need_vdp_command) { insert_vdp_command(); }
+  if (need_print_string) { insert_print_string(); }
+  if (need_clear_screen) { insert_clear_screen(); }
+  if (need_plot) { insert_plot(); }
+  if (need_set_colors) { insert_set_colors(); }
+  if (need_set_sound_freq) { insert_set_sound_freq(); }
+  if (need_set_sound_volume) { insert_set_sound_volume(); }
+  if (need_set_sprite_visible) { insert_set_sprite_visible(); }
+  if (need_set_sprite_image) { insert_set_sprite_image(); }
+  if (need_set_sprite_pos) { insert_set_sprite_pos(); }
+  if (need_set_sprite_color) { insert_set_sprite_color(); }
 
   return 0;
 }

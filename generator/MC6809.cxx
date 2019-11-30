@@ -45,7 +45,6 @@ MC6809::MC6809() :
 
 MC6809::~MC6809()
 {
-  if (need_multiply) { add_multiply(); }
 }
 
 int MC6809::open(const char *filename)
@@ -57,6 +56,13 @@ int MC6809::open(const char *filename)
   // Set where RAM starts / ends
   fprintf(out, "ram_start equ 0x%04x\n", ram_start);
   fprintf(out, "ram_end equ 0x0x%04x\n", ram_end);
+
+  return 0;
+}
+
+int MC6809::finish()
+{
+  if (need_multiply) { add_multiply(); }
 
   return 0;
 }

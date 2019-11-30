@@ -108,30 +108,30 @@ int M6502::open(const char *filename)
 
 int M6502::finish()
 {
-  if(need_swap) { insert_swap(); }
-  if(need_add_integer) { insert_add_integer(); }
-  if(need_sub_integer) { insert_sub_integer(); }
-  if(need_mul_integer) { insert_mul_integer(); }
-  if(need_div_integer) { insert_div_integer(); }
-  if(need_mod_integer) { insert_mod_integer(); }
-  if(need_neg_integer) { insert_neg_integer(); }
-  if(need_shift_left_integer) { insert_shift_left_integer(); }
-  if(need_shift_right_integer) { insert_shift_right_integer(); }
-  if(need_shift_right_uinteger) { insert_shift_right_uinteger(); }
-  if(need_and_integer) { insert_and_integer(); }
-  if(need_or_integer) { insert_or_integer(); }
-  if(need_xor_integer) { insert_xor_integer(); }
-  if(need_integer_to_byte) { insert_integer_to_byte(); }
-  if(need_dup) { insert_dup(); }
-  if(need_push_array_length) { insert_push_array_length(); }
-  if(need_push_array_length2) { insert_push_array_length2(); }
-  if(need_array_byte_support) { insert_array_byte_support(); }
-  if(need_array_int_support) { insert_array_int_support(); }
-  if(need_get_values_from_stack) { insert_get_values_from_stack(); }
-  if(need_memory_read8) { insert_memory_read8(); }
-  if(need_memory_write8) { insert_memory_write8(); }
-  if(need_memory_read16) { insert_memory_read16(); }
-  if(need_memory_write16) { insert_memory_write16(); }
+  if (need_swap) { insert_swap(); }
+  if (need_add_integer) { insert_add_integer(); }
+  if (need_sub_integer) { insert_sub_integer(); }
+  if (need_mul_integer) { insert_mul_integer(); }
+  if (need_div_integer) { insert_div_integer(); }
+  if (need_mod_integer) { insert_mod_integer(); }
+  if (need_neg_integer) { insert_neg_integer(); }
+  if (need_shift_left_integer) { insert_shift_left_integer(); }
+  if (need_shift_right_integer) { insert_shift_right_integer(); }
+  if (need_shift_right_uinteger) { insert_shift_right_uinteger(); }
+  if (need_and_integer) { insert_and_integer(); }
+  if (need_or_integer) { insert_or_integer(); }
+  if (need_xor_integer) { insert_xor_integer(); }
+  if (need_integer_to_byte) { insert_integer_to_byte(); }
+  if (need_dup) { insert_dup(); }
+  if (need_push_array_length) { insert_push_array_length(); }
+  if (need_push_array_length2) { insert_push_array_length2(); }
+  if (need_array_byte_support) { insert_array_byte_support(); }
+  if (need_array_int_support) { insert_array_int_support(); }
+  if (need_get_values_from_stack) { insert_get_values_from_stack(); }
+  if (need_memory_read8) { insert_memory_read8(); }
+  if (need_memory_write8) { insert_memory_write8(); }
+  if (need_memory_read16) { insert_memory_read16(); }
+  if (need_memory_write16) { insert_memory_write16(); }
 
   return 0;
 }
