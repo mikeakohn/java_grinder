@@ -237,11 +237,16 @@ int M6502_8::push_int(int32_t n)
   }
 
   uint16_t value = (n & 0xffff);
+  uint16_t lo = value & 0xff;
+  uint16_t hi = value >> 8;
 
   fprintf(out, "; push_int\n");
-  fprintf(out, "  lda #0x%02x\n", value & 0xff);
+  fprintf(out, "  lda #0x%02x\n", lo);
   PUSH_LO();
-  fprintf(out, "  lda #0x%02x\n", value >> 8);
+  if (hi != lo)
+  {
+    fprintf(out, "  lda #0x%02x\n", hi);
+  }
   PUSH_HI();
   stack++;
 
@@ -258,7 +263,6 @@ int M6502_8::push_float(float f)
 {
   return -1;
 }
-
 int M6502_8::push_double(double f)
 {
   return -1;
@@ -339,8 +343,15 @@ int M6502_8::pop()
 
 int M6502_8::dup()
 {
-  printf("dup not supported.\n");
-  return -1;
+  fprintf(out, "; dup()\n");
+  fprintf(out, "  lda stack_lo+1,x\n");
+  fprintf(out, "  sta stack_lo+0,x\n");
+  fprintf(out, "  lda stack_hi+1,x\n");
+  fprintf(out, "  sta stack_hi+0,x\n");
+  fprintf(out, "  dex\n");
+  stack++;
+
+  return 0;
 }
 
 int M6502_8::dup2()
@@ -368,6 +379,21 @@ int M6502_8::add_integer()
 
 int M6502_8::add_integer(int num)
 {
+#if 0
+  if (num == 1)
+  {
+    fprintf(out, "; add_integer num = %d\n", num);
+    fprintf(out, "  inc stack_lo + 1,x\n");
+    fprintf(out, "  bne add_integer_%d\n", label_count);
+    fprintf(out, "  inc stack_hi + 1,x\n");
+    fprintf(out, "add_integer_%d:\n", label_count);
+
+    label_count++;
+
+    return 0;
+  }
+#endif
+
   return -1;
 }
 
@@ -416,6 +442,18 @@ int M6502_8::shift_left_integer()
 
 int M6502_8::shift_left_integer(int num)
 {
+#if 0
+  // This should work, but probably needs some testing.
+  if (num == 1)
+  {
+    fprintf(out, "; shift_left_integer num = %d\n", num);
+    fprintf(out, "  asl stack_lo + 1,x\n");
+    fprintf(out, "  rol stack_hi + 1,x\n");
+
+    return 0;
+  }
+#endif
+
   return -1;
 }
 
@@ -458,7 +496,33 @@ int M6502_8::and_integer()
 
 int M6502_8::and_integer(int num)
 {
-  return -1;
+  int lo = num & 0xff;
+  int hi = (num >> 8) & 0xff;
+
+  fprintf(out, "; and_integer num = 0x%02x\n", num);
+
+  if (lo != 0xff)
+  {
+    fprintf(out, "  lda #0x%02x\n", lo);
+    fprintf(out, "  and stack_lo + 1,x\n");
+    fprintf(out, "  sta stack_lo + 1,x\n");
+  }
+
+  if (hi == 0x00)
+  {
+    fprintf(out, "  lda #0x%02x\n", hi);
+    fprintf(out, "  sta stack_hi + 1,x\n");
+  }
+    else
+  if (hi != 0xff)
+  {
+    fprintf(out, "  lda #0x%02x\n", hi);
+    fprintf(out, "  and stack_hi + 1,x\n");
+    fprintf(out, "  sta stack_hi + 1,x\n");
+  }
+
+  return 0;
+  //return -1;
 }
 
 int M6502_8::or_integer()
@@ -472,6 +536,31 @@ int M6502_8::or_integer()
 
 int M6502_8::or_integer(int num)
 {
+#if 0
+  // This should work, but needs some testing.  This could also be optimized
+  // further if hi or lo are 0xff.
+  int lo = num & 0xff;
+  int hi = (num >> 8) & 0xff;
+
+  fprintf(out, "; or_integer num = %d\n", num);
+
+  if (lo != 0)
+  {
+    fprintf(out, "  lda #0x%02x\n", lo);
+    fprintf(out, "  or stack_lo + 1,x\n");
+    fprintf(out, "  sta stack_lo + 1,x\n");
+  }
+
+  if (hi != 0)
+  {
+    fprintf(out, "  lda #0x%02x\n", hi);
+    fprintf(out, "  or stack_hi + 1,x\n");
+    fprintf(out, "  sta stack_hi + 1,x\n");
+  }
+
+  return 0;
+#endif
+
   return -1;
 }
 
@@ -836,19 +925,19 @@ int M6502_8::insert_array(std::string &name, int32_t *data, int len, uint8_t typ
 
   if (type == TYPE_BYTE)
   {
-    fprintf(out, ".align 16\n");
+    //fprintf(out, ".align 16\n");
     return insert_db(name, data, len, TYPE_SHORT);
   }
     else
   if (type == TYPE_SHORT)
   {
-    fprintf(out, ".align 16\n");
+    //fprintf(out, ".align 16\n");
     return insert_dw(name, data, len, TYPE_SHORT);
   }
     else
   if (type == TYPE_INT)
   {
-    fprintf(out, ".align 16\n");
+    //fprintf(out, ".align 16\n");
     return insert_dw(name, data, len, TYPE_SHORT);
   }
 

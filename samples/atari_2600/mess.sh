@@ -12,7 +12,7 @@ then
   extra="-aviwrite out.avi -snapsize 320x216"
 fi
 
-mess a2600 -window \
+mame a2600 -window \
   -cart space_revenge.bin \
   ${extra}
 
