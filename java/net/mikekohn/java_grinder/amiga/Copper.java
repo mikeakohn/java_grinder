@@ -294,7 +294,7 @@ public class Copper
   /** Get the Copper list as an array of int. */
   public int[] getArrayAsInt() { return null; }
 
-  /** Get the Copper list as an array of char. */
+  /** Get the Copper list as an array of char (16 bit unsigned). */
   public char[] getArrayAsChar() { return null; }
 
   private int index;

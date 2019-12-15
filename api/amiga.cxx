@@ -72,6 +72,7 @@ int amiga(JavaClass *java_class, Generator *generator, const char *method_name)
   CHECK_FUNC(clearAudioModulation,_I)
   CHECK_FUNC(setDMA,_I)
   CHECK_FUNC(clearDMA,_I)
+  CHECK_FUNC(inVerticalBlank,)
 
   return -1;
 }
@@ -100,6 +101,8 @@ int copper(JavaClass *java_class, Generator *generator, const char *method_name)
   CHECK_FUNC_COPPER(setIndex,_I)
   CHECK_FUNC_COPPER(run,)
   CHECK_FUNC_COPPER(stop,)
+  CHECK_FUNC_COPPER(getArrayAsInt,)
+  CHECK_FUNC_COPPER(getArrayAsChar,)
 
   return -1;
 }

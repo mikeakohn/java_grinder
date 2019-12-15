@@ -140,5 +140,8 @@ abstract public class Amiga
 
   /** Turn off DMA based on mask while ignoring DMA not set by mask. */
   public static void clearDMA(int mask) { }
+
+  /** Returns true if the video is in a vertical blank state. */
+  public static boolean inVerticalBlank() { return false; }
 }
 

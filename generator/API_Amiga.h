@@ -39,6 +39,7 @@ public:
   virtual int amiga_clearAudioModulation_I() { return -1; }
   virtual int amiga_setDMA_I() { return -1; }
   virtual int amiga_clearDMA_I() { return -1; }
+  virtual int amiga_inVerticalBlank() { return -1; }
 
   virtual int copper_Constructor_I() { return -1; }
   virtual int copper_appendInstruction_I() { return -1; }

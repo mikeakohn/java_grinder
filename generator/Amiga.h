@@ -57,6 +57,7 @@ public:
   virtual int amiga_clearAudioModulation_I();
   virtual int amiga_setDMA_I();
   virtual int amiga_clearDMA_I();
+  virtual int amiga_inVerticalBlank();
 
   virtual int copper_Constructor_I();
   virtual int copper_appendInstruction_I();

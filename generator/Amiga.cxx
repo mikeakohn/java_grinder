@@ -158,9 +158,11 @@ int Amiga::field_init_ref(std::string &name, int index)
   //fprintf(out, "  move.l #_%s, (%s)\n", name.c_str(), name.c_str());
 
   fprintf(out,
+    "  ;; field_init_ref(%s, %d)\n"
     "  lea (0,pc), a2\n"
     "  adda.l #%s-$+2, a2\n"
     "  move.l (_%s,pc), (a2)\n",
+    name.c_str(), index,
     name.c_str(),
     name.c_str());
 
@@ -627,6 +629,20 @@ int Amiga::amiga_clearDMA_I()
     reg - 1);
 
   reg -= 1;
+
+  return 0;
+}
+
+int Amiga::amiga_inVerticalBlank()
+{
+  fprintf(out,
+    "  ;; amiga_inVerticalBlank()\n"
+    "  move.w d%d, (INTREQR,a3)\n"
+    "  lsr.w #5, d%d\n"
+    "  and.w #1, d%d\n",
+    reg, reg, reg);
+
+  reg += 1;
 
   return 0;
 }
