@@ -21,6 +21,7 @@ public:
   virtual ~SH4();
 
   virtual int open(const char *filename);
+  virtual int finish();
   virtual int start_init();
   virtual int insert_static_field_define(std::string &name, std::string &type, int index);
   virtual int init_heap(int field_count);

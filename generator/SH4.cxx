@@ -47,14 +47,6 @@ SH4::SH4() :
 
 SH4::~SH4()
 {
-  fprintf(out,
-    "  ;; If this function is right before the constants pool it should\n"
-    "  ;; the displacement should be 0 (PC + 4)\n"
-    "_load_constants_pool:\n"
-    "  mov.l @(0,PC), r15\n"
-    "  rts\n\n");
-
-  insert_constants_pool();
 }
 
 int SH4::open(const char *filename)
@@ -66,6 +58,20 @@ int SH4::open(const char *filename)
   // Set where RAM starts / ends
   //fprintf(out, "ram_start equ 0\n");
   //fprintf(out, "ram_end equ 0x8000\n");
+
+  return 0;
+}
+
+int Playstation2::finish()
+{
+  fprintf(out,
+    "  ;; If this function is right before the constants pool it should\n"
+    "  ;; the displacement should be 0 (PC + 4)\n"
+    "_load_constants_pool:\n"
+    "  mov.l @(0,PC), r15\n"
+    "  rts\n\n");
+
+  insert_constants_pool();
 
   return 0;
 }
