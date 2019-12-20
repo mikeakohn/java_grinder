@@ -4,7 +4,7 @@ import net.mikekohn.java_grinder.amiga.Amiga;
 import net.mikekohn.java_grinder.amiga.Blitter;
 import net.mikekohn.java_grinder.amiga.Copper;
 
-public class AmigaDemo
+public class TestDisplay
 {
 /*
   static char[] sprite_old =
@@ -18,35 +18,30 @@ public class AmigaDemo
   };
 */
 
-  static public void main(String args[])
+  static byte[] bitplane_1;
+
+  static public void main(String[] args)
   {
-    //byte[] bitplane_1 = new byte[8000];
-    //byte[] blitter_a = new byte[128];
+    byte[] blitter_a = new byte[128];
     //char[] sprite = new char[12];
-    //char[] sprite_blank = new char[4];
+    char[] sprite_blank = new char[4];
     Copper copper = new Copper(200);
     Blitter blitter = new Blitter();
 
-    Display.init();
+    bitplane_1 = new byte[8000];
 
-    //sprite_blank[0] = 0;
-    //sprite_blank[1] = 0;
+    sprite_blank[0] = 0;
+    sprite_blank[1] = 0;
 
-    //for (int i = 0; i < 8000; i++) { bitplane_1[i] = 0x0f; }
+    for (int i = 0; i < 8000; i++) { bitplane_1[i] = 0x0f; }
     //for (int i = 0; i < 12; i += 2) { sprite[i] = 0x0f; sprite[i + 1] = 0xf0; }
 
     //sprite[0] = 0x5555;
     //sprite[1] = 0x5900;
 
-    Amiga.disableMultitasking();
-    //Amiga.disableInterrupts();
-
-    //Amiga.clearDMA(Amiga.DMA_BITPLANE | Amiga.DMA_COPPER);
-
     //copper.appendInstruction(Copper.MOVE_BPLCON0 | 0x1200);
-/*
     copper.appendSetBitplane(0, bitplane_1);
-    copper.appendSetSprite(0, sprite_old);
+    copper.appendSetSprite(0, sprite_blank);
     copper.appendSetSprite(1, sprite_blank);
     copper.appendSetSprite(2, sprite_blank);
     copper.appendSetSprite(3, sprite_blank);
@@ -64,17 +59,11 @@ public class AmigaDemo
     copper.appendSetColor(0, 0x0f0);
     copper.appendEnd();
     copper.run();
-*/
 
-    // Setup 320x200 display.
     Amiga.setVideoMode(
-      //Amiga.VIDEO_MODE_HIRES |
       Amiga.VIDEO_MODE_BITPLANE_COUNT_1 |
       Amiga.VIDEO_MODE_COLOR);
 
-    Display.init();
-
-/*
     Amiga.setPlayfieldScroll(0, 0);
     Amiga.setPlayfieldPriority(4, 4, false);
     Amiga.setBitplaneModuloEven(0);
@@ -83,38 +72,7 @@ public class AmigaDemo
     Amiga.setDisplayWindowStop(193, 244);
     Amiga.setDisplayBitplaneStart(56);
     Amiga.setDisplayBitplaneStop(208);
-*/
 
-    Amiga.setDMA(
-      //Amiga.DMA_SPRITE |
-      Amiga.DMA_BLITTER |
-      Amiga.DMA_COPPER |
-      Amiga.DMA_BITPLANE);
-
-    //SongBach.play();
-
-    //Memory.clearArray(blitter_a);
-
-/*
-    for (int n = 0; n < 128; n++) { blitter_a[n] = -1; }
-
-    blitter.setSourceA(blitter_a);
-    blitter.setModuloA(0);
-    blitter.setModuloDestination(38);
-    blitter.setDestination(bitplane_1);
-    blitter.setShiftA(0);
-    blitter.setShiftB(0);
-    //blitter.setSize(32, 32);
-    blitter.enableChannels(Blitter.MASK_ENABLE_A | Blitter.MASK_ENABLE_D);
-    blitter.setChannelAMasks(0xffff, 0xffff);
-    blitter.setAsFillMode(Blitter.FILL_OPTIONS_INCLUSIVE);
-    //blitter.setLogicalFunction(LINE_FUNCTION_ABC);
-
-    Blitter.waitBusy();
-    blitter.runFill(1, 16);
-*/
-
-/*
     while(true)
     {
       //Amiga.setSpritePosition(0, 100, 100, 105);
@@ -126,14 +84,6 @@ public class AmigaDemo
 
       //Amiga.setPalette(0, 0x000);
     }
-*/
-
-    ImageJavaGrinder.show(copper);
-
-    //Display.waitForVericalBlanks(180);
-    //Display.setDisplay(copper, 5);
-
-    while (true) { }
   }
 }
 

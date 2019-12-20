@@ -91,13 +91,16 @@ int Amiga::start_init()
   );
 #endif
 
+  fprintf(out, "  lea (6,pc), a4\n");
   fprintf(out, "  bra.w _start\n\n");
+
+  fprintf(out, "_statics:\n");
 
   for (auto static_field : static_fields)
   {
     fprintf(out,
       "%s:\n"
-      "  dw 0\n",
+      "  dc32 0\n",
       static_field.c_str());
   }
 
@@ -144,8 +147,8 @@ int Amiga::field_init_int(std::string &name, int index, int value)
   //fprintf(out, "  move.l #%d, (%s)\n", value, name.c_str());
 
   fprintf(out,
-    "  lea (0,pc), a2\n"
-    "  suba.l #%s-$+2, a2\n"
+    "  lea (2,pc), a2\n"
+    "  suba.l #%s-$, a2\n"
     "  move.l #0x%02x, (a2)\n",
     name.c_str(),
     value);
@@ -159,9 +162,12 @@ int Amiga::field_init_ref(std::string &name, int index)
 
   fprintf(out,
     "  ;; field_init_ref(%s, %d)\n"
-    "  lea (0,pc), a2\n"
-    "  adda.l #%s-$+2, a2\n"
-    "  move.l (_%s,pc), (a2)\n",
+    "  lea (2,pc), a2\n"
+    "  adda.l #%s-$, a2\n"
+    "  lea (2,pc), a1\n"
+    "  adda.l #_%s-$, a1\n"
+    "  move.l a1, (a2)\n",
+    //"  move.l (_%s,pc), (a2)\n",
     name.c_str(), index,
     name.c_str(),
     name.c_str());
@@ -174,9 +180,9 @@ int Amiga::push_ref_static(std::string &name, int index)
   // REVIEW: Shouldn't this be (a2) with #%s?
   fprintf(out,
     "  ;; push_ref_static(%s, %d)\n"
-    "  lea (0,pc), a2\n"
-    "  adda.l #_%s-$+2, a2\n"
-    "  move.l a2, d%s\n",
+    "  lea (2,pc), a2\n"
+    "  adda.l #%s-$, a2\n"
+    "  move.l (a2), d%s\n",
     name.c_str(), index,
     name.c_str(),
     push_reg());
@@ -188,8 +194,8 @@ int Amiga::put_static(std::string &name, int index)
 {
   fprintf(out,
     "  ;; put_static(%s,%d)\n"
-    "  lea (0,pc), a2\n"
-    "  adda.l #_%s-$+2, a2\n"
+    "  lea (2,pc), a2\n"
+    "  adda.l #%s-$, a2\n"
     "  move.l %s, (a2)\n",
     name.c_str(), index,
     name.c_str(),
@@ -202,8 +208,8 @@ int Amiga::get_static(std::string &name, int index)
 {
   fprintf(out,
     "  ;; get_static(%s,%d)\n"
-    "  lea (0,pc), a2\n"
-    "  adda.l #_%s-$+2, a2\n"
+    "  lea (2,pc), a2\n"
+    "  adda.l #%s-$, a2\n"
     "  move.l (a2), %s\n",
     name.c_str(), index,
     name.c_str(),
@@ -216,9 +222,9 @@ int Amiga::push_ref(std::string &name)
 {
   fprintf(out,
     "  ;; push_ref(%s)\n"
-    "  lea (0,pc), a2\n"
-    "  adda.l #_%s-$+2, a2\n"
-    "  move.l a2, %s\n",
+    "  lea (2,pc), a2\n"
+    "  adda.l #%s-$, a2\n"
+    "  move.l (a2), %s\n",
     name.c_str(),
     name.c_str(),
     push_reg());
