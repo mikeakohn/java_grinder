@@ -70,7 +70,7 @@ public class Display
 */
   }
 
-  static public void waitForVerticalBlankEnd()
+  static public void waitForVerticalBlank()
   {
     while (Amiga.inVerticalBlank() == false);
     while (Amiga.inVerticalBlank() == true);
@@ -82,7 +82,7 @@ public class Display
 
     for (n = 0; n < count; n++)
     {
-      waitForVerticalBlankEnd();
+      waitForVerticalBlank();
     }
   }
 }

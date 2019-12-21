@@ -91,7 +91,7 @@ public class AmigaDemo
       Amiga.DMA_COPPER |
       Amiga.DMA_BITPLANE);
 
-    //SongBach.play();
+    Amiga.clearDMA(Amiga.DMA_SPRITE);
 
     //Memory.clearArray(blitter_a);
 
@@ -114,24 +114,17 @@ public class AmigaDemo
     blitter.runFill(1, 16);
 */
 
-/*
-    while(true)
-    {
-      //Amiga.setSpritePosition(0, 100, 100, 105);
-
-      Amiga.setPalette(16, 0xfff);
-      Amiga.setPalette(17, 0x0ff);
-      Amiga.setPalette(18, 0xf0f);
-      Amiga.setPalette(19, 0xff0);
-
-      //Amiga.setPalette(0, 0x000);
-    }
-*/
-
     ImageJavaGrinder.show(copper);
 
-    //Display.waitForVericalBlanks(180);
-    //Display.setDisplay(copper, 5);
+    Display.waitForVericalBlanks(80);
+
+    SongBach.play();
+
+    Display.waitForVericalBlanks(260);
+
+    Amiga.clearDMA(Amiga.DMA_AUDIO_0);
+
+    Display.setDisplay(copper, 5);
 
     while (true) { }
   }

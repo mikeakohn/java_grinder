@@ -192,28 +192,58 @@ int Amiga::push_ref_static(std::string &name, int index)
 
 int Amiga::put_static(std::string &name, int index)
 {
-  fprintf(out,
-    "  ;; put_static(%s,%d)\n"
-    "  lea (2,pc), a2\n"
-    "  adda.l #%s-$, a2\n"
-    "  move.l %s, (a2)\n",
-    name.c_str(), index,
-    name.c_str(),
-    pop_reg());
+#if 0
+  if (index >= 0)
+  {
+    fprintf(out,
+      "  ;; put_static(%s,%d)\n"
+      "  lea (%d,a4), a2\n"
+      "  move.l %s, (a2)\n",
+      name.c_str(), index,
+      index * 4,
+      pop_reg());
+  }
+    else
+#endif
+  {
+    fprintf(out,
+      "  ;; put_static(%s,%d)\n"
+      "  lea (2,pc), a2\n"
+      "  adda.l #%s-$, a2\n"
+      "  move.l %s, (a2)\n",
+      name.c_str(), index,
+      name.c_str(),
+      pop_reg());
+  }
 
   return 0;
 }
 
 int Amiga::get_static(std::string &name, int index)
 {
-  fprintf(out,
-    "  ;; get_static(%s,%d)\n"
-    "  lea (2,pc), a2\n"
-    "  adda.l #%s-$, a2\n"
-    "  move.l (a2), %s\n",
-    name.c_str(), index,
-    name.c_str(),
-    push_reg());
+#if 0
+  if (index >= 0)
+  {
+    fprintf(out,
+      "  ;; get_static(%s,%d)\n"
+      "  lea (%d,a4), a2\n"
+      "  move.l (a2), %s\n",
+      name.c_str(), index,
+      index * 4,
+      push_reg());
+  }
+    else
+#endif
+  {
+    fprintf(out,
+      "  ;; get_static(%s,%d)\n"
+      "  lea (2,pc), a2\n"
+      "  adda.l #%s-$, a2\n"
+      "  move.l (a2), %s\n",
+      name.c_str(), index,
+      name.c_str(),
+      push_reg());
+  }
 
   return 0;
 }
@@ -641,10 +671,24 @@ int Amiga::amiga_clearDMA_I()
 
 int Amiga::amiga_inVerticalBlank()
 {
+#if 0
   fprintf(out,
     "  ;; amiga_inVerticalBlank()\n"
-    "  move.w d%d, (INTREQR,a3)\n"
+    "  eor.l d%d, d%d\n"
+    "  move.w (INTREQR,a3), d%d\n"
     "  lsr.w #5, d%d\n"
+    "  and.w #1, d%d\n",
+    reg, reg,
+    reg, reg, reg);
+#endif
+
+  fprintf(out,
+    "  ;; amiga_inVerticalBlank()\n"
+    "  move.l (VPOSR,a3), d5\n"
+    "  and.l #0x1ff00, d5\n"
+    "  cmp.l #0x12f00, d5\n"
+    "  move sr, d%d\n"
+    "  lsr.w #2, d%d\n"
     "  and.w #1, d%d\n",
     reg, reg, reg);
 
