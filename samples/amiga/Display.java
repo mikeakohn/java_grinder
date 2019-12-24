@@ -8,11 +8,12 @@ public class Display
 {
   static public byte[] bitplanes;
   static public int bitplane_count;
+  static public final int MEMORY_SIZE = 8000 * 6;
 
   static public void init()
   {
     // Allocate memory for up to 6 bit planes (around 48k).
-    bitplanes = new byte[8000 * 6];
+    bitplanes = new byte[MEMORY_SIZE];
 
     Amiga.setPlayfieldScroll(0, 0);
     Amiga.setPlayfieldPriority(4, 4, false);
@@ -22,6 +23,16 @@ public class Display
     Amiga.setDisplayWindowStop(193, 244);
     Amiga.setDisplayBitplaneStart(56);
     Amiga.setDisplayBitplaneStop(208);
+  }
+
+  static public void clear()
+  {
+    int n;
+
+    for (n = 0; n < MEMORY_SIZE; n++)
+    {
+      bitplanes[n] = 0x00;
+    }
   }
 
   static public void setDisplay(Copper copper, int bitplane_count)
@@ -59,15 +70,38 @@ public class Display
   {
 
     int[] copper_list = copper.getArrayAsInt();
+    int palette = 0x180 + (index << 1);
 
-    copper_list[bitplane_count + index] = (0x180 << 16) | color;
-/*
-    int copper_index = copper.index;
+    index = (bitplane_count << 1) + index;
 
-    copper.setIndex(bitplane_count);
-    copper.appendSetColor(index, color);
-    copper.setIndex(copper_index);
-*/
+    copper_list[index] = (palette << 16) | color;
+  }
+
+  static public void plot(int x, int y, int color)
+  {
+    int index;
+    int n, mask, bit;
+
+    index = (y * (320 / 8)) + (x >> 3);
+
+    bit = 1 << (7 - (x & 0x7));
+    mask = bit ^ 0xff;
+
+    for (n = 0; n < bitplane_count; n++)
+    {
+      if ((color & 1) == 0)
+      {
+        bitplanes[index] &= (byte)mask;
+      }
+        else
+      {
+        bitplanes[index] |= (byte)bit;
+      }
+
+      color = color >> 1;
+
+      index += 8000;
+    }
   }
 
   static public void waitForVerticalBlank()

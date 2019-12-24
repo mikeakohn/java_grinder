@@ -504,7 +504,7 @@ int MC68000::xor_integer()
 
 int MC68000::xor_integer(int num)
 {
-  fprintf(out, "  eor.l #%d, %s\n", num, top_reg());
+  fprintf(out, "  eori.l #%d, %s\n", num, top_reg());
   return 0;
 }
 

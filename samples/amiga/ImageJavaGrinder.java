@@ -26,10 +26,12 @@ public class ImageJavaGrinder
     copper.appendSetBitplane(0, Memory.addressOf(bitplanes) + 0);
     copper.appendSetBitplane(1, Memory.addressOf(bitplanes) + 8000);
     copper.appendSetBitplane(2, Memory.addressOf(bitplanes) + 16000);
+
     for (n = 0; n < palette.length; n++)
     {
       copper.appendSetColor(n, palette[n]);
     }
+
     copper.appendEnd();
     copper.run();
   }

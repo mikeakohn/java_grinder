@@ -114,17 +114,16 @@ public class AmigaDemo
     blitter.runFill(1, 16);
 */
 
+    // Show JavaGrinder Billion devices logo.
     ImageJavaGrinder.show(copper);
-
     Display.waitForVericalBlanks(80);
 
+    // After a pause, play Bach's Invention 13.
     SongBach.play();
-
     Display.waitForVericalBlanks(260);
-
     Amiga.clearDMA(Amiga.DMA_AUDIO_0);
 
-    Display.setDisplay(copper, 5);
+    Mandelbrot.run(copper);
 
     while (true) { }
   }

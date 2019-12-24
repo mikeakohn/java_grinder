@@ -4,6 +4,7 @@ NAKEN_INCLUDE=../../../naken_asm/include
 CLASSES= \
   Display.class \
   ImageJavaGrinder.class \
+  Mandelbrot.class \
   SongBach.class \
   AmigaDemo.class
 
