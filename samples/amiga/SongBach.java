@@ -6,7 +6,7 @@ public class SongBach
 {
   static public void play()
   {
-    byte[] song = Memory.preloadByteArray("commodore.bin");
+    byte[] song = Memory.preloadByteArray("bach.bin");
 
 /*
     byte[] sound = new byte[8];
