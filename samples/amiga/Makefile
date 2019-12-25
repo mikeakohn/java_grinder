@@ -6,6 +6,7 @@ CLASSES= \
   ImageJavaGrinder.class \
   Mandelbrot.class \
   SongBach.class \
+  Stars.class \
   AmigaDemo.class
 
 default: $(CLASSES)

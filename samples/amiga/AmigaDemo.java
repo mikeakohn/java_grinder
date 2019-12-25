@@ -20,7 +20,6 @@ public class AmigaDemo
 
   static public void main(String args[])
   {
-    //byte[] bitplane_1 = new byte[8000];
     //byte[] blitter_a = new byte[128];
     //char[] sprite = new char[12];
     //char[] sprite_blank = new char[4];
@@ -86,7 +85,6 @@ public class AmigaDemo
 */
 
     Amiga.setDMA(
-      //Amiga.DMA_SPRITE |
       Amiga.DMA_BLITTER |
       Amiga.DMA_COPPER |
       Amiga.DMA_BITPLANE);
@@ -123,6 +121,7 @@ public class AmigaDemo
     Display.waitForVericalBlanks(260);
     Amiga.clearDMA(Amiga.DMA_AUDIO_0);
 
+    Stars.run(copper);
     Mandelbrot.run(copper);
 
     while (true) { }
