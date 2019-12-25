@@ -130,6 +130,7 @@ int blitter(JavaClass *java_class, Generator *generator, const char *method_name
   CHECK_FUNC_BLITTER(setLineTypeB,_I)
   CHECK_FUNC_BLITTER(setLineTypeC,_I)
   CHECK_FUNC_BLITTER(setLineTexture,_I)
+  CHECK_FUNC_BLITTER(setLineOctant,_I)
   CHECK_FUNC_BLITTER(setLineStart,_I)
   CHECK_FUNC_BLITTER(runFill,_II)
   CHECK_FUNC_BLITTER(drawLine,_I)

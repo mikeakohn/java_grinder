@@ -1419,6 +1419,24 @@ int Amiga::blitter_setLineTexture_I()
   return 0;
 }
 
+int Amiga::blitter_setLineOctant_I()
+{
+  const int object = reg - 2;
+  const int value = reg - 1;
+
+  fprintf(out,
+    "  ;; blitter_setLineOctant_I()\n"
+    "  movea.l d%d, a2\n"
+    "  andi.w #0xffe3, (2,a2)\n"
+    "  or.w d%d, (2,a2)\n",
+    object,
+    value);
+
+  reg -= 2;
+
+  return 0;
+}
+
 int Amiga::blitter_setLineStart_I()
 {
   const int object = reg - 2;

@@ -97,6 +97,7 @@ public:
   virtual int blitter_setLineTypeB_I();
   virtual int blitter_setLineTypeC_I();
   virtual int blitter_setLineTexture_I();
+  virtual int blitter_setLineOctant_I();
   virtual int blitter_setLineStart_I();
   virtual int blitter_runFill_II();
   virtual int blitter_drawLine_I();

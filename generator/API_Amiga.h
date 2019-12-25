@@ -79,6 +79,7 @@ public:
   virtual int blitter_setLineTypeB_I() { return -1; }
   virtual int blitter_setLineTypeC_I() { return -1; }
   virtual int blitter_setLineTexture_I() { return -1; }
+  virtual int blitter_setLineOctant_I() { return -1; }
   virtual int blitter_setLineStart_I() { return -1; }
   virtual int blitter_runFill_II() { return -1; }
   virtual int blitter_drawLine_I() { return -1; }

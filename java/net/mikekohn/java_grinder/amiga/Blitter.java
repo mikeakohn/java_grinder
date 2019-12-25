@@ -51,6 +51,15 @@ public class Blitter
   public static final int LINE_TYPE_TEXTURE = 0x8000;
   public static final int LINE_TYPE_SOLID = 0xff;
 
+  public static final int OCTANT_0 = 6 << 2;
+  public static final int OCTANT_1 = 1 << 2;
+  public static final int OCTANT_2 = 3 << 2;
+  public static final int OCTANT_3 = 7 << 2;
+  public static final int OCTANT_4 = 5 << 2;
+  public static final int OCTANT_5 = 2 << 2;
+  public static final int OCTANT_6 = 0 << 2;
+  public static final int OCTANT_7 = 4 << 2;
+
   public Blitter()
   {
   }
@@ -123,6 +132,9 @@ public class Blitter
 
   /** Set line texture (BLTCON1 15-12). */
   public void setLineTexture(int value) { }
+
+  /** Set octant (BLTCON1 4-2). */
+  public void setLineOctant(int value) { }
 
   /** Set line start (BLTCON0 15-12). */
   public void setLineStart(int value) { }
