@@ -22,6 +22,7 @@ package net.mikekohn.java_grinder.amiga;
 public class Blitter
 {
   //public static final int FILL_OPTIONS_LINE = 0x01;
+  public static final int FILL_OPTIONS_NONE = 0x00;
   public static final int FILL_OPTIONS_DESC = 0x02;
   public static final int FILL_OPTIONS_FILL_CARRY_INPUT = 0x04;
   public static final int FILL_OPTIONS_INCLUSIVE = 0x08;
@@ -43,10 +44,10 @@ public class Blitter
   public static final int LINE_FUNCTION_ABNC = 0x40;
   public static final int LINE_FUNCTION_ABC = 0x80;
 
-  public static final int MASK_ENABLE_A = 0x08;
-  public static final int MASK_ENABLE_B = 0x04;
-  public static final int MASK_ENABLE_C = 0x02;
-  public static final int MASK_ENABLE_D = 0x01;
+  public static final int MASK_ENABLE_A = 0x800;
+  public static final int MASK_ENABLE_B = 0x400;
+  public static final int MASK_ENABLE_C = 0x200;
+  public static final int MASK_ENABLE_D = 0x100;
 
   public static final int LINE_TYPE_TEXTURE = 0x8000;
   public static final int LINE_TYPE_SOLID = 0xff;
@@ -68,16 +69,16 @@ public class Blitter
   static public void waitBusy() { }
 
   /** Set source A. */
-  public void setSourceA(byte[] data) { }
+  public void setSourceA(int address) { }
 
   /** Set source B. */
-  public void setSourceB(byte[] data) { }
+  public void setSourceB(int address) { }
 
   /** Set source C. */
-  public void setSourceC(byte[] data) { }
+  public void setSourceC(int address) { }
 
   /** Set destination D. */
-  public void setDestination(byte[] data) { }
+  public void setDestination(int address) { }
 
   /** Set modulo A.  The paramter "value" is automatically added to
       the address at the end of each line. */
@@ -115,7 +116,7 @@ public class Blitter
   /** Put the blitter in line mode. */
   public void setAsLineMode(int options) { }
 
-  /** Set the logical function mode of the blittler. */
+  /** Set the logical function mode of the blittler. BLTCON0 LF0-LF7. */
   public void setLogicalFunction(int mask) { }
 
   /** No idea what this is (BLTSIZH, BLTSIZV). */
@@ -138,6 +139,15 @@ public class Blitter
 
   /** Set line start (BLTCON0 15-12). */
   public void setLineStart(int value) { }
+
+  /** Immediately set the data register for channel A. */
+  public void setDataRegisterA(char value) { }
+
+  /** Immediately set the data register for channel B. */
+  public void setDataRegisterB(char value) { }
+
+  /** Immediately set the data register for channel C. */
+  public void setDataRegisterC(char value) { }
 
   /** Execute current blitter settings with passed in width in
       words and height in pixels. */

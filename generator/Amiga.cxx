@@ -1045,7 +1045,7 @@ int Amiga::blitter_waitBusy()
     "  tst.w (DMACONR,a3)\n"
     "label_%d:\n"
     "  btst #6, (DMACONR,a3)\n"
-    "  bne.s label_%d\n",
+    "  bne.b label_%d\n",
     label_count,
     label_count);
 
@@ -1054,13 +1054,13 @@ int Amiga::blitter_waitBusy()
   return 0;
 }
 
-int Amiga::blitter_setSourceA_aB()
+int Amiga::blitter_setSourceA_I()
 {
   const int object = reg - 2;
   const int data = reg - 1;
 
   fprintf(out,
-    "  ;; blitter_setSourceA_aB()\n"
+    "  ;; blitter_setSourceA_I()\n"
     "  movea.l d%d, a2\n"
     "  move.l d%d, (16, a2)\n",
     object,
@@ -1071,13 +1071,13 @@ int Amiga::blitter_setSourceA_aB()
   return 0;
 }
 
-int Amiga::blitter_setSourceB_aB()
+int Amiga::blitter_setSourceB_I()
 {
   const int object = reg - 2;
   const int data = reg - 1;
 
   fprintf(out,
-    "  ;; blitter_setSourceB_aB()\n"
+    "  ;; blitter_setSourceB_I()\n"
     "  movea.l d%d, a2\n"
     "  move.l d%d, (12, a2)\n",
     object,
@@ -1088,13 +1088,13 @@ int Amiga::blitter_setSourceB_aB()
   return 0;
 }
 
-int Amiga::blitter_setSourceC_aB()
+int Amiga::blitter_setSourceC_I()
 {
   const int object = reg - 2;
   const int data = reg - 1;
 
   fprintf(out,
-    "  ;; blitter_setSourceC_aB()\n"
+    "  ;; blitter_setSourceC_I()\n"
     "  movea.l d%d, a2\n"
     "  move.l d%d, (8, a2)\n",
     object,
@@ -1105,13 +1105,13 @@ int Amiga::blitter_setSourceC_aB()
   return 0;
 }
 
-int Amiga::blitter_setDestination_aB()
+int Amiga::blitter_setDestination_I()
 {
   const int object = reg - 2;
   const int data = reg - 1;
 
   fprintf(out,
-    "  ;; blitter_setDestination_aB()\n"
+    "  ;; blitter_setDestination_I()\n"
     "  movea.l d%d, a2\n"
     "  move.l d%d, (20, a2)\n",
     object,
@@ -1262,11 +1262,9 @@ int Amiga::blitter_enableChannels_I()
   fprintf(out,
     "  ;; blitter_enableChannels_I()\n"
     "  movea.l d%d, a2\n"
-    "  lsl.w #8, d%d\n"
-    "  andi.w #0xf0ff, (0,a2)\n"
-    "  or.w d%d, (0,a2)\n",
+    "  andi.w #0xf0ff, (a2)\n"
+    "  or.w d%d, (a2)\n",
     object,
-    mask,
     mask);
 
   reg -= 2;
@@ -1330,6 +1328,7 @@ int Amiga::blitter_setLogicalFunction_I()
   return 0;
 }
 
+#if 0
 int Amiga::blitter_setSize_II()
 {
   const int object = reg - 3;
@@ -1349,6 +1348,7 @@ int Amiga::blitter_setSize_II()
 
   return 0;
 }
+#endif
 
 int Amiga::blitter_setLineTypeA_I()
 {
@@ -1455,6 +1455,51 @@ int Amiga::blitter_setLineStart_I()
   return 0;
 }
 
+int Amiga::blitter_setDataRegisterA_C()
+{
+  //const int object = reg - 2;
+  const int value = reg - 1;
+
+  fprintf(out,
+    "  ;; blitter_setDataRegisterA_I(int value)\n"
+    "  move.w d%d, (BLTADAT,a3)\n",
+    value);
+
+  reg -= 2;
+
+  return 0;
+}
+
+int Amiga::blitter_setDataRegisterB_C()
+{
+  //const int object = reg - 2;
+  const int value = reg - 1;
+
+  fprintf(out,
+    "  ;; blitter_setDataRegisterB_I(int value)\n"
+    "  move.w d%d, (BLTBDAT,a3)\n",
+    value);
+
+  reg -= 2;
+
+  return 0;
+}
+
+int Amiga::blitter_setDataRegisterC_C()
+{
+  //const int object = reg - 2;
+  const int value = reg - 1;
+
+  fprintf(out,
+    "  ;; blitter_setDataRegisterC_I(int value)\n"
+    "  move.w d%d, (BLTCDAT,a3)\n",
+    value);
+
+  reg -= 2;
+
+  return 0;
+}
+
 int Amiga::blitter_runFill_II()
 {
   const int object = reg - 3;
@@ -1466,15 +1511,15 @@ int Amiga::blitter_runFill_II()
     "  movea.l d%d, a2\n"
     "  move.l (a2), (BLTCON0,a3)\n"
     "  move.l (4,a2), (BLTAFWM,a3)\n"
-    "  move.l (8,a2), (BLTCPTH,a3)\n"
     "  move.l (12,a2), (BLTBPTH,a3)\n"
     "  move.l (16,a2), (BLTAPTH,a3)\n"
     "  move.l (20,a2), (BLTDPTH,a3)\n"
-    "  move.l (24,a2), (BLTSIZV,a3)\n"
+    //"  move.l (24,a2), (BLTSIZV,a3)\n"
     "  move.l (28,a2), (BLTCMOD,a3)\n"
-    "  move.l (32,a2), (BLTAMOD,a3)\n",
+    "  move.l (32,a2), (BLTAMOD,a3)\n"
     //"  move.l (36,a2), (BLTCDAT,a3)\n"
-    //"  move.w (38,a2), (BLTADAT,a3)\n",
+    //"  move.w (38,a2), (BLTADAT,a3)\n"
+    "  move.l (8,a2), (BLTCPTH,a3)\n",
     object);
 
   fprintf(out,

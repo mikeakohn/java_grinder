@@ -77,10 +77,10 @@ public:
 
   virtual int blitter_Constructor();
   virtual int blitter_waitBusy();
-  virtual int blitter_setSourceA_aB();
-  virtual int blitter_setSourceB_aB();
-  virtual int blitter_setSourceC_aB();
-  virtual int blitter_setDestination_aB();
+  virtual int blitter_setSourceA_I();
+  virtual int blitter_setSourceB_I();
+  virtual int blitter_setSourceC_I();
+  virtual int blitter_setDestination_I();
   virtual int blitter_setModuloA_I();
   virtual int blitter_setModuloB_I();
   virtual int blitter_setModuloC_I();
@@ -92,13 +92,16 @@ public:
   virtual int blitter_setAsFillMode_I();
   virtual int blitter_setAsLineMode_I();
   virtual int blitter_setLogicalFunction_I();
-  virtual int blitter_setSize_II();
+  //virtual int blitter_setSize_II();
   virtual int blitter_setLineTypeA_I();
   virtual int blitter_setLineTypeB_I();
   virtual int blitter_setLineTypeC_I();
   virtual int blitter_setLineTexture_I();
   virtual int blitter_setLineOctant_I();
   virtual int blitter_setLineStart_I();
+  virtual int blitter_setDataRegisterA_C();
+  virtual int blitter_setDataRegisterB_C();
+  virtual int blitter_setDataRegisterC_C();
   virtual int blitter_runFill_II();
   virtual int blitter_drawLine_I();
 

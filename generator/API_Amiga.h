@@ -59,10 +59,10 @@ public:
 
   virtual int blitter_Constructor() { return -1; }
   virtual int blitter_waitBusy() { return -1; }
-  virtual int blitter_setSourceA_aB() { return -1; }
-  virtual int blitter_setSourceB_aB() { return -1; }
-  virtual int blitter_setSourceC_aB() { return -1; }
-  virtual int blitter_setDestination_aB() { return -1; }
+  virtual int blitter_setSourceA_I() { return -1; }
+  virtual int blitter_setSourceB_I() { return -1; }
+  virtual int blitter_setSourceC_I() { return -1; }
+  virtual int blitter_setDestination_I() { return -1; }
   virtual int blitter_setModuloA_I() { return -1; }
   virtual int blitter_setModuloB_I() { return -1; }
   virtual int blitter_setModuloC_I() { return -1; }
@@ -74,13 +74,16 @@ public:
   virtual int blitter_setAsFillMode_I() { return -1; }
   virtual int blitter_setAsLineMode_I() { return -1; }
   virtual int blitter_setLogicalFunction_I() { return -1; }
-  virtual int blitter_setSize_II() { return -1; }
+  //virtual int blitter_setSize_II() { return -1; }
   virtual int blitter_setLineTypeA_I() { return -1; }
   virtual int blitter_setLineTypeB_I() { return -1; }
   virtual int blitter_setLineTypeC_I() { return -1; }
   virtual int blitter_setLineTexture_I() { return -1; }
   virtual int blitter_setLineOctant_I() { return -1; }
   virtual int blitter_setLineStart_I() { return -1; }
+  virtual int blitter_setDataRegisterA_C() { return -1; }
+  virtual int blitter_setDataRegisterB_C() { return -1; }
+  virtual int blitter_setDataRegisterC_C() { return -1; }
   virtual int blitter_runFill_II() { return -1; }
   virtual int blitter_drawLine_I() { return -1; }
 };
