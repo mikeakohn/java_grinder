@@ -3,6 +3,7 @@ NAKEN_INCLUDE=../../../naken_asm/include
 
 CLASSES= \
   Display.class \
+  ImageCommodoreLogo.class \
   ImageJavaGrinder.class \
   Mandelbrot.class \
   SongBach.class \

@@ -20,7 +20,6 @@ public class AmigaDemo
 
   static public void main(String args[])
   {
-    //byte[] blitter_a = new byte[128];
     //char[] sprite = new char[12];
     //char[] sprite_blank = new char[4];
     Copper copper = new Copper(200);
@@ -91,27 +90,6 @@ public class AmigaDemo
 
     Amiga.clearDMA(Amiga.DMA_SPRITE);
 
-    //Memory.clearArray(blitter_a);
-
-/*
-    for (int n = 0; n < 128; n++) { blitter_a[n] = -1; }
-
-    blitter.setSourceA(blitter_a);
-    blitter.setModuloA(0);
-    blitter.setModuloDestination(38);
-    blitter.setDestination(bitplane_1);
-    blitter.setShiftA(0);
-    blitter.setShiftB(0);
-    //blitter.setSize(32, 32);
-    blitter.enableChannels(Blitter.MASK_ENABLE_A | Blitter.MASK_ENABLE_D);
-    blitter.setChannelAMasks(0xffff, 0xffff);
-    blitter.setAsFillMode(Blitter.FILL_OPTIONS_INCLUSIVE);
-    //blitter.setLogicalFunction(LINE_FUNCTION_ABC);
-
-    Blitter.waitBusy();
-    blitter.runFill(1, 16);
-*/
-
     // Show JavaGrinder Billion devices logo.
     ImageJavaGrinder.show(copper);
     Display.waitForVericalBlanks(80);
@@ -121,7 +99,7 @@ public class AmigaDemo
     Display.waitForVericalBlanks(260);
     Amiga.clearDMA(Amiga.DMA_AUDIO_0);
 
-    Stars.run(copper);
+    Stars.run(copper, blitter);
     Mandelbrot.run(copper);
 
     while (true) { }
