@@ -50,6 +50,8 @@ public class Stars
     int delay = 200;
     int text_color = 0;
     int a,n;
+    int logo_offset_0;
+    int logo_offset_1;
 
     Display.clear();
     Display.setDisplay(copper, 4);
@@ -63,9 +65,9 @@ public class Stars
 
     // Set up a blitter copy of 64x56 pixels.
     blitter.setModuloA(0);
-    blitter.setModuloDestination(32);
-    blitter.setShiftA(0);
-    blitter.setShiftB(0);
+    blitter.setModuloDestination(31);
+    blitter.setShiftA(8);
+    blitter.setShiftB(8);
     blitter.setLogicalFunction(0xf0);
     blitter.enableChannels(Blitter.MASK_ENABLE_A | Blitter.MASK_ENABLE_D);
     blitter.setChannelAMasks(0xffff, 0xffff);
@@ -75,6 +77,9 @@ public class Stars
     blitter.setDataRegisterC((char)0);
 
     short[] stars = Memory.allocStackShorts(stars_init.length);
+
+    logo_offset_0 = 8000 + (4000 - (28 * 40)) + (20 - 6);
+    logo_offset_1 = logo_offset_0 + 16000;
 
     // Copy stars to RAM
     for (n = 0; n < stars.length; n++)
@@ -98,13 +103,13 @@ public class Stars
 
       blitter.waitBusy();
       blitter.setSourceA(Memory.addressOf(ImageCommodoreLogo.bitplane_0));
-      blitter.setDestination(Memory.addressOf(Display.bitplanes) + 8000);
-      blitter.runFill(4, 56);
+      blitter.setDestination(Memory.addressOf(Display.bitplanes) + logo_offset_0);
+      blitter.runFill(5, 56);
 
       blitter.waitBusy();
       blitter.setSourceA(Memory.addressOf(ImageCommodoreLogo.bitplane_1));
-      blitter.setDestination(Memory.addressOf(Display.bitplanes) + 24000);
-      blitter.runFill(4, 56);
+      blitter.setDestination(Memory.addressOf(Display.bitplanes) + logo_offset_1);
+      blitter.runFill(5, 56);
 
       while (!Amiga.inVerticalBlank());
     }
