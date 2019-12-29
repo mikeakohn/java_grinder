@@ -25,7 +25,7 @@ public class Stars
         {
           x -= stars[n + 2];
           y -= stars[n + 3];
-          Display.plot(x, y, 0);
+          Display.plotEven(x, y, 0);
         }
 
         stars[n + 0] = stars_init[n + 0];
@@ -37,7 +37,7 @@ public class Stars
 
       for (int c = 1; c <= 4; c++)
       {
-        Display.plot(x, y, c);
+        Display.plotEven(x, y, c);
         x -= stars[n + 2];
         y -= stars[n + 3];
       }
@@ -53,8 +53,10 @@ public class Stars
 
     Display.clear();
     Display.setDisplay(copper, 4);
+    Display.setDoublePlayfield();
+    Amiga.setPlayfieldPriority(0, 0, true);
 
-    for (n = 0; n < 16; n++)
+    for (n = 0; n < colors.length; n++)
     {
       Display.setPalette(copper, n, colors[n]);
     }
@@ -96,12 +98,12 @@ public class Stars
 
       blitter.waitBusy();
       blitter.setSourceA(Memory.addressOf(ImageCommodoreLogo.bitplane_0));
-      blitter.setDestination(Memory.addressOf(Display.bitplanes));
+      blitter.setDestination(Memory.addressOf(Display.bitplanes) + 8000);
       blitter.runFill(4, 56);
 
       blitter.waitBusy();
       blitter.setSourceA(Memory.addressOf(ImageCommodoreLogo.bitplane_1));
-      blitter.setDestination(Memory.addressOf(Display.bitplanes) + 8000);
+      blitter.setDestination(Memory.addressOf(Display.bitplanes) + 24000);
       blitter.runFill(4, 56);
 
       while (!Amiga.inVerticalBlank());
@@ -110,8 +112,11 @@ public class Stars
 
   public static short[] colors =
   {
+    // Playfield even colors (0 to 7).
     0x000, 0xeee, 0x888, 0x444,
     0x000, 0x000, 0x000, 0x000,
+    // Playfield odd colors (16 to 23).
+    0xfff, 0x025, 0xf00, 0x0f0,
   };
 
   public static short[] stars_init =

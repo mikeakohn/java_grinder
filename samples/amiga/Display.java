@@ -66,6 +66,14 @@ public class Display
     copper.run();
   }
 
+  static public void setDoublePlayfield()
+  {
+    Amiga.setVideoMode(
+      (bitplane_count << 12) |
+      Amiga.VIDEO_MODE_DOUBLE_PLAYFIELD |
+      Amiga.VIDEO_MODE_COLOR);
+  }
+
   static public void setPalette(Copper copper, int index, int color)
   {
 
@@ -186,6 +194,62 @@ public class Display
       color = color >> 1;
 
       index += 8000;
+    }
+  }
+
+  static public void plotEven(int x, int y, int color)
+  {
+    int index;
+    int n, mask, bit;
+
+    index = (y * (320 / 8)) + (x >> 3);
+
+    bit = 1 << (7 - (x & 0x7));
+    mask = bit ^ 0xff;
+
+    for (n = 0; n < bitplane_count; n++)
+    {
+      if ((color & 1) == 0)
+      {
+        bitplanes[index] &= (byte)mask;
+      }
+        else
+      {
+        bitplanes[index] |= (byte)bit;
+      }
+
+      color = color >> 1;
+
+      index += 16000;
+    }
+  }
+
+  static public void plotOdd(int x, int y, int color)
+  {
+    int index;
+    int n, mask, bit;
+
+    index = (y * (320 / 8)) + (x >> 3);
+
+    index += 8000;
+
+    bit = 1 << (7 - (x & 0x7));
+    mask = bit ^ 0xff;
+
+    for (n = 0; n < bitplane_count; n++)
+    {
+      if ((color & 1) == 0)
+      {
+        bitplanes[index] &= (byte)mask;
+      }
+        else
+      {
+        bitplanes[index] |= (byte)bit;
+      }
+
+      color = color >> 1;
+
+      index += 16000;
     }
   }
 

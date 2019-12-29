@@ -39,10 +39,8 @@ public class AmigaDemo
     Amiga.disableMultitasking();
     //Amiga.disableInterrupts();
 
-    //Amiga.clearDMA(Amiga.DMA_BITPLANE | Amiga.DMA_COPPER);
-
-    //copper.appendInstruction(Copper.MOVE_BPLCON0 | 0x1200);
 /*
+    //copper.appendInstruction(Copper.MOVE_BPLCON0 | 0x1200);
     copper.appendSetBitplane(0, bitplane_1);
     copper.appendSetSprite(0, sprite_old);
     copper.appendSetSprite(1, sprite_blank);
