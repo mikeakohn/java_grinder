@@ -44,6 +44,45 @@ public class Stars
     }
   }
 
+  public static void showJavaGrinder(Blitter blitter, int offset_0, int offset_1)
+  {
+    blitter.waitBusy();
+    blitter.setSourceA(Memory.addressOf(ImageJavaGrinderText.bitplane_0));
+    blitter.setDestination(Memory.addressOf(Display.bitplanes) + offset_0);
+    blitter.runFill(5, 56);
+
+    blitter.waitBusy();
+    blitter.setSourceA(Memory.addressOf(ImageJavaGrinderText.bitplane_1));
+    blitter.setDestination(Memory.addressOf(Display.bitplanes) + offset_1);
+    blitter.runFill(5, 56);
+  }
+
+  public static void showAmigaLogo(Blitter blitter, int offset_0, int offset_1)
+  {
+    blitter.waitBusy();
+    blitter.setSourceA(Memory.addressOf(ImageAmigaLogo8.bitplane_0));
+    blitter.setDestination(Memory.addressOf(Display.bitplanes) + offset_0);
+    blitter.runFill(7, 37);
+
+    blitter.waitBusy();
+    blitter.setSourceA(Memory.addressOf(ImageAmigaLogo8.bitplane_1));
+    blitter.setDestination(Memory.addressOf(Display.bitplanes) + offset_1);
+    blitter.runFill(7, 37);
+  }
+
+  public static void showCommodoreLogo(Blitter blitter, int offset_0, int offset_1)
+  {
+    blitter.waitBusy();
+    blitter.setSourceA(Memory.addressOf(ImageCommodoreLogo.bitplane_0));
+    blitter.setDestination(Memory.addressOf(Display.bitplanes) + offset_0);
+    blitter.runFill(5, 56);
+
+    blitter.waitBusy();
+    blitter.setSourceA(Memory.addressOf(ImageCommodoreLogo.bitplane_1));
+    blitter.setDestination(Memory.addressOf(Display.bitplanes) + offset_1);
+    blitter.runFill(5, 56);
+  }
+
   public static void run(Copper copper, Blitter blitter)
   {
     int state = 0;
@@ -101,15 +140,6 @@ public class Stars
 
       moveStars(stars);
 
-      blitter.waitBusy();
-      blitter.setSourceA(Memory.addressOf(ImageCommodoreLogo.bitplane_0));
-      blitter.setDestination(Memory.addressOf(Display.bitplanes) + logo_offset_0);
-      blitter.runFill(5, 56);
-
-      blitter.waitBusy();
-      blitter.setSourceA(Memory.addressOf(ImageCommodoreLogo.bitplane_1));
-      blitter.setDestination(Memory.addressOf(Display.bitplanes) + logo_offset_1);
-      blitter.runFill(5, 56);
 
       while (!Amiga.inVerticalBlank());
     }

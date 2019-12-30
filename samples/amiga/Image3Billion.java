@@ -3,7 +3,7 @@ import net.mikekohn.java_grinder.Memory;
 import net.mikekohn.java_grinder.amiga.Copper;
 import net.mikekohn.java_grinder.amiga.Amiga;
 
-public class ImageJavaGrinder
+public class Image3Billion
 {
   static public short[] palette =
   {
@@ -15,7 +15,7 @@ public class ImageJavaGrinder
   static public void show(Copper copper)
   {
     int n;
-    bitplanes = Memory.preloadByteArray("ImageJavaGrinder.bin");
+    bitplanes = Memory.preloadByteArray("Image3Billion.bin");
 
     Amiga.setVideoMode(
       Amiga.VIDEO_MODE_BITPLANE_COUNT_3 |

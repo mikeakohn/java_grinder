@@ -89,7 +89,7 @@ public class AmigaDemo
     Amiga.clearDMA(Amiga.DMA_SPRITE);
 
     // Show JavaGrinder Billion devices logo.
-    ImageJavaGrinder.show(copper);
+    Image3Billion.show(copper);
     Display.waitForVericalBlanks(80);
 
     // After a pause, play Bach's Invention 13.

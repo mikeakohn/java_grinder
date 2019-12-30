@@ -3,8 +3,12 @@ NAKEN_INCLUDE=../../../naken_asm/include
 
 CLASSES= \
   Display.class \
+  Image3Billion.class \
+  ImageAmigaCheck.class \
+  ImageAmigaLogo8.class \
+  ImageAmigaLogo16.class \
   ImageCommodoreLogo.class \
-  ImageJavaGrinder.class \
+  ImageJavaGrinderText.class\
   Mandelbrot.class \
   SongBach.class \
   Stars.class \
@@ -23,6 +27,9 @@ display:
 
 %.class: %.java
 	javac -classpath ../../build/JavaGrinder.jar:. $*.java
+
+song:
+	../../../drumsplusplus/playdpp -o song.mid song.dpp
 
 clean:
 	@rm -f *.lst *.class amiga_demo.asm amiga_demo
