@@ -6,6 +6,10 @@ import net.mikekohn.java_grinder.Memory;
 
 public class Stars
 {
+  private static int logo_offset_0;
+  private static int logo_offset_1;
+  private static int logo_offset_2;
+
   public static void moveStars(short[] stars)
   {
     int n;
@@ -44,42 +48,52 @@ public class Stars
     }
   }
 
-  public static void showJavaGrinder(Blitter blitter, int offset_0, int offset_1)
+  public static void showJavaGrinder(Blitter blitter)
   {
     blitter.waitBusy();
-    blitter.setSourceA(Memory.addressOf(ImageJavaGrinderText.bitplane_0));
-    blitter.setDestination(Memory.addressOf(Display.bitplanes) + offset_0);
-    blitter.runFill(5, 56);
+    blitter.setSourceA(Memory.addressOf(ImageJavaGrinder.bitplane_0));
+    blitter.setDestination(Memory.addressOf(Display.bitplanes) + logo_offset_0);
+    blitter.runFill(7, 68);
 
     blitter.waitBusy();
-    blitter.setSourceA(Memory.addressOf(ImageJavaGrinderText.bitplane_1));
-    blitter.setDestination(Memory.addressOf(Display.bitplanes) + offset_1);
-    blitter.runFill(5, 56);
+    blitter.setSourceA(Memory.addressOf(ImageJavaGrinder.bitplane_1));
+    blitter.setDestination(Memory.addressOf(Display.bitplanes) + logo_offset_1);
+    blitter.runFill(7, 68);
+
+    blitter.waitBusy();
+    blitter.setSourceA(Memory.addressOf(ImageJavaGrinder.bitplane_2));
+    blitter.setDestination(Memory.addressOf(Display.bitplanes) + logo_offset_2);
+    blitter.runFill(7, 68);
   }
 
-  public static void showAmigaLogo(Blitter blitter, int offset_0, int offset_1)
+  public static void showAmigaLogo(Blitter blitter)
   {
     blitter.waitBusy();
     blitter.setSourceA(Memory.addressOf(ImageAmigaLogo8.bitplane_0));
-    blitter.setDestination(Memory.addressOf(Display.bitplanes) + offset_0);
+    blitter.setDestination(Memory.addressOf(Display.bitplanes) + logo_offset_0);
     blitter.runFill(7, 37);
 
     blitter.waitBusy();
     blitter.setSourceA(Memory.addressOf(ImageAmigaLogo8.bitplane_1));
-    blitter.setDestination(Memory.addressOf(Display.bitplanes) + offset_1);
+    blitter.setDestination(Memory.addressOf(Display.bitplanes) + logo_offset_1);
+    blitter.runFill(7, 37);
+
+    blitter.waitBusy();
+    blitter.setSourceA(Memory.addressOf(ImageAmigaLogo8.bitplane_2));
+    blitter.setDestination(Memory.addressOf(Display.bitplanes) + logo_offset_2);
     blitter.runFill(7, 37);
   }
 
-  public static void showCommodoreLogo(Blitter blitter, int offset_0, int offset_1)
+  public static void showCommodoreLogo(Blitter blitter)
   {
     blitter.waitBusy();
     blitter.setSourceA(Memory.addressOf(ImageCommodoreLogo.bitplane_0));
-    blitter.setDestination(Memory.addressOf(Display.bitplanes) + offset_0);
+    blitter.setDestination(Memory.addressOf(Display.bitplanes) + logo_offset_0);
     blitter.runFill(5, 56);
 
     blitter.waitBusy();
     blitter.setSourceA(Memory.addressOf(ImageCommodoreLogo.bitplane_1));
-    blitter.setDestination(Memory.addressOf(Display.bitplanes) + offset_1);
+    blitter.setDestination(Memory.addressOf(Display.bitplanes) + logo_offset_1);
     blitter.runFill(5, 56);
   }
 
@@ -89,11 +103,9 @@ public class Stars
     int delay = 200;
     int text_color = 0;
     int a,n;
-    int logo_offset_0;
-    int logo_offset_1;
 
     Display.clear();
-    Display.setDisplay(copper, 4);
+    Display.setDisplay(copper, 6);
     Display.setDoublePlayfield();
     Amiga.setPlayfieldPriority(0, 0, true);
 
@@ -105,8 +117,8 @@ public class Stars
     // Set up a blitter copy of 64x56 pixels.
     blitter.setModuloA(0);
     blitter.setModuloDestination(31);
-    blitter.setShiftA(8);
-    blitter.setShiftB(8);
+    blitter.setShiftA(0);
+    blitter.setShiftB(0);
     blitter.setLogicalFunction(0xf0);
     blitter.enableChannels(Blitter.MASK_ENABLE_A | Blitter.MASK_ENABLE_D);
     blitter.setChannelAMasks(0xffff, 0xffff);
@@ -117,8 +129,16 @@ public class Stars
 
     short[] stars = Memory.allocStackShorts(stars_init.length);
 
-    logo_offset_0 = 8000 + (4000 - (28 * 40)) + (20 - 6);
+    ImageJavaGrinder.init(copper, blitter);
+    //ImageAmigaLogo8.init(copper, blitter);
+
+    logo_offset_0 = ImageJavaGrinder.getCenter();
+    //logo_offset_0 = ImageAmigaLogo8.getCenter();
     logo_offset_1 = logo_offset_0 + 16000;
+    logo_offset_2 = logo_offset_1 + 16000;
+
+    showJavaGrinder(blitter);
+    //showAmigaLogo(blitter);
 
     // Copy stars to RAM
     for (n = 0; n < stars.length; n++)
@@ -140,7 +160,6 @@ public class Stars
 
       moveStars(stars);
 
-
       while (!Amiga.inVerticalBlank());
     }
   }
@@ -151,7 +170,7 @@ public class Stars
     0x000, 0xeee, 0x888, 0x444,
     0x000, 0x000, 0x000, 0x000,
     // Playfield odd colors (16 to 23).
-    0xfff, 0x025, 0xf00, 0x0f0,
+    //0x000, 0xfff, 0xfff, 0xfff,
   };
 
   public static short[] stars_init =

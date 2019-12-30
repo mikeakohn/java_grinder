@@ -59,6 +59,8 @@ public class Display
 
     for (n = 0; n < 1 << bitplane_count; n++)
     {
+      if (n >= 32) { break; }
+
       copper.appendSetColor(n, 0);
     }
 

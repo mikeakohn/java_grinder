@@ -8,7 +8,7 @@ CLASSES= \
   ImageAmigaLogo8.class \
   ImageAmigaLogo16.class \
   ImageCommodoreLogo.class \
-  ImageJavaGrinderText.class\
+  ImageJavaGrinder.class\
   Mandelbrot.class \
   SongBach.class \
   Stars.class \
