@@ -10,6 +10,7 @@ CLASSES= \
   ImageCommodoreLogo.class \
   ImageJavaGrinder.class\
   Mandelbrot.class \
+  SongAmigaGrind.class \
   SongBach.class \
   Stars.class \
   AmigaDemo.class
@@ -29,7 +30,7 @@ display:
 	javac -classpath ../../build/JavaGrinder.jar:. $*.java
 
 song:
-	../../../drumsplusplus/playdpp -o song.mid song.dpp
+	../../../drumsplusplus/playdpp -o amiga_grind.mid amiga_grind.dpp
 
 clean:
 	@rm -f *.lst *.class amiga_demo.asm amiga_demo

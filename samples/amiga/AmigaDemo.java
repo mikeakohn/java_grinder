@@ -97,6 +97,9 @@ public class AmigaDemo
     Display.waitForVericalBlanks(260);
     Amiga.clearDMA(Amiga.DMA_AUDIO_0);
 
+    Display.clear();
+    Display.waitForVericalBlanks(5);
+
     Stars.run(copper, blitter);
     Mandelbrot.run(copper);
 

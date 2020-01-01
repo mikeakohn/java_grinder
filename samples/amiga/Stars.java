@@ -48,6 +48,54 @@ public class Stars
     }
   }
 
+  public static void clearLogo(Blitter blitter)
+  {
+    int offset;
+
+    blitter.enableChannels(Blitter.MASK_ENABLE_D);
+    blitter.setDataRegisterA((char)0);
+    blitter.setModuloDestination(26);
+
+    offset = 8000 + (4000 - (28 * 40)) + (20 - 6);
+
+    blitter.waitBusy();
+    blitter.setDestination(Memory.addressOf(Display.bitplanes) + offset);
+    blitter.runFill(7, 68);
+
+    offset += 16000;
+
+    blitter.waitBusy();
+    blitter.setDestination(Memory.addressOf(Display.bitplanes) + offset);
+    blitter.runFill(7, 68);
+
+    offset += 16000;
+
+    blitter.waitBusy();
+    blitter.setDestination(Memory.addressOf(Display.bitplanes) + offset);
+    blitter.runFill(7, 68);
+
+    // Since this only modifies memory and not Amiga registers, this can
+    // be set after runFill();
+    blitter.enableChannels(Blitter.MASK_ENABLE_A | Blitter.MASK_ENABLE_D);
+  }
+
+  public static void clearCommodoreLogo(Blitter blitter)
+  {
+    int offset;
+
+    blitter.enableChannels(Blitter.MASK_ENABLE_D);
+    blitter.setDataRegisterA((char)0);
+    blitter.setModuloDestination(39);
+    blitter.setShiftA(0);
+
+    blitter.waitBusy();
+    blitter.setDestination(Memory.addressOf(Display.bitplanes) + logo_offset_0 - 2);
+    blitter.runFill(1, 56);
+
+    blitter.enableChannels(Blitter.MASK_ENABLE_A | Blitter.MASK_ENABLE_D);
+    blitter.setModuloDestination(30);
+  }
+
   public static void showJavaGrinder(Blitter blitter)
   {
     blitter.waitBusy();
@@ -99,10 +147,8 @@ public class Stars
 
   public static void run(Copper copper, Blitter blitter)
   {
-    int state = 0;
     int delay = 200;
-    int text_color = 0;
-    int a,n;
+    int n, frame;
 
     Display.clear();
     Display.setDisplay(copper, 6);
@@ -114,7 +160,6 @@ public class Stars
       Display.setPalette(copper, n, colors[n]);
     }
 
-    // Set up a blitter copy of 64x56 pixels.
     blitter.setModuloA(0);
     blitter.setModuloDestination(31);
     blitter.setShiftA(0);
@@ -129,38 +174,95 @@ public class Stars
 
     short[] stars = Memory.allocStackShorts(stars_init.length);
 
-    ImageJavaGrinder.init(copper, blitter);
-    //ImageAmigaLogo8.init(copper, blitter);
-
-    logo_offset_0 = ImageJavaGrinder.getCenter();
-    //logo_offset_0 = ImageAmigaLogo8.getCenter();
-    logo_offset_1 = logo_offset_0 + 16000;
-    logo_offset_2 = logo_offset_1 + 16000;
-
-    showJavaGrinder(blitter);
-    //showAmigaLogo(blitter);
-
     // Copy stars to RAM
     for (n = 0; n < stars.length; n++)
     {
       stars[n] = stars_init[n];
     }
 
+    SongAmigaGrind.play();
+
     // Main part of method to animate the stars
-    for (a = 0; a < 1000; a++)
+    for (frame = 0; frame < 240; frame++)
     {
-      if (delay == 0)
+      if (frame == 40)
       {
-        delay = 150;
+        ImageJavaGrinder.init(copper, blitter);
+
+        logo_offset_0 = ImageJavaGrinder.getCenter();
+        logo_offset_1 = logo_offset_0 + 16000;
+        logo_offset_2 = logo_offset_1 + 16000;
+
+        showJavaGrinder(blitter);
       }
         else
+      if (frame == 80)
       {
-        delay--;
+        clearLogo(blitter);
+      }
+        else
+      if (frame == 110)
+      {
+        ImageAmigaLogo8.init(copper, blitter);
+
+        logo_offset_0 = ImageAmigaLogo8.getCenter();
+        logo_offset_1 = logo_offset_0 + 16000;
+        logo_offset_2 = logo_offset_1 + 16000;
+
+        showAmigaLogo(blitter);
+      }
+        else
+      if (frame == 160)
+      {
+        clearLogo(blitter);
+      }
+        else
+      if (frame == 190)
+      {
+        ImageCommodoreLogo.init(copper, blitter);
+
+        logo_offset_0 = ImageCommodoreLogo.getCenter();
+        logo_offset_1 = logo_offset_0 + 16000;
+        logo_offset_2 = logo_offset_1 + 16000;
+
+        showCommodoreLogo(blitter);
       }
 
       moveStars(stars);
 
       while (!Amiga.inVerticalBlank());
+    }
+
+    byte[] bitplanes = Display.bitplanes;
+
+    for (n = 0; n < 8000; n++)
+    {
+      bitplanes[n] = 0;
+      bitplanes[n + 16000] = 0;
+    }
+
+    n = 0;
+
+    for (frame = 0; frame < 60; frame++)
+    {
+      while (!Amiga.inVerticalBlank());
+
+      if (n == 0) { clearCommodoreLogo(blitter); }
+
+      blitter.setShiftA(n);
+
+      showCommodoreLogo(blitter);
+
+      n = n + 2;
+
+      if (n == 16)
+      {
+        n = 0;
+
+        logo_offset_0 += 2;
+        logo_offset_1 = logo_offset_0 + 16000;
+        logo_offset_2 = logo_offset_1 + 16000;
+      }
     }
   }
 

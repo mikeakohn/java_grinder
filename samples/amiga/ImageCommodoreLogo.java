@@ -1,14 +1,39 @@
 
+import net.mikekohn.java_grinder.amiga.Blitter;
 import net.mikekohn.java_grinder.amiga.Copper;
+
+/*
+ ---------- BMP Info Header ----------
+           width: 64 + 16
+          height: 56
+
+Total Colors: 4
+*/
 
 public class ImageCommodoreLogo
 {
-/*
+  static public void init(Copper copper, Blitter blitter)
+  {
+    int n;
+
+    for (n = 8; n < palette.length + 8; n++)
+    {
+      Display.setPalette(copper, n, palette[n - 8]);
+    }
+
+    // 320 / 8 = 40, 40 - (width / 8) = 32.
+    blitter.setModuloDestination(30);
+  }
+
+  static public int getCenter()
+  {
+    return 8000 + (4000 - (30 * 40)) + (20 - 3);
+  }
+
   static public short[] palette =
   {
     0xfff, 0x025, 0xf00, 0x000,
   };
-*/
 
   static public byte[] bitplane_0 =
   {
