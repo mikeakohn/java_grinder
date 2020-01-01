@@ -42,6 +42,11 @@ public class Mandelbrot
     final int i1 = (1 << DEC_PLACE);
     int dx = (r1 - r0) / 320;
     int dy = (i1 - i0) / 200;
+    byte[] bitplanes = Display.bitplanes;
+    int bit, index;
+
+    index = 0;
+    bit = 128;
 
     Display.clear();
     Display.setDisplay(copper, 4);
@@ -59,8 +64,8 @@ public class Mandelbrot
 
       for (x = 0; x < 320; x++)
       {
-        zr = 0;
-        zi = 0;
+        zr = zi = 0;
+        //zi = 0;
 
         for (count = 0; count < 16; count++)
         {
@@ -69,17 +74,33 @@ public class Mandelbrot
 
           if (zr2 + zi2 > (4 << DEC_PLACE)) { break; }
           tr = zr2 - zi2;
-          ti = 2 * ((zr * zi) >> DEC_PLACE);
+          ti = ((zr * zi) >> DEC_PLACE) << 1;
 
           zr = tr + rs;
           zi = ti + is;
         }
 
-        //if (count == 16) { count = 15; }
-
         if (count < 15)
         {
-          Display.plot(x, y, count);
+          //Display.plot(x, y, count);
+
+          if (count != 0)
+          {
+            if ((count & 1) != 0) { bitplanes[index] |= bit; }
+            if ((count & 2) != 0) { bitplanes[index + 8000] |= bit; }
+            if ((count & 4) != 0) { bitplanes[index + 16000] |= bit; }
+            if ((count & 8) != 0) { bitplanes[index + 24000] |= bit; }
+          }
+        }
+
+        if (bit == 1)
+        {
+          bit = 128;
+          index++;
+        }
+          else
+        {
+          bit = bit >> 1;
         }
 
         rs += dx;
