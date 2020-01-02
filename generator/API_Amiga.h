@@ -52,6 +52,7 @@ public:
   virtual int copper_appendEnd() { return -1; }
   virtual int copper_resetIndex() { return -1; }
   virtual int copper_setIndex_I() { return -1; }
+  virtual int copper_getIndex() { return -1; }
   virtual int copper_run() { return -1; }
   virtual int copper_stop() { return -1; }
   virtual int copper_getArrayAsInt() { return -1; }

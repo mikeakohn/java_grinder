@@ -949,13 +949,27 @@ int Amiga::copper_setIndex_I()
   const int index = reg - 1;
 
   fprintf(out,
-    "  ;; copper_resetIndex()\n"
+    "  ;; copper_setIndex_I()\n"
     "  movea.l d%d, a2\n"
     "  move.l d%d, (-4,a2)\n",
     object,
     index);
 
   reg -= 2;
+
+  return 0;
+}
+
+int Amiga::copper_getIndex()
+{
+  const int object = reg - 1;
+
+  fprintf(out,
+    "  ;; copper_getIndex()\n"
+    "  movea.l d%d, a2\n"
+    "  move.l (-4,a2), d%d\n",
+    object,
+    object);
 
   return 0;
 }

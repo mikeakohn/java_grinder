@@ -285,6 +285,9 @@ public class Copper
   /** Reset internal instruction list index. */
   public void setIndex(int index) { }
 
+  /** Get internal instruction list index. */
+  public int getIndex() { return 0; }
+
   /** Run this Copper program. */
   public void run() { }
 

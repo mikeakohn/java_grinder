@@ -70,6 +70,7 @@ public:
   virtual int copper_appendEnd();
   virtual int copper_resetIndex();
   virtual int copper_setIndex_I();
+  virtual int copper_getIndex();
   virtual int copper_run();
   virtual int copper_stop();
   virtual int copper_getArrayAsInt();
