@@ -167,7 +167,7 @@ for n in range(0, bytes_in_image, 2):
   else:
     data_1 = (bitplanes[1][n] << 8) | bitplanes[1][n+1]
 
-  print("    0x%04x, 0x%04x" % (data_0, data_1));
+  print("    0x%04x, 0x%04x," % (data_0, data_1));
 
 print("\n  };")
 

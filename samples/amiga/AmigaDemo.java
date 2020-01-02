@@ -40,8 +40,6 @@ public class AmigaDemo
     //Amiga.disableInterrupts();
 
 /*
-    //copper.appendInstruction(Copper.MOVE_BPLCON0 | 0x1200);
-    copper.appendSetBitplane(0, bitplane_1);
     copper.appendSetSprite(0, sprite_old);
     copper.appendSetSprite(1, sprite_blank);
     copper.appendSetSprite(2, sprite_blank);
@@ -50,16 +48,12 @@ public class AmigaDemo
     copper.appendSetSprite(5, sprite_blank);
     copper.appendSetSprite(6, sprite_blank);
     copper.appendSetSprite(7, sprite_blank);
-    //copper.appendInstruction(Copper.MOVE_SPR0POS | 0x5555);
-    //copper.appendInstruction(Copper.MOVE_SPR0CTL | 0x5900);
     copper.appendSetColor(0, 0x00f);
     copper.appendSetColor(1, 0x700);
     copper.appendWait(0, 100);
     copper.appendSetColor(0, 0xf00);
     copper.appendWait(0, 150);
     copper.appendSetColor(0, 0x0f0);
-    copper.appendEnd();
-    copper.run();
 */
 
     // Setup 320x200 display.
@@ -69,17 +63,6 @@ public class AmigaDemo
       Amiga.VIDEO_MODE_COLOR);
 
     Display.init();
-
-/*
-    Amiga.setPlayfieldScroll(0, 0);
-    Amiga.setPlayfieldPriority(4, 4, false);
-    Amiga.setBitplaneModuloEven(0);
-    Amiga.setBitplaneModuloOdd(0);
-    Amiga.setDisplayWindowStart(129, 44);
-    Amiga.setDisplayWindowStop(193, 244);
-    Amiga.setDisplayBitplaneStart(56);
-    Amiga.setDisplayBitplaneStop(208);
-*/
 
     Amiga.setDMA(
       Amiga.DMA_BLITTER |
