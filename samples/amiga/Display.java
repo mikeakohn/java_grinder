@@ -90,8 +90,8 @@ public class Display
   static public void drawLine(int x0, int y0, int x1, int y1, int color)
   {
     int count;
-    int dx,dy;
-    int i,j;
+    int dx, dy;
+    int i, j;
 
     if (x0 == x1)
     { 
@@ -179,7 +179,8 @@ public class Display
 
     index = (y * (320 / 8)) + (x >> 3);
 
-    bit = 1 << (7 - (x & 0x7));
+    //bit = 1 << (7 - (x & 0x7));
+    bit = 128 >> (x & 0x7);
     mask = bit ^ 0xff;
 
     for (n = 0; n < bitplane_count; n++)
