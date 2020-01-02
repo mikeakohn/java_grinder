@@ -101,7 +101,12 @@ public class AmigaDemo
     Display.waitForVericalBlanks(5);
 
     Stars.run(copper, blitter);
-    Mandelbrot.run(copper);
+    Logo.run(copper, blitter);
+
+    Amiga.clearDMA(Amiga.DMA_AUDIO_0 |
+                   Amiga.DMA_SPRITE);
+
+    Mandelbrot.run(copper, blitter);
 
     while (true) { }
   }

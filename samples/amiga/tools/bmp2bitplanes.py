@@ -113,6 +113,8 @@ out.write("import net.mikekohn.java_grinder.amiga.Copper;\n")
 out.write("\n")
 out.write("public class " + image_name + "\n")
 out.write("{\n")
+out.write("  static final int width = " + str(width) + ";\n")
+out.write("  static final int height = " + str(height) + ";\n\n")
 
 out.write("  static public short[] palette =\n")
 out.write("  {")

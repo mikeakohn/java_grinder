@@ -1,7 +1,7 @@
 
-//import net.mikekohn.java_grinder.Memory;
+import net.mikekohn.java_grinder.Memory;
 import net.mikekohn.java_grinder.amiga.Amiga;
-//import net.mikekohn.java_grinder.amiga.Blitter;
+import net.mikekohn.java_grinder.amiga.Blitter;
 import net.mikekohn.java_grinder.amiga.Copper;
 
 public class Mandelbrot
@@ -26,7 +26,7 @@ public class Mandelbrot
     0xf00,  // 15
   };
 
-  public static void run(Copper copper)
+  public static void run(Copper copper, Blitter blitter)
   {
     int n;
     final int DEC_PLACE = 10;
@@ -55,6 +55,21 @@ public class Mandelbrot
     {
       Display.setPalette(copper, n, colors[n]);
     }
+
+    blitter.setModuloA(0);
+    //blitter.setModuloDestination(31);
+    blitter.setLogicalFunction(0xf0);
+    blitter.enableChannels(Blitter.MASK_ENABLE_A | Blitter.MASK_ENABLE_D);
+    blitter.setChannelAMasks(0xffff, 0xffff);
+    blitter.setAsFillMode(Blitter.FILL_OPTIONS_NONE);
+    blitter.setDataRegisterA((char)0);
+    blitter.setDataRegisterB((char)0);
+    blitter.setDataRegisterC((char)0);
+
+    ImageJavaGrinderText.init(blitter);
+    ImageJavaGrinderText.show(blitter);
+    ImageCodedUsing.init(blitter);
+    ImageCodedUsing.show(blitter);
 
     is = i0;
 

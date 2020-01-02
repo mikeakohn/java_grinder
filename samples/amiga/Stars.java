@@ -147,7 +147,6 @@ public class Stars
 
   public static void run(Copper copper, Blitter blitter)
   {
-    int delay = 200;
     int n, frame;
 
     Display.clear();

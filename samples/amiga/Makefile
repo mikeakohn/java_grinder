@@ -2,13 +2,17 @@
 NAKEN_INCLUDE=../../../naken_asm/include
 
 CLASSES= \
+  Common.class \
   Display.class \
   Image3Billion.class \
   ImageAmigaCheck.class \
   ImageAmigaLogo8.class \
   ImageAmigaLogo16.class \
+  ImageCodedUsing.class \
   ImageCommodoreLogo.class \
   ImageJavaGrinder.class\
+  ImageJavaGrinderText.class\
+  Logo.class \
   Mandelbrot.class \
   SongAmigaGrind.class \
   SongBach.class \
