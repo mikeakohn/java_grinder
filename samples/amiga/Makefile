@@ -16,6 +16,7 @@ CLASSES= \
   Mandelbrot.class \
   SongAmigaGrind.class \
   SongBach.class \
+  SpriteJava.class \
   Stars.class \
   AmigaDemo.class
 

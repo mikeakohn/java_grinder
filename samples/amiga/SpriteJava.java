@@ -22,6 +22,30 @@ public class SpriteJava
     // Don't add appendEnd() so that Copper bars can be made with Logo.java.
   }
 
+  static public void setPosition0(int x, int y)
+  {
+    sprite_j[0] = (char)((y << 8) | x);
+    sprite_j[1] = (char)(((y + 14) << 8));
+  }
+
+  static public void setPosition1(int x, int y)
+  {
+    sprite_a0[0] = (char)((y << 8) | x);
+    sprite_a0[1] = (char)(((y + 14) << 8));
+  }
+
+  static public void setPosition2(int x, int y)
+  {
+    sprite_v[0] = (char)((y << 8) | x);
+    sprite_v[1] = (char)(((y + 14) << 8));
+  }
+
+  static public void setPosition3(int x, int y)
+  {
+    sprite_a1[0] = (char)((y << 8) | x);
+    sprite_a1[1] = (char)(((y + 14) << 8));
+  }
+
   static public short[] palette =
   {
     0x05a, 0xfff,
@@ -48,7 +72,7 @@ public class SpriteJava
 
   static public char[] sprite_a0 =
   {
-    0x7555, 0x6300,
+    0x5565, 0x6300,
     0x0180, 0x0000,
     0x0180, 0x0000,
     0x03c0, 0x0000,
@@ -67,7 +91,7 @@ public class SpriteJava
 
   static public char[] sprite_v =
   {
-    0x9555, 0x6300,
+    0x5575, 0x6300,
     0x0c30, 0x0000,
     0x0c30, 0x0000,
     0x0c30, 0x0000,
@@ -86,7 +110,7 @@ public class SpriteJava
 
   static public char[] sprite_a1 =
   {
-    0xa555, 0x6300,
+    0x5585, 0x6300,
     0x0180, 0x0000,
     0x0180, 0x0000,
     0x03c0, 0x0000,
