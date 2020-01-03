@@ -1,0 +1,44 @@
+include "../../../drumsplusplus/samples/drum_defines.inc"
+  
+set bpm=75;
+set defaultvolume=127;
+set timesignature=4/4;
+
+pattern blank
+{
+  closed_hihat: 1;
+}
+
+pattern click_track
+{
+  closed_hihat: 1 2 3 4;
+}
+
+pattern riff_1
+{
+  //splash_cymbal: 1;
+  crash_cymbal1: 1;
+  closed_hihat: 1 2 3;
+  open_hihat: 4;
+  snare: 2 4;
+  bassdrum: 1 1.25 2.75 3 3.5;
+}
+
+pattern riff_2
+{
+  closed_hihat: 1 2 3;
+  open_hihat: 4;
+  snare: 2 4;
+  bassdrum: 1 1.25 2.75 3 3.5;
+}
+
+section main
+{
+  play: riff_1, riff_2, riff_2, riff_2;
+}
+
+song test_song
+{
+  play: blank, click_track, 6 main;
+}
+
