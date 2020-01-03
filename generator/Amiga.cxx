@@ -18,7 +18,7 @@
 
 #include "generator/Amiga.h"
 
-#define HEAP_SIZE 250 * 1024
+#define HEAP_SIZE 200 * 1024
 
 // NOTE: a3 points to Amiga hardware registers.
 
@@ -119,7 +119,7 @@ int Amiga::init_heap(int field_count)
   fprintf(out, "  ;; Setup heap and static initializers\n");
 
   fprintf(out,
-    "  ;; heap = AllocMem(100k, CHIP_MEM=2)\n"
+    "  ;; heap = AllocMem(200k, CHIP_MEM=2)\n"
     "  move.l a6, -(a7)\n"
     "  movea.l (ExecBase), a6\n"
     "  move.l #%d, d0\n"
@@ -950,8 +950,10 @@ int Amiga::copper_setIndex_I()
 
   fprintf(out,
     "  ;; copper_setIndex_I()\n"
+    "  lsl.w #2, d%d\n"
     "  movea.l d%d, a2\n"
     "  move.l d%d, (-4,a2)\n",
+    index,
     object,
     index);
 
@@ -967,7 +969,9 @@ int Amiga::copper_getIndex()
   fprintf(out,
     "  ;; copper_getIndex()\n"
     "  movea.l d%d, a2\n"
-    "  move.l (-4,a2), d%d\n",
+    "  move.l (-4,a2), d%d\n"
+    "  lsr.w #2, d%d\n",
+    object,
     object,
     object);
 
