@@ -182,7 +182,7 @@ public class Stars
     SongAmigaGrind.play();
 
     // Main part of method to animate the stars
-    for (frame = 0; frame < 240; frame++)
+    for (frame = 0; frame < 275; frame++)
     {
       if (frame == 40)
       {
@@ -211,12 +211,12 @@ public class Stars
         showAmigaLogo(blitter);
       }
         else
-      if (frame == 160)
+      if (frame == 170)
       {
         clearLogo(blitter);
       }
         else
-      if (frame == 190)
+      if (frame == 205)
       {
         ImageCommodoreLogo.init(copper, blitter);
 

@@ -18,8 +18,7 @@ public class SongAmigaGrind
     Amiga.setDMA(Amiga.DMA_AUDIO_0);
   }
 
-/*
-  static public void playSolo()
+  static public void playSecond()
   {
     byte[] song = Memory.preloadByteArray("amiga_grind_2.bin");
 
@@ -32,6 +31,5 @@ public class SongAmigaGrind
     Amiga.setAudioVolume(0, 63);
     Amiga.setDMA(Amiga.DMA_AUDIO_0);
   }
-*/
 }
 

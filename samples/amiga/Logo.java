@@ -60,6 +60,8 @@ public class Logo
 
     SpriteJava.init(copper);
 
+    SongAmigaGrind.playSecond();
+
     // Create copper bars.
     int copper_bar = copper.getIndex();
 
@@ -128,7 +130,7 @@ public class Logo
     int t0 = 0;
 
     // Main part of method to animate the stars.
-    for (frame = 0; frame < 500; frame++)
+    for (frame = 0; frame < 700; frame++)
     {
       while (!Amiga.inVerticalBlank());
 
