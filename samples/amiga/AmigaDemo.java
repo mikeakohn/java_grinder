@@ -6,55 +6,15 @@ import net.mikekohn.java_grinder.amiga.Copper;
 
 public class AmigaDemo
 {
-/*
-  static char[] sprite_old =
-  {
-    0x5555, 0x5900,
-    0x00f0, 0x000f,
-    0x00f0, 0x0a0f,
-    0x00f0, 0x000f,
-    0x00f0, 0x000f,
-    0x00f0, 0x000f,
-  };
-*/
-
   static public void main(String args[])
   {
-    //char[] sprite = new char[12];
-    //char[] sprite_blank = new char[4];
     Copper copper = new Copper(200);
     Blitter blitter = new Blitter();
 
     Display.init();
 
-    //sprite_blank[0] = 0;
-    //sprite_blank[1] = 0;
-
-    //for (int i = 0; i < 8000; i++) { bitplane_1[i] = 0x0f; }
-    //for (int i = 0; i < 12; i += 2) { sprite[i] = 0x0f; sprite[i + 1] = 0xf0; }
-
-    //sprite[0] = 0x5555;
-    //sprite[1] = 0x5900;
-
     Amiga.disableMultitasking();
     //Amiga.disableInterrupts();
-
-/*
-    copper.appendSetSprite(0, sprite_old);
-    copper.appendSetSprite(1, sprite_blank);
-    copper.appendSetSprite(2, sprite_blank);
-    copper.appendSetSprite(3, sprite_blank);
-    copper.appendSetSprite(4, sprite_blank);
-    copper.appendSetSprite(5, sprite_blank);
-    copper.appendSetSprite(6, sprite_blank);
-    copper.appendSetSprite(7, sprite_blank);
-    copper.appendSetColor(0, 0x00f);
-    copper.appendSetColor(1, 0x700);
-    copper.appendWait(0, 100);
-    copper.appendSetColor(0, 0xf00);
-    copper.appendWait(0, 150);
-    copper.appendSetColor(0, 0x0f0);
-*/
 
     // Setup 320x200 display.
     Amiga.setVideoMode(
