@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn
+ * Copyright 2014-2020 by Michael Kohn
  *
  */
 
@@ -58,6 +58,7 @@ public:
   virtual int amiga_setDMA_I();
   virtual int amiga_clearDMA_I();
   virtual int amiga_inVerticalBlank();
+  virtual int amiga_plot_IIIII();
 
   virtual int copper_Constructor_I();
   virtual int copper_appendInstruction_I();

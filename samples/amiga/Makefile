@@ -5,7 +5,6 @@ CLASSES= \
   Common.class \
   Display.class \
   Image3Billion.class \
-  ImageAmigaCheck.class \
   ImageAmigaLogo8.class \
   ImageAmigaLogo16.class \
   ImageCodedUsing.class \

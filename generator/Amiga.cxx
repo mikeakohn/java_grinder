@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn
+ * Copyright 2014-2020 by Michael Kohn
  *
  */
 
@@ -693,6 +693,79 @@ int Amiga::amiga_inVerticalBlank()
     reg, reg, reg);
 
   reg += 1;
+
+  return 0;
+}
+
+int Amiga::amiga_plot_IIIII()
+{
+  const int address = reg - 5;
+  const int x = reg - 4;
+  const int y = reg - 3;
+  const int color = reg - 2;
+  const int depth = reg - 1;
+
+  fprintf(out, "  ;; amiga_plot_IIIII()\n");
+
+  // address/a2 += y * 40 = (y << 5) + (y << 3)
+  fprintf(out,
+    "  lsl.w #3, d%d\n"
+    "  add.l d%d, d%d\n"
+    "  lsl.w #2, d%d\n"
+    "  add.l d%d, d%d\n"
+    "  movea.l d%d, a2\n",
+    y,
+    y, address,
+    y,
+    y, address,
+    address);
+
+  // address += (x >> 3)
+  fprintf(out,
+    "  move.w d%d, d7\n"
+    "  lsr.w #3, d7\n"
+    "  add.w d7, a2\n",
+    x);
+
+  // bit/d7 = 128 >> (x & 0x7)
+  fprintf(out,
+    "and.w #7, d%d\n"
+    "move.w #128, d7\n"
+    "lsr d%d, d7\n",
+    x, x);
+
+  // mask/d6 = bit ^ 0xff;
+  fprintf(out,
+    "move.w d7, d6\n"
+    "eori.b #0xff, d6\n");
+
+  fprintf(out,
+    "_plot_%d:\n",
+    label_count);
+
+  fprintf(out,
+    "  lsr.w #1, d%d\n"
+    "  bcc.b _plot_remove_pixel_%d\n"
+    "  or.b d7, (a2)\n"
+    "  bra.b _plot_done_%d\n"
+    "_plot_remove_pixel_%d:\n"
+    "  and.b d6, (a2)\n"
+    "_plot_done_%d:\n",
+    color,
+    label_count,
+    label_count,
+    label_count,
+    label_count);
+
+  fprintf(out,
+    "  add.l #8000, a2\n"
+    "  subq.w #1, d%d\n"
+    "  bne.b _plot_%d\n",
+    depth,
+    label_count);
+
+  label_count++;
+  reg -= 5;
 
   return 0;
 }

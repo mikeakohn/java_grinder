@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn
+ * Copyright 2014-2020 by Michael Kohn
  *
  */
 
@@ -73,6 +73,7 @@ int amiga(JavaClass *java_class, Generator *generator, const char *method_name)
   CHECK_FUNC(setDMA,_I)
   CHECK_FUNC(clearDMA,_I)
   CHECK_FUNC(inVerticalBlank,)
+  CHECK_FUNC(plot,_IIIII)
 
   return -1;
 }

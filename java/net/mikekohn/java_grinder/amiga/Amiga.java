@@ -143,5 +143,8 @@ abstract public class Amiga
 
   /** Returns true if the video is in a vertical blank state. */
   public static boolean inVerticalBlank() { return false; }
+
+  /** Plot a pixel on a 320x200 bitplane at the address passed in. */
+  public static void plot(int address, int x, int y, int color, int depth) { }
 }
 
