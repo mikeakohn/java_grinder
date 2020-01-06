@@ -37,7 +37,7 @@ public class AmigaDemo
 
     // After a pause, play Bach's Invention 13.
     SongBach.play();
-    Display.waitForVericalBlanks(260);
+    Display.waitForVericalBlanks(325);
     Amiga.clearDMA(Amiga.DMA_AUDIO_0);
 
     Display.clear();

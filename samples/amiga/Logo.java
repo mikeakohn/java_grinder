@@ -368,7 +368,7 @@ public class Logo
     t0 = 0;
 
     // Animate the sprites and copper while showing Amiga logo.
-    for (frame = 0; frame < 335; frame++)
+    for (frame = 0; frame < 445; frame++)
     {
       while (!Amiga.inVerticalBlank());
 
@@ -380,7 +380,7 @@ public class Logo
     Display.setPalette(copper, 1, 0xfff);
 
     // Animate the sprites, copper, and cube.
-    for (frame = 0; frame < 335; frame++)
+    for (frame = 0; frame < 445; frame++)
     {
       computeBox();
       computeBox();

@@ -18,7 +18,7 @@
 
 #include "generator/Amiga.h"
 
-#define HEAP_SIZE 200 * 1024
+#define HEAP_SIZE 100 * 1024
 
 // NOTE: a3 points to Amiga hardware registers.
 
@@ -674,14 +674,15 @@ int Amiga::amiga_inVerticalBlank()
 #if 0
   fprintf(out,
     "  ;; amiga_inVerticalBlank()\n"
-    "  eor.l d%d, d%d\n"
+    "  moveq #0, d%d\n"
     "  move.w (INTREQR,a3), d%d\n"
     "  lsr.w #5, d%d\n"
-    "  and.w #1, d%d\n",
-    reg, reg,
+    "  andi.w #1, d%d\n",
+    reg,
     reg, reg, reg);
 #endif
 
+#if 0
   fprintf(out,
     "  ;; amiga_inVerticalBlank()\n"
     "  move.l (VPOSR,a3), d5\n"
@@ -689,7 +690,18 @@ int Amiga::amiga_inVerticalBlank()
     "  cmp.l #0x12f00, d5\n"
     "  move sr, d%d\n"
     "  lsr.w #2, d%d\n"
-    "  and.w #1, d%d\n",
+    "  andi.w #1, d%d\n",
+    reg, reg, reg);
+#endif
+
+  fprintf(out,
+    "  ;; amiga_inVerticalBlank()\n"
+    "  move.l (VPOSR,a3), d5\n"
+    "  and.l #0x1ff00, d5\n"
+    "  cmp.l #0x01900, d5\n"
+    "  move sr, d%d\n"
+    "  lsr.w #3, d%d\n"
+    "  andi.w #1, d%d\n",
     reg, reg, reg);
 
   reg += 1;
