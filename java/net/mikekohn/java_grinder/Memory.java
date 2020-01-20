@@ -15,6 +15,9 @@ public class Memory
 {
   private Memory() { }
 
+  /** Initialize a heap.  Currently only needed with Amiga. */
+  public static void initHeap(int size) { }
+
   /** Read a single byte from an address */
   public static byte read8(int address) { return 0; }
 

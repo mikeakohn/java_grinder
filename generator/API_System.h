@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2020 by Michael Kohn
  *
  */
 
@@ -16,6 +16,7 @@ class API_System
 {
 public:
   // Memory
+  virtual int memory_initHeap_I() { return -1; }
   virtual int memory_read8_I() { return -1; }
   virtual int memory_read8_I(int address) { return -1; }
   virtual int memory_write8_IB() { return -1; }

@@ -119,7 +119,7 @@ int Amiga::init_heap(int field_count)
   fprintf(out, "  ;; Setup heap and static initializers\n");
 
   fprintf(out,
-    "  ;; heap = AllocMem(200k, CHIP_MEM=2)\n"
+    "  ;; heap = AllocMem(100k, CHIP_MEM=2)\n"
     "  move.l a6, -(a7)\n"
     "  movea.l (ExecBase), a6\n"
     "  move.l #%d, d0\n"
@@ -1670,6 +1670,37 @@ int Amiga::blitter_drawLine_I()
   reg -= 2;
 
   return 0;
+}
+
+int Amiga::memory_initHeap_I()
+{
+  fprintf(out,
+    "  ;; memory_initHeap_I()\n"
+    "  move.l a6, -(a7)\n"
+    "  movea.l (ExecBase), a6\n");
+
+  if (reg != 1)
+  {
+    fprintf(out,
+    "  move.l d%d, -(a7)\n"
+    "  move.l d%d, d0\n",
+    reg - 1, reg - 1);
+  }
+
+  fprintf(out,
+    "  moveq #2, d1\n"
+    "  jsr (AllocMem,a6)\n");
+
+  if (reg != 1)
+  {
+    fprintf(out, "  movea.l (a7)+, d0\n");
+  }
+
+  fprintf(out, "  movea.l (a7)+, a6\n");
+
+  reg -= 1;
+
+  return -1;
 }
 
 int Amiga::memory_clearArray_aB()

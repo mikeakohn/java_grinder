@@ -107,6 +107,7 @@ public:
   virtual int blitter_runFill_II();
   virtual int blitter_drawLine_I();
 
+  virtual int memory_initHeap_I();
   virtual int memory_clearArray_aB();
   virtual int memory_clearArray_aS();
   virtual int memory_clearArray_aI();
