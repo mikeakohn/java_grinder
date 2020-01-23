@@ -1099,7 +1099,7 @@ int MC68000::memory_allocStackBytes_I()
 int MC68000::memory_allocStackShorts_I()
 {
   const char *reg = top_reg();
-  fprintf(out, "  // allocStackShorts_I\n");
+  fprintf(out, "  ;; allocStackShorts_I\n");
   fprintf(out, "  move.l %s, d7\n", reg);
   fprintf(out, "  lsl.l #1, d7\n");
   fprintf(out, "  addq.l #3, d7\n");
