@@ -741,15 +741,15 @@ int Amiga::amiga_plot_IIIII()
 
   // bit/d7 = 128 >> (x & 0x7)
   fprintf(out,
-    "and.w #7, d%d\n"
-    "move.w #128, d7\n"
-    "lsr d%d, d7\n",
+    "  and.w #7, d%d\n"
+    "  move.w #128, d7\n"
+    "  lsr d%d, d7\n",
     x, x);
 
   // mask/d6 = bit ^ 0xff;
   fprintf(out,
-    "move.w d7, d6\n"
-    "eori.b #0xff, d6\n");
+    "  move.w d7, d6\n"
+    "  eori.b #0xff, d6\n");
 
   fprintf(out,
     "_plot_%d:\n",
