@@ -525,6 +525,60 @@ int SH4::jump_cond(std::string &label, int cond, int distance)
 
 int SH4::jump_cond_integer(std::string &label, int cond, int distance)
 {
+  fprintf(out, "  ; jump_cond_integer(%s, %d, %d)\n", label.c_str(), cond, distance);
+
+  // I think this should never happen
+  if (stack != 0)
+  {
+    printf("Internal Error: Stack not empty\n");
+    return -1;
+  }
+
+  const int value1 = REG_STACK(reg - 2);
+  const int value2 = REG_STACK(reg - 1);
+
+  switch(cond)
+  {
+    case COND_EQUAL:
+      fprintf(out, "  cmp/eq r%d, r%d\n", value2, value1);
+      fprintf(out, "  bt %s\n", label.c_str());
+      fprintf(out, "  nop\n");
+      reg -= 2;
+      return 0;
+    case COND_NOT_EQUAL:
+      fprintf(out, "  cmp/eq r%d, r%d\n", value2, value1);
+      fprintf(out, "  bf %s\n", label.c_str());
+      fprintf(out, "  nop\n");
+      reg -= 2;
+      return 0;
+    case COND_LESS:
+      fprintf(out, "  cmp/ge r%d, r%d\n", value2, value1);
+      fprintf(out, "  bf %s\n", label.c_str());
+      fprintf(out, "  nop\n");
+      reg -= 2;
+      return 0;
+    case COND_LESS_EQUAL:
+      fprintf(out, "  cmp/gt r%d, r%d\n", value2, value1);
+      fprintf(out, "  bf %s\n", label.c_str());
+      fprintf(out, "  nop\n");
+      reg -= 2;
+      return 0;
+    case COND_GREATER:
+      fprintf(out, "  cmp/gt r%d, r%d\n", value2, value1);
+      fprintf(out, "  bt %s\n", label.c_str());
+      fprintf(out, "  nop\n");
+      reg -= 2;
+      return 0;
+    case COND_GREATER_EQUAL:
+      fprintf(out, "  cmp/ge r%d, r%d\n", value2, value1);
+      fprintf(out, "  bt %s\n", label.c_str());
+      fprintf(out, "  nop\n");
+      reg -= 2;
+      return 0;
+    default:
+      break;
+  }
+
   return -1;
 }
 
