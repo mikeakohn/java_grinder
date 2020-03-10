@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn
+ * Copyright 2014-2020 by Michael Kohn
  *
  */
 
@@ -15,7 +15,7 @@
 
 #include "generator/SH4.h"
 
-#define REG_STACK(a) (a - 1)
+#define REG_STACK(a) (a + 1)
 #define LOCALS(i) (i * 4)
 
 // ABI is:
@@ -62,7 +62,7 @@ int SH4::open(const char *filename)
   return 0;
 }
 
-int Playstation2::finish()
+int SH4::finish()
 {
   fprintf(out,
     "  ;; If this function is right before the constants pool it should\n"
@@ -79,7 +79,11 @@ int Playstation2::finish()
 int SH4::start_init()
 {
   // Add any set up items (stack, registers, etc).
-  //fprintf(out, ".org ???\n");
+  // Start  0x0c000000
+  //   End  0x1c000000
+  // Video  0x04000000
+  //   End  0x04800000
+  fprintf(out, ".org 0x0c000000\n");
   fprintf(out, "start:\n");
 
   return 0;
@@ -100,16 +104,16 @@ int SH4::init_heap(int field_count)
 
 int SH4::field_init_int(std::string &name, int index, int value)
 {
-  int offset = get_constant(value);
+  int c = get_constant(value);
 
-  if (offset == -1) { return -1; }
+  if (c == -1) { return -1; }
 
   fprintf(out,
     "  ;; field_init_int(%s,%d,%d)\n"
     "  mov.l @(%d,r15), r15\n"
     "  mov.l r15, @(%d,GBR)\n",
     name.c_str(), index, value,
-    constant,
+    c,
     index * 4);
 
   return 0;
@@ -159,7 +163,7 @@ int SH4::push_int(int32_t n)
 
   if (offset == -1) { return -1; }
 
-  fprintf(out, "  mov.l (%d, r15), r%d\n", offset * 4, REG(reg));
+  fprintf(out, "  mov.l (%d, r15), r%d\n", offset * 4, REG_STACK(reg));
 
   reg++;
 
@@ -215,34 +219,39 @@ int SH4::pop()
 
 int SH4::dup()
 {
-  fprintf(out, "  mov.l r%d, r%d\n", REG(reg - 1), REG(reg));
+  fprintf(out, "  mov r%d, r%d\n", REG_STACK(reg - 1), REG_STACK(reg));
 
-  reg++:
+  reg++;
 
   return 0;
 }
 
 int SH4::dup2()
 {
-  return -1;
+  fprintf(out, "  mov r%d, r%d\n", REG_STACK(reg - 2), REG_STACK(reg + 0));
+  fprintf(out, "  mov r%d, r%d\n", REG_STACK(reg - 1), REG_STACK(reg + 1));
+
+  reg += 2;
+
+  return 0;
 }
 
 int SH4::swap()
 {
   fprintf(out,
-    "  mov.l r%d, r15\n"
-    "  mov.l r%d, r%d\n"
-    "  mov.l r15, r%d\n",
-    REG(reg - 2),
-    REG(reg - 1), REG(reg - 2),
-    REG(reg - 1));
+    "  mov r%d, r0\n"
+    "  mov r%d, r%d\n"
+    "  mov r0, r%d\n",
+    REG_STACK(reg - 2),
+    REG_STACK(reg - 1), REG_STACK(reg - 2),
+    REG_STACK(reg - 1));
 
   return 0;
 }
 
 int SH4::add_integer()
 {
-  fprintf(out, "  add r%d, r%d\n", REG(reg - 1), REG(reg - 2));
+  fprintf(out, "  add r%d, r%d\n", REG_STACK(reg - 1), REG_STACK(reg - 2));
 
   reg--;
 
@@ -253,14 +262,14 @@ int SH4::add_integer(int num)
 {
   if (num < -128 || num > 127) { return -1; }
 
-  fprintf(out, "  add #%d, r%d\n", num, REG(reg - 1));
+  fprintf(out, "  add #%d, r%d\n", num, REG_STACK(reg - 1));
 
   return 0;
 }
 
 int SH4::sub_integer()
 {
-  fprintf(out, "  sub r%d, r%d\n", REG(reg - 1), REG(reg - 2));
+  fprintf(out, "  sub r%d, r%d\n", REG_STACK(reg - 1), REG_STACK(reg - 2));
 
   reg--;
 
@@ -269,7 +278,16 @@ int SH4::sub_integer()
 
 int SH4::sub_integer(int num)
 {
-  // FIXME: Can use DT and some other optimizations?
+  // There is no immediate sub instruction, but maybe could change to
+  // an add minus?  The DT instruction decrements by 1, so use that if
+  // possible.
+
+  if (num == 1)
+  {
+    fprintf(out, "  dt r%d\n", REG_STACK(reg - 1));
+    return 0;
+  }
+
 
   return -1;
 }
@@ -277,10 +295,10 @@ int SH4::sub_integer(int num)
 int SH4::mul_integer()
 {
   fprintf(out,
-    "  mul r%d, r%d\n"
+    "  mul.l r%d, r%d\n"
     "  sts MACL, r%d\n",
-    REG(reg - 1), REG(reg - 2),
-    REG(reg - 2));
+    REG_STACK(reg - 1), REG_STACK(reg - 2),
+    REG_STACK(reg - 2));
 
   reg--;
 
@@ -299,14 +317,19 @@ int SH4::mod_integer()
 
 int SH4::neg_integer()
 {
-  fprintf("  neg r%d, r%d\n", REG(reg - 1), REG(reg - 1));
+  fprintf(out, "  neg r%d, r%d\n", REG_STACK(reg - 1), REG_STACK(reg - 1));
 
   return 0;
 }
 
 int SH4::shift_left_integer()
 {
-  return -1;
+  // SHAD shifts left arithmetically if source reg is positive.
+  fprintf(out, "  shad r%d, r%d\n", REG_STACK(reg - 1), REG_STACK(reg - 2));
+
+  reg--;
+
+  return 0;
 }
 
 int SH4::shift_left_integer(int num)
@@ -316,7 +339,13 @@ int SH4::shift_left_integer(int num)
 
 int SH4::shift_right_integer()
 {
-  return -1;
+  // SHAD shifts right arithmetically if source reg is negative.
+  fprintf(out, "  neg r%d\n", REG_STACK(reg - 1));
+  fprintf(out, "  shad r%d, r%d\n", REG_STACK(reg - 1), REG_STACK(reg - 2));
+
+  reg--;
+
+  return 0;
 }
 
 int SH4::shift_right_integer(int num)
@@ -326,7 +355,11 @@ int SH4::shift_right_integer(int num)
 
 int SH4::shift_right_uinteger()
 {
-  return -1;
+  // SHLD shifts right logically if source reg is negative.
+  fprintf(out, "  neg r%d\n", REG_STACK(reg - 1));
+  fprintf(out, "  shld r%d, r%d\n", REG_STACK(reg - 1), REG_STACK(reg - 2));
+
+  return 0;
 }
 
 int SH4::shift_right_uinteger(int num)
@@ -336,47 +369,79 @@ int SH4::shift_right_uinteger(int num)
 
 int SH4::and_integer()
 {
-  return -1;
+  fprintf(out, "  and r%d, r%d\n", REG_STACK(reg - 1), REG_STACK(reg - 2));
+
+  reg--;
+
+  return 0;
 }
 
 int SH4::and_integer(int num)
 {
-  return -1;
+  if (num < 0 || num > 255) { return -1; }
+
+  fprintf(out, "  and #%d, r%d\n", num, REG_STACK(reg - 1));
+
+  return 0;
 }
 
 int SH4::or_integer()
 {
-  return -1;
+  fprintf(out, "  or r%d, r%d\n", REG_STACK(reg - 1), REG_STACK(reg - 2));
+
+  reg--;
+
+  return 0;
 }
 
 int SH4::or_integer(int num)
 {
-  return -1;
+  if (num < 0 || num > 255) { return -1; }
+
+  fprintf(out, "  or #%d, r%d\n", num, REG_STACK(reg - 1));
+
+  return 0;
 }
 
 int SH4::xor_integer()
 {
-  return -1;
+  fprintf(out, "  xor r%d, r%d\n", REG_STACK(reg - 1), REG_STACK(reg - 2));
+
+  reg--;
+
+  return 0;
 }
 
 int SH4::xor_integer(int num)
 {
-  return -1;
+  if (num < 0 || num > 255) { return -1; }
+
+  fprintf(out, "  xor #%d, r%d\n", num, REG_STACK(reg - 1));
+
+  return 0;
 }
 
 int SH4::inc_integer(int index, int num)
 {
+  fprintf(out, "  ; inc_integer(local_%d,%d)\n", index, num);
+
   return -1;
 }
 
 int SH4::integer_to_byte()
 {
-  return -1;
+  fprintf(out, "  ; integer_to_byte() - sign extend byte to long\n");
+  fprintf(out, "  exts.b r%d, r%d\n", REG_STACK(reg - 1), REG_STACK(reg - 1));
+
+  return 0;
 }
 
 int SH4::integer_to_short()
 {
-  return -1;
+  fprintf(out, "  ; integer_to_short() - sign extend word to long\n");
+  fprintf(out, "  exts.w r%d, r%d\n", REG_STACK(reg - 1), REG_STACK(reg - 1));
+
+  return 0;
 }
 
 int SH4::add_float()
@@ -416,6 +481,45 @@ int SH4::integer_to_float()
 
 int SH4::jump_cond(std::string &label, int cond, int distance)
 {
+  fprintf(out, "  ; jump_cond(%s, %d, %d)\n", label.c_str(), cond, distance);
+
+  switch(cond)
+  {
+    case COND_EQUAL:
+      fprintf(out, "  cmp/eq #0, r%d\n", REG_STACK(reg - 1));
+      fprintf(out, "  bt %s\n", label.c_str());
+      fprintf(out, "  nop\n");
+      reg--;
+      return 0;
+    case COND_NOT_EQUAL:
+      fprintf(out, "  cmp/eq #0, r%d\n", REG_STACK(reg - 1));
+      fprintf(out, "  bf %s\n", label.c_str());
+      fprintf(out, "  nop\n");
+      return 0;
+    case COND_LESS:
+      fprintf(out, "  cmp/ge #0, r%d\n", REG_STACK(reg - 1));
+      fprintf(out, "  bf %s\n", label.c_str());
+      fprintf(out, "  nop\n");
+      return 0;
+    case COND_LESS_EQUAL:
+      fprintf(out, "  cmp/gt #0, r%d\n", REG_STACK(reg - 1));
+      fprintf(out, "  bf %s\n", label.c_str());
+      fprintf(out, "  nop\n");
+      return 0;
+    case COND_GREATER:
+      fprintf(out, "  cmp/gt #0, r%d\n", REG_STACK(reg - 1));
+      fprintf(out, "  bt %s\n", label.c_str());
+      fprintf(out, "  nop\n");
+      return 0;
+    case COND_GREATER_EQUAL:
+      fprintf(out, "  cmp/ge #0, r%d\n", REG_STACK(reg - 1));
+      fprintf(out, "  bt %s\n", label.c_str());
+      fprintf(out, "  nop\n");
+      return 0;
+    default:
+      break;
+  }
+
   return -1;
 }
 

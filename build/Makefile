@@ -60,6 +60,7 @@ CPUS= \
   generator/MSP430X.o \
   generator/Propeller.o \
   generator/R5900.o \
+  generator/SH4.o \
   generator/STDC.o \
   generator/TMS9900.o \
   generator/W65816.o \
