@@ -38,6 +38,7 @@
 #include "generator/PIC32.h"
 #include "generator/Playstation2.h"
 #include "generator/Propeller.h"
+#include "generator/SegaDreamcast.h"
 #include "generator/SegaGenesis.h"
 #include "generator/SNES.h"
 #include "generator/STDC.h"
@@ -203,6 +204,11 @@ static Generator *new_generator(const char *chip_type)
     generator = new Propeller();
   }
     else
+  if (strcasecmp("sega_dreamcast", chip_type) == 0)
+  {
+    generator = new SegaDreamcast();
+  }
+    else
   if (strcasecmp("sega_genesis", chip_type) == 0)
   {
     generator = new SegaGenesis();
@@ -314,7 +320,7 @@ int main(int argc, char *argv[])
            "     mips32, pic32, playstation2\n"
            "     msp430g2231, msp430g2452, msp430g2553, msp430f5529\n"
            "     propeller\n"
-           "     sega_genesis\n"
+           "     sega_dreamcast, sega_genesis\n"
            "     ti99\n"
            "     w65c134sxb, w65c265sxb\n"
            "     x86, x86_64\n"

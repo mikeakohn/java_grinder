@@ -80,6 +80,7 @@ SYSTEMS= \
   generator/Playstation2VU0.o \
   generator/Playstation2VU1.o \
   generator/PIC32.o \
+  generator/SegaDreamcast.o \
   generator/SegaGenesis.o \
   generator/SNES.o \
   generator/TI84.o \

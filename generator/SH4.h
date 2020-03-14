@@ -121,6 +121,9 @@ protected:
   int reg_max;        // size of register stack
   int stack;          // count how many things we put on the stack
   bool is_main : 1;
+  uint32_t ram_start;
+  uint32_t ram_end;
+  uint32_t org;
 };
 
 #endif
