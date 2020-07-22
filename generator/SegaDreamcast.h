@@ -26,6 +26,8 @@ public:
   virtual int new_object(std::string &object_name, int field_count);
 
 private:
+  void init_system();
+  void init_video();
 };
 
 #endif

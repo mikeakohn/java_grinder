@@ -32,9 +32,9 @@
 // r10 end of stack
 // r11 is temp
 // r12 is temp
-// r13 is temp
-// r14 points to locals
-// r15 points to constants
+// r13 points to locals
+// r14 points to constants
+// r15 hardware stack pointer
 
 SH4::SH4() :
   reg(0),
@@ -71,7 +71,7 @@ int SH4::finish()
     "  ;; If this function is right before the constants pool it should\n"
     "  ;; the displacement should be 0 (PC + 4)\n"
     "_load_constants_pool:\n"
-    "  mov.l @(0,PC), r15\n"
+    "  mov.l @(0,PC), r14\n"
     "  rts\n\n");
 
   insert_constants_pool();
@@ -104,9 +104,9 @@ int SH4::init_heap(int field_count)
 {
   fprintf(out,
     "  ;; init_heap(field_count=%d)\n"
-    "  mov.l _globals_address, r13\n"
+    "  mov.l _globals_address, r12\n"
     "  nop\n"
-    "  mov.l _constants_pool_address, r15\n"
+    "  mov.l _constants_pool_address, r14\n"
     "  bra _init_heap\n"
     "  nop\n"
     "  nop\n"
@@ -115,7 +115,7 @@ int SH4::init_heap(int field_count)
     "_constants_pool_address:\n"
     "  .dc32 _constant_pool\n"
     "_init_heap:\n"
-    "  ldc r13, GBR\n",
+    "  ldc r12, GBR\n",
     field_count);
 
   return 0;
@@ -129,8 +129,8 @@ int SH4::field_init_int(std::string &name, int index, int value)
   if (value >= -128 && value <= 127)
   {
     fprintf(out,
-      "  mov #%d, r15\n"
-      "  mov.l r15, @(%d,GBR)\n",
+      "  mov #%d, r12\n"
+      "  mov.l r12, @(%d,GBR)\n",
       value,
       index * 4);
 
@@ -142,8 +142,8 @@ int SH4::field_init_int(std::string &name, int index, int value)
   if (c == -1) { return -1; }
 
   fprintf(out,
-    "  mov.l @(%d,r15), r15\n"
-    "  mov.l r15, @(%d,GBR)\n",
+    "  mov.l @(%d,r14), r12\n"
+    "  mov.l r12, @(%d,GBR)\n",
     c,
     index * 4);
 
@@ -203,7 +203,7 @@ int SH4::push_int(int32_t n)
 
   if (offset == -1) { return -1; }
 
-  fprintf(out, "  mov.l @(%d, r15), r%d\n", offset * 4, REG_STACK(reg));
+  fprintf(out, "  mov.l @(%d, r14), r%d\n", offset * 4, REG_STACK(reg));
 
   reg++;
 
