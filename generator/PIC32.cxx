@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2020 by Michael Kohn
  *
  */
 
@@ -39,7 +39,7 @@ int PIC32::open(const char *filename)
 {
   if (MIPS32::open(filename) != 0) { return -1; }
 
-  fprintf(out, ".mips32\n");
+  fprintf(out, ".pic32\n");
 
   fprintf(out, "  SPI1CON equ 0x5800\n");
   fprintf(out, "  SPI1STAT equ 0x5810\n");
