@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2020 by Michael Kohn
  *
  */
 
@@ -201,27 +201,30 @@ int MSP430X::cpu_setClock25()
 {
   need_set_vcore_up = true;
 
-  fprintf(out, "  ;; Increase CPU voltage for faster MCLK\n");
-  fprintf(out, "  mov.w #1, r15\n");
-  fprintf(out, "  call #set_vcore_up\n");
-  fprintf(out, "  mov.w #2, r15\n");
-  fprintf(out, "  call #set_vcore_up\n");
-  fprintf(out, "  mov.w #3, r15\n");
-  fprintf(out, "  call #set_vcore_up\n\n");
-  fprintf(out, "  ;; Set up DCO to 25MHz\n");
-  fprintf(out, "  bis.w #SCG0, SR\n");
-  fprintf(out, "  mov.w #SELREF__REFOCLK, &UCSCTL3\n");
-  fprintf(out, "  mov.w #XT1OFF|XT2OFF, &UCSCTL6\n");
-  fprintf(out, "  mov.w #0, &UCSCTL0\n");
-  fprintf(out, "  mov.w #DCORSEL_6, &UCSCTL1\n");
-  fprintf(out, "  mov.w #762, &UCSCTL2\n");
-  fprintf(out, "  mov.w #SELA__REFOCLK|SELS__DCOCLK|SELM__DCOCLK, &UCSCTL4\n");
-  fprintf(out, "  bic.w #SCG0, SR\n");
-  fprintf(out, "wait_clock_%d:\n", label_count);
-  fprintf(out, "  bic.w #XT2OFFG|XT1LFOFFG|XT1HFOFFG|DCOFFG, &UCSCTL7\n");
-  fprintf(out, "  bic.w #OFIFG, &SFRIFG1\n");
-  fprintf(out, "  bit.w #OFIFG, &SFRIFG1\n");
-  fprintf(out, "  jnz wait_clock_%d\n", label_count);
+  fprintf(out,
+    "  ;; Increase CPU voltage for faster MCLK\n"
+    "  mov.w #1, r15\n"
+    "  call #set_vcore_up\n"
+    "  mov.w #2, r15\n"
+    "  call #set_vcore_up\n"
+    "  mov.w #3, r15\n"
+    "  call #set_vcore_up\n\n"
+    "  ;; Set up DCO to 25MHz\n"
+    "  bis.w #SCG0, SR\n"
+    "  mov.w #SELREF__REFOCLK, &UCSCTL3\n"
+    "  mov.w #XT1OFF|XT2OFF, &UCSCTL6\n"
+    "  mov.w #0, &UCSCTL0\n"
+    "  mov.w #DCORSEL_6, &UCSCTL1\n"
+    "  mov.w #762, &UCSCTL2\n"
+    "  mov.w #SELA__REFOCLK|SELS__DCOCLK|SELM__DCOCLK, &UCSCTL4\n"
+    "  bic.w #SCG0, SR\n"
+    "wait_clock_%d:\n"
+    "  bic.w #XT2OFFG|XT1LFOFFG|XT1HFOFFG|DCOFFG, &UCSCTL7\n"
+    "  bic.w #OFIFG, &SFRIFG1\n"
+    "  bit.w #OFIFG, &SFRIFG1\n"
+    "  jnz wait_clock_%d\n",
+    label_count,
+    label_count);
 
   label_count++;
 
@@ -232,31 +235,32 @@ int MSP430X::cpu_setClockExternal2()
 {
   need_set_vcore_up = true;
 
-  fprintf(out, "  ;; Increase CPU voltage for faster MCLK\n");
-  fprintf(out, "  mov.w #1, r15\n");
-  fprintf(out, "  call #set_vcore_up\n");
-  fprintf(out, "  mov.w #2, r15\n");
-  fprintf(out, "  call #set_vcore_up\n");
-  fprintf(out, "  mov.w #3, r15\n");
-  fprintf(out, "  call #set_vcore_up\n\n");
-  fprintf(out, "  ;; Turn on XT2 crystal\n");
-  fprintf(out, "  bis.b #0x0c, &P5SEL\n");
-  fprintf(out, "  mov.w #SELS_5|SELM_5|SELA_2, &UCSCTL4\n");
-  fprintf(out, "  bic.w #SELREF_7, &UCSCTL3\n");
-  fprintf(out, "  bis.w #SELREF_2, &UCSCTL3\n");
-  fprintf(out, "  mov.w #0, &UCSCTL0\n");
-  fprintf(out, "  bic.w #XT2OFF, &UCSCTL6\n");
-  fprintf(out, "wait_clock:\n");
-  fprintf(out, "  bic.w #XT2OFFG|XT1LFOFFG|XT1HFOFFG|DCOFFG, &UCSCTL7\n");
-  fprintf(out, "  bic.w #OFIFG, &SFRIFG1\n");
-  fprintf(out, "  mov.w #5000, r15\n");
-  fprintf(out, "dec_again:\n");
-  fprintf(out, "  dec r15\n");
-  fprintf(out, "  jnz dec_again\n");
-  fprintf(out, "  bit.w #OFIFG, &SFRIFG1\n");
-  fprintf(out, "  jnz wait_clock\n");
-  fprintf(out, "  mov.w #0, &UCSCTL5\n\n");
-  fprintf(out, "  mov.w #SELS_5|SELM_5|SELA_2, &UCSCTL4\n");
+  fprintf(out,
+    "  ;; Increase CPU voltage for faster MCLK\n"
+    "  mov.w #1, r15\n"
+    "  call #set_vcore_up\n"
+    "  mov.w #2, r15\n"
+    "  call #set_vcore_up\n"
+    "  mov.w #3, r15\n"
+    "  call #set_vcore_up\n\n"
+    "  ;; Turn on XT2 crystal\n"
+    "  bis.b #0x0c, &P5SEL\n"
+    "  mov.w #SELS_5|SELM_5|SELA_2, &UCSCTL4\n"
+    "  bic.w #SELREF_7, &UCSCTL3\n"
+    "  bis.w #SELREF_2, &UCSCTL3\n"
+    "  mov.w #0, &UCSCTL0\n"
+    "  bic.w #XT2OFF, &UCSCTL6\n"
+    "wait_clock:\n"
+    "  bic.w #XT2OFFG|XT1LFOFFG|XT1HFOFFG|DCOFFG, &UCSCTL7\n"
+    "  bic.w #OFIFG, &SFRIFG1\n"
+    "  mov.w #5000, r15\n"
+    "dec_again:\n"
+    "  dec r15\n"
+    "  jnz dec_again\n"
+    "  bit.w #OFIFG, &SFRIFG1\n"
+    "  jnz wait_clock\n"
+    "  mov.w #0, &UCSCTL5\n\n"
+    "  mov.w #SELS_5|SELM_5|SELA_2, &UCSCTL4\n");
 
   return 0;
 }
@@ -266,7 +270,7 @@ int MSP430X::timer_setInterval_II(int cycles, int divider)
 {
   if (cycles > 0xffff)
   {
-    printf("** Error cycles is more than 16 bit\n"); 
+    printf("** Error cycles is more than 16 bit\n");
     return -1;
   }
 
@@ -353,48 +357,63 @@ void MSP430X::insert_set_vcore_up()
   // Make sure no flags are set for iterative sequences
 /* The manual says to do this.. I see someone else not doing this.. and
    this hangs if it's done.. :(
-  fprintf(out, "set_vcore_up_svsmhdlyifg_1:\n");
-  fprintf(out, "  bit.w #SVSMHDLYIFG, &PMMIFG\n");
-  fprintf(out, "  jz set_vcore_up_svsmhdlyifg_1\n");
-  fprintf(out, "set_vcore_up_svsmldlyifg_1:\n");
-  fprintf(out, "  bit.w #SVSMLDLYIFG, &PMMIFG\n");
-  fprintf(out, "  jz set_vcore_up_svsmldlyifg_1\n");
+  fprintf(out,
+    "set_vcore_up_svsmhdlyifg_1:\n"
+    "  bit.w #SVSMHDLYIFG, &PMMIFG\n"
+    "  jz set_vcore_up_svsmhdlyifg_1\n"
+    "set_vcore_up_svsmldlyifg_1:\n"
+    "  bit.w #SVSMLDLYIFG, &PMMIFG\n"
+    "  jz set_vcore_up_svsmldlyifg_1\n");
 */
+
   // Set SVS/SVM high side new level
   //SVSMHCTL = SVSHE + (SVSHRVL0 * level) + SVMHE + (SVSMHRRL0 * level);
-  fprintf(out, "  mov.w r15, r14\n");
-  fprintf(out, "  rlam.w #4, r14\n");
-  fprintf(out, "  rlam.w #4, r14\n");
-  fprintf(out, "  mov.w r14, r13\n");
-  fprintf(out, "  bis.w #SVSHE|SVMHE, r13\n");
-  fprintf(out, "  mov.w r13, &SVSMHCTL\n");
+  fprintf(out,
+    "  mov.w r15, r14\n"
+    "  rlam.w #4, r14\n"
+    "  rlam.w #4, r14\n"
+    "  mov.w r14, r13\n"
+    "  bis.w #SVSHE|SVMHE, r13\n"
+    "  mov.w r13, &SVSMHCTL\n");
+
   // Set SVM low side to new level
   //SVSMLCTL = SVSLE + SVMLE + (SVSMLRRL0 * level);
-  fprintf(out, "  mov.w r15, r13\n");
-  fprintf(out, "  bis.w #SVSLE|SVMLE, r13\n");
-  fprintf(out, "  mov.w r13, &SVSMLCTL\n");
+  fprintf(out,
+    "  mov.w r15, r13\n"
+    "  bis.w #SVSLE|SVMLE, r13\n"
+    "  mov.w r13, &SVSMLCTL\n");
+
   // Wait till SVM is settled
-  fprintf(out, "set_vcore_up_svsmldlyifg_2:\n");
-  fprintf(out, "  bit.w #SVSMLDLYIFG, &PMMIFG\n");
-  fprintf(out, "  jz set_vcore_up_svsmldlyifg_2\n");
+  fprintf(out,
+    "set_vcore_up_svsmldlyifg_2:\n"
+    "  bit.w #SVSMLDLYIFG, &PMMIFG\n"
+    "  jz set_vcore_up_svsmldlyifg_2\n");
+
   // Clear already set flags
   fprintf(out, "  bic.w #SVMLVLRIFG|SVMLIFG, &PMMIFG\n");
+
   // Set VCore to new level
   //PMMCTL0_L = PMMCOREV0 * level;
   fprintf(out, "  mov.b r15, &PMMCTL0_L\n");
+
   // Wait till new level reached
-  fprintf(out, "  bit.w #SVMLIFG, &PMMIFG\n");
-  fprintf(out, "  jz set_vcore_up_skip_level_check\n");
-  fprintf(out, "set_vcore_up_level_check:\n");
-  fprintf(out, "  bit.w #SVMLVLRIFG, &PMMIFG\n");
-  fprintf(out, "  jz set_vcore_up_level_check\n");
-  fprintf(out, "set_vcore_up_skip_level_check:\n");
+  fprintf(out,
+    "  bit.w #SVMLIFG, &PMMIFG\n"
+    "  jz set_vcore_up_skip_level_check\n"
+    "set_vcore_up_level_check:\n"
+    "  bit.w #SVMLVLRIFG, &PMMIFG\n"
+    "  jz set_vcore_up_level_check\n"
+    "set_vcore_up_skip_level_check:\n");
+
   // Set SVS/SVM low side to new level
   //SVSMLCTL = SVSLE + (SVSLRVL0 * level) + SVMLE + (SVSMLRRL0 * level);
-  fprintf(out, "  bis.w #SVSLE|SVMLE, r14\n");
-  fprintf(out, "  mov.w r14, &SVSMLCTL\n");
+  fprintf(out,
+    "  bis.w #SVSLE|SVMLE, r14\n"
+    "  mov.w r14, &SVSMLCTL\n");
+
   // Lock PMM registers for write access
-  fprintf(out, "  mov.b #0x00, &PMMCTL0_H\n");
-  fprintf(out, "  ret\n\n");
+  fprintf(out,
+    "  mov.b #0x00, &PMMCTL0_H\n"
+    "  ret\n\n");
 }
 
