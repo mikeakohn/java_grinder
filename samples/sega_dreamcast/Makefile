@@ -6,7 +6,7 @@ default: $(CLASSES)
 
 grind: $(CLASSES)
 	../../java_grinder SegaDreamcastDemo.class sega_dreamcast_demo.asm sega_dreamcast
-	../../../naken_asm/naken_asm -I $(INCLUDES) -l -b -o sega_dreamcast_demo.bin sega_dreamcast_demo.asm
+	../../../naken_asm/naken_asm -I $(INCLUDES) -l -type bin -o sega_dreamcast_demo.bin sega_dreamcast_demo.asm
 
 %.class: %.java
 	javac -classpath ../../build/JavaGrinder.jar:. $*.java

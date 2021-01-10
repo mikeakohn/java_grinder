@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  * W65816 written by Joe Davisson
  *
@@ -646,7 +646,7 @@ int W65816::jump_cond(std::string &label, int cond, int distance)
         {
           fprintf(out, "  lda stack,x\n");
           fprintf(out, "  cmp #0\n");
-          fprintf(out, "  bmi lalbe_%d\n", label_count);
+          fprintf(out, "  bmi label_%d\n", label_count);
           fprintf(out, "  jmp %s\n", label.c_str());
         }
           else

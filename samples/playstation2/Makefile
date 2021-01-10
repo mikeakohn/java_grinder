@@ -4,14 +4,14 @@ default: PS2JavaDemo.class SimpleTest.class
 
 grind: PS2JavaDemo.class
 	../../java_grinder -v PS2JavaDemo.class ps2_java_demo.asm playstation2
-	../../../naken_asm/naken_asm -I $(INCLUDE_PATH) -l -e -o ps2_java_demo.elf ps2_java_demo.asm
+	../../../naken_asm/naken_asm -I $(INCLUDE_PATH) -l -type elf -o ps2_java_demo.elf ps2_java_demo.asm
 
 simple: SimpleTest.class
 	../../java_grinder -v SimpleTest.class simple_test.asm playstation2
-	../../../naken_asm/naken_asm -I $(INCLUDE_PATH) -l -e -o simple_test.elf simple_test.asm
+	../../../naken_asm/naken_asm -I $(INCLUDE_PATH) -l -type elf -o simple_test.elf simple_test.asm
 
 debug:
-	../../../naken_asm/naken_asm -I $(INCLUDE_PATH) -l -e -dump_symbols -o ps2_java_demo.elf ps2_java_demo.asm
+	../../../naken_asm/naken_asm -I $(INCLUDE_PATH) -l -type elf -dump_symbols -o ps2_java_demo.elf ps2_java_demo.asm
 
 %.class: %.java
 	javac -classpath ../../build/JavaGrinder.jar:. $*.java
