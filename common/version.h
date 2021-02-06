@@ -1,7 +1,7 @@
 #ifndef JAVA_GRINDER_COMMON_VERSION_H
 #define JAVA_GRINDER_COMMON_VERSION_H
 
-#define VERSION "January 15, 2020"
+#define VERSION "February 6, 2021"
 
 #endif
 

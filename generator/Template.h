@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -100,7 +100,7 @@ public:
 protected:
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack
-  int stack;          // count how many things we put on the stack
+  int stack;          // count how many things currently on the stack
   bool is_main : 1;
 };
 
