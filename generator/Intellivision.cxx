@@ -19,8 +19,8 @@
 // r0 temp
 // r1 temp
 // r2
-// r3
-// r4 points to locals
+// r3 points to locals
+// r4
 // r5 points to heap
 // r6 SP (stack write/inc with push, dec/read with pop)
 // r7 PC
@@ -28,6 +28,8 @@
 // 0x0102 Scratchpad RAM start (EXEC uses this?)
 // 0x015d Scratchpad RAM general area start
 // 0x01ef Scratchpad RAM end
+//
+// 0x0200-0x02ef BACKTAB (20x12 words)
 
 Intellivision::Intellivision() : is_main(false)
 {
@@ -83,7 +85,8 @@ int Intellivision::start_init()
 
   fprintf(out,
     "start:\n"
-    "  mvii #ram_start, r6\n");
+    "  ; Point r3 to local variables\n"
+    "  mvii #ram_start, r3\n");
 
   // FIXME: Remove.
 #if 0
@@ -102,7 +105,7 @@ int Intellivision::insert_static_field_define(
   std::string &type,
   int index)
 {
-  fprintf(out, "  %s equ ram_end-%d\n", name.c_str(), index);
+  fprintf(out, "  %s equ ram_end-%d\n", name.c_str(), (index + 1) * 2);
 
   return 0;
 }
@@ -112,7 +115,7 @@ int Intellivision::init_heap(int field_count)
   fprintf(out,
     "  ; Set up heap and static initializers\n"
     "  mvii #ram_end-%d, r5\n",
-    field_count);
+    field_count * 2);
 
   return -1;
 }
@@ -123,7 +126,7 @@ int Intellivision::field_init_int(std::string &name, int index, int value)
     "  mvii #ram_end-%d, r0\n"
     "  mvii #%d, r1\n"
     "  mvo@ r1, r0\n",
-    index,
+    (index + 1) * 2,
     value & 0xffff);
 
   return 0;
@@ -147,7 +150,6 @@ void Intellivision::method_start(
     name.c_str(),
     local_count,
     param_count);
-
 }
 
 void Intellivision::method_end(int local_count)
@@ -157,14 +159,25 @@ void Intellivision::method_end(int local_count)
 
 int Intellivision::push_local_var_int(int index)
 {
-  fprintf(out,
-    "  ; push_local_var_int(%d)\n"
-    "  movr r4, r3\n"
-    "  subi #%d, r3\n"
-    "  mvi@ r3, r0\n"
-    "  mvo@ r0, r6\n",
-    index,
-    index);
+  if (index == 0)
+  {
+    fprintf(out,
+      "  ; push_local_var_int(%d)\n"
+      "  mvi@ r3, r0\n"
+      "  pshr r0\n",
+      index);
+  }
+    else
+  {
+    fprintf(out,
+      "  ; push_local_var_int(%d)\n"
+      "  movr r3, r4\n"
+      "  addi #%d, r4\n"
+      "  mvi@ r4, r0\n"
+      "  pshr r0\n",
+      index,
+      index * 2);
+  }
 
   return 0;
 }
@@ -193,7 +206,7 @@ int Intellivision::push_int(int32_t n)
   fprintf(out,
     "  ; push_int()\n"
     "  mvii #0x%04x, r0\n"
-    "  mvo@ r0, r6\n",
+    "  pshr r0\n",
     n & 0xffff);
 
   return 0;
@@ -224,14 +237,25 @@ int Intellivision::push_ref(std::string &name)
 
 int Intellivision::pop_local_var_int(int index)
 {
-  fprintf(out,
-    "  ; pop_local_var_int(%d)\n"
-    "  movr r4, r3\n"
-    "  subi #%d, r3\n"
-    "  mvi@ r6, r0\n"
-    "  mvo@ r0, r3\n",
-    index,
-    index);
+  if (index == 0)
+  {
+    fprintf(out,
+      "  ; pop_local_var_int(%d)\n"
+      "  pulr r0\n"
+      "  mvo@ r0, r3\n",
+      index);
+  }
+    else
+  {
+    fprintf(out,
+      "  ; pop_local_var_int(%d)\n"
+      "  movr r3, r4\n"
+      "  addi #%d, r4\n"
+      "  pulr r0\n"
+      "  mvo@ r0, r4\n",
+      index * 2,
+      index);
+  }
 
   return 0;
 }
@@ -254,9 +278,9 @@ int Intellivision::dup()
 {
   fprintf(out,
     "  ; dup()\n"
-    "  mvi@ r6, r0\n"
-    "  mvo@ r0, r6\n"
-    "  mvo@ r0, r6\n");
+    "  pulr r0\n"
+    "  pshr r0\n"
+    "  pshr r0\n");
 
   return 0;
 }
@@ -265,12 +289,12 @@ int Intellivision::dup2()
 {
   fprintf(out,
     "  ; dup2()\n"
-    "  mvi@ r6, r0\n"
-    "  mvi@ r6, r1\n"
-    "  mvo@ r1, r6\n"
-    "  mvo@ r0, r6\n"
-    "  mvo@ r1, r6\n"
-    "  mvo@ r0, r6\n");
+    "  pulr r0\n"
+    "  pulr r1\n"
+    "  pshr r1\n"
+    "  pshr r0\n"
+    "  pshr r1\n"
+    "  pshr r0\n");
 
   return 0;
 }
@@ -279,10 +303,10 @@ int Intellivision::swap()
 {
   fprintf(out,
     "  ; swap()\n"
-    "  mvi@ r6, r0\n"
-    "  mvi@ r6, r1\n"
-    "  mvo@ r0, r6\n"
-    "  mvo@ r1, r6\n");
+    "  pulr r0\n"
+    "  pulr r1\n"
+    "  pshr r0\n"
+    "  pshr r1\n");
 
   return 0;
 }
@@ -291,20 +315,22 @@ int Intellivision::add_integer()
 {
   fprintf(out,
     "  ; add_integer()\n"
-    "  mvi@ r6, r0\n"
+    "  pulr r0\n"
     "  add@ r6, r0\n"
-    "  mvo@ r0, r6\n");
+    "  phsr r0\n");
 
   return 0;
 }
 
 int Intellivision::add_integer(int num)
 {
+  if (num < 0 || num > 255) { return -1; }
+
   fprintf(out,
     "  ; add_integer(%d)\n"
     "  mvii #%d, r0\n"
     "  add@ r6, r0\n"
-    "  mvo@ r0, r6\n",
+    "  phsr r0\n",
     num,
     num & 0xffff);
 
@@ -315,22 +341,24 @@ int Intellivision::sub_integer()
 {
   fprintf(out,
     "  ; sub_integer()\n"
-    "  mvi@ r6, r0\n"
-    "  mvi@ r6, r1\n"
+    "  pulr r0\n"
+    "  pulr r1\n"
     "  subr r0, r1\n"
-    "  mvo@ r1, r6\n");
+    "  pshr r1\n");
 
   return 0;
 }
 
 int Intellivision::sub_integer(int num)
 {
+  if (num < 0 || num > 255) { return -1; }
+
   fprintf(out,
     "  ; sub_integer(%d)\n"
-    "  mvi@ r6, r0\n"
+    "  pulr r0\n"
     "  mvii #%d, r1\n"
     "  subr r0, r1\n"
-    "  mvo@ r1, r6\n",
+    "  pshr r1\n",
     num,
     num & 0xffff);
 
@@ -356,9 +384,9 @@ int Intellivision::neg_integer()
 {
   fprintf(out,
     "  ; neg_integer()\n"
-    "  mvi@ r6, r0\n"
+    "  pulr r0\n"
     "  neg r0\n"
-    "  mvo@ r0, r6\n");
+    "  pshr r0\n");
 
   return 0;
 }
@@ -367,13 +395,13 @@ int Intellivision::shift_left_integer()
 {
   fprintf(out,
     "  ; shift_left_integer()\n"
-    "  mvi@ r6, r1\n"
-    "  mvi@ r6, r0\n"
+    "  pulr r1\n"
+    "  pulr r0\n"
     "label_%d:\n"
     "  sll r0\n"
     "  decr r1\n"
     "  bneq label_%d\n"
-    "  mvo@ r0, r6\n",
+    "  pshr r0\n",
     label_count,
     label_count);
 
@@ -386,7 +414,7 @@ int Intellivision::shift_left_integer(int num)
 {
   fprintf(out,
     "  ; shift_left_integer(%d)\n"
-    "  mvi@ r6, r0\n",
+    "  pulr r0\n",
     num);
 
   if (num <= 8)
@@ -427,13 +455,13 @@ int Intellivision::shift_right_integer()
 {
   fprintf(out,
     "  ; shift_right_integer()\n"
-    "  mvi@ r6, r1\n"
-    "  mvi@ r6, r0\n"
+    "  pulr r1\n"
+    "  pulr r0\n"
     "label_%d:\n"
     "  sar r0\n"
     "  decr r1\n"
     "  bneq label_%d\n"
-    "  mvo@ r0, r6\n",
+    "  pshr r0\n",
     label_count,
     label_count);
 
@@ -446,7 +474,7 @@ int Intellivision::shift_right_integer(int num)
 {
   fprintf(out,
     "  ; shift_right_integer(%d)\n"
-    "  mvi@ r6, r0\n",
+    "  pulr r0\n",
     num);
 
   if (num <= 8)
@@ -478,7 +506,7 @@ int Intellivision::shift_right_integer(int num)
     label_count++;
   }
 
-  fprintf(out, "  mvi@ r6, r0\n");
+  fprintf(out, "  pshr r0\n");
 
   return 0;
 }
@@ -487,13 +515,13 @@ int Intellivision::shift_right_uinteger()
 {
   fprintf(out,
     "  ; shift_right_uinteger()\n"
-    "  mvi@ r6, r1\n"
-    "  mvi@ r6, r0\n"
+    "  pulr r1\n"
+    "  pulr r0\n"
     "label_%d:\n"
     "  slr r0\n"
     "  decr r1\n"
     "  bneq label_%d\n"
-    "  mvo@ r0, r6\n",
+    "  pshr r0\n",
     label_count,
     label_count);
 
@@ -506,7 +534,7 @@ int Intellivision::shift_right_uinteger(int num)
 {
   fprintf(out,
     "  ; shift_right_uinteger(%d)\n"
-    "  mvi@ r6, r0\n",
+    "  pulr r0\n",
     num);
 
   if (num <= 8)
@@ -538,7 +566,7 @@ int Intellivision::shift_right_uinteger(int num)
     label_count++;
   }
 
-  fprintf(out, "  mvi@ r6, r0\n");
+  fprintf(out, "  pshr r0\n");
 
   return 0;
 }
@@ -547,21 +575,23 @@ int Intellivision::and_integer()
 {
   fprintf(out,
     "  ; add_integer()\n"
-    "  mvi@ r6, r0\n"
+    "  pulr r0\n"
     "  and@ r6, r0\n"
-    "  mvo@ r0, r6\n");
+    "  pshr r0\n");
 
   return 0;
 }
 
 int Intellivision::and_integer(int num)
 {
+  if (num < 0 || num > 255) { return -1; }
+
   fprintf(out,
     "  ; and_integer(0x%04x)\n"
-    "  mvi@ r6, r0\n"
+    "  pulr r0\n"
     "  mvii #0x%04x, r1\n"
     "  andr r0, r1\n"
-    "  mvo@ r1, r6\n",
+    "  pshr r1\n",
     num & 0xffff,
     num & 0xffff);
 
@@ -572,28 +602,30 @@ int Intellivision::or_integer()
 {
   fprintf(out,
     "  ; or_integer()\n"
-    "  mvi@ r6, r0\n"
-    "  mvi@ r6, r1\n"
+    "  pulr r0\n"
+    "  pulr r1\n"
     "  comr r0\n"
     "  comr r1\n"
     "  andr r1, r0\n"
     "  comr r0\n"
-    "  mvo@ r0, r6\n");
+    "  pshr r0\n");
 
   return 0;
 }
 
 int Intellivision::or_integer(int num)
 {
+  if (num < 0 || num > 255) { return -1; }
+
   fprintf(out,
     "  ; or_integer(0x%04x)\n"
-    "  mvi@ r6, r0\n"
+    "  pulr r0\n"
     "  mvii #0x%04x, r1\n"
     "  comr r0\n"
     "  comr r1\n"
     "  andr r1, r0\n"
     "  comr r0\n"
-    "  mvo@ r0, r6\n",
+    "  pshr r0\n",
     num & 0xffff,
     num & 0xffff);
 
@@ -604,21 +636,23 @@ int Intellivision::xor_integer()
 {
   fprintf(out,
     "  ; add_integer()\n"
-    "  mvi@ r6, r0\n"
+    "  pulr r0\n"
     "  xor@ r6, r0\n"
-    "  mvo@ r0, r6\n");
+    "  pshr r0\n");
 
   return 0;
 }
 
 int Intellivision::xor_integer(int num)
 {
+  if (num < 0 || num > 255) { return -1; }
+
   fprintf(out,
     "  ; xor_integer(0x%04x)\n"
-    "  mvi@ r6, r0\n"
+    "  pulr r0\n"
     "  mvii #0x%04x, r1\n"
     "  xorr r0, r1\n"
-    "  mvo@ r1, r6\n",
+    "  pshr r1\n",
     num & 0xffff,
     num & 0xffff);
 
@@ -627,14 +661,38 @@ int Intellivision::xor_integer(int num)
 
 int Intellivision::inc_integer(int index, int num)
 {
-  fprintf(out,
-    "  ; inc_integer(%d)\n"
-    "  movr r4, r3\n"
-    "  subi #%d, r3\n"
-    "  addi #d, r0\n"
-    "  mvo@ r0, r3\n",
-    num,
-    num & 0xffff);
+  const char *operation = "add";
+
+  if (num < 0)
+  {
+    num = -num;
+    operation = "sub";
+  }
+
+  if (index == 0)
+  {
+    fprintf(out,
+      "  ; inc_integer(%d)\n"
+      "  mvii #d, r0\n"
+      "  %s@ r3, r0\n"
+      "  mvo@ r0, r3\n",
+      num & 0xffff,
+      operation);
+  }
+    else
+  {
+    fprintf(out,
+      "  ; inc_integer(%d)\n"
+      "  mvii #%d, r0\n"
+      "  movr r3, r4\n"
+      "  addi #%d, r4\n"
+      "  %s@ r4, r0\n"
+      "  mvo@ r0, r4\n",
+      num,
+      num & 0xffff,
+      index * 2,
+      operation);
+  }
 
   return 0;
 }
@@ -643,14 +701,14 @@ int Intellivision::integer_to_byte()
 {
   fprintf(out,
     "  ; integer_to_byte()\n"
-    "  mvi@ r6, r0\n"
+    "  pulr r0\n"
     "  movr r0, r1\n"
     "  andi #0x80, r1\n"
     "  beq label_%d\n"
     "  andi #0x00ff, r0\n"
     "  xori #0xff00, r0\n"
     "label_%d\n"
-    "  mvo@ r0, r6\n",
+    "  pshr r0\n",
     label_count,
     label_count);
 
