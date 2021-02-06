@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -63,7 +63,7 @@ MSP430::MSP430(uint8_t chip_type) :
   need_mul_integers(0),
   need_div_integers(0),
   need_timer_interrupt(0),
-  is_main(0),
+  is_main(false),
   is_interrupt(0)
 {
   ram_start = 0x0200;
@@ -168,7 +168,11 @@ int MSP430::field_init_ref(std::string &name, int index)
   return 0;
 }
 
-void MSP430::method_start(int local_count, int max_stack, int param_count, std::string &name)
+void MSP430::method_start(
+  int local_count,
+  int max_stack,
+  int param_count,
+  std::string &name)
 {
   reg = 0;
   stack = 0;
@@ -176,8 +180,8 @@ void MSP430::method_start(int local_count, int max_stack, int param_count, std::
   this->max_stack = max_stack;
   //printf("max_stack=%d\n", max_stack);
 
-  is_main = (name == "main") ? 1 : 0;
-  is_interrupt = (name == "timerInterrupt") ? 1 : 0;
+  is_main = name == "main";
+  is_interrupt = name == "timerInterrupt";
 
   // main() function goes here
   fprintf(out, "%s:\n", name.c_str());

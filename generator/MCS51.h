@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn, Joe Davisson
+ * Copyright 2014-2021 by Michael Kohn, Joe Davisson
  *
  * MCS-51 (8051) written by Joe Davisson
  *

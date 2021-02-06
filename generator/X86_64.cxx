@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -47,7 +47,7 @@ static const char *cond_str[] = { "je", "jne", "jl", "jle", "jg", "jge" };
 X86_64::X86_64() :
   reg(0),
   stack(0),
-  is_main(0)
+  is_main(false)
 {
 
 }

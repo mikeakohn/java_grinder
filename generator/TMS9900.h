@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -15,7 +15,7 @@
 #include "generator/Generator.h"
 
 #define REG_START 2
-#define REG_STACK(a) (a+REG_START)
+#define REG_STACK(a) (a + REG_START)
 
 class TMS9900 : public Generator
 {

@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -24,7 +24,7 @@ DotNet::DotNet() :
   reg(0),
   reg_max(9),
   stack(0),
-  is_main(0)
+  is_main(false)
 {
 
 }
@@ -55,7 +55,10 @@ int DotNet::start_init()
   return 0;
 }
 
-int DotNet::insert_static_field_define(std::string &name, std::string &type, int index)
+int DotNet::insert_static_field_define(
+  std::string &name,
+  std::string &type,
+  int index)
 {
   return -1;
 }
@@ -78,7 +81,11 @@ int DotNet::field_init_ref(std::string &name, int index)
   return -1;
 }
 
-void DotNet::method_start(int local_count, int max_stack, int param_count, std::string &name)
+void DotNet::method_start(
+  int local_count,
+  int max_stack,
+  int param_count,
+  std::string &name)
 {
 }
 

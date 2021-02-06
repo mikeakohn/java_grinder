@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -37,7 +37,7 @@ MC6809::MC6809() :
   reg(0),
   reg_max(9),
   stack(0),
-  is_main(0),
+  is_main(false),
   need_multiply(0)
 {
 
@@ -77,7 +77,10 @@ int MC6809::start_init()
   return 0;
 }
 
-int MC6809::insert_static_field_define(std::string &name, std::string &type, int index)
+int MC6809::insert_static_field_define(
+  std::string &name,
+  std::string &type,
+  int index)
 {
   fprintf(out, "%s equ ram_start+%d\n", name.c_str(), index * 2);
 
@@ -108,11 +111,15 @@ int MC6809::field_init_ref(std::string &name, int index)
   return 0;
 }
 
-void MC6809::method_start(int local_count, int max_stack, int param_count, std::string &name)
+void MC6809::method_start(
+  int local_count,
+  int max_stack,
+  int param_count,
+  std::string &name)
 {
   int n;
 
-  is_main = (name == "main") ? 1 : 0;
+  is_main = name == "main";
 
   fprintf(out, "%s:\n", name.c_str());
 

@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn, Joe Davisson
+ * Copyright 2014-2021 by Michael Kohn, Joe Davisson
  *
  * AVR8 written by Joe Davisson
  *
@@ -100,7 +100,7 @@ static char *adc_out_string;
 
 AVR8::AVR8(uint8_t chip_type) :
   stack(0),
-  is_main(0),
+  is_main(false),
   need_farjump(0),
   need_memory_mapped_adc(0),
   need_swap(0),
@@ -282,7 +282,10 @@ int AVR8::start_init()
   return 0;
 }
 
-int AVR8::insert_static_field_define(std::string &name, std::string &type, int index)
+int AVR8::insert_static_field_define(
+  std::string &name,
+  std::string &type,
+  int index)
 {
   fprintf(out, "%s equ ram_start + %d\n", name.c_str(), (index + 1) * 2);
 
@@ -324,11 +327,15 @@ int AVR8::field_init_ref(std::string &name, int index)
   return 0;
 }
 
-void AVR8::method_start(int local_count, int max_stack, int param_count, std::string &name)
+void AVR8::method_start(
+  int local_count,
+  int max_stack,
+  int param_count,
+  std::string &name)
 {
   stack = 0;
 
-  is_main = (name == "main") ? 1 : 0;
+  is_main = name == "main";
 
   fprintf(out, "%s:\n", name.c_str());
 

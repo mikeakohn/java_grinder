@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2020 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -40,7 +40,7 @@ SH4::SH4() :
   reg(0),
   reg_max(9),
   stack(0),
-  is_main(0),
+  is_main(false),
   ram_start(0),
   ram_end(0),
   org(0)

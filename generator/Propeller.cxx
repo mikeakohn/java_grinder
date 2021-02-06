@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -46,7 +46,7 @@
 Propeller::Propeller() :
   reg(0),
   reg_max(0),
-  is_main(0),
+  is_main(false),
   need_muls(0)
 {
 
@@ -132,7 +132,10 @@ int Propeller::start_init()
   return 0;
 }
 
-int Propeller::insert_static_field_define(std::string &name, std::string &type, int index)
+int Propeller::insert_static_field_define(
+  std::string &name,
+  std::string &type,
+  int index)
 {
   statics.push_back(name.c_str());
 
@@ -158,11 +161,15 @@ int Propeller::field_init_ref(std::string &name, int index)
   return -1;
 }
 
-void Propeller::method_start(int local_count, int max_stack, int param_count, std::string &name)
+void Propeller::method_start(
+  int local_count,
+  int max_stack,
+  int param_count,
+  std::string &name)
 {
   method_name = name;
 
-  is_main = (name == "main");
+  is_main = name == "main";
 
   if (is_main)
   {

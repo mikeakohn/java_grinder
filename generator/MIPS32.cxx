@@ -72,7 +72,7 @@ MIPS32::MIPS32() :
   ram_end(0),
   virtual_address(0),
   physical_address(0),
-  is_main(0)
+  is_main(false)
 {
 
 }
@@ -181,9 +181,13 @@ int MIPS32::field_init_ref(std::string &name, int index)
   return 0;
 }
 
-void MIPS32::method_start(int local_count, int max_stack, int param_count, std::string &name)
+void MIPS32::method_start(
+  int local_count,
+  int max_stack,
+  int param_count,
+  std::string &name)
 {
-  is_main = (name == "main") ? 1 : 0;
+  is_main = name == "main";
 
   fprintf(out, "%s:\n", name.c_str());
   fprintf(out, "  ; %s(local_count=%d, max_stack=%d, param_count=%d)\n", name.c_str(), local_count, max_stack, param_count);

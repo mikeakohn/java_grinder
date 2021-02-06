@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -71,7 +71,7 @@ R5900::R5900() :
   ram_start(0),
   ram_end(0),
   physical_address(0),
-  is_main(0)
+  is_main(false)
 {
 
 }
@@ -107,7 +107,10 @@ int R5900::start_init()
   return 0;
 }
 
-int R5900::insert_static_field_define(std::string &name, std::string &type, int index)
+int R5900::insert_static_field_define(
+  std::string &name,
+  std::string &type,
+  int index)
 {
   fprintf(out, "  %s equ 0x%x\n", name.c_str(), ram_end - (index + 1) * 4);
   return 0;
@@ -165,9 +168,13 @@ int R5900::field_init_ref(std::string &name, int index)
   return 0;
 }
 
-void R5900::method_start(int local_count, int max_stack, int param_count, std::string &name)
+void R5900::method_start(
+  int local_count,
+  int max_stack,
+  int param_count,
+  std::string &name)
 {
-  is_main = (name == "main") ? 1 : 0;
+  is_main = name == "main";
 
   fprintf(out, "%s:\n", name.c_str());
   fprintf(out, "  ; %s(local_count=%d, max_stack=%d, param_count=%d)\n", name.c_str(), local_count, max_stack, param_count);

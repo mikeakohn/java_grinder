@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -19,7 +19,7 @@ WebAssembly::WebAssembly() :
   reg(0),
   reg_max(9),
   stack(0),
-  is_main(0)
+  is_main(false)
 {
 
 }

@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -62,7 +62,7 @@ Epiphany::Epiphany() :
   reg(0),
   reg_max(9),
   stack(0),
-  is_main(0),
+  is_main(false),
   is_interrupt(0),
   max_stack(0)
 {

@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -46,7 +46,7 @@ MC68000::MC68000() :
   reg(0),
   reg_max(5),
   stack(0),
-  is_main(0)
+  is_main(false)
 {
 
 }
@@ -81,7 +81,10 @@ int MC68000::start_init()
   return 0;
 }
 
-int MC68000::insert_static_field_define(std::string &name, std::string &type, int index)
+int MC68000::insert_static_field_define(
+  std::string &name,
+  std::string &type,
+  int index)
 {
   fprintf(out, "%s equ ram_start+%d\n", name.c_str(), index * 4);
   return 0;
@@ -107,12 +110,16 @@ int MC68000::field_init_ref(std::string &name, int index)
   return 0;
 }
 
-void MC68000::method_start(int local_count, int max_stack, int param_count, std::string &name)
+void MC68000::method_start(
+  int local_count,
+  int max_stack,
+  int param_count,
+  std::string &name)
 {
   reg = 0;
   stack = 0;
 
-  is_main = (name == "main") ? true : false;
+  is_main = name == "main";
 
   // main() function goes here
   fprintf(out, "%s:\n", name.c_str());

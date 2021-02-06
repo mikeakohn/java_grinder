@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn, Joe Davisson
+ * Copyright 2014-2021 by Michael Kohn, Joe Davisson
  *
  * MCS-51 (8051) written by Joe Davisson
  *
@@ -63,7 +63,10 @@ int MCS51::start_init()
   return 0;
 }
 
-int MCS51::insert_static_field_define(std::string &name, std::string &type, int index)
+int MCS51::insert_static_field_define(
+  std::string &name,
+  std::string &type,
+  int index)
 {
   return -1;
 }
@@ -86,11 +89,15 @@ int MCS51::field_init_ref(std::string &name, int index)
   return -1;
 }
 
-void MCS51::method_start(int local_count, int max_stack, int param_count, std::string &name)
+void MCS51::method_start(
+  int local_count,
+  int max_stack,
+  int param_count,
+  std::string &name)
 {
   stack = 0;
 
-  is_main = (name == "main") ? 1 : 0;
+  is_main = name == "main";
 
   fprintf(out, "%s:\n", name.c_str());
 

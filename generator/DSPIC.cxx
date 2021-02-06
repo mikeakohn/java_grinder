@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -110,7 +110,10 @@ int DSPIC::start_init()
   return 0;
 }
 
-int DSPIC::insert_static_field_define(std::string &name, std::string &type, int index)
+int DSPIC::insert_static_field_define(
+  std::string &name,
+  std::string &type,
+  int index)
 {
   if (type[0] == '[') { need_tables = true; }
   fprintf(out, "%s equ ram_end-%d\n", name.c_str(), (index + 2) * 2);
@@ -149,12 +152,16 @@ int DSPIC::field_init_ref(std::string &name, int index)
   return 0;
 }
 
-void DSPIC::method_start(int local_count, int max_stack, int param_count, std::string &name)
+void DSPIC::method_start(
+  int local_count,
+  int max_stack,
+  int param_count,
+  std::string &name)
 {
   reg = 0;
   stack = 0;
 
-  is_main = (name == "main") ? true : false;
+  is_main = name == "main";
 
   // main() function goes here
   fprintf(out, "%s:\n", name.c_str());

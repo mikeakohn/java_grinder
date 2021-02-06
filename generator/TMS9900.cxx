@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -42,7 +42,7 @@ static const char *cond_str[] = { "jeq", "jne", "jlt", "???", "jgt", "???" };
 TMS9900::TMS9900() :
   reg(0),
   reg_max(9),
-  is_main(0)
+  is_main(false)
 {
 
 }
@@ -115,9 +115,13 @@ int TMS9900::field_init_ref(std::string &name, int index)
   return 0;
 }
 
-void TMS9900::method_start(int local_count, int max_stack, int param_count, std::string &name)
+void TMS9900::method_start(
+  int local_count,
+  int max_stack,
+  int param_count,
+  std::string &name)
 {
-  is_main = (name == "main") ? 1 : 0;
+  is_main = name == "main";
 
   fprintf(out, "%s:\n", name.c_str());
 

@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -26,7 +26,7 @@ static const char *cond_str[] = { "==", "!=", "<", "<=", ">", ">=" };
 
 STDC::STDC() :
   stack(0),
-  is_main(0),
+  is_main(false),
   temp_var(0)
 {
 
@@ -68,7 +68,7 @@ int STDC::insert_static_field_define(std::string &name, std::string &type, int i
 int STDC::init_heap(int field_count)
 {
 #if 0
-int n;
+  int n;
 
   for (n = 0; n < field_count; n++)
   {
@@ -93,9 +93,13 @@ int STDC::field_init_ref(std::string &name, int index)
   return 0;
 }
 
-void STDC::method_start(int local_count, int max_stack, int param_count, std::string &name)
+void STDC::method_start(
+  int local_count,
+  int max_stack,
+  int param_count,
+  std::string &name)
 {
-int n;
+  int n;
 
   if (name == "main")
   {
@@ -481,7 +485,7 @@ int STDC::call(std::string &name)
 
 int STDC::invoke_static_method(const char *name, int params, int is_void)
 {
-int n;
+  int n;
 
   fprintf(out, "  stack_%d = %s(", stack - params, name);
   for (n = 0; n < params; n++)

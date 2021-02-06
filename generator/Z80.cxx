@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -40,7 +40,7 @@ enum
 
 Z80::Z80() :
   stack(0),
-  is_main(0),
+  is_main(false),
   need_mul16_integer(0),
   need_div16_integer(0)
 
@@ -128,10 +128,11 @@ void Z80::method_start(int local_count, int max_stack, int param_count, std::str
 {
   stack = 0;
 
-  is_main = (name == "main") ? 1 : 0;
+  is_main = name == "main";
 
   fprintf(out, "%s:\n", name.c_str());
   fprintf(out, "  ;; Save iy if needed.  iy = alloca(params * 2)\n");
+
   if (is_main)
   {
     fprintf(out, "  ld (save_iy),iy\n");

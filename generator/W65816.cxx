@@ -42,7 +42,7 @@ W65816::W65816() :
   java_stack(0x200),
   ram_start(0x7000),
   label_count(0),
-  is_main(0),
+  is_main(false),
 
   need_swap(0),
   need_add_integer(0),
@@ -153,7 +153,10 @@ int W65816::start_init()
   return 0;
 }
 
-int W65816::insert_static_field_define(std::string &name, std::string &type, int index)
+int W65816::insert_static_field_define(
+  std::string &name,
+  std::string &type,
+  int index)
 {
   fprintf(out, "; insert_static_field_define\n");
   fprintf(out, "  %s equ ram_start + %d\n", name.c_str(), (index + 1) * 2);
@@ -190,11 +193,15 @@ int W65816::field_init_ref(std::string &name, int index)
   return 0;
 }
 
-void W65816::method_start(int local_count, int max_stack, int param_count, std::string &name)
+void W65816::method_start(
+  int local_count,
+  int max_stack,
+  int param_count,
+  std::string &name)
 {
   stack = 0;
 
-  is_main = (name == "main") ? 1 : 0;
+  is_main = name == "main";
 
   fprintf(out, "%s:\n", name.c_str());
 
