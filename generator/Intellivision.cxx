@@ -58,7 +58,7 @@ int Intellivision::open(const char *filename)
 int Intellivision::start_init()
 {
   // Add any set up items (stack, registers, etc).
-  fprintf(out, ".define BIDECLE(a) .dw a & 0xff, a >> 8\n");
+  fprintf(out, ".define BIDECLE(param_) .dw param_ & 0xff, param_ >> 8\n");
 
   fprintf(out,
     ".org 0x57ff\n"
@@ -107,7 +107,7 @@ int Intellivision::insert_static_field_define(
   std::string &type,
   int index)
 {
-  fprintf(out, "  %s equ ram_end-%d\n", name.c_str(), (index + 1) * 2);
+  fprintf(out, "static_%s equ ram_end-%d\n", name.c_str(), (index + 1) * 2);
 
   return 0;
 }
@@ -249,8 +249,14 @@ int Intellivision::push_double(double f)
 
 int Intellivision::push_ref(std::string &name)
 {
-  // Need to move the address of name to the top of stack
-  return -1;
+  fprintf(out,
+    "  ; push_ref(%s)\n"
+    "  mvii #static_%s, r0\n"
+    "  pshr r0\n",
+    name.c_str(),
+    name.c_str());
+
+  return 0;
 }
 
 int Intellivision::pop_local_var_int(int index)
@@ -338,7 +344,7 @@ int Intellivision::add_integer()
     "  ; add_integer()\n"
     "  pulr r0\n"
     "  add@ r6, r0\n"
-    "  phsr r0\n");
+    "  pshr r0\n");
 
   return 0;
 }
@@ -351,7 +357,7 @@ int Intellivision::add_integer(int num)
     "  ; add_integer(%d)\n"
     "  mvii #%d, r0\n"
     "  add@ r6, r0\n"
-    "  phsr r0\n",
+    "  pshr r0\n",
     num,
     num & 0xffff);
 

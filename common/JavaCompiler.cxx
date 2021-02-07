@@ -1774,6 +1774,8 @@ int JavaCompiler::compile_method(
           break;
         }
 
+        int index = java_class->get_field_index(field_name);
+
         if (gen32->tag == CONSTANT_METHODREF)
         {
           stack->push(ref);
@@ -1786,8 +1788,6 @@ int JavaCompiler::compile_method(
           else
         if (type[0] == 'L')
         {
-          int index = java_class->get_field_index(field_name);
-
           if (generator->get_static(field_name, index) != 0)
           {
             printf("Internal Error: get_static not implemented\n");
