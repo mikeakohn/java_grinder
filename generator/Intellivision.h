@@ -99,6 +99,7 @@ public:
 
 protected:
   bool is_main : 1;
+  int current_local_count;
 };
 
 #endif

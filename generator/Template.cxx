@@ -287,6 +287,13 @@ int Template::jump_cond(std::string &label, int cond, int distance)
   return -1;
 }
 
+#if 0
+int Template::jump_cond_zero(std::string &label, int cond, int distance)
+{
+  return -1;
+}
+#endif
+
 int Template::jump_cond_integer(std::string &label, int cond, int distance)
 {
   return -1;

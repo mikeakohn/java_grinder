@@ -31,7 +31,9 @@
 //
 // 0x0200-0x02ef BACKTAB (20x12 words)
 
-Intellivision::Intellivision() : is_main(false)
+Intellivision::Intellivision() :
+  is_main(false),
+  current_local_count(0)
 {
 
 }
@@ -123,11 +125,14 @@ int Intellivision::init_heap(int field_count)
 int Intellivision::field_init_int(std::string &name, int index, int value)
 {
   fprintf(out,
-    "  mvii #ram_end-%d, r0\n"
+    "  mvii #ram_end-%d, r4\n"
+    "  mvii #%d, r0\n"
     "  mvii #%d, r1\n"
-    "  mvo@ r1, r0\n",
+    "  mvo@ r0, r4\n"
+    "  mvo@ r1, r4\n",
     (index + 1) * 2,
-    value & 0xffff);
+    value & 0xff,
+    (value >> 8) & 0xff);
 
   return 0;
 }
@@ -150,6 +155,13 @@ void Intellivision::method_start(
     name.c_str(),
     local_count,
     param_count);
+
+  if (!is_main)
+  {
+    fprintf(out, "  pshr r4\n");
+  }
+
+  current_local_count = local_count;
 }
 
 void Intellivision::method_end(int local_count)
@@ -163,7 +175,9 @@ int Intellivision::push_local_var_int(int index)
   {
     fprintf(out,
       "  ; push_local_var_int(%d)\n"
-      "  mvi@ r3, r0\n"
+      "  movr r3, r4\n"
+      "  sdbd\n"
+      "  mvi@ r4, r0\n"
       "  pshr r0\n",
       index);
   }
@@ -173,6 +187,7 @@ int Intellivision::push_local_var_int(int index)
       "  ; push_local_var_int(%d)\n"
       "  movr r3, r4\n"
       "  addi #%d, r4\n"
+      "  sdbd\n"
       "  mvi@ r4, r0\n"
       "  pshr r0\n",
       index,
@@ -205,9 +220,12 @@ int Intellivision::push_int(int32_t n)
 {
   fprintf(out,
     "  ; push_int()\n"
+    "  sdbd\n"
     "  mvii #0x%04x, r0\n"
+    "  .dw %04x\n"
     "  pshr r0\n",
-    n & 0xffff);
+    n & 0xff,
+    (n >> 8) & 0xff);
 
   return 0;
 }
@@ -242,7 +260,9 @@ int Intellivision::pop_local_var_int(int index)
     fprintf(out,
       "  ; pop_local_var_int(%d)\n"
       "  pulr r0\n"
-      "  mvo@ r0, r3\n",
+      "  movr r3, r4\n"
+      "  sdbd\n"
+      "  mvo@ r0, r4\n",
       index);
   }
     else
@@ -252,6 +272,7 @@ int Intellivision::pop_local_var_int(int index)
       "  movr r3, r4\n"
       "  addi #%d, r4\n"
       "  pulr r0\n"
+      "  sdbd\n"
       "  mvo@ r0, r4\n",
       index * 2,
       index);
@@ -723,11 +744,75 @@ int Intellivision::integer_to_short()
 
 int Intellivision::jump_cond(std::string &label, int cond, int distance)
 {
+  fprintf(out, "  ;; jump_cond(%s, cond=%d, distance=%d)\n",
+    label.c_str(), cond, distance);
+
+  fprintf(out,
+    //"  xorr r0, r0\n"
+    "  pulr r1\n"
+    "  cmpi #0, r1\n");
+
+  switch (cond)
+  {
+    case COND_EQUAL:
+      fprintf(out, "  beq %s\n", label.c_str());
+      return 0;
+    case COND_NOT_EQUAL:
+      fprintf(out, "  bneq %s\n", label.c_str());
+      return 0;
+    case COND_LESS:
+      fprintf(out, "  blt %s\n", label.c_str());
+      return 0;
+    case COND_LESS_EQUAL:
+      fprintf(out, "  ble %s\n", label.c_str());
+      return 0;
+    case COND_GREATER:
+      fprintf(out, "  bgt %s\n", label.c_str());
+      return 0;
+    case COND_GREATER_EQUAL:
+      fprintf(out, "  bge %s\n", label.c_str());
+      return 0;
+    default:
+      return -1;
+  }
+
   return -1;
 }
 
 int Intellivision::jump_cond_integer(std::string &label, int cond, int distance)
 {
+  fprintf(out, "  ;; jump_cond_integer(%s, cond=%d, distance=%d)\n",
+    label.c_str(), cond, distance);
+
+  fprintf(out,
+    "  pulr r0\n"
+    "  pulr r1\n"
+    "  cmpr r0, r1\n");
+
+  switch (cond)
+  {
+    case COND_EQUAL:
+      fprintf(out, "  beq %s\n", label.c_str());
+      return 0;
+    case COND_NOT_EQUAL:
+      fprintf(out, "  bneq %s\n", label.c_str());
+      return 0;
+    case COND_LESS:
+      fprintf(out, "  blt %s\n", label.c_str());
+      return 0;
+    case COND_LESS_EQUAL:
+      fprintf(out, "  ble %s\n", label.c_str());
+      return 0;
+    case COND_GREATER:
+      fprintf(out, "  bgt %s\n", label.c_str());
+      return 0;
+    case COND_GREATER_EQUAL:
+      fprintf(out, "  bge %s\n", label.c_str());
+      return 0;
+    default:
+      return -1;
+  }
+
   return -1;
 }
 
@@ -743,22 +828,64 @@ int Intellivision::ternary(int cond, int compare, int value_true, int value_fals
 
 int Intellivision::return_local(int index, int local_count)
 {
-  return -1;
+  fprintf(out,
+    "  ; return_integer(index=%d, local_count=%d)\n",
+    index,
+    local_count);
+
+  if (index == 0)
+  {
+    fprintf(out,
+      "  movr r3, r4\n"
+      "  sdbd\n"
+      "  mvi@ r4, r0\n");
+  }
+    else
+  {
+    fprintf(out,
+      "  movr r3, r4\n"
+      "  addi #%d, r4\n"
+      "  sdbd\n"
+      "  mvi@ r4, r0\n",
+      index * 2);
+  }
+
+  fprintf(out, "  pulr r7\n");
+
+  return 0;
 }
 
 int Intellivision::return_integer(int local_count)
 {
-  return -1;
+  fprintf(out,
+    "  ; return_integer(local_count=%d)\n"
+    "  pulr r0\n"
+    "  pulr r7\n",
+    local_count);
+
+  return 0;
 }
 
 int Intellivision::return_void(int local_count)
 {
-  return -1;
+  fprintf(out,
+    "  ; return_void(local_count=%d)\n"
+    "  pulr r7\n",
+    local_count);
+
+  return 0;
 }
 
 int Intellivision::jump(std::string &name, int distance)
 {
-  return -1;
+  fprintf(out,
+    "  ; jump(%s, %d)\n"
+    "  j %s\n",
+    name.c_str(),
+    distance,
+    name.c_str());
+
+  return 0;
 }
 
 int Intellivision::call(std::string &name)
@@ -766,24 +893,96 @@ int Intellivision::call(std::string &name)
   return -1;
 }
 
-int Intellivision::invoke_static_method(const char *name, int params, int is_void)
+int Intellivision::invoke_static_method(
+  const char *name,
+  int params,
+  int is_void)
 {
-  return -1;
+  int n;
+
+  fprintf(out,
+    "  ; invoke_static_method(%s, %d, is_void=%d)\n",
+    name,
+    params,
+    is_void);
+
+  // Copy locals pointer to r4.
+  // Copy stack pointer to r5.
+  fprintf(out,
+    "  movr r3, r4\n"
+    "  movr r6, r5\n"
+    "  subi #%d, r5\n",
+    params);
+
+  // Copy params from stack to locals.
+  for (n = 0; n < params; n++)
+  {
+    fprintf(out,
+      "  mvi@ r5, r0\n"
+      "  sdbd\n"
+      "  mvo@ r0, r4\n");
+  }
+
+  // Fix stack, push current locals pointer and adjust for new locals.
+  fprintf(out,
+    "  subi #%d, r6\n"
+    "  pshr r3\n"
+    "  add #%d, r3\n",
+    params,
+    current_local_count * 2);
+
+  // Call the function.
+  fprintf(out, "  jsr r4, %s\n", name);
+
+  // Restore pointer to locals.
+  fprintf(out, "  pulr r3\n");
+
+  // Push return value to stack.
+  if (!is_void)
+  {
+    fprintf(out, "  pshr r0\n");
+  }
+
+  return 0;
 }
 
 int Intellivision::put_static(std::string &name, int index)
 {
-  return -1;
+  fprintf(out,
+    "  ; put_static(%s, %d)\n"
+    "  mvii #ram_end-%d, r4\n"
+    "  pulr r0\n"
+    "  sdbd\n"
+    "  mvo@ r0, r4\n",
+    name.c_str(),
+    index,
+    (index + 1) * 2);
+
+  return 0;
 }
 
 int Intellivision::get_static(std::string &name, int index)
 {
-  return -1;
+  fprintf(out,
+    "  ; get_static(%s, %d)\n"
+    "  mvii #ram_end-%d, r4\n"
+    "  sdbd\n"
+    "  mvi@ r4, r0\n"
+    "  pshr r0\n",
+    name.c_str(),
+    index,
+    (index + 1) * 2);
+
+  return 0;
 }
 
 int Intellivision::brk()
 {
-  return -1;
+  fprintf(out,
+    "  ; brk()\n"
+    "  hlt\n");
+
+  return 0;
 }
 
 int Intellivision::new_array(uint8_t type)
@@ -801,11 +1000,6 @@ int Intellivision::insert_array(std::string &name, int32_t *data, int len, uint8
   if (type == TYPE_SHORT)
   {
     return insert_dw(name, data, len, TYPE_INT);
-  }
-    else
-  if (type == TYPE_INT)
-  {
-    return insert_dc32(name, data, len, TYPE_INT);
   }
 
   return -1;
