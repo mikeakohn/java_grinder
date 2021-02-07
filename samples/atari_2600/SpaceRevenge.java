@@ -2,6 +2,7 @@
 // "space revenge" - by Joe Davisson
 
 import net.mikekohn.java_grinder.Atari2600;
+import net.mikekohn.java_grinder.Joystick;
 import net.mikekohn.java_grinder.Memory;
 
 public class SpaceRevenge
@@ -146,7 +147,7 @@ public class SpaceRevenge
       Atari2600.clearCollisionLatches();
       switches = Atari2600.getSwitches();
 
-      if(mode == 0)
+      if (mode == 0)
       {
         // initial screen, waiting for reset
         Atari2600.startVblank();
@@ -167,7 +168,7 @@ public class SpaceRevenge
         Atari2600.setScore1((byte)score1);
 
         // choose game type
-        if(((frame & 31) == 31) && ((switches & 2) == 0))
+        if (((frame & 31) == 31) && ((switches & 2) == 0))
         {
           game++;
           game &= 7;
@@ -178,7 +179,7 @@ public class SpaceRevenge
         Memory.write8(0x05, (byte)game_params[game]);
 
         // start game
-        if((switches & 1) == 0)
+        if ((switches & 1) == 0)
         {
           score0 = 0;
           score1 = 0;
@@ -208,22 +209,26 @@ public class SpaceRevenge
         Atari2600.setScore0((byte)score0);
         Atari2600.setScore1((byte)score1);
 
-        if((ship0_hit == 0) && (ship1_hit == 0))
+        if ((ship0_hit == 0) && (ship1_hit == 0))
         {
           // move player
-          if(Atari2600.isJoystick0Right())
+          if (Joystick.isRight(0))
           {
-            if(ship0_x < (right - 4))
+            if (ship0_x < (right - 4))
+            {
               ship0_x++;
+            }
           }
-          else if(Atari2600.isJoystick0Left())
+          else if (Joystick.isLeft(0))
           {
-            if(ship0_x > (left + 4))
+            if (ship0_x > (left + 4))
+            {
               ship0_x--;
+            }
           }
 
           // fire shot
-          if(Atari2600.isJoystick0ButtonDown() && shot0_y == 100)
+          if (Joystick.isButtonDown_0(0) && shot0_y == 100)
           {
             shot0_y = ship0_y;
             Atari2600.setAudioControl0((byte)0b0100);
@@ -231,13 +236,13 @@ public class SpaceRevenge
           }
 
           // move enemy
-          if((frame & 3) == 3)
+          if ((frame & 3) == 3)
           {
             dir = (ship0_x - (ship1_x + (offset[game] >> 1))) >> 2;
-            if((dir < 0) || (ship1_x <= (right - offset[game]))) 
+            if ((dir < 0) || (ship1_x <= (right - offset[game])))
             {
               ship1_x += dir;
-              if(ship1_x < left)
+              if (ship1_x < left)
                 ship1_x = left;
             }
           }
@@ -245,19 +250,19 @@ public class SpaceRevenge
         else
         {
           // animate players when hit
-          if(ship0_hit > 0)
+          if (ship0_hit > 0)
           {
             Atari2600.setColorPlayer0(0x88 + ship0_hit);
             ship0_hit--;
-            if(ship0_hit == 0)
+            if (ship0_hit == 0)
               Atari2600.setAudioVolume1((byte)0);
           }
 
-          if(ship1_hit > 0)
+          if (ship1_hit > 0)
           {
             Atari2600.setColorPlayer1(0x38 + ship1_hit);
             ship1_hit--;
-            if(ship1_hit == 0)
+            if (ship1_hit == 0)
               Atari2600.setAudioVolume0((byte)0);
           }
         }
@@ -274,14 +279,14 @@ public class SpaceRevenge
         Atari2600.startOverscan();
 
         // playfield hit
-        if(Atari2600.isCollisionMissile0Playfield())
+        if (Atari2600.isCollisionMissile0Playfield())
         {
           shot0_y = 100;
           Atari2600.setAudioVolume0((byte)0);
         }
 
         // player hit
-        if(Atari2600.isCollisionMissile1Player0())
+        if (Atari2600.isCollisionMissile1Player0())
         {
           ship0_hit = 40;
           shot0_y = 100;
@@ -294,7 +299,7 @@ public class SpaceRevenge
         }
 
         // enemy hit
-        if(Atari2600.isCollisionMissile0Player1())
+        if (Atari2600.isCollisionMissile0Player1())
         {
           ship1_hit = 40;
           shot0_y = 100;
@@ -306,14 +311,14 @@ public class SpaceRevenge
           score0++;
         }
 
-        if((frame & 1) == 1)
+        if ((frame & 1) == 1)
         {
           // move player shot
-          if(shot0_y < 100)
+          if (shot0_y < 100)
           {
             Atari2600.setAudioFrequency0((byte)((shot0_y >> 1) + 2));
             shot0_y--;
-            if(shot0_y < ship1_y)
+            if (shot0_y < ship1_y)
             {
               shot0_y = 100;
               Atari2600.setAudioVolume0((byte)0);
@@ -321,15 +326,15 @@ public class SpaceRevenge
           }
 
           // move enemy shot
-          if(shot1_y < 100)
+          if (shot1_y < 100)
           {
             Atari2600.setAudioFrequency1((byte)(shot1_y >> 1));
             shot1_y++;
-            if(game > 2)
+            if (game > 2)
               shot1_y++;
-            if(game > 5)
+            if (game > 5)
               shot1_y++;
-            if(shot1_y > ship0_y + 4)
+            if (shot1_y > ship0_y + 4)
             {
               shot1_y = 100;
               Atari2600.setAudioVolume1((byte)0);
@@ -341,7 +346,7 @@ public class SpaceRevenge
         rnd -= 77;
         rnd &= 127;
 
-        if(((rnd ^ ship0_x) < ship1_y) && (shot1_y == 100))
+        if (((rnd ^ ship0_x) < ship1_y) && (shot1_y == 100))
         {
           shot1_y = ship1_y + 4;
           Atari2600.setAudioControl1((byte)0b0001);
@@ -349,7 +354,7 @@ public class SpaceRevenge
         }
 
         // end game if max score reached or switches pressed
-        if((score0 >= 10) || (score1 >= 10) | ((switches & 2) == 0))
+        if ((score0 >= 10) || (score1 >= 10) | ((switches & 2) == 0))
         {
           Atari2600.setAudioVolume0((byte)0);
           Atari2600.setAudioVolume1((byte)0);

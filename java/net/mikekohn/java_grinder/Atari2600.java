@@ -5,7 +5,7 @@
  *     Web: http://www.naken.cc/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -124,6 +124,7 @@ abstract public class Atari2600
   /** Audio volume, 4 bit number */
   public static void setAudioVolume1(byte value) { }
 
+/*
   public static boolean isJoystick0Right() { return false; }
   public static boolean isJoystick0Left() { return false; }
   public static boolean isJoystick0Down() { return false; }
@@ -134,6 +135,7 @@ abstract public class Atari2600
   public static boolean isJoystick1Down() { return false; }
   public static boolean isJoystick1Up() { return false; }
   public static boolean isJoystick1ButtonDown() { return false; }
+*/
 
   public static byte getSwitches() { return -1; }
   public static boolean isSwitchResetDown() { return false; }

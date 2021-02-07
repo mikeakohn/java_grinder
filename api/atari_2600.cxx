@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "api/atari_2600.h"
+#include "api/joystick.h"
 
 #define CHECK_FUNC(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \
@@ -117,17 +117,6 @@ int atari_2600(JavaClass *java_class, Generator *generator, const char *method_n
   CHECK_FUNC(setAudioFrequency1,_B)
   CHECK_FUNC(setAudioVolume0,_B)
   CHECK_FUNC(setAudioVolume1,_B)
-
-  CHECK_FUNC(isJoystick0Right,)
-  CHECK_FUNC(isJoystick0Left,)
-  CHECK_FUNC(isJoystick0Down,)
-  CHECK_FUNC(isJoystick0Up,)
-  CHECK_FUNC(isJoystick0ButtonDown,)
-  CHECK_FUNC(isJoystick1Right,)
-  CHECK_FUNC(isJoystick1Left,)
-  CHECK_FUNC(isJoystick1Down,)
-  CHECK_FUNC(isJoystick1Up,)
-  CHECK_FUNC(isJoystick1ButtonDown,)
 
   CHECK_FUNC(getSwitches,)
   CHECK_FUNC(isSwitchResetDown,)

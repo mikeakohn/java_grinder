@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -111,17 +111,6 @@ public:
   virtual int atari2600_setAudioVolume0_B(int value) { return -1; }
   virtual int atari2600_setAudioVolume1_B() { return -1; }
   virtual int atari2600_setAudioVolume1_B(int value) { return -1; }
-
-  virtual int atari2600_isJoystick0Right() { return -1; }
-  virtual int atari2600_isJoystick0Left() { return -1; }
-  virtual int atari2600_isJoystick0Down() { return -1; }
-  virtual int atari2600_isJoystick0Up() { return -1; }
-  virtual int atari2600_isJoystick0ButtonDown() { return -1; }
-  virtual int atari2600_isJoystick1Right() { return -1; }
-  virtual int atari2600_isJoystick1Left() { return -1; }
-  virtual int atari2600_isJoystick1Down() { return -1; }
-  virtual int atari2600_isJoystick1Up() { return -1; }
-  virtual int atari2600_isJoystick1ButtonDown() { return -1; }
 
   virtual int atari2600_getSwitches() { return -1; }
   virtual int atari2600_isSwitchResetDown() { return -1; }

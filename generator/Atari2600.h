@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn, Joe Davisson
+ * Copyright 2014-2021 by Michael Kohn, Joe Davisson
  *
  * Atari 2600 written by Joe Davisson
  *
@@ -121,16 +121,16 @@ public:
   virtual int atari2600_setAudioVolume1_B();
   virtual int atari2600_setAudioVolume1_B(int value);
 
-  virtual int atari2600_isJoystick0Right();
-  virtual int atari2600_isJoystick0Left();
-  virtual int atari2600_isJoystick0Down();
-  virtual int atari2600_isJoystick0Up();
-  virtual int atari2600_isJoystick0ButtonDown();
-  virtual int atari2600_isJoystick1Right();
-  virtual int atari2600_isJoystick1Left();
-  virtual int atari2600_isJoystick1Down();
-  virtual int atari2600_isJoystick1Up();
-  virtual int atari2600_isJoystick1ButtonDown();
+  virtual int joystick_isRight_I();
+  virtual int joystick_isRight_I(int index);
+  virtual int joystick_isLeft_I();
+  virtual int joystick_isLeft_I(int index);
+  virtual int joystick_isDown_I();
+  virtual int joystick_isDown_I(int index);
+  virtual int joystick_isUp_I();
+  virtual int joystick_isUp_I(int index);
+  virtual int joystick_isButtonDown_0_I();
+  virtual int joystick_isButtonDown_0_I(int index);
 
   virtual int atari2600_getSwitches();
   virtual int atari2600_isSwitchResetDown();

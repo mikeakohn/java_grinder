@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -15,9 +15,23 @@
 #include "common/JavaClass.h"
 #include "generator/Generator.h"
 
-int invoke_static(JavaClass *java_class, int method_id, Generator *generator);
-int invoke_static(JavaClass *java_class, int method_id, Generator *generator, int *const_vals, int const_count);
-int invoke_static(JavaClass *java_class, int method_id, Generator *generator, const char *const_val);
+int invoke_static(
+  JavaClass *java_class,
+  int method_id,
+  Generator *generator);
+
+int invoke_static(
+  JavaClass *java_class,
+  int method_id,
+  Generator *generator,
+  int *const_vals,
+  int const_count);
+
+int invoke_static(
+  JavaClass *java_class,
+  int method_id,
+  Generator *generator,
+  const char *const_val);
 
 #endif
 

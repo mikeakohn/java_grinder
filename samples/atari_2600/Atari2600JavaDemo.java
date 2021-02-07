@@ -1,9 +1,10 @@
 import net.mikekohn.java_grinder.Atari2600;
+import net.mikekohn.java_grinder.Joystick;
 import net.mikekohn.java_grinder.Memory;
 
 public class Atari2600JavaDemo
 {
-  public static byte bass_waveform[] = 
+  public static byte bass_waveform[] =
   {
     8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 8, 6,
     8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 8, 6,
@@ -11,7 +12,7 @@ public class Atari2600JavaDemo
     8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 6, 6, 8, 6, 8, 6,
   };
 
-  public static byte bass_line[] = 
+  public static byte bass_line[] =
   {
     29, -1, 19, -1, 14, -1, 19, -1, 29, -1, 19, -1, 14, -1, 19, -1,
     23, -1, 11, 11, 14, -1, 11, -1, 23, -1, 11, 11, 14, -1, 11, -1,
@@ -19,7 +20,7 @@ public class Atari2600JavaDemo
     23, -1, 11, 11, 14, -1, 11, -1, 23, -1, 11, 11, 14, -1, 11, -1,
   };
 
-  public static byte lead_line[] = 
+  public static byte lead_line[] =
   {
     28, 25, 28, -1, 28, 25, 28, -1, 28, 28, -1, -1, 28, 28, -1, -1,
     22, 22, 25, -1, 22, 25, -1, -1, 22, 22, 25, -1, 28, 25, 28, 28,
@@ -39,7 +40,7 @@ public class Atari2600JavaDemo
 
     Atari2600.setAudioControl0((byte)6);
     Atari2600.setAudioControl1((byte)4);
-    
+
     Atari2600.setAudioVolume0((byte)0);
     Atari2600.setAudioVolume1((byte)0);
 
@@ -117,27 +118,27 @@ public class Atari2600JavaDemo
 
       n++;
 
-      if (Atari2600.isJoystick0Left())
+      if (Joystick.isLeft(0))
       {
         Atari2600.setColorBackground(0x80 | 0x70 | 0x01);
       }
         else
-      if (Atari2600.isJoystick0Right())
+      if (Joystick.isRight(0))
       {
         Atari2600.setColorBackground(0x80 | 0x70 | 0x02);
       }
         else
-      if (Atari2600.isJoystick0Down())
+      if (Joystick.isDown(0))
       {
         Atari2600.setColorBackground(0x80 | 0x74 | 0x02);
       }
         else
-      if (Atari2600.isJoystick0Up())
+      if (Joystick.isUp(0))
       {
         Atari2600.setColorBackground(0x80 | 0x64 | 0x02);
       }
         else
-      if (Atari2600.isJoystick0ButtonDown())
+      if (Joystick.isButtonDown_0(0))
       {
         Atari2600.setColorBackground(0x80 | 0x64 | 0x08);
       }

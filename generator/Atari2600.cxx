@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn, Joe Davisson
+ * Copyright 2014-2021 by Michael Kohn, Joe Davisson
  *
  * Atari 2600 written by Joe Davisson
  *
@@ -922,122 +922,180 @@ int Atari2600::atari2600_setAudioVolume1_B(int value)
   return 0;
 }
 
-int Atari2600::atari2600_isJoystick0Right()
+int Atari2600::joystick_isRight_I()
 {
-  fprintf(out, "; isJoystick0Right\n");
-  fprintf(out, "  lda SWCHA\n");
-  fprintf(out, "  and #0x80\n");
-  fprintf(out, "  eor #0x80\n");
-  PUSH();
-  stack++;
-
-  return 0;
+  return -1;
 }
 
-int Atari2600::atari2600_isJoystick0Left()
+int Atari2600::joystick_isRight_I(int index)
 {
-  fprintf(out, "; isJoystick0Left\n");
-  fprintf(out, "  lda SWCHA\n");
-  fprintf(out, "  and #0x40\n");
-  fprintf(out, "  eor #0x40\n");
-  PUSH();
-  stack++;
+  fprintf(out, "; Joystick.isRight(index=%d)\n", index);
 
-  return 0;
+  if (index == 0)
+  {
+    fprintf(out,
+      "  lda SWCHA\n"
+      "  and #0x80\n"
+      "  eor #0x80\n");
+    PUSH();
+    stack++;
+
+    return 0;
+  }
+    else
+  {
+    fprintf(out,
+      "  lda SWCHA\n"
+      "  and #0x08\n"
+      "  eor #0x08\n");
+    PUSH();
+    stack++;
+
+    return 0;
+  }
+
+  return -1;
 }
 
-int Atari2600::atari2600_isJoystick0Down()
+int Atari2600::joystick_isLeft_I()
 {
-  fprintf(out, "; isJoystick0Down\n");
-  fprintf(out, "  lda SWCHA\n");
-  fprintf(out, "  and #0x20\n");
-  fprintf(out, "  eor #0x20\n");
-  PUSH();
-  stack++;
-
-  return 0;
+  return -1;
 }
 
-int Atari2600::atari2600_isJoystick0Up()
+int Atari2600::joystick_isLeft_I(int index)
 {
-  fprintf(out, "; isJoystick0Up\n");
-  fprintf(out, "  lda SWCHA\n");
-  fprintf(out, "  and #0x10\n");
-  fprintf(out, "  eor #0x10\n");
-  PUSH();
-  stack++;
+  fprintf(out, "; isLeft(index=%d)\n", index);
 
-  return 0;
+  if (index == 0)
+  {
+    fprintf(out,
+      "  lda SWCHA\n"
+      "  and #0x40\n"
+      "  eor #0x40\n");
+    PUSH();
+    stack++;
+
+    return 0;
+  }
+    else
+  {
+    fprintf(out,
+      "  lda SWCHA\n"
+      "  and #0x04\n"
+      "  eor #0x04\n");
+    PUSH();
+    stack++;
+
+    return 0;
+  }
+
+  return -1;
 }
 
-int Atari2600::atari2600_isJoystick0ButtonDown()
+int Atari2600::joystick_isDown_I()
 {
-  fprintf(out, "; isJoystick0ButtonDown\n");
-  fprintf(out, "  lda INPT4\n");
-  fprintf(out, "  and #0x80\n");
-  fprintf(out, "  eor #0x80\n");
-  PUSH();
-  stack++;
-
-  return 0;
+  return -1;
 }
 
-int Atari2600::atari2600_isJoystick1Right()
+int Atari2600::joystick_isDown_I(int index)
 {
-  fprintf(out, "; isJoystick1Right\n");
-  fprintf(out, "  lda SWCHA\n");
-  fprintf(out, "  and #0x08\n");
-  fprintf(out, "  eor #0x08\n");
-  PUSH();
-  stack++;
+  fprintf(out, "; isDown(index=%d)\n", index);
 
-  return 0;
+  if (index == 0)
+  {
+    fprintf(out,
+      "  lda SWCHA\n"
+      "  and #0x20\n"
+      "  eor #0x20\n");
+    PUSH();
+    stack++;
+
+    return 0;
+  }
+    else
+  {
+    fprintf(out,
+      "  lda SWCHA\n"
+      "  and #0x02\n"
+      "  eor #0x02\n");
+      PUSH();
+      stack++;
+
+      return 0;
+  }
+
+  return -1;
 }
 
-int Atari2600::atari2600_isJoystick1Left()
+int Atari2600::joystick_isUp_I()
 {
-  fprintf(out, "; isJoystick1Left\n");
-  fprintf(out, "  lda SWCHA\n");
-  fprintf(out, "  and #0x04\n");
-  fprintf(out, "  eor #0x04\n");
-  PUSH();
-  stack++;
-
-  return 0;
+printf("Wrong\n");
+  return -1;
 }
 
-int Atari2600::atari2600_isJoystick1Down()
+int Atari2600::joystick_isUp_I(int index)
 {
-  fprintf(out, "; isJoystick1Down\n");
-  fprintf(out, "  and #0x02\n");
-  fprintf(out, "  eor #0x02\n");
-  PUSH();
-  stack++;
+  fprintf(out, "; isUp(index=%d)\n", index);
 
-  return 0;
+  if (index == 0)
+  {
+    fprintf(out,
+      "  lda SWCHA\n"
+      "  and #0x10\n"
+      "  eor #0x10\n");
+    PUSH();
+    stack++;
+
+    return 0;
+  }
+    else
+  {
+    fprintf(out,
+      "  lda SWCHA\n"
+      "  and #0x01\n"
+      "  eor #0x01\n");
+    PUSH();
+    stack++;
+
+    return 0;
+  }
+
+  return -1;
 }
 
-int Atari2600::atari2600_isJoystick1Up()
+int Atari2600::joystick_isButtonDown_0_I()
 {
-  fprintf(out, "; isJoystick1Up\n");
-  fprintf(out, "  and #0x01\n");
-  fprintf(out, "  eor #0x01\n");
-  PUSH();
-  stack++;
-
-  return 0;
+  return -1;
 }
 
-int Atari2600::atari2600_isJoystick1ButtonDown()
+int Atari2600::joystick_isButtonDown_0_I(int index)
 {
-  fprintf(out, "; isJoystick1ButtonDown\n");
-  fprintf(out, "  lda INPT5\n");
-  fprintf(out, "  and #0x80\n");
-  fprintf(out, "  eor #0x80\n");
-  PUSH();
-  stack++;
+  fprintf(out, "; isButtonDown(index=%d)\n", index);
 
-  return 0;
+  if (index == 0)
+  {
+    fprintf(out,
+      "  lda INPT4\n"
+      "  and #0x80\n"
+      "  eor #0x80\n");
+    PUSH();
+    stack++;
+
+    return 0;
+  }
+    else
+  {
+    fprintf(out,
+      "  lda INPT5\n"
+      "  and #0x80\n"
+      "  eor #0x80\n");
+    PUSH();
+    stack++;
+
+    return 0;
+  }
+
+  return -1;
 }
 
 int Atari2600::atari2600_getSwitches()

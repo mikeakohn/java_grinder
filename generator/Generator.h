@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -25,6 +25,7 @@
 #include "generator/API_CPC.h"
 #include "generator/API_DSP.h"
 #include "generator/API_Draw3D.h"
+#include "generator/API_Joystick.h"
 #include "generator/API_Math.h"
 #include "generator/API_Microcontroller.h"
 #include "generator/API_MSX.h"
@@ -47,6 +48,7 @@ class Generator :
   public API_CPC,
   public API_DSP,
   public API_Draw3D,
+  public API_Joystick,
   public API_Math,
   public API_Microcontroller,
   public API_MSX,
