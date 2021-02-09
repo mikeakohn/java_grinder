@@ -13,6 +13,7 @@ JAVA_SRC=\
   $(SRC_DIR)/CPC.java \
   $(SRC_DIR)/CPU.java \
   $(SRC_DIR)/DSP.java \
+  $(SRC_DIR)/Intellivision.java \
   $(SRC_DIR)/IOPort.java \
   $(SRC_DIR)/IOPort0.java \
   $(SRC_DIR)/IOPort1.java \

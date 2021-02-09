@@ -33,6 +33,7 @@
 
 Intellivision::Intellivision() :
   is_main(false),
+  need_multiply(false),
   current_local_count(0)
 {
 
@@ -55,14 +56,21 @@ int Intellivision::open(const char *filename)
   return 0;
 }
 
+int Intellivision::finish()
+{
+  if (need_multiply) { add_mul(); }
+
+  return 0;
+}
+
 int Intellivision::start_init()
 {
   // Add any set up items (stack, registers, etc).
-  fprintf(out, ".define BIDECLE(param_) .dw param_ & 0xff, param_ >> 8\n");
+  fprintf(out, ".define BIDECLE(param_) .dc16 param_ & 0xff, param_ >> 8\n");
 
   fprintf(out,
     ".org 0x57ff\n"
-    "  .dw 0x0000\n\n"
+    "  .dc16 0x0000\n\n"
     ".org 0x5000\n\n");
 
   fprintf(out,
@@ -83,7 +91,7 @@ int Intellivision::start_init()
 
   fprintf(out,
     "title:"
-    "  .dw 107, 0\n");
+    "  .dw 107, 'J', 'A', 'V', 'A', 0\n");
 
   fprintf(out,
     "start:\n"
@@ -124,15 +132,27 @@ int Intellivision::init_heap(int field_count)
 
 int Intellivision::field_init_int(std::string &name, int index, int value)
 {
-  fprintf(out,
-    "  mvii #ram_end-%d, r4\n"
-    "  mvii #%d, r0\n"
-    "  mvii #%d, r1\n"
-    "  mvo@ r0, r4\n"
-    "  mvo@ r1, r4\n",
-    (index + 1) * 2,
-    value & 0xff,
-    (value >> 8) & 0xff);
+  if (index == 0)
+  {
+    fprintf(out,
+      "  mvii #ram_end-%d, r4\n"
+      "  xorr r0, r0\n"
+      "  mvo@ r0, r4\n"
+      "  mvo@ r1, r4\n",
+      (index + 1) * 2);
+  }
+    else
+  {
+    fprintf(out,
+      "  mvii #ram_end-%d, r4\n"
+      "  mvii #%d, r0\n"
+      "  mvii #%d, r1\n"
+      "  mvo@ r0, r4\n"
+      "  mvo@ r1, r4\n",
+      (index + 1) * 2,
+      value & 0xff,
+      (value >> 8) & 0xff);
+  }
 
   return 0;
 }
@@ -222,7 +242,7 @@ int Intellivision::push_int(int32_t n)
     "  ; push_int()\n"
     "  sdbd\n"
     "  mvii #0x%04x, r0\n"
-    "  .dw %04x\n"
+    "  .dc16 %04x\n"
     "  pshr r0\n",
     n & 0xff,
     (n >> 8) & 0xff);
@@ -251,8 +271,11 @@ int Intellivision::push_ref(std::string &name)
 {
   fprintf(out,
     "  ; push_ref(%s)\n"
-    "  mvii #static_%s, r0\n"
+    "  sdbd\n" 
+    "  mvi static_%s & 0xff, r0\n"
+    "  .dc16 static_%s >> 8\n"
     "  pshr r0\n",
+    name.c_str(),
     name.c_str(),
     name.c_str());
 
@@ -394,7 +417,13 @@ int Intellivision::sub_integer(int num)
 
 int Intellivision::mul_integer()
 {
-  return -1;
+  need_multiply = true;
+
+  fprintf(out,
+    "  ; mul_integer()\n"
+    "  jsr r4, _multiply\n");
+
+  return 0;
 }
 
 int Intellivision::div_integer()
@@ -1084,5 +1113,48 @@ int Intellivision::array_write_short(std::string &name, int field_id)
 int Intellivision::array_write_int(std::string &name, int field_id)
 {
   return -1;
+}
+
+int Intellivision::intellivision_plot_II()
+{
+  fprintf(out,
+    "  ; intellivision_plot_II()\n"
+    "  pulr r0\n"
+    "  addi #0x200, r0\n"
+    "  pulr r1\n"
+    "  mvo@ r1, r0\n");
+
+  return 0;
+}
+
+int Intellivision::intellivision_plot_III()
+{
+  need_multiply = true;
+
+  fprintf(out,
+    "  ; intellivision_plot_II()\n"
+    "  jsr _multiply\n"
+    "  pulr r0\n"
+    "  addi #0x200, r0\n"
+    "  pulr r1\n"
+    "  mvo@ r1, r0\n");
+
+  return 0;
+}
+
+void Intellivision::add_mul()
+{
+  fprintf(out,
+    "  ;; Multiply\n"
+    "_multiply:\n"
+    "  pulr r0\n"
+    "  pulr r1\n"
+    "  xorr r2, r2\n"
+    "_multiply_loop:\n"
+    "  addr r0, r2\n"
+    "  decr r1\n"
+    "  bneq _multiply_loop\n"
+    "  pshr r2\n"
+    "  movr r4, r7\n\n");
 }
 

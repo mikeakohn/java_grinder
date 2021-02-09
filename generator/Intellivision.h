@@ -21,6 +21,7 @@ public:
   virtual ~Intellivision();
 
   virtual int open(const char *filename);
+  virtual int finish();
   virtual int start_init();
   virtual int insert_static_field_define(std::string &name, std::string &type, int index);
   virtual int init_heap(int field_count);
@@ -97,8 +98,14 @@ public:
   virtual int array_write_short(std::string &name, int field_id);
   virtual int array_write_int(std::string &name, int field_id);
 
+  virtual int intellivision_plot_II();
+  virtual int intellivision_plot_III();
+
 protected:
+  void add_mul();
+
   bool is_main : 1;
+  bool need_multiply : 1;
   int current_local_count;
 };
 
