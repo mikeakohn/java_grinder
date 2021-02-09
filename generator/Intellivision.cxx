@@ -75,28 +75,30 @@ int Intellivision::start_init()
 
   fprintf(out,
     "rom_header:\n"
-    "  BIDECLE(zero)       ; MOB picture base   (points to NULL list)\n"
-    "  BIDECLE(zero)       ; Process table      (points to NULL list)\n"
-    "  BIDECLE(start)      ; Program start address\n"
-    "  BIDECLE(zero)       ; Bkgnd picture base (points to NULL list)\n"
-    "  BIDECLE(ones)       ; GRAM pictures      (points to NULL list)\n"
-    "  BIDECLE(title)      ; Cartridge title/date\n"
-    "  .dw 0x03c0          ; Flags:  No ECS title, run code after title,\n"
-    "zero:\n"
-    "  .dw 0x0000          ; Screen border control\n"
-    "  .dw 0x0000          ; 0 = color stack, 1 = f/b mode\n"
-    "  BIDECLE(ones)       ; GRAM pictures      (points to NULL list)\n"
-    "ones:\n"
+    "  BIDECLE(_zero)      ; MOB picture base   (points to NULL list)\n"
+    "  BIDECLE(_zero)      ; Process table      (points to NULL list)\n"
+    "  BIDECLE(_start)     ; Program start address\n"
+    "  BIDECLE(_zero)      ; Bkgnd picture base (points to NULL list)\n"
+    "  BIDECLE(_ones)      ; GRAM pictures      (points to NULL list)\n"
+    "  BIDECLE(_title)     ; Cartridge title/date\n"
+    "  .dc16 0x03c0        ; Flags:  No ECS title, run code after title,\n"
+    "_zero:\n"
+    "  .dc16 0x0000        ; Screen border control\n"
+    "  .dc16 0x0000        ; 0 = color stack, 1 = f/b mode\n"
+    "  BIDECLE(_ones)      ; GRAM pictures      (points to NULL list)\n"
+    "_ones:\n"
     "  .dw 1, 1, 1, 1, 1   ; Color stack initialization\n\n");
 
+  // FIXME: 121 = 2021.. Should this be configurable?
   fprintf(out,
-    "title:"
-    "  .dw 107, 'J', 'A', 'V', 'A', 0\n");
+    "_title:\n"
+    "  .dc16 121, 'J', 'A', 'V', 'A', 0\n");
 
   fprintf(out,
-    "start:\n"
+    "_start:\n"
     "  ; Point r3 to local variables\n"
-    "  mvii #ram_start, r3\n");
+    "  mvii #ram_start, r3\n"
+    "  eis\n");
 
   // FIXME: Remove.
 #if 0
@@ -135,10 +137,17 @@ int Intellivision::field_init_int(std::string &name, int index, int value)
   if (index == 0)
   {
     fprintf(out,
-      "  mvii #ram_end-%d, r4\n"
-      "  xorr r0, r0\n"
-      "  mvo@ r0, r4\n"
+      "  ; field_init_int(%s, index=%d, value=%d)\n"
+      "  sdbd\n"
+      "  mvii #(ram_end-%d) & 0xff, r4\n"
+      "  .dc16 (ram_end-%d) >> 8\n"
+      "  xorr r1, r1\n"
+      "  mvo@ r1, r4\n"
       "  mvo@ r1, r4\n",
+      name.c_str(),
+      index,
+      value,
+      (index + 1) * 2,
       (index + 1) * 2);
   }
     else
@@ -238,6 +247,7 @@ int Intellivision::push_fake()
 
 int Intellivision::push_int(int32_t n)
 {
+  // FIXME: if n <= 0x3ff, should be able to load without an sbdb
   fprintf(out,
     "  ; push_int()\n"
     "  sdbd\n"
@@ -269,12 +279,26 @@ int Intellivision::push_double(double f)
 
 int Intellivision::push_ref(std::string &name)
 {
+#if 0
   fprintf(out,
     "  ; push_ref(%s)\n"
-    "  sdbd\n" 
-    "  mvi static_%s & 0xff, r0\n"
+    "  sdbd\n"
+    "  mvi static_%s & 0xff, r1\n"
     "  .dc16 static_%s >> 8\n"
-    "  pshr r0\n",
+    "  pshr r1\n",
+    name.c_str(),
+    name.c_str(),
+    name.c_str());
+#endif
+
+  fprintf(out,
+    "  ; push_ref(%s)\n"
+    "  sdbd\n"
+    "  mvii #static_%s & 0xff, r4\n"
+    "  .dc16 static_%s >> 8\n"
+    "  sdbd\n"
+    "  mvi@ r4, r1\n"
+    "  pshr r1\n",
     name.c_str(),
     name.c_str(),
     name.c_str());
@@ -288,10 +312,11 @@ int Intellivision::pop_local_var_int(int index)
   {
     fprintf(out,
       "  ; pop_local_var_int(%d)\n"
-      "  pulr r0\n"
+      "  pulr r1\n"
       "  movr r3, r4\n"
-      "  sdbd\n"
-      "  mvo@ r0, r4\n",
+      "  mvo@ r1, r4\n"
+      "  swap r1\n"
+      "  mvo@ r1, r4\n",
       index);
   }
     else
@@ -300,9 +325,10 @@ int Intellivision::pop_local_var_int(int index)
       "  ; pop_local_var_int(%d)\n"
       "  movr r3, r4\n"
       "  addi #%d, r4\n"
-      "  pulr r0\n"
-      "  sdbd\n"
-      "  mvo@ r0, r4\n",
+      "  pulr r1\n"
+      "  mvo@ r1, r4\n"
+      "  swap r1\n"
+      "  mvo@ r1, r4\n",
       index * 2,
       index);
   }
@@ -729,9 +755,9 @@ int Intellivision::inc_integer(int index, int num)
   {
     fprintf(out,
       "  ; inc_integer(%d)\n"
-      "  mvii #d, r0\n"
-      "  %s@ r3, r0\n"
-      "  mvo@ r0, r3\n",
+      "  mvii #d, r1\n"
+      "  %s@ r3, r1\n"
+      "  mvo@ r1, r3\n",
       num & 0xffff,
       operation);
   }
@@ -739,11 +765,11 @@ int Intellivision::inc_integer(int index, int num)
   {
     fprintf(out,
       "  ; inc_integer(%d)\n"
-      "  mvii #%d, r0\n"
+      "  mvii #%d, r1\n"
       "  movr r3, r4\n"
       "  addi #%d, r4\n"
-      "  %s@ r4, r0\n"
-      "  mvo@ r0, r4\n",
+      "  %s@ r4, r1\n"
+      "  mvo@ r1, r4\n",
       num,
       num & 0xffff,
       index * 2,
@@ -953,9 +979,10 @@ int Intellivision::invoke_static_method(
   for (n = 0; n < params; n++)
   {
     fprintf(out,
-      "  mvi@ r5, r0\n"
-      "  sdbd\n"
-      "  mvo@ r0, r4\n");
+      "  mvi@ r5, r1\n"
+      "  mvo@ r1, r4\n"
+      "  swap r1\n"
+      "  mvo@ r1, r4\n");
   }
 
   // Fix stack, push current locals pointer and adjust for new locals.
@@ -985,12 +1012,16 @@ int Intellivision::put_static(std::string &name, int index)
 {
   fprintf(out,
     "  ; put_static(%s, %d)\n"
-    "  mvii #ram_end-%d, r4\n"
-    "  pulr r0\n"
     "  sdbd\n"
-    "  mvo@ r0, r4\n",
+    "  mvii #(ram_end-%d) & 0xff, r4\n"
+    "  .dc16 (ram_end-%d) >> 8\n"
+    "  pulr r1\n"
+    "  mvo@ r1, r4\n"
+    "  swap r1\n"
+    "  mvo@ r1, r4\n",
     name.c_str(),
     index,
+    (index + 1) * 2,
     (index + 1) * 2);
 
   return 0;
@@ -1119,10 +1150,10 @@ int Intellivision::intellivision_plot_II()
 {
   fprintf(out,
     "  ; intellivision_plot_II()\n"
-    "  pulr r0\n"
-    "  addi #0x200, r0\n"
+    "  pulr r2\n"
+    "  addi #0x200, r2\n"
     "  pulr r1\n"
-    "  mvo@ r1, r0\n");
+    "  mvo@ r1, r2\n");
 
   return 0;
 }
@@ -1134,10 +1165,10 @@ int Intellivision::intellivision_plot_III()
   fprintf(out,
     "  ; intellivision_plot_II()\n"
     "  jsr _multiply\n"
-    "  pulr r0\n"
-    "  addi #0x200, r0\n"
+    "  pulr r2\n"
+    "  addi #0x200, r2\n"
     "  pulr r1\n"
-    "  mvo@ r1, r0\n");
+    "  mvo@ r1, r2\n");
 
   return 0;
 }
