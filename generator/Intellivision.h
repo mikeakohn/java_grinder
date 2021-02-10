@@ -100,6 +100,14 @@ public:
 
   virtual int intellivision_plot_II();
   virtual int intellivision_plot_III();
+  virtual int intellivision_getControllerLeft();
+  virtual int intellivision_getControllerRight();
+  virtual int intellivision_setSoundChannelPeriod_II();
+  virtual int intellivision_setSoundChannelVolume_II();
+  virtual int intellivision_setSoundEnvelopePeriod_I();
+  virtual int intellivision_setSoundEnvelopeType_I();
+  virtual int intellivision_setSoundNoisePeriod_I();
+  virtual int intellivision_setSoundType_I();
 
 protected:
   void add_mul();

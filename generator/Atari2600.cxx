@@ -929,7 +929,7 @@ int Atari2600::joystick_isRight_I()
 
 int Atari2600::joystick_isRight_I(int index)
 {
-  fprintf(out, "; Joystick.isRight(index=%d)\n", index);
+  fprintf(out, "; Joystick.isRight_I(index=%d)\n", index);
 
   if (index == 0)
   {
@@ -964,7 +964,7 @@ int Atari2600::joystick_isLeft_I()
 
 int Atari2600::joystick_isLeft_I(int index)
 {
-  fprintf(out, "; isLeft(index=%d)\n", index);
+  fprintf(out, "; isLeft_I(index=%d)\n", index);
 
   if (index == 0)
   {
@@ -999,7 +999,7 @@ int Atari2600::joystick_isDown_I()
 
 int Atari2600::joystick_isDown_I(int index)
 {
-  fprintf(out, "; isDown(index=%d)\n", index);
+  fprintf(out, "; isDown_I(index=%d)\n", index);
 
   if (index == 0)
   {
@@ -1029,13 +1029,12 @@ int Atari2600::joystick_isDown_I(int index)
 
 int Atari2600::joystick_isUp_I()
 {
-printf("Wrong\n");
   return -1;
 }
 
 int Atari2600::joystick_isUp_I(int index)
 {
-  fprintf(out, "; isUp(index=%d)\n", index);
+  fprintf(out, "; isUp_I(index=%d)\n", index);
 
   if (index == 0)
   {
@@ -1070,7 +1069,7 @@ int Atari2600::joystick_isButtonDown_0_I()
 
 int Atari2600::joystick_isButtonDown_0_I(int index)
 {
-  fprintf(out, "; isButtonDown(index=%d)\n", index);
+  fprintf(out, "; isButtonDown_0_I(index=%d)\n", index);
 
   if (index == 0)
   {

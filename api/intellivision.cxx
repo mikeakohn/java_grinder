@@ -41,6 +41,14 @@ int intellivision(
 {
   CHECK_FUNC(plot,_II)
   CHECK_FUNC(plot,_III)
+  CHECK_FUNC(getControllerLeft,)
+  CHECK_FUNC(getControllerRight,)
+  CHECK_FUNC(setSoundChannelPeriod,_II)
+  CHECK_FUNC(setSoundChannelVolume,_II)
+  CHECK_FUNC(setSoundEnvelopePeriod,_I)
+  CHECK_FUNC(setSoundEnvelopeType,_I)
+  CHECK_FUNC(setSoundNoisePeriod,_I)
+  CHECK_FUNC(setSoundType,_I)
 
   return -1;
 }

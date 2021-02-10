@@ -279,18 +279,6 @@ int Intellivision::push_double(double f)
 
 int Intellivision::push_ref(std::string &name)
 {
-#if 0
-  fprintf(out,
-    "  ; push_ref(%s)\n"
-    "  sdbd\n"
-    "  mvi static_%s & 0xff, r1\n"
-    "  .dc16 static_%s >> 8\n"
-    "  pshr r1\n",
-    name.c_str(),
-    name.c_str(),
-    name.c_str());
-#endif
-
   fprintf(out,
     "  ; push_ref(%s)\n"
     "  sdbd\n"
@@ -1168,6 +1156,102 @@ int Intellivision::intellivision_plot_III()
     "  pulr r2\n"
     "  addi #0x200, r2\n"
     "  pulr r1\n"
+    "  mvo@ r1, r2\n");
+
+  return 0;
+}
+
+int Intellivision::intellivision_getControllerLeft()
+{
+  fprintf(out,
+    "  ; intellivision_getControllerLeft()\n"
+    "  mvi 0x01ff, r1\n"
+    "  pshr r1\n");
+
+  return 0;
+}
+
+int Intellivision::intellivision_getControllerRight()
+{
+  fprintf(out,
+    "  ; intellivision_getControllerRight()\n"
+    "  mvi 0x01fe, r1\n"
+    "  pshr r1\n");
+
+  return 0;
+}
+
+int Intellivision::intellivision_setSoundChannelPeriod_II()
+{
+  fprintf(out,
+    "  ; intellivision_setSoundChannelPeriod_II()\n"
+    "  pulr r1\n"
+    "  pulr r0\n"
+    "  mvi #0x1f0, r2\n"
+    "  addr r0, r2\n"
+    "  mvo@ r1, r2\n"
+    "  swap r1\n"
+    "  addi #4, r2\n"
+    "  mvo@ r1, r2\n");
+
+  return 0;
+}
+
+int Intellivision::intellivision_setSoundChannelVolume_II()
+{
+  fprintf(out,
+    "  ; intellivision_setSoundChannelVolume_II()\n"
+    "  pulr r1\n"
+    "  pulr r0\n"
+    "  mvi #0x1fb, r2\n"
+    "  addr r0, r2\n"
+    "  mvo@ r1, r2\n");
+
+  return 0;
+}
+
+int Intellivision::intellivision_setSoundEnvelopePeriod_I()
+{
+  fprintf(out,
+    "  ; intellivision_setSoundEnvelopePeriod_I()\n"
+    "  pulr r1\n"
+    "  mvi #0x1f3, r2\n"
+    "  mvo@ r1, r2\n"
+    "  swap r1\n"
+    "  addi #4, r2\n"
+    "  mvo@ r1, r2\n");
+
+  return 0;
+}
+
+int Intellivision::intellivision_setSoundEnvelopeType_I()
+{
+  fprintf(out,
+    "  ; intellivision_setSoundEnvelopeType_I()\n"
+    "  pulr r1\n"
+    "  mvi #0x1fa, r2\n"
+    "  mvo@ r1, r2\n");
+
+  return 0;
+}
+
+int Intellivision::intellivision_setSoundNoisePeriod_I()
+{
+  fprintf(out,
+    "  ; intellivision_setSoundNoisePeriod_I()\n"
+    "  pulr r1\n"
+    "  mvi #0x1f9, r2\n"
+    "  mvo@ r1, r2\n");
+
+  return 0;
+}
+
+int Intellivision::intellivision_setSoundType_I()
+{
+  fprintf(out,
+    "  ; intellivision_setSoundType_I()\n"
+    "  pulr r1\n"
+    "  mvi #0x1f8, r2\n"
     "  mvo@ r1, r2\n");
 
   return 0;
