@@ -21,7 +21,20 @@ public class IntellivisionDemo
 
     while (true)
     {
-      a = a + 1;
+      Intellivision.plot((0x21 << 3) | Intellivision.COLOR_WHITE, 40);
+
+      for (a = 0; a < 60; a++)
+      {
+        Intellivision.waitForVerticalBlank();
+      }
+
+      Intellivision.plot((0x3a << 3) | Intellivision.COLOR_BLUE, 40);
+
+      for (a = 0; a < 60; a++)
+      {
+        Intellivision.waitForVerticalBlank();
+      }
+
     }
   }
 }

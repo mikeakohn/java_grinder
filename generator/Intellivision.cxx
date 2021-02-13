@@ -60,6 +60,16 @@ int Intellivision::finish()
 {
   if (need_multiply) { add_mul(); }
 
+  fprintf(out,
+    "  _vblank_interrupt:\n"
+    "  ;; Enable display.\n"
+    "  mvo r0, 0x0020\n"
+    "  ;; Set did_vblank to 1.\n"
+    "  mvii #1, r0\n"
+    "  mvo r0, 0x0102\n"
+    "  ;; Return from interrupt.\n"
+    "  jr r5\n");
+
   return 0;
 }
 
@@ -96,6 +106,13 @@ int Intellivision::start_init()
 
   fprintf(out,
     "_start:\n"
+    "  ; Setup interrupt.\n"
+    "  mvii #_vblank_interrupt, r0\n"
+    "  mvo r0, 0x100\n"
+    "  swap r0\n"
+    "  mvo r0, 0x101\n"
+    "  mvii #0, r0\n"
+    "  mvo r0, 0x0102\n"
     "  ; Point r3 to local variables\n"
     "  mvii #ram_start, r3\n"
     "  eis\n");
@@ -1157,6 +1174,24 @@ int Intellivision::intellivision_plot_III()
     "  addi #0x200, r2\n"
     "  pulr r1\n"
     "  mvo@ r1, r2\n");
+
+  return 0;
+}
+
+int Intellivision::intellivision_waitForVerticalBlank()
+{
+  fprintf(out,
+    "  ; intellivision_waitVerticalBlank()\n"
+    "  _wait_for_vertical_blank_%d:\n"
+    "  mvi 0x102, r0\n"
+    "  cmpi #1, r0\n"
+    "  bneq _wait_for_vertical_blank_%d\n"
+    "  mvii #0, r0\n"
+    "  mvo r0, 0x0102\n",
+    label_count,
+    label_count);
+
+  label_count++;
 
   return 0;
 }

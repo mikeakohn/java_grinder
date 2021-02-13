@@ -34,6 +34,8 @@ abstract public class Intellivision
   public static final int COLOR_YELLOW_GREEN = 14;
   public static final int COLOR_PURPLE = 15;
 
+  // Video functions.
+
   // Data is:
   // Bits [ 12, 13, 10, 9] : Background color
   // Bits [ 11 ]           : GROM vs GRAM 
@@ -41,6 +43,7 @@ abstract public class Intellivision
   // Bits [ 2 - 0 ]        : Foreground Color
   public static void plot(int data, int pos) { }
   public static void plot(int data, int x, int y) { }
+  public static void waitForVerticalBlank() { }
 
   // Controller input.
   // http://wiki.intellivision.us/index.php?title=Hand_Controller
@@ -50,6 +53,8 @@ abstract public class Intellivision
   public static final int SOUND_CHANNEL_A = 0;
   public static final int SOUND_CHANNEL_B = 1;
   public static final int SOUND_CHANNEL_C = 2;
+
+  // Sound functions.
 
   /** Sound period: Valid values between 0 to 4095. */
   public static void setSoundChannelPeriod(int channel, int value) { }
@@ -69,5 +74,7 @@ abstract public class Intellivision
   /** Sound type: Valid values between 0 to 31 where
       bits 3-5 noise and 0-2 tone. */
   public static void setSoundType(int value) { }
+
+  // Sprite Functions.
 }
 
