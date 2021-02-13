@@ -62,11 +62,13 @@ int Intellivision::finish()
 
   fprintf(out,
     "  _vblank_interrupt:\n"
-    "  ;; Enable display.\n"
+    "  ;; Enable display with STIC.\n"
     "  mvo r0, 0x0020\n"
     "  ;; Set did_vblank to 1.\n"
     "  mvii #1, r0\n"
     "  mvo r0, 0x0102\n"
+    "  mvii #0, r0\n"
+    "  mvo r0, 0x002c\n"
     "  ;; Return from interrupt.\n"
     "  jr r5\n");
 
@@ -185,7 +187,25 @@ int Intellivision::field_init_int(std::string &name, int index, int value)
 
 int Intellivision::field_init_ref(std::string &name, int index)
 {
-  return -1;
+  fprintf(out,
+    "  ; field_init_ref(%s, %d)\n"
+    "  sdbd\n"
+    "  mvii #static_%s & 0xff, r4\n"
+    "  .dc16 static_%s >> 8\n"
+    "  sdbd\n"
+    "  mvii #_%s & 0xff, r0\n"
+    "  .dc16 _%s >> 8\n"
+    "  mvo@ r0, r4\n"
+    "  swap r0\n"
+    "  mvo@ r0, r4\n",
+    name.c_str(),
+    index,
+    name.c_str(),
+    name.c_str(),
+    name.c_str(),
+    name.c_str());
+
+  return 0;
 }
 
 void Intellivision::method_start(
@@ -267,19 +287,21 @@ int Intellivision::push_int(int32_t n)
   if (n >= 0 && n <= 0x3ff)
   {
     fprintf(out,
-      "  ; push_int()\n"
+      "  ; push_int(%d)\n"
       "  mvii #0x%04x, r0\n"
       "  pshr r0\n",
+      n,
       n);
   }
     else
   {
     fprintf(out,
-      "  ; push_int()\n"
+      "  ; push_int(%d)\n"
       "  sdbd\n"
       "  mvii #0x%04x, r0\n"
       "  .dc16 %04x\n"
       "  pshr r0\n",
+      n,
       n & 0xff,
       (n >> 8) & 0xff);
   }
@@ -434,8 +456,8 @@ int Intellivision::sub_integer()
     "  ; sub_integer()\n"
     "  pulr r0\n"
     "  pulr r1\n"
-    "  subr r0, r1\n"
-    "  pshr r1\n");
+    "  subr r1, r0\n"
+    "  pshr r0\n");
 
   return 0;
 }
@@ -448,8 +470,8 @@ int Intellivision::sub_integer(int num)
     "  ; sub_integer(%d)\n"
     "  pulr r0\n"
     "  mvii #%d, r1\n"
-    "  subr r0, r1\n"
-    "  pshr r1\n",
+    "  subr r1, r0\n"
+    "  pshr r0\n",
     num,
     num & 0xffff);
 
@@ -509,12 +531,13 @@ int Intellivision::shift_left_integer()
 
 int Intellivision::shift_left_integer(int num)
 {
+  // FIXME: Optimize further (along with the other shifts).
   fprintf(out,
     "  ; shift_left_integer(%d)\n"
     "  pulr r0\n",
     num);
 
-  if (num <= 8)
+  if (num < 8)
   {
     for (int n = 0; n < num; n = n + 2)
     {
@@ -527,6 +550,13 @@ int Intellivision::shift_left_integer(int num)
         fprintf(out, "  sll r0, 1\n");
       }
     }
+  }
+    else
+  if (num == 8)
+  {
+    fprintf(out,
+      "  and #0xff, r0\n"
+      "  swap r0\n");
   }
     else
   {
@@ -543,7 +573,7 @@ int Intellivision::shift_left_integer(int num)
     label_count++;
   }
 
-  fprintf(out, "  mvi@ r6, r0\n");
+  fprintf(out, "  pshr r0\n");
 
   return 0;
 }
@@ -634,7 +664,7 @@ int Intellivision::shift_right_uinteger(int num)
     "  pulr r0\n",
     num);
 
-  if (num <= 8)
+  if (num < 8)
   {
     for (int n = 0; n < num; n = n + 2)
     {
@@ -647,6 +677,13 @@ int Intellivision::shift_right_uinteger(int num)
         fprintf(out, "  sar r0, 1\n");
       }
     }
+  }
+    else
+  if (num == 8)
+  {
+    fprintf(out,
+      "  swap r0\n"
+      "  andi #0xff, r0");
   }
     else
   {
@@ -997,34 +1034,43 @@ int Intellivision::invoke_static_method(
   // Copy locals pointer to r4.
   // Copy stack pointer to r5.
   fprintf(out,
+    "  ; Copy locals pointer to r4 and add current local length\n"
+    "  ; Copy stack pointer to r5\n"
     "  movr r3, r4\n"
+    "  addi #%d, r4\n"
     "  movr r6, r5\n"
     "  subi #%d, r5\n",
+    current_local_count * 2,
     params);
 
   // Copy params from stack to locals.
   for (n = 0; n < params; n++)
   {
     fprintf(out,
+      "  ; Setup param %d (local %d)\n"
       "  mvi@ r5, r1\n"
       "  mvo@ r1, r4\n"
       "  swap r1\n"
-      "  mvo@ r1, r4\n");
+      "  mvo@ r1, r4\n",
+      n, n);
   }
 
   // Fix stack, push current locals pointer and adjust for new locals.
   fprintf(out,
+    "  ; Pop paramters off the stack, push local pointer, and move\n"
+    "  ; pointer past current locals.\n"
     "  subi #%d, r6\n"
     "  pshr r3\n"
     "  addi #%d, r3\n",
     params,
     current_local_count * 2);
 
-  // Call the function.
-  fprintf(out, "  jsr r4, %s\n", name);
-
-  // Restore pointer to locals.
-  fprintf(out, "  pulr r3\n");
+  // Call the function and restore locals.
+  fprintf(out,
+    "  ; Call function then restore locals pointer.\n"
+    "  jsr r4, %s\n"
+    "  pulr r3\n",
+    name);
 
   // Push return value to stack.
   if (!is_void)
@@ -1083,16 +1129,40 @@ int Intellivision::new_array(uint8_t type)
   return -1;
 }
 
-int Intellivision::insert_array(std::string &name, int32_t *data, int len, uint8_t type)
+int Intellivision::insert_array(
+  std::string &name,
+  int32_t *data,
+  int len,
+  uint8_t type)
 {
   if (type == TYPE_BYTE)
   {
-    return insert_db(name, data, len, TYPE_INT);
+    return insert_dw(name, data, len, TYPE_SHORT);
   }
     else
   if (type == TYPE_SHORT)
   {
-    return insert_dw(name, data, len, TYPE_INT);
+    fprintf(out,
+      "  dc16 %d   ; %s.length\n"
+      "_%s:\n",
+      len, name.c_str(),
+      name.c_str());
+
+    for (int n = 0; n < len; n++)
+    {
+      if ((n % 4) == 0) { fprintf(out, "  .dc16"); }
+      else { fprintf(out, ","); }
+
+      uint16_t value = data[n];
+
+      fprintf(out, " 0x%04x, 0x%04x", value & 0xff, value >> 8);
+
+      if (((n + 1) % 4) == 0) { fprintf(out, "\n"); }
+    }
+
+    fprintf(out, "\n");
+
+    return 0;
   }
 
   return -1;
@@ -1100,32 +1170,89 @@ int Intellivision::insert_array(std::string &name, int32_t *data, int len, uint8
 
 int Intellivision::insert_string(std::string &name, uint8_t *bytes, int len)
 {
-  return -1;
+  fprintf(out,
+    "  .dc16 %d   ; %s.length\n"
+    "_%s:\n",
+    len, name.c_str(),
+    name.c_str());
+
+  for (int n = 0; n < len; n++)
+  {
+    if ((n % 8) == 0) { fprintf(out, "  .dc16"); }
+    else { fprintf(out, ","); }
+
+    fprintf(out, " 0x%04x", bytes[n]);
+
+    if (((n + 1) % 8) == 0) { fprintf(out, "\n"); }
+  }
+
+  fprintf(out, "\n");
+
+  return 0;
 }
 
 int Intellivision::push_array_length()
 {
-  return -1;
+  fprintf(out,
+    "  ; push_array_length()\n"
+    "  pulr r4\n"
+    "  subi #1, r4\n"
+    "  mvi@ r4, r0\n"
+    "  pshr r0\n");
+
+  return 0;
 }
 
 int Intellivision::push_array_length(std::string &name, int field_id)
 {
-  return -1;
+  fprintf(out,
+    "  ; push_array_length(%s, %d)\n"
+    "  sdbd\n"
+    "  mvii #%s & 0xff, r4\n"
+    "  .dc16 %s >> 8\n"
+    "  subi #2, r4\n"
+    "  sdbd\n"
+    "  mvi@ r4, r0\n"
+    "  pshr r0\n",
+    name.c_str(),
+    field_id,
+    name.c_str(),
+    name.c_str());
+
+  return 0;
 }
 
 int Intellivision::array_read_byte()
 {
-  return -1;
+  fprintf(out,
+    "  ; array_read_byte()\n"
+    "  pulr r0\n"
+    "  pulr r4\n"
+    "  addr r0, r4\n"
+    "  mvi@ r4, r0\n"
+    "  pshr r0\n");
+
+  return 0;
 }
 
 int Intellivision::array_read_short()
 {
-  return -1;
+  fprintf(out,
+    "  ; array_read_short()\n"
+    "  pulr r0\n"
+    "  pulr r4\n"
+    "  sll r0\n"
+    "  addr r0, r4\n"
+    "  sdbd\n"
+    "  mvi@ r4, r0\n"
+    "  pshr r0\n");
+
+  return 0;
 }
 
 int Intellivision::array_read_int()
 {
-  return -1;
+  return array_read_short();
 }
 
 int Intellivision::array_read_byte(std::string &name, int field_id)
@@ -1140,7 +1267,7 @@ int Intellivision::array_read_short(std::string &name, int field_id)
 
 int Intellivision::array_read_int(std::string &name, int field_id)
 {
-  return -1;
+  return array_read_short(name, field_id);
 }
 
 int Intellivision::array_write_byte()

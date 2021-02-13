@@ -186,6 +186,7 @@ public:
   void instruction_count_inc() { instruction_count++; }
 
   int use_array_file(const char *filename, const char *array, int type);
+  //int ignore() { return 0; }
 
 protected:
   struct ArrayFiles

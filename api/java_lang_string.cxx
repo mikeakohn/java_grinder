@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -42,20 +42,34 @@ static int string_charAt_I(JavaClass *java_class, Generator *generator)
   return 0;
 }
 
-int java_lang_string(JavaClass *java_class, Generator *generator, const char *function, const char *field_name, int field_id)
+static int string_getBytes(JavaClass *java_class, Generator *generator)
+{
+  return 0;
+}
+
+int java_lang_string(
+  JavaClass *java_class,
+  Generator *generator,
+  const char *function,
+  const char *field_name,
+  int field_id)
 {
   CHECK_FUNC(length)
   CHECK_FUNC(charAt_I)
+  CHECK_FUNC(getBytes)
 
   return -1;
 }
 
-int java_lang_string(JavaClass *java_class, Generator *generator, const char *method_name)
+int java_lang_string(
+  JavaClass *java_class,
+  Generator *generator,
+  const char *method_name)
 {
   CHECK_FUNC_PUSHED(length,,push_array_length)
   CHECK_FUNC_PUSHED(charAt,_I,array_read_byte)
+  //CHECK_FUNC_PUSHED(getBytes,,ignore)
 
   return -1;
 }
-
 
