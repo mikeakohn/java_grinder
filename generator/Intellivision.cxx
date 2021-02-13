@@ -264,15 +264,25 @@ int Intellivision::push_fake()
 
 int Intellivision::push_int(int32_t n)
 {
-  // FIXME: if n <= 0x3ff, should be able to load without an sbdb
-  fprintf(out,
-    "  ; push_int()\n"
-    "  sdbd\n"
-    "  mvii #0x%04x, r0\n"
-    "  .dc16 %04x\n"
-    "  pshr r0\n",
-    n & 0xff,
-    (n >> 8) & 0xff);
+  if (n >= 0 && n <= 0x3ff)
+  {
+    fprintf(out,
+      "  ; push_int()\n"
+      "  mvii #0x%04x, r0\n"
+      "  pshr r0\n",
+      n);
+  }
+    else
+  {
+    fprintf(out,
+      "  ; push_int()\n"
+      "  sdbd\n"
+      "  mvii #0x%04x, r0\n"
+      "  .dc16 %04x\n"
+      "  pshr r0\n",
+      n & 0xff,
+      (n >> 8) & 0xff);
+  }
 
   return 0;
 }
@@ -334,8 +344,8 @@ int Intellivision::pop_local_var_int(int index)
       "  mvo@ r1, r4\n"
       "  swap r1\n"
       "  mvo@ r1, r4\n",
-      index * 2,
-      index);
+      index,
+      index * 2);
   }
 
   return 0;
@@ -760,25 +770,37 @@ int Intellivision::inc_integer(int index, int num)
   {
     fprintf(out,
       "  ; inc_integer(%d)\n"
-      "  mvii #d, r1\n"
-      "  %s@ r3, r1\n"
-      "  mvo@ r1, r3\n",
-      num & 0xffff,
-      operation);
+      "  movr r3, r4\n"
+      "  sdbd\n"
+      "  mvi@ r4, r1\n"
+      "  %si #%d, r1\n"
+      "  movr r3, r4\n"
+      "  mvo@ r1, r4\n"
+      "  swap r1\n"
+      "  mvo@ r1, r4\n",
+      num,
+      operation,
+      num & 0xfff);
   }
     else
   {
     fprintf(out,
       "  ; inc_integer(%d)\n"
-      "  mvii #%d, r1\n"
       "  movr r3, r4\n"
       "  addi #%d, r4\n"
-      "  %s@ r4, r1\n"
+      "  sdbd\n"
+      "  mvi@ r4, r1\n"
+      "  %si #%d, r1\n"
+      "  movr r3, r4\n"
+      "  addi #%d, r4\n"
+      "  mvo@ r1, r4\n"
+      "  swap r1\n"
       "  mvo@ r1, r4\n",
       num,
-      num & 0xffff,
       index * 2,
-      operation);
+      operation,
+      num & 0xffff,
+      index * 2);
   }
 
   return 0;
@@ -994,7 +1016,7 @@ int Intellivision::invoke_static_method(
   fprintf(out,
     "  subi #%d, r6\n"
     "  pshr r3\n"
-    "  add #%d, r3\n",
+    "  addi #%d, r3\n",
     params,
     current_local_count * 2);
 
@@ -1168,10 +1190,14 @@ int Intellivision::intellivision_plot_III()
   need_multiply = true;
 
   fprintf(out,
-    "  ; intellivision_plot_II()\n"
-    "  jsr _multiply\n"
+    "  ; intellivision_plot_III()\n"
+    "  mvii #20, r0\n"
+    "  pshr r0\n"
+    "  jsr r4, _multiply\n"
     "  pulr r2\n"
+    "  pulr r1\n"
     "  addi #0x200, r2\n"
+    "  addr r1, r2\n"
     "  pulr r1\n"
     "  mvo@ r1, r2\n");
 
