@@ -25,7 +25,11 @@
 // r6 SP (stack write/inc with push, dec/read with pop)
 // r7 PC
 //
+// 0x0100 Interrupt pointer.
 // 0x0102 Scratchpad RAM start (EXEC uses this?)
+// 0x0102 VerticalBlank interrupt flag
+// 0x0103 Horizontal Delay
+// 0x0104 Vertical Delay
 // 0x015d Scratchpad RAM general area start
 // 0x01ef Scratchpad RAM end
 //
@@ -69,6 +73,10 @@ int Intellivision::finish()
     "  mvo r0, 0x0102\n"
     "  mvii #0, r0\n"
     "  mvo r0, 0x002c\n"
+    "  mvi 0x0103, r0\n"
+    "  mvo r0, 0x0030\n"
+    "  mvi 0x0104, r0\n"
+    "  mvo r0, 0x0031\n"
     "  ;; Return from interrupt.\n"
     "  jr r5\n");
 
@@ -115,6 +123,8 @@ int Intellivision::start_init()
     "  mvo r0, 0x101\n"
     "  mvii #0, r0\n"
     "  mvo r0, 0x0102\n"
+    "  mvo r0, 0x0103\n"
+    "  mvo r0, 0x0104\n"
     "  ; Point r3 to local variables\n"
     "  mvii #ram_start, r3\n"
     "  eis\n");
@@ -299,7 +309,7 @@ int Intellivision::push_int(int32_t n)
       "  ; push_int(%d)\n"
       "  sdbd\n"
       "  mvii #0x%04x, r0\n"
-      "  .dc16 %04x\n"
+      "  .dc16 0x%04x\n"
       "  pshr r0\n",
       n,
       n & 0xff,
@@ -1345,6 +1355,26 @@ int Intellivision::intellivision_waitForVerticalBlank()
     label_count);
 
   label_count++;
+
+  return 0;
+}
+
+int Intellivision::intellivision_setHorizontalDelay_I()
+{
+  fprintf(out,
+    "  ; intellivision_setHorizontalDelay_I()\n"
+    "  pulr r0\n"
+    "  mvo r0, 0x103\n");
+
+  return 0;
+}
+
+int Intellivision::intellivision_setVerticalDelay_I()
+{
+  fprintf(out,
+    "  ; intellivision_setVerticalDelay_I()\n"
+    "  pulr r0\n"
+    "  mvo r0, 0x104\n");
 
   return 0;
 }

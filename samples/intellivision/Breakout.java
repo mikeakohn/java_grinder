@@ -65,9 +65,21 @@ public class Breakout
     clearScreen();
     displayText(author.getBytes(), 6, 4, Intellivision.COLOR_WHITE);
 
+    int x = 0;
+    int dx = 1;
+
     while (true)
     {
       Intellivision.plot((0x21 << 3) | Intellivision.COLOR_WHITE, 2, 4);
+
+      Intellivision.setHorizontalDelay(x);
+      Intellivision.setVerticalDelay(x);
+
+      x = x + dx;
+
+      if (x == 7) { dx = -1; }
+        else
+      if (x == 0) { dx = 1; }
 
       for (a = 0; a < 60; a++)
       {
