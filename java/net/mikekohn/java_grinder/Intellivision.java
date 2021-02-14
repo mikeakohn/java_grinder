@@ -36,6 +36,7 @@ abstract public class Intellivision
 
   public static final int VIDEO_MODE_COLOR_STACK = 0;
   public static final int VIDEO_MODE_FOREGROUND_BACKGROUND = 1;
+  public static final int COLOR_STACK_ADVANCE = 0x2000;
 
   // Video functions.
 
@@ -56,6 +57,9 @@ abstract public class Intellivision
 
   /** Select either foreground / background mode or color stack mode. */
   public static void setVideoMode(int value) { }
+
+  /** Sets the color of the color stack (index from 0 to 3). */
+  public static void setColorStack(int index, int color) { }
 
   // Controller input.
   // http://wiki.intellivision.us/index.php?title=Hand_Controller

@@ -31,6 +31,7 @@
 // 0x0103 Horizontal Delay
 // 0x0104 Vertical Delay
 // 0x0105 Video mode
+// 0x0106-0x0109 Color Stack
 // 0x015d Scratchpad RAM general area start
 // 0x01ef Scratchpad RAM end
 //
@@ -67,22 +68,37 @@ int Intellivision::finish()
 
   fprintf(out,
     "  _vblank_interrupt:\n"
-    "  ;; Enable display with STIC.\n"
+    "  ; Enable display with STIC.\n"
     "  mvo r0, 0x0020\n"
-    "  ;; Set did_vblank to 1.\n"
+    "  ; Set did_vblank to 1.\n"
     "  mvii #1, r0\n"
     "  mvo r0, 0x0102\n"
+    "  ; border color\n"
     "  mvii #0, r0\n"
     "  mvo r0, 0x002c\n"
+    "  ; Horizontal / Vertical delay.\n"
     "  mvi 0x0103, r0\n"
     "  mvo r0, 0x0030\n"
     "  mvi 0x0104, r0\n"
     "  mvo r0, 0x0031\n"
+    "  ; Color stack\n"
+    "  mvi 0x0106, r0\n"
+    "  mvo r0, 0x0028\n"
+    "  mvi 0x0107, r0\n"
+    "  mvo r0, 0x0029\n"
+    "  mvi 0x0108, r0\n"
+    "  mvo r0, 0x002a\n"
+    "  mvi 0x0109, r0\n"
+    "  mvo r0, 0x002b\n"
+    "  ; Video mode.\n"
     "  mvi 0x0105, r0\n"
     "  cmpi #1, r0\n"
-    "  bneq _skip_mode_strobe\n"
+    "  bneq _skip_mode_write\n"
     "  mvo r0, 0x0021\n"
-    "_skip_mode_strobe:\n"
+    "  j _finish_mode_strobe\n"
+    "_skip_mode_write:\n"
+    "  mvi 0x0021, r0\n"
+    "_finish_mode_strobe:\n"
     "  ;; Return from interrupt.\n"
     "  jr r5\n");
 
@@ -105,14 +121,14 @@ int Intellivision::start_init()
     "  BIDECLE(_zero)      ; Process table      (points to NULL list)\n"
     "  BIDECLE(_start)     ; Program start address\n"
     "  BIDECLE(_zero)      ; Bkgnd picture base (points to NULL list)\n"
-    "  BIDECLE(_ones)      ; GRAM pictures      (points to NULL list)\n"
+    "  BIDECLE(_colors)    ; GRAM pictures      (points to NULL list)\n"
     "  BIDECLE(_title)     ; Cartridge title/date\n"
     "  .dc16 0x03c0        ; Flags:  No ECS title, run code after title,\n"
     "_zero:\n"
     "  .dc16 0x0000        ; Screen border control\n"
     "  .dc16 0x0000        ; 0 = color stack, 1 = f/b mode\n"
-    "  BIDECLE(_ones)      ; GRAM pictures      (points to NULL list)\n"
-    "_ones:\n"
+    //"  BIDECLE(_ones)      ; GRAM pictures      (points to NULL list)\n"
+    "_colors:\n"
     "  .dw 1, 1, 1, 1, 1   ; Color stack initialization\n\n");
 
   // FIXME: 121 = 2021.. Should this be configurable?
@@ -133,18 +149,15 @@ int Intellivision::start_init()
     "  mvo r0, 0x0104\n"
     "  mvii #0x0, r0\n"
     "  mvo r0, 0x0105\n"
+    "  mvii #0x1, r1\n"
+    "  mvii #0x0106, r4\n"
+    "  mvo@ r1, r4\n"
+    "  mvo@ r1, r4\n"
+    "  mvo@ r1, r4\n"
+    "  mvo@ r1, r4\n"
     "  ; Point r3 to local variables\n"
     "  mvii #ram_start, r3\n"
     "  eis\n");
-
-  // FIXME: Remove.
-#if 0
-  fprintf(out,
-    "main:\n"
-    "  eis\n"
-    "while_1:\n"
-    "  b while_1\n\n");
-#endif
 
   return 0;
 }
@@ -1393,6 +1406,18 @@ int Intellivision::intellivision_setVideoMode_I()
     "  ; intellivision_setVideoMode_I()\n"
     "  pulr r0\n"
     "  mvo r0, 0x0105\n");
+
+  return 0;
+}
+
+int Intellivision::intellivision_setColorStack_II()
+{
+  fprintf(out,
+    "  ; intellivision_setColorStack_II()\n"
+    "  pulr r0\n"
+    "  pulr r4\n"
+    "  addi #0x0106, r4\n"
+    "  mvo@ r0, r4\n");
 
   return 0;
 }

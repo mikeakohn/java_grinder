@@ -83,6 +83,7 @@ public class Breakout
     pause(60);
 
     scrollText(author, 5);
+    Intellivision.setVideoMode(Intellivision.VIDEO_MODE_COLOR_STACK);
     scrollText(java_grinder, 3);
 
     while (true);
