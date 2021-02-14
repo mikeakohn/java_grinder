@@ -535,7 +535,7 @@ int Intellivision::neg_integer()
   fprintf(out,
     "  ; neg_integer()\n"
     "  pulr r0\n"
-    "  neg r0\n"
+    "  negr r0\n"
     "  pshr r0\n");
 
   return 0;
@@ -1427,6 +1427,7 @@ int Intellivision::intellivision_getControllerLeft()
   fprintf(out,
     "  ; intellivision_getControllerLeft()\n"
     "  mvi 0x01ff, r1\n"
+    "  xori #0xff, r1\n"
     "  pshr r1\n");
 
   return 0;
@@ -1437,6 +1438,7 @@ int Intellivision::intellivision_getControllerRight()
   fprintf(out,
     "  ; intellivision_getControllerRight()\n"
     "  mvi 0x01fe, r1\n"
+    "  xori #0xff, r1\n"
     "  pshr r1\n");
 
   return 0;
