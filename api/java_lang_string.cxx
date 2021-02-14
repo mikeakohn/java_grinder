@@ -68,7 +68,7 @@ int java_lang_string(
 {
   CHECK_FUNC_PUSHED(length,,push_array_length)
   CHECK_FUNC_PUSHED(charAt,_I,array_read_byte)
-  //CHECK_FUNC_PUSHED(getBytes,,ignore)
+  CHECK_FUNC_PUSHED(getBytes,,ignore)
 
   return -1;
 }

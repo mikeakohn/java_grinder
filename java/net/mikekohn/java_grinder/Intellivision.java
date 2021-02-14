@@ -34,6 +34,9 @@ abstract public class Intellivision
   public static final int COLOR_YELLOW_GREEN = 14;
   public static final int COLOR_PURPLE = 15;
 
+  public static final int VIDEO_MODE_COLOR_STACK = 0;
+  public static final int VIDEO_MODE_FOREGROUND_BACKGROUND = 1;
+
   // Video functions.
 
   // Data is:
@@ -50,6 +53,9 @@ abstract public class Intellivision
 
   /** Scroll the entire video display vertically by (value 0 to 7) pixels. */
   public static void setVerticalDelay(int value) { }
+
+  /** Select either foreground / background mode or color stack mode. */
+  public static void setVideoMode(int value) { }
 
   // Controller input.
   // http://wiki.intellivision.us/index.php?title=Hand_Controller

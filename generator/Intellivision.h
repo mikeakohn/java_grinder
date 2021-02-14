@@ -103,6 +103,7 @@ public:
   virtual int intellivision_waitForVerticalBlank();
   virtual int intellivision_setHorizontalDelay_I();
   virtual int intellivision_setVerticalDelay_I();
+  virtual int intellivision_setVideoMode_I();
   virtual int intellivision_getControllerLeft();
   virtual int intellivision_getControllerRight();
   virtual int intellivision_setSoundChannelPeriod_II();

@@ -3,13 +3,13 @@ import net.mikekohn.java_grinder.Intellivision;
 
 public class Breakout
 {
-  static String author = "Mike Kohn";
-  static String java_grinder = "Java Grinder";
+  static String author = " MIKE KOHN";
+  static String java_grinder = " JAVA GRINDER";
   static String breakout = "BREAKOUT";
 
   static public void clearScreen()
   {
-    int a;
+    int a, color = 0x200;
 
     for (a = 0; a < 20 * 12; a++)
     {
@@ -17,82 +17,75 @@ public class Breakout
     }
   }
 
-  //static public void displayText(byte[] text, int x, int y, int color)
   static public void displayText(byte[] text, int x, int y, int color)
   {
     int n, a;
 
     for (n = 0; n < text.length; n++)
     {
-      int c = text[n];
+      int c = text[n] - 32;
 
-      if (c >= 'A' || c <= 'Z')
-      {
-        c = c - 'A' + 0x21;
-        Intellivision.plot((c << 3) | color, x, y);
-      }
-        else
-      if (c >= 'a' || c <= 'a')
-      {
-        c = c - 'a' + 0x41;
-        Intellivision.plot((c << 3) | color, x, y);
-      }
-        else
-      if (c >= '0' || c <= '9')
-      {
-        c = c - '0' + 0x11;
-        Intellivision.plot((c << 3) | color, x, y);
-      }
-        else
-      {
-        Intellivision.plot(color, x, y);
-      }
+      Intellivision.plot((c << 3) | color, x, y);
 
       x++;
+
+      if (x >= 20) { break; }
+    }
+  }
+
+  public static void scrollText(String text, int x)
+  {
+    int n, r;
+
+    displayText(text.getBytes(), x, 4, Intellivision.COLOR_TAN);
+    pause(60);
+
+    for (n = x; n < 20; n++)
+    {
+      for (r = n; r < n + text.length(); r++)
+      {
+        Intellivision.plot(' ', r, 4);
+      }
+
+      Intellivision.setHorizontalDelay(0);
+
+      displayText(text.getBytes(), n, 4, Intellivision.COLOR_WHITE);
+
+      for (r = 0; r < 8; r++)
+      {
+        Intellivision.setHorizontalDelay(r);
+        pause(1);
+      }
+    }
+
+    Intellivision.setHorizontalDelay(0);
+  }
+
+  public static void pause(int value)
+  {
+    int n;
+
+    for (n = 0; n < value; n++)
+    {
+      Intellivision.waitForVerticalBlank();
     }
   }
 
   public static void main(String args[])
   {
-    int a;
+    int n, x;
 
-    // Two second pause, then clear the screen.
-    for (a = 0; a < 120; a++)
-    {
-      Intellivision.waitForVerticalBlank();
-    }
+    pause(120);
 
     clearScreen();
-    displayText(author.getBytes(), 6, 4, Intellivision.COLOR_WHITE);
+    Intellivision.setVideoMode(Intellivision.VIDEO_MODE_FOREGROUND_BACKGROUND);
 
-    int x = 0;
-    int dx = 1;
+    pause(60);
 
-    while (true)
-    {
-      Intellivision.plot((0x21 << 3) | Intellivision.COLOR_WHITE, 2, 4);
+    scrollText(author, 5);
+    scrollText(java_grinder, 3);
 
-      Intellivision.setHorizontalDelay(x);
-      Intellivision.setVerticalDelay(x);
-
-      x = x + dx;
-
-      if (x == 7) { dx = -1; }
-        else
-      if (x == 0) { dx = 1; }
-
-      for (a = 0; a < 60; a++)
-      {
-        Intellivision.waitForVerticalBlank();
-      }
-
-      Intellivision.plot((0x3a << 3) | Intellivision.COLOR_BLUE, 2, 4);
-
-      for (a = 0; a < 60; a++)
-      {
-        Intellivision.waitForVerticalBlank();
-      }
-    }
+    while (true);
   }
 }
 

@@ -30,6 +30,7 @@
 // 0x0102 VerticalBlank interrupt flag
 // 0x0103 Horizontal Delay
 // 0x0104 Vertical Delay
+// 0x0105 Video mode
 // 0x015d Scratchpad RAM general area start
 // 0x01ef Scratchpad RAM end
 //
@@ -77,6 +78,11 @@ int Intellivision::finish()
     "  mvo r0, 0x0030\n"
     "  mvi 0x0104, r0\n"
     "  mvo r0, 0x0031\n"
+    "  mvi 0x0105, r0\n"
+    "  cmpi #1, r0\n"
+    "  bneq _skip_mode_strobe\n"
+    "  mvo r0, 0x0021\n"
+    "_skip_mode_strobe:\n"
     "  ;; Return from interrupt.\n"
     "  jr r5\n");
 
@@ -125,6 +131,8 @@ int Intellivision::start_init()
     "  mvo r0, 0x0102\n"
     "  mvo r0, 0x0103\n"
     "  mvo r0, 0x0104\n"
+    "  mvii #0x0, r0\n"
+    "  mvo r0, 0x0105\n"
     "  ; Point r3 to local variables\n"
     "  mvii #ram_start, r3\n"
     "  eis\n");
@@ -1364,7 +1372,7 @@ int Intellivision::intellivision_setHorizontalDelay_I()
   fprintf(out,
     "  ; intellivision_setHorizontalDelay_I()\n"
     "  pulr r0\n"
-    "  mvo r0, 0x103\n");
+    "  mvo r0, 0x0103\n");
 
   return 0;
 }
@@ -1374,7 +1382,17 @@ int Intellivision::intellivision_setVerticalDelay_I()
   fprintf(out,
     "  ; intellivision_setVerticalDelay_I()\n"
     "  pulr r0\n"
-    "  mvo r0, 0x104\n");
+    "  mvo r0, 0x0104\n");
+
+  return 0;
+}
+
+int Intellivision::intellivision_setVideoMode_I()
+{
+  fprintf(out,
+    "  ; intellivision_setVideoMode_I()\n"
+    "  pulr r0\n"
+    "  mvo r0, 0x0105\n");
 
   return 0;
 }

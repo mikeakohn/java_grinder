@@ -44,6 +44,7 @@ int intellivision(
   CHECK_FUNC(waitForVerticalBlank,)
   CHECK_FUNC(setHorizontalDelay,_I)
   CHECK_FUNC(setVerticalDelay,_I)
+  CHECK_FUNC(setVideoMode,_I)
   CHECK_FUNC(getControllerLeft,)
   CHECK_FUNC(getControllerRight,)
   CHECK_FUNC(setSoundChannelPeriod,_II)
