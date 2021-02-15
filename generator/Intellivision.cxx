@@ -1475,7 +1475,7 @@ int Intellivision::intellivision_setSoundChannelPeriod_II()
     "  ; intellivision_setSoundChannelPeriod_II()\n"
     "  pulr r1\n"
     "  pulr r0\n"
-    "  mvi #0x1f0, r2\n"
+    "  mvii #0x1f0, r2\n"
     "  addr r0, r2\n"
     "  mvo@ r1, r2\n"
     "  swap r1\n"
@@ -1491,7 +1491,7 @@ int Intellivision::intellivision_setSoundChannelVolume_II()
     "  ; intellivision_setSoundChannelVolume_II()\n"
     "  pulr r1\n"
     "  pulr r0\n"
-    "  mvi #0x1fb, r2\n"
+    "  mvii #0x1fb, r2\n"
     "  addr r0, r2\n"
     "  mvo@ r1, r2\n");
 
@@ -1503,7 +1503,7 @@ int Intellivision::intellivision_setSoundEnvelopePeriod_I()
   fprintf(out,
     "  ; intellivision_setSoundEnvelopePeriod_I()\n"
     "  pulr r1\n"
-    "  mvi #0x1f3, r2\n"
+    "  mvii #0x1f3, r2\n"
     "  mvo@ r1, r2\n"
     "  swap r1\n"
     "  addi #4, r2\n"
@@ -1517,7 +1517,7 @@ int Intellivision::intellivision_setSoundEnvelopeType_I()
   fprintf(out,
     "  ; intellivision_setSoundEnvelopeType_I()\n"
     "  pulr r1\n"
-    "  mvi #0x1fa, r2\n"
+    "  mvii #0x1fa, r2\n"
     "  mvo@ r1, r2\n");
 
   return 0;
@@ -1528,7 +1528,7 @@ int Intellivision::intellivision_setSoundNoisePeriod_I()
   fprintf(out,
     "  ; intellivision_setSoundNoisePeriod_I()\n"
     "  pulr r1\n"
-    "  mvi #0x1f9, r2\n"
+    "  mvii #0x1f9, r2\n"
     "  mvo@ r1, r2\n");
 
   return 0;
@@ -1539,7 +1539,7 @@ int Intellivision::intellivision_setSoundType_I()
   fprintf(out,
     "  ; intellivision_setSoundType_I()\n"
     "  pulr r1\n"
-    "  mvi #0x1f8, r2\n"
+    "  mvii #0x1f8, r2\n"
     "  mvo@ r1, r2\n");
 
   return 0;

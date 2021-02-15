@@ -10,6 +10,9 @@ public class Breakout
   static String java_grinder = " JAVA GRINDER";
   static String game_over = "GAME OVER";
 
+  //static byte[] tones = { 169, 190, 213, 254 };
+  static byte[] tones = { 0, -87, -66, -43, -2 };
+
   static int player_x = 9;
   static int ball_x = 10;
   static int ball_y = 12;
@@ -18,6 +21,7 @@ public class Breakout
   static int count = 0;
   static int state = STATE_GAME_OVER;
   static int bricks_left = 0;
+  static int sound_on = 0;
 
   static void clearScreen()
   {
@@ -98,6 +102,8 @@ public class Breakout
     }
 
     bricks_left = 80;
+    ball_x = 10;
+    ball_y = 12;
   }
 
   static void drawPlayer()
@@ -128,6 +134,11 @@ public class Breakout
     {
       if (Intellivision.readDisplay(x, y) != 0)
       {
+        Intellivision.setSoundType(0x08);
+        Intellivision.setSoundChannelPeriod(0, tones[y] & 0xff);
+        Intellivision.setSoundChannelVolume(0, 0x0f);
+        sound_on = 15;
+
         if (ball_dy == -1)
         {
           ball_dy = 1;
@@ -151,21 +162,42 @@ public class Breakout
   {
     if (ball_y == 21)
     {
+      boolean bounce = false;
+
       if (x == player_x || x == player_x - 1)
       {
+        bounce = true;
         ball_dx = -1;
-        ball_dy = -1;
       }
         else
-      if (x == player_x + 1)
+      if (x == player_x + 1 || x == player_x + 2)
       {
+        bounce = true;
         ball_dx = 1;
+      }
+
+      if (bounce)
+      {
+        Intellivision.setSoundType(0x08);
+        Intellivision.setSoundChannelPeriod(0, 508);
+        Intellivision.setSoundChannelVolume(0, 0x0f);
+        sound_on = 15;
+
         ball_dy = -1;
       }
     }
       else
     if (ball_y == 22)
     {
+      Intellivision.setSoundEnvelopePeriod(1000);
+      Intellivision.setSoundEnvelopeType(1);
+      Intellivision.setSoundType(0);
+
+      Intellivision.setSoundChannelPeriod(0, 5000);
+      Intellivision.setSoundChannelVolume(0, 15);
+
+      sound_on = 15;
+
       setGameOver();
       return true;
     }
@@ -278,6 +310,9 @@ public class Breakout
     Intellivision.setColorStack(3, Intellivision.COLOR_BLACK);
     Intellivision.setVideoMode(Intellivision.VIDEO_MODE_COLOR_STACK);
 
+    Intellivision.setSoundEnvelopePeriod(40000);
+    Intellivision.setSoundEnvelopeType(0);
+
     clearScreen();
     drawBricks();
     setGameOver();
@@ -292,6 +327,15 @@ public class Breakout
 
       if (state == STATE_PLAYING) { moveBall(); }
       movePlayer();
+
+      if (sound_on != 0)
+      {
+        sound_on--;
+      }
+        else
+      {
+        Intellivision.setSoundChannelVolume(0, 0);
+      }
     }
   }
 }
