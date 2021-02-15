@@ -904,9 +904,15 @@ int Intellivision::jump_cond(std::string &label, int cond, int distance)
     label.c_str(), cond, distance);
 
   fprintf(out,
-    //"  xorr r0, r0\n"
     "  pulr r1\n"
     "  cmpi #0, r1\n");
+
+#if 0
+  fprintf(out,
+    "  xorr r0, r0\n"
+    "  pulr r1\n"
+    "  cmpr r0, r1\n");
+#endif
 
   switch (cond)
   {
@@ -1358,6 +1364,25 @@ int Intellivision::intellivision_plot_III()
     "  addr r1, r2\n"
     "  pulr r1\n"
     "  mvo@ r1, r2\n");
+
+  return 0;
+}
+
+int Intellivision::intellivision_readDisplay_II()
+{
+  need_multiply = true;
+
+  fprintf(out,
+    "  ; intellivision_readDisplay_II()\n"
+    "  mvii #20, r0\n"
+    "  pshr r0\n"
+    "  jsr r4, _multiply\n"
+    "  pulr r2\n"
+    "  pulr r1\n"
+    "  addi #0x200, r2\n"
+    "  addr r1, r2\n"
+    "  mvi@ r2, r0\n"
+    "  pshr r0\n");
 
   return 0;
 }

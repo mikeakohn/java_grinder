@@ -47,7 +47,7 @@ abstract public class Intellivision
   // Bits [ 2 - 0 ]        : Foreground Color
   public static void plot(int data, int pos) { }
   public static void plot(int data, int x, int y) { }
-  public static int readDisplay(int x, int y) { }
+  public static int readDisplay(int x, int y) { return 0; }
   public static void waitForVerticalBlank() { }
 
   /** Scroll the entire video display horizontally by (value 0 to 7) pixels. */

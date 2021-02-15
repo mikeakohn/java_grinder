@@ -100,6 +100,7 @@ public:
 
   virtual int intellivision_plot_II();
   virtual int intellivision_plot_III();
+  virtual int intellivision_readDisplay_II();
   virtual int intellivision_waitForVerticalBlank();
   virtual int intellivision_setHorizontalDelay_I();
   virtual int intellivision_setVerticalDelay_I();

@@ -17,6 +17,7 @@ class API_Intellivision
 public:
   virtual int intellivision_plot_II() { return -1; }
   virtual int intellivision_plot_III() { return -1; }
+  virtual int intellivision_readDisplay_II() { return -1; }
   virtual int intellivision_waitForVerticalBlank() { return -1; }
   virtual int intellivision_setHorizontalDelay_I() { return -1; }
   virtual int intellivision_setVerticalDelay_I() { return -1; }

@@ -3,17 +3,23 @@ import net.mikekohn.java_grinder.Intellivision;
 
 public class Breakout
 {
+  static final int STATE_GAME_OVER = 0;
+  static final int STATE_PLAYING = 1;
+
   static String author = " MIKE KOHN";
   static String java_grinder = " JAVA GRINDER";
-  static String breakout = "BREAKOUT";
+  static String game_over = "GAME OVER";
 
   static int player_x = 9;
   static int ball_x = 10;
   static int ball_y = 12;
   static int ball_dx = 1;
   static int ball_dy = 1;
+  static int count = 0;
+  static int state = STATE_GAME_OVER;
+  static int bricks_left = 0;
 
-  static public void clearScreen()
+  static void clearScreen()
   {
     int a, color = 0x200;
 
@@ -23,7 +29,7 @@ public class Breakout
     }
   }
 
-  static public void displayText(byte[] text, int x, int y, int color)
+  static void displayText(byte[] text, int x, int y, int color)
   {
     int n, a;
 
@@ -39,7 +45,7 @@ public class Breakout
     }
   }
 
-  public static void scrollText(String text, int x)
+  static void scrollText(String text, int x)
   {
     int n, r;
 
@@ -67,7 +73,7 @@ public class Breakout
     Intellivision.setHorizontalDelay(0);
   }
 
-  public static void pause(int value)
+  static void pause(int value)
   {
     int n;
 
@@ -77,11 +83,11 @@ public class Breakout
     }
   }
 
-  public static void drawAllBricks()
+  static void drawBricks()
   {
     int x, y, c = 1;
 
-    for (y = 2; y < 6; y++)
+    for (y = 1; y < 5; y++)
     {
       for (x = 0; x < 20; x++)
       {
@@ -90,15 +96,17 @@ public class Breakout
 
       c++;
     }
+
+    bricks_left = 80;
   }
 
-  public static void drawPlayer()
+  static void drawPlayer()
   {
     Intellivision.plot((0xca << 3) | Intellivision.COLOR_WHITE, player_x, 11);
     Intellivision.plot((0xca << 3) | Intellivision.COLOR_WHITE, player_x + 1, 11);
   }
 
-  public static void drawBall()
+  static void drawBall()
   {
     int x = ball_x >> 1;
     int y = ball_y >> 1;
@@ -111,27 +119,104 @@ public class Breakout
     Intellivision.plot((c << 3) | Intellivision.COLOR_WHITE, x, y);
   }
 
-  public static void moveBall()
+  static void checkBrickCollision()
   {
     int x = ball_x >> 1;
     int y = ball_y >> 1;
 
-    Intellivision.plot(Intellivision.COLOR_WHITE, x, y);
+    if (y < 5)
+    {
+      if (Intellivision.readDisplay(x, y) != 0)
+      {
+        if (ball_dy == -1)
+        {
+          ball_dy = 1;
+        }
+          else
+        {
+          ball_dx = -ball_dx;
+        }
+
+        bricks_left--;
+      }
+    }
+      else
+    if (bricks_left == 0)
+    {
+      drawBricks();
+    }
+  }
+
+  static boolean checkPlayerCollision(int x, int y)
+  {
+    if (ball_y == 21)
+    {
+      if (x == player_x || x == player_x - 1)
+      {
+        ball_dx = -1;
+        ball_dy = -1;
+      }
+        else
+      if (x == player_x + 1)
+      {
+        ball_dx = 1;
+        ball_dy = -1;
+      }
+    }
+      else
+    if (ball_y == 22)
+    {
+      setGameOver();
+      return true;
+    }
+
+    return false;
+  }
+
+  static void moveBall()
+  {
+    count++;
+
+    if ((count & 3) != 0) { return; }
+
+    int x = ball_x >> 1;
+    int y = ball_y >> 1;
+
+    Intellivision.plot(0, x, y);
 
     ball_x += ball_dx;
     ball_y += ball_dy;
+
+    if (ball_dy == 1)
+    {
+      if (checkPlayerCollision(x, y)) { return; }
+    }
 
     if (ball_x <= 0)  { ball_x =  0; ball_dx =  1; }
     if (ball_x >= 39) { ball_x = 39; ball_dx = -1; }
 
     if (ball_y <= 2)  { ball_y =  2; ball_dy =  1; }
     if (ball_y >= 23) { ball_y = 23; ball_dy = -1; }
+
+    checkBrickCollision();
   }
 
-  public static void movePlayer()
+  static void movePlayer()
   {
     int hand_controller = Intellivision.getControllerLeft();
 
+    if ((count & 1) != 0) { return; }
+
+    if (hand_controller == 0x0a ||
+        hand_controller == 0x60 ||
+        hand_controller == 0xc0)
+    {
+      if (state == STATE_GAME_OVER)
+      {
+        reset();
+      }
+    }
+      else
     if (hand_controller == 0x08)
     {
       Intellivision.plot(Intellivision.COLOR_WHITE, player_x, 11);
@@ -149,8 +234,28 @@ public class Breakout
 
       player_x += 1;
 
-      if (player_x == 18) { player_x = 18; }
+      if (player_x >= 18) { player_x = 18; }
     }
+  }
+
+  static void reset()
+  {
+    for (int n = 6 + (8 * 20); n < 15 + (8 * 20); n++)
+    {
+      Intellivision.plot(Intellivision.COLOR_WHITE, n);
+      drawBricks();
+
+      ball_x = 10;
+      ball_y = 12;
+    }
+
+    state = STATE_PLAYING;
+  }
+
+  static void setGameOver()
+  {
+    state = STATE_GAME_OVER;
+    displayText(game_over.getBytes(), 6, 8, Intellivision.COLOR_GREEN);
   }
 
   public static void main(String args[])
@@ -174,16 +279,18 @@ public class Breakout
     Intellivision.setVideoMode(Intellivision.VIDEO_MODE_COLOR_STACK);
 
     clearScreen();
-    drawAllBricks();
+    drawBricks();
+    setGameOver();
 
     while (true)
     {
       drawPlayer();
-      drawBall();
+
+      if (state == STATE_PLAYING) { drawBall(); }
 
       Intellivision.waitForVerticalBlank();
 
-      moveBall();
+      if (state == STATE_PLAYING) { moveBall(); }
       movePlayer();
     }
   }
