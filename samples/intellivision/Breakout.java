@@ -6,12 +6,12 @@ public class Breakout
   static final int STATE_GAME_OVER = 0;
   static final int STATE_PLAYING = 1;
 
+  //static byte[] tones = { 169, 190, 213, 254 };
+  static byte[] tones = { 0, -87, -66, -43, -2 };
+
   static String author = " MIKE KOHN";
   static String java_grinder = " JAVA GRINDER";
   static String game_over = "GAME OVER";
-
-  //static byte[] tones = { 169, 190, 213, 254 };
-  static byte[] tones = { 0, -87, -66, -43, -2 };
 
   static int player_x = 9;
   static int ball_x = 10;
@@ -108,8 +108,11 @@ public class Breakout
 
   static void drawPlayer()
   {
-    Intellivision.plot((0xca << 3) | Intellivision.COLOR_WHITE, player_x, 11);
-    Intellivision.plot((0xca << 3) | Intellivision.COLOR_WHITE, player_x + 1, 11);
+    Intellivision.plot(0, player_x + 219);
+    Intellivision.plot(0, player_x + 222);
+
+    Intellivision.plot((0xca << 3) | Intellivision.COLOR_WHITE, player_x + 220);
+    Intellivision.plot((0xca << 3) | Intellivision.COLOR_WHITE, player_x + 221);
   }
 
   static void drawBall()
@@ -239,9 +242,7 @@ public class Breakout
 
     if ((count & 1) != 0) { return; }
 
-    if (hand_controller == 0x0a ||
-        hand_controller == 0x60 ||
-        hand_controller == 0xc0)
+    if (hand_controller == 0x60)
     {
       if (state == STATE_GAME_OVER)
       {
@@ -251,9 +252,6 @@ public class Breakout
       else
     if (hand_controller == 0x08)
     {
-      Intellivision.plot(Intellivision.COLOR_WHITE, player_x, 11);
-      Intellivision.plot(Intellivision.COLOR_WHITE, player_x + 1, 11);
-
       player_x -= 1;
 
       if (player_x == -1) { player_x = 0; }
@@ -261,9 +259,6 @@ public class Breakout
       else
     if (hand_controller == 0x02)
     {
-      Intellivision.plot(Intellivision.COLOR_WHITE, player_x, 11);
-      Intellivision.plot(Intellivision.COLOR_WHITE, player_x + 1, 11);
-
       player_x += 1;
 
       if (player_x >= 18) { player_x = 18; }

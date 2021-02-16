@@ -365,8 +365,8 @@ int Intellivision::push_ref(std::string &name)
     "  mvii #static_%s & 0xff, r4\n"
     "  .dc16 static_%s >> 8\n"
     "  sdbd\n"
-    "  mvi@ r4, r1\n"
-    "  pshr r1\n",
+    "  mvi@ r4, r0\n"
+    "  pshr r0\n",
     name.c_str(),
     name.c_str(),
     name.c_str());
@@ -487,8 +487,8 @@ int Intellivision::sub_integer()
     "  ; sub_integer()\n"
     "  pulr r0\n"
     "  pulr r1\n"
-    "  subr r1, r0\n"
-    "  pshr r0\n");
+    "  subr r0, r1\n"
+    "  pshr r1\n");
 
   return 0;
 }
@@ -500,8 +500,9 @@ int Intellivision::sub_integer(int num)
   fprintf(out,
     "  ; sub_integer(%d)\n"
     "  pulr r0\n"
-    "  mvii #%d, r1\n"
-    "  subr r1, r0\n"
+    //"  mvii #%d, r1\n"
+    //"  subr r1, r0\n"
+    "  subi #%d, r0\n"
     "  pshr r0\n",
     num,
     num & 0xffff);
@@ -1072,7 +1073,7 @@ int Intellivision::invoke_static_method(
   // Copy stack pointer to r5.
   fprintf(out,
     "  ; Copy locals pointer to r4 and add current local length\n"
-    "  ; Copy stack pointer to r5\n"
+    "  ; Copy stack pointer to r5 - number of parameters to copy\n"
     "  movr r3, r4\n"
     "  addi #%d, r4\n"
     "  movr r6, r5\n"
