@@ -321,6 +321,7 @@ int main(int argc, char *argv[])
            "     appleiigs\n"
            "     attiny2313, atmega328, atmega328p, attiny85, attiny84, attiny13,\n"
            "     dspic,\n"
+           "     intellivision,\n"
            "     m6502, c64\n"
            "     m6502_8, atari2600\n"
            "     mips32, pic32, playstation2\n"

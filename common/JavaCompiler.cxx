@@ -1799,12 +1799,14 @@ int JavaCompiler::compile_method(
 
           // This fixes Joe's demo (meant to deal with strings) kind of
           // gross with a strcmp :(  Maybe revisit later.
+#if 0
           if (type == "Ljava/lang/String;")
           {
             DEBUG_PRINT("  static is %s (will invoke)\n", field_name.c_str());
             //generator->push_ref(field_name);
             stack->push(ref);
           }
+#endif
         }
           else
         {

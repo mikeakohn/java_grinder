@@ -111,7 +111,8 @@ int Intellivision::start_init()
   fprintf(out, ".define BIDECLE(param_) .dc16 param_ & 0xff, param_ >> 8\n");
 
   fprintf(out,
-    ".org 0x57ff\n"
+    //".org 0x57ff\n"
+    ".org 0x5fff\n"
     "  .dc16 0x0000\n\n"
     ".org 0x5000\n\n");
 
