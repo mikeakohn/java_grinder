@@ -101,9 +101,6 @@ int R5900::start_init()
   fprintf(out, ".org 0x%x\n", org);
   fprintf(out, "start:\n");
 
-  //fprintf(out, "  li $s1, ram_start       ; $s1 points to statics\n");
-  //fprintf(out, "  li $sp, ram_end+1\n");
-
   return 0;
 }
 
@@ -161,7 +158,6 @@ int R5900::field_init_ref(std::string &name, int index)
 {
   fprintf(out, "  ; static init\n");
   fprintf(out, "  li $t8, _%s\n", name.c_str());
-  //fprintf(out, "  li $t8, _%s + voffset\n", name.c_str());
   fprintf(out, "  li $t9, %s\n", name.c_str());
   fprintf(out, "  sw $t8, ($t9)\n");
 
@@ -259,8 +255,6 @@ int R5900::push_int(int32_t n)
     {
       STACK_PUSH(0)
     }
-
-    //return 0;
   }
     else
   if ((value & 0x0000ffff) == 0x0000)
@@ -275,8 +269,6 @@ int R5900::push_int(int32_t n)
       fprintf(out, "  lui $t8, 0x%04x\n", value >> 16);
       STACK_PUSH(8)
     }
-
-    //return 0;
   }
     else
   if (n >= 0 && n < 0xffff)
@@ -291,8 +283,6 @@ int R5900::push_int(int32_t n)
       fprintf(out, "  ori $t8, $0, 0x%04x\n", value);
       STACK_PUSH(8)
     }
-
-    //return 0;
   }
     else
   if (n >= -32768 && n < 32768)
@@ -307,8 +297,6 @@ int R5900::push_int(int32_t n)
       fprintf(out, "  addiu $t8, $0, %d\n", n);
       STACK_PUSH(8)
     }
-
-    //return 0;
   }
     else
   {
@@ -323,37 +311,6 @@ int R5900::push_int(int32_t n)
       STACK_PUSH(8)
     }
   }
-
-#if 0
-  int index = get_constant(value);
-
-  if (index == -1)
-  {
-    if (reg < reg_max)
-    {
-      fprintf(out, "  li $t%d, 0x%04x\n", reg, value);
-      reg++;
-    }
-      else
-    {
-      fprintf(out, "  li $t8, 0x%04x\n", value);
-      STACK_PUSH(8)
-    }
-  }
-    else
-  {
-    if (reg < reg_max)
-    {
-      fprintf(out, "  lw $t%d, 0x%04x($s0)\n", reg, index * 4);
-      reg++;
-    }
-      else
-    {
-      fprintf(out, "  lw $t8, 0x%04x($s0)\n", index * 4);
-      STACK_PUSH(8)
-    }
-  }
-#endif
 
   return 0;
 }
@@ -510,7 +467,6 @@ int R5900::dup2()
     else
   if (stack == 1)
   {
-    //fprintf(out, "  move $t8, $t%d\n", reg - 1);
     fprintf(out, "  lw $t9, 0($sp)\n");
     STACK_PUSH(reg - 1);
     STACK_PUSH(9);
@@ -1198,7 +1154,6 @@ int R5900::return_integer(int local_count)
   }
 
   fprintf(out, "  move $v0, $t0\n");
-  //fprintf(out, "  addiu $sp, $fp, %d\n", local_count * 4);
   fprintf(out, "  addiu $sp, $fp, 4\n");
   fprintf(out, "  jr $ra\n");
   fprintf(out, "  nop ; Delay slot\n");
@@ -1214,8 +1169,6 @@ int R5900::return_void(int local_count)
     printf("Internal Error: Reg stack not empty %s:%d\n", __FILE__, __LINE__);
   }
 
-  //fprintf(out, "  addiu $sp, $fp, %d\n", local_count * 4);
-  //fprintf(out, "  move $sp, $fp\n");
   fprintf(out, "  addiu $sp, $fp, 4\n");
   fprintf(out, "  jr $ra\n");
   fprintf(out, "  nop ; Delay slot\n");
@@ -1239,7 +1192,6 @@ int R5900::invoke_static_method(const char *name, int params, int is_void)
 {
   int save_space;
   int save_regs;
-  //int local_index = 0;
   int n;
   int param_sp = 0;
 
