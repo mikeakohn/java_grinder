@@ -80,6 +80,7 @@ SYSTEMS= \
   generator/C64.o \
   generator/CPC.o \
   generator/MSX.o \
+  generator/Nintendo64.o \
   generator/Playstation2.o \
   generator/Playstation2VU0.o \
   generator/Playstation2VU1.o \
