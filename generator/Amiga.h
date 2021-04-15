@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2020 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -115,6 +115,10 @@ public:
   virtual int memory_addressOf_aS();
   virtual int memory_addressOf_aC();
   virtual int memory_addressOf_aI();
+  virtual int memory_read8_I();
+  virtual int memory_write8_IB();
+  virtual int memory_read16_I();
+  virtual int memory_write16_IS();
 
 protected:
   virtual int add_array_files();

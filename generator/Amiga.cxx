@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2020 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -1787,6 +1787,58 @@ int Amiga::memory_addressOf_aC()
 int Amiga::memory_addressOf_aI()
 {
   fprintf(out, "  ;; memory_addressOf_aI()\n");
+
+  return 0;
+}
+
+int Amiga::memory_read8_I()
+{
+  fprintf(out,
+    "  ;; memory_read8_I()\n"
+    "  movea.l d%d, a2\n"
+    "  move.b (a2), d%d\n",
+    reg - 1,
+    reg - 1);
+
+  return 0;
+}
+
+int Amiga::memory_write8_IB()
+{
+  fprintf(out,
+    "  ;; memory_write8_IS()\n"
+    "  movea.l d%d, a2\n"
+    "  move.b d%d, (a2)\n",
+    reg - 2,
+    reg - 1);
+
+  reg -= 2;
+
+  return 0;
+}
+
+int Amiga::memory_read16_I()
+{
+  fprintf(out,
+    "  ;; memory_read16_I()\n"
+    "  movea.l d%d, a2\n"
+    "  move.w (a2), d%d\n",
+    reg - 1,
+    reg - 1);
+
+  return 0;
+}
+
+int Amiga::memory_write16_IS()
+{
+  fprintf(out,
+    "  ;; memory_write16_IS()\n"
+    "  movea.l d%d, a2\n"
+    "  move.w d%d, (a2)\n",
+    reg - 2,
+    reg - 1);
+
+  reg -= 2;
 
   return 0;
 }
