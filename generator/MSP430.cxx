@@ -1978,7 +1978,7 @@ int MSP430::adc_disable()
 
 int MSP430::adc_setChannel_I()
 {
-int value_reg;
+  int value_reg;
 
   get_values_from_stack(&value_reg);
 
