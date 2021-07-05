@@ -59,12 +59,13 @@ MSP430::MSP430(uint8_t chip_type) :
   reg_max(6),
   stack(0),
   label_count(0),
-  need_read_spi(0),
-  need_mul_integers(0),
-  need_div_integers(0),
-  need_timer_interrupt(0),
+  need_read_spi(false),
+  need_i2c(false),
+  need_mul_integers(false),
+  need_div_integers(false),
+  need_timer_interrupt(false),
   is_main(false),
-  is_interrupt(0)
+  is_interrupt(false)
 {
   ram_start = 0x0200;
   vector_timer = 0xfff2;
@@ -122,6 +123,7 @@ int MSP430::open(const char *filename)
 int MSP430::finish()
 {
   if (need_read_spi) { insert_read_spi(); }
+  if (need_i2c) { insert_i2c(); }
   if (need_mul_integers) { insert_mul_integers(); }
   if (need_div_integers) { insert_div_integers(); }
 
@@ -502,7 +504,7 @@ int MSP430::mul_integer()
     }
   }
 
-  need_mul_integers = 1;
+  need_mul_integers = true;
 
   return 0;
 }
@@ -555,7 +557,7 @@ int MSP430::div_integer()
     }
   }
 
-  need_div_integers = 1;
+  need_div_integers = true;
 
   return 0;
 }
@@ -1889,7 +1891,7 @@ int MSP430::spi_read_I(int port)
   fprintf(out, "  call #_read_spi\n");
   push_reg("r15");
 
-  need_read_spi = 1;
+  need_read_spi = true;
 
   return 0;
 }
@@ -2219,6 +2221,91 @@ int MSP430::memory_write16_IS()
   return 0;
 }
 
+int MSP430::i2c_init_I()
+{
+  need_i2c = true;
+
+  // FIXME: Implement this.
+
+  return -1;
+}
+
+int MSP430::i2c_init_I(int clock_divisor)
+{
+  need_i2c = true;
+
+  fprintf(out,
+    "  ;; i2c_init_II(%d)\n"
+    "  mov.b #USISWRST, &USICTL0\n"
+    "  bis.b #USIPE7|USIPE6|USIMST, &USICTL0\n"
+    "  mov.b #USII2C, &USICTL1\n"
+    "  mov.b #USIDIV_%d|USISSEL_2|USICKPL, &USICKCTL\n"
+    "  bis.b #USISCLREL, &USICNT  ; let the clock float (pulled high by res)\n"
+    "  bic.b #USISWRST, &USICTL0  ; clear reset\n",
+    clock_divisor,
+    clock_divisor);
+
+  return 0;
+}
+
+int MSP430::i2c_disable()
+{
+  fprintf(out,
+    "  ;; i2c_disable()\n"
+    "  bic.b #USIPE7|USIPE6|USIMST, &USICTL0\n");
+  return 0;
+}
+
+int MSP430::i2c_enable()
+{
+  fprintf(out,
+    "  ;; i2c_enable()\n"
+    "  bis.b #USIPE7|USIPE6|USIMST, &USICTL0\n");
+  return 0;
+}
+
+int MSP430::i2c_start()
+{
+  need_i2c = true;
+  fprintf(out, "  call #i2c_start\n");
+  return 0;
+}
+
+int MSP430::i2c_stop()
+{
+  need_i2c = true;
+  fprintf(out, "  call #i2c_stop\n");
+  return 0;
+}
+
+int MSP430::i2c_write_I()
+{
+  need_i2c = true;
+
+  fprintf(out,
+    "  mov.b r%d, r15\n"
+    "  call #i2c_write\n",
+    REG_STACK(reg - 1));
+
+  reg--;
+
+  return 0;
+}
+
+int MSP430::i2c_read()
+{
+  need_i2c = true;
+
+  fprintf(out,
+    "  call #i2c_read\n"
+    "  mov.b r15, r%d\n",
+    REG_STACK(reg));
+
+  reg++;
+
+  return 0;
+}
+
 // Protected functions
 void MSP430::push_reg(const char *dst)
 {
@@ -2330,6 +2417,67 @@ void MSP430::insert_read_spi()
   fprintf(out, "  jz _read_spi_wait\n");
   fprintf(out, "  mov.b &USISRL, r15\n");
   fprintf(out, "  ret\n\n");
+}
+
+void MSP430::insert_i2c()
+{
+  fprintf(out,
+    ";; SDA goes low while SCL is still high then SCL goes low.\n"
+    "i2c_start:\n"
+    "  mov.b #0, &USISRL\n"
+    "  bis.b #USIOE|USIGE, &USICTL0\n"
+    "  bic.b #USIGE, &USICTL0\n"
+    "  ret\n");
+
+  fprintf(out,
+    ";; SCL needs to go high and then SDA goes high.\n"
+    "i2c_stop:\n"
+    "  bis.b #USISCLREL, &USICNT\n"
+    "  bis.b #USIOE, &USICTL0\n"
+    "  mov.b #0, &USISRL\n"
+    "  mov.b #1, &USICNT\n"
+    "i2c_stop_busy:\n"
+    "  bit.b #USIIFG, &USICTL1\n"
+    "  jz i2c_stop_busy\n"
+    "  mov.b #0xff, &USISRL\n"
+    "  bis.b #USIGE, &USICTL0\n"
+    "  bic.b #USIOE|USIGE, &USICTL0\n"
+    "  ret\n");
+
+  fprintf(out,
+    ";; i2c_write(data=r15)\n"
+    "i2c_write:\n"
+    "  bis.b #USIOE, &USICTL0\n"
+    "  mov.b r15, &USISRL\n"
+    "  mov.b #8, &USICNT\n"
+    "i2c_write_busy:\n"
+    "  bit.b #USIIFG, &USICTL1\n"
+    "  jz i2c_write_busy\n"
+    "  mov.b #0, &USISRL\n"
+    "  mov.b #1, &USICNT\n"
+    "  bic.b #USIOE, &USICTL0\n"
+    "i2c_write_ack_busy:\n"
+    "  bit.b #USIIFG, &USICTL1\n"
+    "  jz i2c_write_ack_busy\n"
+    "  mov.b &USISRL, r15\n"
+    "  ret\n");
+
+  fprintf(out,
+    ";; i2c_read()\n"
+    "i2c_read:\n"
+    "  bic.b #USIOE, &USICTL0\n"
+    "  mov.b #8, &USICNT\n"
+    "i2c_read_busy:\n"
+    "  bit.b #USIIFG, &USICTL1\n"
+    "  jz i2c_read_busy\n"
+    "  mov.b &USISRL, r15\n"
+    "  mov.b #0, &USISRL\n"
+    "  mov.b #1, &USICNT\n"
+    "  bis.b #USIOE, &USICTL0\n"
+    "i2c_read_ack_busy:\n"
+    "  bit.b #USIIFG, &USICTL1\n"
+    "  jz i2c_read_ack_busy\n"
+    "  ret\n");
 }
 
 void MSP430::insert_mul_integers()

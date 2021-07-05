@@ -26,6 +26,7 @@
 #include "api/cpc.h"
 #include "api/cpu.h"
 #include "api/dsp.h"
+#include "api/i2c.h"
 #include "api/intellivision.h"
 #include "api/ioport.h"
 #include "api/joystick.h"
@@ -162,6 +163,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     CHECK_WITH_PORT(SPI, spi, 1)
     CHECK_WITH_PORT(UART, uart, 0)
     CHECK_WITH_PORT(UART, uart, 1)
+    CHECK(I2C, i2c)
     CHECK(Intellivision, intellivision)
     CHECK(Joystick, joystick)
     CHECK(Math, math)
@@ -258,6 +260,7 @@ int invoke_static(
     CHECK_CONST(Timer, timer)
     CHECK_CONST(CPU, cpu)
     CHECK_CONST(CPC, cpc)
+    CHECK_CONST(I2C, i2c)
     CHECK_CONST(Joystick, joystick)
     CHECK_CONST(MSX, msx)
     CHECK_CONST(Parallella, parallella)

@@ -15,7 +15,7 @@
 class API_Microcontroller
 {
 public:
-  // GPIO functions
+  // GPIO functions.
   virtual int ioport_setPinsAsInput_I(int port) { return -1; }
   virtual int ioport_setPinsAsInput_I(int port, int const_val) { return -1; }
   virtual int ioport_setPinsAsOutput_I(int port) { return -1; }
@@ -40,7 +40,7 @@ public:
   virtual int ioport_setPinsResistorEnable_I(int port) { return -1; }
   virtual int ioport_setPinsResistorEnable_I(int port, int const_val) { return -1; }
 
-  // UART functions
+  // UART functions.
   virtual int uart_init_I(int port) { return -1; }
   virtual int uart_init_I(int port, int baud_rate) { return -1; }
   virtual int uart_send_I(int port) { return -1; }
@@ -48,7 +48,7 @@ public:
   virtual int uart_isDataAvailable(int port) { return -1; }
   virtual int uart_isSendReady(int port) { return -1; }
 
-  // SPI functions
+  // SPI functions.
   virtual int spi_init_II(int port) { return -1; }
   virtual int spi_init_II(int port, int clock_divisor, int mode) { return -1; }
   virtual int spi_init16_II(int port) { return -1; }
@@ -62,14 +62,14 @@ public:
   virtual int spi_disable(int port) { return -1; }
   virtual int spi_enable(int port) { return -1; }
 
-  // ADC functions
+  // ADC functions.
   virtual int adc_enable() { return -1; }
   virtual int adc_disable() { return -1; }
   virtual int adc_setChannel_I() { return -1; }
   virtual int adc_setChannel_I(int channel) { return -1; }
   virtual int adc_read() { return -1; }
 
-  // Timer functions
+  // Timer functions.
   virtual int timer_setInterval_II() { return -1; }
   virtual int timer_setInterval_II(int cycles, int divider) { return -1; }
   virtual int timer_setListener_Z() { return -1; }
@@ -78,10 +78,20 @@ public:
   virtual int timer_setValue_I() { return -1; }
   virtual int timer_setValue_I(int const_value) { return -1; }
 
-  // Watchdog
+  // Watchdog.
   virtual int watchdog_enable() { return -1; }
   virtual int watchdog_disable() { return -1; }
   virtual int watchdog_kick() { return -1; }
+
+  // i2c functions.
+  virtual int i2c_init_I() { return -1; }
+  virtual int i2c_init_I(int clock_divisor) { return -1; }
+  virtual int i2c_disable() { return -1; }
+  virtual int i2c_enable() { return -1; }
+  virtual int i2c_start() { return -1; }
+  virtual int i2c_stop() { return -1; }
+  virtual int i2c_write_I() { return -1; }
+  virtual int i2c_read() { return -1; }
 };
 
 #endif

@@ -20,6 +20,7 @@ API= \
   api/draw3d_object.o \
   api/draw3d_texture.o \
   api/intellivision.o \
+  api/i2c.o \
   api/invoke.o \
   api/invoke_static.o \
   api/invoke_virtual.o \

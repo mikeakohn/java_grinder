@@ -188,6 +188,16 @@ public:
   virtual int memory_read16_I();
   virtual int memory_write16_IS();
 
+  // i2c
+  virtual int i2c_init_I();
+  virtual int i2c_init_I(int clock_divisor);
+  virtual int i2c_disable();
+  virtual int i2c_enable();
+  virtual int i2c_start();
+  virtual int i2c_stop();
+  virtual int i2c_write_I();
+  virtual int i2c_read();
+
 protected:
   virtual int get_int_size() { return 2; }
   int set_periph(const char *instr, const char *periph);
@@ -197,6 +207,7 @@ protected:
   void push_reg(const char *reg);
   void pop_reg(char *reg);
   void insert_read_spi();
+  void insert_i2c();
   void insert_mul_integers();
   void insert_div_integers();
   int get_values_from_stack(int *value1, int *value2, int *value3);
@@ -209,6 +220,7 @@ protected:
   int label_count;
   char reg_string[16];
   bool need_read_spi : 1;
+  bool need_i2c : 1;
   bool need_mul_integers : 1;
   bool need_div_integers : 1;
   bool need_timer_interrupt : 1;
