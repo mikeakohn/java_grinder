@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2020 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -37,8 +37,11 @@ public:
   virtual int memory_addressOf_aI() { return -1; }
 
   // CPU functions
-  virtual int cpu_setClock16() { return -1; }
+  virtual int cpu_setClock1() { return -1; }
+  virtual int cpu_setClock2() { return -1; }
+  virtual int cpu_setClock4() { return -1; }
   virtual int cpu_setClock8() { return -1; }
+  virtual int cpu_setClock16() { return -1; }
   virtual int cpu_setClock25() { return -1; }
   virtual int cpu_setClockExternal2() { return -1; }
   virtual int cpu_nop() { return -1; }

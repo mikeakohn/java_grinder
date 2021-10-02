@@ -1936,6 +1936,36 @@ int MSP430::spi_enable(int port)
 }
 
 // CPU functions
+int MSP430::cpu_setClock1()
+{
+  fprintf(out, "  ;; Set MCLK to 1 MHz with DCO\n");
+  fprintf(out, "  mov.b #DCO_3, &DCOCTL\n");
+  fprintf(out, "  mov.b #RSEL_7, &BCSCTL1\n");
+  fprintf(out, "  mov.b #0, &BCSCTL2\n\n");
+
+  return 0;
+}
+
+int MSP430::cpu_setClock2()
+{
+  fprintf(out, "  ;; Set MCLK to 2 MHz with DCO\n");
+  fprintf(out, "  mov.b #DCO_3, &DCOCTL\n");
+  fprintf(out, "  mov.b #RSEL_9, &BCSCTL1\n");
+  fprintf(out, "  mov.b #0, &BCSCTL2\n\n");
+
+  return 0;
+}
+
+int MSP430::cpu_setClock4()
+{
+  fprintf(out, "  ;; Set MCLK to 4 MHz with DCO\n");
+  fprintf(out, "  mov.b #DCO_4, &DCOCTL\n");
+  fprintf(out, "  mov.b #RSEL_11, &BCSCTL1\n");
+  fprintf(out, "  mov.b #0, &BCSCTL2\n\n");
+
+  return 0;
+}
+
 int MSP430::cpu_setClock8()
 {
   fprintf(out, "  ;; Set MCLK to 8 MHz with DCO\n");

@@ -19,6 +19,15 @@ public class CPU
   {
   }
 
+  /** Set clock speed to 1MHz (internal crystal? DCO?) */
+  public static void setClock1() { }
+
+  /** Set clock speed to 2MHz (internal crystal? DCO?) */
+  public static void setClock2() { }
+
+  /** Set clock speed to 4MHz (internal crystal? DCO?) */
+  public static void setClock4() { }
+
   /** Set clock speed to 8MHz (internal crystal? DCO?) */
   public static void setClock8() { }
 
