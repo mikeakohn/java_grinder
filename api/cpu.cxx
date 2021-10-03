@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -49,6 +49,9 @@ static int cpu_asm(JavaClass *java_class, Generator *generator, int const_index)
 
 int cpu(JavaClass *java_class, Generator *generator, const char *method_name)
 {
+  CHECK_FUNC(setClock1,)
+  CHECK_FUNC(setClock2,)
+  CHECK_FUNC(setClock4,)
   CHECK_FUNC(setClock8,)
   CHECK_FUNC(setClock16,)
   CHECK_FUNC(setClock25,)

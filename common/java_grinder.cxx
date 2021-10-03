@@ -420,7 +420,7 @@ int main(int argc, char *argv[])
     if (compiler->compile_methods(false) == -1) { ret = -1; break; }
     // Add constants at end if needed.
     if (compiler->add_constants() == -1) { ret = -1; break; }
-  } while(0);
+  } while (false);
 
   // Any subclass (CPU / system) in the Generator can add any extra
   // functions and data sections needed to the assembly source before

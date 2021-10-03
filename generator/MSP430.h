@@ -229,10 +229,13 @@ protected:
   bool need_timer_interrupt : 1;
   bool is_main : 1;
   bool is_interrupt : 1;
+  bool has_usi : 1;
+  bool has_usci : 1;
   uint32_t ram_start;
   uint32_t stack_start;
   uint32_t flash_start;
   int max_stack;
+  int cpu_speed;
   const char *include_file;
   uint16_t vector_timer;
 };

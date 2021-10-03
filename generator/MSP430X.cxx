@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2020 by Michael Kohn
+ * Copyright 2014-2021 by Michael Kohn
  *
  */
 
@@ -227,6 +227,8 @@ int MSP430X::cpu_setClock25()
     label_count);
 
   label_count++;
+
+  cpu_speed = 25000000;
 
   return 0;
 }

@@ -65,17 +65,21 @@ MSP430::MSP430(uint8_t chip_type) :
   need_div_integers(false),
   need_timer_interrupt(false),
   is_main(false),
-  is_interrupt(false)
+  is_interrupt(false),
+  has_usi(false),
+  has_usci(false),
+  cpu_speed(1000000)
 {
   ram_start = 0x0200;
   vector_timer = 0xfff2;
   include_file = "msp430x2xx.inc";
 
-  switch(chip_type)
+  switch (chip_type)
   {
     case MSP430G2231:
       flash_start = 0xf800;
       stack_start = 0x0280;
+      has_usi = true;
       break;
     case MSP430G2452:
       flash_start = 0xe000;
@@ -84,6 +88,7 @@ MSP430::MSP430(uint8_t chip_type) :
     case MSP430G2553:
       flash_start = 0xc000;
       stack_start = 0x0400;
+      has_usci = true;
       break;
     default:
       flash_start = 0xf800;
@@ -1161,7 +1166,7 @@ int MSP430::invoke_static_method(const char *name, int params, int is_void)
   // the called method.  Start with -4 because the return address will
   // be at 0 and r12 will be at 2.
   local = (params * -2);
-  while(local != 0)
+  while (local != 0)
   {
     if (stack_vars > 0)
     {
@@ -1741,31 +1746,128 @@ int MSP430::ioport_setPinsResistorEnable_I(int port, int const_val)
 // UART functions
 int MSP430::uart_init_I(int port)
 {
+
   return -1;
 }
 
 int MSP430::uart_init_I(int port, int baud_rate)
 {
+  if (baud_rate > 5)
+  {
+    printf("Error: Unknown baud rate.\n");
+    return -1;
+  }
+
+  int baud[] = { 1200, 2400, 9600, 19200, 38400, 57600 };
+  int divisor = cpu_speed / baud[baud_rate];
+
+  if (has_usci)
+  {
+    fprintf(out,
+      "  ;; MSP430::uart_init_I(%d, %d)\n"
+      "  mov.b #UCSSEL_2|UCSWRST, &UCA0CTL1\n"
+      "  mov.b #0, &UCA0CTL0\n"
+      //"  mov.b #UCBRS_1, &UCA0MCTL\n"
+      "  mov.b #0x%02x, &UCA0BR0\n"
+      "  mov.b #0x%02x, &UCA0BR1\n"
+      "  bis.b #0x06, &P1SEL\n"
+      "  bis.b #0x06, &P1SEL2\n"
+      "  bic.b #UCSWRST, &UCA0CTL1\n\n",
+      port,
+      baud_rate,
+      divisor & 0xff,
+      divisor >> 8);
+
+    return 0;
+  }
+
   return -1;
 }
 
 int MSP430::uart_send_I(int port)
 {
+  if (has_usci)
+  {
+    fprintf(out,
+      "  ;; MSP430::uart_send_I(%d)\n"
+      "  mov.b r%d, &UCA0TXBUF\n",
+      port,
+      REG_STACK(reg - 1));
+
+    reg--;
+
+    return 0;
+  }
+
   return -1;
 }
 
 int MSP430::uart_read(int port)
 {
+  if (has_usci)
+  {
+    fprintf(out,
+      "  ;; MSP430::uart_read(%d)\n"
+      "  mov.b &UCA0RXBUF, r%d\n",
+      port,
+      REG_STACK(reg));
+
+    reg++;
+
+    return 0;
+  }
+
   return -1;
 }
 
 int MSP430::uart_isDataAvailable(int port)
 {
+  if (has_usci)
+  {
+#if 0
+    fprintf(out,
+      "  ;; MSP430::uart_isDataAvailable(%d)\n"
+      "  bit.b #UCA0RXIFG, &IFG2\n"
+      "  mov.b SR, r%d\n"
+      "  bic.b #0xfd, r%d\n",
+      port,
+      REG_STACK(reg),
+      REG_STACK(reg));
+#endif
+
+    fprintf(out,
+      "  ;; MSP430::uart_isDataAvailable(%d)\n"
+      "  mov.b &IFG2, r4\n"
+      "  bic.b #UCA0RXIFG ^ 0xff, r%d\n",
+      port,
+      REG_STACK(reg));
+
+    reg++;
+
+    return 0;
+  }
+
   return -1;
 }
 
 int MSP430::uart_isSendReady(int port)
 {
+  if (has_usci)
+  {
+    fprintf(out,
+      "  ;; MSP430::uart_isSendReady(%d)\n"
+      "  bit.b #UCA0TXIFG, &IFG2\n"
+      "  mov.b SR, r%d\n"
+      "  bic.b #0xfd, r%d\n",
+      port,
+      REG_STACK(reg),
+      REG_STACK(reg));
+
+    reg++;
+
+    return 0;
+  }
+
   return -1;
 }
 
@@ -1939,9 +2041,13 @@ int MSP430::spi_enable(int port)
 int MSP430::cpu_setClock1()
 {
   fprintf(out, "  ;; Set MCLK to 1 MHz with DCO\n");
-  fprintf(out, "  mov.b #DCO_3, &DCOCTL\n");
+  //fprintf(out, "  mov.b #DCO_3, &DCOCTL\n");
+  //fprintf(out, "  mov.b #RSEL_7, &BCSCTL1\n");
+  fprintf(out, "  mov.b #DCO_2, &DCOCTL\n");
   fprintf(out, "  mov.b #RSEL_7, &BCSCTL1\n");
   fprintf(out, "  mov.b #0, &BCSCTL2\n\n");
+
+  cpu_speed = 1000000;
 
   return 0;
 }
@@ -1953,6 +2059,8 @@ int MSP430::cpu_setClock2()
   fprintf(out, "  mov.b #RSEL_9, &BCSCTL1\n");
   fprintf(out, "  mov.b #0, &BCSCTL2\n\n");
 
+  cpu_speed = 2000000;
+
   return 0;
 }
 
@@ -1962,6 +2070,8 @@ int MSP430::cpu_setClock4()
   fprintf(out, "  mov.b #DCO_4, &DCOCTL\n");
   fprintf(out, "  mov.b #RSEL_11, &BCSCTL1\n");
   fprintf(out, "  mov.b #0, &BCSCTL2\n\n");
+
+  cpu_speed = 4000000;
 
   return 0;
 }
@@ -1973,6 +2083,8 @@ int MSP430::cpu_setClock8()
   fprintf(out, "  mov.b #RSEL_13, &BCSCTL1\n");
   fprintf(out, "  mov.b #0, &BCSCTL2\n\n");
 
+  cpu_speed = 8000000;
+
   return 0;
 }
 
@@ -1982,6 +2094,8 @@ int MSP430::cpu_setClock16()
   fprintf(out, "  mov.b #DCO_4, &DCOCTL\n");
   fprintf(out, "  mov.b #RSEL_15, &BCSCTL1\n");
   fprintf(out, "  mov.b #0, &BCSCTL2\n\n");
+
+  cpu_speed = 16000000;
 
   return 0;
 }
