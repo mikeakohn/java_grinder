@@ -43,6 +43,7 @@ API= \
   api/timer.o \
   api/trs80_coco.o \
   api/uart.o \
+  api/vsmile.o \
   api/watchdog.o \
   generator/Math.o
 
@@ -92,6 +93,8 @@ SYSTEMS= \
   generator/TI84.o \
   generator/TI99.o \
   generator/TRS80Coco.o \
+  generator/UNSP.o \
+  generator/VSmile.o \
   generator/W65C134SXB.o \
   generator/W65C265SXB.o
 

@@ -48,6 +48,7 @@
 #include "generator/TI99.h"
 #include "generator/TMS9900.h"
 #include "generator/TRS80Coco.h"
+#include "generator/VSmile.h"
 #include "generator/W65816.h"
 #include "generator/W65C134SXB.h"
 #include "generator/W65C265SXB.h"
@@ -261,6 +262,11 @@ static Generator *new_generator(const char *chip_type)
     generator = new TRS80Coco();
   }
     else
+  if (strcasecmp("vsmile", chip_type) == 0)
+  {
+    generator = new VSmile();
+  }
+    else
   if (strcasecmp("w65816", chip_type) == 0)
   {
     generator = new W65816();
@@ -336,6 +342,7 @@ int main(int argc, char *argv[])
            "     propeller\n"
            "     sega_dreamcast, sega_genesis\n"
            "     ti99\n"
+           "     vsmile\n"
            "     w65c134sxb, w65c265sxb\n"
            "     x86, x86_64\n"
            "     z80, cpc, msx, ti84plus\n", argv[0]);

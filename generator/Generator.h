@@ -40,6 +40,7 @@
 #include "generator/API_TI84.h"
 #include "generator/API_TI99.h"
 #include "generator/API_TRS80_Coco.h"
+#include "generator/API_VSmile.h"
 
 class Generator :
   public API_Amiga,
@@ -63,7 +64,8 @@ class Generator :
   public API_System,
   public API_TI84,
   public API_TI99,
-  public API_TRS80_Coco
+  public API_TRS80_Coco,
+  public API_VSmile
 {
 public:
   Generator();

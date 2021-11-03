@@ -45,6 +45,7 @@
 #include "api/timer.h"
 #include "api/trs80_coco.h"
 #include "api/uart.h"
+#include "api/vsmile.h"
 #include "api/watchdog.h"
 #include "common/JavaClass.h"
 #include "common/JavaCompiler.h"
@@ -177,6 +178,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     CHECK(TI99, ti99)
     CHECK(TRS80Coco, trs80_coco)
     CHECK(SXB, sxb)
+    CHECK(VSmile, vsmile)
     CHECK(Watchdog, watchdog)
       else
     {}
@@ -270,6 +272,7 @@ int invoke_static(
     CHECK_CONST(SNES, snes)
     CHECK_CONST(TRS80Coco, trs80_coco)
     CHECK_CONST(SXB, sxb)
+    CHECK_CONST(VSmile, vsmile)
     CHECK_WITH_PORT_CONST(SPI, spi, 0)
     CHECK_WITH_PORT_CONST(SPI, spi, 1)
     CHECK_WITH_PORT_CONST(TI99, ti99, 0)
@@ -292,6 +295,7 @@ int invoke_static(
     CHECK_CONST_2(TI99, ti99)
     CHECK_CONST_2(SegaGenesis, sega_genesis)
     CHECK_CONST_2(SNES, snes)
+    CHECK_CONST_2(VSmile, vsmile)
       else
     {}
   }
