@@ -14,34 +14,34 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "api/snes.h"
+#include "api/nes.h"
 
 #define CHECK_FUNC(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return generator->snes_##funct##sig(); \
+    return generator->nes_##funct##sig(); \
   }
 
 #define CHECK_FUNC_CONST_1(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return generator->snes_##funct##sig(const_val); \
+    return generator->nes_##funct##sig(const_val); \
   }
 
 #define CHECK_FUNC_CONST_2(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return generator->snes_##funct##sig(const_val1, const_val2); \
+    return generator->nes_##funct##sig(const_val1, const_val2); \
   }
 
-int snes(JavaClass *java_class, Generator *generator, const char *method_name)
+int nes(JavaClass *java_class, Generator *generator, const char *method_name)
 {
-  CHECK_FUNC(setBackgroundColor,_I)
+  //CHECK_FUNC(setBackgroundColor,_I)
 
   return -1;
 }
 
-int snes(
+int nes(
   JavaClass *java_class,
   Generator *generator,
   const char *method_name,
@@ -50,7 +50,7 @@ int snes(
   return -1;
 }
 
-int snes(
+int nes(
   JavaClass *java_class,
   Generator *generator,
   const char *function,

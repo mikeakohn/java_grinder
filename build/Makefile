@@ -31,6 +31,7 @@ API= \
   api/math.o \
   api/memory.o \
   api/msx.o \
+  api/nes.o \
   api/parallella.o \
   api/playstation_2.o \
   api/propeller.o \
@@ -81,6 +82,7 @@ SYSTEMS= \
   generator/C64.o \
   generator/CPC.o \
   generator/MSX.o \
+  generator/NES.o \
   generator/Nintendo64.o \
   generator/Playstation2.o \
   generator/Playstation2VU0.o \

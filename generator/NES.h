@@ -9,23 +9,24 @@
  *
  */
 
-#ifndef JAVA_GRINDER_GENERATOR_SNES_H
-#define JAVA_GRINDER_GENERATOR_SNES_H
+#ifndef JAVA_GRINDER_GENERATOR_NES_H
+#define JAVA_GRINDER_GENERATOR_NES_H
 
-#include "generator/W65816.h"
+#include "generator/M6502.h"
 
-class SNES : public W65816
+class NES : public M6502
 {
 public:
-  SNES();
-  virtual ~SNES();
+  NES();
+  virtual ~NES();
 
   virtual int open(const char *filename);
-  virtual int snes_setBackgroundColor_I();
 
 private:
+  void write_init();
   void write_interrupts();
   void write_cartridge_info();
+
 };
 
 #endif

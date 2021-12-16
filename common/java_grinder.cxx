@@ -36,6 +36,7 @@
 #include "generator/MSP430X.h"
 #include "generator/MCS51.h"
 #include "generator/MSX.h"
+#include "generator/NES.h"
 #include "generator/Nintendo64.h"
 #include "generator/PIC32.h"
 #include "generator/Playstation2.h"
@@ -194,6 +195,11 @@ static Generator *new_generator(const char *chip_type)
   if (strcasecmp("msx", chip_type) == 0)
   {
     generator = new MSX();
+  }
+    else
+  if (strcasecmp("nes", chip_type) == 0)
+  {
+    generator = new NES();
   }
     else
   if (strcasecmp("nintendo64", chip_type) == 0)

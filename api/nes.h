@@ -9,21 +9,21 @@
  *
  */
 
-#ifndef JAVA_GRINDER_API_SNES_API_H
-#define JAVA_GRINDER_API_SNES_API_H
+#ifndef JAVA_GRINDER_API_NES_API_H
+#define JAVA_GRINDER_API_NES_API_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"
 
-int snes(JavaClass *java_class, Generator *generator, const char *method_name);
+int nes(JavaClass *java_class, Generator *generator, const char *method_name);
 
-int snes(
+int nes(
   JavaClass *java_class,
   Generator *generator,
   const char *method_name,
   int const_val);
 
-int snes(
+int nes(
   JavaClass *java_class,
   Generator *generator,
   const char *method_name,
