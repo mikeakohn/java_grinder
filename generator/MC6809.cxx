@@ -522,7 +522,7 @@ int MC6809::integer_to_byte()
 {
   fprintf(out, "  ; integer_to_byte()\n");
   fprintf(out, "  puls a,b\n");
-  fprintf(out, "  sex ; (oh yeah, harder!)\n");
+  fprintf(out, "  sex\n");
   fprintf(out, "  pshs a,b\n");
   return 0;
 }

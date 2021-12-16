@@ -30,6 +30,44 @@ int NES::open(const char *filename)
 {
   if (M6502::open(filename) != 0) { return -1; }
 
+  fprintf(out, ".include \"nes.inc\"\n\n");
+
+  write_init();
+
+  return 0;
+}
+
+int NES::nes_setBackgroundPalette_II()
+{
+  fprintf(out,
+    "  ;; nes_setBackgroundPalette(int index, int color)\n"
+    "  lda NES_PPU_STATUS\n"
+    "  lda #0x3f\n"
+    "  sta NES_PPU_ADDRESS\n"
+    "  lda stack_lo - 2, x\n"
+    "  sta NES_PPU_ADDRESS\n"
+    "  lda stack_lo - 1, x\n"
+    "  sta NES_PPU_ADDRESS\n"
+    "  dex\n"
+    "  dex\n");
+
+  return 0;
+}
+
+int NES::nes_setSpritePalette_II()
+{
+  fprintf(out,
+    "  ;; nes_setSpritePalette(int index, int color)\n"
+    "  lda NES_PPU_STATUS\n"
+    "  lda #0x3f\n"
+    "  sta NES_PPU_ADDRESS\n"
+    "  lda stack_lo - 2, x\n"
+    "  sta NES_PPU_ADDRESS\n"
+    "  lda stack_lo - 1, x\n"
+    "  sta NES_PPU_ADDRESS\n"
+    "  dex\n"
+    "  dex\n");
+
   return 0;
 }
 

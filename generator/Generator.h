@@ -30,6 +30,7 @@
 #include "generator/API_Math.h"
 #include "generator/API_Microcontroller.h"
 #include "generator/API_MSX.h"
+#include "generator/API_NES.h"
 #include "generator/API_Parallella.h"
 #include "generator/API_Playstation2.h"
 #include "generator/API_Propeller.h"
@@ -54,6 +55,7 @@ class Generator :
   public API_Math,
   public API_Microcontroller,
   public API_MSX,
+  public API_NES,
   public API_Parallella,
   public API_Playstation2,
   public API_Propeller,

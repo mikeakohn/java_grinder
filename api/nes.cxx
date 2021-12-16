@@ -36,7 +36,8 @@
 
 int nes(JavaClass *java_class, Generator *generator, const char *method_name)
 {
-  //CHECK_FUNC(setBackgroundColor,_I)
+  CHECK_FUNC(setBackgroundPalette,_II)
+  CHECK_FUNC(setSpritePalette,_II)
 
   return -1;
 }

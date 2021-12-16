@@ -5,7 +5,8 @@ public class NesJavaDemo
 {
   static public void main(String args[])
   {
-    //NES.setBackgroundColor(0x0f00);
+    NES.setBackgroundPalette(0, 1);
+    NES.setBackgroundPalette(1, 0);
 
     while(true);
   }

@@ -15,6 +15,7 @@ abstract public class NES
 {
   protected NES() { }
 
-  public static void setBackgroundColor(int color) { }
+  public static void setBackgroundPalette(int index, int color) { }
+  public static void setSpritePalette(int index, int color) { }
 }
 

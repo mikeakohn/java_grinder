@@ -21,6 +21,8 @@ public:
   virtual ~NES();
 
   virtual int open(const char *filename);
+  virtual int nes_setBackgroundPalette_II();
+  virtual int nes_setSpritePalette_II();
 
 private:
   void write_init();
