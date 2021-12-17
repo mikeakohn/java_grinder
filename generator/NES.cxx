@@ -44,12 +44,12 @@ int NES::nes_setBackgroundPalette_II()
     "  lda NES_PPU_STATUS\n"
     "  lda #0x3f\n"
     "  sta NES_PPU_ADDRESS\n"
-    "  lda stack_lo - 2, x\n"
+    "  lda stack_lo + 2, x\n"
     "  sta NES_PPU_ADDRESS\n"
-    "  lda stack_lo - 1, x\n"
-    "  sta NES_PPU_ADDRESS\n"
-    "  dex\n"
-    "  dex\n");
+    "  lda stack_lo + 1, x\n"
+    "  sta NES_PPU_DATA\n"
+    "  inx\n"
+    "  inx\n");
 
   return 0;
 }
@@ -61,12 +61,12 @@ int NES::nes_setSpritePalette_II()
     "  lda NES_PPU_STATUS\n"
     "  lda #0x3f\n"
     "  sta NES_PPU_ADDRESS\n"
-    "  lda stack_lo - 2, x\n"
+    "  lda stack_lo + 2, x\n"
     "  sta NES_PPU_ADDRESS\n"
-    "  lda stack_lo - 1, x\n"
-    "  sta NES_PPU_ADDRESS\n"
-    "  dex\n"
-    "  dex\n");
+    "  lda stack_lo + 1, x\n"
+    "  sta NES_PPU_DATA\n"
+    "  inx\n"
+    "  inx\n");
 
   return 0;
 }
@@ -74,43 +74,16 @@ int NES::nes_setSpritePalette_II()
 void NES::write_init()
 {
   fprintf(out,
-    "  ;; Disable IRQs, decimal mode, and APU frame IRQ.\n"
-    "  sei\n"
-    "  cld\n"
-    "  ldx NES_CONTROLLER_2\n\n"
-
-    "  ;; Set stack pointer to 0xff.\n"
-    "  ldx 0xff\n"
-    "  txs\n\n"
-
     "  ;; Disable NMI, rendering, DMC IRQs\n"
-    "  stx NES_PPU_CONTROL\n"
-    "  stx NES_PPU_MASK\n"
-    "  stx NES_APU_MOD_CONTROL\n\n"
+    "  lda #0xff\n"
+    "  sta NES_PPU_CONTROL\n"
+    "  sta NES_PPU_MASK\n"
+    "  sta NES_APU_MOD_CONTROL\n\n"
 
     ";; Wait for vertical blank.\n"
     "_wait_vblank_1:\n"
     "  bit NES_PPU_STATUS\n"
     "  bpl _wait_vblank_1\n\n"
-
-    "_clear_memory:\n"
-    "  lda #0x00\n"
-    "  sta 0x0000, x\n"
-    "  sta 0x0100, x\n"
-    "  sta 0x0200, x\n"
-    "  sta 0x0400, x\n"
-    "  sta 0x0500, x\n"
-    "  sta 0x0600, x\n"
-    "  sta 0x0700, x\n"
-    "  lda #0xfe\n"
-    "  sta 0x0300, x\n"
-    "  inx\n"
-    "  bne _clear_memory\n\n"
-
-    ";; Wait for vertical blank.\n"
-    "_wait_vblank_2:\n"
-    "  bit NES_PPU_STATUS\n"
-    "  bpl _wait_vblank_2\n\n"
 
     "  ;; Set up PPU.\n"
     "  lda #0x00\n"
@@ -153,6 +126,5 @@ void NES::write_cartridge_info()
     ".db 0\n"
     "; PRG-RAM size.\n"
     ".ascii \"NI2.1\"\n\n");
-
 }
 
