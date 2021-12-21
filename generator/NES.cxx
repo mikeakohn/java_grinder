@@ -71,6 +71,21 @@ int NES::nes_setSpritePalette_II()
   return 0;
 }
 
+int NES::nes_setPattern_IaB()
+{
+  return -1;
+}
+
+int NES::nes_setNameTable_II()
+{
+  return -1;
+}
+
+int NES::nes_setNameTable_III()
+{
+  return -1;
+}
+
 void NES::write_init()
 {
   fprintf(out,

@@ -18,6 +18,9 @@ public:
   // Nintendo Entertainment System.
   virtual int nes_setBackgroundPalette_II() { return -1; }
   virtual int nes_setSpritePalette_II() { return -1; }
+  virtual int nes_setPattern_IaB() { return -1; }
+  virtual int nes_setNameTable_II() { return -1; }
+  virtual int nes_setNameTable_III() { return -1; }
 };
 
 #endif

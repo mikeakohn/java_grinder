@@ -21,3 +21,4 @@ snap
 *.d64
 *.srec
 *.elf
+*.nes

@@ -23,6 +23,9 @@ public:
   virtual int open(const char *filename);
   virtual int nes_setBackgroundPalette_II();
   virtual int nes_setSpritePalette_II();
+  virtual int nes_setPattern_IaB();
+  virtual int nes_setNameTable_II();
+  virtual int nes_setNameTable_III();
 
 private:
   void write_init();

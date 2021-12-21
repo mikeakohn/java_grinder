@@ -38,6 +38,9 @@ int nes(JavaClass *java_class, Generator *generator, const char *method_name)
 {
   CHECK_FUNC(setBackgroundPalette,_II)
   CHECK_FUNC(setSpritePalette,_II)
+  CHECK_FUNC(setPattern,_IaB)
+  CHECK_FUNC(setNameTable,_II)
+  CHECK_FUNC(setNameTable,_III)
 
   return -1;
 }
