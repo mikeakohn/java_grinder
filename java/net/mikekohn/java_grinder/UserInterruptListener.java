@@ -2,7 +2,7 @@
  *  Java Grinder
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.naken.cc/
+ *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
  * Copyright 2014-2017 by Michael Kohn
