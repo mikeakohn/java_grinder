@@ -24,7 +24,7 @@ public class ArrayReadWrite
     return total;
   }
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     add_nums();
   }

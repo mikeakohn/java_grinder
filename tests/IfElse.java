@@ -24,7 +24,7 @@ public class IfElse
     return b;
   }
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     addLessThan5(2);
   }

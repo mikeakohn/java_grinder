@@ -6,7 +6,7 @@ public class TI84Demo
   static String hello = "Hello World";
   static int blah = 7;
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     int n,x,y,ptr,pixels;
 

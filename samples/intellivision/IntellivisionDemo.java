@@ -5,7 +5,7 @@ public class IntellivisionDemo
 {
   static int a = 0;
 
-  public static void main(String args[])
+  public static void main(String[] args)
   {
     Intellivision.setColorStack(0, Intellivision.COLOR_DARK_GREEN);
     Intellivision.setColorStack(1, Intellivision.COLOR_BLACK);

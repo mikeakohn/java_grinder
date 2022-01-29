@@ -62,7 +62,7 @@ public class LCD
   static final int SPI_CLK = 0x20;
   static final int SPI_SDO = 0x40;
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     int x=60,y=30;
     int dx=1,dy=1;

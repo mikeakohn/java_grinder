@@ -6,7 +6,7 @@ import net.mikekohn.java_grinder.amiga.Copper;
 
 public class AmigaDemo
 {
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     Copper copper = new Copper(200);
     Blitter blitter = new Blitter();

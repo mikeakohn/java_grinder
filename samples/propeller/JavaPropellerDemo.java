@@ -8,7 +8,7 @@ public class JavaPropellerDemo
   static int led;
   static int n;
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     led = 1 << 16;
 

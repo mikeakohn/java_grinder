@@ -2,7 +2,7 @@ import net.mikekohn.java_grinder.CPC;
 
 public class TestCPC
 {
-  public static void main(String args[])
+  public static void main(String[] args)
   {
     String message = "Hello CPC from JAVA";
     int zahl = 6128;

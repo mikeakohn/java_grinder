@@ -73,6 +73,8 @@ int NES::nes_setSpritePalette_II()
 
 int NES::nes_setPattern_IaB()
 {
+  fprintf(out,
+    "  ;; nes_setSpritePalette(int index, int color)\n"
   return -1;
 }
 

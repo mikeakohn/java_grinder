@@ -29,7 +29,7 @@ public class Mandelbrot
     0xf800,
   };
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     final int DEC_PLACE = 10;
     int x,y;

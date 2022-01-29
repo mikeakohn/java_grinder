@@ -8,7 +8,7 @@ public class TimerTest implements TimerListener
 {
   static int led_value = 0x40;
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     IOPort0.setPinsAsOutput(0x41);
     Timer.setInterval(65000, 4);

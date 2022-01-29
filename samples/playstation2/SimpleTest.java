@@ -24,7 +24,7 @@ public class SimpleTest
      320.0f,  100.0f, 0.f,
   };
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     int n;
 

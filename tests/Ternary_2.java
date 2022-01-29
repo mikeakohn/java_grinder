@@ -8,7 +8,7 @@ public class Ternary_2
     return a + b == 5 ? 1 : 0;
   }
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     addIs5(3,4);
   }

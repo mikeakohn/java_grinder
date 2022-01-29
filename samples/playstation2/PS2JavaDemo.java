@@ -201,7 +201,7 @@ public class PS2JavaDemo
     }
   }
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     Playstation2.performanceCountEnable(Playstation2.EVENT_PROCESSOR_CYCLE);
 

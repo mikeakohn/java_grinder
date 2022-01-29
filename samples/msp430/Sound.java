@@ -65,7 +65,7 @@ public class Sound
     }
   }
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     // Set the DCO to 8MHz
     CPU.setClock8();

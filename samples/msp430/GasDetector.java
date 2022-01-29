@@ -27,7 +27,7 @@ public class GasDetector
    119, 119, 119, 119, 119, 119, 51, 59, 63, 63, 63, 31, 31, 31, 15, 7
   };
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     int n;
 

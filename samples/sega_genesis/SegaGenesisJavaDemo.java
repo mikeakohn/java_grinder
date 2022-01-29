@@ -3,7 +3,7 @@ import net.mikekohn.java_grinder.SegaGenesis;
 
 public class SegaGenesisJavaDemo
 {
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     // Set font screen.
     SegaGenesis.setPalettePointer(49);

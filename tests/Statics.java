@@ -13,7 +13,7 @@ public class Statics
     return integer + short_integer + byte_integer + byte_integer_neg;
   }
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     short_integer = 20;
     get_number();

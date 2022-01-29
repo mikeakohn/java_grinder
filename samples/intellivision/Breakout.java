@@ -285,7 +285,7 @@ public class Breakout
     displayText(game_over.getBytes(), 6, 8, Intellivision.COLOR_GREEN);
   }
 
-  public static void main(String args[])
+  public static void main(String[] args)
   {
     int n, x;
 

@@ -6,7 +6,7 @@ public class Mandelbrot implements UserInterruptListener
 {
   static boolean start_signal = false;
 
-  public static void main(String args[])
+  public static void main(String[] args)
   {
     int data;
     float real_start;

@@ -16,7 +16,7 @@ public class JavaTrs80Demo
     return c;
   }
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     int a,n,x,y;
     int dx,dy;

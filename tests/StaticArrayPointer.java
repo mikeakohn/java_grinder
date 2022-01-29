@@ -9,7 +9,7 @@ public class StaticArrayPointer
 
   static public int reflection(int i) { return i; }
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     int total = 0;
     int i;

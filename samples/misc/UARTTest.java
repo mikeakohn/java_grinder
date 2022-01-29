@@ -3,7 +3,7 @@ import net.mikekohn.java_grinder.UART0;
 
 public class UARTTest
 {
-  static void main(String args[])
+  static void main(String[] args)
   {
     int c;
 

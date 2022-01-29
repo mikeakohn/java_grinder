@@ -8,7 +8,7 @@ public class Divide
     return a / b;
   }
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     div_nums(27000, 400);
   }

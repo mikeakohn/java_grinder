@@ -3,7 +3,7 @@ import net.mikekohn.java_grinder.Parallella;
 
 public class Test
 {
-  public static void main(String args[])
+  public static void main(String[] args)
   {
     int n;
 
@@ -16,5 +16,4 @@ public class Test
     }
   }
 }
-
 

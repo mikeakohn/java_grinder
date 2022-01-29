@@ -8,7 +8,7 @@ public class Testing
     return a + b;
   }
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     add_nums(5, 6);
   }

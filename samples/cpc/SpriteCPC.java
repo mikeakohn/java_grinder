@@ -46,7 +46,7 @@ public class SpriteCPC
   static char SPRITE_WIDTH = 12;
   static char MAX_X = 79;
   
-  public static void main(String args[])
+  public static void main(String[] args)
   {
      char nX = 20;
      char nY = 100;

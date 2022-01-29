@@ -11,7 +11,7 @@ public class Nokia5110
   static final int LCD_DC = 1;
   static final int SPI_CS = 2;
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     int n;
 

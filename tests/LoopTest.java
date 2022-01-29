@@ -29,7 +29,7 @@ public class LoopTest
      return total;
   }
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
      //loop_up();
      loop_down();

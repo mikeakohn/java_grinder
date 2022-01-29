@@ -231,7 +231,7 @@ public class LCD
 //WriteSpiData((color >> 4) & 0xFF);
 //WriteSpiData(((color & 0xF) << 4) | ((color >> 8) & 0xF));
 //WriteSpiData(color & 0xFF);
-  public static void main(String args[])
+  public static void main(String[] args)
   {
     IOPort5.setPinsAsOutput(LCD_RESET|SPI_CS|SPI_CLK|SPI_SDO);
     IOPort5.setPinsValue(LCD_RESET|SPI_CS|SPI_CLK);

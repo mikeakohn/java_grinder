@@ -2,7 +2,7 @@ import net.mikekohn.java_grinder.CPC;
 
 public class GrafCPC
 {
-  public static void main(String args[])
+  public static void main(String[] args)
   {
    int i;
    char c;  

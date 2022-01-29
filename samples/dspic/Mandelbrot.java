@@ -67,7 +67,7 @@ public class Mandelbrot
   static final int SPI_CLK = 1;
   static final int SPI_SDO = 3;
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     int x=60,y=30;
     int dx=1,dy=1;

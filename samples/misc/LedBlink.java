@@ -3,7 +3,7 @@ import net.mikekohn.java_grinder.IOPort0;
 
 public class LedBlink
 {
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     int n;
 

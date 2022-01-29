@@ -12,7 +12,7 @@ public class OptimizeLoadStore
     return n;
   }
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     add_nums(5, 6);
   }

@@ -8,7 +8,7 @@ public class Ternary_4
     return a + b < 5 ? 1 : 0;
   }
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     addLessThan5(3,1);
   }

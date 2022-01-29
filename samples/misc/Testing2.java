@@ -1,7 +1,7 @@
 
 public class Testing2
 {
-  static public void main(String args[])
+  static public void main(String[] args)
   {
   int c;
   int k = 10;

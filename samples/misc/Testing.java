@@ -24,7 +24,7 @@ public class Testing
     return a;
   }
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
   int c;
 

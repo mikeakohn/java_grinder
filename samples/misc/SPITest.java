@@ -3,7 +3,7 @@ import net.mikekohn.java_grinder.SPI0;
 
 public class SPITest
 {
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     int n;
 

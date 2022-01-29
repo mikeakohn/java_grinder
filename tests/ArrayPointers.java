@@ -8,7 +8,7 @@ public class ArrayPointers
 
   static public int reflection(int i) { return i; }
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     byte[] array;
     int total = 0;

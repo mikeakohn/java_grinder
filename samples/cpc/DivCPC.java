@@ -8,7 +8,7 @@ public class DivCPC
     return a / b;
   }
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     int help;
     char c;

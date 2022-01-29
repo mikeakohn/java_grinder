@@ -478,7 +478,7 @@ public class GrinderDemoTi99
     soundOff();
   }
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     sprite_dx = new byte[4];
     sprite_dy = new byte[4];

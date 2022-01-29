@@ -3,7 +3,7 @@ import net.mikekohn.java_grinder.Memory;
 
 public class ScreenCPC
 {
-  public static void main(String args[])
+  public static void main(String[] args)
   {
     int i,scr,z;
     

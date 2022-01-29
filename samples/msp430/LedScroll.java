@@ -7,7 +7,7 @@ public class LedScroll
   static int letter = 0;
   static String text = "   HELLO TO YOU   ";
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     int n;
 

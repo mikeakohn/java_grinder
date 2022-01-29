@@ -10,7 +10,7 @@ public class NotNull
     return string != null;
   }
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
     isNotNull();
   }

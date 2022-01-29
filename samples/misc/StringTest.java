@@ -4,7 +4,7 @@ public class StringTest
   static String string = "Just a test";
   static byte[] mem;
 
-  static public void main(String args[])
+  static public void main(String[] args)
   {
   int len;
   int n;

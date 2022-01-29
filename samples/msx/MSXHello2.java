@@ -19,7 +19,7 @@ import net.mikekohn.java_grinder.MSX;
 public class MSXHello2 {
 	public static String strMsg = "Hello MSX from JAVA";
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		MSX.cls();
 
 		for (int i = 0; i < strMsg.length(); i++) {
