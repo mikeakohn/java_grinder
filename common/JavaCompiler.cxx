@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -652,7 +652,7 @@ int JavaCompiler::array_store(JavaClass *java_class, int constant_id, uint8_t ar
   return -1;
 }
 
-int JavaCompiler::push_ref(int index, _stack *stack)
+int JavaCompiler::push_ref(int index, Stack *stack)
 {
   int ref = stack->pop();
   std::string field_name;
@@ -709,7 +709,7 @@ int JavaCompiler::compile_method(
   std::string label;
   std::string method_name;
   std::string class_name;
-  _stack *stack;
+  Stack *stack;
   int const_val;
   int skip_bytes;
   int index;
@@ -771,7 +771,7 @@ int JavaCompiler::compile_method(
   pc = pc_start;
 
   generator->method_start(max_locals, max_stack, param_count, method_name);
-  stack = (_stack *)alloca(max_stack * sizeof(uint32_t) + sizeof(uint32_t));
+  stack = (Stack *)alloca(max_stack * sizeof(uint32_t) + sizeof(uint32_t));
   stack->reset();
 
   int label_map_len = (code_len / 8) + 1;
@@ -934,6 +934,7 @@ int JavaCompiler::compile_method(
           constant_string_t *constant_string = (constant_string_t *)gen32;
           const_val = constant_string->string_index;
 
+printf("here\n");
           // I think this is wrong.. why use the index to the string?
 #if 0
           ret = optimize_const(java_class, method_name, bytes,

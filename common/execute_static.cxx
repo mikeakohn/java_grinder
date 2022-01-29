@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -15,7 +15,7 @@
 #include <stdint.h>
 
 #include "common/JavaClass.h"
-#include "common/stack.h"
+#include "common/Stack.h"
 #include "common/table_java_instr.h"
 #include "generator/Generator.h"
 
@@ -27,7 +27,13 @@
 // how to add the other code to the init section.  Maybe the trick is to
 // generate a brand new Java function and compile it.
 
-#define UNIMPL() { printf("Unimplemented opcode=%d %s:%d\n", bytes[pc], __FILE__, __LINE__); ret = -1; break; }
+#define UNIMPL() \
+{ \
+  printf("Unimplemented opcode=%d %s:%d\n", bytes[pc], __FILE__, __LINE__); \
+  ret = -1; \
+  break; \
+}
+
 #define CHECK_STACK(n) \
         if (stack->length() < n) \
         { \
@@ -35,6 +41,7 @@
           ret = -1; \
           break; \
         }
+
 #define CHECK_BOUNDS() \
         if (index > array_len) \
         { \
@@ -64,7 +71,7 @@ int execute_static(
   int32_t value;
   float value_float;
   int32_t *value_bin;
-  _stack *stack;
+  Stack *stack;
   int32_t *array = NULL;
   int array_len = -1;
   int array_type = -1;
@@ -93,7 +100,7 @@ int execute_static(
   DEBUG_PRINT("max_stack=%d max_locals=%d code_len=%d\n", max_stack, max_locals, code_len);
 
   //generator->method_start(max_locals, method_name);
-  stack = (_stack *)alloca(max_stack * sizeof(int32_t) + sizeof(int32_t));
+  stack = (Stack *)alloca(max_stack * sizeof(int32_t) + sizeof(int32_t));
   stack->reset();
 
   while(pc - pc_start < code_len)

@@ -5,14 +5,14 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
 #ifndef JAVA_GRINDER_COMMON_STACK_H
 #define JAVA_GRINDER_COMMON_STACK_H
 
-struct _stack
+struct Stack
 {
   void reset() { ptr = 0; }
   int length() { return ptr; }
@@ -24,7 +24,7 @@ struct _stack
   int ptr;
 
 private:
-  union
+  union Data
   {
     uint32_t i;
     float f;
