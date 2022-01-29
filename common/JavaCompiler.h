@@ -53,7 +53,7 @@ private:
   int optimize_compare(JavaClass *java_class, std::string &method_name, uint8_t *bytes, int pc, int pc_end, int address, int index);
   int array_load(JavaClass *java_class, int constant_id, uint8_t array_type);
   int array_store(JavaClass *java_class, int constant_id, uint8_t array_type);
-  int push_ref(int index, Stack *stack);
+  int push_ref(int index, Stack &stack);
   int compile_method(JavaClass *java_class, int method_id, const char *alt_name = NULL);
   int field_type_to_int(const char *field_type);
   const char *field_type_from_int(int type);

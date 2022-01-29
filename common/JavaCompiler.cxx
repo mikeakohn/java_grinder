@@ -51,7 +51,7 @@ static int calc_distance(uint8_t *bytes, int pc, int pc_jump_to)
     pc = temp;
   }
 
-  while(pc < pc_jump_to)
+  while (pc < pc_jump_to)
   {
     if (bytes[pc] == 0xc4)
     {
@@ -218,13 +218,13 @@ void JavaCompiler::fill_label_map(uint8_t *label_map, int label_map_len, uint8_t
 
   memset(label_map, 0, label_map_len);
 
-  while(pc - pc_start < code_len)
+  while (pc - pc_start < code_len)
   {
     int opcode = bytes[pc];
 
     if (opcode == 0xc4) { wide = 1; pc++; continue; }
 
-    switch(opcode)
+    switch (opcode)
     {
         case 0x99:  // ifeq
         case 0x9a:  // ifne
@@ -652,9 +652,9 @@ int JavaCompiler::array_store(JavaClass *java_class, int constant_id, uint8_t ar
   return -1;
 }
 
-int JavaCompiler::push_ref(int index, Stack *stack)
+int JavaCompiler::push_ref(int index, Stack &stack)
 {
-  int ref = stack->pop();
+  int ref = stack.pop();
   std::string field_name;
   std::string type;
   int ret;
@@ -709,7 +709,7 @@ int JavaCompiler::compile_method(
   std::string label;
   std::string method_name;
   std::string class_name;
-  Stack *stack;
+  Stack stack;
   int const_val;
   int skip_bytes;
   int index;
@@ -771,8 +771,7 @@ int JavaCompiler::compile_method(
   pc = pc_start;
 
   generator->method_start(max_locals, max_stack, param_count, method_name);
-  stack = (Stack *)alloca(max_stack * sizeof(uint32_t) + sizeof(uint32_t));
-  stack->reset();
+  stack.reset();
 
   int label_map_len = (code_len / 8) + 1;
   label_map = (uint8_t *)alloca(label_map_len);
@@ -787,7 +786,7 @@ int JavaCompiler::compile_method(
 
   generator->instruction_count_clear();
 
-  while(pc - pc_start < code_len)
+  while (pc - pc_start < code_len)
   {
     int address = pc - pc_start;
     skip_bytes = 0;
@@ -807,7 +806,7 @@ int JavaCompiler::compile_method(
     // possible to unpop the array pointer from the stack.
     generator->instruction_count_inc();
 
-    switch(bytes[pc])
+    switch (bytes[pc])
     {
       case 0: // nop (0x00)
         break;
@@ -1066,10 +1065,14 @@ printf("here\n");
         break;
 
       case 46: // iaload (0x2e)
-        if (stack->length() == 0)
-        { ret = generator->array_read_int(); }
+        if (stack.length() == 0)
+        {
+          ret = generator->array_read_int();
+        }
           else
-        { ret = array_load(java_class, stack->pop(), ARRAY_TYPE_INT); }
+        {
+          ret = array_load(java_class, stack.pop(), ARRAY_TYPE_INT);
+        }
 
         break;
 
@@ -1078,10 +1081,10 @@ printf("here\n");
         break;
 
       case 48: // faload (0x30)
-        if (stack->length() == 0)
+        if (stack.length() == 0)
         { ret = generator->array_read_float(); }
           else
-        { ret = array_load(java_class, stack->pop(), ARRAY_TYPE_FLOAT); }
+        { ret = array_load(java_class, stack.pop(), ARRAY_TYPE_FLOAT); }
         break;
 
       case 49: // daload (0x31)
@@ -1089,18 +1092,18 @@ printf("here\n");
         break;
 
       case 50: // aaload (0x32)
-        if (stack->length() == 0)
+        if (stack.length() == 0)
         { ret = generator->array_read_object(); }
           else
-        { ret = array_load(java_class, stack->pop(), ARRAY_TYPE_OBJECT); }
+        { ret = array_load(java_class, stack.pop(), ARRAY_TYPE_OBJECT); }
         break;
         break;
 
       case 51: // baload (0x33)
-        if (stack->length() == 0)
+        if (stack.length() == 0)
         { ret = generator->array_read_byte(); }
           else
-        { ret = array_load(java_class, stack->pop(), ARRAY_TYPE_BYTE); }
+        { ret = array_load(java_class, stack.pop(), ARRAY_TYPE_BYTE); }
         break;
 
       case 52: // caload (0x34)
@@ -1108,10 +1111,10 @@ printf("here\n");
         break;
 
       case 53: // saload (0x35)
-        if (stack->length() == 0)
+        if (stack.length() == 0)
         { ret = generator->array_read_short(); }
           else
-        { ret = array_load(java_class, stack->pop(), ARRAY_TYPE_SHORT); }
+        { ret = array_load(java_class, stack.pop(), ARRAY_TYPE_SHORT); }
         break;
 
       case 54: // istore (0x36)
@@ -1156,10 +1159,15 @@ printf("here\n");
           index = bytes[pc+1];
         }
 
-        if (stack->length() == 0)
-        { ret = generator->pop_local_var_ref(index); }
+        if (stack.length() == 0)
+        {
+          ret = generator->pop_local_var_ref(index);
+        }
           else
-        { ret = push_ref(index, stack); }
+        {
+          ret = push_ref(index, stack);
+        }
+
         break;
 
       case 59: // istore_0 (0x3b)
@@ -1219,17 +1227,27 @@ printf("here\n");
       case 78: // astore_3 (0x4e)
         // Pop ref off stack and store in local variable
         index = bytes[pc] - 75;
-        if (stack->length() == 0)
-        { ret = generator->pop_local_var_ref(index); }
+        if (stack.length() == 0)
+        {
+          ret = generator->pop_local_var_ref(index);
+        }
           else
-        { ret = push_ref(index, stack); }
+        {
+          ret = push_ref(index, stack);
+        }
+
         break;
 
       case 79: // iastore (0x4f)
-        if (stack->length() == 0)
-        { ret = generator->array_write_int(); }
+        if (stack.length() == 0)
+        {
+          ret = generator->array_write_int();
+        }
           else
-        { ret = array_store(java_class, stack->pop(), ARRAY_TYPE_INT); }
+        {
+          ret = array_store(java_class, stack.pop(), ARRAY_TYPE_INT);
+        }
+
         break;
 
       case 80: // lastore (0x50)
@@ -1237,10 +1255,15 @@ printf("here\n");
         break;
 
       case 81: // fastore (0x51)
-        if (stack->length() == 0)
-        { ret = generator->array_write_float(); }
+        if (stack.length() == 0)
+        {
+          ret = generator->array_write_float();
+        }
           else
-        { ret = array_store(java_class, stack->pop(), ARRAY_TYPE_FLOAT); }
+        {
+          ret = array_store(java_class, stack.pop(), ARRAY_TYPE_FLOAT);
+        }
+
         break;
 
       case 82: // dastore (0x52)
@@ -1248,31 +1271,51 @@ printf("here\n");
         break;
 
       case 83: // aastore (0x53)
-        if (stack->length() == 0)
-        { ret = generator->array_write_object(); }
+        if (stack.length() == 0)
+        {
+          ret = generator->array_write_object();
+        }
           else
-        { ret = array_store(java_class, stack->pop(), ARRAY_TYPE_OBJECT); }
+        {
+          ret = array_store(java_class, stack.pop(), ARRAY_TYPE_OBJECT);
+        }
+
         break;
 
       case 84: // bastore (0x54)
-        if (stack->length() == 0)
-        { ret = generator->array_write_byte(); }
+        if (stack.length() == 0)
+        {
+          ret = generator->array_write_byte();
+        }
           else
-        { ret = array_store(java_class, stack->pop(), ARRAY_TYPE_BYTE); }
+        {
+          ret = array_store(java_class, stack.pop(), ARRAY_TYPE_BYTE);
+        }
+
         break;
 
       case 85: // castore (0x55)
-        if (stack->length() == 0)
-        { ret = generator->array_write_short(); }
+        if (stack.length() == 0)
+        {
+          ret = generator->array_write_short();
+        }
           else
-        { ret = array_store(java_class, stack->pop(), ARRAY_TYPE_CHAR); }
+        {
+          ret = array_store(java_class, stack.pop(), ARRAY_TYPE_CHAR);
+        }
+
         break;
 
       case 86: // sastore (0x56)
-        if (stack->length() == 0)
-        { ret = generator->array_write_short(); }
+        if (stack.length() == 0)
+        {
+          ret = generator->array_write_short();
+        }
           else
-        { ret = array_store(java_class, stack->pop(), ARRAY_TYPE_SHORT); }
+        {
+          ret = array_store(java_class, stack.pop(), ARRAY_TYPE_SHORT);
+        }
+
         break;
 
       case 87: // pop (0x57)
@@ -1722,8 +1765,8 @@ printf("here\n");
 
       case 172: // ireturn (0xac)
         //value1 = POP_INTEGER()
-        //stack_values = java_stack->values;
-        //stack_types = java_stack->types;
+        //stack_values = java_stack.values;
+        //stack_types = java_stack.types;
         //PUSH_INTEGER(value1);
         ret = generator->return_integer(max_locals);
         break;
@@ -1731,24 +1774,24 @@ printf("here\n");
       case 173: // lreturn (0xad)
         UNIMPL()
         //lvalue1 = POP_LONG()
-        //stack_values = java_stack->values;
-        //stack_types = java_stack->types;
+        //stack_values = java_stack.values;
+        //stack_types = java_stack.types;
         //PUSH_LONG(lvalue1);
         break;
 
       case 174: // freturn (0xae)
         UNIMPL()
         //value1 = POP_INTEGER()
-        //stack_values = java_stack->values;
-        //stack_types = java_stack->types;
+        //stack_values = java_stack.values;
+        //stack_types = java_stack.types;
         //PUSH_INTEGER(value1);
         break;
 
       case 175: // dreturn (0xaf)
         UNIMPL()
         //dvalue1 = POP_DOUBLE()
-        //stack_values = java_stack->values;
-        //stack_types = java_stack->types;
+        //stack_values = java_stack.values;
+        //stack_types = java_stack.types;
         //PUSH_LONG(dvalue1);
         break;
 
@@ -1779,7 +1822,7 @@ printf("here\n");
 
         if (gen32->tag == CONSTANT_METHODREF)
         {
-          stack->push(ref);
+          stack.push(ref);
         }
           else
         if (type[0] == '[')
@@ -1805,7 +1848,7 @@ printf("here\n");
           {
             DEBUG_PRINT("  static is %s (will invoke)\n", field_name.c_str());
             //generator->push_ref(field_name);
-            stack->push(ref);
+            stack.push(ref);
           }
 #endif
         }
@@ -1831,12 +1874,12 @@ printf("here\n");
           break;
         }
 
-        if (stack->length() != 0)
+        if (stack.length() != 0)
         {
           std::string field_name;
           std::string type;
 
-          if (java_class->get_ref_name_type(field_name, type, stack->pop()) != 0)
+          if (java_class->get_ref_name_type(field_name, type, stack.pop()) != 0)
           {
             printf("Error retrieving field name %d\n", ref);
             ret = -1;
@@ -1862,13 +1905,13 @@ printf("here\n");
       case 182: // invokevirtual (0xb6)
         ref = GET_PC_UINT16(1);
 
-        if (stack->length() == 0)
+        if (stack.length() == 0)
         {
           ret = invoke_virtual(java_class, ref, generator);
         }
           else
         {
-          ret = invoke_virtual(java_class, ref, stack->pop(), generator);
+          ret = invoke_virtual(java_class, ref, stack.pop(), generator);
         }
 
         break;
@@ -1911,12 +1954,12 @@ printf("here\n");
         break;
 
       case 190: // arraylength (0xbe)
-        DEBUG_PRINT("stack->length()=%d\n", stack->length());
+        DEBUG_PRINT("stack.length()=%d\n", stack.length());
 
         // FIXME - This is may not be correct
-        if (stack->length() > 0)
+        if (stack.length() > 0)
         {
-          uint32_t value = stack->pop();
+          uint32_t value = stack.pop();
           gen32 = (generic_32bit_t *)java_class->get_constant(value);
           if (gen32->tag == CONSTANT_FIELDREF)
           {
@@ -2150,7 +2193,7 @@ int JavaCompiler::load_class(const char *filename)
   DEBUG_PRINT("load_class(%s)\n", filename);
 
   ptr = 0;
-  while(filename[ptr] != 0)
+  while (filename[ptr] != 0)
   {
     if (filename[ptr] == '/') { last_slash = ptr; }
     if (filename[ptr] == '\\') { last_slash = ptr; }  // DOS :( come on now :(
@@ -2507,7 +2550,7 @@ int JavaCompiler::get_const(uint8_t *bytes, int len, int address, int *value)
       return -1;
     }
 
-    switch(bytes[address + 1])
+    switch (bytes[address + 1])
     {
     }
 
@@ -2522,7 +2565,7 @@ int JavaCompiler::get_const(uint8_t *bytes, int len, int address, int *value)
       return -1;
     }
 
-    switch(bytes[address])
+    switch (bytes[address])
     {
       case 1: // aconst_null (0x01)
         *value = 0;
@@ -2548,7 +2591,7 @@ int JavaCompiler::get_cond(uint8_t *bytes, int len, int address, int *cond, int 
 {
   if (table_java_instr[bytes[address]].op_type != OP_TYPE_IF) { return -1; }
 
-  switch(bytes[address])
+  switch (bytes[address])
   {
     case 153: // ifeq (0x99)
     case 159: // if_icmpeq (0x9f)

@@ -12,23 +12,47 @@
 #ifndef JAVA_GRINDER_COMMON_STACK_H
 #define JAVA_GRINDER_COMMON_STACK_H
 
+#include <vector>
+
 struct Stack
 {
-  void reset() { ptr = 0; }
-  int length() { return ptr; }
-  void push(uint32_t value) { data[ptr++].i = value; }
-  void push_float(float value) { data[ptr++].f = value; }
-  uint32_t pop() { return data[--ptr].i; }
-  float pop_float() { return data[--ptr].f; }
+  Stack()
+  {
+  }
 
-  int ptr;
+  void reset() { data.clear(); }
+
+  int length() { return data.size(); }
+
+  void push(uint32_t value) { data.push_back(value); }
+
+  void push_float(float value) { data.push_back(value); }
+
+  uint32_t pop()
+  {
+    uint32_t value = data.back().i;
+    data.pop_back();
+    return value;
+  }
+
+  float pop_float()
+  {
+    float value = data.back().f;
+    data.pop_back();
+    return value;
+  }
 
 private:
   union Data
   {
+    Data(uint32_t value) { i = value; }
+    Data(float value) { f = value; }
+
     uint32_t i;
     float f;
-  } data[];
+  };
+
+  std::vector<Data> data;
 };
 
 #endif

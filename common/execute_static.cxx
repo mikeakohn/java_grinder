@@ -35,7 +35,7 @@
 }
 
 #define CHECK_STACK(n) \
-        if (stack->length() < n) \
+        if (stack.length() < n) \
         { \
           printf("Error: stack < %d\n", n); \
           ret = -1; \
@@ -71,7 +71,7 @@ int execute_static(
   int32_t value;
   float value_float;
   int32_t *value_bin;
-  Stack *stack;
+  Stack stack;
   int32_t *array = NULL;
   int array_len = -1;
   int array_type = -1;
@@ -100,21 +100,20 @@ int execute_static(
   DEBUG_PRINT("max_stack=%d max_locals=%d code_len=%d\n", max_stack, max_locals, code_len);
 
   //generator->method_start(max_locals, method_name);
-  stack = (Stack *)alloca(max_stack * sizeof(int32_t) + sizeof(int32_t));
-  stack->reset();
+  stack.reset();
 
-  while(pc - pc_start < code_len)
+  while (pc - pc_start < code_len)
   {
     int address = pc - pc_start;
 #ifdef DEBUG
     DEBUG_PRINT("pc=%d %s opcode=%d (0x%02x)\n", address, table_java_instr[bytes[pc]].name, bytes[pc], bytes[pc]);
 #endif
 
-    switch(bytes[pc])
+    switch (bytes[pc])
     {
       case 0: // nop (0x00)
       case 1: // aconst_null (0x01)
-        stack->push(0);
+        stack.push(0);
         break;
       case 2: // iconst_m1 (0x02)
       case 3: // iconst_0 (0x03)
@@ -123,35 +122,35 @@ int execute_static(
       case 6: // iconst_3 (0x06)
       case 7: // iconst_4 (0x07)
       case 8: // iconst_5 (0x08)
-        stack->push(bytes[pc] - 0x03);
+        stack.push(bytes[pc] - 0x03);
         break;
       case 9:  // lconst_0 (0x09)
       case 10: // lconst_1 (0x0a)
-        stack->push(bytes[pc] - 0x09);
+        stack.push(bytes[pc] - 0x09);
         break;
       case 11: // fconst_0 (0x0b)
         value_float = 0.0;
         value_bin = (int32_t *)&value_float;
-        stack->push(*value_bin);
+        stack.push(*value_bin);
         break;
       case 12: // fconst_1 (0x0c)
         value_float = 1.0;
         value_bin = (int32_t *)&value_float;
-        stack->push(*value_bin);
+        stack.push(*value_bin);
         break;
       case 13: // fconst_2 (0x0d)
         value_float = 2.0;
         value_bin = (int32_t *)&value_float;
-        stack->push(*value_bin);
+        stack.push(*value_bin);
         break;
       case 14: // dconst_0 (0x0e)
       case 15: // dconst_1 (0x0f)
         UNIMPL();
       case 16: // bipush (0x10)
-        stack->push((int8_t)bytes[pc+1]);
+        stack.push((int8_t)bytes[pc+1]);
         break;
       case 17: // sipush (0x11)
-        stack->push((int16_t)((bytes[pc+1] << 8) | bytes[pc+2]));
+        stack.push((int16_t)((bytes[pc+1] << 8) | bytes[pc+2]));
         break;
       case 18: // ldc (0x12)
         index = bytes[pc+1];
@@ -164,12 +163,12 @@ int execute_static(
 
         if (gen32->tag == CONSTANT_INTEGER)
         {
-          stack->push(gen32->value);
+          stack.push(gen32->value);
         }
           else
         if (gen32->tag == CONSTANT_FLOAT)
         {
-          stack->push(gen32->value);
+          stack.push(gen32->value);
         }
           else
         if (gen32->tag == CONSTANT_STRING)
@@ -292,62 +291,62 @@ int execute_static(
         UNIMPL();
       case 79: // iastore (0x4f)
         CHECK_STACK(3);
-        value = stack->pop();
-        index = stack->pop();
+        value = stack.pop();
+        index = stack.pop();
         CHECK_BOUNDS();
         array[index] = value;
-        stack->pop();
+        stack.pop();
         break;
       case 80: // lastore (0x50)
         UNIMPL();
       case 81: // fastore (0x51)
         CHECK_STACK(3);
-        //value_float = stack->pop_float();
-        value = stack->pop();
+        //value_float = stack.pop_float();
+        value = stack.pop();
         //value_bin = (int32_t *)&value_float;
-        index = stack->pop();
+        index = stack.pop();
         CHECK_BOUNDS();
         //array[index] = *value_bin;
         array[index] = value;
-        stack->pop();
+        stack.pop();
         break;
       case 82: // dastore (0x52)
       case 83: // aastore (0x53)
         UNIMPL();
       case 84: // bastore (0x54)
         CHECK_STACK(3);
-        value = stack->pop();
-        index = stack->pop();
+        value = stack.pop();
+        index = stack.pop();
         CHECK_BOUNDS();
         array[index] = value;
         //stack_ptr -= 3;
-        stack->pop();
+        stack.pop();
         break;
       case 85: // castore (0x55)
         //UNIMPL();
         // This should be the same as sastore?  It's just unsigned.
       case 86: // sastore (0x56)
         CHECK_STACK(3);
-        value = stack->pop();
-        index = stack->pop();
+        value = stack.pop();
+        index = stack.pop();
         //printf("index=%d value=%d\n", index, stack_ptr-1);
         CHECK_BOUNDS();
         array[index] = value;
         //stack_ptr -= 3;
-        stack->pop();
+        stack.pop();
         break;
       case 87: // pop (0x57)
-        stack->pop();
+        stack.pop();
         break;
       case 88: // pop2 (0x58)
-        stack->pop();
-        stack->pop();
+        stack.pop();
+        stack.pop();
         break;
       case 89: // dup (0x59)
         CHECK_STACK(1)
-        temp = stack->pop();
-        stack->push(temp);
-        stack->push(temp);
+        temp = stack.pop();
+        stack.push(temp);
+        stack.push(temp);
         break;
       case 90: // dup_x1 (0x5a)
       case 91: // dup_x2 (0x5b)
@@ -445,7 +444,7 @@ int execute_static(
       case 179: // putstatic (0xb3)
         CHECK_STACK(1);
         index = (bytes[pc+1] << 8) | bytes[pc+2];
-        temp = stack->pop();
+        temp = stack.pop();
 
         DEBUG_PRINT("id=%d index=%d\n", temp, index);
 
@@ -567,9 +566,9 @@ int execute_static(
         UNIMPL()
       case 188: // newarray (0xbc)
         CHECK_STACK(1);
-        temp = stack->pop();
+        temp = stack.pop();
         array_len = temp;
-        stack->push(0); // FIXME - put the new array on the stack
+        stack.push(0); // FIXME - put the new array on the stack
         array_type = bytes[pc+1];
 
         DEBUG_PRINT("array_len=%d type=%d\n", array_len, array_type);
@@ -658,9 +657,9 @@ int execute_static(
     }
 
     if (ret != 0) { break; }
-    if (stack->length() < 0 || stack->length() > max_stack)
+    if (stack.length() < 0 || stack.length() > max_stack)
     {
-      printf("Stack error: stack_ptr=%d max_stack=%d\n", stack->length(), max_stack);
+      printf("Stack error: stack_ptr=%d max_stack=%d\n", stack.length(), max_stack);
       ret = -1;
       break;
     }
@@ -671,7 +670,7 @@ int execute_static(
     wide = 0;
   }
 
-  DEBUG_PRINT("stack->length()=%d after execute ends\n", stack->length());
+  DEBUG_PRINT("stack.length()=%d after execute ends\n", stack.length());
 
   // printf("EXIT pc=%d ret=%d code_len=%d\n", pc, ret, code_len);
   if (array != NULL) { free(array); }
