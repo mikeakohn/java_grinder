@@ -298,7 +298,7 @@ int JavaCompiler::optimize_const(
   switch (bytes[pc])
   {
     case 54: // istore (0x36)
-      if (generator->set_integer_local(bytes[pc+1], const_val) != 0)
+      if (generator->set_integer_local(bytes[pc + 1], const_val) != 0)
       { return 0; }
       return 2;
     case 59: // istore_0 (0x3b)
@@ -365,7 +365,7 @@ int JavaCompiler::optimize_const(
   }
 
   // istore wide
-  if (pc + 2 < pc_end && bytes[pc] == 0xc4 && bytes[pc+1] == 0x36)
+  if (pc + 2 < pc_end && bytes[pc] == 0xc4 && bytes[pc + 1] == 0x36)
   {
     if (generator->set_integer_local(GET_PC_UINT16(1), const_val) != 0)
     {
@@ -397,8 +397,9 @@ int JavaCompiler::optimize_const(
   // 07 (0x07) iconst_4
   // 08 (0x08) iconst_5
   if (pc + 3 < pc_end &&
-      bytes[pc] >= 0x02 && bytes[pc] <= 0x08 &&
-      bytes[pc+1] == 0xb8)
+      bytes[pc] >= 0x02 &&
+      bytes[pc] <= 0x08 &&
+      bytes[pc + 1] == 0xb8)
   {
     const_vals[0] = const_val;
     const_vals[1] = (int8_t)bytes[pc] - 3;
@@ -416,8 +417,8 @@ int JavaCompiler::optimize_const(
   // invokestatic with two const
   // 16 (0x10) bipush
   if (pc + 4 < pc_end &&
-      bytes[pc] == 0x10 &&
-      bytes[pc+2] == 0xb8)
+      bytes[pc + 0] == 0x10 &&
+      bytes[pc + 2] == 0xb8)
   {
     const_vals[0] = const_val;
     const_vals[1] = (int8_t)bytes[pc + 1];
@@ -492,7 +493,7 @@ int JavaCompiler::optimize_compare(JavaClass *java_class, std::string &method_na
       }
         else
       {
-        local_index = bytes[pc+1];
+        local_index = bytes[pc + 1];
         skip_bytes += 2;
       }
       if (local_index == index) { check_for_compare = true; }
@@ -760,14 +761,16 @@ int JavaCompiler::compile_method(
   }
 
   // bytes points to the method attributes info for the method.
-  max_stack = ((int)bytes[0]<<8) | ((int)bytes[1]);
-  max_locals = ((int)bytes[2]<<8) | ((int)bytes[3]);
-  code_len = ((int)bytes[4]<<24) |
-             ((int)bytes[5]<<16) |
-             ((int)bytes[6]<<8) |
+  max_stack  = ((int)bytes[0] << 8) | (int)bytes[1];
+  max_locals = ((int)bytes[2] << 8) | (int)bytes[3];
+
+  code_len = ((int)bytes[4] << 24) |
+             ((int)bytes[5] << 16) |
+             ((int)bytes[6] << 8) |
              ((int)bytes[7]);
-  pc_start = (((int)bytes[code_len+8]<<8) |
-             ((int)bytes[code_len+9])) + 8;
+
+  pc_start = (((int)bytes[code_len + 8] << 8) |
+              ((int)bytes[code_len + 9])) + 8;
   pc = pc_start;
 
   generator->method_start(max_locals, max_stack, param_count, method_name);
@@ -823,8 +826,16 @@ int JavaCompiler::compile_method(
       case 7: // iconst_4 (0x07)
       case 8: // iconst_5 (0x08)
         const_val = uint8_t(bytes[pc]) - 3;
-        ret = optimize_const(java_class, method_name, bytes, pc + 1,
-                             pc_start + code_len, address + 1, const_val);
+
+        ret = optimize_const(
+          java_class,
+          method_name,
+          bytes,
+          pc + 1,
+          pc_start + code_len,
+          address + 1,
+          const_val);
+
         if (ret == 0)
         {
           ret = generator->push_int(const_val);
@@ -862,9 +873,17 @@ int JavaCompiler::compile_method(
         break;
 
       case 16: // bipush (0x10)
-        const_val = (int8_t)bytes[pc+1];
-        ret = optimize_const(java_class, method_name, bytes, pc + 2,
-                             pc_start + code_len, address + 2, const_val);
+        const_val = (int8_t)bytes[pc + 1];
+
+        ret = optimize_const(
+          java_class,
+          method_name,
+          bytes,
+          pc + 2,
+          pc_start + code_len,
+          address + 2,
+          const_val);
+
         if (ret == 0)
         {
           ret = generator->push_int(const_val);
@@ -877,9 +896,17 @@ int JavaCompiler::compile_method(
         break;
 
       case 17: // sipush (0x11)
-        const_val = (int16_t)((bytes[pc+1]<<8)|(bytes[pc+2]));
-        ret = optimize_const(java_class, method_name, bytes, pc + 3,
-                             pc_start + code_len, address + 3, const_val);
+        const_val = (int16_t)((bytes[pc + 1] << 8) | bytes[pc + 2]);
+
+        ret = optimize_const(
+          java_class,
+          method_name,
+          bytes,
+          pc + 3,
+          pc_start + code_len,
+          address + 3,
+          const_val);
+
         if (ret == 0)
         {
           ret = generator->push_int(const_val);
@@ -892,7 +919,7 @@ int JavaCompiler::compile_method(
         break;
 
       case 18: // ldc (0x12)
-        index = bytes[pc+1];
+        index = bytes[pc + 1];
         instruction_length = 2;
       case 19: // ldc_w (0x13)
         if (bytes[pc] == 0x13)
@@ -908,9 +935,16 @@ int JavaCompiler::compile_method(
         if (gen32->tag == CONSTANT_INTEGER)
         {
           const_val = gen32->value;
-          ret = optimize_const(java_class, method_name, bytes,
-                               pc + instruction_length, pc_start + code_len,
-                               address + instruction_length, const_val);
+
+          ret = optimize_const(
+            java_class,
+            method_name,
+            bytes,
+            pc + instruction_length,
+            pc_start + code_len,
+            address + instruction_length,
+            const_val);
+
           if (ret == 0)
           {
             ret = generator->push_int(const_val);
@@ -933,24 +967,32 @@ int JavaCompiler::compile_method(
           constant_string_t *constant_string = (constant_string_t *)gen32;
           const_val = constant_string->string_index;
 
-printf("here\n");
           // I think this is wrong.. why use the index to the string?
 #if 0
-          ret = optimize_const(java_class, method_name, bytes,
-                               pc + instruction_length, pc_start + code_len,
-                               address + instruction_length, const_val);
+          ret = optimize_const(
+            java_class,
+            method_name,
+            bytes,
+            pc + instruction_length,
+            pc_start + code_len,
+            address + instruction_length,
+            const_val);
 
-          //if (ret == 0)
+          if (ret == 0)
 #endif
           {
             std::string data;
 
             java_class->get_name_constant(data, const_val);
 
-            ret = optimize_const(java_class, method_name, bytes,
-                                 pc + instruction_length,
-                                 pc_start + code_len,
-                                 address + instruction_length, data.c_str());
+            ret = optimize_const(
+              java_class,
+              method_name,
+              bytes,
+              pc + instruction_length,
+              pc_start + code_len,
+              address + instruction_length,
+              data.c_str());
           }
 
           if (ret == 0)
@@ -986,8 +1028,8 @@ printf("here\n");
         }
           else
         {
-          //PUSH_INTEGER(local_vars[bytes[pc+1]]);
-          ret = generator->push_local_var_int(bytes[pc+1]);
+          //PUSH_INTEGER(local_vars[bytes[pc + 1]]);
+          ret = generator->push_local_var_int(bytes[pc + 1]);
         }
         break;
 
@@ -1002,7 +1044,7 @@ printf("here\n");
         }
           else
         {
-          index = bytes[pc+1];
+          index = bytes[pc + 1];
         }
 
         ret = generator->push_local_var_float(index);
@@ -1019,7 +1061,7 @@ printf("here\n");
         }
           else
         {
-          index = bytes[pc+1];
+          index = bytes[pc + 1];
         }
 
         ret = generator->push_local_var_ref(index);
@@ -1124,7 +1166,7 @@ printf("here\n");
         }
           else
         {
-          ret = generator->pop_local_var_int(bytes[pc+1]);
+          ret = generator->pop_local_var_int(bytes[pc + 1]);
         }
 
         break;
@@ -1141,7 +1183,7 @@ printf("here\n");
         }
           else
         {
-          ret = generator->pop_local_var_float(bytes[pc+1]);
+          ret = generator->pop_local_var_float(bytes[pc + 1]);
         }
         break;
 
@@ -1156,7 +1198,7 @@ printf("here\n");
         }
           else
         {
-          index = bytes[pc+1];
+          index = bytes[pc + 1];
         }
 
         if (stack.length() == 0)
@@ -1177,12 +1219,12 @@ printf("here\n");
         // Pop integer off stack and store in local variable
         ret = generator->pop_local_var_int(bytes[pc]-59);
 
-        if (optimize == 1 && !needs_label(label_map, pc+1, pc_start) &&
-            bytes[pc+1] == 26 + (bytes[pc]-59))
+        if (optimize == 1 && !needs_label(label_map, pc + 1, pc_start) &&
+            bytes[pc + 1] == 26 + (bytes[pc]-59))
         {
           if (generator->push_fake() == 0)
           {
-            pc += table_java_instr[bytes[pc+1]].normal;
+            pc += table_java_instr[bytes[pc + 1]].normal;
           }
         }
 
@@ -1557,8 +1599,8 @@ printf("here\n");
         }
           else
         {
-          index = bytes[pc+1];
-          ret = generator->inc_integer(index, (int8_t)bytes[pc+2]);
+          index = bytes[pc + 1];
+          ret = generator->inc_integer(index, (int8_t)bytes[pc + 2]);
           instruction_length = table_java_instr[bytes[pc]].normal;
         }
 
@@ -1747,8 +1789,8 @@ printf("here\n");
         }
           else
         {
-          //pc = local_vars[bytes[pc+1]];
-          ret = generator->return_local(bytes[pc+1], max_locals);
+          //pc = local_vars[bytes[pc + 1]];
+          ret = generator->return_local(bytes[pc + 1], max_locals);
           pc += 2;
         }
 #endif
@@ -1944,7 +1986,7 @@ printf("here\n");
         break;
 
       case 188: // newarray (0xbc)
-        ret = generator->new_array(bytes[pc+1]);
+        ret = generator->new_array(bytes[pc + 1]);
         break;
 
       case 189: // anewarray (0xbd)
