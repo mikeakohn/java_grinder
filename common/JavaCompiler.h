@@ -21,9 +21,9 @@
 #include "generator/Generator.h"
 
 #define GET_PC_INT16(a) \
-  ((uint16_t) \
-    ((uint16_t)bytes[pc + a + 0]) << 8 | \
-     (uint16_t)bytes[pc + a + 1])
+  ((int16_t) \
+   (((uint16_t)bytes[pc + a + 0]) << 8 | \
+     (uint16_t)bytes[pc + a + 1]))
 
 #define GET_PC_UINT16(a) \
   (((uint16_t)bytes[pc + a + 0]) << 8 | \
@@ -31,10 +31,10 @@
 
 #define GET_PC_INT32(a) \
   ((int32_t) \
-   ((uint32_t)bytes[pc + a + 0]) << 24 | \
-   ((uint32_t)bytes[pc + a + 1]) << 16 |\
-   ((uint32_t)bytes[pc + a + 2]) << 8  |\
-    (uint32_t)bytes[pc + a + 3])
+   (((uint32_t)bytes[pc + a + 0]) << 24 | \
+    ((uint32_t)bytes[pc + a + 1]) << 16 |\
+    ((uint32_t)bytes[pc + a + 2]) << 8  |\
+     (uint32_t)bytes[pc + a + 3]))
 
 #define GET_PC_UINT32(a) \
   (((uint32_t)bytes[pc + a + 0]) << 24 | \
