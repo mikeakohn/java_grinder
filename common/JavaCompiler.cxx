@@ -299,14 +299,20 @@ int JavaCompiler::optimize_const(
   {
     case 54: // istore (0x36)
       if (generator->set_integer_local(bytes[pc + 1], const_val) != 0)
-      { return 0; }
+      {
+        return 0;
+      }
+
       return 2;
     case 59: // istore_0 (0x3b)
     case 60: // istore_1 (0x3c)
     case 61: // istore_2 (0x3d)
     case 62: // istore_3 (0x3e)
       if (generator->set_integer_local(bytes[pc] - 0x3b, const_val) != 0)
-      { return 0; }
+      {
+        return 0;
+      }
+
       return 1;
     case 96: // iadd (0x60)
       if (generator->add_integer(const_val) != 0) { return 0; }
@@ -353,7 +359,7 @@ int JavaCompiler::optimize_const(
 
       label = method_name + "_" + std::to_string(jump_to);
 
-      if (generator->jump_cond_integer(label, cond_table[bytes[pc]-159], const_val, calc_distance(bytes, pc, pc + byte_count)) == -1)
+      if (generator->jump_cond_integer(label, cond_table[bytes[pc] - 159], const_val, calc_distance(bytes, pc, pc + byte_count)) == -1)
       {
         return 0;
       }
@@ -967,8 +973,11 @@ int JavaCompiler::compile_method(
           constant_string_t *constant_string = (constant_string_t *)gen32;
           const_val = constant_string->string_index;
 
-          // I think this is wrong.. why use the index to the string?
-#if 0
+          // FIXME: I think this is wrong.. why use the index to the string?
+          // 2022-Jan-29: This appears to be fine and is needed for the
+          // CPU.asm(String code) feature. Not sure why I commented this out
+          // earlier.
+//#if 0
           ret = optimize_const(
             java_class,
             method_name,
@@ -979,7 +988,7 @@ int JavaCompiler::compile_method(
             const_val);
 
           if (ret == 0)
-#endif
+//#endif
           {
             std::string data;
 
