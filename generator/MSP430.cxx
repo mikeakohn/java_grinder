@@ -575,7 +575,8 @@ int MSP430::mod_integer()
 int MSP430::neg_integer()
 {
   fprintf(out, "  ;; neg_integer()\n");
-  fprintf(out, "  neg.w %s\n", top_reg());
+  fprintf(out, "  xor.w #0xffff, %s\n", top_reg());
+  fprintf(out, "  add.w #1, %s\n", top_reg());
   return 0;
 }
 
