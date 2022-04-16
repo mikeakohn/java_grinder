@@ -5,9 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn, Joe Davisson
- *
- * MCS-51 (8051) written by Joe Davisson
+ * Copyright 2014-2022 by Michael Kohn, Joe Davisson
  *
  */
 
@@ -18,15 +16,37 @@
 
 #include "generator/MCS51.h"
 
-#define REG_STACK(a) (a)
-#define LOCALS(i) (i * 2)
+#define REG_STACK_LO(a) (a * 2)
+#define REG_STACK_HI(a) ((a * 2) + 1)
+#define REG_ADDRESS_STACK_LO(a) ((a * 2) + 8)
+#define REG_ADDRESS_STACK_HI(a) (((a * 2) + 1) + 8)
+#define LOCALS_LO(a) (a * 2)
+#define LOCALS_HI(a) ((a * 2) + 1)
 
 // ABI is:
+// Bank 0:
+//  0x00 r0: temp pointer
+//  0x01 r1: temp pointer
+//  0x02 r2:
+//  0x03 r3:
+//  0x04 r4:
+//  0x05 r5:
+//  0x06 r6: frame pointer
+//  0x07 r7: global pointer
+// Bank 1:
+//  0x08 r0: top of java stack
+//  0x09 r1:
+//  0x0a r2:
+//  0x0b r3:
+//  0x0c r4:
+//  0x0d r5:
+//  0x0e r6:
+//  0x0f r7: bottom of java stack
+// SP = 0x10 to 0xff
 
 MCS51::MCS51() :
   reg(0),
-  reg_max(9),
-  stack(0),
+  reg_max(4),
   is_main(0)
 {
 
@@ -58,7 +78,6 @@ int MCS51::start_init()
   // Add any set up items (stack, registers, etc).
   fprintf(out, ".org 0x0000\n");
   fprintf(out, "start:\n");
-  fprintf(out, "  mov SP,#0x20\n");
 
   return 0;
 }
@@ -75,6 +94,9 @@ int MCS51::init_heap(int field_count)
 {
   fprintf(out, "  ;; Set up heap and static initializers\n");
   //fprintf(out, "  mov #ram_start+%d, &ram_start\n", (field_count + 1) * 2);
+
+  fprintf(out, "  mov SP, #0x10\n");
+  fprintf(out, "  mov r7, #0x10\n");
 
   return -1;
 }
@@ -95,8 +117,6 @@ void MCS51::method_start(
   int param_count,
   std::string &name)
 {
-  stack = 0;
-
   is_main = name == "main";
 
   fprintf(out, "%s:\n", name.c_str());
@@ -104,15 +124,12 @@ void MCS51::method_start(
   // main() function goes here
   if (!is_main)
   {
-    fprintf(out, "  push 0x00\n");
-    fprintf(out, "  clr A\n");
-    fprintf(out, "  push ACC\n");
+    fprintf(out, "  push 6");
   }
-
-  fprintf(out, "  mov locals,SP\n");
-  fprintf(out, "  mov A,SP\n");
-  fprintf(out, "  add A,#0x%02x\n", local_count * 2);
-  fprintf(out, "  mov SP,A\n");
+    else
+  {
+    fprintf(out, "  mov r6, SP\n");
+  }
 }
 
 void MCS51::method_end(int local_count)
@@ -123,15 +140,29 @@ void MCS51::method_end(int local_count)
 int MCS51::push_local_var_int(int index)
 {
   fprintf(out, "; push_local_var_int\n");
-  fprintf(out, "  mov A,locals\n");
-  fprintf(out, "  add A,%d\n", LOCALS(index));
-  fprintf(out, "  mov r1,A\n");
-  fprintf(out, "  mov A,@r1\n");
-  fprintf(out, "  push ACC\n");
-  fprintf(out, "  inc r1\n");
-  fprintf(out, "  mov A,@r1\n");
-  fprintf(out, "  push ACC\n");
-  stack++;
+
+  if (index == 0)
+  {
+    fprintf(out,
+      "  mov r0, r7\n"
+      "  mov %d, @r0\n"
+      "  inc r0\n"
+      "  mov %d, @r0\n",
+      REG_ADDRESS_STACK_LO(reg),
+      REG_ADDRESS_STACK_HI(reg));
+  }
+    else
+  {
+    fprintf(out,
+      "  mov A, r0\n"
+      "  add A, #4\n"
+      "  mov r0, A\n"
+      "  mov %d, @r0\n"
+      "  inc r0\n"
+      "  mov %d, @r0\n",
+      REG_ADDRESS_STACK_LO(reg),
+      REG_ADDRESS_STACK_HI(reg));
+  }
 
   return 0;
 }
@@ -156,18 +187,19 @@ int MCS51::push_int(int32_t n)
   if (n > 65535 || n < -32768)
   {
     printf("Error: literal value %d bigger than 16 bit.\n", n);
-
     return -1;
   }
 
   uint16_t value = (n & 0xffff);
 
-  fprintf(out, "; push_int\n");
-  fprintf(out, "  mov A,#0x%02x\n", value & 0xff);
-  fprintf(out, "  push ACC\n");
-  fprintf(out, "  mov A,#0x%02x\n", value  >> 8);
-  fprintf(out, "  push ACC\n");
-  stack++;
+  fprintf(out,
+    "; push_int\n"
+    "  mov %d, #0x%02x\n"
+    "  mov %d, #0x%02x\n",
+    REG_ADDRESS_STACK_LO(reg), value & 0xff,
+    REG_ADDRESS_STACK_HI(reg), value >> 8);
+
+  reg++;
 
   return 0;
 }
@@ -199,17 +231,6 @@ int MCS51::pop_local_var_int(int index)
 {
   fprintf(out, "; pop_local_var_int\n");
 
-  fprintf(out, "  pop 0x05\n");
-  fprintf(out, "  pop 0x04\n");
-
-  fprintf(out, "  mov A,locals\n");
-  fprintf(out, "  add A,%d\n", LOCALS(index));
-  fprintf(out, "  mov r1,A\n");
-  fprintf(out, "  mov @r1,0x04\n");
-  fprintf(out, "  inc r1\n");
-  fprintf(out, "  mov @r1,0x05\n");
-  stack--;
-
   return 0;
 }
 
@@ -225,7 +246,16 @@ int MCS51::pop()
 
 int MCS51::dup()
 {
-  return -1;
+  fprintf(out,
+    "  ;; dup\n"
+    "  mov %d, %d\n"
+    "  mov %d, %d\n",
+    REG_ADDRESS_STACK_LO(reg), REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg), REG_ADDRESS_STACK_HI(reg - 1));
+
+  reg++;
+
+  return 0;
 }
 
 int MCS51::dup2()
@@ -235,17 +265,77 @@ int MCS51::dup2()
 
 int MCS51::swap()
 {
-  return -1;
+  fprintf(out,
+    "  ;; dup\n"
+    "  mov r0, %d\n"
+    "  mov r1, %d\n"
+    "  mov %d, %d\n"
+    "  mov %d, %d\n"
+    "  mov %d, r0\n"
+    "  mov %d, r1\n",
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1),
+    REG_ADDRESS_STACK_LO(reg - 1), REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 1), REG_ADDRESS_STACK_HI(reg - 2),
+    REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 2));
+
+  return 0;
 }
 
 int MCS51::add_integer()
 {
-  return -1;
+  fprintf(out,
+    "  ;; add_integer()\n"
+    "  setb PSW.3\n"
+    "  mov A, r%d\n"
+    "  add A, r%d\n"
+    "  mov r%d, A\n"
+    "  mov A, r%d\n"
+    "  addc A, r%d\n"
+    "  mov r%d, A\n"
+    "  clr PSW.3\n",
+    REG_STACK_LO(reg - 1),
+    REG_STACK_LO(reg - 2),
+    REG_STACK_LO(reg - 2),
+    REG_STACK_HI(reg - 1),
+    REG_STACK_HI(reg - 2),
+    REG_STACK_HI(reg - 2));
+
+  reg--;
+
+  return 0;
 }
 
 int MCS51::add_integer(int num)
 {
-  return -1;
+  if (num > 65535 || num < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", num);
+    return -1;
+  }
+
+  uint16_t value = (num & 0xffff);
+
+  fprintf(out,
+    "  ;; add_integer(%d)\n"
+    "  setb PSW.3\n"
+    "  mov A, r%d\n"
+    "  add A, #0x%02x\n"
+    "  mov r%d, A\n"
+    "  mov A, r%d\n"
+    "  addc A, #0x%02x\n"
+    "  mov r%d, A\n"
+    "  clr PSW.3\n",
+    num,
+    REG_STACK_LO(reg - 1),
+    value & 0xff,
+    REG_STACK_LO(reg - 1),
+    REG_STACK_HI(reg - 1),
+    value >> 8,
+    REG_STACK_HI(reg - 1));
+
+  return 0;
 }
 
 int MCS51::sub_integer()

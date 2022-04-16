@@ -5,14 +5,12 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn, Joe Davisson
- *
- * MCS-51 (8051) written by Joe Davisson
+ * Copyright 2014-2022 by Michael Kohn, Joe Davisson
  *
  */
 
-#ifndef JAVA_GRINDER_GENERATOR_TEMPLATE_H
-#define JAVA_GRINDER_GENERATOR_TEMPLATE_H
+#ifndef JAVA_GRINDER_GENERATOR_MCS51_H
+#define JAVA_GRINDER_GENERATOR_MCS51_H
 
 #include "generator/Generator.h"
 
@@ -104,7 +102,6 @@ protected:
 
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 
-  int stack;          // count how many things we put on the stack
   bool is_main : 1;
 };
 
