@@ -44,6 +44,7 @@
 #include "generator/SegaDreamcast.h"
 #include "generator/SegaGenesis.h"
 #include "generator/SNES.h"
+#include "generator/SleepyBee.h"
 #include "generator/STDC.h"
 #include "generator/TI84.h"
 #include "generator/TI99.h"
@@ -232,6 +233,11 @@ static Generator *new_generator(const char *chip_type)
     generator = new SegaGenesis();
   }
     else
+  if (strcasecmp("sleepy_bee", chip_type) == 0)
+  {
+    generator = new SleepyBee();
+  }
+    else
   if (strcasecmp("snes", chip_type) == 0)
   {
     generator = new SNES();
@@ -328,7 +334,7 @@ int main(int argc, char *argv[])
            "     -v verbose output\n"
            "     -O0 turn off optimizer\n"
            "   platforms:\n"
-           "     8051\n"
+           "     8051, sleepy_bee\n"
            "     amiga\n"
            "     appleiigs\n"
            "     attiny2313, atmega328, atmega328p, attiny85, attiny84, attiny13,\n"

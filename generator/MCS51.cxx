@@ -16,10 +16,6 @@
 
 #include "generator/MCS51.h"
 
-#define REG_STACK_LO(a) (a * 2)
-#define REG_STACK_HI(a) ((a * 2) + 1)
-#define REG_ADDRESS_STACK_LO(a) ((a * 2) + 8)
-#define REG_ADDRESS_STACK_HI(a) (((a * 2) + 1) + 8)
 #define LOCALS_LO(a) (a * 2)
 #define LOCALS_HI(a) ((a * 2) + 1)
 
@@ -445,11 +441,94 @@ int MCS51::integer_to_short()
 
 int MCS51::jump_cond(std::string &label, int cond, int distance)
 {
+  fprintf(out, "  ; jump_cond(%s, %d, %d)\n", label.c_str(), cond, distance);
+
+  switch(cond)
+  {
+    case COND_EQUAL:
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
+      fprintf(out, "  orl A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
+      fprintf(out, "  jz %s\n", label.c_str());
+      reg--;
+      return 0;
+    case COND_NOT_EQUAL:
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
+      fprintf(out, "  orl A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
+      fprintf(out, "  jnz %s\n", label.c_str());
+      reg--;
+      return 0;
+    case COND_LESS:
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
+      fprintf(out, "  anl A, #0x80\n");
+      fprintf(out, "  jnz %s\n", label.c_str());
+      reg -= 1;
+      return 0;
+    case COND_LESS_EQUAL:
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
+      fprintf(out, "  anl A, #0x80\n");
+      fprintf(out, "  jnz %s\n", label.c_str());
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
+      fprintf(out, "  orl A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
+      fprintf(out, "  jz %s\n", label.c_str());
+      reg -= 1;
+      return 0;
+    case COND_GREATER:
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
+      fprintf(out, "  orl A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
+      fprintf(out, "  jz label_%d\n", label_count);
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
+      fprintf(out, "  anl A, #0x80\n");
+      fprintf(out, "  jz %s\n", label.c_str());
+      fprintf(out, "label_%d:\n",label_count);
+      label_count++;
+      reg -= 1;
+      return 0;
+    case COND_GREATER_EQUAL:
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
+      fprintf(out, "  anl A, #0x80\n");
+      fprintf(out, "  jz %s\n", label.c_str());
+      reg -= 1;
+      return 0;
+    default:
+      break;
+  }
+
   return -1;
 }
 
 int MCS51::jump_cond_integer(std::string &label, int cond, int distance)
 {
+  fprintf(out, "  ; jump_cond_integer(%s, %d, %d)\n", label.c_str(), cond, distance);
+
+  switch (cond)
+  {
+    case COND_EQUAL:
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
+      fprintf(out, "  xrl A, %d\n", REG_ADDRESS_STACK_LO(reg - 2));
+      fprintf(out, "  mov r2, A\n");
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
+      fprintf(out, "  xrl A, %d\n", REG_ADDRESS_STACK_HI(reg - 2));
+      fprintf(out, "  orl A, r2\n");
+      fprintf(out, "  jz %s\n", label.c_str());
+      reg -= 2;
+      return 0;
+    case COND_NOT_EQUAL:
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
+      fprintf(out, "  xrl A, %d\n", REG_ADDRESS_STACK_LO(reg - 2));
+      fprintf(out, "  jnz %s\n", label.c_str());
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
+      fprintf(out, "  xrl A, %d\n", REG_ADDRESS_STACK_HI(reg - 2));
+      fprintf(out, "  jnz %s\n", label.c_str());
+      reg -= 2;
+      return 0;
+    case COND_LESS:
+    case COND_LESS_EQUAL:
+    case COND_GREATER:
+    case COND_GREATER_EQUAL:
+    default:
+      break;
+  }
+
   return -1;
 }
 
@@ -615,5 +694,199 @@ int MCS51::array_write_short(std::string &name, int field_id)
 int MCS51::array_write_int(std::string &name, int field_id)
 {
   return -1;
+}
+
+int MCS51::ioport_setPinsValue_I(int port)
+{
+  fprintf(out,
+    "  ;; ioport_setPinsValue_I(%d)\n"
+    "  mov A, %d\n"
+    "  mov P%d, A\n",
+    port,
+    REG_ADDRESS_STACK_LO(--reg),
+    port);
+
+  return 0;
+}
+
+int MCS51::ioport_setPinsValue_I(int port, int const_val)
+{
+  fprintf(out,
+    "  ;; ioport_setPinsValue_I(%d, 0x%02x)\n"
+    "  mov P%d, 0x%02x\n",
+    port, const_val,
+    port, const_val);
+
+  return 0;
+}
+
+int MCS51::ioport_setPinsHigh_I(int port)
+{
+  fprintf(out,
+    "  ;; ioport_setPinsHigh_I(%d)\n"
+    "  mov A, %d\n"
+    "  orl P%d, A\n",
+    port,
+    REG_ADDRESS_STACK_LO(--reg),
+    port);
+
+  return 0;
+}
+
+int MCS51::ioport_setPinsLow_I(int port)
+{
+  fprintf(out,
+    "  ;; ioport_setPinsLow_I(%d)\n"
+    "  mov A, %d\n"
+    "  cpl A\n"
+    "  anl P%d, A\n",
+    port,
+    REG_ADDRESS_STACK_LO(--reg),
+    port);
+
+  return 0;
+}
+
+int MCS51::ioport_setPinHigh_I(int port)
+{
+  fprintf(out,
+    "  ;; ioport_setPinHigh_I(%d)\n"
+    "  mov A, 0\n"
+    "  setb C\n"
+    "label_%d:\n"
+    "  rlc\n"
+    "  djnz %d, label_%d\n"
+    "  orl P%d, A\n",
+    port,
+    label_count,
+    REG_ADDRESS_STACK_LO(--reg), label_count,
+    port);
+
+  label_count++;
+
+  return 0;
+}
+
+int MCS51::ioport_setPinHigh_I(int port, int const_val)
+{
+#if 0
+  fprintf(out,
+    "  ;; ioport_setPinHigh_I(%d, %d)\n"
+    "  mov r2, %d\n"
+    "  mov A, 0\n"
+    "  setb C\n"
+    "label_%d:\n"
+    "  rlc\n"
+    "  djnz r2, label_%d\n"
+    "  orl P%d, A\n",
+    port, const_val,
+    const_val,
+    label_count,
+    label_count,
+    port);
+
+  label_count++;
+#endif
+
+  fprintf(out,
+    "  ;; ioport_setPinHigh_I(%d, %d)\n"
+    "  setb P%d.%d\n",
+    port, const_val,
+    port, const_val);
+
+  return 0;
+}
+
+int MCS51::ioport_setPinLow_I(int port)
+{
+  fprintf(out,
+    "  ;; ioport_setPinLow_I(%d)\n"
+    "  mov A, 0\n"
+    "  setb C\n"
+    "label_%d:\n"
+    "  rlc\n"
+    "  djnz %d, label_%d\n"
+    "  cpl A\n"
+    "  anl P%d, A\n",
+    port,
+    label_count,
+    REG_ADDRESS_STACK_LO(--reg), label_count,
+    port);
+
+  label_count++;
+
+  return 0;
+}
+
+int MCS51::ioport_setPinLow_I(int port, int const_val)
+{
+#if 0
+  fprintf(out,
+    "  ;; ioport_setPinLow_I(%d, %d)\n"
+    "  mov r2, %d\n"
+    "  mov A, 0\n"
+    "  setb C\n"
+    "label_%d:\n"
+    "  rlc\n"
+    "  djnz r2, label_%d\n"
+    "  cpl A\n"
+    "  anl P%d, A\n",
+    port, const_val,
+    const_val,
+    label_count,
+    label_count,
+    port);
+
+  label_count++;
+#endif
+
+  fprintf(out,
+    "  ;; ioport_setPinLow_I(%d, %d)\n"
+    "  clr P%d.%d\n",
+    port, const_val,
+    port, const_val);
+
+  return 0;
+}
+
+int MCS51::ioport_isPinInputHigh_I(int port)
+{
+  fprintf(out,
+    "  ;; ioport_isPinInputHigh_I(%d)\n"
+    "  mov %d, #0\n"
+    "  mov %d, #0\n"
+    "  mov A, P%d\n"
+    "label_%d:\n"
+    "  rrc A\n"
+    "  djnz %d, label_%d\n"
+    "  rlc A\n"
+    "  anl A, #1\n"
+    "  mov %d, A\n",
+    port,
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1),
+    port,
+    label_count,
+    REG_ADDRESS_STACK_LO(reg - 1), label_count,
+    REG_ADDRESS_STACK_LO(reg - 1));
+
+   reg++;
+
+  return 0;
+}
+
+int MCS51::ioport_getPortInputValue(int port)
+{
+  fprintf(out,
+    "  ;; ioport_getPortInputValue(%d)\n"
+    "  mov %d, P%d\n"
+    "  mov %d, #0\n",
+    port,
+    REG_ADDRESS_STACK_LO(reg - 1), port,
+    REG_ADDRESS_STACK_HI(reg - 1));
+
+  reg++;
+
+  return 0;
 }
 

@@ -14,6 +14,11 @@
 
 #include "generator/Generator.h"
 
+#define REG_STACK_LO(a) (a * 2)
+#define REG_STACK_HI(a) ((a * 2) + 1)
+#define REG_ADDRESS_STACK_LO(a) ((a * 2) + 8)
+#define REG_ADDRESS_STACK_HI(a) (((a * 2) + 1) + 8)
+
 class MCS51 : public Generator
 {
 public:
@@ -96,6 +101,18 @@ public:
   virtual int array_write_byte(std::string &name, int field_id);
   virtual int array_write_short(std::string &name, int field_id);
   virtual int array_write_int(std::string &name, int field_id);
+
+  // GPIO methods.
+  virtual int ioport_setPinsValue_I(int port);
+  virtual int ioport_setPinsValue_I(int port, int const_val);
+  virtual int ioport_setPinsHigh_I(int port);
+  virtual int ioport_setPinsLow_I(int port);
+  virtual int ioport_setPinHigh_I(int port);
+  virtual int ioport_setPinHigh_I(int port, int const_val);
+  virtual int ioport_setPinLow_I(int port);
+  virtual int ioport_setPinLow_I(int port, int const_val);
+  virtual int ioport_isPinInputHigh_I(int port);
+  virtual int ioport_getPortInputValue(int port);
 
 protected:
   virtual int get_int_size() { return 2; }

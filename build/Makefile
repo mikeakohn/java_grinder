@@ -91,6 +91,7 @@ SYSTEMS= \
   generator/SegaDreamcast.o \
   generator/SegaGenesis.o \
   generator/SNES.o \
+  generator/SleepyBee.o \
   generator/TI84.o \
   generator/TI99.o \
   generator/TRS80Coco.o \
