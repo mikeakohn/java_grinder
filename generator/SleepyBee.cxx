@@ -30,6 +30,18 @@ int SleepyBee::open(const char *filename)
   return 0;
 }
 
+int SleepyBee::start_init()
+{
+  MCS51::start_init();
+
+  fprintf(out,
+    "  ;; Disable watchdog.\n"
+    "  anl 0xd9, #0xbf\n"
+    "  mov 0xd9, A\n\n");
+
+  return 0;
+}
+
 int SleepyBee::ioport_setPinsAsInput_I(int port)
 {
   fprintf(out,
@@ -73,6 +85,9 @@ int SleepyBee::ioport_setPinsAsOutput_I(int port)
 
 int SleepyBee::ioport_setPinsAsOutput_I(int port, int const_val)
 {
+  // FIXME: How to take care of XBR1.
+  fprintf(out, "  mov 0xe3, #0x40\n");
+
   fprintf(out,
     "  ;; ioport_setPinsAsOutput_I(%d)\n"
     "  mov A, #0x%02x\n"

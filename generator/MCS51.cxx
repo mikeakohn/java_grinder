@@ -145,12 +145,12 @@ int MCS51::push_local_var_int(int index)
 
   if (index == 0)
   {
-    fprintf(out, "  mov r0, r7\n");
+    fprintf(out, "  mov r0, r6\n");
   }
     else
   {
     fprintf(out,
-      "  mov A, r0\n"
+      "  mov A, r6\n"
       "  add A, #%d\n"
       "  mov r0, A\n",
       index * 2);
@@ -234,13 +234,12 @@ int MCS51::pop_local_var_int(int index)
 
   if (index == 0)
   {
-    fprintf(out, "  mov r0, r7\n");
-
+    fprintf(out, "  mov r0, r6\n");
   }
     else
   {
     fprintf(out,
-      "  mov A, r0\n"
+      "  mov A, r6\n"
       "  add A, #%d\n"
       "  mov r0, A\n",
       index * 2);
@@ -519,11 +518,11 @@ int MCS51::inc_integer(int index, int num)
 
   fprintf(out,
     "  mov A, @r0\n"
-    "  add A, %d\n"
+    "  add A, #%d\n"
     "  mov @r0, A\n"
     "  inc r0\n"
     "  mov A, @r0\n"
-    "  addc A, %d\n"
+    "  addc A, #%d\n"
     "  mov @r0, A\n",
     value & 0xff,
     value >> 8);

@@ -21,6 +21,7 @@ public:
   virtual ~SleepyBee();
 
   virtual int open(const char *filename);
+  virtual int start_init();
 
   // GPIO methods.
   virtual int ioport_setPinsAsInput_I(int port);
