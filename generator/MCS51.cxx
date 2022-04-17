@@ -88,7 +88,7 @@ int MCS51::insert_static_field_define(
 
 int MCS51::init_heap(int field_count)
 {
-  fprintf(out, "  ;; Set up heap and static initializers\n");
+  fprintf(out, "  ;; Setup heap and static initializers\n");
   //fprintf(out, "  mov #ram_start+%d, &ram_start\n", (field_count + 1) * 2);
 
   fprintf(out, "  mov SP, #0x10\n");
@@ -126,6 +126,12 @@ void MCS51::method_start(
   {
     fprintf(out, "  mov r6, SP\n");
   }
+
+  fprintf(out,
+    "  mov A, SP\n"
+    "  add A, #%d\n"
+    "  mov SP, A\n",
+    local_count * 2);
 }
 
 void MCS51::method_end(int local_count)
@@ -135,30 +141,29 @@ void MCS51::method_end(int local_count)
 
 int MCS51::push_local_var_int(int index)
 {
-  fprintf(out, "; push_local_var_int\n");
+  fprintf(out, "  ;; push_local_var_int\n");
 
   if (index == 0)
   {
-    fprintf(out,
-      "  mov r0, r7\n"
-      "  mov %d, @r0\n"
-      "  inc r0\n"
-      "  mov %d, @r0\n",
-      REG_ADDRESS_STACK_LO(reg),
-      REG_ADDRESS_STACK_HI(reg));
+    fprintf(out, "  mov r0, r7\n");
   }
     else
   {
     fprintf(out,
       "  mov A, r0\n"
-      "  add A, #4\n"
-      "  mov r0, A\n"
+      "  add A, #%d\n"
+      "  mov r0, A\n",
+      index * 2);
+  }
+
+  fprintf(out,
       "  mov %d, @r0\n"
       "  inc r0\n"
       "  mov %d, @r0\n",
       REG_ADDRESS_STACK_LO(reg),
       REG_ADDRESS_STACK_HI(reg));
-  }
+
+  reg += 1;
 
   return 0;
 }
@@ -189,7 +194,7 @@ int MCS51::push_int(int32_t n)
   uint16_t value = (n & 0xffff);
 
   fprintf(out,
-    "; push_int\n"
+    "  ;; push_int\n"
     "  mov %d, #0x%02x\n"
     "  mov %d, #0x%02x\n",
     REG_ADDRESS_STACK_LO(reg), value & 0xff,
@@ -225,7 +230,30 @@ int MCS51::push_ref(std::string &name)
 
 int MCS51::pop_local_var_int(int index)
 {
-  fprintf(out, "; pop_local_var_int\n");
+  fprintf(out, "  ;; pop_local_var_int\n");
+
+  if (index == 0)
+  {
+    fprintf(out, "  mov r0, r7\n");
+
+  }
+    else
+  {
+    fprintf(out,
+      "  mov A, r0\n"
+      "  add A, #%d\n"
+      "  mov r0, A\n",
+      index * 2);
+  }
+
+  fprintf(out,
+    "  mov @r0, %d\n"
+    "  inc r0\n"
+    "  mov @r0, %d\n",
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1));
+
+  reg -= 1;
 
   return 0;
 }
@@ -336,12 +364,52 @@ int MCS51::add_integer(int num)
 
 int MCS51::sub_integer()
 {
-  return -1;
+  fprintf(out,
+    "  ;; sub_integer()\n"
+    "  mov A, %d\n"
+    "  clr C\n"
+    "  subb A, %d\n"
+    "  mov %d, A\n"
+    "  mov A, %d\n"
+    "  subb A, %d\n"
+    "  mov %d, A\n",
+    REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 2));
+
+  return 0;
 }
 
 int MCS51::sub_integer(int num)
 {
-  return -1;
+  if (num > 65535 || num < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", num);
+    return -1;
+  }
+
+  uint16_t value = (num & 0xffff);
+
+  fprintf(out,
+    "  ;; sub_integer()\n"
+    "  mov A, %d\n"
+    "  clr C\n"
+    "  subb A, %d\n"
+    "  mov %d, A\n"
+    "  mov A, %d\n"
+    "  subb A, %d\n"
+    "  mov %d, A\n",
+    REG_ADDRESS_STACK_LO(reg - 1),
+    value & 0xff,
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1),
+    value >> 8,
+    REG_ADDRESS_STACK_HI(reg - 1));
+
+  return 0;
 }
 
 int MCS51::mul_integer()
@@ -426,7 +494,41 @@ int MCS51::xor_integer(int num)
 
 int MCS51::inc_integer(int index, int num)
 {
-  return -1;
+  if (num > 65535 || num < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", num);
+    return -1;
+  }
+
+  uint16_t value = (num & 0xffff);
+
+  fprintf(out, "  ;; inc_integer(index=%d, num=%d)\n", index, num);
+
+  if (index == 0)
+  {
+    fprintf(out, "  mov r0, r6\n");
+  }
+    else
+  {
+    fprintf(out,
+      "  mov A, r6\n"
+      "  add A, #%d\n"
+      "  mov r0, A\n",
+      index * 2);
+  }
+
+  fprintf(out,
+    "  mov A, @r0\n"
+    "  add A, %d\n"
+    "  mov @r0, A\n"
+    "  inc r0\n"
+    "  mov A, @r0\n"
+    "  addc A, %d\n"
+    "  mov @r0, A\n",
+    value & 0xff,
+    value >> 8);
+
+  return 0;
 }
 
 int MCS51::integer_to_byte()
@@ -522,9 +624,32 @@ int MCS51::jump_cond_integer(std::string &label, int cond, int distance)
       reg -= 2;
       return 0;
     case COND_LESS:
+      return -1;
     case COND_LESS_EQUAL:
+      return -1;
     case COND_GREATER:
+      return -1;
     case COND_GREATER_EQUAL:
+      // 0000 0000    N________ xor PSW.2
+      // 1000 0000
+      // 0000 0100
+      // 1000 0100
+      fprintf(out, "  clr C\n");
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 2));
+      fprintf(out, "  subb A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
+      fprintf(out, "  mov r2, A\n");
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 2));
+      fprintf(out, "  subb A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
+      fprintf(out, "  swap A\n");
+      fprintf(out, "  rr A\n");
+      fprintf(out, "  anl A, 0x04\n");
+      fprintf(out, "  mov r3, A\n");
+      fprintf(out, "  mov A, PSW\n");
+      fprintf(out, "  anl A, 0x04\n");
+      fprintf(out, "  xrl A, r3\n");
+      fprintf(out, "  jz %s\n", label.c_str());
+      reg -= 2;
+      return 0;
     default:
       break;
   }
@@ -568,7 +693,10 @@ int MCS51::return_void(int local_count)
 
 int MCS51::jump(std::string &name, int distance)
 {
-  return -1;
+  fprintf(out, "  ;; jump(%s, %d)\n", name.c_str(), distance);
+  fprintf(out, "  ljmp %s\n", name.c_str());
+
+  return 0;
 }
 
 int MCS51::call(std::string &name)

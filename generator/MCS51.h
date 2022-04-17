@@ -14,10 +14,10 @@
 
 #include "generator/Generator.h"
 
-#define REG_STACK_LO(a) (a * 2)
-#define REG_STACK_HI(a) ((a * 2) + 1)
-#define REG_ADDRESS_STACK_LO(a) ((a * 2) + 8)
-#define REG_ADDRESS_STACK_HI(a) (((a * 2) + 1) + 8)
+#define REG_STACK_LO(a) ((a) * 2)
+#define REG_STACK_HI(a) (((a) * 2) + 1)
+#define REG_ADDRESS_STACK_LO(a) (((a) * 2) + 8)
+#define REG_ADDRESS_STACK_HI(a) ((((a) * 2) + 1) + 8)
 
 class MCS51 : public Generator
 {
