@@ -141,7 +141,7 @@ void MCS51::method_end(int local_count)
 
 int MCS51::push_local_var_int(int index)
 {
-  fprintf(out, "  ;; push_local_var_int\n");
+  fprintf(out, "  ;; push_local_var_int(index=%d)\n", index);
 
   if (index == 0)
   {
@@ -194,9 +194,10 @@ int MCS51::push_int(int32_t n)
   uint16_t value = (n & 0xffff);
 
   fprintf(out,
-    "  ;; push_int\n"
+    "  ;; push_int(%d)\n"
     "  mov %d, #0x%02x\n"
     "  mov %d, #0x%02x\n",
+    n,
     REG_ADDRESS_STACK_LO(reg), value & 0xff,
     REG_ADDRESS_STACK_HI(reg), value >> 8);
 
@@ -230,7 +231,7 @@ int MCS51::push_ref(std::string &name)
 
 int MCS51::pop_local_var_int(int index)
 {
-  fprintf(out, "  ;; pop_local_var_int\n");
+  fprintf(out, "  ;; pop_local_var_int(index=%d)\n", index);
 
   if (index == 0)
   {
@@ -542,64 +543,68 @@ int MCS51::integer_to_short()
 
 int MCS51::jump_cond(std::string &label, int cond, int distance)
 {
-  fprintf(out, "  ; jump_cond(%s, %d, %d)\n", label.c_str(), cond, distance);
+  fprintf(out, "  ;; jump_cond(%s, %d, %d)\n", label.c_str(), cond, distance);
 
   switch(cond)
   {
     case COND_EQUAL:
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
       fprintf(out, "  orl A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
-      fprintf(out, "  jz %s\n", label.c_str());
+      fprintf(out, "  jnz label_%d\n", label_count);
       reg--;
-      return 0;
+      break;
     case COND_NOT_EQUAL:
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
       fprintf(out, "  orl A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
-      fprintf(out, "  jnz %s\n", label.c_str());
+      fprintf(out, "  jz label_%d\n", label_count);
       reg--;
-      return 0;
+      break;
     case COND_LESS:
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
       fprintf(out, "  anl A, #0x80\n");
-      fprintf(out, "  jnz %s\n", label.c_str());
+      fprintf(out, "  jz label_%d\n", label_count);
       reg -= 1;
-      return 0;
+      break;
     case COND_LESS_EQUAL:
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
       fprintf(out, "  anl A, #0x80\n");
-      fprintf(out, "  jnz %s\n", label.c_str());
+      fprintf(out, "  jz label_%d\n", label_count);
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
       fprintf(out, "  orl A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
-      fprintf(out, "  jz %s\n", label.c_str());
+      fprintf(out, "  jnz label_%d\n", label_count);
       reg -= 1;
-      return 0;
+      break;
     case COND_GREATER:
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
       fprintf(out, "  orl A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
       fprintf(out, "  jz label_%d\n", label_count);
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
       fprintf(out, "  anl A, #0x80\n");
-      fprintf(out, "  jz %s\n", label.c_str());
-      fprintf(out, "label_%d:\n",label_count);
-      label_count++;
+      fprintf(out, "  jnz label_%d\n", label_count);
       reg -= 1;
-      return 0;
+      break;
     case COND_GREATER_EQUAL:
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
       fprintf(out, "  anl A, #0x80\n");
-      fprintf(out, "  jz %s\n", label.c_str());
+      fprintf(out, "  jnz label_%d\n", label_count);
       reg -= 1;
-      return 0;
-    default:
       break;
+    default:
+      return -1;
   }
 
-  return -1;
+  fprintf(out,
+    "  ljmp %s\n"
+    "label_%d:\n",
+    label.c_str(),
+    label_count++);
+
+  return 0;
 }
 
 int MCS51::jump_cond_integer(std::string &label, int cond, int distance)
 {
-  fprintf(out, "  ; jump_cond_integer(%s, %d, %d)\n", label.c_str(), cond, distance);
+  fprintf(out, "  ;; jump_cond_integer(%s, %d, %d)\n", label.c_str(), cond, distance);
 
   switch (cond)
   {
@@ -610,18 +615,18 @@ int MCS51::jump_cond_integer(std::string &label, int cond, int distance)
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
       fprintf(out, "  xrl A, %d\n", REG_ADDRESS_STACK_HI(reg - 2));
       fprintf(out, "  orl A, r2\n");
-      fprintf(out, "  jz %s\n", label.c_str());
+      fprintf(out, "  jnz label_%d\n", label_count);
       reg -= 2;
-      return 0;
+      break;
     case COND_NOT_EQUAL:
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
       fprintf(out, "  xrl A, %d\n", REG_ADDRESS_STACK_LO(reg - 2));
       fprintf(out, "  jnz %s\n", label.c_str());
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
       fprintf(out, "  xrl A, %d\n", REG_ADDRESS_STACK_HI(reg - 2));
-      fprintf(out, "  jnz %s\n", label.c_str());
+      fprintf(out, "  jz label_%d\n", label_count);
       reg -= 2;
-      return 0;
+      break;
     case COND_LESS:
       return -1;
     case COND_LESS_EQUAL:
@@ -636,24 +641,30 @@ int MCS51::jump_cond_integer(std::string &label, int cond, int distance)
       fprintf(out, "  clr C\n");
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 2));
       fprintf(out, "  subb A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
-      fprintf(out, "  mov r2, A\n");
+      //fprintf(out, "  mov r2, A\n");
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 2));
       fprintf(out, "  subb A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
       fprintf(out, "  swap A\n");
       fprintf(out, "  rr A\n");
-      fprintf(out, "  anl A, 0x04\n");
+      fprintf(out, "  anl A, #0x04\n");
       fprintf(out, "  mov r3, A\n");
       fprintf(out, "  mov A, PSW\n");
-      fprintf(out, "  anl A, 0x04\n");
+      fprintf(out, "  anl A, #0x04\n");
       fprintf(out, "  xrl A, r3\n");
-      fprintf(out, "  jz %s\n", label.c_str());
+      fprintf(out, "  jnz label_%d\n", label_count);
       reg -= 2;
-      return 0;
-    default:
       break;
+    default:
+      return -1;
   }
 
-  return -1;
+  fprintf(out,
+    "  ljmp %s\n"
+    "label_%d:\n",
+    label.c_str(),
+    label_count++);
+
+  return 0;
 }
 
 int MCS51::ternary(int cond, int value_true, int value_false)
