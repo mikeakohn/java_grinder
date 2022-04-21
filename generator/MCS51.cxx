@@ -180,7 +180,9 @@ int MCS51::push_ref_static(std::string &name, int index)
 
 int MCS51::push_fake()
 {
-  return -1;
+  reg++;
+
+  return 0;
 }
 
 int MCS51::push_int(int32_t n)
@@ -265,7 +267,8 @@ int MCS51::pop_local_var_ref(int index)
 
 int MCS51::pop()
 {
-  return -1;
+  reg--;
+  return 0;
 }
 
 int MCS51::dup()
@@ -434,62 +437,330 @@ int MCS51::neg_integer()
 
 int MCS51::shift_left_integer()
 {
-  return -1;
+  fprintf(out,
+    "  ;; shift_left_integer()\n"
+    "  setb PSW.3\n"
+    "label_%d:\n"
+    "  clr C\n"
+    "  mov A, r%d\n"
+    "  rlc A\n"
+    "  mov r%d, A\n"
+    "  mov A, r%d\n"
+    "  rlc A\n"
+    "  mov r%d, A\n"
+    "  djnz r%d, label_%d\n"
+    "  clr PSW.3\n",
+    label_count,
+    REG_STACK_LO(reg - 2),
+    REG_STACK_LO(reg - 2),
+    REG_STACK_HI(reg - 2),
+    REG_STACK_HI(reg - 2),
+    REG_STACK_LO(reg - 1), label_count);
+
+  label_count++;
+  reg--;
+
+  return 0;
 }
 
 int MCS51::shift_left_integer(int num)
 {
-  return -1;
+  fprintf(out,
+    "  ;; shift_left_integer(%d)\n"
+    "  mov r1, #%d\n"
+    "label_%d:\n"
+    "  clr C\n"
+    "  mov A, %d\n"
+    "  rlc A\n"
+    "  mov %d, A\n"
+    "  mov A, %d\n"
+    "  rlc A\n"
+    "  mov %d, A\n"
+    "  djnz r1, label_%d\n",
+    num,
+    num,
+    label_count,
+    REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 2),
+    label_count);
+
+  label_count++;
+  reg--;
+
+  return 0;
 }
 
 int MCS51::shift_right_integer()
 {
-  return -1;
+  fprintf(out,
+    "  ;; shift_right_uinteger()\n"
+    "  setb PSW.3\n"
+    "label_%d:\n"
+    "  mov A, r%d\n"
+    "  rlc A\n"
+    "  mov A, r%d\n"
+    "  rrc A\n"
+    "  mov r%d, A\n"
+    "  mov A, r%d\n"
+    "  rrc A\n"
+    "  mov r%d, A\n"
+    "  djnz r%d, label_%d\n"
+    "  clr PSW.3\n",
+    label_count,
+    REG_STACK_HI(reg - 2),
+    REG_STACK_HI(reg - 2),
+    REG_STACK_HI(reg - 2),
+    REG_STACK_LO(reg - 2),
+    REG_STACK_LO(reg - 2),
+    REG_STACK_LO(reg - 1), label_count);
+
+  label_count++;
+  reg--;
+
+  return 0;
 }
 
 int MCS51::shift_right_integer(int num)
 {
-  return -1;
+  fprintf(out,
+    "  ;; shift_right_integer(%d)\n"
+    "  mov r1, #%d\n"
+    "label_%d:\n"
+    "  mov A, %d\n"
+    "  rlc A\n"
+    "  mov A, %d\n"
+    "  rrc A\n"
+    "  mov %d, A\n"
+    "  mov A, %d\n"
+    "  rrc A\n"
+    "  mov %d, A\n"
+    "  djnz r1, label_%d\n",
+    num,
+    num,
+    label_count,
+    REG_ADDRESS_STACK_HI(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 2),
+    REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_LO(reg - 2),
+    label_count);
+
+  label_count++;
+  reg--;
+
+  return 0;
 }
 
 int MCS51::shift_right_uinteger()
 {
-  return -1;
+  fprintf(out,
+    "  ;; shift_right_uinteger()\n"
+    "  setb PSW.3\n"
+    "label_%d:\n"
+    "  clr C\n"
+    "  mov A, r%d\n"
+    "  rrc A\n"
+    "  mov r%d, A\n"
+    "  mov A, r%d\n"
+    "  rrc A\n"
+    "  mov r%d, A\n"
+    "  djnz r%d, label_%d\n"
+    "  clr PSW.3\n",
+    label_count,
+    REG_STACK_HI(reg - 2),
+    REG_STACK_HI(reg - 2),
+    REG_STACK_LO(reg - 2),
+    REG_STACK_LO(reg - 2),
+    REG_STACK_LO(reg - 1), label_count);
+
+  label_count++;
+  reg--;
+
+  return 0;
 }
 
 int MCS51::shift_right_uinteger(int num)
 {
-  return -1;
+  fprintf(out,
+    "  ;; shift_right_uinteger(%d)\n"
+    "  mov r1, #%d\n"
+    "label_%d:\n"
+    "  clr C\n"
+    "  mov A, %d\n"
+    "  rrc A\n"
+    "  mov %d, A\n"
+    "  mov A, %d\n"
+    "  rrc A\n"
+    "  mov %d, A\n"
+    "  djnz r1, label_%d\n",
+    num,
+    num,
+    label_count,
+    REG_ADDRESS_STACK_HI(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 2),
+    REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_LO(reg - 2),
+    label_count);
+
+  label_count++;
+  reg--;
+
+  return 0;
 }
 
 int MCS51::and_integer()
 {
-  return -1;
+  fprintf(out,
+    "  ;; and_integer()\n"
+    "  mov A, %d\n"
+    "  anl A, %d\n"
+    "  mov %d, A\n"
+    "  mov A, %d\n"
+    "  anl A, %d\n"
+    "  mov %d, A\n",
+    REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1));
+
+  reg--;
+
+  return 0;
 }
 
 int MCS51::and_integer(int num)
 {
-  return -1;
+  if (num > 65535 || num < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", num);
+    return -1;
+  }
+
+  uint16_t value = (num & 0xffff);
+
+  fprintf(out,
+    "  ;; and_integer(%d)\n"
+    "  mov A, %d\n"
+    "  anl A, #%d\n"
+    "  mov %d, A\n"
+    "  mov A, %d\n"
+    "  anl A, #%d\n"
+    "  mov %d, A\n",
+    num,
+    REG_ADDRESS_STACK_LO(reg - 1),
+    value & 0xff,
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1),
+    value >> 8,
+    REG_ADDRESS_STACK_HI(reg - 1));
+
+  return 0;
 }
 
 int MCS51::or_integer()
 {
-  return -1;
+  fprintf(out,
+    "  ;; and_integer()\n"
+    "  mov A, %d\n"
+    "  orl A, %d\n"
+    "  mov %d, A\n"
+    "  mov A, %d\n"
+    "  orl A, %d\n"
+    "  mov %d, A\n",
+    REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1));
+
+  reg--;
+
+  return 0;
 }
 
 int MCS51::or_integer(int num)
 {
-  return -1;
+  if (num > 65535 || num < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", num);
+    return -1;
+  }
+
+  uint16_t value = (num & 0xffff);
+
+  fprintf(out,
+    "  ;; and_integer(%d)\n"
+    "  mov A, %d\n"
+    "  orl A, #%d\n"
+    "  mov %d, A\n"
+    "  mov A, %d\n"
+    "  orl A, #%d\n"
+    "  mov %d, A\n",
+    num,
+    REG_ADDRESS_STACK_LO(reg - 1),
+    value & 0xff,
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1),
+    value >> 8,
+    REG_ADDRESS_STACK_HI(reg - 1));
+
+  return 0;
 }
 
 int MCS51::xor_integer()
 {
-  return -1;
+  fprintf(out,
+    "  ;; and_integer()\n"
+    "  mov A, %d\n"
+    "  xrl A, %d\n"
+    "  mov %d, A\n"
+    "  mov A, %d\n"
+    "  xrl A, %d\n"
+    "  mov %d, A\n",
+    REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1));
+
+  reg--;
+
+  return 0;
 }
 
 int MCS51::xor_integer(int num)
 {
-  return -1;
+  if (num > 65535 || num < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", num);
+    return -1;
+  }
+
+  uint16_t value = (num & 0xffff);
+
+  fprintf(out,
+    "  ;; and_integer(%d)\n"
+    "  mov A, %d\n"
+    "  xrl A, #%d\n"
+    "  mov %d, A\n"
+    "  mov A, %d\n"
+    "  xrl A, #%d\n"
+    "  mov %d, A\n",
+    num,
+    REG_ADDRESS_STACK_LO(reg - 1),
+    value & 0xff,
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1),
+    value >> 8,
+    REG_ADDRESS_STACK_HI(reg - 1));
+
+  return 0;
 }
 
 int MCS51::inc_integer(int index, int num)
@@ -533,12 +804,27 @@ int MCS51::inc_integer(int index, int num)
 
 int MCS51::integer_to_byte()
 {
-  return -1;
+  fprintf(out,
+    "  ;; integer_to_byte()\n"
+    "  mov A, %d\n"
+    "  anl A, #0x80\n"
+    "  jz label_%d\n"
+    "  mov %d, #0xff\n"
+    "label_%d:\n",
+    REG_ADDRESS_STACK_LO(reg - 1),
+    label_count,
+    REG_ADDRESS_STACK_HI(reg - 1),
+    label_count);
+
+  label_count++;
+
+  return 0;
 }
 
 int MCS51::integer_to_short()
 {
-  return -1;
+  // Do nothing here.
+  return 0;
 }
 
 int MCS51::jump_cond(std::string &label, int cond, int distance)
@@ -689,14 +975,16 @@ int MCS51::return_integer(int local_count)
 
 int MCS51::return_void(int local_count)
 {
-  fprintf(out, "; return void\n");
-  fprintf(out, "  mov locals,SP\n");
+  fprintf(out, "  ;; return_void(%d)\n", local_count);
 
-  if(!is_main)
+  if (!is_main)
   {
-    fprintf(out, "  pop locals\n");
-    fprintf(out, "  ret\n");
+    fprintf(out,
+      "  pop r2\n"
+      "  mov SP, r2\n");
   }
+
+  fprintf(out, "  ret\n");
 
   return 0;
 }
