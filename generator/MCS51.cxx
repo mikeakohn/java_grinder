@@ -18,6 +18,8 @@
 
 #define LOCALS_LO(a) (a * 2)
 #define LOCALS_HI(a) ((a * 2) + 1)
+#define STATICS_LO(a) (a * 2)
+#define STATICS_HI(a) ((a * 2) + 1)
 
 // ABI is:
 // Bank 0:
@@ -83,15 +85,17 @@ int MCS51::insert_static_field_define(
   std::string &type,
   int index)
 {
-  return -1;
+  fprintf(out, "%s equ %d\n", name.c_str(), 0x10 + (index * 2));
+  return 0;
 }
 
 int MCS51::init_heap(int field_count)
 {
-  fprintf(out, "  ;; Setup heap and static initializers\n");
-  //fprintf(out, "  mov #ram_start+%d, &ram_start\n", (field_count + 1) * 2);
+  fprintf(out,
+    "  ;; Setup heap and static initializers (field_count=%d)\n",
+    field_count);
 
-  fprintf(out, "  mov SP, #0x10\n");
+  fprintf(out, "  mov SP, #0x%02x\n", 0x0f + (field_count * 2));
   fprintf(out, "  mov r7, #0x10\n");
 
   return -1;
@@ -99,7 +103,32 @@ int MCS51::init_heap(int field_count)
 
 int MCS51::field_init_int(std::string &name, int index, int value)
 {
-  return -1;
+  fprintf(out, "  ;; field_init_int(name=%s, index=%d, value=%d)\n",
+    name.c_str(),
+    index,
+    value);
+
+  if (index == 0)
+  {
+    fprintf(out, "  mov r0, r7\n");
+  }
+    else
+  {
+    fprintf(out,
+      "  mov A, r7\n"
+      "  add A, #%d\n"
+      "  mov r0, A\n",
+      index * 2);
+  }
+
+  fprintf(out,
+      "  mov @r0, #0x%02x\n"
+      "  inc r0\n"
+      "  mov @r0, #0x%02x\n",
+      value & 0xff,
+      (value >> 8) & 0xff);
+
+  return 0;
 }
 
 int MCS51::field_init_ref(std::string &name, int index)
@@ -965,12 +994,51 @@ int MCS51::ternary(int cond, int compare, int value_true, int value_false)
 
 int MCS51::return_local(int index, int local_count)
 {
-  return -1;
+  fprintf(out, "  ;; return_integer(%d)\n", local_count);
+  if (!is_main)
+  {
+    fprintf(out,
+      "  pop r2\n"
+      "  mov SP, r2\n");
+  }
+
+  fprintf(out, "  mov A, r6\n");
+
+  if (index != 0)
+  {
+    fprintf(out, "  add A, #%d\n", index * 2);
+  }
+
+  fprintf(out,
+    "  mov r0, A\n"
+    "  mov r2, @r0\n"
+    "  inc r0\n"
+    "  mov r3, @r0\n");
+
+  fprintf(out, "  ret\n");
+
+  return 0;
 }
 
 int MCS51::return_integer(int local_count)
 {
-  return -1;
+  fprintf(out, "  ;; return_integer(%d)\n", local_count);
+  if (!is_main)
+  {
+    fprintf(out,
+      "  pop r2\n"
+      "  mov SP, r2\n");
+  }
+
+  fprintf(out,
+    "  mov r2, %d\n"
+    "  mov r3, %d\n",
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1));
+
+  fprintf(out, "  ret\n");
+
+  return 0;
 }
 
 int MCS51::return_void(int local_count)
@@ -1004,17 +1072,89 @@ int MCS51::call(std::string &name)
 
 int MCS51::invoke_static_method(const char *name, int params, int is_void)
 {
-  return -1;
+  int saved_registers = reg - params;
+  int n;
+
+  for (n = 0; n < saved_registers; n++)
+  {
+    fprintf(out, "  push %d\n", REG_ADDRESS_STACK_LO(n));
+    fprintf(out, "  push %d\n", REG_ADDRESS_STACK_HI(n));
+  }
+
+  fprintf(out,
+    "  mov r0, SP\n"
+    "  inc r0\n"
+    "  inc r0\n"
+    "  inc r0\n");
+
+  for (n = saved_registers; n < reg; n++)
+  {
+    fprintf(out,
+      "  mov @r0, %d\n"
+      "  inc r0\n"
+      "  mov @r0, %d\n"
+      "  inc r0\n",
+      REG_ADDRESS_STACK_LO(n),
+      REG_ADDRESS_STACK_HI(n));
+
+    reg--;
+  }
+
+  for (n = saved_registers - 1; n >= 0; n--)
+  {
+    fprintf(out, "  pop %d\n", REG_ADDRESS_STACK_HI(n));
+    fprintf(out, "  pop %d\n", REG_ADDRESS_STACK_LO(n));
+  }
+
+  if (!is_void)
+  {
+    fprintf(out, "  push 2\n");
+    fprintf(out, "  push 3\n");
+  }
+
+  reg++;
+
+  return 0;
 }
 
 int MCS51::put_static(std::string &name, int index)
 {
-  return -1;
+  fprintf(out,
+    "  ;; put_static(%s, %d)\n"
+    "  mov r2, %d\n"
+    "  mov r3, %d\n"
+    "  mov %d, r2\n"
+    "  mov %d, r3\n",
+    name.c_str(),
+    index,
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1),
+    STATICS_LO(index),
+    STATICS_HI(index));
+
+  reg--;
+
+  return 0;
 }
 
 int MCS51::get_static(std::string &name, int index)
 {
-  return -1;
+  fprintf(out,
+    "  ;; put_static(%s, %d)\n"
+    "  mov r2, %d\n"
+    "  mov r3, %d\n"
+    "  mov %d, r2\n"
+    "  mov %d, r3\n",
+    name.c_str(),
+    index,
+    STATICS_LO(index),
+    STATICS_HI(index),
+    REG_ADDRESS_STACK_LO(reg),
+    REG_ADDRESS_STACK_HI(reg));
+
+  reg++;
+
+  return 0;
 }
 
 int MCS51::brk()
