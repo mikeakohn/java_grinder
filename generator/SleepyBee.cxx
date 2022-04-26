@@ -27,6 +27,8 @@ int SleepyBee::open(const char *filename)
 {
   if (MCS51::open(filename) != 0) { return -1; }
 
+  fprintf(out, ".include \"EFM8SB2.inc\"\n");
+
   return 0;
 }
 
@@ -36,8 +38,8 @@ int SleepyBee::start_init()
 
   fprintf(out,
     "  ;; Disable watchdog.\n"
-    "  anl 0xd9, #0xbf\n"
-    "  mov 0xd9, A\n\n");
+    "  anl PCA0MD, #0xbf\n"
+    "  mov PCA0MD, A\n\n");
 
   return 0;
 }
@@ -86,7 +88,7 @@ int SleepyBee::ioport_setPinsAsOutput_I(int port)
 int SleepyBee::ioport_setPinsAsOutput_I(int port, int const_val)
 {
   // FIXME: How to take care of XBR1.
-  fprintf(out, "  mov 0xe3, #0x40\n");
+  fprintf(out, "  mov XBR2, #0x40\n");
 
   fprintf(out,
     "  ;; ioport_setPinsAsOutput_I(%d)\n"
