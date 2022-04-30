@@ -65,8 +65,8 @@ int MCS51::open(const char *filename)
   //fprintf(out, "ram_end equ 0x8000\n");
   fprintf(out, ".8051\n");
 
-  fprintf(out, "stack equ 0x20\n");
-  fprintf(out, "locals equ r2\n");
+  //fprintf(out, "stack equ 0x20\n");
+  //fprintf(out, "locals equ r2\n");
 
   return 0;
 }
@@ -148,18 +148,21 @@ void MCS51::method_start(
   fprintf(out, "%s:\n", name.c_str());
 
   // main() function goes here
-  if (!is_main)
+  if (local_count != 0)
   {
-    fprintf(out, "  push 6\n");
+    if (!is_main)
+    {
+      fprintf(out, "  push 6\n");
+    }
+
+    fprintf(out,
+      "  mov r6, SP\n"
+      "  inc r6\n"
+      "  mov A, SP\n"
+      "  add A, #%d\n"
+      "  mov SP, A\n",
+      local_count * 2);
   }
-
-  fprintf(out, "  mov r6, SP\n");
-
-  fprintf(out,
-    "  mov A, SP\n"
-    "  add A, #%d\n"
-    "  mov SP, A\n",
-    local_count * 2);
 }
 
 void MCS51::method_end(int local_count)
@@ -495,26 +498,36 @@ int MCS51::shift_left_integer()
 
 int MCS51::shift_left_integer(int num)
 {
+  fprintf(out, "  ;; shift_left_integer(%d)\n", num);
+
+  if (num != 1)
+  {
+    fprintf(out,
+      "  mov r1, #%d\n"
+      "label_%d:\n",
+      num,
+      label_count);
+  }
+
   fprintf(out,
-    "  ;; shift_left_integer(%d)\n"
-    "  mov r1, #%d\n"
-    "label_%d:\n"
     "  clr C\n"
     "  mov A, %d\n"
     "  rlc A\n"
     "  mov %d, A\n"
     "  mov A, %d\n"
     "  rlc A\n"
-    "  mov %d, A\n"
-    "  djnz r1, label_%d\n",
-    num,
-    num,
-    label_count,
+    "  mov %d, A\n",
     REG_ADDRESS_STACK_LO(reg - 1),
     REG_ADDRESS_STACK_LO(reg - 1),
     REG_ADDRESS_STACK_HI(reg - 1),
-    REG_ADDRESS_STACK_HI(reg - 1),
-    label_count);
+    REG_ADDRESS_STACK_HI(reg - 1));
+
+  if (num != 1)
+  {
+    fprintf(out,
+      "  djnz r1, label_%d\n",
+      label_count);
+  }
 
   label_count++;
 
@@ -553,10 +566,18 @@ int MCS51::shift_right_integer()
 
 int MCS51::shift_right_integer(int num)
 {
+  fprintf(out, "  ;; shift_right_integer(%d)\n", num);
+
+  if (num != 1)
+  {
+    fprintf(out,
+      "  mov r1, #%d\n"
+      "label_%d:\n",
+      num,
+      label_count);
+  }
+
   fprintf(out,
-    "  ;; shift_right_integer(%d)\n"
-    "  mov r1, #%d\n"
-    "label_%d:\n"
     "  mov A, %d\n"
     "  rlc A\n"
     "  mov A, %d\n"
@@ -564,17 +585,19 @@ int MCS51::shift_right_integer(int num)
     "  mov %d, A\n"
     "  mov A, %d\n"
     "  rrc A\n"
-    "  mov %d, A\n"
-    "  djnz r1, label_%d\n",
-    num,
-    num,
-    label_count,
+    "  mov %d, A\n",
     REG_ADDRESS_STACK_HI(reg - 1),
     REG_ADDRESS_STACK_HI(reg - 1),
     REG_ADDRESS_STACK_HI(reg - 1),
     REG_ADDRESS_STACK_LO(reg - 1),
-    REG_ADDRESS_STACK_LO(reg - 1),
-    label_count);
+    REG_ADDRESS_STACK_LO(reg - 1));
+
+  if (num != 1)
+  {
+    fprintf(out,
+      "  djnz r1, label_%d\n",
+      label_count);
+  }
 
   label_count++;
 
@@ -611,26 +634,36 @@ int MCS51::shift_right_uinteger()
 
 int MCS51::shift_right_uinteger(int num)
 {
+  fprintf(out, "  ;; shift_right_uinteger(%d)\n", num);
+
+  if (num != 1)
+  {
+    fprintf(out,
+      "  mov r1, #%d\n"
+      "label_%d:\n",
+      num,
+      label_count);
+  }
+
   fprintf(out,
-    "  ;; shift_right_uinteger(%d)\n"
-    "  mov r1, #%d\n"
-    "label_%d:\n"
     "  clr C\n"
     "  mov A, %d\n"
     "  rrc A\n"
     "  mov %d, A\n"
     "  mov A, %d\n"
     "  rrc A\n"
-    "  mov %d, A\n"
-    "  djnz r1, label_%d\n",
-    num,
-    num,
-    label_count,
+    "  mov %d, A\n",
     REG_ADDRESS_STACK_HI(reg - 1),
     REG_ADDRESS_STACK_HI(reg - 1),
     REG_ADDRESS_STACK_LO(reg - 1),
-    REG_ADDRESS_STACK_LO(reg - 1),
-    label_count);
+    REG_ADDRESS_STACK_LO(reg - 1));
+
+  if (num != 1)
+  {
+    fprintf(out,
+      "  djnz r1, label_%d\n",
+      label_count);
+  }
 
   label_count++;
 
@@ -993,15 +1026,19 @@ int MCS51::ternary(int cond, int compare, int value_true, int value_false)
 int MCS51::return_local(int index, int local_count)
 {
   fprintf(out, "  ;; return_integer(%d)\n", local_count);
-  if (!is_main)
+
+  if (local_count != 0)
   {
-    fprintf(out,
-      "  mov A, SP\n"
-      "  clr C\n"
-      "  subb A, #%d\n"
-      "  mov SP, A\n"
-      "  pop 6\n",
-      local_count * 2);
+    if (!is_main)
+    {
+      fprintf(out,
+        "  mov A, SP\n"
+        "  clr C\n"
+        "  subb A, #%d\n"
+        "  mov SP, A\n"
+        "  pop 6\n",
+        local_count * 2);
+    }
   }
 
   fprintf(out, "  mov A, r6\n");
@@ -1025,15 +1062,19 @@ int MCS51::return_local(int index, int local_count)
 int MCS51::return_integer(int local_count)
 {
   fprintf(out, "  ;; return_integer(%d)\n", local_count);
-  if (!is_main)
+
+  if (local_count != 0)
   {
-    fprintf(out,
-      "  mov A, SP\n"
-      "  clr C\n"
-      "  subb A, #%d\n"
-      "  mov SP, A\n"
-      "  pop 6\n",
-      local_count * 2);
+    if (!is_main)
+    {
+      fprintf(out,
+        "  mov A, SP\n"
+        "  clr C\n"
+        "  subb A, #%d\n"
+        "  mov SP, A\n"
+        "  pop 6\n",
+        local_count * 2);
+    }
   }
 
   fprintf(out,
@@ -1051,15 +1092,18 @@ int MCS51::return_void(int local_count)
 {
   fprintf(out, "  ;; return_void(%d)\n", local_count);
 
-  if (!is_main)
+  if (local_count != 0)
   {
-    fprintf(out,
-      "  mov A, SP\n"
-      "  clr C\n"
-      "  subb A, #%d\n"
-      "  mov SP, A\n"
-      "  pop 6\n",
-      local_count * 2);
+    if (!is_main)
+    {
+      fprintf(out,
+        "  mov A, SP\n"
+        "  clr C\n"
+        "  subb A, #%d\n"
+        "  mov SP, A\n"
+        "  pop 6\n",
+        local_count * 2);
+    }
   }
 
   fprintf(out, "  ret\n");
@@ -1100,10 +1144,9 @@ int MCS51::invoke_static_method(const char *name, int params, int is_void)
   if (params != 0)
   {
     fprintf(out,
-      "  mov r0, SP\n"
-      "  inc r0\n"
-      "  inc r0\n"
-      "  inc r0\n");
+      "  mov A, SP\n"
+      "  add A, #4\n"
+      "  mov r0, A\n");
   }
 
   int count = 0;
@@ -1113,10 +1156,14 @@ int MCS51::invoke_static_method(const char *name, int params, int is_void)
     fprintf(out,
       "  mov @r0, %d\n"
       "  inc r0\n"
-      "  mov @r0, %d\n"
-      "  inc r0\n",
+      "  mov @r0, %d\n",
       REG_ADDRESS_STACK_LO(n),
       REG_ADDRESS_STACK_HI(n));
+
+    if (n != reg - 1)
+    {
+      fprintf(out, "  inc r0\n");
+    }
 
     count++;
   }

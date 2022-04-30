@@ -41,6 +41,15 @@ int SleepyBee::start_init()
     "  anl PCA0MD, #0xbf\n"
     "  mov PCA0MD, A\n\n");
 
+#if 0
+  fprintf(out,
+    "  clr PSW.3\n"
+    "  clr PSW.4\n");
+#endif
+
+  // FIXME: How to take care of XBR1.
+  fprintf(out, "  mov XBR2, #0x40\n");
+
   return 0;
 }
 
@@ -50,10 +59,10 @@ int SleepyBee::ioport_setPinsAsInput_I(int port)
     "  ;; ioport_setPinsAsInput_I(%d)\n"
     "  mov A, %d\n"
     "  cpl A\n"
-    "  anl 0x%02x, A\n",
+    "  anl P%dMDOUT, A\n",
     port,
     REG_ADDRESS_STACK_LO(--reg),
-    0xa4 + port);
+    port);
 
   return 0;
 }
@@ -64,10 +73,10 @@ int SleepyBee::ioport_setPinsAsInput_I(int port, int const_val)
     "  ;; ioport_setPinsAsInput_I(%d)\n"
     "  mov A, #%02x\n"
     "  cpl A\n"
-    "  anl 0x%02x, A\n",
+    "  anl P%dMDOUT, A\n",
     port,
     const_val,
-    0xa4 + port);
+    port);
 
   return 0;
 }
@@ -77,26 +86,23 @@ int SleepyBee::ioport_setPinsAsOutput_I(int port)
   fprintf(out,
     "  ;; ioport_setPinsAsOutput_I(%d)\n"
     "  mov A, %d\n"
-    "  orl 0x%02x, A\n",
+    "  orl P%dMDOUT, A\n",
     port,
     REG_ADDRESS_STACK_LO(--reg),
-    0xa4 + port);
+    port);
 
   return 0;
 }
 
 int SleepyBee::ioport_setPinsAsOutput_I(int port, int const_val)
 {
-  // FIXME: How to take care of XBR1.
-  fprintf(out, "  mov XBR2, #0x40\n");
-
   fprintf(out,
-    "  ;; ioport_setPinsAsOutput_I(%d)\n"
+    "  ;; ioport_setPinsAsOutput_I(%d, value=0x%02x)\n"
     "  mov A, #0x%02x\n"
-    "  orl 0x%02x, A\n",
-    port,
+    "  orl P%dMDOUT, A\n",
+    port, const_val,
     const_val,
-    0xa4 + port);
+    port);
 
   return 0;
 }
@@ -110,11 +116,11 @@ int SleepyBee::ioport_setPinAsOutput_I(int port)
     "label_%d:\n"
     "  rlc\n"
     "  djnz %d, label_%d\n"
-    "  orl 0x%02x, A\n",
+    "  orl P%dMDOUT, A\n",
     port,
     label_count,
     REG_ADDRESS_STACK_LO(--reg), label_count,
-    0xa4 + port);
+    port);
 
   label_count++;
 
@@ -142,11 +148,11 @@ int SleepyBee::ioport_setPinAsInput_I(int port)
     "  rlc\n"
     "  djnz %d, label_%d\n"
     "  cpl A\n"
-    "  anl 0x%02x, A\n",
+    "  anl P%dMDOUT, A\n",
     port,
     label_count,
     REG_ADDRESS_STACK_LO(--reg), label_count,
-    0xa4 + port);
+    port);
 
   label_count++;
 
