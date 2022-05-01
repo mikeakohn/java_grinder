@@ -16,6 +16,7 @@
 
 #include "generator/Generator.h"
 
+/*
 #define PUSH_LO() \
   fprintf(out, "; PUSH_LO\n"); \
   fprintf(out, "  sta stack_lo,x\n")
@@ -25,6 +26,11 @@
   fprintf(out, "  sta stack_hi,x\n"); \
   fprintf(out, "  dex\n")
 
+#undef POP_HI_FAKE
+#define POP_HI_FAKE() \
+  fprintf(out, "; POP_HI_FAKE\n"); \
+  fprintf(out, "  inx\n")
+
 #define POP_HI() \
   fprintf(out, "; POP_HI\n"); \
   fprintf(out, "  inx\n"); \
@@ -33,6 +39,7 @@
 #define POP_LO() \
   fprintf(out, "; POP_LO\n"); \
   fprintf(out, "  lda stack_lo,x\n")
+*/
 
 class M6502 : public Generator
 {
@@ -123,8 +130,8 @@ public:
   virtual int array_write_byte(std::string &name, int field_id);
   virtual int array_write_short(std::string &name, int field_id);
   virtual int array_write_int(std::string &name, int field_id);
+  virtual int get_values_from_stack(int);
   //virtual void close();
-  virtual int get_values_from_stack(int num);
 
   // Memory API
   virtual int memory_read8_I();
@@ -158,11 +165,11 @@ protected:
   bool need_xor_integer:1;
   bool need_integer_to_byte:1;
   bool need_dup:1;
+  bool need_dup2:1;
   bool need_push_array_length:1;
   bool need_push_array_length2:1;
   bool need_array_byte_support:1;
   bool need_array_int_support:1;
-  bool need_get_values_from_stack:1;
 
   bool need_memory_read8:1;
   bool need_memory_write8:1;
@@ -184,11 +191,11 @@ protected:
   void insert_xor_integer();
   void insert_integer_to_byte();
   void insert_dup();
+  void insert_dup2();
   void insert_push_array_length();
   void insert_push_array_length2();
   void insert_array_byte_support();
   void insert_array_int_support();
-  void insert_get_values_from_stack();
 
   void insert_memory_read8();
   void insert_memory_write8();

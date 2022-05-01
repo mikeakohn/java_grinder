@@ -79,7 +79,11 @@ public:
   virtual int c64_vic_make_hires_tables() { return -1; }
   virtual int c64_vic_text_enable() { return -1; }
   virtual int c64_vic_text_clear() { return -1; }
+  virtual int c64_vic_text_copy() { return -1; }
   virtual int c64_vic_text_plot() { return -1; }
+  virtual int c64_vic_text_read() { return -1; }
+  virtual int c64_vic_make_text_table() { return -1; }
+  virtual int c64_vic_make_color_table() { return -1; }
   virtual int c64_vic_color_ram_clear() { return -1; }
 };
 

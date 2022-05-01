@@ -180,9 +180,11 @@ void M6502_8::method_start(int local_count, int max_stack, int param_count, std:
   if (!is_main)
   {
     fprintf(out, "  lda locals\n");
-    PUSH_LO();
+    fprintf(out, "  sta stack_lo,x\n");
     fprintf(out, "  lda #0\n");
-    PUSH_HI();
+    fprintf(out, "  sta stack_hi,x\n");
+    fprintf(out, "  dex\n");
+
   }
 
   fprintf(out, "  stx locals\n");
@@ -202,9 +204,10 @@ int M6502_8::push_local_var_int(int index)
   fprintf(out, "; push_local_var_int\n");
   fprintf(out, "  ldy locals\n");
   fprintf(out, "  lda stack_lo - %d,y\n", LOCALS(index));
-  PUSH_LO();
+  fprintf(out, "  sta stack_lo,x\n");
   fprintf(out, "  lda stack_hi - %d,y\n", LOCALS(index));
-  PUSH_HI();
+  fprintf(out, "  sta stack_hi,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -242,12 +245,13 @@ int M6502_8::push_int(int32_t n)
 
   fprintf(out, "; push_int\n");
   fprintf(out, "  lda #0x%02x\n", lo);
-  PUSH_LO();
+  fprintf(out, "  sta stack_lo,x\n");
   if (hi != lo)
   {
     fprintf(out, "  lda #0x%02x\n", hi);
   }
-  PUSH_HI();
+  fprintf(out, "  sta stack_hi,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -302,13 +306,10 @@ int M6502_8::push_ref(std::string &name)
 {
   fprintf(out, "; push_ref\n");
   fprintf(out, "  lda #(%s & 0xff)\n", name.c_str());
-  PUSH_LO();
+  fprintf(out, "  sta stack_lo,x\n");
   fprintf(out, "  lda #(%s >> 8)\n", name.c_str());
-  PUSH_HI();
-//  fprintf(out, "  lda %s + 0\n", name.c_str());
-//  PUSH_LO();
-//  fprintf(out, "  lda %s + 1\n", name.c_str());
-//  PUSH_HI();
+  fprintf(out, "  sta stack_hi,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -318,9 +319,10 @@ int M6502_8::pop_local_var_int(int index)
 {
   fprintf(out, "; pop_local_var_int\n");
   fprintf(out, "  ldy locals\n");
-  POP_HI();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_hi,x\n");
   fprintf(out, "  sta stack_hi - %d,y\n", LOCALS(index));
-  POP_LO();
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta stack_lo - %d,y\n", LOCALS(index));
   stack--;
 
@@ -335,7 +337,8 @@ int M6502_8::pop_local_var_ref(int index)
 int M6502_8::pop()
 {
   fprintf(out, "; pop\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   stack--;
 
   return 0;
@@ -344,10 +347,10 @@ int M6502_8::pop()
 int M6502_8::dup()
 {
   fprintf(out, "; dup()\n");
-  fprintf(out, "  lda stack_lo+1,x\n");
-  fprintf(out, "  sta stack_lo+0,x\n");
-  fprintf(out, "  lda stack_hi+1,x\n");
-  fprintf(out, "  sta stack_hi+0,x\n");
+  fprintf(out, "  lda stack_lo + 1,x\n");
+  fprintf(out, "  sta stack_lo + 0,x\n");
+  fprintf(out, "  lda stack_hi + 1,x\n");
+  fprintf(out, "  sta stack_hi + 0,x\n");
   fprintf(out, "  dex\n");
   stack++;
 
@@ -522,7 +525,6 @@ int M6502_8::and_integer(int num)
   }
 
   return 0;
-  //return -1;
 }
 
 int M6502_8::or_integer()
@@ -770,7 +772,8 @@ int M6502_8::return_local(int index, int local_count)
 
   if (!is_main)
   { 
-    POP();
+    fprintf(out, "  inx\n");
+    fprintf(out, "  lda stack_lo,x\n");
     fprintf(out, "  sta locals\n");
   }
 
@@ -782,9 +785,10 @@ int M6502_8::return_local(int index, int local_count)
 int M6502_8::return_integer(int local_count)
 {
   fprintf(out, "; return_integer\n");
-  POP_HI();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_hi,x\n");
   fprintf(out, "  sta result + 1\n");
-  POP_LO();
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta result + 0\n");
   stack--;
 
@@ -792,7 +796,8 @@ int M6502_8::return_integer(int local_count)
 
   if (!is_main)
   {
-    POP();
+    fprintf(out, "  inx\n");
+    fprintf(out, "  lda stack_lo,x\n");
     fprintf(out, "  sta locals\n");
   }
 
@@ -808,7 +813,8 @@ int M6502_8::return_void(int local_count)
 
   if (!is_main)
   {
-    POP();
+    fprintf(out, "  inx\n");
+    fprintf(out, "  lda stack_lo,x\n");
     fprintf(out, "  sta locals\n");
   }
 
@@ -870,9 +876,10 @@ int M6502_8::invoke_static_method(const char *name, int params, int is_void)
   if (!is_void)
   {
     fprintf(out, "  lda result + 0\n");
-    PUSH_LO();
+    fprintf(out, "  sta stack_lo,x\n");
     fprintf(out, "  lda result + 1\n");
-    PUSH_HI();
+    fprintf(out, "  sta stack_hi,x\n");
+    fprintf(out, "  dex\n");
     stack++;
   }
 
@@ -883,9 +890,10 @@ int M6502_8::put_static(std::string &name, int index)
 {
   if (stack > 0)
   {
-    POP_HI();
+    fprintf(out, "  inx\n");
+    fprintf(out, "  lda stack_hi,x\n");
     fprintf(out, "  sta %s + 1\n", name.c_str());
-    POP_LO();
+    fprintf(out, "  lda stack_lo,x\n");
     fprintf(out, "  sta %s + 0\n", name.c_str());
     stack--;
   }
@@ -897,9 +905,10 @@ int M6502_8::get_static(std::string &name, int index)
 {
   if (stack > 0)
   {
-    POP_HI();
+    fprintf(out, "  inx\n");
+    fprintf(out, "  lda stack_hi,x\n");
     fprintf(out, "  sta %s + 1\n", name.c_str());
-    POP_LO();
+    fprintf(out, "  lda stack_lo,x\n");
     fprintf(out, "  sta %s + 0\n", name.c_str());
     stack--;
   }
@@ -1037,14 +1046,17 @@ int M6502_8::memory_read8_I()
   return 0;
 }
 
+/*
 int M6502_8::memory_read8_I(int address)
 {
   fprintf(out, "  lda 0x%04x\n", address);
+  fprintf(out, "  jsr memory_write8\n");
   PUSH();
   stack++;
 
   return 0;
 }
+*/
 
 int M6502_8::memory_write8_IB()
 {
@@ -1072,24 +1084,22 @@ void M6502_8::insert_swap()
 void M6502_8::insert_add_integer()
 {
   fprintf(out, "add_integer:\n");
-  POP();
-  fprintf(out, "  sta result + 0\n");
-  POP();
+  fprintf(out, "  inx\n");
   fprintf(out, "  clc\n");
-  fprintf(out, "  adc result + 0\n");
-  PUSH();
+  fprintf(out, "  lda stack_lo + 0,x\n");
+  fprintf(out, "  adc stack_lo + 1,x\n");
+  fprintf(out, "  sta stack_lo + 1,x\n");
   fprintf(out, "  rts\n\n");
 }
 
 void M6502_8::insert_sub_integer()
 {
   fprintf(out, "sub_integer:\n");
-  POP();
-  fprintf(out, "  sta result + 0\n");
-  POP();
+  fprintf(out, "  inx\n");
   fprintf(out, "  sec\n");
-  fprintf(out, "  sbc result + 0\n");
-  PUSH();
+  fprintf(out, "  lda stack_lo + 1,x\n");
+  fprintf(out, "  sbc stack_lo + 0,x\n");
+  fprintf(out, "  sta stack_lo + 1,x\n");
   fprintf(out, "  rts\n\n");
 }
 
@@ -1100,160 +1110,140 @@ void M6502_8::insert_neg_integer()
 void M6502_8::insert_shift_left_integer()
 {
   fprintf(out, "shift_left_integer:\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo + 0,x\n");
   fprintf(out, "  tay\n");
-  POP();
+  fprintf(out, "  lda stack_lo + 1,x\n");
   fprintf(out, "  asl\n");
   fprintf(out, "  dey\n");
   fprintf(out, "  bne #-4\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo + 1,x\n");
   fprintf(out, "  rts\n\n");
 }
 
 void M6502_8::insert_shift_right_integer()
 {
   fprintf(out, "shift_right_integer:\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo + 0,x\n");
   fprintf(out, "  tay\n");
-  POP();
+  fprintf(out, "  lda stack_lo + 1,x\n");
   fprintf(out, "  cmp #0x80\n");
   fprintf(out, "  ror\n");
   fprintf(out, "  dey\n");
   fprintf(out, "  bne #-6\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo + 1,x\n");
   fprintf(out, "  rts\n\n");
 }
 
 void M6502_8::insert_shift_right_uinteger()
 {
   fprintf(out, "shift_right_uinteger:\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo + 0,x\n");
   fprintf(out, "  tay\n");
-  POP();
+  fprintf(out, "  lda stack_lo + 1,x\n");
   fprintf(out, "  lsr\n");
   fprintf(out, "  dey\n");
   fprintf(out, "  bne #-4\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo + 1,x\n");
   fprintf(out, "  rts\n\n");
 }
 
 void M6502_8::insert_and_integer()
 {
   fprintf(out, "and_integer:\n");
-  POP();
-  fprintf(out, "  sta result + 0\n");
-  POP();
-  fprintf(out, "  and result + 0\n");
-  PUSH();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda stack_lo + 0,x\n");
+  fprintf(out, "  and stack_lo + 1,x\n");
+  fprintf(out, "  sta stack_lo + 1,x\n");
   fprintf(out, "  rts\n\n");
 }
 
 void M6502_8::insert_or_integer()
 {
   fprintf(out, "or_integer:\n");
-  POP();
-  fprintf(out, "  sta result + 0\n");
-  POP();
-  fprintf(out, "  ora result + 0\n");
-  PUSH();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda stack_lo + 0,x\n");
+  fprintf(out, "  ora stack_lo + 1,x\n");
+  fprintf(out, "  sta stack_lo + 1,x\n");
   fprintf(out, "  rts\n\n");
 }
 
 void M6502_8::insert_xor_integer()
 {
   fprintf(out, "xor_integer:\n");
-  POP();
-  fprintf(out, "  sta result + 0\n");
-  POP();
-  fprintf(out, "  eor result + 0\n");
-  PUSH();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda stack_lo + 0,x\n");
+  fprintf(out, "  eor stack_lo + 1,x\n");
+  fprintf(out, "  sta stack_lo + 1,x\n");
   fprintf(out, "  rts\n\n");
 }
 
 void M6502_8::insert_push_array_length()
 {
   fprintf(out, "push_array_length:\n");
-  POP_HI();
-  fprintf(out, "  sta result + 1\n");
-  POP_LO();
-  fprintf(out, "  sta result + 0\n");
-
-  fprintf(out, "  lda result + 0\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda result + 1\n");
-  fprintf(out, "  sta address + 1\n");
   fprintf(out, "  sec\n");
-  fprintf(out, "  lda address + 0\n");
+  fprintf(out, "  lda stack_lo - 1,x\n");
   fprintf(out, "  sbc #2\n");
   fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda address + 1\n");
+  fprintf(out, "  lda stack_hi - 1,x\n");
   fprintf(out, "  sbc #0\n");
   fprintf(out, "  sta address + 1\n");
-
   fprintf(out, "  ldy #0\n");
   fprintf(out, "  lda (address),y\n");
-  fprintf(out, "  sta result + 0\n");
-  fprintf(out, "  ldy #1\n");
+  fprintf(out, "  sta stack_lo + 1,x\n");
+  fprintf(out, "  iny\n");
   fprintf(out, "  lda (address),y\n");
-  fprintf(out, "  sta result + 1\n");
-
-  fprintf(out, "  lda result + 0\n");
-  PUSH_LO();
-  fprintf(out, "  lda result + 1\n");
-  PUSH_HI();
+  fprintf(out, "  sta stack_hi + 1,x\n");
   fprintf(out, "  rts\n\n");
 }
 
 void M6502_8::insert_array_read_byte()
 {
-  fprintf(out, "array_read_byte:\n");
-  POP_HI();
-  fprintf(out, "  sta value1 + 1\n");
-  POP_LO();
-  fprintf(out, "  sta value1 + 0\n");
-  POP_HI();
-  fprintf(out, "  sta value2 + 1\n");
-  POP_LO();
-  fprintf(out, "  sta value2 + 0\n");
-  
+  fprintf(out, "  array_read_byte:\n");
+  fprintf(out, "  inx\n");
   fprintf(out, "  clc\n");
-  fprintf(out, "  lda value1 + 0\n");
-  fprintf(out, "  adc value2 + 0\n");
-  fprintf(out, "  sta value2 + 0\n");
-  fprintf(out, "  lda value1 + 1\n");
-  fprintf(out, "  adc value2 + 1\n");
-  fprintf(out, "  sta value2 + 1\n");
+  fprintf(out, "  lda stack_lo + 1,x\n");
+  fprintf(out, "  adc stack_lo + 0,x\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda stack_hi + 1,x\n");
+  fprintf(out, "  adc stack_hi + 0,x\n");
+  fprintf(out, "  sta address + 1\n");
   fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda (value2),y\n");
-  PUSH();
+  fprintf(out, "  lda (address),y\n");
+  fprintf(out, "  sta stack_lo + 1,x\n");
   fprintf(out, "  rts\n\n");
 }
 
 void M6502_8::insert_memory_read8()
 {
   fprintf(out, "memory_read8:\n");
-  POP_HI();
-  fprintf(out, "  sta address + 1\n");
-  POP_LO();
+  fprintf(out, "  lda stack_lo - 1,x\n");
   fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda stack_hi - 1,x\n");
+  fprintf(out, "  sta address + 1\n");
   fprintf(out, "  ldy #0\n");
   fprintf(out, "  lda (address),y\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo + 0,x\n");
   fprintf(out, "  rts\n\n");
 }
 
 void M6502_8::insert_memory_write8()
 {
   fprintf(out, "memory_write8:\n");
-  POP();
-  fprintf(out, "  sta result\n");
-  POP_HI();
-  fprintf(out, "  sta address + 1\n");
-  POP_LO();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo + 1,x\n");
   fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda stack_hi + 1,x\n");
+  fprintf(out, "  sta address + 1\n");
   fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda result\n");
+  fprintf(out, "  lda stack_lo + 0,x\n");
   fprintf(out, "  sta (address),y\n");
+  fprintf(out, "  inx\n");
   fprintf(out, "  rts\n\n");
 }
 

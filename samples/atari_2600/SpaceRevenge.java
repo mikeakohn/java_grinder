@@ -183,8 +183,9 @@ public class SpaceRevenge
         {
           score0 = 0;
           score1 = 0;
-          //shot1_offset = (3 << (game_params[game] >> 4)) >> 1;
-          shot1_offset = (2 << game_params[game] >> 4);
+//joe
+          shot1_offset = (3 << (game_params[game] >> 4)) >> 1;
+          //shot1_offset = (2 << game_params[game] >> 4);
           Atari2600.setColorPlayfield(0x06);
           Atari2600.setColorPlayer0(0x88);
           Atari2600.setColorPlayer1(0x38);

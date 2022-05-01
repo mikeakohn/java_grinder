@@ -19,27 +19,37 @@
 #include "generator/C64.h"
 
 #define POKE(dst) \
-  POP_HI(); \
-  POP_LO(); \
-  fprintf(out, "  sta 0x%04x\n", dst)
+  fprintf(out, "  inx\n"); \
+  fprintf(out, "  lda stack_lo,x\n"); \
+  fprintf(out, "  sta 0x%04x\n", dst); \
+  stack--
 
 #define PEEK(src) \
   fprintf(out, "  lda 0x%04x\n", src); \
-  PUSH_LO(); \
+  fprintf(out, "  sta stack_lo,x\n"); \
   fprintf(out, "  lda #0\n"); \
-  PUSH_HI()
+  fprintf(out, "  sta stack_hi,x\n"); \
+  fprintf(out, "  dex\n"); \
+  stack++
 
 C64::C64() :
+  label_count(0),
+
   need_c64_vic_hires_enable(0),
   need_c64_vic_hires_clear(0),
   need_c64_vic_hires_plot(0),
   need_c64_vic_make_hires_tables(0),
   need_c64_vic_text_enable(0),
   need_c64_vic_text_clear(0),
+  need_c64_vic_text_copy(0),
   need_c64_vic_text_plot(0),
+  need_c64_vic_text_read(0),
+  need_c64_vic_make_color_table(0),
   need_c64_vic_color_ram_clear(0)
 {
   start_org = 0x07ff;
+//  java_stack_lo = 0xb0;
+//  java_stack_hi = 0xd0;
   java_stack_lo = 0x200;
   java_stack_hi = 0x300;
   ram_start = 0xa000;
@@ -53,7 +63,11 @@ C64::~C64()
   if(need_c64_vic_make_hires_tables) { insert_c64_vic_make_hires_tables(); }
   if(need_c64_vic_text_enable) { insert_c64_vic_text_enable(); }
   if(need_c64_vic_text_clear) { insert_c64_vic_text_clear(); }
+  if(need_c64_vic_text_copy) { insert_c64_vic_text_copy(); }
   if(need_c64_vic_text_plot) { insert_c64_vic_text_plot(); }
+  if(need_c64_vic_text_read) { insert_c64_vic_text_read(); }
+  if(need_c64_vic_make_text_table) { insert_c64_vic_make_text_table(); }
+  if(need_c64_vic_make_color_table) { insert_c64_vic_make_color_table(); }
   if(need_c64_vic_color_ram_clear) { insert_c64_vic_color_ram_clear(); }
 }
 
@@ -85,6 +99,10 @@ int C64::open(const char *filename)
   fprintf(out, "value1 equ 0x2a\n");
   fprintf(out, "value2 equ 0x2c\n");
   fprintf(out, "value3 equ 0x2e\n");
+  fprintf(out, "temp1 equ 0x30\n");
+  fprintf(out, "temp2 equ 0x32\n");
+
+  // 0x40-0xa3 reserved for text/color tables
 
   // sprites
   fprintf(out, "sprite_msb_set equ 0x10\n");
@@ -112,23 +130,42 @@ int C64::open(const char *filename)
   fprintf(out, "start:\n");
   fprintf(out, "  sei\n");
   fprintf(out, "  cld\n");
-  fprintf(out, "  lda #0xff\n");
-  fprintf(out, "  tax\n");
+  fprintf(out, "  ldx #0xff\n");
   fprintf(out, "  txs\n");
 
   // switch VIC-II to bank 0
   fprintf(out, "  lda #4\n");
   fprintf(out, "  sta 0xdd00\n");
 
-  // put text screen at 0xc000 and charset at 0xc800
-  fprintf(out, "  lda #2\n");
+  // put text screen at 0xc400 and charset at 0xc800
+  fprintf(out, "  lda #0x12\n");
   fprintf(out, "  sta 0xd018\n");
 
   // copy charset from ROM
+  // lowercase charset
   fprintf(out, "  lda #50\n");
   fprintf(out, "  sta 0x0001\n");
   fprintf(out, "  ldy #0\n");
   fprintf(out, "copy_charset_loop:\n");
+  fprintf(out, "  lda 0xd800,y\n");
+  fprintf(out, "  sta 0xc800,y\n");
+  fprintf(out, "  lda 0xd900,y\n");
+  fprintf(out, "  sta 0xc900,y\n");
+  fprintf(out, "  lda 0xda00,y\n");
+  fprintf(out, "  sta 0xca00,y\n");
+  fprintf(out, "  lda 0xdb00,y\n");
+  fprintf(out, "  sta 0xcb00,y\n");
+  fprintf(out, "  lda 0xdc00,y\n");
+  fprintf(out, "  sta 0xcc00,y\n");
+  fprintf(out, "  lda 0xdd00,y\n");
+  fprintf(out, "  sta 0xcd00,y\n");
+  fprintf(out, "  lda 0xde00,y\n");
+  fprintf(out, "  sta 0xce00,y\n");
+  fprintf(out, "  lda 0xdf00,y\n");
+  fprintf(out, "  sta 0xcf00,y\n");
+
+/*
+  // uppercase charset
   fprintf(out, "  lda 0xd000,y\n");
   fprintf(out, "  sta 0xc800,y\n");
   fprintf(out, "  lda 0xd100,y\n");
@@ -145,6 +182,7 @@ int C64::open(const char *filename)
   fprintf(out, "  sta 0xce00,y\n");
   fprintf(out, "  lda 0xd700,y\n");
   fprintf(out, "  sta 0xcf00,y\n");
+*/
   fprintf(out, "  dey\n");
   fprintf(out, "  bne copy_charset_loop\n");
 
@@ -158,20 +196,24 @@ int C64::open(const char *filename)
 
 int C64::c64_sid_voice1_frequency(/* value */)
 {
-  POP_HI();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_hi,x\n");
   fprintf(out, "  sta 0xd401\n");
-  POP_LO();
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd400\n");
+  stack--;
 
   return 0;
 }
 
 int C64::c64_sid_voice1_pulse_width(/* value */)
 {
-  POP_HI();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_hi,x\n");
   fprintf(out, "  sta 0xd403\n");
-  POP_LO();
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd402\n");
+  stack--;
 
   return 0;
 }
@@ -180,30 +222,36 @@ int C64::c64_sid_voice1_waveform(/* value */) { POKE(0xd404); return 0; }
 
 int C64::c64_sid_voice1_adsr(/* value */)
 {
-  POP_HI();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_hi,x\n");
   fprintf(out, "  sta 0xd406\n");
-  POP_LO();
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd405\n");
+  stack--;
 
   return 0;
 }
 
 int C64::c64_sid_voice2_frequency(/* value */)
 {
-  POP_HI();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_hi,x\n");
   fprintf(out, "  sta 0xd408\n");
-  POP_LO();
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd407\n");
+  stack--;
 
   return 0;
 }
 
 int C64::c64_sid_voice2_pulse_width(/* value */)
 {
-  POP_HI();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_hi,x\n");
   fprintf(out, "  sta 0xd40a\n");
-  POP_LO();
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd409\n");
+  stack--;
 
   return 0;
 }
@@ -212,30 +260,36 @@ int C64::c64_sid_voice2_waveform(/* value */) { POKE(0xd40b); return 0; }
 
 int C64::c64_sid_voice2_adsr(/* value */)
 {
-  POP_HI();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_hi,x\n");
   fprintf(out, "  sta 0xd40d\n");
-  POP_LO();
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd40c\n");
+  stack--;
 
   return 0;
 }
 
 int C64::c64_sid_voice3_frequency(/* value */)
 {
-  POP_HI();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_hi,x\n");
   fprintf(out, "  sta 0xd40f\n");
-  POP_LO();
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd40e\n");
+  stack--;
 
   return 0;
 }
 
 int C64::c64_sid_voice3_pulse_width(/* value */)
 {
-  POP_HI();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_hi,x\n");
   fprintf(out, "  sta 0xd411\n");
-  POP_LO();
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd410\n");
+  stack--;
 
   return 0;
 }
@@ -244,20 +298,24 @@ int C64::c64_sid_voice3_waveform(/* value */) { POKE(0xd412); return 0; }
 
 int C64::c64_sid_voice3_adsr(/* value */)
 {
-  POP_HI();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_hi,x\n");
   fprintf(out, "  sta 0xd414\n");
-  POP_LO();
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd413\n");
+  stack--;
 
   return 0;
 }
 
 int C64::c64_sid_filter_cutoff(/* value */)
 {
-  POP_HI();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_hi,x\n");
   fprintf(out, "  sta 0xd416\n");
-  POP_LO();
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd415\n");
+  stack--;
 
   return 0;
 }
@@ -284,21 +342,23 @@ int C64::c64_vic_sprite0pos(/* x, y */)
   fprintf(out, "; sprite0pos\n");
 
   // y
-  POP_HI();
-  POP_LO();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd001\n");
 
   // x
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  and #255 - 1\n");
   fprintf(out, "  sta 0xd010\n");
-  POP_HI();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_hi,x\n");
   fprintf(out, "  beq #8\n");
   fprintf(out, "  lda 0xd010\n");
-  fprintf(out, "  ora #(1 << 0)\n");
+  fprintf(out, "  ora #1\n");
   fprintf(out, "  sta 0xd010\n");
-  POP_LO();
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd000\n");
+  stack -= 2;
 
   return 0;
 }
@@ -308,21 +368,23 @@ int C64::c64_vic_sprite1pos(/* x, y */)
   fprintf(out, "; sprite1pos\n");
 
   // y
-  POP_HI();
-  POP_LO();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd003\n");
 
   // x
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  and #255 - 2\n");
   fprintf(out, "  sta 0xd010\n");
-  POP_HI();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_hi,x\n");
   fprintf(out, "  beq #8\n");
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  ora #2\n");
   fprintf(out, "  sta 0xd010\n");
-  POP_LO();
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd002\n");
+  stack -= 2;
 
   return 0;
 }
@@ -332,21 +394,23 @@ int C64::c64_vic_sprite2pos(/* x, y */)
   fprintf(out, "; sprite2pos\n");
 
   // y
-  POP_HI();
-  POP_LO();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd005\n");
 
   // x
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  and #255 - 4\n");
   fprintf(out, "  sta 0xd010\n");
-  POP_HI();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_hi,x\n");
   fprintf(out, "  beq #8\n");
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  ora #4\n");
   fprintf(out, "  sta 0xd010\n");
-  POP_LO();
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd004\n");
+  stack -= 2;
 
   return 0;
 }
@@ -356,21 +420,23 @@ int C64::c64_vic_sprite3pos(/* x, y */)
   fprintf(out, "; sprite3pos\n");
 
   // y
-  POP_HI();
-  POP_LO();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd007\n");
 
   // x
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  and #255 - 8\n");
   fprintf(out, "  sta 0xd010\n");
-  POP_HI();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_hi,x\n");
   fprintf(out, "  beq #8\n");
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  ora #8\n");
   fprintf(out, "  sta 0xd010\n");
-  POP_LO();
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd006\n");
+  stack -= 2;
 
   return 0;
 }
@@ -380,21 +446,23 @@ int C64::c64_vic_sprite4pos(/* x, y */)
   fprintf(out, "; sprite4pos\n");
 
   // y
-  POP_HI();
-  POP_LO();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd009\n");
 
   // x
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  and #255 - 16\n");
   fprintf(out, "  sta 0xd010\n");
-  POP_HI();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_hi,x\n");
   fprintf(out, "  beq #8\n");
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  ora #16\n");
   fprintf(out, "  sta 0xd010\n");
-  POP_LO();
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd008\n");
+  stack -= 2;
 
   return 0;
 }
@@ -404,21 +472,23 @@ int C64::c64_vic_sprite5pos(/* x, y */)
   fprintf(out, "; sprite5pos\n");
 
   // y
-  POP_HI();
-  POP_LO();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd00b\n");
 
   // x
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  and #255 - 32\n");
   fprintf(out, "  sta 0xd010\n");
-  POP_HI();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_hi,x\n");
   fprintf(out, "  beq #8\n");
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  ora #32\n");
   fprintf(out, "  sta 0xd010\n");
-  POP_LO();
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd00a\n");
+  stack -= 2;
 
   return 0;
 }
@@ -428,21 +498,23 @@ int C64::c64_vic_sprite6pos(/* x, y */)
   fprintf(out, "; sprite6pos\n");
 
   // y
-  POP_HI();
-  POP_LO();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd00d\n");
 
   // x
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  and #255 - 64\n");
   fprintf(out, "  sta 0xd010\n");
-  POP_HI();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_hi,x\n");
   fprintf(out, "  beq #8\n");
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  ora #64\n");
   fprintf(out, "  sta 0xd010\n");
-  POP_LO();
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd00c\n");
+  stack -= 2;
 
   return 0;
 }
@@ -452,21 +524,23 @@ int C64::c64_vic_sprite7pos(/* x, y */)
   fprintf(out, "; sprite7pos\n");
 
   // y
-  POP_HI();
-  POP_LO();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd00f\n");
 
   // x
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  and #255 - 128\n");
   fprintf(out, "  sta 0xd010\n");
-  POP_HI();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_hi,x\n");
   fprintf(out, "  beq #8\n");
   fprintf(out, "  lda 0xd010\n");
   fprintf(out, "  ora #128\n");
   fprintf(out, "  sta 0xd010\n");
-  POP_LO();
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd00e\n");
+  stack -= 2;
 
   return 0;
 }
@@ -476,13 +550,15 @@ int C64::c64_vic_read_control1() { PEEK(0xd011); return 0; }
 int C64::c64_vic_wait_raster(/* line */)
 {
   fprintf(out, "; wait_raster\n");
-  POP_HI();
-  POP_LO();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  cmp 0xd012\n");
   fprintf(out, "  bne #-5\n");
+  stack--;
 
   return 0;
 }
+
 int C64::c64_vic_sprite_enable(/* value */) { POKE(0xd015); return 0; }
 int C64::c64_vic_write_control2(/* value */) { POKE(0xd016); return 0; }
 int C64::c64_vic_read_control2() { PEEK(0xd016); return 0; }
@@ -521,6 +597,8 @@ int C64::c64_vic_hires_clear(/* value */)
 {
   need_c64_vic_hires_clear = 1;
   fprintf(out, "  jsr hires_clear\n");
+  stack--;
+
   return 0;
 }
 
@@ -528,6 +606,8 @@ int C64::c64_vic_hires_plot(/* x, y, value */)
 {
   need_c64_vic_hires_plot = 1;
   fprintf(out, "  jsr hires_plot\n");
+  stack -= 3;
+
   return 0;
 }
 
@@ -549,13 +629,47 @@ int C64::c64_vic_text_clear(/* value */)
 {
   need_c64_vic_text_clear = 1;
   fprintf(out, "  jsr text_clear\n");
+  stack--;
+
   return 0;
 }
 
-int C64::c64_vic_text_plot(/* x, y, value */)
+int C64::c64_vic_text_copy()
+{
+  need_c64_vic_text_copy = 1;
+  fprintf(out, "  jsr text_copy\n");
+  return 0;
+}
+
+int C64::c64_vic_text_plot(/* x, y, value, color */)
 {
   need_c64_vic_text_plot = 1;
   fprintf(out, "  jsr text_plot\n");
+  stack -= 4;
+
+  return 0;
+}
+
+int C64::c64_vic_text_read(/* x, y */)
+{
+  need_c64_vic_text_read = 1;
+  fprintf(out, "  jsr text_read\n");
+  stack--;
+
+  return 0;
+}
+
+int C64::c64_vic_make_text_table()
+{
+  need_c64_vic_make_text_table = 1;
+  fprintf(out, "  jsr make_text_table\n");
+  return 0;
+}
+
+int C64::c64_vic_make_color_table()
+{
+  need_c64_vic_make_color_table = 1;
+  fprintf(out, "  jsr make_color_table\n");
   return 0;
 }
 
@@ -563,6 +677,7 @@ int C64::c64_vic_color_ram_clear(/* value */)
 {
   need_c64_vic_color_ram_clear = 1;
   fprintf(out, "  jsr color_ram_clear\n");
+  stack--;
   return 0;
 }
 
@@ -580,8 +695,8 @@ void C64::insert_c64_vic_hires_enable()
 void C64::insert_c64_vic_hires_clear()
 {
   fprintf(out, "hires_clear:\n");
-  POP_HI();
-  POP_LO();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  ldy #0\n");
   fprintf(out, "hires_clear_loop:\n");
   fprintf(out, "  sta 0xe000,y\n");
@@ -625,21 +740,21 @@ void C64::insert_c64_vic_hires_plot()
 {
   fprintf(out, "hires_plot:\n");
   // value
-  POP_HI();
-  POP_LO();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   // y
-  POP_HI();
-  POP_LO();
-  fprintf(out, "  tay\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  ldy stack_lo,x\n");
   // address lo/hi
   fprintf(out, "  lda 0x0400,y\n");
   fprintf(out, "  sta address + 0\n");
   fprintf(out, "  lda 0x0500,y\n");
   fprintf(out, "  sta address + 1\n");
   // x
-  POP_HI();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_hi,x\n");
   fprintf(out, "  sta result + 1\n");
-  POP_LO();
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta result + 0\n");
   // x & 7
   fprintf(out, "  and #7\n");
@@ -786,36 +901,146 @@ void C64::insert_c64_vic_text_enable()
 void C64::insert_c64_vic_text_clear()
 {
   fprintf(out, "text_clear:\n");
-  POP_HI();
-  POP_LO();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  ldy #0\n");
   fprintf(out, "text_clear_loop:\n");
   fprintf(out, "  sta 0xc000,y\n");
   fprintf(out, "  sta 0xc100,y\n");
   fprintf(out, "  sta 0xc200,y\n");
-  fprintf(out, "  sta 0xc300,y\n");
+  fprintf(out, "  sta 0xc2e8,y\n");
   fprintf(out, "  dey\n");
   fprintf(out, "  bne text_clear_loop\n");
+  fprintf(out, "  rts\n");
+}
+
+// copy screen buffers
+void C64::insert_c64_vic_text_copy()
+{
+  fprintf(out, "text_copy:\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "text_copy_loop_1:\n");
+  fprintf(out, "  lda 0xc000,y\n");
+  fprintf(out, "  sta 0xc400,y\n");
+  fprintf(out, "  lda 0xc100,y\n");
+  fprintf(out, "  sta 0xc500,y\n");
+  fprintf(out, "  lda 0xc200,y\n");
+  fprintf(out, "  sta 0xc600,y\n");
+  fprintf(out, "  lda 0xc2e8,y\n");
+  fprintf(out, "  sta 0xc6e8,y\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  bne text_copy_loop_1\n");
   fprintf(out, "  rts\n");
 }
 
 void C64::insert_c64_vic_text_plot()
 {
   fprintf(out, "text_plot:\n");
+  fprintf(out, "  lda stack_lo + 4,x\n");
+  fprintf(out, "  tay\n");  // x
+  fprintf(out, "text_plot_row:\n");
+  fprintf(out, "  lda stack_lo + 3,x\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  adc #0x40\n");
+  fprintf(out, "  sta text_plot_char + 4\n");
+  fprintf(out, "  adc #50\n");
+  fprintf(out, "  sta text_plot_color + 4\n");
+  fprintf(out, "text_plot_char:\n");
+  fprintf(out, "  lda stack_lo + 2,x\n");
+  fprintf(out, "  sta (0x40),y\n");
+  fprintf(out, "text_plot_color:\n");
+  fprintf(out, "  lda stack_lo + 1,x\n");
+  fprintf(out, "  sta (0x72),y\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  rts\n");
+}
+
+void C64::insert_c64_vic_text_read()
+{
+  fprintf(out, "text_read:\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo + 0,x\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  adc #0x40\n");
+  fprintf(out, "  sta text_read_row + 1\n");
+  fprintf(out, "  lda stack_lo + 1,x\n");
+  fprintf(out, "  tay\n");  // x
+  fprintf(out, "text_read_row:\n");
+  fprintf(out, "  lda (0x40),y\n");
+  fprintf(out, "  sta stack_lo + 1,x\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sta stack_hi + 1,x\n");
+  fprintf(out, "  rts\n");
+}
+
+void C64::insert_c64_vic_make_text_table()
+{
+  fprintf(out, "make_text_table:\n");
+  fprintf(out, "  lda #0x00\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda #0xc0\n");
+  fprintf(out, "  sta address + 1\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "make_text_table_loop:\n");
+  fprintf(out, "  lda address + 0\n");
+  fprintf(out, "  sta 0x40,y\n");
+  fprintf(out, "  lda address + 1\n");
+  fprintf(out, "  sta 0x41,y\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda address + 0\n");
+  fprintf(out, "  adc #40\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda address + 1\n");
+  fprintf(out, "  adc #0\n");
+  fprintf(out, "  sta address + 1\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  cpy #50\n");
+  fprintf(out, "  bmi make_text_table_loop\n");
+  fprintf(out, "  rts\n");
+}
+
+void C64::insert_c64_vic_make_color_table()
+{
+  fprintf(out, "make_color_table:\n");
+  fprintf(out, "  lda #0x00\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda #0xd8\n");
+  fprintf(out, "  sta address + 1\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "make_color_table_loop:\n");
+  fprintf(out, "  lda address + 0\n");
+  fprintf(out, "  sta 0x72,y\n");
+  fprintf(out, "  lda address + 1\n");
+  fprintf(out, "  sta 0x73,y\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda address + 0\n");
+  fprintf(out, "  adc #40\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda address + 1\n");
+  fprintf(out, "  adc #0\n");
+  fprintf(out, "  sta address + 1\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  cpy #50\n");
+  fprintf(out, "  bmi make_color_table_loop\n");
   fprintf(out, "  rts\n");
 }
 
 void C64::insert_c64_vic_color_ram_clear()
 {
   fprintf(out, "color_ram_clear:\n");
-  POP_HI();
-  POP_LO();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  ldy #0\n");
   fprintf(out, "color_ram_clear_loop:\n");
   fprintf(out, "  sta 0xd800,y\n");
   fprintf(out, "  sta 0xd900,y\n");
   fprintf(out, "  sta 0xda00,y\n");
-  fprintf(out, "  sta 0xdb00,y\n");
+  fprintf(out, "  sta 0xdae8,y\n");
   fprintf(out, "  dey\n");
   fprintf(out, "  bne color_ram_clear_loop\n");
   fprintf(out, "  rts\n");

@@ -88,17 +88,28 @@ public:
   virtual int c64_vic_make_hires_tables();
   virtual int c64_vic_text_enable();
   virtual int c64_vic_text_clear();
+  virtual int c64_vic_text_copy();
   virtual int c64_vic_text_plot();
+  virtual int c64_vic_text_read();
+  virtual int c64_vic_make_text_table();
+  virtual int c64_vic_make_color_table();
   virtual int c64_vic_color_ram_clear();
 
 protected:
+  int label_count;
+
   bool need_c64_vic_hires_enable:1;
   bool need_c64_vic_hires_clear:1;
   bool need_c64_vic_hires_plot:1;
   bool need_c64_vic_make_hires_tables:1;
   bool need_c64_vic_text_enable:1;
   bool need_c64_vic_text_clear:1;
+  bool need_c64_vic_text_copy:1;
   bool need_c64_vic_text_plot:1;
+  bool need_c64_vic_text_read:1;
+  bool need_c64_vic_text_print:1;
+  bool need_c64_vic_make_text_table:1;
+  bool need_c64_vic_make_color_table:1;
   bool need_c64_vic_color_ram_clear:1;
 
   void insert_c64_vic_hires_enable();
@@ -107,7 +118,11 @@ protected:
   void insert_c64_vic_make_hires_tables();
   void insert_c64_vic_text_enable();
   void insert_c64_vic_text_clear();
+  void insert_c64_vic_text_copy();
   void insert_c64_vic_text_plot();
+  void insert_c64_vic_text_read();
+  void insert_c64_vic_make_text_table();
+  void insert_c64_vic_make_color_table();
   void insert_c64_vic_color_ram_clear();
 };
 

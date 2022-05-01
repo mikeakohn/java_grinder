@@ -237,9 +237,29 @@ static int c64_vic_text_clear(JavaClass *java_class, Generator *generator)
   return generator->c64_vic_text_clear();
 }
 
+static int c64_vic_text_copy(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_text_copy();
+}
+
 static int c64_vic_text_plot(JavaClass *java_class, Generator *generator)
 {
   return generator->c64_vic_text_plot();
+}
+
+static int c64_vic_text_read(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_text_read();
+}
+
+static int c64_vic_make_text_table(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_make_text_table();
+}
+
+static int c64_vic_make_color_table(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_make_color_table();
 }
 
 static int c64_vic_color_ram_clear(JavaClass *java_class, Generator *generator)
@@ -293,7 +313,11 @@ int c64_vic(JavaClass *java_class, Generator *generator, const char *function)
   CHECK_FUNC(make_hires_tables)
   CHECK_FUNC(text_enable)
   CHECK_FUNC(text_clear)
+  CHECK_FUNC(text_copy)
   CHECK_FUNC(text_plot)
+  CHECK_FUNC(text_read)
+  CHECK_FUNC(make_text_table)
+  CHECK_FUNC(make_color_table)
   CHECK_FUNC(color_ram_clear)
 
   return -1;

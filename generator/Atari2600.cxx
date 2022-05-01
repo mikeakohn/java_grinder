@@ -97,7 +97,8 @@ int Atari2600::finish()
 int Atari2600::atari2600_waitHsync_I()
 {
   fprintf(out, "; waitLines_I()\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  tay\n");
   fprintf(out, "_wait_sync_%d:\n", label_count);
   fprintf(out, "  sta WSYNC\n");
@@ -164,7 +165,8 @@ int Atari2600::atari2600_waitOverscan()
 int Atari2600::atari2600_setColorPlayer0_I()
 {
   fprintf(out, "; setColorPlayer0_I\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta COLUP0\n");
   stack--;
 
@@ -188,7 +190,8 @@ int Atari2600::atari2600_setColorPlayer0_I(int color)
 int Atari2600::atari2600_setColorPlayer1_I()
 {
   fprintf(out, "; setColorPlayer1_I\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta COLUP1\n");
   stack--;
 
@@ -212,7 +215,8 @@ int Atari2600::atari2600_setColorPlayer1_I(int color)
 int Atari2600::atari2600_setColorPlayfield_I()
 {
   fprintf(out, "; setColorPlayfield_I\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta COLUPF\n");
   stack--;
 
@@ -236,7 +240,8 @@ int Atari2600::atari2600_setColorPlayfield_I(int color)
 int Atari2600::atari2600_setColorBackground_I()
 {
   fprintf(out, "; setColorBackground_I\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta COLUBK\n");
   stack--;
 
@@ -406,7 +411,8 @@ int Atari2600::atari2600_disablePlayer1Reflect()
 int Atari2600::atari2600_setPlayfieldMode_I()
 {
   fprintf(out, "; setPlayfieldMode_I\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta CTRLPF\n");
   stack--;
 
@@ -424,7 +430,8 @@ int Atari2600::atari2600_setPlayfieldMode_I(int mode)
 int Atari2600::atari2600_setPlayfield0_B()
 {
   fprintf(out, "; setPlayfield0_B\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta PF0\n");
   stack--;
 
@@ -443,7 +450,8 @@ int Atari2600::atari2600_setPlayfield0_B(int value)
 int Atari2600::atari2600_setPlayfield1_B()
 {
   fprintf(out, "; setPlayfield1_B\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta PF1\n");
   stack--;
 
@@ -462,7 +470,8 @@ int Atari2600::atari2600_setPlayfield1_B(int value)
 int Atari2600::atari2600_setPlayfield2_B()
 {
   fprintf(out, "; setPlayfield2_B\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta PF2\n");
   stack--;
 
@@ -481,10 +490,11 @@ int Atari2600::atari2600_setPlayfield2_B(int value)
 int Atari2600::atari2600_setPlayfieldData_aB()
 {
   fprintf(out, "; setPlayfieldData\n");
-  POP_HI();
-  fprintf(out, "  sta playfield + 1\n");
-  POP_LO();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta playfield + 0\n");
+  fprintf(out, "  lda stack_hi,x\n");
+  fprintf(out, "  sta playfield + 1\n");
   stack--;
 
   return 0;
@@ -493,7 +503,8 @@ int Atari2600::atari2600_setPlayfieldData_aB()
 int Atari2600::atari2600_setPlayfieldLength_B()
 {
   fprintf(out, "; setPlayfieldLength\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta playfield_length\n");
   stack--;
 
@@ -503,9 +514,11 @@ int Atari2600::atari2600_setPlayfieldLength_B()
 int Atari2600::atari2600_setPlayer0Position_BB()
 {
   fprintf(out, "; setPlayer0Position\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta player0_y\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  stx result\n");
   fprintf(out, "  ldx #0\n");
   fprintf(out, "  jsr div15\n");
@@ -518,9 +531,11 @@ int Atari2600::atari2600_setPlayer0Position_BB()
 int Atari2600::atari2600_setPlayer1Position_BB()
 {
   fprintf(out, "; setPlayer1Position\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta player1_y\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  stx result\n");
   fprintf(out, "  ldx #1\n");
   fprintf(out, "  jsr div15\n");
@@ -533,9 +548,11 @@ int Atari2600::atari2600_setPlayer1Position_BB()
 int Atari2600::atari2600_setMissile0Position_BB()
 {
   fprintf(out, "; setMissile0Position\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta missile0_y\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  stx result\n");
   fprintf(out, "  ldx #2\n");
   fprintf(out, "  jsr div15\n");
@@ -548,9 +565,11 @@ int Atari2600::atari2600_setMissile0Position_BB()
 int Atari2600::atari2600_setMissile1Position_BB()
 {
   fprintf(out, "; setMissile1Position\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta missile1_y\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  stx result\n");
   fprintf(out, "  ldx #3\n");
   fprintf(out, "  jsr div15\n");
@@ -563,9 +582,11 @@ int Atari2600::atari2600_setMissile1Position_BB()
 int Atari2600::atari2600_setBallPosition_BB()
 {
   fprintf(out, "; setBallPosition\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta ball_y\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  stx result\n");
   fprintf(out, "  ldx #4\n");
   fprintf(out, "  jsr div15\n");
@@ -578,10 +599,11 @@ int Atari2600::atari2600_setBallPosition_BB()
 int Atari2600::atari2600_setPlayer0Sprite_aB()
 {
   fprintf(out, "; setPlayer0Sprite\n");
-  POP_HI();
-  fprintf(out, "  sta player0_sprite + 1\n");
-  POP_LO();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta player0_sprite + 0\n");
+  fprintf(out, "  lda stack_hi,x\n");
+  fprintf(out, "  sta player0_sprite + 1\n");
   stack--;
 
   return 0;
@@ -590,10 +612,11 @@ int Atari2600::atari2600_setPlayer0Sprite_aB()
 int Atari2600::atari2600_setPlayer1Sprite_aB()
 {
   fprintf(out, "; setPlayer1Sprite\n");
-  POP_HI();
-  fprintf(out, "  sta player1_sprite + 1\n");
-  POP_LO();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta player1_sprite + 0\n");
+  fprintf(out, "  lda stack_hi,x\n");
+  fprintf(out, "  sta player1_sprite + 1\n");
   stack--;
 
   return 0;
@@ -602,10 +625,11 @@ int Atari2600::atari2600_setPlayer1Sprite_aB()
 int Atari2600::atari2600_setMissile0Sprite_aB()
 {
   fprintf(out, "; setMissile0Sprite\n");
-  POP_HI();
-  fprintf(out, "  sta missile0_sprite + 1\n");
-  POP_LO();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta missile0_sprite + 0\n");
+  fprintf(out, "  lda stack_hi,x\n");
+  fprintf(out, "  sta missile0_sprite + 1\n");
   stack--;
 
   return 0;
@@ -614,10 +638,11 @@ int Atari2600::atari2600_setMissile0Sprite_aB()
 int Atari2600::atari2600_setMissile1Sprite_aB()
 {
   fprintf(out, "; setMissile1Sprite\n");
-  POP_HI();
-  fprintf(out, "  sta missile1_sprite + 1\n");
-  POP_LO();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta missile1_sprite + 0\n");
+  fprintf(out, "  lda stack_hi,x\n");
+  fprintf(out, "  sta missile1_sprite + 1\n");
   stack--;
 
   return 0;
@@ -626,10 +651,11 @@ int Atari2600::atari2600_setMissile1Sprite_aB()
 int Atari2600::atari2600_setBallSprite_aB()
 {
   fprintf(out, "; setBallSprite\n");
-  POP_HI();
-  fprintf(out, "  sta ball_sprite + 1\n");
-  POP_LO();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta ball_sprite + 0\n");
+  fprintf(out, "  lda stack_hi,x\n");
+  fprintf(out, "  sta ball_sprite + 1\n");
   stack--;
 
   return 0;
@@ -648,7 +674,8 @@ int Atari2600::atari2600_isCollisionMissile0Player1()
   fprintf(out, "; isCollisionMissile0Player1\n");
   fprintf(out, "  lda CXM0P\n");
   fprintf(out, "  and #0x80\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -659,7 +686,8 @@ int Atari2600::atari2600_isCollisionMissile0Player0()
   fprintf(out, "; isCollisionMissile0Player0\n");
   fprintf(out, "  lda CXM0P\n");
   fprintf(out, "  and #0x40\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -670,7 +698,8 @@ int Atari2600::atari2600_isCollisionMissile1Player0()
   fprintf(out, "; isCollisionMissile1Player0\n");
   fprintf(out, "  lda CXM1P\n");
   fprintf(out, "  and #0x80\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -681,7 +710,8 @@ int Atari2600::atari2600_isCollisionMissile1Player1()
   fprintf(out, "; isCollisionMissile1Player1\n");
   fprintf(out, "  lda CXM1P\n");
   fprintf(out, "  and #0x40\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -692,7 +722,8 @@ int Atari2600::atari2600_isCollisionPlayer0PlayField()
   fprintf(out, "; isCollisionPlayer0PlayField\n");
   fprintf(out, "  lda CXP0FB\n");
   fprintf(out, "  and #0x80\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -703,7 +734,8 @@ int Atari2600::atari2600_isCollisionPlayer0Ball()
   fprintf(out, "; isCollisionPlayer0Ball\n");
   fprintf(out, "  lda CXP0FB\n");
   fprintf(out, "  and #0x40\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -714,7 +746,8 @@ int Atari2600::atari2600_isCollisionPlayer1PlayField()
   fprintf(out, "; isCollisionPlayer1PlayField\n");
   fprintf(out, "  lda CXP1FB\n");
   fprintf(out, "  and #0x80\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -725,7 +758,8 @@ int Atari2600::atari2600_isCollisionPlayer1Ball()
   fprintf(out, "; isCollisionPlayer1Ball\n");
   fprintf(out, "  lda CXP1FB\n");
   fprintf(out, "  and #0x40\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -736,7 +770,8 @@ int Atari2600::atari2600_isCollisionMissile0Playfield()
   fprintf(out, "; isCollisionMissile0Playfield\n");
   fprintf(out, "  lda CXM0FB\n");
   fprintf(out, "  and #0x80\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -747,7 +782,8 @@ int Atari2600::atari2600_isCollisionMissile0Ball()
   fprintf(out, "; isCollisionMissile0Ball\n");
   fprintf(out, "  lda CXM0FB\n");
   fprintf(out, "  and #0x40\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -758,7 +794,8 @@ int Atari2600::atari2600_isCollisionMissile1Playfield()
   fprintf(out, "; isCollisionMissile1Playfield\n");
   fprintf(out, "  lda CXM1FB\n");
   fprintf(out, "  and #0x80\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -769,7 +806,8 @@ int Atari2600::atari2600_isCollisionMissile1Ball()
   fprintf(out, "; isCollisionMissile1Ball\n");
   fprintf(out, "  lda CXM1FB\n");
   fprintf(out, "  and #0x40\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -780,7 +818,8 @@ int Atari2600::atari2600_isCollisionBallPlayfield()
   fprintf(out, "; isCollisionBallPlayfield\n");
   fprintf(out, "  lda CXBLPF\n");
   fprintf(out, "  and #0x80\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -791,7 +830,8 @@ int Atari2600::atari2600_isCollisionPlayer0Player1()
   fprintf(out, "; isCollisionPlayer0Player1\n");
   fprintf(out, "  lda CXPPMM\n");
   fprintf(out, "  and #0x80\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -802,7 +842,8 @@ int Atari2600::atari2600_isCollisionMissile0Missile1()
   fprintf(out, "; isCollisionMissile0Missile1\n");
   fprintf(out, "  lda CXPPMM\n");
   fprintf(out, "  and #0x40\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -811,7 +852,8 @@ int Atari2600::atari2600_isCollisionMissile0Missile1()
 int Atari2600::atari2600_setAudioControl0_B()
 {
   fprintf(out, "; setAudioControl0_B\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta AUDC0\n");
   stack--;
 
@@ -830,7 +872,8 @@ int Atari2600::atari2600_setAudioControl0_B(int value)
 int Atari2600::atari2600_setAudioControl1_B()
 {
   fprintf(out, "; setAudioControl1_B\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta AUDC1\n");
   stack--;
 
@@ -849,7 +892,8 @@ int Atari2600::atari2600_setAudioControl1_B(int value)
 int Atari2600::atari2600_setAudioFrequency0_B()
 {
   fprintf(out, "; setAudioFrequency0_B\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta AUDF0\n");
   stack--;
 
@@ -868,7 +912,8 @@ int Atari2600::atari2600_setAudioFrequency0_B(int value)
 int Atari2600::atari2600_setAudioFrequency1_B()
 {
   fprintf(out, "; setAudioFrequency1_B\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta AUDF1\n");
   stack--;
 
@@ -887,7 +932,8 @@ int Atari2600::atari2600_setAudioFrequency1_B(int value)
 int Atari2600::atari2600_setAudioVolume0_B()
 {
   fprintf(out, "; setAudioVolume0_B\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta AUDV0\n");
   stack--;
 
@@ -906,7 +952,8 @@ int Atari2600::atari2600_setAudioVolume0_B(int value)
 int Atari2600::atari2600_setAudioVolume1_B()
 {
   fprintf(out, "; setAudioVolume1_B\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta AUDV1\n");
   stack--;
 
@@ -937,7 +984,8 @@ int Atari2600::joystick_isRight_I(int index)
       "  lda SWCHA\n"
       "  and #0x80\n"
       "  eor #0x80\n");
-    PUSH();
+    fprintf(out, "  sta stack_lo,x\n");
+    fprintf(out, "  dex\n");
     stack++;
 
     return 0;
@@ -948,7 +996,8 @@ int Atari2600::joystick_isRight_I(int index)
       "  lda SWCHA\n"
       "  and #0x08\n"
       "  eor #0x08\n");
-    PUSH();
+    fprintf(out, "  sta stack_lo,x\n");
+    fprintf(out, "  dex\n");
     stack++;
 
     return 0;
@@ -972,7 +1021,8 @@ int Atari2600::joystick_isLeft_I(int index)
       "  lda SWCHA\n"
       "  and #0x40\n"
       "  eor #0x40\n");
-    PUSH();
+    fprintf(out, "  sta stack_lo,x\n");
+    fprintf(out, "  dex\n");
     stack++;
 
     return 0;
@@ -983,7 +1033,8 @@ int Atari2600::joystick_isLeft_I(int index)
       "  lda SWCHA\n"
       "  and #0x04\n"
       "  eor #0x04\n");
-    PUSH();
+    fprintf(out, "  sta stack_lo,x\n");
+    fprintf(out, "  dex\n");
     stack++;
 
     return 0;
@@ -1007,7 +1058,8 @@ int Atari2600::joystick_isDown_I(int index)
       "  lda SWCHA\n"
       "  and #0x20\n"
       "  eor #0x20\n");
-    PUSH();
+    fprintf(out, "  sta stack_lo,x\n");
+    fprintf(out, "  dex\n");
     stack++;
 
     return 0;
@@ -1018,8 +1070,9 @@ int Atari2600::joystick_isDown_I(int index)
       "  lda SWCHA\n"
       "  and #0x02\n"
       "  eor #0x02\n");
-      PUSH();
-      stack++;
+    fprintf(out, "  sta stack_lo,x\n");
+    fprintf(out, "  dex\n");
+    stack++;
 
       return 0;
   }
@@ -1042,7 +1095,8 @@ int Atari2600::joystick_isUp_I(int index)
       "  lda SWCHA\n"
       "  and #0x10\n"
       "  eor #0x10\n");
-    PUSH();
+    fprintf(out, "  sta stack_lo,x\n");
+    fprintf(out, "  dex\n");
     stack++;
 
     return 0;
@@ -1053,7 +1107,8 @@ int Atari2600::joystick_isUp_I(int index)
       "  lda SWCHA\n"
       "  and #0x01\n"
       "  eor #0x01\n");
-    PUSH();
+    fprintf(out, "  sta stack_lo,x\n");
+    fprintf(out, "  dex\n");
     stack++;
 
     return 0;
@@ -1077,7 +1132,8 @@ int Atari2600::joystick_isButtonDown_0_I(int index)
       "  lda INPT4\n"
       "  and #0x80\n"
       "  eor #0x80\n");
-    PUSH();
+    fprintf(out, "  sta stack_lo,x\n");
+    fprintf(out, "  dex\n");
     stack++;
 
     return 0;
@@ -1088,7 +1144,8 @@ int Atari2600::joystick_isButtonDown_0_I(int index)
       "  lda INPT5\n"
       "  and #0x80\n"
       "  eor #0x80\n");
-    PUSH();
+    fprintf(out, "  sta stack_lo,x\n");
+    fprintf(out, "  dex\n");
     stack++;
 
     return 0;
@@ -1101,7 +1158,8 @@ int Atari2600::atari2600_getSwitches()
 {
   fprintf(out, "; getSwitches\n");
   fprintf(out, "  lda SWCHB\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -1113,7 +1171,8 @@ int Atari2600::atari2600_isSwitchResetDown()
   fprintf(out, "  lda SWCHB\n");
   fprintf(out, "  and #0x01\n");
   fprintf(out, "  eor #0x01\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -1125,7 +1184,8 @@ int Atari2600::atari2600_isSwitchSelectDown()
   fprintf(out, "  lda SWCHB\n");
   fprintf(out, "  and #0x02\n");
   fprintf(out, "  eor #0x02\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -1136,7 +1196,8 @@ int Atari2600::atari2600_isSwitchColorSet()
   fprintf(out, "; isSwitchColorSet\n");
   fprintf(out, "  lda SWCHB\n");
   fprintf(out, "  and #0x04\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -1148,7 +1209,8 @@ int Atari2600::atari2600_isSwitchDifficultyP0Down()
   fprintf(out, "  lda SWCHB\n");
   fprintf(out, "  and #0x40\n");
   fprintf(out, "  eor #0x40\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -1160,7 +1222,8 @@ int Atari2600::atari2600_isSwitchDifficultyP1Down()
   fprintf(out, "  lda SWCHB\n");
   fprintf(out, "  and #0x80\n");
   fprintf(out, "  eor #0x80\n");
-  PUSH();
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  dex\n");
   stack++;
 
   return 0;
@@ -1170,7 +1233,8 @@ int Atari2600::atari2600_isSwitchDifficultyP1Down()
 int Atari2600::atari2600_setScore0_B()
 {
   fprintf(out, "; setScore0\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta result\n");
   fprintf(out, "  asl\n");
   fprintf(out, "  asl\n");
@@ -1185,7 +1249,8 @@ int Atari2600::atari2600_setScore0_B()
 int Atari2600::atari2600_setScore1_B()
 {
   fprintf(out, "; setScore1\n");
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta result\n");
   fprintf(out, "  asl\n");
   fprintf(out, "  asl\n");
@@ -1199,7 +1264,8 @@ int Atari2600::atari2600_setScore1_B()
 
 int Atari2600::atari2600_setTitlePos_I()
 {
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta title_pos\n");
   stack--;
 
@@ -1208,7 +1274,8 @@ int Atari2600::atari2600_setTitlePos_I()
 
 int Atari2600::atari2600_setTitleColor_I()
 {
-  POP();
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta title_color\n");
   stack--;
 

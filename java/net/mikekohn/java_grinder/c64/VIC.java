@@ -145,7 +145,11 @@ public class VIC
   public static void make_hires_tables() { }
   public static void text_enable() { }
   public static void text_clear(int value) { }
-  public static void text_plot(int x, int y, int value) { }
+  public static void text_copy() { }
+  public static void text_plot(int x, int y, int value, int color) { }
+  public static int text_read(int x, int y) { return 0; }
+  public static void make_text_table() { }
+  public static void make_color_table() { }
   public static void color_ram_clear(int value) { }
 }
 
