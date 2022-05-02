@@ -15,7 +15,9 @@
 
 #include "generator/SleepyBee.h"
 
-SleepyBee::SleepyBee()
+SleepyBee::SleepyBee() :
+  need_new_array_byte(false),
+  need_new_array_int(false)
 {
 }
 
@@ -141,12 +143,55 @@ int SleepyBee::finish()
 
   fprintf(out, "end_of_code:\n");
 
+  if (need_new_array_byte) { add_new_array_byte(); }
+  if (need_new_array_int)  { add_new_array_int(); }
+
   return 0;
 }
 
 int SleepyBee::new_array(uint8_t type)
 {
-  return -1;
+  if (type == TYPE_SHORT || type == TYPE_CHAR || type == TYPE_INT)
+  {
+    fprintf(out,
+      "  ;; new_array(INT)\n"
+      "  mov r0, %d\n"
+      "  mov r1, %d\n"
+      "  lcall _new_array_int\n"
+      "  mov %d, r2\n"
+      "  mov %d, r3\n",
+      REG_ADDRESS_STACK_LO(reg - 1),
+      REG_ADDRESS_STACK_HI(reg - 1),
+      REG_ADDRESS_STACK_LO(reg - 1),
+      REG_ADDRESS_STACK_HI(reg - 1));
+
+    need_new_array_int = true;
+
+    return 0;
+  }
+    else
+  if (type == TYPE_BYTE)
+  {
+    fprintf(out,
+      "  ;; new_array(BYTE)\n"
+      "  mov r0, %d\n"
+      "  mov r1, %d\n"
+      "  lcall _new_array_byte\n"
+      "  mov %d, r2\n"
+      "  mov %d, r3\n",
+      REG_ADDRESS_STACK_LO(reg - 1),
+      REG_ADDRESS_STACK_HI(reg - 1),
+      REG_ADDRESS_STACK_LO(reg - 1),
+      REG_ADDRESS_STACK_HI(reg - 1));
+
+    need_new_array_byte = true;
+  }
+    else
+  {
+    return -1;
+  }
+
+  return 0;
 }
 
 int SleepyBee::push_array_length()
@@ -646,6 +691,69 @@ int SleepyBee::adc_read()
 
   reg++;
   label_count += 1;
+
+  return 0;
+}
+
+int SleepyBee::add_new_array_byte()
+{
+  fprintf(out,
+    "  ;; _new_array_byte()\n"
+    "_new_array_byte:\n"
+    "  mov DPL, r4\n"
+    "  mov DPH, r5\n"
+    "  mov A, r0\n"
+    "  movx @DPTR, A\n"
+    "  inc DPTR\n"
+    "  mov A, r1\n"
+    "  movx @DPTR, A\n"
+    "  inc DPTR\n"
+    "  mov r4, DPL\n"
+    "  mov r5, DPH\n"
+    "  mov r2, 4\n"
+    "  mov r3, 5\n"
+    "  mov A, r4\n"
+    "  add A, r0\n"
+    "  mov r4, A\n"
+    "  mov A, r5\n"
+    "  addc A, r1\n"
+    "  mov r5, A\n"
+    "  ret\n\n");
+
+  return 0;
+}
+
+int SleepyBee::add_new_array_int()
+{
+  fprintf(out,
+    "  ;; _new_array_int()\n"
+    "_new_array_int:\n"
+    "  mov DPL, r4\n"
+    "  mov DPH, r5\n"
+    "  mov A, r0\n"
+    "  movx @DPTR, A\n"
+    "  inc DPTR\n"
+    "  mov A, r1\n"
+    "  movx @DPTR, A\n"
+    "  inc DPTR\n"
+    "  mov r4, DPL\n"
+    "  mov r5, DPH\n"
+    "  mov r2, 4\n"
+    "  mov r3, 5\n"
+    "  clr C\n"
+    "  mov A, r0\n"
+    "  rlc A\n"
+    "  mov r0, A\n"
+    "  mov A, r1\n"
+    "  rlc A\n"
+    "  mov r1, A\n"
+    "  mov A, r4\n"
+    "  add A, r0\n"
+    "  mov r4, A\n"
+    "  mov A, r5\n"
+    "  addc A, r1\n"
+    "  mov r5, A\n"
+    "  ret\n\n");
 
   return 0;
 }

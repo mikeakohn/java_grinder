@@ -18,17 +18,17 @@
 
 #define LOCALS_LO(a) (a * 2)
 #define LOCALS_HI(a) ((a * 2) + 1)
-#define STATICS_LO(a) (a * 2)
-#define STATICS_HI(a) ((a * 2) + 1)
+#define STATICS_LO(a) ((a * 2) + 16)
+#define STATICS_HI(a) ((a * 2) + 17)
 
 // ABI is:
 // Bank 0:
 //  0x00 r0: temp pointer
 //  0x01 r1: temp pointer
-//  0x02 r2:
-//  0x03 r3:
-//  0x04 r4:
-//  0x05 r5:
+//  0x02 r2: temp var
+//  0x03 r3: temp var
+//  0x04 r4: lo byte top of array heap
+//  0x05 r5: hi byte top of array heap
 //  0x06 r6: frame pointer
 //  0x07 r7: global pointer
 // Bank 1:
@@ -1216,6 +1216,7 @@ int MCS51::invoke_static_method(const char *name, int params, int is_void)
 
 int MCS51::put_static(std::string &name, int index)
 {
+#if 0
   fprintf(out,
     "  ;; put_static(%s, %d)\n"
     "  mov r2, %d\n"
@@ -1228,6 +1229,18 @@ int MCS51::put_static(std::string &name, int index)
     REG_ADDRESS_STACK_HI(reg - 1),
     STATICS_LO(index),
     STATICS_HI(index));
+#endif
+
+  fprintf(out,
+    "  ;; put_static(%s, %d)\n"
+    "  mov %d, %d\n"
+    "  mov %d, %d\n",
+    name.c_str(),
+    index,
+    STATICS_LO(index),
+    REG_ADDRESS_STACK_LO(reg - 1),
+    STATICS_HI(index),
+    REG_ADDRESS_STACK_HI(reg - 1));
 
   reg--;
 

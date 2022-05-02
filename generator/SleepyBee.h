@@ -58,7 +58,11 @@ public:
   virtual int adc_read();
 
 private:
+  int add_new_array_byte();
+  int add_new_array_int();
 
+  bool need_new_array_byte : 1;
+  bool need_new_array_int : 1;
 };
 
 #endif
