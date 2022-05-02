@@ -45,7 +45,8 @@
 MCS51::MCS51() :
   reg(0),
   reg_max(4),
-  is_main(0)
+  is_main(false),
+  has_array(false)
 {
 
 }
@@ -133,7 +134,15 @@ int MCS51::field_init_int(std::string &name, int index, int value)
 
 int MCS51::field_init_ref(std::string &name, int index)
 {
-  return -1;
+  fprintf(out,
+    "  mov %d, #(_%s - start_of_arrays) & 0xff\n"
+    "  mov %d, #(_%s - start_of_arrays) >> 8\n",
+    (16 + (index * 2)) + 0,
+    name.c_str(),
+    (16 + (index * 2)) + 1,
+    name.c_str());
+
+  return 0;
 }
 
 void MCS51::method_start(
@@ -258,8 +267,17 @@ int MCS51::push_double(double f)
 
 int MCS51::push_ref(std::string &name)
 {
-  // Need to move the address of name to the top of stack
-  return -1;
+  fprintf(out,
+    "  ;; push_ref(%s)\n"
+    "  mov %d, #%s + 0\n"
+    "  mov %d, #%s + 1\n",
+    name.c_str(),
+    REG_ADDRESS_STACK_LO(reg), name.c_str(),
+    REG_ADDRESS_STACK_HI(reg), name.c_str());
+
+  reg++;
+
+  return 0;
 }
 
 int MCS51::pop_local_var_int(int index)
@@ -433,10 +451,10 @@ int MCS51::sub_integer(int num)
     "  ;; sub_integer()\n"
     "  mov A, %d\n"
     "  clr C\n"
-    "  subb A, %d\n"
+    "  subb A, #0x%02x\n"
     "  mov %d, A\n"
     "  mov A, %d\n"
-    "  subb A, %d\n"
+    "  subb A, #0x%02x\n"
     "  mov %d, A\n",
     REG_ADDRESS_STACK_LO(reg - 1),
     value & 0xff,
@@ -1215,7 +1233,7 @@ int MCS51::put_static(std::string &name, int index)
 int MCS51::get_static(std::string &name, int index)
 {
   fprintf(out,
-    "  ;; put_static(%s, %d)\n"
+    "  ;; get_static(%s, %d)\n"
     "  mov r2, %d\n"
     "  mov r3, %d\n"
     "  mov %d, r2\n"
@@ -1244,19 +1262,25 @@ int MCS51::new_array(uint8_t type)
 
 int MCS51::insert_array(std::string &name, int32_t *data, int len, uint8_t type)
 {
+  if (!has_array)
+  {
+    fprintf(out, "start_of_arrays:\n\n");
+    has_array = true;
+  }
+
   if (type == TYPE_BYTE)
   {
-    return insert_db(name, data, len, TYPE_INT);
+    return insert_db(name, data, len, TYPE_SHORT);
   }
     else
   if (type == TYPE_SHORT)
   {
-    return insert_dw(name, data, len, TYPE_INT);
+    return insert_dw(name, data, len, TYPE_SHORT);
   }
     else
   if (type == TYPE_INT)
   {
-    return insert_dc32(name, data, len, TYPE_INT);
+    return insert_dw(name, data, len, TYPE_SHORT);
   }
 
   return -1;
@@ -1264,6 +1288,12 @@ int MCS51::insert_array(std::string &name, int32_t *data, int len, uint8_t type)
 
 int MCS51::insert_string(std::string &name, uint8_t *bytes, int len)
 {
+  if (!has_array)
+  {
+    fprintf(out, "start_of_arrays:\n\n");
+    has_array = true;
+  }
+
   return -1;
 }
 

@@ -22,6 +22,23 @@ public:
 
   virtual int open(const char *filename);
   virtual int start_init();
+  virtual int finish();
+
+  virtual int new_array(uint8_t type);
+  virtual int push_array_length();
+  virtual int push_array_length(std::string &name, int field_id);
+  virtual int array_read_byte();
+  virtual int array_read_short();
+  virtual int array_read_int();
+  virtual int array_read_byte(std::string &name, int field_id);
+  virtual int array_read_short(std::string &name, int field_id);
+  virtual int array_read_int(std::string &name, int field_id);
+  virtual int array_write_byte();
+  virtual int array_write_short();
+  virtual int array_write_int();
+  virtual int array_write_byte(std::string &name, int field_id);
+  virtual int array_write_short(std::string &name, int field_id);
+  virtual int array_write_int(std::string &name, int field_id);
 
   // GPIO methods.
   virtual int ioport_setPinsAsInput_I(int port);
@@ -32,6 +49,13 @@ public:
   virtual int ioport_setPinAsOutput_I(int port, int const_val);
   virtual int ioport_setPinAsInput_I(int port);
   virtual int ioport_setPinAsInput_I(int port, int const_val);
+
+  // ADC functions.
+  virtual int adc_enable();
+  virtual int adc_disable();
+  virtual int adc_setChannel_I();
+  virtual int adc_setChannel_I(int channel);
+  virtual int adc_read();
 
 private:
 

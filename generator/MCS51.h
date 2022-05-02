@@ -120,6 +120,7 @@ protected:
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 
   bool is_main : 1;
+  bool has_array : 1;
 };
 
 #endif

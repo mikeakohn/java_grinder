@@ -4,6 +4,9 @@ import net.mikekohn.java_grinder.IOPort2;
 
 public class SleepyBeeDemo
 {
+  static public int[] blah = { 8, 1932, 1231, 23 };
+  static public byte[] bricks = { 9, 100, 99 };
+
   static public void sendSPI(int value)
   {
     int n = 8;
@@ -86,17 +89,28 @@ public class SleepyBeeDemo
     clearDisplay();
     draw();
 
+    bricks[0] = 1;
+
+    if (bricks[0] == 1)
+    {
+      IOPort2.setPinLow(2);
+    }
+      else
+    {
+      IOPort2.setPinHigh(2);
+    }
+
     while (true)
     {
       IOPort2.setPinHigh(0);
-      IOPort2.setPinLow(1);
-      IOPort2.setPinHigh(2);
+      //IOPort2.setPinLow(1);
+      //IOPort2.setPinHigh(2);
 
       delay();
 
       IOPort2.setPinLow(0);
-      IOPort2.setPinHigh(1);
-      IOPort2.setPinHigh(2);
+      //IOPort2.setPinHigh(1);
+      //IOPort2.setPinHigh(2);
 
       delay();
     }

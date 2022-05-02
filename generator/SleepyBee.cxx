@@ -48,9 +48,420 @@ int SleepyBee::start_init()
 #endif
 
   // FIXME: How to take care of XBR1.
-  fprintf(out, "  mov XBR2, #0x40\n");
+  fprintf(out, "  mov XBR2, #0x40\n\n");
+
+  // Set r1:r0 to point to flash.
+  // Set r3:r2 to point to XRAM.
+  fprintf(out,
+    "  ;; memcpy() arrays from flash to XRAM\n"
+    "  mov r0, #start_of_arrays & 0xff\n"
+    "  mov r1, #start_of_arrays >> 8\n"
+    "  mov r2, #0x%02x\n"
+    "  mov r3, #0x%02x\n"
+    "  mov r4, #(end_of_code - start_of_arrays) & 0xff\n"
+    "  mov r5, #(end_of_code - start_of_arrays) >> 8\n",
+    0, 0);
+
+  int label_repeat = label_count++;
+  int label_end = label_count++;
+  int label_if = label_count++;
+
+  // if (r1:r0 == r3:r2) goto end
+  fprintf(out,
+    "label_%d:\n"
+    "  mov A, r2\n"
+    "  xrl A, r4\n"
+    "  jnz label_%d\n"
+    "  mov A, r3\n"
+    "  xrl A, r5\n"
+    "  jnz label_%d\n"
+    "  sjmp label_%d\n"
+    "label_%d:\n",
+    label_repeat,
+    label_if,
+    label_if,
+    label_end,
+    label_if);
+
+  // Copy byte.
+  fprintf(out,
+    "  mov DPL, r0\n"
+    "  mov DPH, r1\n"
+    "  mov A, #0\n"
+    "  movc A, @A+DPTR\n"
+    "  inc DPTR\n"
+    "  mov r0, DPL\n"
+    "  mov r1, DPH\n");
+
+  fprintf(out,
+    "  mov DPL, r2\n"
+    "  mov DPH, r3\n"
+    "  movx @DPTR, A\n"
+    "  inc DPTR\n"
+    "  mov r2, DPL\n"
+    "  mov r3, DPH\n");
+
+#if 0
+  // Increment r1:r0.
+  fprintf(out,
+    "  clr C\n"
+    "  mov A, r0\n"
+    "  add A, #1\n"
+    "  mov r0, A\n"
+    "  mov A, r1\n"
+    "  addc A, #1\n"
+    "  mov r1, A\n");
+
+  // Increment r3:r1.
+  fprintf(out,
+    "  clr C\n"
+    "  mov A, r2\n"
+    "  add A, #1\n"
+    "  mov r2, A\n"
+    "  mov A, r3\n"
+    "  addc A, #1\n"
+    "  mov r3, A\n");
+#endif
+
+  fprintf(out,
+    "  sjmp label_%d\n"
+    "label_%d:\n",
+    label_repeat,
+    label_end);
 
   return 0;
+}
+
+int SleepyBee::finish()
+{
+  if (!has_array)
+  {
+    fprintf(out, "start_of_arrays:\n");
+  }
+
+  fprintf(out, "end_of_code:\n");
+
+  return 0;
+}
+
+int SleepyBee::new_array(uint8_t type)
+{
+  return -1;
+}
+
+int SleepyBee::push_array_length()
+{
+  fprintf(out,
+    "  ;; push_array_length()\n"
+    "  mov r0, %d\n"
+    "  mov r1, %d\n"
+    "  mov A, @r0\n"
+    "  add A, #0xfe\n"
+    "  mov DPL, A\n"
+    "  mov A, @r1\n"
+    "  addc A, #0xff\n"
+    "  mov DPH, A\n"
+    "  movx A, @DPTR\n"
+    "  mov %d, A\n"
+    "  inc DPTR\n"
+    "  movx A, @DPTR\n"
+    "  mov %d, A\n",
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1),
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1));
+
+  return 0;
+}
+
+int SleepyBee::push_array_length(std::string &name, int field_id)
+{
+  fprintf(out,
+    "  ;; push_array_length(%s, %d)\n"
+    "  mov DPTR, #_%s - start_of_arrays\n"
+    "  dec DPTR\n"
+    "  dec DPTR\n"
+    "  movx A, @DPTR\n"
+    "  mov %d, A\n"
+    "  inc DPTR\n"
+    "  movx A, @DPTR\n"
+    "  mov %d, A\n",
+    name.c_str(), field_id,
+    name.c_str(),
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1));
+
+  return 0;
+}
+
+int SleepyBee::array_read_byte()
+{
+  fprintf(out,
+    "  ;; array_read_byte()\n"
+    "  mov r0, %d\n"
+    "  mov r1, %d\n"
+    "  mov A, %d\n"
+    "  add A, @r0\n"
+    "  mov DPL, A\n"
+    "  mov A, %d\n"
+    "  addc A, @r1\n"
+    "  mov DPH, A\n",
+    REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 2),
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1));
+
+  fprintf(out,
+    "  movx A, @DPTR\n"
+    "  mov %d, A\n"
+    "  anl A, #0x80\n"
+    "  mov %d, #0x00\n"
+    "  jz label_%d\n"
+    "  mov %d, #0xff\n"
+    "label_%d:\n",
+    REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 2),
+    label_count,
+    REG_ADDRESS_STACK_HI(reg - 2),
+    label_count);
+
+  label_count++;
+  reg -= 1;
+
+  return 0;
+}
+
+int SleepyBee::array_read_short()
+{
+  fprintf(out,
+    "  ;; array_read_short()\n"
+    "  mov r0, %d\n"
+    "  mov r1, %d\n",
+    REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 2));
+
+  // index = index * 2;
+  fprintf(out,
+    "  clr C\n"
+    "  mov A, %d\n"
+    "  rlc A\n"
+    "  mov %d, A\n"
+    "  mov A, %d\n"
+    "  rlc A\n"
+    "  mov %d, A\n",
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1));
+
+  // address = address + index;
+  fprintf(out,
+    "  mov A, %d\n"
+    "  add A, @r0\n"
+    "  mov DPL, A\n"
+    "  mov A, %d\n"
+    "  addc A, @r1\n"
+    "  mov DPH, A\n",
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1));
+
+  // data = *address;
+  fprintf(out,
+    "  movx A, @DPTR\n"
+    "  mov %d, A\n"
+    "  inc DPTR\n"
+    "  movx A, @DPTR\n"
+    "  mov %d, A\n",
+    REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 2));
+
+  reg -= 1;
+
+  return 0;
+}
+
+int SleepyBee::array_read_int()
+{
+  return array_read_short();
+}
+
+int SleepyBee::array_read_byte(std::string &name, int field_id)
+{
+  fprintf(out,
+    "  ;; array_read_byte(%s, %d)\n"
+    "  mov r0, #(%s - start_of_arrays) & 0xff\n"
+    "  mov r1, #(%s - start_of_arrays) >> 8\n"
+    "  mov A, %d\n"
+    "  add A, r0\n"
+    "  mov r0, A\n"
+    "  mov A, %d\n"
+    "  addc A, r1\n"
+    "  mov r1, A\n"
+    "  mov DPL, r0\n"
+    "  mov DPH, r0\n",
+    name.c_str(), field_id,
+    name.c_str(),
+    name.c_str(),
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1));
+
+  fprintf(out,
+    "  mov A, @DPTR\n"
+    "  mov %d, A\n"
+    "  anl A, #0x80\n"
+    "  mov %d, #0x00\n"
+    "  jz label_%d\n"
+    "  mov %d, #0xff\n"
+    "label_%d:\n",
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1),
+    label_count,
+    REG_ADDRESS_STACK_HI(reg - 1),
+    label_count);
+
+  label_count++;
+
+  return 0;
+}
+
+int SleepyBee::array_read_short(std::string &name, int field_id)
+{
+  fprintf(out,
+    "  ;; array_read_short(%s, %d)\n"
+    "  mov r0, #(%s - start_of_arrays) & 0xff\n"
+    "  mov r1, #(%s - start_of_arrays) >> 8\n"
+    "  clr C\n"
+    "  mov A, %d\n"
+    "  rlc A\n"
+    "  mov r2, A\n"
+    "  mov A, %d\n"
+    "  rlc A\n"
+    "  mov r3, A\n"
+    "  mov A, r2\n"
+    "  add A, r0\n"
+    "  mov r0, A\n"
+    "  mov A, r3\n"
+    "  addc A, r1\n"
+    "  mov r1, A\n"
+    "  mov DPL, r0\n"
+    "  mov DPH, r0\n",
+    name.c_str(), field_id,
+    name.c_str(),
+    name.c_str(),
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1));
+
+  fprintf(out,
+    "  mov A, @DPTR\n"
+    "  mov %d, A\n"
+    "  inc DPTR\n"
+    "  mov A, @DPTR\n"
+    "  mov %d, A\n",
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1));
+
+  return 0;
+}
+
+int SleepyBee::array_read_int(std::string &name, int field_id)
+{
+  return array_read_int(name, field_id);
+}
+
+int SleepyBee::array_write_byte()
+{
+  fprintf(out,
+    "  ;; array_write_byte()\n"
+    "  mov r0, %d\n"
+    "  mov r1, %d\n"
+    "  mov A, %d\n"
+    "  add A, @r0\n"
+    "  mov DPL, A\n"
+    "  mov A, %d\n"
+    "  addc A, @r1\n"
+    "  mov DPH, A\n",
+    REG_ADDRESS_STACK_LO(reg - 3),
+    REG_ADDRESS_STACK_HI(reg - 3),
+    REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 2));
+
+  fprintf(out,
+    "  mov A, %d\n"
+    "  movx @DPTR, A\n",
+    REG_ADDRESS_STACK_LO(reg - 1));
+
+  reg -= 3;
+
+  return 0;
+}
+
+int SleepyBee::array_write_short()
+{
+  fprintf(out,
+    "  ;; array_write_short()\n"
+    "  mov r0, %d\n"
+    "  mov r1, %d\n",
+    REG_ADDRESS_STACK_LO(reg - 3),
+    REG_ADDRESS_STACK_HI(reg - 3));
+
+  // index = index * 2;
+  fprintf(out,
+    "  clr C\n"
+    "  mov A, %d\n"
+    "  rlc A\n"
+    "  mov %d, A\n"
+    "  mov A, %d\n"
+    "  rlc A\n"
+    "  mov %d, A\n",
+    REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 2));
+
+  // address = address + index;
+  fprintf(out,
+    "  mov A, %d\n"
+    "  add A, @r0\n"
+    "  mov DPL, A\n"
+    "  mov A, %d\n"
+    "  addc A, @r1\n"
+    "  mov DPH, A\n",
+    REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 2));
+
+  // data = *address;
+  fprintf(out,
+    "  mov A, %d\n"
+    "  movx @DPTR, A\n"
+    "  inc DPTR\n"
+    "  mov A, %d\n"
+    "  movx @DPTR, A\n",
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1));
+
+  reg -= 3;
+
+  return 0;
+}
+
+int SleepyBee::array_write_int()
+{
+  return array_write_short();
+}
+
+int SleepyBee::array_write_byte(std::string &name, int field_id)
+{
+  return -1;
+}
+
+int SleepyBee::array_write_short(std::string &name, int field_id)
+{
+  return -1;
+}
+
+int SleepyBee::array_write_int(std::string &name, int field_id)
+{
+  return array_write_short(name, field_id);
 }
 
 int SleepyBee::ioport_setPinsAsInput_I(int port)
@@ -166,6 +577,87 @@ int SleepyBee::ioport_setPinAsInput_I(int port, int const_val)
     "  clr 0x%02x.%d\n",
     port,
     0xa4 + port, const_val);
+
+  return 0;
+}
+
+int SleepyBee::adc_enable()
+{
+  fprintf(out,
+    " ;; adc_enable()\n"
+    "  mov ADC0CN0, #0x80\n"
+    "  mov ADC0CF, #0xf8\n"
+    "  mov REF0CN, #0x08");
+
+  return 0;
+}
+
+int SleepyBee::adc_disable()
+{
+  fprintf(out,
+    " ;; adc_disable()\n"
+    "  mov ADC0CN0, #0x00\n");
+
+  return 0;
+}
+
+int SleepyBee::adc_setChannel_I()
+{
+#if 0
+  fprintf(out,
+    " ;; adc_setChannel_I()\n"
+#endif
+
+  return -1;
+}
+
+int SleepyBee::adc_setChannel_I(int channel)
+{
+  int port = channel / 8;
+  int pin = channel % 8;
+  int mask = 0xff ^ (1 << pin);
+
+  fprintf(out,
+    " ;; adc_setChannel_I(%d)\n"
+    "  mov A, P%dMDIN\n"
+    "  anl A, #0x%02x\n"
+    "  mov P%dMDIN, A\n"
+    "  setb P%d.%d\n"
+    "  mov A, P%dSKIP\n"
+    "  orl A, #0x%02x\n"
+    "  mov P%dSKIP, A\n"
+    "  mov ADC0MX, #ADC0P%d\n",
+    channel,
+    port,
+    mask,
+    port,
+    port, pin,
+    port,
+    1 << pin,
+    port,
+    channel);
+
+  return 0;
+}
+
+int SleepyBee::adc_read()
+{
+  fprintf(out,
+    " ;; adc_read()\n"
+    "  mov ADC0CN0, #0x90\n"
+    "label_%d:\n"
+    "  mov A, ADC0CN0\n"
+    "  anl A, #0x20\n"
+    "  jnz label_%d\n"
+    "  mov %d, ADC0L\n"
+    "  mov %d, ADC0H\n",
+    label_count,
+    label_count,
+    REG_ADDRESS_STACK_LO(reg),
+    REG_ADDRESS_STACK_HI(reg));
+
+  reg++;
+  label_count += 1;
 
   return 0;
 }

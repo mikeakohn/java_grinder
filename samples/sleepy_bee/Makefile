@@ -4,7 +4,7 @@ INCLUDE=../../../naken_asm/include/8051
 default: SleepyBeeDemo.class
 
 grind: SleepyBeeDemo.class
-	../../java_grinder SleepyBeeDemo.class sleepy_bee_demo.asm sleepy_bee
+	../../java_grinder -v SleepyBeeDemo.class sleepy_bee_demo.asm sleepy_bee
 	naken_asm -I $(INCLUDE) -l -o sleepy_bee_demo.hex sleepy_bee_demo.asm
 
 %.class: %.java
