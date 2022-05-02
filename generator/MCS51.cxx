@@ -269,11 +269,15 @@ int MCS51::push_ref(std::string &name)
 {
   fprintf(out,
     "  ;; push_ref(%s)\n"
-    "  mov %d, #%s + 0\n"
-    "  mov %d, #%s + 1\n",
+    "  mov r0, #%s + 0\n"
+    "  mov r1, #%s + 1\n"
+    "  mov %d, @r0\n"
+    "  mov %d, @r1\n",
     name.c_str(),
-    REG_ADDRESS_STACK_LO(reg), name.c_str(),
-    REG_ADDRESS_STACK_HI(reg), name.c_str());
+    name.c_str(),
+    name.c_str(),
+    REG_ADDRESS_STACK_LO(reg),
+    REG_ADDRESS_STACK_HI(reg));
 
   reg++;
 

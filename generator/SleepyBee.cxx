@@ -153,12 +153,10 @@ int SleepyBee::push_array_length()
 {
   fprintf(out,
     "  ;; push_array_length()\n"
-    "  mov r0, %d\n"
-    "  mov r1, %d\n"
-    "  mov A, @r0\n"
+    "  mov A, %d\n"
     "  add A, #0xfe\n"
     "  mov DPL, A\n"
-    "  mov A, @r1\n"
+    "  mov A, %d\n"
     "  addc A, #0xff\n"
     "  mov DPH, A\n"
     "  movx A, @DPTR\n"
@@ -198,18 +196,16 @@ int SleepyBee::array_read_byte()
 {
   fprintf(out,
     "  ;; array_read_byte()\n"
-    "  mov r0, %d\n"
-    "  mov r1, %d\n"
     "  mov A, %d\n"
-    "  add A, @r0\n"
+    "  add A, %d\n"
     "  mov DPL, A\n"
     "  mov A, %d\n"
-    "  addc A, @r1\n"
+    "  addc A, %d\n"
     "  mov DPH, A\n",
-    REG_ADDRESS_STACK_LO(reg - 2),
-    REG_ADDRESS_STACK_HI(reg - 2),
     REG_ADDRESS_STACK_LO(reg - 1),
-    REG_ADDRESS_STACK_HI(reg - 1));
+    REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 2));
 
   fprintf(out,
     "  movx A, @DPTR\n"
@@ -233,12 +229,7 @@ int SleepyBee::array_read_byte()
 
 int SleepyBee::array_read_short()
 {
-  fprintf(out,
-    "  ;; array_read_short()\n"
-    "  mov r0, %d\n"
-    "  mov r1, %d\n",
-    REG_ADDRESS_STACK_LO(reg - 2),
-    REG_ADDRESS_STACK_HI(reg - 2));
+  fprintf(out, "  ;; array_read_short()\n");
 
   // index = index * 2;
   fprintf(out,
@@ -257,13 +248,15 @@ int SleepyBee::array_read_short()
   // address = address + index;
   fprintf(out,
     "  mov A, %d\n"
-    "  add A, @r0\n"
+    "  add A, %d\n"
     "  mov DPL, A\n"
     "  mov A, %d\n"
-    "  addc A, @r1\n"
+    "  addc A, %d\n"
     "  mov DPH, A\n",
     REG_ADDRESS_STACK_LO(reg - 1),
-    REG_ADDRESS_STACK_HI(reg - 1));
+    REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 2));
 
   // data = *address;
   fprintf(out,
@@ -372,18 +365,16 @@ int SleepyBee::array_write_byte()
 {
   fprintf(out,
     "  ;; array_write_byte()\n"
-    "  mov r0, %d\n"
-    "  mov r1, %d\n"
     "  mov A, %d\n"
-    "  add A, @r0\n"
+    "  add A, %d\n"
     "  mov DPL, A\n"
     "  mov A, %d\n"
-    "  addc A, @r1\n"
+    "  addc A, %d\n"
     "  mov DPH, A\n",
-    REG_ADDRESS_STACK_LO(reg - 3),
-    REG_ADDRESS_STACK_HI(reg - 3),
     REG_ADDRESS_STACK_LO(reg - 2),
-    REG_ADDRESS_STACK_HI(reg - 2));
+    REG_ADDRESS_STACK_LO(reg - 3),
+    REG_ADDRESS_STACK_HI(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 3));
 
   fprintf(out,
     "  mov A, %d\n"
@@ -397,12 +388,7 @@ int SleepyBee::array_write_byte()
 
 int SleepyBee::array_write_short()
 {
-  fprintf(out,
-    "  ;; array_write_short()\n"
-    "  mov r0, %d\n"
-    "  mov r1, %d\n",
-    REG_ADDRESS_STACK_LO(reg - 3),
-    REG_ADDRESS_STACK_HI(reg - 3));
+  fprintf(out, "  ;; array_write_short()\n");
 
   // index = index * 2;
   fprintf(out,
@@ -421,13 +407,15 @@ int SleepyBee::array_write_short()
   // address = address + index;
   fprintf(out,
     "  mov A, %d\n"
-    "  add A, @r0\n"
+    "  add A, %d\n"
     "  mov DPL, A\n"
     "  mov A, %d\n"
-    "  addc A, @r1\n"
+    "  addc A, %d\n"
     "  mov DPH, A\n",
     REG_ADDRESS_STACK_LO(reg - 2),
-    REG_ADDRESS_STACK_HI(reg - 2));
+    REG_ADDRESS_STACK_LO(reg - 3),
+    REG_ADDRESS_STACK_HI(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 3));
 
   // data = *address;
   fprintf(out,
