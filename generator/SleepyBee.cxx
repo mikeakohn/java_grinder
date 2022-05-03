@@ -170,7 +170,7 @@ int SleepyBee::new_array(uint8_t type)
     return 0;
   }
     else
-  if (type == TYPE_BYTE)
+  if (type == TYPE_BYTE || type == TYPE_BOOLEAN)
   {
     fprintf(out,
       "  ;; new_array(BYTE)\n"
@@ -620,7 +620,7 @@ int SleepyBee::adc_enable()
     " ;; adc_enable()\n"
     "  mov ADC0CN0, #0x80\n"
     "  mov ADC0CF, #0xf8\n"
-    "  mov REF0CN, #0x08");
+    "  mov REF0CN, #0x08\n");
 
   return 0;
 }

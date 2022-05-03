@@ -220,6 +220,8 @@ int MCS51::push_ref_static(std::string &name, int index)
 
 int MCS51::push_fake()
 {
+  fprintf(out, "  ;; push_fake()\n");
+
   reg++;
 
   return 0;
@@ -320,6 +322,7 @@ int MCS51::pop_local_var_ref(int index)
 
 int MCS51::pop()
 {
+  fprintf(out, "  ;; pop()\n");
   reg--;
   return 0;
 }
@@ -996,20 +999,85 @@ int MCS51::jump_cond_integer(std::string &label, int cond, int distance)
       reg -= 2;
       break;
     case COND_LESS:
-      return -1;
-    case COND_LESS_EQUAL:
-      return -1;
-    case COND_GREATER:
-      return -1;
-    case COND_GREATER_EQUAL:
-      // 0000 0000    N________ xor PSW.2
+      // Check reg_0 < reg_1.
+      // Subtract reg_0 - reg_1. If negative, condition matches.
+      // N xor V == 1 (less than).
+      // 0000 0000    N________ xor PSW.2 [C____V__]
       // 1000 0000
       // 0000 0100
       // 1000 0100
       fprintf(out, "  clr C\n");
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 2));
       fprintf(out, "  subb A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
-      //fprintf(out, "  mov r2, A\n");
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 2));
+      fprintf(out, "  subb A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
+      fprintf(out, "  swap A\n");
+      fprintf(out, "  rr A\n");
+      fprintf(out, "  anl A, #0x04\n");
+      fprintf(out, "  mov r3, A\n");
+      fprintf(out, "  mov A, PSW\n");
+      fprintf(out, "  anl A, #0x04\n");
+      fprintf(out, "  xrl A, r3\n");
+      fprintf(out, "  jz label_%d\n", label_count);
+      reg -= 2;
+      break;
+    case COND_LESS_EQUAL:
+      // Check reg_0 <= reg_1.
+      // Subtract reg_1 - reg_0. If positive or 0, condition matches.
+      // N xor V == 0 (greater than or equal).
+      // 0000 0000    N________ xor PSW.2 [C____V__]
+      // 1000 0000
+      // 0000 0100
+      // 1000 0100
+      fprintf(out, "  clr C\n");
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
+      fprintf(out, "  subb A, %d\n", REG_ADDRESS_STACK_LO(reg - 2));
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
+      fprintf(out, "  subb A, %d\n", REG_ADDRESS_STACK_HI(reg - 2));
+      fprintf(out, "  swap A\n");
+      fprintf(out, "  rr A\n");
+      fprintf(out, "  anl A, #0x04\n");
+      fprintf(out, "  mov r3, A\n");
+      fprintf(out, "  mov A, PSW\n");
+      fprintf(out, "  anl A, #0x04\n");
+      fprintf(out, "  xrl A, r3\n");
+      fprintf(out, "  jnz label_%d\n", label_count);
+      reg -= 2;
+      break;
+    case COND_GREATER:
+      // Check reg_0 > reg_1.
+      // Subtract reg_1 - reg_0. If negative, condition matches.
+      // N xor V == 1 (less than).
+      // 0000 0000    N________ xor PSW.2 [C____V__]
+      // 1000 0000
+      // 0000 0100
+      // 1000 0100
+      fprintf(out, "  clr C\n");
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
+      fprintf(out, "  subb A, %d\n", REG_ADDRESS_STACK_LO(reg - 2));
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
+      fprintf(out, "  subb A, %d\n", REG_ADDRESS_STACK_HI(reg - 2));
+      fprintf(out, "  swap A\n");
+      fprintf(out, "  rr A\n");
+      fprintf(out, "  anl A, #0x04\n");
+      fprintf(out, "  mov r3, A\n");
+      fprintf(out, "  mov A, PSW\n");
+      fprintf(out, "  anl A, #0x04\n");
+      fprintf(out, "  xrl A, r3\n");
+      fprintf(out, "  jz label_%d\n", label_count);
+      reg -= 2;
+      break;
+    case COND_GREATER_EQUAL:
+      // Check reg_0 >= reg_1.
+      // Subtract reg_0 - reg_1. If positive or 0, condition matches.
+      // N xor V == 0 (greater than or equal).
+      // 0000 0000    N________ xor PSW.2 [C____V__]
+      // 1000 0000
+      // 0000 0100
+      // 1000 0100
+      fprintf(out, "  clr C\n");
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 2));
+      fprintf(out, "  subb A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 2));
       fprintf(out, "  subb A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
       fprintf(out, "  swap A\n");
@@ -1216,21 +1284,6 @@ int MCS51::invoke_static_method(const char *name, int params, int is_void)
 
 int MCS51::put_static(std::string &name, int index)
 {
-#if 0
-  fprintf(out,
-    "  ;; put_static(%s, %d)\n"
-    "  mov r2, %d\n"
-    "  mov r3, %d\n"
-    "  mov %d, r2\n"
-    "  mov %d, r3\n",
-    name.c_str(),
-    index,
-    REG_ADDRESS_STACK_LO(reg - 1),
-    REG_ADDRESS_STACK_HI(reg - 1),
-    STATICS_LO(index),
-    STATICS_HI(index));
-#endif
-
   fprintf(out,
     "  ;; put_static(%s, %d)\n"
     "  mov %d, %d\n"
@@ -1508,26 +1561,6 @@ int MCS51::ioport_setPinLow_I(int port)
 
 int MCS51::ioport_setPinLow_I(int port, int const_val)
 {
-#if 0
-  fprintf(out,
-    "  ;; ioport_setPinLow_I(%d, %d)\n"
-    "  mov r2, %d\n"
-    "  mov A, 0\n"
-    "  setb C\n"
-    "label_%d:\n"
-    "  rlc\n"
-    "  djnz r2, label_%d\n"
-    "  cpl A\n"
-    "  anl P%d, A\n",
-    port, const_val,
-    const_val,
-    label_count,
-    label_count,
-    port);
-
-  label_count++;
-#endif
-
   fprintf(out,
     "  ;; ioport_setPinLow_I(%d, %d)\n"
     "  clr P%d.%d\n",

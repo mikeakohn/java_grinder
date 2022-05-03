@@ -2132,17 +2132,16 @@ int AVR8::adc_setChannel_I()
 
 int AVR8::adc_setChannel_I(int channel)
 {
-  if(channel < 0 || channel > 7)
+  if (channel < 0 || channel > 7)
+  {
     return -1;
+  }
 
   fprintf(out, "; adc_setChannel_I\n");
   fprintf(out, "  %s temp, ADMUX\n", adc_in_string);
   fprintf(out, "  andi temp, 248\n");
   fprintf(out, "  ori temp, %d\n", channel);
   fprintf(out, "  %s ADMUX, temp\n", adc_out_string);
-  PUSH_LO("zero");
-  PUSH_HI("zero");
-  stack++;
 
   return 0;
 } 

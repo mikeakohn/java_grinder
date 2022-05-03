@@ -6,7 +6,7 @@ public class SleepyBeeDemo
 {
   static public int[] blah = { 8, 1932, 1231, 23 };
   static public byte[] bricks = { 9, 100, 99 };
-  static int test = 1;
+  static int test = 1000;
   static byte global = 2;
 
   static public void sendSPI(int value)
@@ -91,9 +91,11 @@ public class SleepyBeeDemo
     clearDisplay();
     draw();
 
-    blah[1] = 1;
+    //blah[1] = 1;
 
-    if (blah[1] == 1)
+    //if (blah[1] == 1)
+
+    if (test > 1000)
     {
       IOPort2.setPinLow(2);
     }
