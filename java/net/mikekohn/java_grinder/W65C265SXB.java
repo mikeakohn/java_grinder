@@ -2,10 +2,10 @@
  *  Java Grinder
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.naken.cc/
+ *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  * W65C265SXB by Joe Davission
  *

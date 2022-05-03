@@ -5,7 +5,7 @@
  *     Web: https://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2015 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
