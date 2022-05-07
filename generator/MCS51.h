@@ -116,6 +116,8 @@ public:
 
 protected:
   virtual int get_int_size() { return 2; }
+  void set_bit();
+  void set_bit(int position);
 
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack 

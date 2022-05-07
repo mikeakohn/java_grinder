@@ -553,63 +553,58 @@ int SleepyBee::ioport_setPinsAsOutput_I(int port, int const_val)
 
 int SleepyBee::ioport_setPinAsOutput_I(int port)
 {
-  fprintf(out,
-    "  ;; ioport_setPinAsOutput_I(%d)\n"
-    "  mov A, 0\n"
-    "  setb C\n"
-    "label_%d:\n"
-    "  rlc\n"
-    "  djnz %d, label_%d\n"
-    "  orl P%dMDOUT, A\n",
-    port,
-    label_count,
-    REG_ADDRESS_STACK_LO(--reg), label_count,
-    port);
+  fprintf(out, "  ;; ioport_setPinAsOutput_I(%d)\n", port);
+  set_bit();
+  fprintf(out, "  orl P%dMDOUT, A\n", port);
 
-  label_count++;
+  reg--;
 
   return 0;
 }
 
 int SleepyBee::ioport_setPinAsOutput_I(int port, int const_val)
 {
-  fprintf(out,
-    "  ;; ioport_setPinAsOutput_I(%d)\n"
-    "  setb 0x%02x.%d\n",
-    port,
-    0xa4 + port, const_val);
+  fprintf(out, "  ;; ioport_setPinAsOutput_I(%d)\n", port);
+  set_bit(const_val);
+  fprintf(out, "  orl P%dMDOUT, A\n", port);
 
   return 0;
 }
 
 int SleepyBee::ioport_setPinAsInput_I(int port)
 {
+  fprintf(out, "  ;; ioport_setPinAsInput_I(%d)\n", port);
+
+  set_bit();
+
   fprintf(out,
-    "  ;; ioport_setPinAsInput_I(%d)\n"
-    "  mov A, 0\n"
-    "  setb C\n"
-    "label_%d:\n"
-    "  rlc\n"
-    "  djnz %d, label_%d\n"
+    "  orl P%dMDIN, A\n"
+    "  orl P%d, A\n"
     "  cpl A\n"
     "  anl P%dMDOUT, A\n",
     port,
-    label_count,
-    REG_ADDRESS_STACK_LO(--reg), label_count,
+    port,
     port);
 
-  label_count++;
+  reg -= 1;
 
   return 0;
 }
 
 int SleepyBee::ioport_setPinAsInput_I(int port, int const_val)
 {
+  fprintf(out, "  ;; ioport_setPinAsInput_I(%d, %d)\n", port, const_val);
+
+  set_bit(const_val);
+
   fprintf(out,
-    "  ;; ioport_setPinAsInput_I(%d)\n"
-    "  clr 0x%02x.%d\n",
+    "  orl P%dMDIN, A\n"
+    "  orl P%d, A\n"
+    "  cpl A\n"
+    "  anl P%dMDOUT, A\n",
     port,
-    0xa4 + port, const_val);
+    port,
+    port);
 
   return 0;
 }

@@ -919,33 +919,40 @@ int MCS51::jump_cond(std::string &label, int cond, int distance)
   switch(cond)
   {
     case COND_EQUAL:
+      fprintf(out, "  ;; COND_EQUAL\n");
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
       fprintf(out, "  orl A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
       fprintf(out, "  jnz label_%d\n", label_count);
       reg--;
       break;
     case COND_NOT_EQUAL:
+      fprintf(out, "  ;; COND_NOT_EQUAL\n");
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
       fprintf(out, "  orl A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
       fprintf(out, "  jz label_%d\n", label_count);
       reg--;
       break;
     case COND_LESS:
+      fprintf(out, "  ;; COND_LESS\n");
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
       fprintf(out, "  anl A, #0x80\n");
       fprintf(out, "  jz label_%d\n", label_count);
       reg -= 1;
       break;
     case COND_LESS_EQUAL:
-      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
-      fprintf(out, "  anl A, #0x80\n");
-      fprintf(out, "  jz label_%d\n", label_count);
+      fprintf(out, "  ;; COND_LESS_EQUAL\n");
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
-      fprintf(out, "  orl A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
+      fprintf(out, "  cpl A\n");
+      fprintf(out, "  add A, #1\n");
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
+      fprintf(out, "  cpl A\n");
+      fprintf(out, "  addc A, #0\n");
+      fprintf(out, "  anl A, #0x80\n");
       fprintf(out, "  jnz label_%d\n", label_count);
       reg -= 1;
       break;
     case COND_GREATER:
+      fprintf(out, "  ;; COND_GREATER\n");
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
       fprintf(out, "  orl A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
       fprintf(out, "  jz label_%d\n", label_count);
@@ -955,6 +962,7 @@ int MCS51::jump_cond(std::string &label, int cond, int distance)
       reg -= 1;
       break;
     case COND_GREATER_EQUAL:
+      fprintf(out, "  ;; COND_GREATER_EQUAL\n");
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
       fprintf(out, "  anl A, #0x80\n");
       fprintf(out, "  jnz label_%d\n", label_count);
@@ -1574,24 +1582,27 @@ int MCS51::ioport_isPinInputHigh_I(int port)
 {
   fprintf(out,
     "  ;; ioport_isPinInputHigh_I(%d)\n"
+    "  mov r2, %d\n"
+    "  inc r2\n"
     "  mov %d, #0\n"
     "  mov %d, #0\n"
     "  mov A, P%d\n"
     "label_%d:\n"
     "  rrc A\n"
-    "  djnz %d, label_%d\n"
+    "  djnz r2, label_%d\n"
     "  rlc A\n"
     "  anl A, #1\n"
     "  mov %d, A\n",
     port,
     REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_LO(reg - 1),
     REG_ADDRESS_STACK_HI(reg - 1),
     port,
     label_count,
-    REG_ADDRESS_STACK_LO(reg - 1), label_count,
+    label_count,
     REG_ADDRESS_STACK_LO(reg - 1));
 
-   reg++;
+   label_count++;
 
   return 0;
 }
@@ -1609,5 +1620,42 @@ int MCS51::ioport_getPortInputValue(int port)
   reg++;
 
   return 0;
+}
+
+void MCS51::set_bit()
+{
+  // Set bit in byte based on top of reg stack value. For example if
+  // 00 03 was pushed on the reg stack, A would be equal to 0x08.
+  fprintf(out,
+    "  mov A, #0\n"
+    "  inc %d\n"
+    "  setb C\n"
+    "label_%d:\n"
+    "  rlc A\n"
+    "  djnz %d, label_%d\n",
+    REG_ADDRESS_STACK_LO(reg),
+    label_count,
+    REG_ADDRESS_STACK_LO(reg), label_count);
+
+  label_count++;
+}
+
+void MCS51::set_bit(int position)
+{
+  // Set bit in byte based on position passed in. For example if
+  // position=3,  would be equal to 0x08.
+  fprintf(out,
+    "  mov A, #0\n"
+    "  mov r0, #%d\n"
+    "  inc r0\n"
+    "  setb C\n"
+    "label_%d:\n"
+    "  rlc A\n"
+    "  djnz r0, label_%d\n",
+    position,
+    label_count,
+    label_count);
+
+  label_count++;
 }
 
