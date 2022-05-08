@@ -50,6 +50,16 @@ public:
   virtual int ioport_setPinAsInput_I(int port);
   virtual int ioport_setPinAsInput_I(int port, int const_val);
 
+  // SPI functions.
+  virtual int spi_init_II(int port);
+  virtual int spi_init_II(int port, int clock_divisor, int mode);
+  virtual int spi_send_I(int port);
+  virtual int spi_read_I(int port);
+  virtual int spi_isDataAvailable(int port);
+  virtual int spi_isBusy(int port);
+  virtual int spi_disable(int port);
+  virtual int spi_enable(int port);
+
   // ADC functions.
   virtual int adc_enable();
   virtual int adc_disable();

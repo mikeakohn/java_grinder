@@ -1,8 +1,9 @@
 
+import net.mikekohn.java_grinder.ADC;
 import net.mikekohn.java_grinder.IOPort0;
 import net.mikekohn.java_grinder.IOPort1;
 import net.mikekohn.java_grinder.IOPort2;
-import net.mikekohn.java_grinder.ADC;
+import net.mikekohn.java_grinder.SPI1;
 
 public class Breakout
 {
@@ -10,6 +11,20 @@ public class Breakout
   static public int player = 3;
   static public int ball_x = 64, ball_y = 64;
   static public int dx = 4, dy = 4;
+
+  static public byte[] reverse_table =
+  {
+     0, -128, 64, -64, 32, -96, 96, -32, 16, -112, 80, -48, 48,
+   -80, 112, -16, 8, -120, 72, -56, 40, -88, 104, -24, 24, -104,
+    88, -40, 56, -72, 120, -8, 4, -124, 68, -60, 36, -92, 100,
+   -28, 20, -108, 84, -44, 52, -76, 116, -12, 12, -116, 76, -52,
+    44, -84, 108, -20, 28, -100, 92, -36, 60, -68, 124, -4, 2,
+  -126, 66, -62, 34, -94, 98, -30, 18, -110, 82, -46, 50, -78, 114,
+   -14, 10, -118, 74, -54, 42, -86, 106, -22, 26, -102, 90, -38, 58,
+   -70, 122, -6, 6, -122, 70, -58, 38, -90, 102, -26, 22, -106, 86,
+   -42, 54, -74, 118, -10, 14, -114, 78, -50, 46, -82, 110, -18, 30,
+   -98, 94, -34, 62, -66, 126, -2
+  };
 
   static public byte[] ball_graphic_1 =
   {
@@ -30,28 +45,8 @@ public class Breakout
 
   static public void sendSPI(int value)
   {
-    int n = 8;
-
-    while (n != 0)
-    {
-      if ((value & 0x01) == 0)
-      {
-        IOPort1.setPinLow(2);
-      }
-        else
-      {
-        IOPort1.setPinHigh(2);
-      }
-
-      IOPort1.setPinHigh(0);
-      value = value >> 1;
-      IOPort1.setPinLow(0);
-
-      n--;
-    }
-
-    IOPort1.setPinLow(2);
-    IOPort1.setPinLow(0);
+    SPI1.send(value);
+    while (SPI1.isBusy());
   }
 
   static public void drawBricks(int row)
@@ -65,15 +60,15 @@ public class Breakout
     {
       IOPort1.setPinHigh(5);
 
-      sendSPI(1);
-      sendSPI(line++);
+      sendSPI(0x80);
+      sendSPI(reverse_table[line++]);
 
       for (n = 0; n < 8; n++)
       {
         if (bricks[index++])
         {
-          sendSPI(0x00);
           sendSPI(0x80);
+          sendSPI(0x00);
         }
           else
         {
@@ -99,8 +94,8 @@ public class Breakout
     {
       IOPort1.setPinHigh(5);
 
-      sendSPI(1);
-      sendSPI(line++);
+      sendSPI(0x80);
+      sendSPI(reverse_table[line++]);
 
       for (n = 0; n < 8; n++)
       {
@@ -133,8 +128,8 @@ public class Breakout
     {
       IOPort1.setPinHigh(5);
 
-      sendSPI(1);
-      sendSPI(line++);
+      sendSPI(0x80);
+      sendSPI(reverse_table[line++]);
 
       int pos_x = 0;
 
@@ -172,12 +167,12 @@ public class Breakout
 
     for (l = line; l < line + 4; l++)
     {
-      for (i = 0 ; i < 7; i++)
+      //for (i = 0 ; i < 7; i++)
       {
         IOPort1.setPinHigh(5);
 
-        sendSPI(1);
-        sendSPI(l);
+        sendSPI(0x80);
+        sendSPI(reverse_table[l]);
 
         for (n = 0; n < 16; n++)
         {
@@ -192,17 +187,38 @@ public class Breakout
     }
   }
 
+/*
+  static public int reverse(int value)
+  {
+    int r = 0;
+    int b = 0x80;
+
+    while (value != 0)
+    {
+      if ((value & 1) != 0)
+      {
+        r |= b;
+      }
+
+      value = value >> 1;
+      b = b >> 1;
+    }
+
+    return r;
+  }
+*/
+
   static public void clearDisplay()
   {
     IOPort1.setPinHigh(5);
-    sendSPI(0x04);
+    sendSPI(0x20);
     sendSPI(0x00);
     IOPort1.setPinLow(5);
   }
 
   static public void delay()
   {
-    for (int n = 0; n < 20000; n++);
+    for (int n = 0; n < 2000; n++);
   }
 
   static public void reset()
@@ -275,6 +291,15 @@ public class Breakout
       if (ball_y == 112)
       {
         dy = -4;
+
+        // Check if the ball fell through the bottom.
+        int x = player << 4;
+
+        if (ball_x < x || ball_x >= x + 16)
+        {
+          clearLine(ball_y);
+          return;
+        }
       }
 
       if (ball_x == 0)
@@ -287,17 +312,7 @@ public class Breakout
         dx = -4;
       }
 
-      //IOPort2.setPinHigh(0);
-      //IOPort2.setPinLow(1);
-      //IOPort2.setPinHigh(2);
-
-      //delay();
-
-      //IOPort2.setPinLow(0);
-      //IOPort2.setPinHigh(1);
-      //IOPort2.setPinHigh(2);
-
-      //delay();
+      delay();
     }
   }
 
@@ -324,6 +339,10 @@ public class Breakout
     ADC.enable();
     ADC.setChannel(15);
 
+    // Setup SPI1.
+    SPI1.enable();
+    SPI1.init(11, 0);
+
     // Setup push button on P0.2.
     IOPort0.setPinAsInput(2);
 
@@ -332,6 +351,7 @@ public class Breakout
     while (true)
     {
       waitForButton();
+      reset();
       play();
     }
   }

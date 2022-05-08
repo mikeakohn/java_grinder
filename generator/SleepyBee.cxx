@@ -609,6 +609,168 @@ int SleepyBee::ioport_setPinAsInput_I(int port, int const_val)
   return 0;
 }
 
+int SleepyBee::spi_init_II(int port)
+{
+  return -1;
+}
+
+int SleepyBee::spi_init_II(int port, int clock_divisor, int mode)
+{
+  uint8_t configs[] = { 0x40, 0x60, 0x50, 0x70 };
+
+  fprintf(out,
+    "  ;; spi_init_II(port=%d, clock_divisor=%d, mode=%d)\n",
+    port,
+    clock_divisor,
+    mode);
+
+  if (port == 0)
+  {
+    // FIXME: Does this chip have an SPI0?
+    fprintf(out,
+      "  orl P0MDOUT, #0x05\n"
+      "  mov SPI0CFG, #0x%02x\n"
+      "  mov SPI0CKR, #0x%02x\n",
+      configs[mode & 0x3],
+      clock_divisor);
+
+    return -1;
+  }
+    else
+  if (port == 1)
+  {
+    fprintf(out,
+      "  orl P1MDOUT, #0x05\n"
+      "  mov SPI1CFG, #0x%02x\n"
+      "  mov SPI1CKR, #0x%02x\n",
+      configs[mode & 0x3],
+      clock_divisor);
+  }
+    else
+  {
+    return -1;
+  }
+
+  return 0;
+}
+
+int SleepyBee::spi_send_I(int port)
+{
+  fprintf(out,
+    "  ;; spi_send_I(%d)\n"
+    "  mov SPI1CN0, #0x01\n"
+    "  mov SPI%dDAT, %d\n",
+    port,
+    port, REG_ADDRESS_STACK_LO(reg - 1));
+
+  reg--;
+
+  return 0;
+}
+
+int SleepyBee::spi_read_I(int port)
+{
+  fprintf(out,
+    "  ;; spi_read_I(%d)\n"
+    "  mov %d, SPI%dDAT\n"
+    "  mov %d, #0\n",
+    port,
+    REG_ADDRESS_STACK_LO(reg - 1), port,
+    REG_ADDRESS_STACK_HI(reg - 1));
+
+  return 0;
+}
+
+int SleepyBee::spi_isDataAvailable(int port)
+{
+  // FIXME: In SleepyBee this is only valid in slave mode and probably not
+  // what anyone using this API would want right now.
+  fprintf(out,
+    "  ;; spi_isDataAvailable(%d)\n"
+    "  mov A, SPI%dCFG\n"
+    "  anl A, #0x01\n"
+    "  xrl A, #0x01\n"
+    "  mov %d, A\n"
+    "  mov %d, #0\n",
+    port,
+    port,
+    REG_ADDRESS_STACK_LO(reg),
+    REG_ADDRESS_STACK_HI(reg));
+
+  reg++;
+
+  return 0;
+}
+
+int SleepyBee::spi_isBusy(int port)
+{
+  fprintf(out,
+    "  ;; spi_isBusy(%d)\n"
+    "  mov A, SPI%dCN0\n"
+    "  anl A, #0x80\n"
+    "  xrl A, #0x80\n"
+    "  rl A\n"
+    "  mov %d, A\n"
+    "  mov %d, #0\n",
+    port,
+    port,
+    REG_ADDRESS_STACK_LO(reg),
+    REG_ADDRESS_STACK_HI(reg));
+
+  reg++;
+
+  return 0;
+}
+
+int SleepyBee::spi_disable(int port)
+{
+  fprintf(out, "  ;; spi_disable(%d)\n", port);
+
+  if (port == 0)
+  {
+    fprintf(out, "  anl XBR0, #0xfd\n");
+  }
+    else
+  if (port == 1)
+  {
+    fprintf(out, "  anl XBR1, #0xbf\n");
+  }
+    else
+  {
+    return -1;
+  }
+
+  return 0;
+}
+
+int SleepyBee::spi_enable(int port)
+{
+  fprintf(out, "  ;; spi_enable(%d)\n", port);
+
+  if (port == 0)
+  {
+    // FIXME: Does this chip have an SPI0?
+    fprintf(out,
+      "  orl XBR0, #0x02\n"
+      "  mov SPI0CN0, #0x01\n");
+
+    return -1;
+  }
+    else
+  if (port == 1)
+  {
+    fprintf(out,
+      "  orl XBR1, #0x40\n"
+      "  mov SPI1CN0, #0x01\n");
+  }
+    else
+  {
+    return -1;
+  }
+
+  return 0;
+}
+
 int SleepyBee::adc_enable()
 {
   fprintf(out,

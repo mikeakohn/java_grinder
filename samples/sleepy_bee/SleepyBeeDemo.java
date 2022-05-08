@@ -9,6 +9,7 @@ public class SleepyBeeDemo
   static int test = 1000;
   static byte global = 2;
 
+  // Software SPI sending bits in reverse order (least significant bit first).
   static public void sendSPI(int value)
   {
     int n = 8;

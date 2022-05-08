@@ -705,12 +705,12 @@ int MCS51::and_integer()
     "  mov A, %d\n"
     "  anl A, %d\n"
     "  mov %d, A\n",
+    REG_ADDRESS_STACK_LO(reg - 1),
     REG_ADDRESS_STACK_LO(reg - 2),
-    REG_ADDRESS_STACK_LO(reg - 1),
-    REG_ADDRESS_STACK_LO(reg - 1),
-    REG_ADDRESS_STACK_HI(reg - 2),
+    REG_ADDRESS_STACK_LO(reg - 2),
     REG_ADDRESS_STACK_HI(reg - 1),
-    REG_ADDRESS_STACK_HI(reg - 1));
+    REG_ADDRESS_STACK_HI(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 2));
 
   reg--;
 
@@ -749,19 +749,19 @@ int MCS51::and_integer(int num)
 int MCS51::or_integer()
 {
   fprintf(out,
-    "  ;; and_integer()\n"
+    "  ;; or_integer()\n"
     "  mov A, %d\n"
     "  orl A, %d\n"
     "  mov %d, A\n"
     "  mov A, %d\n"
     "  orl A, %d\n"
     "  mov %d, A\n",
+    REG_ADDRESS_STACK_LO(reg - 1),
     REG_ADDRESS_STACK_LO(reg - 2),
-    REG_ADDRESS_STACK_LO(reg - 1),
-    REG_ADDRESS_STACK_LO(reg - 1),
-    REG_ADDRESS_STACK_HI(reg - 2),
+    REG_ADDRESS_STACK_LO(reg - 2),
     REG_ADDRESS_STACK_HI(reg - 1),
-    REG_ADDRESS_STACK_HI(reg - 1));
+    REG_ADDRESS_STACK_HI(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 2));
 
   reg--;
 
@@ -779,7 +779,7 @@ int MCS51::or_integer(int num)
   uint16_t value = (num & 0xffff);
 
   fprintf(out,
-    "  ;; and_integer(%d)\n"
+    "  ;; or_integer(%d)\n"
     "  mov A, %d\n"
     "  orl A, #%d\n"
     "  mov %d, A\n"
@@ -800,19 +800,19 @@ int MCS51::or_integer(int num)
 int MCS51::xor_integer()
 {
   fprintf(out,
-    "  ;; and_integer()\n"
+    "  ;; xor_integer()\n"
     "  mov A, %d\n"
     "  xrl A, %d\n"
     "  mov %d, A\n"
     "  mov A, %d\n"
     "  xrl A, %d\n"
     "  mov %d, A\n",
+    REG_ADDRESS_STACK_LO(reg - 1),
     REG_ADDRESS_STACK_LO(reg - 2),
-    REG_ADDRESS_STACK_LO(reg - 1),
-    REG_ADDRESS_STACK_LO(reg - 1),
-    REG_ADDRESS_STACK_HI(reg - 2),
+    REG_ADDRESS_STACK_LO(reg - 2),
     REG_ADDRESS_STACK_HI(reg - 1),
-    REG_ADDRESS_STACK_HI(reg - 1));
+    REG_ADDRESS_STACK_HI(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 2));
 
   reg--;
 
@@ -830,7 +830,7 @@ int MCS51::xor_integer(int num)
   uint16_t value = (num & 0xffff);
 
   fprintf(out,
-    "  ;; and_integer(%d)\n"
+    "  ;; xor_integer(%d)\n"
     "  mov A, %d\n"
     "  xrl A, #%d\n"
     "  mov %d, A\n"
@@ -988,25 +988,28 @@ int MCS51::jump_cond_integer(std::string &label, int cond, int distance)
   switch (cond)
   {
     case COND_EQUAL:
+      fprintf(out, "  ;; COND_EQUAL\n");
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
+      fprintf(out, "  xrl A, %d\n", REG_ADDRESS_STACK_LO(reg - 2));
+      fprintf(out, "  jnz label_%d\n", label_count);
+      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
+      fprintf(out, "  xrl A, %d\n", REG_ADDRESS_STACK_HI(reg - 2));
+      fprintf(out, "  jnz label_%d\n", label_count);
+      reg -= 2;
+      break;
+    case COND_NOT_EQUAL:
+      fprintf(out, "  ;; COND_NOT_EQUAL\n");
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
       fprintf(out, "  xrl A, %d\n", REG_ADDRESS_STACK_LO(reg - 2));
       fprintf(out, "  mov r2, A\n");
       fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
       fprintf(out, "  xrl A, %d\n", REG_ADDRESS_STACK_HI(reg - 2));
       fprintf(out, "  orl A, r2\n");
-      fprintf(out, "  jnz label_%d\n", label_count);
-      reg -= 2;
-      break;
-    case COND_NOT_EQUAL:
-      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_LO(reg - 1));
-      fprintf(out, "  xrl A, %d\n", REG_ADDRESS_STACK_LO(reg - 2));
-      fprintf(out, "  jnz %s\n", label.c_str());
-      fprintf(out, "  mov A, %d\n", REG_ADDRESS_STACK_HI(reg - 1));
-      fprintf(out, "  xrl A, %d\n", REG_ADDRESS_STACK_HI(reg - 2));
       fprintf(out, "  jz label_%d\n", label_count);
       reg -= 2;
       break;
     case COND_LESS:
+      fprintf(out, "  ;; COND_LESS\n");
       // Check reg_0 < reg_1.
       // Subtract reg_0 - reg_1. If negative, condition matches.
       // N xor V == 1 (less than).
@@ -1030,6 +1033,7 @@ int MCS51::jump_cond_integer(std::string &label, int cond, int distance)
       reg -= 2;
       break;
     case COND_LESS_EQUAL:
+      fprintf(out, "  ;; COND_LESS_EQUAL\n");
       // Check reg_0 <= reg_1.
       // Subtract reg_1 - reg_0. If positive or 0, condition matches.
       // N xor V == 0 (greater than or equal).
@@ -1053,6 +1057,7 @@ int MCS51::jump_cond_integer(std::string &label, int cond, int distance)
       reg -= 2;
       break;
     case COND_GREATER:
+      fprintf(out, "  ;; COND_GREATER\n");
       // Check reg_0 > reg_1.
       // Subtract reg_1 - reg_0. If negative, condition matches.
       // N xor V == 1 (less than).
@@ -1076,6 +1081,7 @@ int MCS51::jump_cond_integer(std::string &label, int cond, int distance)
       reg -= 2;
       break;
     case COND_GREATER_EQUAL:
+      fprintf(out, "  ;; COND_GREATER_EQUAL\n");
       // Check reg_0 >= reg_1.
       // Subtract reg_0 - reg_1. If positive or 0, condition matches.
       // N xor V == 0 (greater than or equal).
