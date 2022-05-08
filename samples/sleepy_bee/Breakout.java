@@ -11,6 +11,8 @@ public class Breakout
   static public int player = 3;
   static public int ball_x = 64, ball_y = 64;
   static public int dx = 4, dy = 4;
+  static public int dirty_row = -1;
+  static public int hits = 0;
 
   static public byte[] reverse_table =
   {
@@ -26,21 +28,14 @@ public class Breakout
    -98, 94, -34, 62, -66, 126, -2
   };
 
-  static public byte[] ball_graphic_1 =
+  static public byte[] game_over =
   {
-    //15, -121, -61, -31, -16, -8, -4, -2
-    //-2, -4, -8, -16, -31, -61, -121, 15
-
-    //0xf0, 0xe1, 0xc3, 0x87, 0x0f, 0x07, 0x03, 0x01
-    -16, -31, -61, -121, 15, 7, 3, 1 
-  };
-
-  static public byte[] ball_graphic_2 =
-  {
-    //-1, 127, 63, 31
-
-    //0x01, 0x03, 0x07, 0x0f
-    1, 3, 7, 15
+     -8, 62, -9, -48, 31, -16, 23, -48, 16, 31, -9, -35, 115,
+   -105, -1, -9, -41, -41, -9, -49, -9, -5, -75, 87, -1, -9,
+    -41, -41, -9, -49, -10, 23, -42, -48, 127, -9, -41, -48,
+    112, 31, -9, -48, 23, -41, -1, -9, -37, -73, -9, 63, -9,
+    -41, -41, -41, -1, -9, -35, 119, -9, -97, -8, 55, -41, -48,
+     31, -16, 30, -16, 23, -49
   };
 
   static public void sendSPI(int value)
@@ -51,13 +46,14 @@ public class Breakout
 
   static public void drawBricks(int row)
   {
-    int index = row << 4;
+    int index = row << 3;
     int line, n, i;
 
     line = 20 + (row << 3);
 
     for (i = 0 ; i < 7; i++)
     {
+      int brick = index;
       IOPort1.setPinHigh(5);
 
       sendSPI(0x80);
@@ -65,7 +61,7 @@ public class Breakout
 
       for (n = 0; n < 8; n++)
       {
-        if (bricks[index++])
+        if (bricks[brick++])
         {
           sendSPI(0x80);
           sendSPI(0x00);
@@ -75,6 +71,76 @@ public class Breakout
           sendSPI(0xff);
           sendSPI(0xff);
         }
+      }
+
+      sendSPI(0);
+      sendSPI(0);
+
+      IOPort1.setPinLow(5);
+    }
+  }
+
+  static public void drawBricksAndBall(int row)
+  {
+    int index = row << 3;
+    int line, n, i;
+    int ball_index = ball_x >> 4;
+    int ball_value_1 = 0xff;
+    int ball_value_2 = 0xff;
+    int ball_pos = ball_y & 3;
+
+    dirty_row = row;
+
+    if (ball_pos == 0)
+    {
+      ball_value_1 = 0x0f;
+    }
+      else
+    if (ball_pos == 1)
+    {
+      ball_value_1 = 0x0f;
+    }
+      else
+    if (ball_pos == 2)
+    {
+      ball_value_2 = 0x0f;
+    }
+      else
+    if (ball_pos == 3)
+    {
+      ball_value_2 = 0xf0;
+    }
+
+    line = 20 + (row << 3);
+
+    for (i = 0 ; i < 7; i++)
+    {
+      int brick = index;
+      IOPort1.setPinHigh(5);
+
+      sendSPI(0x80);
+      sendSPI(reverse_table[line++]);
+
+      for (n = 0; n < 8; n++)
+      {
+        if (n == ball_index)
+        {
+          sendSPI(ball_value_1);
+          sendSPI(ball_value_2);
+        }
+          else
+        if (bricks[brick])
+        {
+          sendSPI(0x80);
+          sendSPI(0x00);
+        }
+          else
+        {
+          sendSPI(0xff);
+          sendSPI(0xff);
+        }
+
+        brick++;
       }
 
       sendSPI(0);
@@ -161,29 +227,59 @@ public class Breakout
     }
   }
 
+  static public void drawGameOver()
+  {
+    int line, n, i;
+    int index = 0;
+
+    line = 80;
+
+    for (i = 0 ; i < 7; i++)
+    {
+      IOPort1.setPinHigh(5);
+
+      sendSPI(0x80);
+      sendSPI(reverse_table[line++]);
+
+      for (n = 0; n < 16; n++)
+      {
+        if (n >= 3 && n <13)
+        {
+          sendSPI(game_over[index++]);
+        }
+          else
+        {
+          sendSPI(0xff);
+        }
+      }
+
+      sendSPI(0);
+      sendSPI(0);
+
+      IOPort1.setPinLow(5);
+    }
+  }
+
   static public void clearLine(int line)
   {
     int n, i, l;
 
     for (l = line; l < line + 4; l++)
     {
-      //for (i = 0 ; i < 7; i++)
+      IOPort1.setPinHigh(5);
+
+      sendSPI(0x80);
+      sendSPI(reverse_table[l]);
+
+      for (n = 0; n < 16; n++)
       {
-        IOPort1.setPinHigh(5);
-
-        sendSPI(0x80);
-        sendSPI(reverse_table[l]);
-
-        for (n = 0; n < 16; n++)
-        {
-          sendSPI(0xff);
-        }
-
-        sendSPI(0);
-        sendSPI(0);
-
-        IOPort1.setPinLow(5);
+        sendSPI(0xff);
       }
+
+      sendSPI(0);
+      sendSPI(0);
+
+      IOPort1.setPinLow(5);
     }
   }
 
@@ -238,15 +334,120 @@ public class Breakout
     drawBricks(3);
 
     drawPlayer();
+
+    dy = -4;
+    ball_y = 112;
+    ball_x = (player << 4) + 4;
   }
 
   static public void waitForButton()
   {
+    drawGameOver();
+
     while (true)
     {
-      if (!IOPort0.isPinInputHigh(2))
+      readJoystick();
+      delay();
+
+      if (!IOPort0.isPinInputHigh(3))
       {
         return;
+      }
+    }
+  }
+
+  static public void calcBrickHit(int old_y)
+  {
+    int index = ball_x >> 4;
+
+    if (ball_y >= 44)
+    {
+      if (bricks[24 + index])
+      {
+        bricks[24 + index] = false;
+        dy = -dy;
+
+        if ((ball_y & 1) == 0) { dx = -dx; }
+      }
+
+      drawBricksAndBall(3);
+      return;
+    }
+      else
+    if (ball_y >= 36)
+    {
+      if (bricks[16 + index])
+      {
+        bricks[16 + index] = false;
+        dy = -dy;
+
+        if ((ball_y & 1) == 0) { dx = -dx; }
+      }
+
+      drawBricksAndBall(2);
+      return;
+    }
+      else
+    if (ball_y >= 28)
+    {
+      if (bricks[8 + index])
+      {
+        bricks[8 + index] = false;
+        dy = -dy;
+
+        if ((ball_y & 1) == 0) { dx = -dx; }
+      }
+
+      drawBricksAndBall(1);
+      return;
+    }
+      else
+    if (ball_y >= 20)
+    {
+      if (bricks[index])
+      {
+        bricks[index] = false;
+        dy = -dy;
+
+        if ((ball_y & 1) == 0) { dx = -dx; }
+      }
+
+      drawBricksAndBall(0);
+      return;
+    }
+
+    if (ball_y == 4)
+    {
+      dy = 4;
+    }
+
+    if (ball_y == 16 && dy < 0)
+    {
+      drawBricks(0);
+    }
+
+    drawBall();
+  }
+
+  static public void readJoystick()
+  {
+    int joystick = ADC.read();
+
+    if (joystick > 300 && joystick < 320)
+    {
+      if (player > 0)
+      {
+        player--;
+        drawPlayer();
+      }
+    }
+      else
+    if (joystick > 390 && joystick < 410)
+    {
+      if (player < 7)
+      {
+        player++;
+        drawPlayer();
       }
     }
   }
@@ -255,51 +456,64 @@ public class Breakout
   {
     while (true)
     {
-      int joystick = ADC.read();
-
-      if (joystick > 300 && joystick < 320)
-      {
-        if (player > 0)
-        {
-          player--;
-          drawPlayer();
-        }
-      }
-        else
-      if (joystick > 390 && joystick < 410)
-      {
-        if (player < 7)
-        {
-          player++;
-          drawPlayer();
-        }
-      }
+      readJoystick();
 
       int old_y = ball_y;
 
       ball_x = ball_x + dx;
       ball_y = ball_y + dy;
 
-      clearLine(old_y);
-      drawBall();
-
-      if (ball_y == 52)
+      if (old_y >= 52 || old_y < 20)
       {
-        dy = 4;
+        clearLine(old_y);
+      }
+
+      if (dirty_row != -1)
+      {
+        drawBricks(dirty_row);
+        dirty_row = -1;
+      }
+
+      if (ball_y < 52)
+      {
+        calcBrickHit(old_y);
+        //dy = 4;
       }
         else
-      if (ball_y == 112)
+      if (ball_y == 116)
       {
         dy = -4;
 
         // Check if the ball fell through the bottom.
         int x = player << 4;
 
-        if (ball_x < x || ball_x >= x + 16)
+        if (ball_x < x || ball_x > x + 16)
         {
           clearLine(ball_y);
           return;
         }
+
+        if (player > 1 && player < 7)
+        {
+          int a = (ball_x - x);
+
+          if (a < 8)
+          {
+            dx = -4;
+          }
+            else
+          {
+            dx = 4;
+          }
+        }
+
+        if ((hits & 1) == 0) { dx = -dx; }
+
+        hits++;
+      }
+        else
+      {
+        drawBall();
       }
 
       if (ball_x == 0)
@@ -344,7 +558,7 @@ public class Breakout
     SPI1.init(11, 0);
 
     // Setup push button on P0.2.
-    IOPort0.setPinAsInput(2);
+    IOPort0.setPinAsInput(3);
 
     reset();
 
@@ -353,6 +567,7 @@ public class Breakout
       waitForButton();
       reset();
       play();
+      //IOPort2.setPinLow(0);
     }
   }
 }

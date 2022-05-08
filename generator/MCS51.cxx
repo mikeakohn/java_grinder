@@ -490,7 +490,22 @@ int MCS51::mod_integer()
 
 int MCS51::neg_integer()
 {
-  return -1;
+  fprintf(out,
+    "  ;; neg_integer()\n"
+    "  mov A, %d\n"
+    "  cpl A\n"
+    "  add A, #1\n"
+    "  mov %d, A\n"
+    "  mov A, %d\n"
+    "  cpl A\n"
+    "  addc A, #0\n"
+    "  mov %d, A\n",
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1));
+
+  return 0;
 }
 
 int MCS51::shift_left_integer()
