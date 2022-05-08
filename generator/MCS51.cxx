@@ -370,20 +370,18 @@ int MCS51::add_integer()
 {
   fprintf(out,
     "  ;; add_integer()\n"
-    "  setb PSW.3\n"
-    "  mov A, r%d\n"
-    "  add A, r%d\n"
-    "  mov r%d, A\n"
-    "  mov A, r%d\n"
-    "  addc A, r%d\n"
-    "  mov r%d, A\n"
-    "  clr PSW.3\n",
-    REG_STACK_LO(reg - 1),
-    REG_STACK_LO(reg - 2),
-    REG_STACK_LO(reg - 2),
-    REG_STACK_HI(reg - 1),
-    REG_STACK_HI(reg - 2),
-    REG_STACK_HI(reg - 2));
+    "  mov A, %d\n"
+    "  add A, %d\n"
+    "  mov %d, A\n"
+    "  mov A, %d\n"
+    "  addc A, %d\n"
+    "  mov %d, A\n",
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_LO(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 2),
+    REG_ADDRESS_STACK_HI(reg - 2));
 
   reg--;
 
@@ -402,21 +400,19 @@ int MCS51::add_integer(int num)
 
   fprintf(out,
     "  ;; add_integer(%d)\n"
-    "  setb PSW.3\n"
-    "  mov A, r%d\n"
+    "  mov A, %d\n"
     "  add A, #0x%02x\n"
-    "  mov r%d, A\n"
-    "  mov A, r%d\n"
+    "  mov %d, A\n"
+    "  mov A, %d\n"
     "  addc A, #0x%02x\n"
-    "  mov r%d, A\n"
-    "  clr PSW.3\n",
+    "  mov %d, A\n",
     num,
-    REG_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_LO(reg - 1),
     value & 0xff,
-    REG_STACK_LO(reg - 1),
-    REG_STACK_HI(reg - 1),
+    REG_ADDRESS_STACK_LO(reg - 1),
+    REG_ADDRESS_STACK_HI(reg - 1),
     value >> 8,
-    REG_STACK_HI(reg - 1));
+    REG_ADDRESS_STACK_HI(reg - 1));
 
   return 0;
 }
