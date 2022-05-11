@@ -21,16 +21,14 @@
 #define POKE(dst) \
   fprintf(out, "  inx\n"); \
   fprintf(out, "  lda stack_lo,x\n"); \
-  fprintf(out, "  sta 0x%04x\n", dst); \
-  stack--
+  fprintf(out, "  sta 0x%04x\n", dst)
 
 #define PEEK(src) \
   fprintf(out, "  lda 0x%04x\n", src); \
   fprintf(out, "  sta stack_lo,x\n"); \
   fprintf(out, "  lda #0\n"); \
   fprintf(out, "  sta stack_hi,x\n"); \
-  fprintf(out, "  dex\n"); \
-  stack++
+  fprintf(out, "  dex\n")
 
 C64::C64() :
   label_count(0),
@@ -78,37 +76,37 @@ int C64::open(const char *filename)
   fprintf(out, ".6502\n");
 
   // heap
-  fprintf(out, "ram_start equ 0x%04x\n", ram_start);
-  fprintf(out, "heap_ptr equ ram_start\n");
+  fprintf(out, "  ram_start equ 0x%04x\n", ram_start);
+  fprintf(out, "  heap_ptr equ ram_start\n");
 
   // for indirection (2 bytes)
-  fprintf(out, "address equ 0xfb\n");
+  fprintf(out, "  address equ 0xfb\n");
 
   // java stack
-  fprintf(out, "stack_lo equ 0x%04x\n", java_stack_lo);
-  fprintf(out, "stack_hi equ 0x%04x\n", java_stack_hi);
+  fprintf(out, "  stack_lo equ 0x%04x\n", java_stack_lo);
+  fprintf(out, "  stack_hi equ 0x%04x\n", java_stack_hi);
 
   // points to locals
-  fprintf(out, "locals equ 0xfe\n");
+  fprintf(out, "  locals equ 0xfe\n");
 
   // temp variables
-  fprintf(out, "result equ 0x20\n");
-  fprintf(out, "return equ 0x22\n");
-  fprintf(out, "remainder equ 0x24\n");
-  fprintf(out, "length equ 0x26\n");
-  fprintf(out, "value1 equ 0x2a\n");
-  fprintf(out, "value2 equ 0x2c\n");
-  fprintf(out, "value3 equ 0x2e\n");
-  fprintf(out, "temp1 equ 0x30\n");
-  fprintf(out, "temp2 equ 0x32\n");
+  fprintf(out, "  result equ 0x20\n");
+  fprintf(out, "  return equ 0x22\n");
+  fprintf(out, "  remainder equ 0x24\n");
+  fprintf(out, "  length equ 0x26\n");
+  fprintf(out, "  value1 equ 0x2a\n");
+  fprintf(out, "  value2 equ 0x2c\n");
+  fprintf(out, "  value3 equ 0x2e\n");
+  fprintf(out, "  temp1 equ 0x30\n");
+  fprintf(out, "  temp2 equ 0x32\n");
 
   // 0x40-0xa3 reserved for text/color tables
 
   // sprites
-  fprintf(out, "sprite_msb_set equ 0x10\n");
-  fprintf(out, "sprite_msb_clear equ 0x11\n");
-  fprintf(out, "sprite_x equ 0x12\n");
-  fprintf(out, "sprite_y equ 0x13\n");
+  fprintf(out, "  sprite_msb_set equ 0x10\n");
+  fprintf(out, "  sprite_msb_clear equ 0x11\n");
+  fprintf(out, "  sprite_x equ 0x12\n");
+  fprintf(out, "  sprite_y equ 0x13\n");
 
   // basic loader
   fprintf(out, ".org 0x%04x\n", start_org);
@@ -123,7 +121,7 @@ int C64::open(const char *filename)
   fprintf(out, "db (((start / 1) %% 10) + 0x30)\n");
   fprintf(out, "db ':'\n");
   fprintf(out, "db 0x8f\n");
-  fprintf(out, "db \" MORTIS\"\n");
+  fprintf(out, "db \" JAVA-GRINDER \"\n");
   fprintf(out, "db 0\n");
   fprintf(out, "dw 0\n\n");
 
@@ -183,6 +181,7 @@ int C64::open(const char *filename)
   fprintf(out, "  lda 0xd700,y\n");
   fprintf(out, "  sta 0xcf00,y\n");
 */
+
   fprintf(out, "  dey\n");
   fprintf(out, "  bne copy_charset_loop\n");
 
@@ -201,7 +200,6 @@ int C64::c64_sid_voice1_frequency(/* value */)
   fprintf(out, "  sta 0xd401\n");
   fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd400\n");
-  stack--;
 
   return 0;
 }
@@ -213,7 +211,6 @@ int C64::c64_sid_voice1_pulse_width(/* value */)
   fprintf(out, "  sta 0xd403\n");
   fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd402\n");
-  stack--;
 
   return 0;
 }
@@ -227,7 +224,6 @@ int C64::c64_sid_voice1_adsr(/* value */)
   fprintf(out, "  sta 0xd406\n");
   fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd405\n");
-  stack--;
 
   return 0;
 }
@@ -239,7 +235,6 @@ int C64::c64_sid_voice2_frequency(/* value */)
   fprintf(out, "  sta 0xd408\n");
   fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd407\n");
-  stack--;
 
   return 0;
 }
@@ -251,7 +246,6 @@ int C64::c64_sid_voice2_pulse_width(/* value */)
   fprintf(out, "  sta 0xd40a\n");
   fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd409\n");
-  stack--;
 
   return 0;
 }
@@ -265,7 +259,6 @@ int C64::c64_sid_voice2_adsr(/* value */)
   fprintf(out, "  sta 0xd40d\n");
   fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd40c\n");
-  stack--;
 
   return 0;
 }
@@ -277,7 +270,6 @@ int C64::c64_sid_voice3_frequency(/* value */)
   fprintf(out, "  sta 0xd40f\n");
   fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd40e\n");
-  stack--;
 
   return 0;
 }
@@ -289,7 +281,6 @@ int C64::c64_sid_voice3_pulse_width(/* value */)
   fprintf(out, "  sta 0xd411\n");
   fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd410\n");
-  stack--;
 
   return 0;
 }
@@ -303,7 +294,6 @@ int C64::c64_sid_voice3_adsr(/* value */)
   fprintf(out, "  sta 0xd414\n");
   fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd413\n");
-  stack--;
 
   return 0;
 }
@@ -315,7 +305,6 @@ int C64::c64_sid_filter_cutoff(/* value */)
   fprintf(out, "  sta 0xd416\n");
   fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd415\n");
-  stack--;
 
   return 0;
 }
@@ -358,7 +347,6 @@ int C64::c64_vic_sprite0pos(/* x, y */)
   fprintf(out, "  sta 0xd010\n");
   fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd000\n");
-  stack -= 2;
 
   return 0;
 }
@@ -384,7 +372,6 @@ int C64::c64_vic_sprite1pos(/* x, y */)
   fprintf(out, "  sta 0xd010\n");
   fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd002\n");
-  stack -= 2;
 
   return 0;
 }
@@ -410,7 +397,6 @@ int C64::c64_vic_sprite2pos(/* x, y */)
   fprintf(out, "  sta 0xd010\n");
   fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd004\n");
-  stack -= 2;
 
   return 0;
 }
@@ -436,7 +422,6 @@ int C64::c64_vic_sprite3pos(/* x, y */)
   fprintf(out, "  sta 0xd010\n");
   fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd006\n");
-  stack -= 2;
 
   return 0;
 }
@@ -462,7 +447,6 @@ int C64::c64_vic_sprite4pos(/* x, y */)
   fprintf(out, "  sta 0xd010\n");
   fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd008\n");
-  stack -= 2;
 
   return 0;
 }
@@ -488,7 +472,6 @@ int C64::c64_vic_sprite5pos(/* x, y */)
   fprintf(out, "  sta 0xd010\n");
   fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd00a\n");
-  stack -= 2;
 
   return 0;
 }
@@ -514,7 +497,6 @@ int C64::c64_vic_sprite6pos(/* x, y */)
   fprintf(out, "  sta 0xd010\n");
   fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd00c\n");
-  stack -= 2;
 
   return 0;
 }
@@ -540,7 +522,6 @@ int C64::c64_vic_sprite7pos(/* x, y */)
   fprintf(out, "  sta 0xd010\n");
   fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  sta 0xd00e\n");
-  stack -= 2;
 
   return 0;
 }
@@ -554,7 +535,6 @@ int C64::c64_vic_wait_raster(/* line */)
   fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  cmp 0xd012\n");
   fprintf(out, "  bne #-5\n");
-  stack--;
 
   return 0;
 }
@@ -597,7 +577,6 @@ int C64::c64_vic_hires_clear(/* value */)
 {
   need_c64_vic_hires_clear = 1;
   fprintf(out, "  jsr hires_clear\n");
-  stack--;
 
   return 0;
 }
@@ -606,7 +585,6 @@ int C64::c64_vic_hires_plot(/* x, y, value */)
 {
   need_c64_vic_hires_plot = 1;
   fprintf(out, "  jsr hires_plot\n");
-  stack -= 3;
 
   return 0;
 }
@@ -629,7 +607,6 @@ int C64::c64_vic_text_clear(/* value */)
 {
   need_c64_vic_text_clear = 1;
   fprintf(out, "  jsr text_clear\n");
-  stack--;
 
   return 0;
 }
@@ -645,7 +622,6 @@ int C64::c64_vic_text_plot(/* x, y, value, color */)
 {
   need_c64_vic_text_plot = 1;
   fprintf(out, "  jsr text_plot\n");
-  stack -= 4;
 
   return 0;
 }
@@ -654,7 +630,6 @@ int C64::c64_vic_text_read(/* x, y */)
 {
   need_c64_vic_text_read = 1;
   fprintf(out, "  jsr text_read\n");
-  stack--;
 
   return 0;
 }
@@ -677,7 +652,6 @@ int C64::c64_vic_color_ram_clear(/* value */)
 {
   need_c64_vic_color_ram_clear = 1;
   fprintf(out, "  jsr color_ram_clear\n");
-  stack--;
   return 0;
 }
 
@@ -914,7 +888,6 @@ void C64::insert_c64_vic_text_clear()
   fprintf(out, "  rts\n");
 }
 
-// copy screen buffers
 void C64::insert_c64_vic_text_copy()
 {
   fprintf(out, "text_copy:\n");
@@ -928,7 +901,7 @@ void C64::insert_c64_vic_text_copy()
   fprintf(out, "  sta 0xc600,y\n");
   fprintf(out, "  lda 0xc2e8,y\n");
   fprintf(out, "  sta 0xc6e8,y\n");
-  fprintf(out, "  iny\n");
+  fprintf(out, "  dey\n");
   fprintf(out, "  bne text_copy_loop_1\n");
   fprintf(out, "  rts\n");
 }
