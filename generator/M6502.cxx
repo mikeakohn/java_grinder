@@ -449,8 +449,7 @@ int M6502::add_integer()
 
 int M6502::add_integer(int const_val)
 {
-  fprintf(out, "; add_integer (const_val)");
-  fprintf(out, "  inx\n");
+  fprintf(out, "; add_integer (const_val)\n");
   fprintf(out, "  clc\n");
   fprintf(out, "  lda #%d\n", const_val & 0xff);
   fprintf(out, "  adc stack_lo + 1,x\n");
@@ -473,8 +472,7 @@ int M6502::sub_integer()
 
 int M6502::sub_integer(int const_val)
 {
-  fprintf(out, "; sub_integer (const_val)");
-  fprintf(out, "  inx\n");
+  fprintf(out, "; sub_integer (const_val)\n");
   fprintf(out, "  sec\n");
   fprintf(out, "  lda stack_lo + 1,x\n");
   fprintf(out, "  sbc #%d\n", const_val & 0xff);
@@ -656,14 +654,27 @@ int M6502::inc_integer(int index, int num)
   uint16_t value = num & 0xffff;
 
   fprintf(out, "; inc_integer num = %d\n", num);
-  fprintf(out, "  ldy locals\n");
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda stack_lo - %d,y\n", LOCALS(index));
-  fprintf(out, "  adc #0x%02x\n", value & 0xff);
-  fprintf(out, "  sta stack_lo - %d,y\n", LOCALS(index));
-  fprintf(out, "  lda stack_hi - %d,y\n", LOCALS(index));
-  fprintf(out, "  adc #0x%02x\n", value >> 8);
-  fprintf(out, "  sta stack_hi - %d,y\n", LOCALS(index));
+
+  if(num == 1)
+  {
+    fprintf(out, "  txa\n");
+    fprintf(out, "  ldx locals\n");
+    fprintf(out, "  inc stack_lo - %d,x\n", LOCALS(index));
+    fprintf(out, "  bne #3\n");
+    fprintf(out, "  inc stack_hi - %d,x\n", LOCALS(index));
+    fprintf(out, "  tax\n");
+  }
+  else
+  {
+    fprintf(out, "  ldy locals\n");
+    fprintf(out, "  clc\n");
+    fprintf(out, "  lda stack_lo - %d,y\n", LOCALS(index));
+    fprintf(out, "  adc #0x%02x\n", value & 0xff);
+    fprintf(out, "  sta stack_lo - %d,y\n", LOCALS(index));
+    fprintf(out, "  lda stack_hi - %d,y\n", LOCALS(index));
+    fprintf(out, "  adc #0x%02x\n", value >> 8);
+    fprintf(out, "  sta stack_hi - %d,y\n", LOCALS(index));
+  }
 
   return 0;
 }
