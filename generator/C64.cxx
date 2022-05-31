@@ -55,18 +55,18 @@ C64::C64() :
 
 C64::~C64()
 {
-  if(need_c64_vic_hires_enable) { insert_c64_vic_hires_enable(); }
-  if(need_c64_vic_hires_clear) { insert_c64_vic_hires_clear(); }
-  if(need_c64_vic_hires_plot) { insert_c64_vic_hires_plot(); }
-  if(need_c64_vic_make_hires_tables) { insert_c64_vic_make_hires_tables(); }
-  if(need_c64_vic_text_enable) { insert_c64_vic_text_enable(); }
-  if(need_c64_vic_text_clear) { insert_c64_vic_text_clear(); }
-  if(need_c64_vic_text_copy) { insert_c64_vic_text_copy(); }
-  if(need_c64_vic_text_plot) { insert_c64_vic_text_plot(); }
-  if(need_c64_vic_text_read) { insert_c64_vic_text_read(); }
-  if(need_c64_vic_make_text_table) { insert_c64_vic_make_text_table(); }
-  if(need_c64_vic_make_color_table) { insert_c64_vic_make_color_table(); }
-  if(need_c64_vic_color_ram_clear) { insert_c64_vic_color_ram_clear(); }
+  if (need_c64_vic_hires_enable) { insert_c64_vic_hires_enable(); }
+  if (need_c64_vic_hires_clear) { insert_c64_vic_hires_clear(); }
+  if (need_c64_vic_hires_plot) { insert_c64_vic_hires_plot(); }
+  if (need_c64_vic_make_hires_tables) { insert_c64_vic_make_hires_tables(); }
+  if (need_c64_vic_text_enable) { insert_c64_vic_text_enable(); }
+  if (need_c64_vic_text_clear) { insert_c64_vic_text_clear(); }
+  if (need_c64_vic_text_copy) { insert_c64_vic_text_copy(); }
+  if (need_c64_vic_text_plot) { insert_c64_vic_text_plot(); }
+  if (need_c64_vic_text_read) { insert_c64_vic_text_read(); }
+  if (need_c64_vic_make_text_table) { insert_c64_vic_make_text_table(); }
+  if (need_c64_vic_make_color_table) { insert_c64_vic_make_color_table(); }
+  if (need_c64_vic_color_ram_clear) { insert_c64_vic_color_ram_clear(); }
 }
 
 int C64::open(const char *filename)

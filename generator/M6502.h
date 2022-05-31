@@ -16,31 +16,6 @@
 
 #include "generator/Generator.h"
 
-/*
-#define PUSH_LO() \
-  fprintf(out, "; PUSH_LO\n"); \
-  fprintf(out, "  sta stack_lo,x\n")
-
-#define PUSH_HI() \
-  fprintf(out, "; PUSH_HI\n"); \
-  fprintf(out, "  sta stack_hi,x\n"); \
-  fprintf(out, "  dex\n")
-
-#undef POP_HI_FAKE
-#define POP_HI_FAKE() \
-  fprintf(out, "; POP_HI_FAKE\n"); \
-  fprintf(out, "  inx\n")
-
-#define POP_HI() \
-  fprintf(out, "; POP_HI\n"); \
-  fprintf(out, "  inx\n"); \
-  fprintf(out, "  lda stack_hi,x\n")
-
-#define POP_LO() \
-  fprintf(out, "; POP_LO\n"); \
-  fprintf(out, "  lda stack_lo,x\n")
-*/
-
 class M6502 : public Generator
 {
 public:

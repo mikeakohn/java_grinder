@@ -655,7 +655,7 @@ int M6502::inc_integer(int index, int num)
 
   fprintf(out, "; inc_integer num = %d\n", num);
 
-  if(num == 1)
+  if (num == 1)
   {
     fprintf(out, "  txa\n");
     fprintf(out, "  ldx locals\n");
@@ -664,7 +664,7 @@ int M6502::inc_integer(int index, int num)
     fprintf(out, "  inc stack_hi - %d,x\n", LOCALS(index));
     fprintf(out, "  tax\n");
   }
-  else
+    else
   {
     fprintf(out, "  ldy locals\n");
     fprintf(out, "  clc\n");
@@ -697,97 +697,94 @@ int M6502::jump_cond(std::string &label, int cond, int distance)
 {
   bool reverse = false;
 
-  if (stack > 0)
+  fprintf(out, "; jump_cond\n");
+  fprintf(out, "  inx\n");
+
+  if (cond == COND_LESS_EQUAL)
   {
-    fprintf(out, "; jump_cond\n");
-    fprintf(out, "  inx\n");
-
-    if(cond == COND_LESS_EQUAL)
-    {
-      reverse = true;
-      cond = COND_GREATER_EQUAL;
-    }
-      else
-    if(cond == COND_GREATER)
-    {
-      reverse = true;
-      cond = COND_LESS;
-    }
-
-    switch(cond)
-    {
-      case COND_EQUAL:
-        fprintf(out, "  lda stack_lo - 0,x\n");
-        fprintf(out, "  cmp #0\n");
-        fprintf(out, "  bne cond_equal_skip_%d\n", label_count);
-        fprintf(out, "  lda stack_hi - 0,x\n");
-        fprintf(out, "  cmp #0\n");
-        fprintf(out, "  bne cond_equal_skip_%d\n", label_count);
-        fprintf(out, "  jmp %s\n", label.c_str());
-        fprintf(out, "cond_equal_skip_%d:\n", label_count++);
-        break;
-      case COND_NOT_EQUAL:
-        fprintf(out, "  lda stack_lo - 0,x\n");
-        fprintf(out, "  cmp #0\n");
-        fprintf(out, "  bne cond_not_equal_skip_%d - 3\n", label_count);
-        fprintf(out, "  lda stack_hi - 0,x\n");
-        fprintf(out, "  cmp #0\n");
-        fprintf(out, "  beq cond_not_equal_skip_%d\n", label_count);
-        fprintf(out, "  jmp %s\n", label.c_str());
-        fprintf(out, "cond_not_equal_skip_%d:\n", label_count++);
-        break;
-      case COND_LESS:
-        if(reverse == false)
-        {
-          fprintf(out, "  lda stack_lo - 0,x\n");
-          fprintf(out, "  cmp #0\n");
-          fprintf(out, "  lda stack_hi - 0,x\n");
-          fprintf(out, "  sbc #0\n");
-          fprintf(out, "  bvc #2\n");
-          fprintf(out, "  eor #0x80\n");
-          fprintf(out, "  bpl #3\n");
-          fprintf(out, "  jmp %s\n", label.c_str());
-        }
-          else
-        {
-          fprintf(out, "  lda #0\n");
-          fprintf(out, "  cmp stack_lo - 0,x\n");
-          fprintf(out, "  lda #0\n");
-          fprintf(out, "  sbc stack_hi - 0,x\n");
-          fprintf(out, "  bvc #2\n");
-          fprintf(out, "  eor #0x80\n");
-          fprintf(out, "  bpl #3\n");
-          fprintf(out, "  jmp %s\n", label.c_str());
-        }
-        break;
-      case COND_GREATER_EQUAL:
-        if(reverse == false)
-        {
-          fprintf(out, "  lda stack_lo - 0,x\n");
-          fprintf(out, "  cmp #0\n");
-          fprintf(out, "  lda stack_hi - 0,x\n");
-          fprintf(out, "  sbc #0\n");
-          fprintf(out, "  bvc #2\n");
-          fprintf(out, "  eor #0x80\n");
-          fprintf(out, "  bmi #3\n");
-          fprintf(out, "  jmp %s\n", label.c_str());
-        }
-          else
-        {
-          fprintf(out, "  lda #0\n");
-          fprintf(out, "  cmp stack_lo - 0,x\n");
-          fprintf(out, "  lda #0\n");
-          fprintf(out, "  sbc stack_hi - 0,x\n");
-          fprintf(out, "  bvc #2\n");
-          fprintf(out, "  eor #0x80\n");
-          fprintf(out, "  bmi #3\n");
-          fprintf(out, "  jmp %s\n", label.c_str());
-        }
-        break;
-    }
-
-    stack--;
+    reverse = true;
+    cond = COND_GREATER_EQUAL;
   }
+    else
+  if (cond == COND_GREATER)
+  {
+    reverse = true;
+    cond = COND_LESS;
+  }
+
+  switch (cond)
+  {
+    case COND_EQUAL:
+      fprintf(out, "  lda stack_lo - 0,x\n");
+      fprintf(out, "  cmp #0\n");
+      fprintf(out, "  bne cond_equal_skip_%d\n", label_count);
+      fprintf(out, "  lda stack_hi - 0,x\n");
+      fprintf(out, "  cmp #0\n");
+      fprintf(out, "  bne cond_equal_skip_%d\n", label_count);
+      fprintf(out, "  jmp %s\n", label.c_str());
+      fprintf(out, "cond_equal_skip_%d:\n", label_count++);
+      break;
+    case COND_NOT_EQUAL:
+      fprintf(out, "  lda stack_lo - 0,x\n");
+      fprintf(out, "  cmp #0\n");
+      fprintf(out, "  bne cond_not_equal_skip_%d - 3\n", label_count);
+      fprintf(out, "  lda stack_hi - 0,x\n");
+      fprintf(out, "  cmp #0\n");
+      fprintf(out, "  beq cond_not_equal_skip_%d\n", label_count);
+      fprintf(out, "  jmp %s\n", label.c_str());
+      fprintf(out, "cond_not_equal_skip_%d:\n", label_count++);
+      break;
+    case COND_LESS:
+      if (reverse == false)
+      {
+        fprintf(out, "  lda stack_lo - 0,x\n");
+        fprintf(out, "  cmp #0\n");
+        fprintf(out, "  lda stack_hi - 0,x\n");
+        fprintf(out, "  sbc #0\n");
+        fprintf(out, "  bvc #2\n");
+        fprintf(out, "  eor #0x80\n");
+        fprintf(out, "  bpl #3\n");
+        fprintf(out, "  jmp %s\n", label.c_str());
+      }
+        else
+      {
+        fprintf(out, "  lda #0\n");
+        fprintf(out, "  cmp stack_lo - 0,x\n");
+        fprintf(out, "  lda #0\n");
+        fprintf(out, "  sbc stack_hi - 0,x\n");
+        fprintf(out, "  bvc #2\n");
+        fprintf(out, "  eor #0x80\n");
+        fprintf(out, "  bpl #3\n");
+        fprintf(out, "  jmp %s\n", label.c_str());
+      }
+      break;
+    case COND_GREATER_EQUAL:
+      if (reverse == false)
+      {
+        fprintf(out, "  lda stack_lo - 0,x\n");
+        fprintf(out, "  cmp #0\n");
+        fprintf(out, "  lda stack_hi - 0,x\n");
+        fprintf(out, "  sbc #0\n");
+        fprintf(out, "  bvc #2\n");
+        fprintf(out, "  eor #0x80\n");
+        fprintf(out, "  bmi #3\n");
+        fprintf(out, "  jmp %s\n", label.c_str());
+      }
+        else
+      {
+        fprintf(out, "  lda #0\n");
+        fprintf(out, "  cmp stack_lo - 0,x\n");
+        fprintf(out, "  lda #0\n");
+        fprintf(out, "  sbc stack_hi - 0,x\n");
+        fprintf(out, "  bvc #2\n");
+        fprintf(out, "  eor #0x80\n");
+        fprintf(out, "  bmi #3\n");
+        fprintf(out, "  jmp %s\n", label.c_str());
+      }
+      break;
+  }
+
+  stack--;
 
   return 0;
 }
@@ -796,98 +793,94 @@ int M6502::jump_cond_integer(std::string &label, int cond, int distance)
 {
   bool reverse = false;
 
-  if (stack > 1)
+  fprintf(out, "; jump_cond_integer\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  inx\n");
+
+  if (cond == COND_LESS_EQUAL)
   {
-    fprintf(out, "; jump_cond_integer\n");
-    fprintf(out, "  inx\n");
-    fprintf(out, "  inx\n");
-
-    if(cond == COND_LESS_EQUAL)
-    {
-      reverse = true;
-      cond = COND_GREATER_EQUAL;
-    }
-      else
-    if(cond == COND_GREATER)
-    {
-      reverse = true;
-      cond = COND_LESS;
-    }
-
-    switch(cond)
-    {
-      case COND_EQUAL:
-        fprintf(out, "  lda stack_lo - 0,x\n");
-        fprintf(out, "  cmp stack_lo - 1,x\n");
-        fprintf(out, "  bne cond_integer_equal_skip_%d\n", label_count);
-        fprintf(out, "  lda stack_hi - 0,x\n");
-        fprintf(out, "  cmp stack_hi - 1,x\n");
-        fprintf(out, "  bne cond_integer_equal_skip_%d\n", label_count);
-        fprintf(out, "  jmp %s\n", label.c_str());
-        fprintf(out, "cond_integer_equal_skip_%d:\n", label_count++);
-        break;
-      case COND_NOT_EQUAL:
-        fprintf(out, "  lda stack_lo - 0,x\n");
-        fprintf(out, "  cmp stack_lo - 1,x\n");
-        fprintf(out, "  bne cond_integer_not_equal_skip_%d - 3\n", label_count);
-        fprintf(out, "  lda stack_hi - 0,x\n");
-        fprintf(out, "  cmp stack_hi - 1,x\n");
-        fprintf(out, "  beq cond_integer_not_equal_skip_%d\n", label_count);
-        fprintf(out, "  jmp %s\n", label.c_str());
-        fprintf(out, "cond_integer_not_equal_skip_%d:\n", label_count++);
-        break;
-      case COND_LESS:
-        if(reverse == false)
-        {
-          fprintf(out, "  lda stack_lo - 0,x\n");
-          fprintf(out, "  cmp stack_lo - 1,x\n");
-          fprintf(out, "  lda stack_hi - 0,x\n");
-          fprintf(out, "  sbc stack_hi - 1,x\n");
-          fprintf(out, "  bvc #2\n");
-          fprintf(out, "  eor #0x80\n");
-          fprintf(out, "  bpl #3\n");
-          fprintf(out, "  jmp %s\n", label.c_str());
-        }
-          else
-        {
-          fprintf(out, "  lda stack_lo - 1,x\n");
-          fprintf(out, "  cmp stack_lo - 0,x\n");
-          fprintf(out, "  lda stack_hi - 1,x\n");
-          fprintf(out, "  sbc stack_hi - 0,x\n");
-          fprintf(out, "  bvc #2\n");
-          fprintf(out, "  eor #0x80\n");
-          fprintf(out, "  bpl #3\n");
-          fprintf(out, "  jmp %s\n", label.c_str());
-        }
-        break;
-      case COND_GREATER_EQUAL:
-        if(reverse == false)
-        {
-          fprintf(out, "  lda stack_lo - 0,x\n");
-          fprintf(out, "  cmp stack_lo - 1,x\n");
-          fprintf(out, "  lda stack_hi - 0,x\n");
-          fprintf(out, "  sbc stack_hi - 1,x\n");
-          fprintf(out, "  bvc #2\n");
-          fprintf(out, "  eor #0x80\n");
-          fprintf(out, "  bmi #3\n");
-          fprintf(out, "  jmp %s\n", label.c_str());
-        }
-          else
-        {
-          fprintf(out, "  lda stack_lo - 1,x\n");
-          fprintf(out, "  cmp stack_lo - 0,x\n");
-          fprintf(out, "  lda stack_hi - 1,x\n");
-          fprintf(out, "  sbc stack_hi - 0,x\n");
-          fprintf(out, "  bvc #2\n");
-          fprintf(out, "  eor #0x80\n");
-          fprintf(out, "  bmi #3\n");
-          fprintf(out, "  jmp %s\n", label.c_str());
-        }
-        break;
-    }
-
-    stack -= 2;
+    reverse = true;
+    cond = COND_GREATER_EQUAL;
   }
+    else if (cond == COND_GREATER)
+  {
+    reverse = true;
+    cond = COND_LESS;
+  }
+
+  switch (cond)
+  {
+    case COND_EQUAL:
+      fprintf(out, "  lda stack_lo - 0,x\n");
+      fprintf(out, "  cmp stack_lo - 1,x\n");
+      fprintf(out, "  bne cond_integer_equal_skip_%d\n", label_count);
+      fprintf(out, "  lda stack_hi - 0,x\n");
+      fprintf(out, "  cmp stack_hi - 1,x\n");
+      fprintf(out, "  bne cond_integer_equal_skip_%d\n", label_count);
+      fprintf(out, "  jmp %s\n", label.c_str());
+      fprintf(out, "cond_integer_equal_skip_%d:\n", label_count++);
+      break;
+    case COND_NOT_EQUAL:
+      fprintf(out, "  lda stack_lo - 0,x\n");
+      fprintf(out, "  cmp stack_lo - 1,x\n");
+      fprintf(out, "  bne cond_integer_not_equal_skip_%d - 3\n", label_count);
+      fprintf(out, "  lda stack_hi - 0,x\n");
+      fprintf(out, "  cmp stack_hi - 1,x\n");
+      fprintf(out, "  beq cond_integer_not_equal_skip_%d\n", label_count);
+      fprintf(out, "  jmp %s\n", label.c_str());
+      fprintf(out, "cond_integer_not_equal_skip_%d:\n", label_count++);
+      break;
+    case COND_LESS:
+      if (reverse == false)
+      {
+        fprintf(out, "  lda stack_lo - 0,x\n");
+        fprintf(out, "  cmp stack_lo - 1,x\n");
+        fprintf(out, "  lda stack_hi - 0,x\n");
+        fprintf(out, "  sbc stack_hi - 1,x\n");
+        fprintf(out, "  bvc #2\n");
+        fprintf(out, "  eor #0x80\n");
+        fprintf(out, "  bpl #3\n");
+        fprintf(out, "  jmp %s\n", label.c_str());
+      }
+        else
+      {
+        fprintf(out, "  lda stack_lo - 1,x\n");
+        fprintf(out, "  cmp stack_lo - 0,x\n");
+        fprintf(out, "  lda stack_hi - 1,x\n");
+        fprintf(out, "  sbc stack_hi - 0,x\n");
+        fprintf(out, "  bvc #2\n");
+        fprintf(out, "  eor #0x80\n");
+        fprintf(out, "  bpl #3\n");
+        fprintf(out, "  jmp %s\n", label.c_str());
+      }
+      break;
+    case COND_GREATER_EQUAL:
+      if (reverse == false)
+      {
+        fprintf(out, "  lda stack_lo - 0,x\n");
+        fprintf(out, "  cmp stack_lo - 1,x\n");
+        fprintf(out, "  lda stack_hi - 0,x\n");
+        fprintf(out, "  sbc stack_hi - 1,x\n");
+        fprintf(out, "  bvc #2\n");
+        fprintf(out, "  eor #0x80\n");
+        fprintf(out, "  bmi #3\n");
+        fprintf(out, "  jmp %s\n", label.c_str());
+      }
+        else
+      {
+        fprintf(out, "  lda stack_lo - 1,x\n");
+        fprintf(out, "  cmp stack_lo - 0,x\n");
+        fprintf(out, "  lda stack_hi - 1,x\n");
+        fprintf(out, "  sbc stack_hi - 0,x\n");
+        fprintf(out, "  bvc #2\n");
+        fprintf(out, "  eor #0x80\n");
+        fprintf(out, "  bmi #3\n");
+        fprintf(out, "  jmp %s\n", label.c_str());
+      }
+      break;
+  }
+
+  stack -= 2;
 
   return 0;
 }
@@ -997,9 +990,9 @@ int M6502::invoke_static_method(const char *name, int params, int is_void)
     if (stack_vars > 0)
     {
       fprintf(out, "  lda stack_lo + 1 + %d,x\n", (stack - stack_vars));
-      fprintf(out, "  sta stack_lo + 1 %d,x\n", local-1);
+      fprintf(out, "  sta stack_lo + 1 %d,x\n", local - 1);
       fprintf(out, "  lda stack_hi + 1 + %d,x\n", (stack - stack_vars));
-      fprintf(out, "  sta stack_hi + 1 %d,x\n", local-1);
+      fprintf(out, "  sta stack_hi + 1 %d,x\n", local - 1);
       stack_vars--;
     }
 
@@ -1033,15 +1026,12 @@ int M6502::invoke_static_method(const char *name, int params, int is_void)
 
 int M6502::put_static(std::string &name, int index)
 {
-  if (stack > 0)
-  {
-    fprintf(out, "  inx\n");
-    fprintf(out, "  lda stack_lo,x\n");
-    fprintf(out, "  sta %s + 0\n", name.c_str());
-    fprintf(out, "  lda stack_hi,x\n");
-    fprintf(out, "  sta %s + 1\n", name.c_str());
-    stack--;
-  }
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
+  fprintf(out, "  sta %s + 0\n", name.c_str());
+  fprintf(out, "  lda stack_hi,x\n");
+  fprintf(out, "  sta %s + 1\n", name.c_str());
+  stack--;
 
   return 0;
 }
@@ -1090,13 +1080,11 @@ int M6502::insert_array(std::string &name, int32_t *data, int len, uint8_t type)
   {
     return insert_db(name, data, len, TYPE_SHORT);
   }
-    else
-  if (type == TYPE_SHORT)
+    else if (type == TYPE_SHORT)
   {
     return insert_dw(name, data, len, TYPE_SHORT);
   }
-    else
-  if (type == TYPE_INT)
+    else if (type == TYPE_INT)
   {
     return insert_dw(name, data, len, TYPE_SHORT);
   }
@@ -1160,8 +1148,6 @@ int M6502::array_read_int()
 
 int M6502::array_read_byte(std::string &name, int field_id)
 {
-  return -1;
-
 #if 0
   need_array_byte_support = 1;
 
@@ -1177,6 +1163,8 @@ int M6502::array_read_byte(std::string &name, int field_id)
 
   return 0;
 #endif
+
+  return -1;
 }
 
 int M6502::array_read_short(std::string &name, int field_id)
@@ -1186,8 +1174,6 @@ int M6502::array_read_short(std::string &name, int field_id)
 
 int M6502::array_read_int(std::string &name, int field_id)
 {
-  return -1;
-
 #if 0
   need_array_int_support = 1;
 
@@ -1202,6 +1188,8 @@ int M6502::array_read_int(std::string &name, int field_id)
 
   return 0;
 #endif
+
+  return -1;
 }
 
 int M6502::array_write_byte()
@@ -1229,8 +1217,6 @@ int M6502::array_write_int()
 
 int M6502::array_write_byte(std::string &name, int field_id)
 {
-  return -1;
-
 #if 0
   get_values_from_stack(2);
   fprintf(out, "; array_write_byte2\n");
@@ -1248,6 +1234,8 @@ int M6502::array_write_byte(std::string &name, int field_id)
 
   return 0;
 #endif
+
+  return -1;
 }
 
 int M6502::array_write_short(std::string &name, int field_id)
@@ -1257,8 +1245,6 @@ int M6502::array_write_short(std::string &name, int field_id)
 
 int M6502::array_write_int(std::string &name, int field_id)
 {
-  return -1;
-
 #if 0
   need_array_int_support = 1;
 
@@ -1284,13 +1270,16 @@ int M6502::array_write_int(std::string &name, int field_id)
 
   return 0;
 #endif
+
+  return -1;
 }
 
 int M6502::get_values_from_stack(int num)
 {
+#if 0
   fprintf(out, "; get_values_from_stack, num = %d\n", num);
 
-  if(num > 0)
+  if (num > 0)
   {
     fprintf(out, "  inx\n"); 
     fprintf(out, "  lda stack_lo,x\n"); 
@@ -1300,7 +1289,7 @@ int M6502::get_values_from_stack(int num)
     stack--;
   }
 
-  if(num > 1)
+  if (num > 1)
   {
     fprintf(out, "  inx\n"); 
     fprintf(out, "  lda stack_lo,x\n"); 
@@ -1310,7 +1299,7 @@ int M6502::get_values_from_stack(int num)
     stack--;
   }
 
-  if(num > 2)
+  if (num > 2)
   {
     fprintf(out, "  inx\n"); 
     fprintf(out, "  lda stack_lo,x\n"); 
@@ -1321,6 +1310,9 @@ int M6502::get_values_from_stack(int num)
   }
 
   return 0;
+#endif
+
+  return -1;
 }
 
 // subroutines
@@ -1393,11 +1385,12 @@ void M6502::insert_mul_integer()
   fprintf(out, "  ldy #16\n");
 
   // loop
+  fprintf(out, "mul_integer_loop:\n");
   fprintf(out, "  asl result + 0\n");
   fprintf(out, "  rol result + 1\n");
   fprintf(out, "  asl value1 + 0\n");
   fprintf(out, "  rol value1 + 1\n");
-  fprintf(out, "  bcc #13\n");
+  fprintf(out, "  bcc mul_integer_next\n");
 
   // add
   fprintf(out, "  clc\n");
@@ -1409,8 +1402,9 @@ void M6502::insert_mul_integer()
   fprintf(out, "  sta result + 1\n");
 
   // next
+  fprintf(out, "mul_integer_next:\n");
   fprintf(out, "  dey\n");
-  fprintf(out, "  bne #-26\n");
+  fprintf(out, "  bne mul_integer_loop\n");
 
   // push result
   fprintf(out, "  lda result + 0\n");
@@ -1507,11 +1501,11 @@ void M6502::insert_shift_left_integer()
   fprintf(out, "  lda stack_lo + 0,x\n");
   fprintf(out, "  tay\n");
 
+  fprintf(out, "shift_left_integer_loop:\n");
   fprintf(out, "  asl stack_lo + 1,x\n");
   fprintf(out, "  rol stack_hi + 1,x\n");
   fprintf(out, "  dey\n");
-//  fprintf(out, "  bne #-7\n");
-  fprintf(out, "  bne #-9\n");
+  fprintf(out, "  bne shift_left_integer_loop\n");
   fprintf(out, "  rts\n");
 }
 
@@ -1522,13 +1516,13 @@ void M6502::insert_shift_right_integer()
   fprintf(out, "  lda stack_lo + 0,x\n");
   fprintf(out, "  tay\n");
 
+  fprintf(out, "shift_right_integer_loop:\n");
   fprintf(out, "  lda stack_hi + 1,x\n");
   fprintf(out, "  asl\n");
   fprintf(out, "  ror stack_hi + 1,x\n");
   fprintf(out, "  ror stack_lo + 1,x\n");
   fprintf(out, "  dey\n");
-//  fprintf(out, "  bne #-10\n");
-  fprintf(out, "  bne #-13\n");
+  fprintf(out, "  bne shift_right_integer_loop\n");
 
   fprintf(out, "  rts\n");
 }
@@ -1545,11 +1539,11 @@ void M6502::insert_shift_right_uinteger()
   fprintf(out, "  lda stack_hi + 1,x\n");
   fprintf(out, "  sta result + 1\n");
 
+  fprintf(out, "shift_right_uinteger_loop:\n");
   fprintf(out, "  lsr result + 1\n");
   fprintf(out, "  ror result + 0\n");
   fprintf(out, "  dey\n");
-//  fprintf(out, "  bne #-7\n");
-  fprintf(out, "  bne #-9\n");
+  fprintf(out, "  bne shift_right_uinteger_loop\n");
 
   fprintf(out, "  lda result + 0\n");
   fprintf(out, "  sta stack_lo + 1,x\n");
@@ -1748,36 +1742,6 @@ void M6502::insert_array_byte_support()
   fprintf(out, "  sta stack_hi + 1,x\n");
   fprintf(out, "  rts\n");
 
-#if 0
-  // array_read_byte2
-  fprintf(out, "array_read_byte2:\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_hi,x\n");
-  fprintf(out, "  sta result + 1\n");
-  fprintf(out, "  lda stack_lo,x\n");
-  fprintf(out, "  sta result + 0\n");
-
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda address + 0\n");
-  fprintf(out, "  adc result + 0\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda address + 1\n");
-  fprintf(out, "  adc result + 1\n");
-  fprintf(out, "  sta address + 1\n");
-
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda (address),y\n");
-  fprintf(out, "  sta stack_lo,x\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  sec\n");
-  fprintf(out, "  adc #0xff\n");
-  fprintf(out, "  eor #0xff\n");
-  fprintf(out, "  sta stack_hi,x\n");
-  fprintf(out, "  dex\n");
-  fprintf(out, "  rts\n");
-#endif
-
   // array_write_byte
   fprintf(out, "array_write_byte:\n");
   fprintf(out, "  inx\n");
@@ -1788,7 +1752,6 @@ void M6502::insert_array_byte_support()
   fprintf(out, "  lda stack_hi + 2,x\n");
   fprintf(out, "  adc stack_hi + 1,x\n");
   fprintf(out, "  sta address + 1\n");
-
   fprintf(out, "  ldy #0\n");
   fprintf(out, "  lda stack_lo + 0,x\n");
   fprintf(out, "  sta (address),y\n");
@@ -1870,36 +1833,6 @@ void M6502::insert_array_int_support()
   fprintf(out, "  lda (address),y\n");
   fprintf(out, "  sta stack_hi + 1,x\n");
   fprintf(out, "  rts\n");
-
-#if 0
-  // array_read_int2
-  fprintf(out, "array_read_int2:\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_hi,x\n");
-  fprintf(out, "  sta result + 1\n");
-  fprintf(out, "  lda stack_lo,x\n");
-  fprintf(out, "  sta result + 0\n");
-  fprintf(out, "  asl result + 0\n");
-  fprintf(out, "  rol result + 1\n");
-
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda address + 0\n");
-  fprintf(out, "  adc result + 0\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda address + 1\n");
-  fprintf(out, "  adc result + 1\n");
-  fprintf(out, "  sta address + 1\n");
-
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda (address),y\n");
-  fprintf(out, "  sta stack_lo,x\n");
-
-  fprintf(out, "  iny\n");
-  fprintf(out, "  lda (address),y\n");
-  fprintf(out, "  sta stack_hi,x\n");
-  fprintf(out, "  dex\n");
-  fprintf(out, "  rts\n");
-#endif
 
   // array_write_int
   fprintf(out, "array_write_int:\n");
