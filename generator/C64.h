@@ -61,6 +61,9 @@ public:
   virtual int c64_vic_sprite_expandy();
   virtual int c64_vic_write_pointer();
   virtual int c64_vic_read_pointer();
+  virtual int c64_vic_write_interrupt_status();
+  virtual int c64_vic_read_interrupt_status();
+  virtual int c64_vic_interrupt_control();
   virtual int c64_vic_sprite_priority();
   virtual int c64_vic_sprite_multicolor_enable();
   virtual int c64_vic_sprite_expandx();

@@ -52,6 +52,9 @@ public:
   virtual int c64_vic_sprite_expandy() { return -1; }
   virtual int c64_vic_write_pointer() { return -1; }
   virtual int c64_vic_read_pointer() { return -1; }
+  virtual int c64_vic_write_interrupt_status() { return -1; }
+  virtual int c64_vic_read_interrupt_status() { return -1; }
+  virtual int c64_vic_interrupt_control() { return -1; }
   virtual int c64_vic_sprite_priority() { return -1; }
   virtual int c64_vic_sprite_multicolor_enable() { return -1; }
   virtual int c64_vic_sprite_expandx() { return -1; }

@@ -76,8 +76,11 @@ public class VIC
   public static int read_pointer() { return 0; }
 
   // 0xd019
+  public static void write_interrupt_status(int value) { }
+  public static int read_interrupt_status() { return 0; }
 
   // 0xd01a
+  public static void interrupt_control(int value) { }
 
   // 0xd01b
   public static void sprite_priority(int value) { }

@@ -545,6 +545,9 @@ int C64::c64_vic_read_control2() { PEEK(0xd016); return 0; }
 int C64::c64_vic_sprite_expandy(/* value */) { POKE(0xd017); return 0; }
 int C64::c64_vic_write_pointer(/* value */) { POKE(0xd018); return 0; }
 int C64::c64_vic_read_pointer() { PEEK(0xd018); return 0; }
+int C64::c64_vic_write_interrupt_status(/* value */) { POKE(0xd019); return 0; }
+int C64::c64_vic_read_interrupt_status() { PEEK(0xd019); return 0; }
+int C64::c64_vic_interrupt_control(/* value */) { POKE(0xd01a); return 0; }
 int C64::c64_vic_sprite_priority(/* value */) { POKE(0xd01b); return 0; }
 int C64::c64_vic_sprite_multicolor_enable(/* value */) { POKE(0xd01c); return 0; }
 int C64::c64_vic_sprite_expandx(/* value */) { POKE(0xd01d); return 0; }

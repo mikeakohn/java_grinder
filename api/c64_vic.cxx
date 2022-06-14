@@ -107,6 +107,21 @@ static int c64_vic_read_pointer(JavaClass *java_class, Generator *generator)
   return generator->c64_vic_read_pointer();
 }
 
+static int c64_vic_write_interrupt_status(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_write_interrupt_status();
+}
+
+static int c64_vic_read_interrupt_status(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_read_interrupt_status();
+}
+
+static int c64_vic_interrupt_control(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_interrupt_control();
+}
+
 static int c64_vic_sprite_priority(JavaClass *java_class, Generator *generator)
 {
   return generator->c64_vic_sprite_priority();
@@ -286,6 +301,9 @@ int c64_vic(JavaClass *java_class, Generator *generator, const char *function)
   CHECK_FUNC(sprite_expandy)
   CHECK_FUNC(write_pointer)
   CHECK_FUNC(read_pointer)
+  CHECK_FUNC(write_interrupt_status)
+  CHECK_FUNC(read_interrupt_status)
+  CHECK_FUNC(interrupt_control)
   CHECK_FUNC(sprite_priority)
   CHECK_FUNC(sprite_multicolor_enable)
   CHECK_FUNC(sprite_expandx)
