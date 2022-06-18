@@ -912,21 +912,30 @@ void C64::insert_c64_vic_text_copy()
 void C64::insert_c64_vic_text_plot()
 {
   fprintf(out, "text_plot:\n");
-  fprintf(out, "  lda stack_lo + 4,x\n");
-  fprintf(out, "  tay\n");  // x
-  fprintf(out, "text_plot_row:\n");
-  fprintf(out, "  lda stack_lo + 3,x\n");
+  fprintf(out, "  lda stack_lo + 3,x\n"); // y
   fprintf(out, "  asl\n");
-  fprintf(out, "  adc #0x40\n");
-  fprintf(out, "  sta text_plot_char + 4\n");
-  fprintf(out, "  adc #50\n");
-  fprintf(out, "  sta text_plot_color + 4\n");
-  fprintf(out, "text_plot_char:\n");
-  fprintf(out, "  lda stack_lo + 2,x\n");
-  fprintf(out, "  sta (0x40),y\n");
-  fprintf(out, "text_plot_color:\n");
-  fprintf(out, "  lda stack_lo + 1,x\n");
-  fprintf(out, "  sta (0x72),y\n");
+  fprintf(out, "  tay\n");
+  fprintf(out, "  lda 0x40,y\n");
+  fprintf(out, "  sta address + 0\n");
+
+  fprintf(out, "  lda 0x41,y\n");
+  fprintf(out, "  sta address + 1\n");
+
+  fprintf(out, "  lda 0x72,y\n");
+  fprintf(out, "  sta temp1 + 0\n");
+
+  fprintf(out, "  lda 0x73,y\n");
+  fprintf(out, "  sta temp1 + 1\n");
+
+  fprintf(out, "  lda stack_lo + 4,x\n"); // x
+  fprintf(out, "  tay\n");
+
+  fprintf(out, "  lda stack_lo + 2,x\n"); // char
+  fprintf(out, "  sta (address),y\n");
+
+  fprintf(out, "  lda stack_lo + 1,x\n"); // color
+  fprintf(out, "  sta (temp1),y\n");
+
   fprintf(out, "  inx\n");
   fprintf(out, "  inx\n");
   fprintf(out, "  inx\n");
@@ -938,14 +947,20 @@ void C64::insert_c64_vic_text_read()
 {
   fprintf(out, "text_read:\n");
   fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_lo + 0,x\n");
+  fprintf(out, "  lda stack_lo + 0,x\n"); // y
   fprintf(out, "  asl\n");
-  fprintf(out, "  adc #0x40\n");
-  fprintf(out, "  sta text_read_row + 1\n");
-  fprintf(out, "  lda stack_lo + 1,x\n");
-  fprintf(out, "  tay\n");  // x
-  fprintf(out, "text_read_row:\n");
-  fprintf(out, "  lda (0x40),y\n");
+  fprintf(out, "  tay\n");
+  fprintf(out, "  lda 0x40,y\n");
+  fprintf(out, "  sta address + 0\n");
+
+  fprintf(out, "  lda 0x41,y\n");
+  fprintf(out, "  sta address + 1\n");
+
+  fprintf(out, "  lda stack_lo + 1,x\n"); // x
+  fprintf(out, "  tay\n");
+
+  fprintf(out, "  lda stack_lo + 1,x\n"); // char
+  fprintf(out, "  lda (address),y\n");
   fprintf(out, "  sta stack_lo + 1,x\n");
   fprintf(out, "  lda #0\n");
   fprintf(out, "  sta stack_hi + 1,x\n");
