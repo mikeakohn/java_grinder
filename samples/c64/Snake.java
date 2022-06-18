@@ -244,6 +244,12 @@ public class Snake
       VIC.text_plot(16 + i, 0, score[i] + 48, 12);
   }
 
+  public static void resetScore()
+  {
+    for(int i = 0; i < 8; i++)
+      score[i] = 0;
+   }
+
   public static void increaseScore(int[] amount)
   {
     int carry = 0;
@@ -398,18 +404,42 @@ public class Snake
 
   public static void gameOver()
   {
+    int i = 0;
     int joy = 0;
 
-    VIC.sprite_enable(0);
-    printString(15, 9, 3, "Game Over");
-    VIC.text_copy();
-    wait(10000);
-    printString(7, 11, 12, "Press Button to Play Again");
-    VIC.text_copy();
-    wait(10000);
+    int colors[] = { 9, 2, 11, 8, 12, 10, 15, 7, 15, 10, 12, 8, 11, 2 }; 
 
+    VIC.border(7);
+    wait(1000);
+    VIC.border(10);
+    wait(1000);
+    VIC.border(8);
+    wait(1000);
+    VIC.border(2);
+    wait(2000);
+    VIC.sprite_enable(0);
+    VIC.sprite0pos(0, 0);
+    VIC.sprite1pos(0, 0);
+    VIC.sprite2pos(0, 0);
+    VIC.sprite3pos(0, 0);
+    VIC.sprite4pos(0, 0);
+    VIC.sprite5pos(0, 0);
+    VIC.sprite6pos(0, 0);
+    VIC.sprite7pos(0, 0);
+    
     while(true)
     {
+      final int c = colors[i];
+
+      printString(14, 11, c,  "           ");
+      printString(14, 12, c,  " Game Over ");
+      printString(14, 13, c, "           ");
+      VIC.text_copy();
+      i++;
+
+      if(i > 13)
+        i = 0;
+
       joy = 255 - (Memory.read8(0xdc01) + 128);
 
       if((joy & 16) == 16)
@@ -463,6 +493,8 @@ public class Snake
     int[] shoty = new int[2];
     int[] shotstatus = new int[2];
     int[] shotfreq = new int[2];
+
+    resetScore();
 
     // sprites
     clearSprite(sprite_ram);
@@ -607,16 +639,16 @@ public class Snake
             moved = 1;
           }
         }
-        else if(dx1 != dx2 && dy1 == dy2)
+        else if(dx1 == dx2 && dy1 != dy2)
         {
-          if(t0 == 32 && t1 == 32)
+          if(t0 == 32 && t2 == 32)
           {
             moved = 1;
           }
         }
-        else if(dx1 == dx2 && dy1 != dy2)
+        else if(dx1 != dx2 && dy1 == dy2)
         {
-          if(t0 == 32 && t2 == 32)
+          if(t0 == 32 && t1 == 32)
           {
             moved = 1;
           }
@@ -635,9 +667,17 @@ public class Snake
           shipy = tempy;
           break;
         }
-
         else
         {
+          // ship hit snake
+          if( (t0 >= 160 && t0 <= 163) ||
+              (t1 >= 160 && t1 <= 163) ||
+              (t2 >= 160 && t2 <= 163) ||
+              (t3 >= 160 && t3 <= 163) )
+          {
+            return;
+          }
+
           if(accelx > 0) accelx = 1;
           if(accelx < 0) accelx = -1;
           if(accely > 0) accely = 1;
@@ -647,18 +687,15 @@ public class Snake
 
       if(shipx < 24) shipx = 24;
       if(shipx > 336) shipx = 336;
-      if(shipy < 194) shipy = 194;
+//      if(shipy < 194) shipy = 194;
       if(shipy > 242) shipy = 242;
 
       VIC.sprite0pos(shipx, shipy);
 
-      // ship hit snake
-      if( (t0 >= 160 && t0 <= 163) ||
-          (t1 >= 160 && t1 <= 163) ||
-          (t2 >= 160 && t2 <= 163) ||
-          (t3 >= 160 && t3 <= 163) )
+      // ship hit spider
+      if(collision(shipx, shipy, shipx + 7, shipy + 7,
+                   spiderx, spidery, spiderx + 15, spidery + 15) == 1)
       {
-        VIC.border(2);
         return;
       }
 
@@ -735,14 +772,6 @@ public class Snake
       else
       {
         SID.voice2_waveform(128);
-      }
-
-      // ship hit spider
-      if(collision(shipx, shipy, shipx + 7, shipy + 7,
-                   spiderx, spidery, spiderx + 15, spidery + 15) == 1)
-      {
-        VIC.border(2);
-        return;
       }
 
       for(j = 0; j < 2; j++)
