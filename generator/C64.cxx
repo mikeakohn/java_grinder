@@ -46,8 +46,6 @@ C64::C64() :
   need_c64_vic_color_ram_clear(0)
 {
   start_org = 0x07ff;
-//  java_stack_lo = 0xb0;
-//  java_stack_hi = 0xd0;
   java_stack_lo = 0x200;
   java_stack_hi = 0x300;
   ram_start = 0xa000;
@@ -80,33 +78,32 @@ int C64::open(const char *filename)
   fprintf(out, "  heap_ptr equ ram_start\n");
 
   // for indirection (2 bytes)
-  fprintf(out, "  address equ 0xfb\n");
+  fprintf(out, "  address equ 0x02\n");
 
   // java stack
   fprintf(out, "  stack_lo equ 0x%04x\n", java_stack_lo);
   fprintf(out, "  stack_hi equ 0x%04x\n", java_stack_hi);
 
   // points to locals
-  fprintf(out, "  locals equ 0xfe\n");
+  fprintf(out, "  locals equ 0x04\n");
 
   // temp variables
-  fprintf(out, "  result equ 0x20\n");
-  fprintf(out, "  return equ 0x22\n");
-  fprintf(out, "  remainder equ 0x24\n");
-  fprintf(out, "  length equ 0x26\n");
-  fprintf(out, "  value1 equ 0x2a\n");
-  fprintf(out, "  value2 equ 0x2c\n");
-  fprintf(out, "  value3 equ 0x2e\n");
-  fprintf(out, "  temp1 equ 0x30\n");
-  fprintf(out, "  temp2 equ 0x32\n");
+  fprintf(out, "  result equ 0x0a\n");
+  fprintf(out, "  return equ 0x0c\n");
+  fprintf(out, "  remainder equ 0x0e\n");
+  fprintf(out, "  length equ 0x10\n");
+  fprintf(out, "  value1 equ 0x12\n");
+  fprintf(out, "  value2 equ 0x14\n");
+  fprintf(out, "  value3 equ 0x16\n");
+  fprintf(out, "  temp1 equ 0x18\n");
 
   // 0x40-0xa3 reserved for text/color tables
 
   // sprites
-  fprintf(out, "  sprite_msb_set equ 0x10\n");
-  fprintf(out, "  sprite_msb_clear equ 0x11\n");
-  fprintf(out, "  sprite_x equ 0x12\n");
-  fprintf(out, "  sprite_y equ 0x13\n");
+  fprintf(out, "  sprite_msb_set equ 0x06\n");
+  fprintf(out, "  sprite_msb_clear equ 0x07\n");
+  fprintf(out, "  sprite_x equ 0x08\n");
+  fprintf(out, "  sprite_y equ 0x09\n");
 
   // basic loader
   fprintf(out, ".org 0x%04x\n", start_org);
@@ -128,6 +125,16 @@ int C64::open(const char *filename)
   fprintf(out, "start:\n");
   fprintf(out, "  sei\n");
   fprintf(out, "  cld\n");
+
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "clear_stack_loop:\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sta 0x0200,y\n");
+  fprintf(out, "  sta 0x0300,y\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  cpy #0\n");
+  fprintf(out, "  bne clear_stack_loop\n");
+
   fprintf(out, "  ldx #0xff\n");
   fprintf(out, "  txs\n");
 
@@ -555,9 +562,9 @@ int C64::c64_vic_sprite_collision() { PEEK(0xd01e); return 0; }
 int C64::c64_vic_data_collision() { PEEK(0xd01f); return 0; }
 int C64::c64_vic_border(/* value */) { POKE(0xd020); return 0; }
 int C64::c64_vic_background(/* value */) { POKE(0xd021); return 0; }
-int C64::c64_vic_background1(/* value */) { POKE(0xd022); return 0; }
-int C64::c64_vic_background2(/* value */) { POKE(0xd023); return 0; }
-int C64::c64_vic_background3(/* value */) { POKE(0xd024); return 0; }
+int C64::c64_vic_multi1(/* value */) { POKE(0xd022); return 0; }
+int C64::c64_vic_multi2(/* value */) { POKE(0xd023); return 0; }
+int C64::c64_vic_multi3(/* value */) { POKE(0xd024); return 0; }
 int C64::c64_vic_sprite_multicolor0(/* value */) { POKE(0xd025); return 0; }
 int C64::c64_vic_sprite_multicolor1(/* value */) { POKE(0xd026); return 0; }
 int C64::c64_vic_sprite0color(/* value */) { POKE(0xd027); return 0; }

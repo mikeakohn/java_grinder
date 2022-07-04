@@ -157,19 +157,19 @@ static int c64_vic_background(JavaClass *java_class, Generator *generator)
   return generator->c64_vic_background();
 }
 
-static int c64_vic_background1(JavaClass *java_class, Generator *generator)
+static int c64_vic_multi1(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_background1();
+  return generator->c64_vic_multi1();
 }
 
-static int c64_vic_background2(JavaClass *java_class, Generator *generator)
+static int c64_vic_multi2(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_background2();
+  return generator->c64_vic_multi2();
 }
 
-static int c64_vic_background3(JavaClass *java_class, Generator *generator)
+static int c64_vic_multi3(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_background3();
+  return generator->c64_vic_multi3();
 }
 
 static int c64_vic_sprite_multicolor0(JavaClass *java_class, Generator *generator)
@@ -311,9 +311,9 @@ int c64_vic(JavaClass *java_class, Generator *generator, const char *function)
   CHECK_FUNC(data_collision)
   CHECK_FUNC(border)
   CHECK_FUNC(background)
-  CHECK_FUNC(background1)
-  CHECK_FUNC(background2)
-  CHECK_FUNC(background3)
+  CHECK_FUNC(multi1)
+  CHECK_FUNC(multi2)
+  CHECK_FUNC(multi3)
   CHECK_FUNC(sprite_multicolor0)
   CHECK_FUNC(sprite_multicolor1)
   CHECK_FUNC(sprite0color)

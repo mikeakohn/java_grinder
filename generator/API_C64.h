@@ -62,9 +62,9 @@ public:
   virtual int c64_vic_data_collision() { return -1; }
   virtual int c64_vic_border() { return -1; }
   virtual int c64_vic_background() { return -1; }
-  virtual int c64_vic_background1() { return -1; }
-  virtual int c64_vic_background2() { return -1; }
-  virtual int c64_vic_background3() { return -1; }
+  virtual int c64_vic_multi1() { return -1; }
+  virtual int c64_vic_multi2() { return -1; }
+  virtual int c64_vic_multi3() { return -1; }
   virtual int c64_vic_sprite_multicolor0() { return -1; }
   virtual int c64_vic_sprite_multicolor1() { return -1; }
   virtual int c64_vic_sprite0color() { return -1; }

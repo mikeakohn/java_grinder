@@ -104,13 +104,13 @@ public class VIC
   public static void background(int value) { }
 
   // 0xd022
-  public static void background1(int value) { }
+  public static void multi1(int value) { }
 
   // 0xd023
-  public static void background2(int value) { }
+  public static void multi2(int value) { }
 
   // 0xd024
-  public static void background3(int value) { }
+  public static void multi3(int value) { }
 
   // 0xd025
   public static void sprite_multicolor0(int value) { }

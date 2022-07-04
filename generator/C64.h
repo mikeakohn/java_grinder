@@ -71,9 +71,9 @@ public:
   virtual int c64_vic_data_collision();
   virtual int c64_vic_border();
   virtual int c64_vic_background();
-  virtual int c64_vic_background1();
-  virtual int c64_vic_background2();
-  virtual int c64_vic_background3();
+  virtual int c64_vic_multi1();
+  virtual int c64_vic_multi2();
+  virtual int c64_vic_multi3();
   virtual int c64_vic_sprite_multicolor0();
   virtual int c64_vic_sprite_multicolor1();
   virtual int c64_vic_sprite0color();
