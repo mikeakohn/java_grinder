@@ -15,10 +15,6 @@ public class Snake
   static final int hundred[] = { 0, 0, 0, 0, 0, 1, 0, 0 };
   static final int thousand[] = { 0, 0, 0, 0, 1, 0, 0, 0 };
 
-  // colors
-  static int title_colors[] = { 11, 12, 15, 12, 11, 12, 15, 12, 11, 11 };
-  static int spider_exp_colors[] = { 1, 15, 12, 11 };
-
   // random number seed
   static int seed = 12345;
 
@@ -60,15 +56,23 @@ public class Snake
     "i o i 0 i o i 0 "
   + "i o i 0 i o i 0 ";
 
+  static int spider_exp_colors[] = { 1, 15, 12, 11 };
   static int spider_exp_timer = 0;
   static int spider_exp_status = 0;
+
+  static int ship_exp_colors[] = { 1, 15, 12, 11 };
+  static int ship_exp_timer = 0;
+  static int ship_exp_status = 0;
+
+  static int snake_exp_timer = 0;
+  static int snake_exp_status = 0;
 
   static final int sprite_ship[] =
   {
     0x04, 0x00, 0x00, 0x04, 0x00, 0x00, 0x04, 0x00,
-    0x00, 0x04, 0x00, 0x00, 0x44, 0x40, 0x00, 0x44,
+    0x00, 0x44, 0x40, 0x00, 0x44, 0x40, 0x00, 0x59,
     0x40, 0x00, 0x59, 0x40, 0x00, 0x59, 0x40, 0x00,
-    0x59, 0x40, 0x00, 0x55, 0x40, 0x00, 0x44, 0x40,
+    0x55, 0x40, 0x00, 0x44, 0x40, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -77,14 +81,12 @@ public class Snake
 
   static final int sprite_shot[] =
   {
-    0x04, 0x00, 0x00, 0x04, 0x00, 0x00, 0x08, 0x00,
-    0x00, 0x04, 0x00, 0x00, 0x08, 0x00, 0x00, 0x08,
-    0x00, 0x00, 0x08, 0x00, 0x00, 0x08, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x87,
+    8, 0, 0, 8, 0, 0, 8, 0, 0, 8, 0, 0,
+    8, 0, 0, 8, 0, 0, 8, 0, 0, 8, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0,
   };
 
   static final int sprite_spider1[] =
@@ -120,7 +122,7 @@ public class Snake
     0b11111110,
     0b11111111,
     0b11111110,
-    0b01010100
+    0b01010100,
   };
 
   static final int char_mushroom1[] =
@@ -162,48 +164,48 @@ public class Snake
   static final int char_segment1[] =
   {
     0b11001100,
-    0b11111110,
+    0b11111101,
     0b10111111,
     0b10111111,
     0b10111111,
     0b10111111,
-    0b11111110,
+    0b11111101,
     0b11001100
   };
 
   static final int char_segment2[] =
   {
     0b00110011,
-    0b10111111,
+    0b01111111,
     0b11111110,
     0b11111110,
     0b11111110,
     0b11111110,
-    0b10111111,
+    0b01111111,
     0b00110011
   };
 
   static final int char_segment3[] =
   {
     0b00110011,
-    0b11111110,
+    0b11111101,
     0b10111111,
     0b10111111,
     0b10111111,
     0b10111111,
-    0b11111110,
+    0b11111101,
     0b00110011
   };
 
   static final int char_segment4[] =
   {
     0b11001100,
-    0b10111111,
+    0b01111111,
     0b11111110,
     0b11111110,
     0b11111110,
     0b11111110,
-    0b10111111,
+    0b01111111,
     0b11001100
   };
 
@@ -321,6 +323,59 @@ public class Snake
     }
   }
 
+  public static void expShip()
+  {
+    if(ship_exp_status == 0)
+    {
+      if(ship_exp_timer == 0)
+      {
+        // start attack/decay
+        //                srad 
+        SID.voice3_adsr(0x8f00);
+        SID.voice3_frequency(2000);
+        SID.voice3_waveform(129);
+      }
+
+//      VIC.sprite0color((byte)(ship_exp_colors[(ship_exp_timer >> 2) & 3]));
+      VIC.sprite_multicolor0((byte)(ship_exp_colors[(ship_exp_timer >> 2) & 3]));
+      ship_exp_timer++;
+ 
+      if(ship_exp_timer > 13)
+      {
+        // start decay/release
+        SID.voice3_waveform(128);
+        ship_exp_timer = 0;
+        ship_exp_status = 1;
+        VIC.sprite0color(0);
+      }
+    }
+  }
+
+  public static void expSnake()
+  {
+    if(snake_exp_status == 0)
+    {
+      if(snake_exp_timer == 0)
+      {
+        // start attack/decay
+        //                srad 
+        SID.voice3_adsr(0xe400);
+        SID.voice3_frequency(2000);
+        SID.voice3_waveform(33);
+      }
+
+      snake_exp_timer++;
+ 
+      if(snake_exp_timer > 1)
+      {
+        // start decay/release
+        SID.voice3_waveform(32);
+        snake_exp_timer = 0;
+        snake_exp_status = 1;
+      }
+    }
+  }
+
   public static void playTitleMusic()
   {
     int c;
@@ -419,6 +474,7 @@ public class Snake
 
     c = getFreq(end_song3.charAt(music_pos3));
 
+/*
     if(c > 0)
     {
       SID.voice3_frequency(getFreq(end_song3.charAt(music_pos3)) << 2);
@@ -429,6 +485,7 @@ public class Snake
     {
       SID.voice3_waveform(16);
     }
+*/
 
     music_pos1++;
 
@@ -439,12 +496,12 @@ public class Snake
 
     if(music_pos2 >= end_song2.length())
       music_pos2 = 0;
-
+/*
     music_pos3++;
 
     if(music_pos3 >= end_song3.length())
       music_pos3 = 0;
-
+*/
 /*
     pulse1 += 256;
     pulse1 &= 511;
@@ -458,12 +515,24 @@ public class Snake
   public static void title()
   {
     int time = 0;
+//    int colors[] = { 9, 2, 11, 8, 12, 10, 15, 7, 15, 10, 12, 8, 11, 2 };
+    int colors[] = { 10, 7, 13, 14, 4, 14, 13, 7 };
 
     VIC.text_clear(32);
-    printString(19, 12, 11, "by");
-    printString(14, 13, 12, "Joe Davisson");
-    printString(9, 15, 5, "Made with Java_Grinder");
-    printString(12, 23, 12, "Joystick Port 1");
+    VIC.sprite_enable(16);
+    VIC.sprite_priority(0);
+    VIC.sprite_multicolor_enable(255);
+    VIC.sprite_multicolor0(1);
+    VIC.sprite_multicolor1(12);
+//    VIC.sprite4color(14);
+    VIC.sprite4pos(24 + 160 - 24, 50 + 124);
+    VIC.sprite_expandx(16);
+    VIC.sprite_expandy(16);
+
+    printString(19, 10, 12, "by");
+    printString(14, 11, 15, "Joe Davisson");
+    printString(9, 13, 13, "Made with Java_Grinder");
+    printString(12, 22, 14, "Joystick Port 1");
 
     //                srad 
     SID.voice1_adsr(0xaf1a);
@@ -480,6 +549,10 @@ public class Snake
     music_pos2 = 0;
     music_pos3 = 0;
 
+    VIC.border(11);
+    VIC.background(0);
+    VIC.write_control2(VIC.read_control2() & 239);
+
     while(true)
     {
       final int joy = 255 - (Memory.read8(0xdc01) + 128);
@@ -491,17 +564,24 @@ public class Snake
       wait(300);
       time++;
 
-      final int c = title_colors[time % 10];
+      final int c = colors[time & 7];
 
-      printString(9, 5, c,  "=== =   =  ==  = = ===");
-      printString(9, 6, c,  "=   ==  = =  = = = =  ");
-      printString(9, 7, c,  "=== = = = ==== ==  ===");
-      printString(9, 8, c,  "  = =  == =  = = = =  ");
-      printString(9, 9, c,  "=== =   = =  = = = ===");
+      printString(9, 3, c,  "=== =   =  ==  = = ===");
+      printString(9, 4, c,  "=   ==  = =  = = = =  ");
+      printString(9, 5, c,  "=== = = = ==== ==  ===");
+      printString(9, 6, c,  "  = =  == =  = = = =  ");
+      printString(9, 7, c,  "=== =   = =  = = = ===");
+
+      VIC.sprite4color(c);
+      VIC.sprite_multicolor0(colors[(time + 1) & 7]);
 
       VIC.text_copy();
     }
 
+    VIC.sprite_enable(0);
+    VIC.sprite4pos(0, 0);
+    VIC.sprite_expandx(0);
+    VIC.sprite_expandy(0);
     SID.volume(0);
   }
 
@@ -509,17 +589,49 @@ public class Snake
   {
     int i = 0;
     int joy = 0;
+    int play_music = 64;
 
-    int colors[] = { 9, 2, 11, 8, 12, 10, 15, 7, 15, 10, 12, 8, 11, 2 }; 
+    int colors1[] = { 7, 10, 8, 2, 9, 2, 8, 10 }; 
+    int colors2[] = { 13, 3, 14, 4, 6, 4, 14, 3 };
 
-    VIC.border(7);
-    wait(1000);
-    VIC.border(10);
-    wait(1000);
-    VIC.border(8);
-    wait(1000);
+    SID.filter_resonance(0);
+    SID.volume(15);
+
+    SID.voice1_adsr(0xef1a);
+    SID.voice2_adsr(0xef1a);
+    SID.voice3_adsr(0xef1a);
+
+    ship_exp_status = 0;
+
+    while(true)
+    {
+      expShip();
+
+      if(ship_exp_timer == 0)
+        break;
+
+      i++;
+
+      VIC.border(colors1[(i >> 1) & 7]);
+
+      wait(500);
+    }
+
     VIC.border(2);
-    wait(2000);
+    wait(1000);
+
+//    SID.voice1_adsr(0xaf1a);
+//    SID.voice2_adsr(0xaf1a);
+    VIC.write_control2(VIC.read_control2() & 239);
+
+/*
+    for(i = 0; i < 7; i++)
+    {
+      VIC.border(colors1[i]);
+      wait(500);
+    }
+*/
+
     VIC.sprite_enable(0);
     VIC.sprite0pos(0, 0);
     VIC.sprite1pos(0, 0);
@@ -539,16 +651,11 @@ public class Snake
 
     while(true)
     {
-      final int c = colors[i];
 
-      printString(14, 11, c,  "           ");
-      printString(14, 12, c,  " Game Over ");
-      printString(14, 13, c, "           ");
+      printString(14, 11, 0,  "           ");
+      printString(14, 12, colors2[i & 7],  " Game Over ");
+      printString(14, 13, 0, "           ");
       VIC.text_copy();
-      i++;
-
-      if(i > 13)
-        i = 0;
 
       joy = 255 - (Memory.read8(0xdc01) + 128);
 
@@ -563,8 +670,15 @@ public class Snake
         }
       }
 
-      playEndMusic();
-      wait(200);
+      if(play_music > 0)
+      {
+        play_music--;
+        SID.volume(play_music >> 2);
+        playEndMusic();
+      }
+
+      i++;
+      wait(300);
     }
   }
 
@@ -577,10 +691,11 @@ public class Snake
     int accelx = 0;
     int accely = 0;
     int time = 0;
-    int snake_length = 6;
+    int snake_length = 8;
     int snake_count = snake_length;
     int spiderx = rnd() % 320 + 24;
     int spidery = 0;
+    int spider_timer = 0;
     int button_pressed = 0;
     int shots_active = 0;
     int shot_time = 0;
@@ -603,37 +718,9 @@ public class Snake
     int[] shotfreq = new int[2];
 
     resetScore();
+    ship_exp_status = 1;
     spider_exp_status = 1;
-
-    // sprites
-    clearSprite(sprite_ram);
-    clearSprite(sprite_ram + 64);
-    clearSprite(sprite_ram + 128);
-    clearSprite(sprite_ram + 192);
-    clearSprite(sprite_ram + 256);
-
-/*
-    for(i = 0; i < 24; i++)
-    {
-      Memory.write8(sprite_ram + i, (byte)sprite_ship[i]);
-      Memory.write8(sprite_ram + 64 + i, (byte)sprite_shot[i]);
-    }
-*/
-
-    for(i = 0; i < 63; i++)
-    {
-      Memory.write8(sprite_ram + i, (byte)sprite_ship[i]);
-      Memory.write8(sprite_ram + 64 + i, (byte)sprite_shot[i]);
-      Memory.write8(sprite_ram + 128 + i, (byte)sprite_spider1[i]);
-      Memory.write8(sprite_ram + 192 + i, (byte)sprite_spider2[i]);
-    }
-
-    Memory.write8(sprite_pointer + 0, (byte)192);
-    Memory.write8(sprite_pointer + 1, (byte)193);
-    Memory.write8(sprite_pointer + 2, (byte)193);
-    Memory.write8(sprite_pointer + 3, (byte)193);
-    Memory.write8(sprite_pointer + 4, (byte)194);
-    Memory.write8(sprite_pointer + 5, (byte)196);
+    snake_exp_status = 1;
 
     VIC.sprite_enable(63);
     VIC.sprite_priority(0);
@@ -641,10 +728,16 @@ public class Snake
     VIC.sprite_multicolor0(1);
     VIC.sprite_multicolor1(12);
     VIC.sprite0color(14);
-    VIC.sprite1color(10);
-    VIC.sprite2color(10);
-    VIC.sprite3color(10);
+    VIC.sprite1color(7);
+    VIC.sprite2color(7);
+    VIC.sprite3color(7);
     VIC.sprite4color(4);
+    VIC.border(11);
+
+    VIC.background(0);
+    VIC.multi1((byte)1);
+    VIC.multi2((byte)7);
+    VIC.write_control2(VIC.read_control2() | 16);
 
     // mushrooms
     VIC.text_clear((byte)32);
@@ -702,17 +795,16 @@ public class Snake
       if(accely > 4) accely = 4;
       if(accely < -4) accely = -4;
 
-      if(accelx > 0) accelx--;
-      if(accelx < 0) accelx++;
-      if(accely > 0) accely--;
-      if(accely < 0) accely++;
+      if((time & 1) == 1)
+      {
+        if(accelx > 0) accelx--;
+        if(accelx < 0) accelx++;
+        if(accely > 0) accely--;
+        if(accely < 0) accely++;
+      }
 
       if(shipx > spiderx) spiderx++;
       if(shipx < spiderx) spiderx--;
-
-      spidery++;
-      if(spidery > 250)
-        spidery = 0;
 
       // ship move/collision
       tempx = shipx + accelx;
@@ -721,6 +813,7 @@ public class Snake
       final int dx1 = (tempx - 18) >> 3;
       final int dy1 = (tempy - 44) >> 3;
 //      final int dx1 = (tempx - 20) >> 3;
+
 //      final int dy1 = (tempy - 46) >> 3;
 
       temp = VIC.text_read(dx1, dy1);
@@ -828,9 +921,9 @@ public class Snake
 */
 
       if(shipx < 24) shipx = 24;
-      if(shipx > 336) shipx = 336;
-//      if(shipy < 194) shipy = 194;
-      if(shipy > 242) shipy = 242;
+      if(shipx > 334) shipx = 334;
+      if(shipy < 194) shipy = 194;
+      if(shipy > 240) shipy = 240;
 
       VIC.sprite0pos(shipx, shipy);
 
@@ -841,10 +934,24 @@ public class Snake
     {
       VIC.sprite4pos(spiderx, spidery);
 
-      if(shipx < spiderx + 15 && shipx + 7 > spiderx &&
-         shipy < spidery + 15 && shipy + 7 > spidery)
+      if(shipx < spiderx + 23 && shipx + 9 > spiderx &&
+         shipy < spidery + 20 && shipy + 9 > spidery)
       {
         return;
+      }
+
+      if(spider_timer > 0)
+      {
+        spider_timer--;
+      }
+      else
+      {
+        spidery++;
+
+        if(spidery > 250)
+        {
+          spidery = 0;
+        }
       }
     }
 
@@ -934,17 +1041,18 @@ public class Snake
       {
         if(shotstatus[j] == 1)
         {
-          tx = shotx[j] + 4;
+          tx = shotx[j] + 6;
           ty = shoty[j];
 
           // shot hit spider
           if(spider_exp_status == 1)
           {
-            if(tx < spiderx + 15 && tx + 1 > spiderx &&
-               ty < spidery + 15 && ty + 7 > spidery)
+            if(tx < spiderx + 23 && tx + 1 > spiderx &&
+               ty < spidery + 20 && ty + 7 > spidery)
             {
               spiderx = rnd() % 320 + 24;
               spidery = 0;
+              spider_timer = rnd() % 400 + 1;
               shotx[j] = 0;
               shoty[j] = 0;
               shotstatus[j] = 0;
@@ -986,6 +1094,7 @@ public class Snake
               if((snakestatus[i] == 1) && (sx == dx) && (sy == dy))
               {
                 // hit snake
+                snake_exp_status = 0;
                 shotstatus[j] = 0;
                 shots_active--;
                 shotx[j] = 0;
@@ -1078,6 +1187,7 @@ public class Snake
         }
 
         expSpider();
+        expSnake();
         VIC.text_copy();
       }
     }
@@ -1089,6 +1199,28 @@ public class Snake
 
     VIC.make_text_table();
     VIC.make_color_table();
+
+    // copy sprites
+    clearSprite(sprite_ram);
+    clearSprite(sprite_ram + 64);
+    clearSprite(sprite_ram + 128);
+    clearSprite(sprite_ram + 192);
+    clearSprite(sprite_ram + 256);
+
+    for(i = 0; i < 63; i++)
+    {
+      Memory.write8(sprite_ram + i, (byte)sprite_ship[i]);
+      Memory.write8(sprite_ram + 64 + i, (byte)sprite_shot[i]);
+      Memory.write8(sprite_ram + 128 + i, (byte)sprite_spider1[i]);
+      Memory.write8(sprite_ram + 192 + i, (byte)sprite_spider2[i]);
+    }
+
+    Memory.write8(sprite_pointer + 0, (byte)192);
+    Memory.write8(sprite_pointer + 1, (byte)193);
+    Memory.write8(sprite_pointer + 2, (byte)193);
+    Memory.write8(sprite_pointer + 3, (byte)193);
+    Memory.write8(sprite_pointer + 4, (byte)194);
+    Memory.write8(sprite_pointer + 5, (byte)196);
 
     // copy chars
     for(i = 0; i < 8; i++)
@@ -1103,12 +1235,6 @@ public class Snake
       Memory.write8(char_ram + 8 * 163 + i, (byte)char_segment4[i]);
     }
 
-    VIC.write_control2(VIC.read_control2() | 16);
-
-    VIC.background(0);
-    VIC.multi1((byte)1);
-    VIC.multi2((byte)7);
-
 /*
     Memory.write8(0xd021, (byte)0);
     Memory.write8(0xd022, (byte)1);
@@ -1116,11 +1242,13 @@ public class Snake
     Memory.write8(0xd024, (byte)1);
 */
 
+    // reset SID
+    for(i = 0; i <= 28; i++)
+      Memory.write8(0xd400 + i, (byte)0);
+
     while(true)
     {
-      VIC.border(11);
       title();
-      VIC.border(11);
       snake();
       gameOver();
     }
