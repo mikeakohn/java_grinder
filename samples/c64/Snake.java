@@ -532,7 +532,7 @@ public class Snake
     printString(19, 10, 12, "by");
     printString(14, 11, 15, "Joe Davisson");
     printString(9, 13, 13, "Made with Java_Grinder");
-    printString(12, 22, 14, "Joystick Port 1");
+    printString(12, 22, 14, "Joystick Port 2");
 
     //                srad 
     SID.voice1_adsr(0xaf1a);
@@ -555,7 +555,7 @@ public class Snake
 
     while(true)
     {
-      final int joy = 255 - (Memory.read8(0xdc01) + 128);
+      final int joy = 255 - (Memory.read8(0xdc00) + 128);
 
       if((joy & 16) == 16)
         break;
@@ -657,13 +657,13 @@ public class Snake
       printString(14, 13, 0, "           ");
       VIC.text_copy();
 
-      joy = 255 - (Memory.read8(0xdc01) + 128);
+      joy = 255 - (Memory.read8(0xdc00) + 128);
 
       if((joy & 16) == 16)
       {
         while(true)
         {
-          joy = 255 - (Memory.read8(0xdc01) + 128);
+          joy = 255 - (Memory.read8(0xdc00) + 128);
 
           if((joy & 16) == 0)
             return;
@@ -783,7 +783,7 @@ public class Snake
     while(true)
     {
       // move ship
-      joy = 255 - (Memory.read8(0xdc01) + 128);
+      joy = 255 - (Memory.read8(0xdc00) + 128);
 
       if((joy & 8) == 8) accelx += 2;
       if((joy & 4) == 4) accelx -= 2;
