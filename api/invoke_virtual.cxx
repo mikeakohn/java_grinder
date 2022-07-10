@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -38,7 +38,11 @@
 // deal with stuff like System.out.println() where System is the class,
 // out is the field_name / field_type, and println() is the method_name /
 // method_sig.
-int invoke_virtual(JavaClass *java_class, int method_id, int field_id, Generator *generator)
+int invoke_virtual(
+  JavaClass *java_class,
+  int method_id,
+  int field_id,
+  Generator *generator)
 {
   std::string field_name;
   std::string field_type;
@@ -48,7 +52,7 @@ int invoke_virtual(JavaClass *java_class, int method_id, int field_id, Generator
   std::string method_class;
   std::string function;
 
-  printf("invoke_virtual() (static)\n");
+  //printf("invoke_virtual() (static)\n");
 
   if (java_class->get_ref_name_type(field_name, field_type, field_id) != 0 ||
       java_class->get_class_name(field_class, field_id) != 0)
@@ -64,10 +68,12 @@ int invoke_virtual(JavaClass *java_class, int method_id, int field_id, Generator
     return -1;
   }
 
+#if 0
   printf("field: '%s as %s' from %s\n",
     field_name.c_str(), field_type.c_str(), field_class.c_str());
   printf("method: '%s as %s' from %s\n",
     method_name.c_str(), method_sig.c_str(), method_class.c_str());
+#endif
 
   function = Util::get_virtual_function(method_name, method_sig, field_name, field_class);
 
@@ -105,7 +111,7 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
   std::string function;
   bool is_constructor = false;
 
-  printf("invoke_virtual() (pushed)\n");
+  //printf("invoke_virtual() (pushed)\n");
 
   if (java_class->get_class_name(method_class, method_id) != 0 ||
       java_class->get_ref_name_type(method_name, method_sig, method_id) != 0)
@@ -114,8 +120,10 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
     return -1;
   }
 
+#if 0
   printf("method: '%s as %s' from %s\n",
     method_name.c_str(), method_sig.c_str(), method_class.c_str());
+#endif
 
   if (method_name == "<init>")
   {
