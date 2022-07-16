@@ -328,7 +328,7 @@ int C64::c64_sid_clear()
   fprintf(out, "  lda #0\n");
   fprintf(out, "  sta 0xd400,y\n");
   fprintf(out, "  dey\n");
-  fprintf(out, "  bpl #-8\n");
+  fprintf(out, "  bpl #-6\n");
 
   return 0;
 }

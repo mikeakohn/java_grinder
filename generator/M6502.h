@@ -113,6 +113,15 @@ public:
   virtual int memory_write8_IB();
   virtual int memory_read16_I();
   virtual int memory_write16_IS();
+  virtual int memory_addressOf_aB();
+  virtual int memory_addressOf_aS();
+  virtual int memory_addressOf_aC();
+  virtual int memory_addressOf_aI();
+
+  // Math API
+  virtual int math_abs_I();
+  virtual int math_min_II();
+  virtual int math_max_II();
 
 protected:
   virtual int get_int_size() { return 2; }
@@ -151,6 +160,9 @@ protected:
   bool need_memory_read16:1;
   bool need_memory_write16:1;
 
+  bool need_math_max:1;
+  bool need_math_min:1;
+
   void insert_swap();
   void insert_add_integer();
   void insert_sub_integer();
@@ -176,6 +188,9 @@ protected:
   void insert_memory_write8();
   void insert_memory_read16();
   void insert_memory_write16();
+
+  void insert_math_max();
+  void insert_math_min();
 };
 
 #endif
