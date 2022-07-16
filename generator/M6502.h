@@ -162,6 +162,7 @@ protected:
 
   bool need_math_max:1;
   bool need_math_min:1;
+  bool need_math_abs:1;
 
   void insert_swap();
   void insert_add_integer();
@@ -191,6 +192,7 @@ protected:
 
   void insert_math_max();
   void insert_math_min();
+  void insert_math_abs();
 };
 
 #endif

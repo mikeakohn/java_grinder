@@ -59,7 +59,8 @@ M6502::M6502() :
   need_memory_read16(0),
   need_memory_write16(0),
   need_math_max(0),
-  need_math_min(0)
+  need_math_min(0),
+  need_math_abs(0)
 {
 }
 
@@ -134,6 +135,7 @@ int M6502::finish()
   if (need_memory_write16) { insert_memory_write16(); }
   if (need_math_max) { insert_math_max(); }
   if (need_math_min) { insert_math_min(); }
+  if (need_math_abs) { insert_math_abs(); }
 
   return 0;
 }
@@ -2027,7 +2029,10 @@ int M6502::math_min_II()
 
 int M6502::math_abs_I()
 {
-  fprintf(out, "; math_abs_I:\n");
+  need_math_abs = 1;
+
+  fprintf(out, "  jsr math_abs\n");
+
   return 0;
 }
 
@@ -2063,6 +2068,23 @@ void M6502::insert_math_min()
   fprintf(out, "  lda stack_lo + 0,x\n");
   fprintf(out, "  sta stack_lo + 1,x\n");
   fprintf(out, "  lda stack_hi + 0,x\n");
+  fprintf(out, "  sta stack_hi + 1,x\n");
+  fprintf(out, "  rts\n");
+};
+
+void M6502::insert_math_abs()
+{
+  fprintf(out, "math_abs:\n");
+  fprintf(out, "  lda stack_hi + 1,x\n");
+  fprintf(out, "  and #0x80\n");
+  fprintf(out, "  bne #1\n");
+  fprintf(out, "  rts\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sbc stack_lo + 1,x\n");
+  fprintf(out, "  sta stack_lo + 1,x\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sbc stack_hi + 1,x\n");
   fprintf(out, "  sta stack_hi + 1,x\n");
   fprintf(out, "  rts\n");
 };
