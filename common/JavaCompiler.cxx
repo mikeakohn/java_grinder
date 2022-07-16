@@ -1060,18 +1060,23 @@ int JavaCompiler::compile_method(
       case 21: // iload (0x15)
         if (wide == 1)
         {
-          //PUSH_INTEGER(local_vars[GET_PC_UINT16(1)]);
           ret = generator->push_local_var_int(GET_PC_UINT16(1));
         }
           else
         {
-          //PUSH_INTEGER(local_vars[bytes[pc + 1]]);
           ret = generator->push_local_var_int(bytes[pc + 1]);
         }
         break;
 
       case 22: // lload (0x16)
-        UNIMPL()
+        if (wide == 1)
+        {
+          ret = generator->push_local_var_long(GET_PC_UINT16(1));
+        }
+          else
+        {
+          ret = generator->push_local_var_long(bytes[pc + 1]);
+        }
         break;
 
       case 23: // fload (0x17)

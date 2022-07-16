@@ -89,6 +89,7 @@ public:
   virtual int push_local_var_int(int index) = 0;
   virtual int push_local_var_ref(int index) = 0;
   virtual int push_local_var_float(int index);
+  virtual int push_local_var_long(int index) { return -1; }
   virtual int push_ref_static(std::string &name, int index) = 0;
   virtual int push_fake() { return -1; } // move stack ptr without push
   virtual int set_integer_local(int index, int value) { return -1; }
