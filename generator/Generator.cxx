@@ -48,7 +48,7 @@ void Generator::close()
 
 int Generator::new_object_array(std::string &class_name)
 {
-  printf("Error: Object arrays are not supported on this platform.\n");
+  printf("Error: Arrays of 'object' are not supported on this platform.\n");
   return -1;
 }
 
@@ -132,49 +132,73 @@ int Generator::compare_floats(int cond)
 
 int Generator::array_read_float()
 {
-  printf("Error: Float arrays are not supported on this platform.\n");
+  printf("Error: Arrays of 'float' are not supported on this platform.\n");
+  return -1;
+}
+
+int Generator::array_read_long()
+{
+  printf("Error: Arrays of 'long' are not supported on this platform.\n");
   return -1;
 }
 
 int Generator::array_read_object()
 {
-  printf("Error: Object arrays are not supported on this platform.\n");
+  printf("Error: Arrays of 'object' are not supported on this platform.\n");
   return -1;
 }
 
 int Generator::array_read_float(std::string &name, int field_id)
 {
-  printf("Error: Float arrays are not supported on this platform.\n");
+  printf("Error: Arrays of 'float' are not supported on this platform.\n");
+  return -1;
+}
+
+int Generator::array_read_long(std::string &name, int field_id)
+{
+  printf("Error: Arrays of 'long' are not supported on this platform.\n");
   return -1;
 }
 
 int Generator::array_read_object(std::string &name, int field_id)
 {
-  printf("Error: Object arrays are not supported on this platform.\n");
+  printf("Error: Arrays of 'object' are not supported on this platform.\n");
   return -1;
 }
 
 int Generator::array_write_float()
 {
-  printf("Error: Float arrays are not supported on this platform.\n");
+  printf("Error: Arrays of 'float' are not supported on this platform.\n");
+  return -1;
+}
+
+int Generator::array_write_long()
+{
+  printf("Error: Arrays of 'long' are not supported on this platform.\n");
   return -1;
 }
 
 int Generator::array_write_object()
 {
-  printf("Error: Object arrays are not supported on this platform.\n");
+  printf("Error: Arrays of 'objects' are not supported on this platform.\n");
   return -1;
 }
 
 int Generator::array_write_float(std::string &name, int field_id)
 {
-  printf("Error: Float arrays are not supported on this platform.\n");
+  printf("Error: Arrays of 'float' are not supported on this platform.\n");
+  return -1;
+}
+
+int Generator::array_write_long(std::string &name, int field_id)
+{
+  printf("Error: Arrays of 'long' are not supported on this platform.\n");
   return -1;
 }
 
 int Generator::array_write_object(std::string &name, int field_id)
 {
-  printf("Error: Object arrays are not supported on this platform.\n");
+  printf("Error: Arrays of 'objects' are not supported on this platform.\n");
   return -1;
 }
 

@@ -102,6 +102,7 @@ public:
   virtual int pop_local_var_int(int index) = 0;
   virtual int pop_local_var_ref(int index) = 0;
   virtual int pop_local_var_float(int index) { return -1; }
+  virtual int pop_local_var_long(int index) { return -1; }
   virtual int pop() = 0;
   virtual int dup() = 0;
   virtual int dup2() = 0;
@@ -129,6 +130,8 @@ public:
   virtual int inc_integer(int index, int num) = 0;
   virtual int integer_to_byte() = 0;
   virtual int integer_to_short() = 0;
+  virtual int integer_to_long() { return -1; }
+  virtual int long_to_integer() { return -1; }
   virtual int add_float();
   virtual int sub_float();
   virtual int mul_float();
@@ -136,16 +139,30 @@ public:
   virtual int neg_float();
   virtual int float_to_integer();
   virtual int integer_to_float();
+  virtual int add_long() { return -1; }
+  virtual int sub_long() { return -1; }
+  virtual int mul_long() { return -1; }
+  virtual int div_long() { return -1; }
+  virtual int mod_long() { return -1; }
+  virtual int neg_long() { return -1; }
+  virtual int shift_left_long() { return -1; }
+  virtual int shift_right_long() { return -1; }
+  virtual int shift_right_ulong() { return -1; }
+  virtual int and_long() { return -1; }
+  virtual int or_long() { return -1; }
+  virtual int xor_long() { return -1; }
+  virtual int compare_longs() { return -1; }
   virtual int jump_cond(std::string &label, int cond, int distance) = 0;
   virtual int jump_cond_zero(std::string &label, int cond, int distance) { return -1; }
   virtual int jump_cond_integer(std::string &label, int cond, int distance) = 0;
-  virtual int jump_cond_integer(std::string &label, int cond, int const_val, int distance) { return -1; } 
+  virtual int jump_cond_integer(std::string &label, int cond, int const_val, int distance) { return -1; }
   virtual int compare_floats(int cond);
   virtual int ternary(int cond, int value_true, int value_false) = 0;
   virtual int ternary(int cond, int compare, int value_true, int value_false) = 0;
   virtual int return_local(int index, int local_count) = 0;
   virtual int return_integer(int local_count) = 0;
   virtual int return_void(int local_count) = 0;
+  virtual int return_long(int local_count) { return -1; }
   virtual int jump(std::string &name, int distance) = 0;
   virtual int call(std::string &name) = 0;
   virtual int invoke_static_method(const char *name, int params, int is_void) = 0;
@@ -163,21 +180,25 @@ public:
   virtual int array_read_short() = 0;
   virtual int array_read_int() = 0;
   virtual int array_read_float();
+  virtual int array_read_long();
   virtual int array_read_object();
   virtual int array_read_byte(std::string &name, int field_id) = 0;
   virtual int array_read_short(std::string &name, int field_id) = 0;
   virtual int array_read_int(std::string &name, int field_id) = 0;
   virtual int array_read_float(std::string &name, int field_id);
+  virtual int array_read_long(std::string &name, int field_id);
   virtual int array_read_object(std::string &name, int field_id);
   virtual int array_write_byte() = 0;
   virtual int array_write_short() = 0;
   virtual int array_write_int() = 0;
   virtual int array_write_float();
+  virtual int array_write_long();
   virtual int array_write_object();
   virtual int array_write_byte(std::string &name, int field_id) = 0;
   virtual int array_write_short(std::string &name, int field_id) = 0;
   virtual int array_write_int(std::string &name, int field_id) = 0;
   virtual int array_write_float(std::string &name, int field_id);
+  virtual int array_write_long(std::string &name, int field_id);
   virtual int array_write_object(std::string &name, int field_id);
 
   // CPU
