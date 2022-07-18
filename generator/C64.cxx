@@ -46,8 +46,10 @@ C64::C64() :
   need_c64_vic_color_ram_clear(0)
 {
   start_org = 0x07ff;
-  java_stack_lo = 0x200;
-  java_stack_hi = 0x300;
+//  java_stack_lo = 0x200;
+//  java_stack_hi = 0x300;
+  java_stack_lo = 0x80;
+  java_stack_hi = 0xc0;
   ram_start = 0xa000;
 }
 
@@ -97,7 +99,11 @@ int C64::open(const char *filename)
   fprintf(out, "  value3 equ 0x16\n");
   fprintf(out, "  temp1 equ 0x18\n");
 
-  // 0x40-0xa3 reserved for text/color tables
+  // text/color tables
+//  fprintf(out, "  text_table equ 0x0040\n");
+//  fprintf(out, "  color_table equ 0x0072\n");
+  fprintf(out, "  text_table equ 0x0708\n");
+  fprintf(out, "  color_table equ 0x073a\n");
 
   // sprites
   fprintf(out, "  sprite_msb_set equ 0x06\n");
@@ -126,17 +132,12 @@ int C64::open(const char *filename)
   fprintf(out, "  sei\n");
   fprintf(out, "  cld\n");
 
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "clear_stack_loop:\n");
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  sta 0x0200,y\n");
-  fprintf(out, "  sta 0x0300,y\n");
-  fprintf(out, "  iny\n");
-  fprintf(out, "  cpy #0\n");
-  fprintf(out, "  bne clear_stack_loop\n");
-
   fprintf(out, "  ldx #0xff\n");
   fprintf(out, "  txs\n");
+
+  // init java stack pointer
+  //fprintf(out, "  ldx #0xff\n");  // for 0x200/0x300
+  fprintf(out, "  ldx #0x3f\n");  // for 0x80/0xc0
 
   // switch VIC-II to bank 0
   fprintf(out, "  lda #4\n");
@@ -168,9 +169,15 @@ int C64::open(const char *filename)
   fprintf(out, "  sta 0xce00,y\n");
   fprintf(out, "  lda 0xdf00,y\n");
   fprintf(out, "  sta 0xcf00,y\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bne copy_charset_loop\n");
 
 /*
   // uppercase charset
+  fprintf(out, "  lda #50\n");
+  fprintf(out, "  sta 0x0001\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "copy_charset_loop:\n");
   fprintf(out, "  lda 0xd000,y\n");
   fprintf(out, "  sta 0xc800,y\n");
   fprintf(out, "  lda 0xd100,y\n");
@@ -187,10 +194,9 @@ int C64::open(const char *filename)
   fprintf(out, "  sta 0xce00,y\n");
   fprintf(out, "  lda 0xd700,y\n");
   fprintf(out, "  sta 0xcf00,y\n");
-*/
-
   fprintf(out, "  dey\n");
   fprintf(out, "  bne copy_charset_loop\n");
+*/
 
   // turn off ROM chips
   fprintf(out, "  lda #53\n");
@@ -922,13 +928,13 @@ void C64::insert_c64_vic_text_plot()
   fprintf(out, "  lda stack_lo + 3,x\n"); // y
   fprintf(out, "  asl\n");
   fprintf(out, "  tay\n");
-  fprintf(out, "  lda 0x40,y\n");
+  fprintf(out, "  lda text_table + 0,y\n");
   fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda 0x41,y\n");
+  fprintf(out, "  lda text_table + 1,y\n");
   fprintf(out, "  sta address + 1\n");
-  fprintf(out, "  lda 0x72,y\n");
+  fprintf(out, "  lda color_table + 0,y\n");
   fprintf(out, "  sta temp1 + 0\n");
-  fprintf(out, "  lda 0x73,y\n");
+  fprintf(out, "  lda color_table + 1,y\n");
   fprintf(out, "  sta temp1 + 1\n");
   fprintf(out, "  lda stack_lo + 4,x\n"); // x
   fprintf(out, "  tay\n");
@@ -950,9 +956,9 @@ void C64::insert_c64_vic_text_read()
   fprintf(out, "  lda stack_lo + 0,x\n"); // y
   fprintf(out, "  asl\n");
   fprintf(out, "  tay\n");
-  fprintf(out, "  lda 0x40,y\n");
+  fprintf(out, "  lda text_table + 0,y\n");
   fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda 0x41,y\n");
+  fprintf(out, "  lda text_table + 1,y\n");
   fprintf(out, "  sta address + 1\n");
   fprintf(out, "  lda stack_lo + 1,x\n"); // x
   fprintf(out, "  tay\n");
@@ -974,9 +980,9 @@ void C64::insert_c64_vic_make_text_table()
   fprintf(out, "  ldy #0\n");
   fprintf(out, "make_text_table_loop:\n");
   fprintf(out, "  lda address + 0\n");
-  fprintf(out, "  sta 0x40,y\n");
+  fprintf(out, "  sta text_table + 0,y\n");
   fprintf(out, "  lda address + 1\n");
-  fprintf(out, "  sta 0x41,y\n");
+  fprintf(out, "  sta text_table + 1,y\n");
   fprintf(out, "  clc\n");
   fprintf(out, "  lda address + 0\n");
   fprintf(out, "  adc #40\n");
@@ -1001,9 +1007,9 @@ void C64::insert_c64_vic_make_color_table()
   fprintf(out, "  ldy #0\n");
   fprintf(out, "make_color_table_loop:\n");
   fprintf(out, "  lda address + 0\n");
-  fprintf(out, "  sta 0x72,y\n");
+  fprintf(out, "  sta color_table + 0,y\n");
   fprintf(out, "  lda address + 1\n");
-  fprintf(out, "  sta 0x73,y\n");
+  fprintf(out, "  sta color_table + 1,y\n");
   fprintf(out, "  clc\n");
   fprintf(out, "  lda address + 0\n");
   fprintf(out, "  adc #40\n");
