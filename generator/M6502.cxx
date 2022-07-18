@@ -39,7 +39,6 @@ M6502::M6502() :
   need_sub_integer(0),
   need_mul_integer(0),
   need_div_integer(0),
-  need_mod_integer(0),
   need_neg_integer(0),
   need_shift_left_integer(0),
   need_shift_right_integer(0),
@@ -114,7 +113,6 @@ int M6502::finish()
   if (need_sub_integer) { insert_sub_integer(); }
   if (need_mul_integer) { insert_mul_integer(); }
   if (need_div_integer) { insert_div_integer(); }
-  if (need_mod_integer) { insert_mod_integer(); }
   if (need_neg_integer) { insert_neg_integer(); }
   if (need_shift_left_integer) { insert_shift_left_integer(); } 
   if (need_shift_right_integer) { insert_shift_right_integer(); } 
@@ -522,9 +520,11 @@ int M6502::div_integer(int const_val)
 int M6502::mod_integer()
 {
   need_div_integer = 1;
-  need_mod_integer = 1;
   fprintf(out, "  jsr div_integer\n");
-  fprintf(out, "  jsr mod_integer\n");
+  fprintf(out, "  lda remainder + 0\n");
+  fprintf(out, "  sta stack_lo + 1,x\n");
+  fprintf(out, "  lda remainder + 1\n");
+  fprintf(out, "  sta stack_hi + 1,x\n");
   stack--;
 
   return 0;
@@ -1473,16 +1473,6 @@ void M6502::insert_div_integer()
   fprintf(out, "  sta stack_lo + 1, x\n");
   fprintf(out, "  lda value1 + 1\n");
   fprintf(out, "  sta stack_hi + 1, x\n");
-  fprintf(out, "  rts\n");
-}
-
-void M6502::insert_mod_integer()
-{
-  fprintf(out, "mod_integer:\n");
-  fprintf(out, "  lda remainder + 0\n");
-  fprintf(out, "  sta stack_lo + 1,x\n");
-  fprintf(out, "  lda remainder + 1\n");
-  fprintf(out, "  sta stack_hi + 1,x\n");
   fprintf(out, "  rts\n");
 }
 
