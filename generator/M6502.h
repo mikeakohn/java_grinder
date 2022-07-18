@@ -139,7 +139,6 @@ protected:
   bool need_sub_integer:1;
   bool need_mul_integer:1;
   bool need_div_integer:1;
-  bool need_mod_integer:1;
   bool need_neg_integer:1;
   bool need_shift_left_integer:1;
   bool need_shift_right_integer:1;
@@ -169,7 +168,6 @@ protected:
   void insert_sub_integer();
   void insert_mul_integer();
   void insert_div_integer();
-  void insert_mod_integer();
   void insert_neg_integer();
   void insert_shift_left_integer();
   void insert_shift_right_integer();
