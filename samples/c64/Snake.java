@@ -1,5 +1,6 @@
 import net.mikekohn.java_grinder.CPU;
 import net.mikekohn.java_grinder.Memory;
+import net.mikekohn.java_grinder.Math;
 import net.mikekohn.java_grinder.c64.*;
 
 public class Snake
@@ -708,10 +709,10 @@ public class Snake
     int tempx = 0;
     int tempy = 0;
 
-    byte[] snakex = new byte[16];
-    byte[] snakey = new byte[16];
-    byte[] snakedir = new byte[16];
-    byte[] snakestatus = new byte[16];
+    byte[] snakex = new byte[12];
+    byte[] snakey = new byte[12];
+    byte[] snakedir = new byte[12];
+    byte[] snakestatus = new byte[12];
     int[] shotx = new int[2];
     int[] shoty = new int[2];
     int[] shotstatus = new int[2];
@@ -749,7 +750,7 @@ public class Snake
     }
 
     // initialize
-    for(i = 0; i < 16; i++)
+    for(i = 0; i < 12; i++)
     {
       snakex[i] = (byte)i;
       snakey[i] = 1;
@@ -923,7 +924,7 @@ public class Snake
       if(shipx < 24) shipx = 24;
       if(shipx > 334) shipx = 334;
       if(shipy < 194) shipy = 194;
-      if(shipy > 240) shipy = 240;
+      if(shipy > 242) shipy = 242;
 
       VIC.sprite0pos(shipx, shipy);
 
@@ -1085,7 +1086,7 @@ public class Snake
           }
           else if(temp != 32)
           {
-            for(i = 0; i < snake_length; i++)
+            for(i = 0; i < 12; i++)
             {
               // check snake
               final int sx = snakex[i];
@@ -1109,12 +1110,12 @@ public class Snake
                   // next level
                   snake_length += 2;
 
-                  if(snake_length > 16)
-                    snake_length = 16;
+                  if(snake_length > 12)
+                    snake_length = 12;
 
                   snake_count = snake_length;
 
-                  for(i = 0; i < 16; i++)
+                  for(i = 0; i < 12; i++)
                   {
                     snakex[i] = (byte)i;
                     snakey[i] = 1;
@@ -1147,11 +1148,11 @@ public class Snake
       // move snake
       if((time & 1) == 1)
       {
-        for(i = 0; i < 16; i++)
+        for(i = 0; i < 12; i++)
           if(snakestatus[i] == 1)
             VIC.text_plot(snakex[i], snakey[i], 32, 10);
 
-        for(i = 0; i < 16; i++)
+        for(i = 0; i < 12; i++)
         {
           int sdir = snakedir[i];
           int sx = snakex[i] + sdir;
@@ -1243,14 +1244,40 @@ public class Snake
 */
 
     // reset SID
+    SID.clear();
+/*
     for(i = 0; i <= 28; i++)
       Memory.write8(0xd400 + i, (byte)0);
+*/
+/*
+    // max test
+    if(Math.max(1000, -1000) == 1000)
+      printString(0, 0, 1, "max success");
+    else
+      printString(0, 0, 1, "max fail");
+      
+    if(Math.min(1000, -1000) == -1000)
+      printString(0, 2, 1, "min success");
+    else
+      printString(0, 2, 1, "min fail");
+      
+    if(Math.abs(-32000) == 32000)
+      printString(0, 4, 1, "abs success");
+    else
+      printString(0, 4, 1, "abs fail");
+
+    VIC.text_copy();
+*/      
 
     while(true)
     {
+//      VIC.border(0);
+//      VIC.border(4);
+
       title();
       snake();
       gameOver();
+
     }
   }
 }
