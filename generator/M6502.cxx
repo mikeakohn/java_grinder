@@ -665,8 +665,9 @@ int M6502::inc_integer(int index, int num)
     fprintf(out, "  txa\n");
     fprintf(out, "  ldx locals\n");
     fprintf(out, "  inc stack_lo - %d,x\n", LOCALS(index));
-    fprintf(out, "  bne #3\n");
+    fprintf(out, "  bne inc_integer_%d\n", label_count);
     fprintf(out, "  inc stack_hi - %d,x\n", LOCALS(index));
+    fprintf(out, "inc_integer_%d:\n", label_count++);
     fprintf(out, "  tax\n");
   }
     else
@@ -1949,7 +1950,6 @@ void M6502::insert_memory_read8()
   // sign-extend
   fprintf(out, "  asl\n");
   fprintf(out, "  lda #0\n");
-  fprintf(out, "  sec\n");
   fprintf(out, "  adc #0xff\n");
   fprintf(out, "  eor #0xff\n");
   fprintf(out, "  sta stack_hi + 1,x\n");
@@ -1959,17 +1959,15 @@ void M6502::insert_memory_read8()
 void M6502::insert_memory_write8()
 {
   fprintf(out, "memory_write8:\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_lo,x\n");
-  fprintf(out, "  pha\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_lo,x\n");
+  fprintf(out, "  lda stack_lo + 2,x\n");
   fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda stack_hi,x\n");
+  fprintf(out, "  lda stack_hi + 2,x\n");
   fprintf(out, "  sta address + 1\n");
   fprintf(out, "  ldy #0\n");
-  fprintf(out, "  pla\n");
+  fprintf(out, "  lda stack_lo + 1,x\n");
   fprintf(out, "  sta (address),y\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  inx\n");
   fprintf(out, "  rts\n");
 }
 
@@ -2046,11 +2044,12 @@ void M6502::insert_math_max()
   fprintf(out, "  sbc stack_hi + 0,x\n");
   fprintf(out, "  bvc #2\n");
   fprintf(out, "  eor #0x80\n");
-  fprintf(out, "  bpl #12\n");
+  fprintf(out, "  bpl math_max_skip\n");
   fprintf(out, "  lda stack_lo + 0,x\n");
   fprintf(out, "  sta stack_lo + 1,x\n");
   fprintf(out, "  lda stack_hi + 0,x\n");
   fprintf(out, "  sta stack_hi + 1,x\n");
+  fprintf(out, "math_max_skip:\n");
   fprintf(out, "  rts\n");
 };
 
@@ -2064,11 +2063,12 @@ void M6502::insert_math_min()
   fprintf(out, "  sbc stack_hi + 1,x\n");
   fprintf(out, "  bvc #2\n");
   fprintf(out, "  eor #0x80\n");
-  fprintf(out, "  bpl #12\n");
+  fprintf(out, "  bpl math_min_skip\n");
   fprintf(out, "  lda stack_lo + 0,x\n");
   fprintf(out, "  sta stack_lo + 1,x\n");
   fprintf(out, "  lda stack_hi + 0,x\n");
   fprintf(out, "  sta stack_hi + 1,x\n");
+  fprintf(out, "math_min_skip:\n");
   fprintf(out, "  rts\n");
 };
 
