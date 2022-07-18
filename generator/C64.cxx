@@ -91,19 +91,22 @@ int C64::open(const char *filename)
 
   // temp variables
   fprintf(out, "  result equ 0x0a\n");
-  fprintf(out, "  return equ 0x0c\n");
-  fprintf(out, "  remainder equ 0x0e\n");
-  fprintf(out, "  length equ 0x10\n");
-  fprintf(out, "  value1 equ 0x12\n");
-  fprintf(out, "  value2 equ 0x14\n");
-  fprintf(out, "  value3 equ 0x16\n");
-  fprintf(out, "  temp1 equ 0x18\n");
+//  fprintf(out, "  return equ 0x0c\n");
+  fprintf(out, "  remainder equ 0x0c\n");
+  fprintf(out, "  length equ 0x0e\n");
+  fprintf(out, "  value1 equ 0x10\n");
+  fprintf(out, "  value2 equ 0x12\n");
+  fprintf(out, "  value3 equ 0x14\n");
+  fprintf(out, "  temp1 equ 0x16\n");
 
   // text/color tables
 //  fprintf(out, "  text_table equ 0x0040\n");
 //  fprintf(out, "  color_table equ 0x0072\n");
-  fprintf(out, "  text_table equ 0x0708\n");
-  fprintf(out, "  color_table equ 0x073a\n");
+
+//  fprintf(out, "  text_table equ 0x0708\n");
+//  fprintf(out, "  color_table equ 0x073a\n");
+  fprintf(out, "  text_table equ 0x18\n");
+  fprintf(out, "  color_table equ 0x4a\n");
 
   // sprites
   fprintf(out, "  sprite_msb_set equ 0x06\n");
