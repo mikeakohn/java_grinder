@@ -1529,23 +1529,11 @@ void M6502::insert_shift_right_uinteger()
   fprintf(out, "  inx\n");
   fprintf(out, "  lda stack_lo + 0,x\n");
   fprintf(out, "  tay\n");
-
-  fprintf(out, "  lda stack_lo + 1,x\n");
-  fprintf(out, "  sta result + 0\n");
-  fprintf(out, "  lda stack_hi + 1,x\n");
-  fprintf(out, "  sta result + 1\n");
-
   fprintf(out, "shift_right_uinteger_loop:\n");
-  fprintf(out, "  lsr result + 1\n");
-  fprintf(out, "  ror result + 0\n");
+  fprintf(out, "  lsr stack_hi + 1,x\n");
+  fprintf(out, "  ror stack_lo + 1\n");
   fprintf(out, "  dey\n");
   fprintf(out, "  bne shift_right_uinteger_loop\n");
-
-  fprintf(out, "  lda result + 0\n");
-  fprintf(out, "  sta stack_lo + 1,x\n");
-  fprintf(out, "  lda result + 1\n");
-  fprintf(out, "  sta stack_hi + 1,x\n");
-
   fprintf(out, "  rts\n");
 }
 
