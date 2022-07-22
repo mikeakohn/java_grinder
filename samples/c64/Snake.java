@@ -10,7 +10,8 @@ public class Snake
   static final int sprite_ram = 0xf000;
   static final int sprite_pointer = 0xc400 + 1016;
 
-  // string for score
+  // score is kept by adding strings, as 16-bit integers
+  // don't have enough range
   static int score[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
   static final int ten[] = { 0, 0, 0, 0, 0, 0, 1, 0 };
   static final int hundred[] = { 0, 0, 0, 0, 0, 1, 0, 0 };
@@ -27,14 +28,17 @@ public class Snake
   static int music_pos2 = 0;
   static int music_pos3 = 0;
   
+  // one octave of note frequencies
   static int freq[] =
   {
     0x0115, 0x0125, 0x0137, 0x0149, 0x015d, 0x0172,
     0x0188, 0x019f, 0x01b8, 0x01d2, 0x01ee, 0x020b
   };
 
+  // these correspond to piano keys
   static String keys = "q2w3er5t6y7ui9o0p";
 
+  // music, spaces rest
   static String title_song1 =
     "o   o   o   o   7 7 7   9 9 9   "
   + "oooooooooooooooo77777777yyyyrree";
@@ -46,17 +50,10 @@ public class Snake
     "wwrryy77wwrrrree";
 
   static String end_song1 =
-    "q 0 0 0 q 0 0 0 "
-  + "3 0 0 0 3 0 0 0 ";
-
-  static String end_song2 =
-    "q 3 r 5 t 5 r 3 "
+    "qq33rr55tt55rr33"
   + "q 3 r 5 t 5 r 3 ";
 
-  static String end_song3 =
-    "i o i 0 i o i 0 "
-  + "i o i 0 i o i 0 ";
-
+  // explosion-related
   static int spider_exp_colors[] = { 1, 15, 12, 11 };
   static int spider_exp_timer = 0;
   static int spider_exp_status = 0;
@@ -68,26 +65,64 @@ public class Snake
   static int snake_exp_timer = 0;
   static int snake_exp_status = 0;
 
+  // sprite definitions
+  // props to spritemate: https://github.com/Esshahn/spritemate
   static final int sprite_ship[] =
   {
-    0x04, 0x00, 0x00, 0x04, 0x00, 0x00, 0x04, 0x00,
-    0x00, 0x44, 0x40, 0x00, 0x44, 0x40, 0x00, 0x59,
-    0x40, 0x00, 0x59, 0x40, 0x00, 0x59, 0x40, 0x00,
-    0x55, 0x40, 0x00, 0x44, 0x40, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x83,
+    0b00011000, 0b00000000, 0b00000000,
+    0b00011000, 0b00000000, 0b00000000,
+    0b00011000, 0b00000000, 0b00000000,
+    0b10111101, 0b00000000, 0b00000000,
+    0b11111111, 0b00000000, 0b00000000,
+    0b11111111, 0b00000000, 0b00000000,
+    0b11111111, 0b00000000, 0b00000000,
+    0b11100111, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
   };
 
   static final int sprite_shot[] =
   {
+    0b00011000, 0b00000000, 0b00000000,
+    0b00011000, 0b00000000, 0b00000000,
+    0b00011000, 0b00000000, 0b00000000,
+    0b00011000, 0b00000000, 0b00000000,
+    0b00011000, 0b00000000, 0b00000000,
+    0b00011000, 0b00000000, 0b00000000,
+    0b00011000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b00000000,
+/*
     8, 0, 0, 8, 0, 0, 8, 0, 0, 8, 0, 0,
     8, 0, 0, 8, 0, 0, 8, 0, 0, 8, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0,
+*/
   };
 
   static final int sprite_spider1[] =
@@ -114,6 +149,7 @@ public class Snake
     0x20, 0x02, 0x00, 0x20, 0x02, 0x00, 0x00, 0x84,
   };
 
+  // character definitions
   static final int char_block[] =
   {
     0b01111110,
@@ -305,7 +341,7 @@ public class Snake
       {
         // start attack/decay
         //                srad 
-        SID.voice3_adsr(0xb900);
+        SID.voice3_adsr(0xf900);
         SID.voice3_frequency(1000);
         SID.voice3_waveform(129);
       }
@@ -337,7 +373,6 @@ public class Snake
         SID.voice3_waveform(129);
       }
 
-//      VIC.sprite0color((byte)(ship_exp_colors[(ship_exp_timer >> 2) & 3]));
       VIC.sprite_multicolor0((byte)(ship_exp_colors[(ship_exp_timer >> 2) & 3]));
       ship_exp_timer++;
  
@@ -451,72 +486,26 @@ public class Snake
 
     if(c > 0)
     {
-      SID.voice1_frequency(getFreq(end_song1.charAt(music_pos1)));
- //     SID.voice1_pulse_width(1536 + pulse1);
-      SID.voice1_waveform(17);
+      SID.voice1_frequency(c);
+      SID.voice2_frequency(getFreq(end_song1.charAt(music_pos1) + 5) % 17);
+      SID.voice1_waveform(33);
+      SID.voice2_waveform(65);
     }
     else
     {
-      SID.voice1_waveform(16);
+      SID.voice1_waveform(32);
+      SID.voice2_waveform(64);
     }
-
-    c = getFreq(end_song2.charAt(music_pos2));
-
-    if(c > 0)
-    {
-      SID.voice2_frequency(getFreq(end_song2.charAt(music_pos2)) << 1);
-//      SID.voice2_pulse_width(1536 + pulse2);
-      SID.voice2_waveform(17);
-    }
-    else
-    {
-      SID.voice2_waveform(16);
-    }
-
-    c = getFreq(end_song3.charAt(music_pos3));
-
-/*
-    if(c > 0)
-    {
-      SID.voice3_frequency(getFreq(end_song3.charAt(music_pos3)) << 2);
-//      SID.voice3_pulse_width(1536 + pulse3);
-      SID.voice3_waveform(17);
-    }
-    else
-    {
-      SID.voice3_waveform(16);
-    }
-*/
 
     music_pos1++;
 
     if(music_pos1 >= end_song1.length())
       music_pos1 = 0;
-
-    music_pos2++;
-
-    if(music_pos2 >= end_song2.length())
-      music_pos2 = 0;
-/*
-    music_pos3++;
-
-    if(music_pos3 >= end_song3.length())
-      music_pos3 = 0;
-*/
-/*
-    pulse1 += 256;
-    pulse1 &= 511;
-    pulse2 += 256;
-    pulse2 &= 511;
-    pulse3 += 256;
-    pulse2 &= 511;
-*/
   }
 
   public static void title()
   {
     int time = 0;
-//    int colors[] = { 9, 2, 11, 8, 12, 10, 15, 7, 15, 10, 12, 8, 11, 2 };
     int colors[] = { 10, 7, 13, 14, 4, 14, 13, 7 };
 
     VIC.text_clear(32);
@@ -525,7 +514,6 @@ public class Snake
     VIC.sprite_multicolor_enable(255);
     VIC.sprite_multicolor0(1);
     VIC.sprite_multicolor1(12);
-//    VIC.sprite4color(14);
     VIC.sprite4pos(24 + 160 - 24, 50 + 124);
     VIC.sprite_expandx(16);
     VIC.sprite_expandy(16);
@@ -598,9 +586,9 @@ public class Snake
     SID.filter_resonance(0);
     SID.volume(15);
 
-    SID.voice1_adsr(0xef1a);
-    SID.voice2_adsr(0xef1a);
-    SID.voice3_adsr(0xef1a);
+    SID.voice1_adsr(0xff1a);
+    SID.voice2_adsr(0xff1a);
+    SID.voice3_adsr(0xff1a);
 
     ship_exp_status = 0;
 
@@ -620,18 +608,7 @@ public class Snake
 
     VIC.border(2);
     wait(1000);
-
-//    SID.voice1_adsr(0xaf1a);
-//    SID.voice2_adsr(0xaf1a);
     VIC.write_control2(VIC.read_control2() & 239);
-
-/*
-    for(i = 0; i < 7; i++)
-    {
-      VIC.border(colors1[i]);
-      wait(500);
-    }
-*/
 
     VIC.sprite_enable(0);
     VIC.sprite0pos(0, 0);
@@ -698,8 +675,10 @@ public class Snake
     int spidery = 0;
     int spider_timer = 0;
     int button_pressed = 0;
-    int shots_active = 0;
-    int shot_time = 0;
+    int shotx = 0;
+    int shoty = 0;
+    int shotstatus = 0;
+    int shotfreq = 0;
     int joy = 0;
     int temp = 0;
     int tx = 0;
@@ -709,14 +688,10 @@ public class Snake
     int tempx = 0;
     int tempy = 0;
 
-    byte[] snakex = new byte[12];
-    byte[] snakey = new byte[12];
-    byte[] snakedir = new byte[12];
-    byte[] snakestatus = new byte[12];
-    int[] shotx = new int[2];
-    int[] shoty = new int[2];
-    int[] shotstatus = new int[2];
-    int[] shotfreq = new int[2];
+    byte snakex[] = new byte[12];
+    byte snakey[] = new byte[12];
+    byte snakedir[] = new byte[12];
+    byte snakestatus[] = new byte[12];
 
     resetScore();
     ship_exp_status = 1;
@@ -725,13 +700,11 @@ public class Snake
 
     VIC.sprite_enable(63);
     VIC.sprite_priority(0);
-    VIC.sprite_multicolor_enable(255);
+    VIC.sprite_multicolor_enable(16);
     VIC.sprite_multicolor0(1);
     VIC.sprite_multicolor1(12);
-    VIC.sprite0color(14);
+    VIC.sprite0color(1);
     VIC.sprite1color(7);
-    VIC.sprite2color(7);
-    VIC.sprite3color(7);
     VIC.sprite4color(4);
     VIC.border(11);
 
@@ -762,12 +735,9 @@ public class Snake
         snakestatus[i] = 0;
     }
 
-    for(i = 0; i < 2; i++)
-    {
-      shotx[i] = 0;
-      shoty[i] = 0;
-      shotstatus[i] = 0;
-    }
+    shotx = 0;
+    shoty = 0;
+    shotstatus= 0;
 
     printScore();
 
@@ -786,15 +756,15 @@ public class Snake
       // move ship
       joy = 255 - (Memory.read8(0xdc00) + 128);
 
-      if((joy & 8) == 8) accelx += 2;
-      if((joy & 4) == 4) accelx -= 2;
-      if((joy & 2) == 2) accely += 2;
-      if((joy & 1) == 1) accely -= 2;
+      if((joy & 8) == 8) accelx += 1;
+      if((joy & 4) == 4) accelx -= 1;
+      if((joy & 2) == 2) accely += 1;
+      if((joy & 1) == 1) accely -= 1;
 
-      if(accelx > 4) accelx = 4;
-      if(accelx < -4) accelx = -4;
-      if(accely > 4) accely = 4;
-      if(accely < -4) accely = -4;
+      if(accelx > 3) accelx = 3;
+      if(accelx < -3) accelx = -3;
+      if(accely > 3) accely = 3;
+      if(accely < -3) accely = -3;
 
       if((time & 1) == 1)
       {
@@ -811,11 +781,8 @@ public class Snake
       tempx = shipx + accelx;
       tempy = shipy + accely;
 
-      final int dx1 = (tempx - 18) >> 3;
-      final int dy1 = (tempy - 44) >> 3;
-//      final int dx1 = (tempx - 20) >> 3;
-
-//      final int dy1 = (tempy - 46) >> 3;
+      final int dx1 = (tempx - 20) >> 3;
+      final int dy1 = (tempy - 46) >> 3;
 
       temp = VIC.text_read(dx1, dy1);
 
@@ -835,158 +802,52 @@ public class Snake
         if(accely > 0) accely = 1;
         if(accely < 0) accely = -1;
       }
-/*
-      moved = 0;
-
-      for(i = 0; i < 3; i++)
-      {
-        tempx = shipx;
-        tempy = shipy;
-
-        if(i == 0)
-        {
-          tempx += accelx;
-          tempy += accely;
-        }
-        else if(i == 1)
-        {
-          tempx += accelx;
-        }
-        else if(i == 2)
-        {
-          tempy += accely;
-        }
-
-        final int dx1 = (tempx - 24) >> 3;
-        final int dy1 = (tempy - 50) >> 3;
-        final int dx2 = ((tempx + 7) - 24) >> 3;
-        final int dy2 = ((tempy + 7) - 50) >> 3;
-
-        t0 = VIC.text_read(dx1, dy1);
-        t1 = VIC.text_read(dx2, dy1);
-        t2 = VIC.text_read(dx1, dy2);
-        t3 = VIC.text_read(dx2, dy2);
-
-        if(dx1 != dx2 && dy1 != dy2)
-        {
-          if(t0 == 32 && t1 == 32 && t2 == 32 && t3 == 32)
-          {
-            moved = 1;
-          }
-        }
-        else if(dx1 == dx2 && dy1 != dy2)
-        {
-          if(t0 == 32 && t2 == 32)
-          {
-            moved = 1;
-          }
-        }
-        else if(dx1 != dx2 && dy1 == dy2)
-        {
-          if(t0 == 32 && t1 == 32)
-          {
-            moved = 1;
-          }
-        }
-        else if(dx1 == dx2 && dy1 == dy2)
-        {
-          if(t0 == 32)
-          {
-            moved = 1;
-          }
-        }
-
-        if(moved == 1)
-        {
-          shipx = tempx;
-          shipy = tempy;
-          break;
-        }
-        else
-        {
-          // ship hit snake
-          if( (t0 >= 160 && t0 <= 163) ||
-              (t1 >= 160 && t1 <= 163) ||
-              (t2 >= 160 && t2 <= 163) ||
-              (t3 >= 160 && t3 <= 163) )
-          {
-            return;
-          }
-
-          if(accelx > 0) accelx = 1;
-          if(accelx < 0) accelx = -1;
-          if(accely > 0) accely = 1;
-          if(accely < 0) accely = -1;
-        }
-      }
-*/
 
       if(shipx < 24) shipx = 24;
-      if(shipx > 334) shipx = 334;
+      if(shipx > 336) shipx = 336;
       if(shipy < 194) shipy = 194;
       if(shipy > 242) shipy = 242;
 
       VIC.sprite0pos(shipx, shipy);
 
       // ship hit spider
-  //  if(ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1)
+      //  if(ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1)
 
-    if(spider_exp_status == 1)
-    {
-      VIC.sprite4pos(spiderx, spidery);
-
-      if(shipx < spiderx + 23 && shipx + 9 > spiderx &&
-         shipy < spidery + 20 && shipy + 9 > spidery)
+      if(spider_exp_status == 1)
       {
-        return;
-      }
+        VIC.sprite4pos(spiderx, spidery);
 
-      if(spider_timer > 0)
-      {
-        spider_timer--;
-      }
-      else
-      {
-        spidery++;
-
-        if(spidery > 250)
+        if(shipx < spiderx + 23 && shipx + 7 > spiderx &&
+           shipy < spidery + 20 && shipy + 7 > spidery)
         {
-          spidery = 0;
+          return;
+        }
+
+        if(spider_timer > 0)
+        {
+          spider_timer--;
+        }
+        else
+        {
+          spidery++;
+
+          if(spidery > 250)
+          {
+            spidery = 0;
+          }
         }
       }
-    }
 
-/*
-      if(collision(shipx, shipy, shipx + 7, shipy + 7,
-                   spiderx, spidery, spiderx + 15, spidery + 15) == 1)
-      {
-        return;
-      }
-*/
       // shoot
       if((joy & 16) == 16)
       {
-        if(button_pressed == 0 || shots_active == 0 || shot_time == 0)
+        if(button_pressed == 0 || shotstatus == 0)
         {
-          for(i = 0; i < 2; i++)
-          {
-            if(shotstatus[i] == 0)
-            {
-              shotx[i] = shipx;
-              shoty[i] = shipy;
-              shotstatus[i] = 1;
-              shotfreq[i] = 1500;
-              shots_active++;
-              shot_time = 0;
-              break;
-            }
-          }
+          shotx = shipx;
+          shoty = shipy;
+          shotstatus = 1;
+          shotfreq = 1500;
         }
-
-        shot_time++;
-
-        if(shot_time >= 6)
-          shot_time = 0;
 
         button_pressed = 1;
       }
@@ -996,29 +857,24 @@ public class Snake
       }
 
       // move shots
-      for(i = 0; i < 2; i++)
+      if(shotstatus == 1)
       {
-        if(shotstatus[i] == 1)
-        {
-          shoty[i] -= 8;
-          shotfreq[i] -= 40;
+        shoty -= 8;
+        shotfreq -= 40;
 
-          if(shoty[i] < 42)
-          {
-            shotx[i] = 0;
-            shoty[i] = 0;
-            shotstatus[i] = 0;
-            shots_active--;
-          }
+        if(shoty < 42)
+        {
+          shotx = 0;
+          shoty = 0;
+          shotstatus = 0;
         }
       }
 
-      VIC.sprite1pos(shotx[0], shoty[0]);
-      VIC.sprite2pos(shotx[1], shoty[1]);
+      VIC.sprite1pos(shotx, shoty);
 
-      if(shotstatus[0] == 1)
+      if(shotstatus == 1)
       {
-        SID.voice1_frequency(shotfreq[0]);
+        SID.voice1_frequency(shotfreq);
 //        SID.voice1_pulse_width(1536 + pulse1);
         SID.voice1_waveform(129);
       }
@@ -1027,115 +883,97 @@ public class Snake
         SID.voice1_waveform(128);
       }
 
-      if(shotstatus[1] == 1)
+      // check shots
+      if(shotstatus == 1)
       {
-        SID.voice2_frequency(shotfreq[1]);
-//        SID.voice2_pulse_width(1536 + pulse1);
-        SID.voice2_waveform(129);
-      }
-      else
-      {
-        SID.voice2_waveform(128);
-      }
+        tx = shotx + 4;
+        ty = shoty;
 
-      for(j = 0; j < 2; j++)
-      {
-        if(shotstatus[j] == 1)
+        // shot hit spider
+        if(spider_exp_status == 1)
         {
-          tx = shotx[j] + 6;
-          ty = shoty[j];
-
-          // shot hit spider
-          if(spider_exp_status == 1)
+          if(tx < spiderx + 23 && tx + 1 > spiderx &&
+             ty < spidery + 20 && ty + 7 > spidery)
           {
-            if(tx < spiderx + 23 && tx + 1 > spiderx &&
-               ty < spidery + 20 && ty + 7 > spidery)
-            {
-              spiderx = rnd() % 320 + 24;
-              spidery = 0;
-              spider_timer = rnd() % 400 + 1;
-              shotx[j] = 0;
-              shoty[j] = 0;
-              shotstatus[j] = 0;
-              VIC.sprite1pos(shotx[0], shoty[0]);
-              VIC.sprite2pos(shotx[1], shoty[1]);
-              spider_exp_status = 0;
-              increaseScore(thousand);
-              continue;
-            }
+            spiderx = rnd() % 320 + 24;
+            spidery = 0;
+            spider_timer = rnd() % 400 + 1;
+            shotx = 0;
+            shoty = 0;
+            shotstatus = 0;
+            VIC.sprite1pos(shotx, shoty);
+            spider_exp_status = 0;
+            increaseScore(thousand);
+            continue;
           }
+        }
 
-          dx = ((shotx[j] - 20) >> 3);
-          dy = ((shoty[j] - 50) >> 3);
-          temp = VIC.text_read(dx, dy);
+        dx = ((shotx - 20) >> 3);
+        dy = ((shoty - 50) >> 3);
+        temp = VIC.text_read(dx, dy);
 
-          if(temp >= 33 && temp <= 35)
+        if(temp >= 33 && temp <= 35)
+        {
+          // hit mushroom
+          temp--;
+
+          if(temp < 32)
+            temp = 32;
+
+          VIC.text_plot(dx, dy, temp, 5);
+          shotstatus = 0;
+          shotx = 0;
+          increaseScore(ten);
+        }
+        else if(temp != 32)
+        {
+          for(i = 0; i < 12; i++)
           {
-            // hit mushroom
-            temp--;
+            // check snake
+            final int sx = snakex[i];
+            final int sy = snakey[i];
 
-            if(temp < 32)
-              temp = 32;
-
-            VIC.text_plot(dx, dy, temp, 5);
-            shotstatus[j] = 0;
-            shots_active--;
-            shotx[j] = 0;
-            shot_time = 0;
-            increaseScore(ten);
-          }
-          else if(temp != 32)
-          {
-            for(i = 0; i < 12; i++)
+            if((snakestatus[i] == 1) && (sx == dx) && (sy == dy))
             {
-              // check snake
-              final int sx = snakex[i];
-              final int sy = snakey[i];
+              // hit snake
+              snake_exp_status = 0;
+              shotstatus = 0;
+              shotx = 0;
+              VIC.text_plot(sx, sy, 35, 5);
+              snakestatus[i] = 0;
+              snake_count--;
+              increaseScore(hundred);
 
-              if((snakestatus[i] == 1) && (sx == dx) && (sy == dy))
+              if(snake_count <= 0)
               {
-                // hit snake
-                snake_exp_status = 0;
-                shotstatus[j] = 0;
-                shots_active--;
-                shotx[j] = 0;
-                VIC.text_plot(sx, sy, 35, 5);
-                snakestatus[i] = 0;
-                snake_count--;
-                increaseScore(hundred);
-                shot_time = 0;
+                // next level
+                snake_length += 2;
 
-                if(snake_count <= 0)
+                if(snake_length > 12)
+                  snake_length = 12;
+
+                snake_count = snake_length;
+
+                // reset snake
+                for(i = 0; i < 12; i++)
                 {
-                  // next level
-                  snake_length += 2;
+                  snakex[i] = (byte)i;
+                  snakey[i] = 1;
+                  snakedir[i] = 1;
 
-                  if(snake_length > 12)
-                    snake_length = 12;
-
-                  snake_count = snake_length;
-
-                  for(i = 0; i < 12; i++)
-                  {
-                    snakex[i] = (byte)i;
-                    snakey[i] = 1;
-                    snakedir[i] = 1;
-
-                    if(i < snake_length)
-                      snakestatus[i] = 1;
-                    else
-                      snakestatus[i] = 0;
-                  }
-
-                  for(i = 0; i < 10; i++)
-                  {
-                    VIC.text_plot(rnd() % 40, rnd() % 17 + 1, 35, 5);
-                    wait(500);
-                    VIC.text_copy();
-                  }
+                  if(i < snake_length)
+                    snakestatus[i] = 1;
+                  else
+                    snakestatus[i] = 0;
                 }
 
-                break;
+                // add mushrooms
+                for(i = 0; i < 10; i++)
+                {
+                  VIC.text_plot(rnd() % 40, rnd() % 17 + 1, 35, 5);
+                  wait(500);
+                  VIC.text_copy();
+                }
               }
             }
           }
@@ -1180,12 +1018,12 @@ public class Snake
             VIC.text_plot(sx, sy, d, 10);
 
           snakex[i] = (byte)sx;
-
-          if((time & 7) >= 4)
-            Memory.write8(sprite_pointer + 4, (byte)194);
-          else
-            Memory.write8(sprite_pointer + 4, (byte)195);
         }
+
+        if((time & 7) >= 4)
+          Memory.write8(sprite_pointer + 4, (byte)194);
+        else
+          Memory.write8(sprite_pointer + 4, (byte)195);
 
         expSpider();
         expSnake();
