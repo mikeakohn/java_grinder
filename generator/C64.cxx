@@ -142,6 +142,16 @@ int C64::open(const char *filename)
   //fprintf(out, "  ldx #0xff\n");  // for 0x200/0x300
   fprintf(out, "  ldx #0x3f\n");  // for 0x80/0xc0
 
+  // clear_stack (so it looks nice in monitor)
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "clear_stack_loop:\n");
+  fprintf(out, "  sta 0x80,y\n");
+  fprintf(out, "  sta 0xc0,y\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  cpy #0x40\n");
+  fprintf(out, "  bne clear_stack_loop\n");
+
   // switch VIC-II to bank 0
   fprintf(out, "  lda #4\n");
   fprintf(out, "  sta 0xdd00\n");
@@ -910,6 +920,66 @@ void C64::insert_c64_vic_text_clear()
 void C64::insert_c64_vic_text_copy()
 {
   fprintf(out, "text_copy:\n");
+  fprintf(out, "  ldy #39\n");
+  fprintf(out, "text_copy_loop:\n");
+  fprintf(out, "  lda 0xc000 + 40 * 0,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 0,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 1,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 1,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 2,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 2,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 3,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 3,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 4,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 4,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 5,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 5,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 6,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 6,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 7,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 7,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 8,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 8,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 9,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 9,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 10,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 10,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 11,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 11,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 12,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 12,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 13,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 13,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 14,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 14,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 15,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 15,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 16,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 16,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 17,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 17,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 18,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 18,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 19,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 19,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 20,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 20,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 21,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 21,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 22,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 22,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 23,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 23,y\n");
+  fprintf(out, "  lda 0xc000 + 40 * 24,y\n");
+  fprintf(out, "  sta 0xc400 + 40 * 24,y\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bmi #3\n");
+  fprintf(out, "  jmp text_copy_loop\n");
+  fprintf(out, "  rts\n");
+
+/*
+  // about 10% slower version but smaller
+  fprintf(out, "text_copy:\n");
   fprintf(out, "  ldy #0\n");
   fprintf(out, "text_copy_loop_1:\n");
   fprintf(out, "  lda 0xc000,y\n");
@@ -923,6 +993,7 @@ void C64::insert_c64_vic_text_copy()
   fprintf(out, "  dey\n");
   fprintf(out, "  bne text_copy_loop_1\n");
   fprintf(out, "  rts\n");
+*/
 }
 
 void C64::insert_c64_vic_text_plot()
