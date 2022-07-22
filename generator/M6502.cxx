@@ -1531,7 +1531,7 @@ void M6502::insert_shift_right_uinteger()
   fprintf(out, "  tay\n");
   fprintf(out, "shift_right_uinteger_loop:\n");
   fprintf(out, "  lsr stack_hi + 1,x\n");
-  fprintf(out, "  ror stack_lo + 1\n");
+  fprintf(out, "  ror stack_lo + 1,x\n");
   fprintf(out, "  dey\n");
   fprintf(out, "  bne shift_right_uinteger_loop\n");
   fprintf(out, "  rts\n");
