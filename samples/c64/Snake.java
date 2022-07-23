@@ -21,12 +21,10 @@ public class Snake
   static int seed = 12345;
 
   // music related
-  static int pulse1 = 0;
-  static int pulse2 = 0;
-  static int pulse3 = 0;
-  static int music_pos1 = 0;
-  static int music_pos2 = 0;
-  static int music_pos3 = 0;
+  static int pulse1 = 0x800;
+  static int pulse2 = 0x800;
+  static int pulse3 = 0x800;
+  static int music_pos = 0;
   
   // one octave of note frequencies
   static int freq[] =
@@ -36,7 +34,7 @@ public class Snake
   };
 
   // these correspond to piano keys
-  static String keys = "q2w3er5t6y7ui9o0p";
+  static String keys = "q2w3er5t6y7ui9o0p[";
 
   // music, spaces rest
   static String title_song1 =
@@ -44,26 +42,36 @@ public class Snake
   + "oooooooooooooooo77777777yyyyrree";
 
   static String title_song2 =
-    "wry7yrwry7yrwry7wry7yrwry7yrwry7";
+    "wry7yrwry7yrwry7wry7yrwry7yrwry7"
+  + "wry7yrwry7yrwry7wry7yrwry7yrwry7";
 
   static String title_song3 =
-    "wwrryy77wwrrrree";
+    "wwrryy77wwrrrreewwrryy77wwrrrree"
+  + "wwrryy77wwrrrreewwrryy77wwrrrree";
 
   static String end_song1 =
-    "qq33rr55tt55rr33"
-  + "q 3 r 5 t 5 r 3 ";
+    "qqqqrrrrqqqqrrrr";
 
-  // explosion-related
-  static int spider_exp_colors[] = { 1, 15, 12, 11 };
-  static int spider_exp_timer = 0;
-  static int spider_exp_status = 0;
+  static String end_song2 =
+    "qq33rr55tt55rr33";
 
-  static int ship_exp_colors[] = { 1, 15, 12, 11 };
-  static int ship_exp_timer = 0;
-  static int ship_exp_status = 0;
+  static String next_level_song1 =
+    "rrrrttttyyyyiiii[[[[";
 
-  static int snake_exp_timer = 0;
-  static int snake_exp_status = 0;
+  static String next_level_song2 =
+    "r   t   y   i i9o0p[";
+
+  // animation-related
+  static int anim_spider_colors[] = { 1, 15, 12, 11 };
+  static int anim_spider_timer = 0;
+  static int anim_spider_status = 0;
+
+  static int anim_ship_colors[] = { 1, 15, 12, 11 };
+  static int anim_ship_timer = 0;
+  static int anim_ship_status = 0;
+
+  static int anim_snake_timer = 0;
+  static int anim_snake_status = 0;
 
   // sprite definitions
   // props to spritemate: https://github.com/Esshahn/spritemate
@@ -246,6 +254,46 @@ public class Snake
     0b11001100
   };
 
+  public static void addMushrooms()
+  {
+    int x, y;
+
+    for(x = 0; x < 40; x++)
+      VIC.text_plot(x, 0, 32, 0);
+
+    for(y = 24; y > 0; y--)
+    {
+      for(x = 0; x < 40; x++)
+        VIC.text_plot(x, y, VIC.text_read(x, y - 1), 5);
+    }
+
+    for(y = 0; y < 16; y++)
+    {
+      int tx = rnd() % 40;
+      int ty = rnd() % 17 + 1;
+
+      VIC.text_plot(tx, ty, 35, 1);
+      VIC.text_copy();
+
+      for(x = 0; x < 12; x++)
+      {
+        SID.voice1_adsr(0x8888);
+        SID.voice1_frequency(x << 9);
+        SID.voice1_waveform(33);
+//        wait(40);
+        VIC.text_plot(tx, ty, 35 - (x >> 2), 1);
+        VIC.text_copy();
+        SID.voice1_waveform(32);
+      }
+
+      VIC.text_plot(tx, ty, 35, 5);
+      VIC.text_copy();
+    }
+
+    wait(1000);
+    printScore();
+  }
+
   public static void clearSprite(int address)
   {
     for(int i = 0; i < 64; i++)
@@ -333,11 +381,11 @@ public class Snake
     return 0;
   }
 
-  public static void expSpider()
+  public static void animSpider()
   {
-    if(spider_exp_status == 0)
+    if(anim_spider_status == 0)
     {
-      if(spider_exp_timer == 0)
+      if(anim_spider_timer == 0)
       {
         // start attack/decay
         //                srad 
@@ -346,52 +394,51 @@ public class Snake
         SID.voice3_waveform(129);
       }
 
-      VIC.sprite4color((byte)(spider_exp_colors[(spider_exp_timer >> 2) & 3]));
-      spider_exp_timer++;
+      VIC.sprite4color((byte)(anim_spider_colors[(anim_spider_timer >> 2) & 3]));
+      anim_spider_timer++;
  
-      if(spider_exp_timer > 13)
+      if(anim_spider_timer > 13)
       {
         // start decay/release
         SID.voice3_waveform(128);
-        spider_exp_timer = 0;
-        spider_exp_status = 1;
+        anim_spider_timer = 0;
+        anim_spider_status = 1;
         VIC.sprite4color(4);
       }
     }
   }
 
-  public static void expShip()
+  public static void animShip()
   {
-    if(ship_exp_status == 0)
+    if(anim_ship_status == 0)
     {
-      if(ship_exp_timer == 0)
+      if(anim_ship_timer == 0)
       {
         // start attack/decay
         //                srad 
-        SID.voice3_adsr(0x8f00);
+        SID.voice3_adsr(0x8d00);
         SID.voice3_frequency(2000);
         SID.voice3_waveform(129);
       }
 
-      VIC.sprite_multicolor0((byte)(ship_exp_colors[(ship_exp_timer >> 2) & 3]));
-      ship_exp_timer++;
+      anim_ship_timer++;
  
-      if(ship_exp_timer > 13)
+      if(anim_ship_timer > 13)
       {
         // start decay/release
         SID.voice3_waveform(128);
-        ship_exp_timer = 0;
-        ship_exp_status = 1;
+        anim_ship_timer = 0;
+        anim_ship_status = 1;
         VIC.sprite0color(0);
       }
     }
   }
 
-  public static void expSnake()
+  public static void animSnake()
   {
-    if(snake_exp_status == 0)
+    if(anim_snake_status == 0)
     {
-      if(snake_exp_timer == 0)
+      if(anim_snake_timer == 0)
       {
         // start attack/decay
         //                srad 
@@ -400,14 +447,14 @@ public class Snake
         SID.voice3_waveform(33);
       }
 
-      snake_exp_timer++;
+      anim_snake_timer++;
  
-      if(snake_exp_timer > 1)
+      if(anim_snake_timer > 1)
       {
         // start decay/release
         SID.voice3_waveform(32);
-        snake_exp_timer = 0;
-        snake_exp_status = 1;
+        anim_snake_timer = 0;
+        anim_snake_status = 1;
       }
     }
   }
@@ -416,11 +463,12 @@ public class Snake
   {
     int c;
 
-    c = getFreq(title_song1.charAt(music_pos1));
+    c = getFreq(title_song1.charAt(music_pos));
 
     if(c != 0)
     {
-      SID.voice1_frequency(getFreq(title_song1.charAt(music_pos1)));
+      SID.voice1_adsr(0xa91a);
+      SID.voice1_frequency(getFreq(title_song1.charAt(music_pos)));
       SID.voice1_pulse_width(1536 + pulse1);
       SID.voice1_waveform(33);
     }
@@ -429,24 +477,26 @@ public class Snake
       SID.voice1_waveform(32);
     }
 
-    c = getFreq(title_song2.charAt(music_pos2));
+    c = getFreq(title_song2.charAt(music_pos));
 
     if(c != 0)
     {
-      SID.voice2_frequency(getFreq(title_song2.charAt(music_pos2)) << 1);
+      SID.voice2_adsr(0xa91a);
+      SID.voice2_frequency(getFreq(title_song2.charAt(music_pos)) << 1);
       SID.voice2_pulse_width(1536 + pulse2);
       SID.voice2_waveform(65);
     }
     else
     {
-      SID.voice1_waveform(64);
+      SID.voice2_waveform(64);
     }
 
-    c = getFreq(title_song3.charAt(music_pos3));
+    c = getFreq(title_song3.charAt(music_pos));
 
     if(c != 0)
     {
-      SID.voice3_frequency(getFreq(title_song3.charAt(music_pos3)) << 2);
+      SID.voice3_adsr(0xa91a);
+      SID.voice3_frequency(getFreq(title_song3.charAt(music_pos)) << 2);
       SID.voice3_pulse_width(1536 + pulse3);
       SID.voice3_waveform(65);
     }
@@ -455,20 +505,10 @@ public class Snake
       SID.voice1_waveform(64);
     }
 
-    music_pos1++;
+    music_pos++;
 
-    if(music_pos1 >= title_song1.length())
-      music_pos1 = 0;
-
-    music_pos2++;
-
-    if(music_pos2 >= title_song2.length())
-      music_pos2 = 0;
-
-    music_pos3++;
-
-    if(music_pos3 >= title_song3.length())
-      music_pos3 = 0;
+    if(music_pos >= title_song1.length())
+      music_pos = 0;
 
     pulse1 += 256;
     pulse1 &= 511;
@@ -482,25 +522,72 @@ public class Snake
   {
     int c;
 
-    c = getFreq(end_song1.charAt(music_pos1));
+    c = getFreq(end_song1.charAt(music_pos));
 
     if(c > 0)
     {
-      SID.voice1_frequency(c);
-      SID.voice2_frequency(getFreq(end_song1.charAt(music_pos1) + 5) % 17);
-      SID.voice1_waveform(33);
+      SID.voice1_adsr(0xa914);
+      SID.voice1_frequency(getFreq(end_song1.charAt(music_pos)));
+      SID.voice1_waveform(65);
+      SID.voice2_adsr(0xa914);
+      SID.voice2_frequency(getFreq(end_song2.charAt(music_pos)) << 1);
       SID.voice2_waveform(65);
     }
     else
     {
-      SID.voice1_waveform(32);
+      SID.voice1_waveform(64);
       SID.voice2_waveform(64);
     }
 
-    music_pos1++;
+    music_pos++;
 
-    if(music_pos1 >= end_song1.length())
-      music_pos1 = 0;
+    if(music_pos >= end_song1.length())
+      music_pos = 0;
+  }
+
+  public static void playNextLevelMusic()
+  {
+    int c = 0;
+    int time = 0;
+
+    SID.voice3_adsr(0x0000);
+    pulse1 = 0x800;
+    pulse2 = 0x600;
+    music_pos = 0;
+
+    while(true)
+    {
+      c = getFreq(next_level_song1.charAt(music_pos));
+
+      if(c > 0)
+      {
+        SID.voice1_adsr(0xa949);
+        SID.voice1_frequency(getFreq(next_level_song1.charAt(music_pos)));
+        SID.voice1_waveform(65);
+        SID.voice2_adsr(0xa949);
+        SID.voice2_frequency(getFreq(next_level_song2.charAt(music_pos)) << 1);
+        SID.voice2_waveform(65);
+      }
+      else
+      {
+        SID.voice1_waveform(64);
+        SID.voice2_waveform(64);
+      }
+
+      time++;
+      music_pos++;
+
+      if(music_pos >= next_level_song1.length())
+      {
+        SID.voice1_waveform(64);
+        SID.voice2_waveform(64);
+        break;
+      }
+
+      wait(300);
+    }
+
+    wait(2000);
   }
 
   public static void title()
@@ -518,25 +605,19 @@ public class Snake
     VIC.sprite_expandx(16);
     VIC.sprite_expandy(16);
 
-    printString(19, 10, 12, "by");
-    printString(14, 11, 15, "Joe Davisson");
-    printString(9, 13, 13, "Made with Java_Grinder");
-    printString(12, 22, 14, "Joystick Port 2");
+    printString(9, 9, 12, "Made with Java_Grinder");
+    printString(13, 13, 4, "Kill the Spider");
+    printString(13, 23, 14, "Joystick Port 2");
 
     //                srad 
-    SID.voice1_adsr(0xaf1a);
-    SID.voice2_adsr(0xaf1a);
-    SID.voice3_adsr(0xaf1a);
     SID.filter_cutoff(1500);
     SID.filter_resonance(0x7c);
     SID.volume(31);
 
-    pulse1 = 0;
-    pulse2 = 0;
-    pulse3 = 0;
-    music_pos1 = 0;
-    music_pos2 = 0;
-    music_pos3 = 0;
+    pulse1 = 0x800;
+    pulse2 = 0x800;
+    pulse3 = 0x800;
+    music_pos = 0;
 
     VIC.border(11);
     VIC.background(0);
@@ -562,6 +643,12 @@ public class Snake
       printString(9, 7, c,  "=== =   = =  = = = ===");
 
       VIC.sprite4color(c);
+
+      if((time & 15) >= 8)
+        Memory.write8(sprite_pointer + 4, (byte)194);
+      else
+        Memory.write8(sprite_pointer + 4, (byte)195);
+
       VIC.sprite_multicolor0(colors[(time + 1) & 7]);
 
       VIC.text_copy();
@@ -586,17 +673,14 @@ public class Snake
     SID.filter_resonance(0);
     SID.volume(15);
 
-    SID.voice1_adsr(0xff1a);
-    SID.voice2_adsr(0xff1a);
-    SID.voice3_adsr(0xff1a);
-
-    ship_exp_status = 0;
+    anim_ship_status = 0;
 
     while(true)
     {
-      expShip();
+      animShip();
 
-      if(ship_exp_timer == 0)
+      // game over
+      if(anim_ship_timer == 0)
         break;
 
       i++;
@@ -620,12 +704,10 @@ public class Snake
     VIC.sprite6pos(0, 0);
     VIC.sprite7pos(0, 0);
     
-    pulse1 = 0;
-    pulse2 = 0;
-    pulse3 = 0;
-    music_pos1 = 0;
-    music_pos2 = 0;
-    music_pos3 = 0;
+    pulse1 = 0x800;
+    pulse2 = 0x800;
+    pulse3 = 0x800;
+    music_pos = 0;
 
     while(true)
     {
@@ -683,10 +765,6 @@ public class Snake
     int temp = 0;
     int tx = 0;
     int ty = 0;
-    int dx = 0;
-    int dy = 0;
-    int tempx = 0;
-    int tempy = 0;
 
     byte snakex[] = new byte[12];
     byte snakey[] = new byte[12];
@@ -694,9 +772,9 @@ public class Snake
     byte snakestatus[] = new byte[12];
 
     resetScore();
-    ship_exp_status = 1;
-    spider_exp_status = 1;
-    snake_exp_status = 1;
+    anim_ship_status = 1;
+    anim_spider_status = 1;
+    anim_snake_status = 1;
 
     VIC.sprite_enable(63);
     VIC.sprite_priority(0);
@@ -741,9 +819,12 @@ public class Snake
 
     printScore();
 
+    pulse1 = 0x800;
+    pulse2 = 0x800;
+    pulse3 = 0x800;
     SID.voice1_adsr(0x8411);
     SID.voice2_adsr(0x8411);
-    SID.voice3_adsr(0xa411);
+    SID.voice3_adsr(0x8411);
     SID.voice1_waveform(128);
     SID.voice2_waveform(128);
     SID.voice3_waveform(128);
@@ -778,18 +859,15 @@ public class Snake
       if(shipx < spiderx) spiderx--;
 
       // ship move/collision
-      tempx = shipx + accelx;
-      tempy = shipy + accely;
+      tx = shipx + accelx;
+      ty = shipy + accely;
 
-      final int dx1 = (tempx - 20) >> 3;
-      final int dy1 = (tempy - 46) >> 3;
-
-      temp = VIC.text_read(dx1, dy1);
+      temp = VIC.text_read((tx - 20) >> 3, (ty - 46) >> 3);
 
       if(temp == 32)
       {
-        shipx = tempx;
-        shipy = tempy;
+        shipx = tx;
+        shipy = ty;
       }
       else
       {
@@ -813,7 +891,7 @@ public class Snake
       // ship hit spider
       //  if(ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1)
 
-      if(spider_exp_status == 1)
+      if(anim_spider_status == 1)
       {
         VIC.sprite4pos(spiderx, spidery);
 
@@ -874,6 +952,7 @@ public class Snake
 
       if(shotstatus == 1)
       {
+        SID.voice1_adsr(0x8411);
         SID.voice1_frequency(shotfreq);
 //        SID.voice1_pulse_width(1536 + pulse1);
         SID.voice1_waveform(129);
@@ -890,7 +969,7 @@ public class Snake
         ty = shoty;
 
         // shot hit spider
-        if(spider_exp_status == 1)
+        if(anim_spider_status == 1)
         {
           if(tx < spiderx + 23 && tx + 1 > spiderx &&
              ty < spidery + 20 && ty + 7 > spidery)
@@ -902,15 +981,15 @@ public class Snake
             shoty = 0;
             shotstatus = 0;
             VIC.sprite1pos(shotx, shoty);
-            spider_exp_status = 0;
+            anim_spider_status = 0;
             increaseScore(thousand);
             continue;
           }
         }
 
-        dx = ((shotx - 20) >> 3);
-        dy = ((shoty - 50) >> 3);
-        temp = VIC.text_read(dx, dy);
+        tx = ((shotx - 20) >> 3);
+        ty = ((shoty - 50) >> 3);
+        temp = VIC.text_read(tx, ty);
 
         if(temp >= 33 && temp <= 35)
         {
@@ -920,7 +999,7 @@ public class Snake
           if(temp < 32)
             temp = 32;
 
-          VIC.text_plot(dx, dy, temp, 5);
+          VIC.text_plot(tx, ty, temp, 5);
           shotstatus = 0;
           shotx = 0;
           increaseScore(ten);
@@ -933,10 +1012,10 @@ public class Snake
             final int sx = snakex[i];
             final int sy = snakey[i];
 
-            if((snakestatus[i] == 1) && (sx == dx) && (sy == dy))
+            if((snakestatus[i] == 1) && (sx == tx) && (sy == ty))
             {
               // hit snake
-              snake_exp_status = 0;
+              anim_snake_status = 0;
               shotstatus = 0;
               shotx = 0;
               VIC.text_plot(sx, sy, 35, 5);
@@ -967,13 +1046,20 @@ public class Snake
                     snakestatus[i] = 0;
                 }
 
+                // clear snake
+                for(i = 0; i < 12; i++)
+                  if(snakestatus[i] == 1)
+                    VIC.text_plot(snakex[i], snakey[i], 32, 5);
+
+                VIC.text_copy();
+
+                // play music
+                VIC.sprite1pos(0, 0);
+                playNextLevelMusic();
+
                 // add mushrooms
-                for(i = 0; i < 10; i++)
-                {
-                  VIC.text_plot(rnd() % 40, rnd() % 17 + 1, 35, 5);
-                  wait(500);
-                  VIC.text_copy();
-                }
+                addMushrooms();
+                VIC.text_plot((shipx - 20) >> 3, (shipy - 46) >> 3, 32, 5);
               }
             }
           }
@@ -1025,8 +1111,8 @@ public class Snake
         else
           Memory.write8(sprite_pointer + 4, (byte)195);
 
-        expSpider();
-        expSnake();
+        animSpider();
+        animSnake();
         VIC.text_copy();
       }
     }
