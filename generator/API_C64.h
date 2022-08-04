@@ -75,7 +75,6 @@ public:
   virtual int c64_vic_sprite5color() { return -1; }
   virtual int c64_vic_sprite6color() { return -1; }
   virtual int c64_vic_sprite7color() { return -1; }
-
   virtual int c64_vic_hires_enable() { return -1; }
   virtual int c64_vic_hires_clear() { return -1; }
   virtual int c64_vic_hires_plot() { return -1; }
@@ -88,6 +87,8 @@ public:
   virtual int c64_vic_make_text_table() { return -1; }
   virtual int c64_vic_make_color_table() { return -1; }
   virtual int c64_vic_color_ram_clear() { return -1; }
+  virtual int c64_vic_copy_uppercase() { return -1; }
+  virtual int c64_vic_copy_lowercase() { return -1; }
 };
 
 #endif

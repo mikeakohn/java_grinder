@@ -154,5 +154,7 @@ public class VIC
   public static void make_text_table() { }
   public static void make_color_table() { }
   public static void color_ram_clear(int value) { }
+  public static void copy_uppercase() { }
+  public static void copy_lowercase() { }
 }
 

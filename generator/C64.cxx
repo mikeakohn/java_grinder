@@ -43,13 +43,19 @@ C64::C64() :
   need_c64_vic_text_plot(0),
   need_c64_vic_text_read(0),
   need_c64_vic_make_color_table(0),
-  need_c64_vic_color_ram_clear(0)
+  need_c64_vic_color_ram_clear(0),
+  need_c64_vic_copy_uppercase(0),
+  need_c64_vic_copy_lowercase(0)
 {
   start_org = 0x07ff;
-//  java_stack_lo = 0x200;
-//  java_stack_hi = 0x300;
+
+  // java stack pointer location
   java_stack_lo = 0x80;
   java_stack_hi = 0xc0;
+  // java_stack_lo = 0x200;
+  // java_stack_hi = 0x300;
+
+  // heap location (for new arrays)
   ram_start = 0xa000;
 }
 
@@ -67,6 +73,8 @@ C64::~C64()
   if (need_c64_vic_make_text_table) { insert_c64_vic_make_text_table(); }
   if (need_c64_vic_make_color_table) { insert_c64_vic_make_color_table(); }
   if (need_c64_vic_color_ram_clear) { insert_c64_vic_color_ram_clear(); }
+  if (need_c64_vic_copy_uppercase) { insert_c64_vic_copy_uppercase(); }
+  if (need_c64_vic_copy_lowercase) { insert_c64_vic_copy_lowercase(); }
 }
 
 int C64::open(const char *filename)
@@ -91,7 +99,6 @@ int C64::open(const char *filename)
 
   // temp variables
   fprintf(out, "  result equ 0x0a\n");
-//  fprintf(out, "  return equ 0x0c\n");
   fprintf(out, "  remainder equ 0x0c\n");
   fprintf(out, "  length equ 0x0e\n");
   fprintf(out, "  value1 equ 0x10\n");
@@ -100,11 +107,6 @@ int C64::open(const char *filename)
   fprintf(out, "  temp1 equ 0x16\n");
 
   // text/color tables
-//  fprintf(out, "  text_table equ 0x0040\n");
-//  fprintf(out, "  color_table equ 0x0072\n");
-
-//  fprintf(out, "  text_table equ 0x0708\n");
-//  fprintf(out, "  color_table equ 0x073a\n");
   fprintf(out, "  text_table equ 0x18\n");
   fprintf(out, "  color_table equ 0x4a\n");
 
@@ -116,7 +118,6 @@ int C64::open(const char *filename)
 
   // basic loader
   fprintf(out, ".org 0x%04x\n", start_org);
-
   fprintf(out, "dw 0x0801\n");
   fprintf(out, "dw start\n");
   fprintf(out, "dw 2013\n");
@@ -135,11 +136,12 @@ int C64::open(const char *filename)
   fprintf(out, "  sei\n");
   fprintf(out, "  cld\n");
 
+  // reset processor stack
   fprintf(out, "  ldx #0xff\n");
   fprintf(out, "  txs\n");
 
-  // init java stack pointer
-  //fprintf(out, "  ldx #0xff\n");  // for 0x200/0x300
+  // reset java stack pointer
+  // fprintf(out, "  ldx #0xff\n");  // for 0x200/0x300
   fprintf(out, "  ldx #0x3f\n");  // for 0x80/0xc0
 
   // clear_stack (so it looks nice in monitor)
@@ -159,57 +161,6 @@ int C64::open(const char *filename)
   // put text screen at 0xc400 and charset at 0xc800
   fprintf(out, "  lda #0x12\n");
   fprintf(out, "  sta 0xd018\n");
-
-  // copy charset from ROM
-  // lowercase charset
-  fprintf(out, "  lda #50\n");
-  fprintf(out, "  sta 0x0001\n");
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "copy_charset_loop:\n");
-  fprintf(out, "  lda 0xd800,y\n");
-  fprintf(out, "  sta 0xc800,y\n");
-  fprintf(out, "  lda 0xd900,y\n");
-  fprintf(out, "  sta 0xc900,y\n");
-  fprintf(out, "  lda 0xda00,y\n");
-  fprintf(out, "  sta 0xca00,y\n");
-  fprintf(out, "  lda 0xdb00,y\n");
-  fprintf(out, "  sta 0xcb00,y\n");
-  fprintf(out, "  lda 0xdc00,y\n");
-  fprintf(out, "  sta 0xcc00,y\n");
-  fprintf(out, "  lda 0xdd00,y\n");
-  fprintf(out, "  sta 0xcd00,y\n");
-  fprintf(out, "  lda 0xde00,y\n");
-  fprintf(out, "  sta 0xce00,y\n");
-  fprintf(out, "  lda 0xdf00,y\n");
-  fprintf(out, "  sta 0xcf00,y\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bne copy_charset_loop\n");
-
-/*
-  // uppercase charset
-  fprintf(out, "  lda #50\n");
-  fprintf(out, "  sta 0x0001\n");
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "copy_charset_loop:\n");
-  fprintf(out, "  lda 0xd000,y\n");
-  fprintf(out, "  sta 0xc800,y\n");
-  fprintf(out, "  lda 0xd100,y\n");
-  fprintf(out, "  sta 0xc900,y\n");
-  fprintf(out, "  lda 0xd200,y\n");
-  fprintf(out, "  sta 0xca00,y\n");
-  fprintf(out, "  lda 0xd300,y\n");
-  fprintf(out, "  sta 0xcb00,y\n");
-  fprintf(out, "  lda 0xd400,y\n");
-  fprintf(out, "  sta 0xcc00,y\n");
-  fprintf(out, "  lda 0xd500,y\n");
-  fprintf(out, "  sta 0xcd00,y\n");
-  fprintf(out, "  lda 0xd600,y\n");
-  fprintf(out, "  sta 0xce00,y\n");
-  fprintf(out, "  lda 0xd700,y\n");
-  fprintf(out, "  sta 0xcf00,y\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bne copy_charset_loop\n");
-*/
 
   // turn off ROM chips
   fprintf(out, "  lda #53\n");
@@ -554,6 +505,7 @@ int C64::c64_vic_sprite7pos(/* x, y */)
 
 int C64::c64_vic_write_control1(/* value */) { POKE(0xd011); return 0; }
 int C64::c64_vic_read_control1() { PEEK(0xd011); return 0; }
+
 int C64::c64_vic_wait_raster(/* line */)
 {
   fprintf(out, "; wait_raster\n");
@@ -681,6 +633,20 @@ int C64::c64_vic_color_ram_clear(/* value */)
 {
   need_c64_vic_color_ram_clear = 1;
   fprintf(out, "  jsr color_ram_clear\n");
+  return 0;
+}
+
+int C64::c64_vic_copy_uppercase()
+{
+  need_c64_vic_copy_uppercase = 1;
+  fprintf(out, "  jsr copy_uppercase\n");
+  return 0;
+}
+
+int C64::c64_vic_copy_lowercase()
+{
+  need_c64_vic_copy_lowercase = 1;
+  fprintf(out, "  jsr copy_lowercase\n");
   return 0;
 }
 
@@ -1111,6 +1077,66 @@ void C64::insert_c64_vic_color_ram_clear()
   fprintf(out, "  sta 0xdae8,y\n");
   fprintf(out, "  dey\n");
   fprintf(out, "  bne color_ram_clear_loop\n");
+  fprintf(out, "  rts\n");
+}
+
+void C64::insert_c64_vic_copy_uppercase()
+{
+  fprintf(out, "copy_uppercase:\n");
+  fprintf(out, "  lda #50\n");
+  fprintf(out, "  sta 0x0001\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "copy_uppercase_loop:\n");
+  fprintf(out, "  lda 0xd000,y\n");
+  fprintf(out, "  sta 0xc800,y\n");
+  fprintf(out, "  lda 0xd100,y\n");
+  fprintf(out, "  sta 0xc900,y\n");
+  fprintf(out, "  lda 0xd200,y\n");
+  fprintf(out, "  sta 0xca00,y\n");
+  fprintf(out, "  lda 0xd300,y\n");
+  fprintf(out, "  sta 0xcb00,y\n");
+  fprintf(out, "  lda 0xd400,y\n");
+  fprintf(out, "  sta 0xcc00,y\n");
+  fprintf(out, "  lda 0xd500,y\n");
+  fprintf(out, "  sta 0xcd00,y\n");
+  fprintf(out, "  lda 0xd600,y\n");
+  fprintf(out, "  sta 0xce00,y\n");
+  fprintf(out, "  lda 0xd700,y\n");
+  fprintf(out, "  sta 0xcf00,y\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bne copy_uppercase_loop\n");
+  fprintf(out, "  lda #53\n");
+  fprintf(out, "  sta 0x0001\n");
+  fprintf(out, "  rts\n");
+}
+
+void C64::insert_c64_vic_copy_lowercase()
+{
+  fprintf(out, "copy_lowercase:\n");
+  fprintf(out, "  lda #50\n");
+  fprintf(out, "  sta 0x0001\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "copy_lowercase_loop:\n");
+  fprintf(out, "  lda 0xd800,y\n");
+  fprintf(out, "  sta 0xc800,y\n");
+  fprintf(out, "  lda 0xd900,y\n");
+  fprintf(out, "  sta 0xc900,y\n");
+  fprintf(out, "  lda 0xda00,y\n");
+  fprintf(out, "  sta 0xca00,y\n");
+  fprintf(out, "  lda 0xdb00,y\n");
+  fprintf(out, "  sta 0xcb00,y\n");
+  fprintf(out, "  lda 0xdc00,y\n");
+  fprintf(out, "  sta 0xcc00,y\n");
+  fprintf(out, "  lda 0xdd00,y\n");
+  fprintf(out, "  sta 0xcd00,y\n");
+  fprintf(out, "  lda 0xde00,y\n");
+  fprintf(out, "  sta 0xce00,y\n");
+  fprintf(out, "  lda 0xdf00,y\n");
+  fprintf(out, "  sta 0xcf00,y\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bne copy_lowercase_loop\n");
+  fprintf(out, "  lda #53\n");
+  fprintf(out, "  sta 0x0001\n");
   fprintf(out, "  rts\n");
 }
 

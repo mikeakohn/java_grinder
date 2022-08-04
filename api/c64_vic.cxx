@@ -282,6 +282,16 @@ static int c64_vic_color_ram_clear(JavaClass *java_class, Generator *generator)
   return generator->c64_vic_color_ram_clear();
 }
 
+static int c64_vic_copy_uppercase(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_copy_uppercase();
+}
+
+static int c64_vic_copy_lowercase(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_copy_lowercase();
+}
+
 int c64_vic(JavaClass *java_class, Generator *generator, const char *function)
 {
   CHECK_FUNC(sprite0pos)
@@ -324,7 +334,6 @@ int c64_vic(JavaClass *java_class, Generator *generator, const char *function)
   CHECK_FUNC(sprite5color)
   CHECK_FUNC(sprite6color)
   CHECK_FUNC(sprite7color)
-
   CHECK_FUNC(hires_enable)
   CHECK_FUNC(hires_clear)
   CHECK_FUNC(hires_plot)
@@ -337,6 +346,8 @@ int c64_vic(JavaClass *java_class, Generator *generator, const char *function)
   CHECK_FUNC(make_text_table)
   CHECK_FUNC(make_color_table)
   CHECK_FUNC(color_ram_clear)
+  CHECK_FUNC(copy_uppercase)
+  CHECK_FUNC(copy_lowercase)
 
   return -1;
 }

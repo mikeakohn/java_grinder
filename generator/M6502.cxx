@@ -319,57 +319,8 @@ int M6502::push_int(int32_t n)
   return 0;
 }
 
-int M6502::push_long(int64_t n)
-{
-  return push_int((int32_t)n);
-}
-
-#if 0
-int M6502::push_float(float f)
-{
-  return -1;
-}
-
-int M6502::push_double(double f)
-{
-  return -1;
-}
-#endif
-
-#if 0
-int M6502::push_byte(int8_t b)
-{
-  int16_t n = b;
-  uint16_t value = (n & 0xffff);
-
-  fprintf(out, "; push_byte\n");
-  fprintf(out, "  lda #0x%02x\n", value & 0xff);
-  PUSH_LO();
-  fprintf(out, "  lda #0x%02x\n", value >> 8);
-  PUSH_HI();
-  stack++;
-
-  return 0;
-}
-
-int M6502::push_short(int16_t s)
-{
-  uint16_t value = (s & 0xffff);
-
-  fprintf(out, "; push_short\n");
-  fprintf(out, "  lda #0x%02x\n", value & 0xff);
-  PUSH_LO();
-  fprintf(out, "  lda #0x%02x\n", value >> 8);
-  PUSH_HI();
-  stack++;
-
-  return 0;
-}
-#endif
-
 int M6502::push_ref(std::string &name)
 {
-  
   fprintf(out, "; push_ref\n");
   fprintf(out, "  lda %s + 0\n", name.c_str());
   fprintf(out, "  sta stack_lo,x\n");
@@ -404,10 +355,6 @@ int M6502::pop()
 {
   fprintf(out, "; pop\n");
   fprintf(out, "  inx\n");
-  //  fprintf(out, "  lda stack_lo,x\n");
-  //  fprintf(out, "  sta result + 0\n");
-  //  fprintf(out, "  lda stack_hi,x\n");
-  //  fprintf(out, "  sta result + 1\n");
   stack--;
 
   return 0;
@@ -496,11 +443,6 @@ int M6502::mul_integer()
   return 0;
 }
 
-int M6502::mul_integer(int const_val)
-{
-  return -1;
-}
-
 // unsigned only for now
 int M6502::div_integer()
 {
@@ -509,11 +451,6 @@ int M6502::div_integer()
   stack--;
 
   return 0;
-}
-
-int M6502::div_integer(int const_val)
-{
-  return -1;
 }
 
 // unsigned only for now
@@ -528,11 +465,6 @@ int M6502::mod_integer()
   stack--;
 
   return 0;
-}
-
-int M6502::mod_integer(int const_val)
-{
-  return -1;
 }
 
 int M6502::neg_integer()
@@ -1154,22 +1086,6 @@ int M6502::array_read_int()
 
 int M6502::array_read_byte(std::string &name, int field_id)
 {
-#if 0
-  need_array_byte_support = 1;
-
-  if (stack > 0)
-  {
-    fprintf(out, "  lda %s + 0\n", name.c_str());
-    fprintf(out, "  sta address + 0\n");
-    fprintf(out, "  lda %s + 1\n", name.c_str());
-    fprintf(out, "  sta address + 1\n");
-
-    fprintf(out, "  jsr array_read_byte2\n");
-  }
-
-  return 0;
-#endif
-
   return -1;
 }
 
@@ -1180,21 +1096,6 @@ int M6502::array_read_short(std::string &name, int field_id)
 
 int M6502::array_read_int(std::string &name, int field_id)
 {
-#if 0
-  need_array_int_support = 1;
-
-  if (stack > 0)
-  {
-    fprintf(out, "  lda %s + 0\n", name.c_str());
-    fprintf(out, "  sta address + 0\n");
-    fprintf(out, "  lda %s + 1\n", name.c_str());
-    fprintf(out, "  sta address + 1\n");
-    fprintf(out, "  jsr array_read_int2\n");
-  }
-
-  return 0;
-#endif
-
   return -1;
 }
 
@@ -1223,24 +1124,6 @@ int M6502::array_write_int()
 
 int M6502::array_write_byte(std::string &name, int field_id)
 {
-#if 0
-  get_values_from_stack(2);
-  fprintf(out, "; array_write_byte2\n");
-  fprintf(out, "  clc\n"); 
-  fprintf(out, "  lda value2 + 0\n"); 
-  fprintf(out, "  adc %s + 0\n", name.c_str()); 
-  fprintf(out, "  sta address + 0\n"); 
-  fprintf(out, "  lda value2 + 1\n"); 
-  fprintf(out, "  adc %s + 1\n", name.c_str()); 
-  fprintf(out, "  sta address + 1\n"); 
-
-  fprintf(out, "  ldy #0\n"); 
-  fprintf(out, "  lda value1 + 0\n"); 
-  fprintf(out, "  sta (address),y\n"); 
-
-  return 0;
-#endif
-
   return -1;
 }
 
@@ -1251,73 +1134,6 @@ int M6502::array_write_short(std::string &name, int field_id)
 
 int M6502::array_write_int(std::string &name, int field_id)
 {
-#if 0
-  need_array_int_support = 1;
-
-  get_values_from_stack(2);
-  fprintf(out, "; array_write_int2\n");
-  fprintf(out, "  asl value2 + 0\n");
-  fprintf(out, "  rol value2 + 1\n");
-
-  fprintf(out, "  clc\n"); 
-  fprintf(out, "  lda value2 + 0\n"); 
-  fprintf(out, "  adc %s + 0\n", name.c_str()); 
-  fprintf(out, "  sta address + 0\n"); 
-  fprintf(out, "  lda value2 + 1\n"); 
-  fprintf(out, "  adc %s + 1\n", name.c_str()); 
-  fprintf(out, "  sta address + 1\n"); 
-
-  fprintf(out, "  ldy #0\n"); 
-  fprintf(out, "  lda value1 + 0\n"); 
-  fprintf(out, "  sta (address),y\n"); 
-  fprintf(out, "  ldy #1\n"); 
-  fprintf(out, "  lda value1 + 1\n"); 
-  fprintf(out, "  sta (address),y\n"); 
-
-  return 0;
-#endif
-
-  return -1;
-}
-
-int M6502::get_values_from_stack(int num)
-{
-#if 0
-  fprintf(out, "; get_values_from_stack, num = %d\n", num);
-
-  if (num > 0)
-  {
-    fprintf(out, "  inx\n"); 
-    fprintf(out, "  lda stack_lo,x\n"); 
-    fprintf(out, "  sta value1 + 0\n");
-    fprintf(out, "  lda stack_hi,x\n"); 
-    fprintf(out, "  sta value1 + 1\n");
-    stack--;
-  }
-
-  if (num > 1)
-  {
-    fprintf(out, "  inx\n"); 
-    fprintf(out, "  lda stack_lo,x\n"); 
-    fprintf(out, "  sta value2 + 0\n");
-    fprintf(out, "  lda stack_hi,x\n"); 
-    fprintf(out, "  sta value2 + 1\n");
-    stack--;
-  }
-
-  if (num > 2)
-  {
-    fprintf(out, "  inx\n"); 
-    fprintf(out, "  lda stack_lo,x\n"); 
-    fprintf(out, "  sta value3 + 0\n");
-    fprintf(out, "  lda stack_hi,x\n"); 
-    fprintf(out, "  sta value3 + 1\n");
-    stack--;
-  }
-
-  return 0;
-#endif
-
   return -1;
 }
 
@@ -2066,10 +1882,4 @@ void M6502::insert_math_abs()
   fprintf(out, "  sta stack_hi + 1,x\n");
   fprintf(out, "  rts\n");
 };
-
-#if 0
-void M6502::close()
-{
-}
-#endif
 

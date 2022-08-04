@@ -27,9 +27,6 @@ public:
   virtual int start_init();
   virtual int insert_static_field_define(std::string &name, std::string &type, int index);
   virtual int init_heap(int field_count);
-  //virtual int field_init_boolean(char *name, int index, int value);
-  //virtual int field_init_byte(char *name, int index, int value);
-  //virtual int field_init_short(char *name, int index, int value);
   virtual int field_init_int(std::string &name, int index, int value);
   virtual int field_init_ref(std::string &name, int index);
   virtual void method_start(int local_count, int max_stack, int param_count, std::string &name);
@@ -39,9 +36,6 @@ public:
   virtual int push_ref_static(std::string &name, int index);
   virtual int push_fake();
   virtual int push_int(int32_t n);
-  virtual int push_long(int64_t n);
-  //virtual int push_float(float f);
-  //virtual int push_double(double f);
   virtual int push_ref(std::string &name);
   virtual int pop_local_var_int(int index);
   virtual int pop_local_var_ref(int index);
@@ -54,11 +48,8 @@ public:
   virtual int sub_integer();
   virtual int sub_integer(int const_val);
   virtual int mul_integer();
-  virtual int mul_integer(int const_val);
   virtual int div_integer();
-  virtual int div_integer(int const_val);
   virtual int mod_integer();
-  virtual int mod_integer(int const_val);
   virtual int neg_integer();
   virtual int shift_left_integer();
   virtual int shift_left_integer(int const_val);
@@ -105,8 +96,6 @@ public:
   virtual int array_write_byte(std::string &name, int field_id);
   virtual int array_write_short(std::string &name, int field_id);
   virtual int array_write_int(std::string &name, int field_id);
-  virtual int get_values_from_stack(int);
-  //virtual void close();
 
   // Memory API
   virtual int memory_read8_I();
