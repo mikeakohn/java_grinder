@@ -486,7 +486,15 @@ int M6502::shift_left_integer()
 
 int M6502::shift_left_integer(int const_val)
 {
-  return -1;
+  fprintf(out, "; shift_left_integer (const_val=%d)\n", const_val);
+
+  for(int i = 0; i < const_val; i++)
+  {
+    fprintf(out, "  asl stack_lo + 1,x\n");
+    fprintf(out, "  rol stack_hi + 1,x\n");
+  }
+
+  return 0;
 }
 
 int M6502::shift_right_integer()
@@ -500,7 +508,17 @@ int M6502::shift_right_integer()
 
 int M6502::shift_right_integer(int const_val)
 {
-  return -1;
+  fprintf(out, "; shift_right_integer (const_val=%d)\n", const_val);
+
+  for(int i = 0; i < const_val; i++)
+  {
+    fprintf(out, "  lda stack_hi + 1,x\n");
+    fprintf(out, "  asl\n");
+    fprintf(out, "  ror stack_hi + 1,x\n");
+    fprintf(out, "  ror stack_lo + 1,x\n");
+  }
+
+  return 0;
 }
 
 int M6502::shift_right_uinteger()
@@ -514,7 +532,15 @@ int M6502::shift_right_uinteger()
 
 int M6502::shift_right_uinteger(int const_val)
 {
-  return -1;
+  fprintf(out, "; shift_right_uinteger (const_val=%d)\n", const_val);
+
+  for(int i = 0; i < const_val; i++)
+  {
+    fprintf(out, "  lsr stack_hi + 1,x\n");
+    fprintf(out, "  ror stack_lo + 1,x\n");
+  }
+
+  return 0;
 }
 
 int M6502::and_integer()
