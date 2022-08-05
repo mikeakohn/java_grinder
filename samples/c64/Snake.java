@@ -281,7 +281,7 @@ public class Snake
         SID.voice1_frequency(x << 9);
         SID.voice1_waveform(33);
 //        wait(40);
-        VIC.text_plot(tx, ty, 35 - (x >> 2), 1);
+        VIC.text_plot(tx, ty, 35 - (x >>> 2), 1);
         VIC.text_copy();
         SID.voice1_waveform(32);
       }
@@ -394,7 +394,7 @@ public class Snake
         SID.voice3_waveform(129);
       }
 
-      VIC.sprite4color((byte)(anim_spider_colors[(anim_spider_timer >> 2) & 3]));
+      VIC.sprite4color((byte)(anim_spider_colors[(anim_spider_timer >>> 2) & 3]));
       anim_spider_timer++;
  
       if(anim_spider_timer > 13)
@@ -685,7 +685,7 @@ public class Snake
 
       i++;
 
-      VIC.border(colors1[(i >> 1) & 7]);
+      VIC.border(colors1[(i >>> 1) & 7]);
 
       wait(500);
     }
@@ -733,7 +733,7 @@ public class Snake
       if(play_music > 0)
       {
         play_music--;
-        SID.volume(play_music >> 2);
+        SID.volume(play_music >>> 2);
         playEndMusic();
       }
 
@@ -766,10 +766,10 @@ public class Snake
     int tx = 0;
     int ty = 0;
 
-    byte snakex[] = new byte[12];
-    byte snakey[] = new byte[12];
-    byte snakedir[] = new byte[12];
-    byte snakestatus[] = new byte[12];
+    byte snakex[] = new byte[16];
+    byte snakey[] = new byte[16];
+    byte snakedir[] = new byte[16];
+    byte snakestatus[] = new byte[16];
 
     resetScore();
     anim_ship_status = 1;
@@ -801,7 +801,7 @@ public class Snake
     }
 
     // initialize
-    for(i = 0; i < 12; i++)
+    for(i = 0; i < 16; i++)
     {
       snakex[i] = (byte)i;
       snakey[i] = 1;
@@ -842,11 +842,6 @@ public class Snake
       if((joy & 2) == 2) accely += 1;
       if((joy & 1) == 1) accely -= 1;
 
-      if(accelx > 3) accelx = 3;
-      if(accelx < -3) accelx = -3;
-      if(accely > 3) accely = 3;
-      if(accely < -3) accely = -3;
-
       if((time & 1) == 1)
       {
         if(accelx > 0) accelx--;
@@ -855,6 +850,11 @@ public class Snake
         if(accely < 0) accely++;
       }
 
+      if(accelx > 2) accelx = 2;
+      if(accelx < -2) accelx = -2;
+      if(accely > 2) accely = 2;
+      if(accely < -2) accely = -2;
+
       if(shipx > spiderx) spiderx++;
       if(shipx < spiderx) spiderx--;
 
@@ -862,7 +862,7 @@ public class Snake
       tx = shipx + accelx;
       ty = shipy + accely;
 
-      temp = VIC.text_read((tx - 20) >> 3, (ty - 46) >> 3);
+      temp = VIC.text_read((tx - 20) >>> 3, (ty - 46) >>> 3);
 
       if(temp == 32)
       {
@@ -937,8 +937,8 @@ public class Snake
       // move shots
       if(shotstatus == 1)
       {
-        shoty -= 8;
-        shotfreq -= 40;
+        shoty -= 4;
+        shotfreq -= 20;
 
         if(shoty < 42)
         {
@@ -987,8 +987,8 @@ public class Snake
           }
         }
 
-        tx = ((shotx - 20) >> 3);
-        ty = ((shoty - 50) >> 3);
+        tx = ((shotx - 20) >>> 3);
+        ty = ((shoty - 50) >>> 3);
         temp = VIC.text_read(tx, ty);
 
         if(temp >= 33 && temp <= 35)
@@ -1006,7 +1006,7 @@ public class Snake
         }
         else if(temp != 32)
         {
-          for(i = 0; i < 12; i++)
+          for(i = 0; i < 16; i++)
           {
             // check snake
             final int sx = snakex[i];
@@ -1028,13 +1028,13 @@ public class Snake
                 // next level
                 snake_length += 2;
 
-                if(snake_length > 12)
-                  snake_length = 12;
+                if(snake_length > 16)
+                  snake_length = 16;
 
                 snake_count = snake_length;
 
                 // reset snake
-                for(i = 0; i < 12; i++)
+                for(i = 0; i < 16; i++)
                 {
                   snakex[i] = (byte)i;
                   snakey[i] = 1;
@@ -1047,7 +1047,7 @@ public class Snake
                 }
 
                 // clear snake
-                for(i = 0; i < 12; i++)
+                for(i = 0; i < 16; i++)
                   if(snakestatus[i] == 1)
                     VIC.text_plot(snakex[i], snakey[i], 32, 5);
 
@@ -1059,7 +1059,7 @@ public class Snake
 
                 // add mushrooms
                 addMushrooms();
-                VIC.text_plot((shipx - 20) >> 3, (shipy - 46) >> 3, 32, 5);
+                VIC.text_plot((shipx - 20) >>> 3, (shipy - 46) >>> 3, 32, 5);
               }
             }
           }
@@ -1070,13 +1070,13 @@ public class Snake
       time++;
 
       // move snake
-      if((time & 1) == 1)
+      if((time & 3) == 3)
       {
-        for(i = 0; i < 12; i++)
+        for(i = 0; i < 16; i++)
           if(snakestatus[i] == 1)
             VIC.text_plot(snakex[i], snakey[i], 32, 10);
 
-        for(i = 0; i < 12; i++)
+        for(i = 0; i < 16; i++)
         {
           int sdir = snakedir[i];
           int sx = snakex[i] + sdir;
@@ -1124,6 +1124,7 @@ public class Snake
 
     VIC.make_text_table();
     VIC.make_color_table();
+    VIC.copy_lowercase();
 
     // copy sprites
     clearSprite(sprite_ram);
@@ -1195,9 +1196,6 @@ public class Snake
 
     while(true)
     {
-//      VIC.border(0);
-//      VIC.border(4);
-
       title();
       snake();
       gameOver();
