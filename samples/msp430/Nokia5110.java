@@ -7,9 +7,9 @@ import net.mikekohn.java_grinder.SPI0;
 public class Nokia5110
 {
   // The masks for the IO pins used to communicate with the LCD.
-  static final int LCD_RESET = 0;
-  static final int LCD_DC = 1;
-  static final int SPI_CS = 2;
+  static final int LCD_RESET = 1;
+  static final int LCD_DC = 2;
+  static final int SPI_CS = 3;
 
   static public void main(String[] args)
   {
@@ -22,8 +22,8 @@ public class Nokia5110
     ADC.enable();
     ADC.setChannel(4);
 
-    // Not sure how fast this can be
-    SPI0.init(SPI0.DIV8, 2);
+    // Not sure how fast this can be.
+    SPI0.init(SPI0.DIV8, 3);
 
     // Setup IO port.
     // Pin 1 is SPI_DC
@@ -58,6 +58,7 @@ public class Nokia5110
     clearDisplay();
 
     moveCursor(0, 0);
+
     for (n = 0; n < FaceImage.data.length; n++)
     {
       lcdData(FaceImage.data[n]);
@@ -79,7 +80,7 @@ public class Nokia5110
   /** Clear all pixels. */
   public static void clearDisplay()
   {
-  int n;
+    int n;
 
     moveCursor(0,0);
 
@@ -94,7 +95,8 @@ public class Nokia5110
       a command */
   public static void lcdCommand(int a)
   {
-  int n;
+    int n;
+
     IOPort0.setPinLow(LCD_DC);
 
     // /CS = 0
@@ -111,7 +113,8 @@ public class Nokia5110
       data */
   public static void lcdData(int a)
   {
-  int n;
+    int n;
+
     IOPort0.setPinHigh(LCD_DC);
 
     // /CS = 0
@@ -126,7 +129,8 @@ public class Nokia5110
 
   public static void delay()
   {
-    int n,a;
+    int n, a;
+
     for (a = 0; a < 3; a++)
     {
       for (n = 0; n < 65535; n++) { }

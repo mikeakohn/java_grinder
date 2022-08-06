@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -20,6 +20,13 @@ enum
   MSP430G2452,
   MSP430G2553,
   MSP430F5529,
+};
+
+enum
+{
+  SPI_TYPE_NONE,
+  SPI_TYPE_USI,
+  SPI_TYPE_USCI,
 };
 
 class MSP430 : public Generator
@@ -229,13 +236,14 @@ protected:
   bool need_timer_interrupt : 1;
   bool is_main : 1;
   bool is_interrupt : 1;
-  bool has_usi : 1;
   bool has_usci : 1;
   uint32_t ram_start;
   uint32_t stack_start;
   uint32_t flash_start;
   int max_stack;
   int cpu_speed;
+  uint8_t chip_type;
+  uint8_t spi_type;
   const char *include_file;
   uint16_t vector_timer;
 };

@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -66,9 +66,10 @@ MSP430::MSP430(uint8_t chip_type) :
   need_timer_interrupt(false),
   is_main(false),
   is_interrupt(false),
-  has_usi(false),
   has_usci(false),
-  cpu_speed(1000000)
+  cpu_speed(1000000),
+  chip_type(chip_type),
+  spi_type(SPI_TYPE_NONE)
 {
   ram_start = 0x0200;
   vector_timer = 0xfff2;
@@ -79,7 +80,7 @@ MSP430::MSP430(uint8_t chip_type) :
     case MSP430G2231:
       flash_start = 0xf800;
       stack_start = 0x0280;
-      has_usi = true;
+      spi_type = SPI_TYPE_USI;
       break;
     case MSP430G2452:
       flash_start = 0xe000;
@@ -88,6 +89,7 @@ MSP430::MSP430(uint8_t chip_type) :
     case MSP430G2553:
       flash_start = 0xc000;
       stack_start = 0x0400;
+      spi_type = SPI_TYPE_USCI;
       has_usci = true;
       break;
     default:
@@ -157,7 +159,7 @@ int MSP430::insert_static_field_define(std::string &name, std::string &type, int
 
 int MSP430::init_heap(int field_count)
 {
-  fprintf(out, "  ;; Set up heap and static initializers\n");
+  fprintf(out, "  ;; Setup heap and static initializers\n");
   fprintf(out, "  mov.w #ram_start+%d, &ram_start\n", (field_count + 1) * 2);
   return 0;
 }
@@ -1584,14 +1586,14 @@ void MSP430::close()
 int MSP430::ioport_setPinsAsInput_I(int port)
 {
   char periph[32];
-  sprintf(periph, "P%dDIR", port+1);
+  sprintf(periph, "P%dDIR", port + 1);
   return set_periph("bic", periph);
 }
 
 int MSP430::ioport_setPinsAsInput_I(int port, int const_val)
 {
   char periph[32];
-  sprintf(periph, "P%dDIR", port+1);
+  sprintf(periph, "P%dDIR", port + 1);
   fprintf(out, "  bic.b #%d, &%s\n", const_val, periph);
   return 0;
 }
@@ -1599,14 +1601,14 @@ int MSP430::ioport_setPinsAsInput_I(int port, int const_val)
 int MSP430::ioport_setPinsAsOutput_I(int port)
 {
   char periph[32];
-  sprintf(periph, "P%dDIR", port+1);
+  sprintf(periph, "P%dDIR", port + 1);
   return set_periph("bis", periph);
 }
 
 int MSP430::ioport_setPinsAsOutput_I(int port, int const_val)
 {
   char periph[32];
-  sprintf(periph, "P%dDIR", port+1);
+  sprintf(periph, "P%dDIR", port + 1);
   fprintf(out, "  bis.b #0x%02x, &%s\n", const_val, periph);
   return 0;
 }
@@ -1614,14 +1616,14 @@ int MSP430::ioport_setPinsAsOutput_I(int port, int const_val)
 int MSP430::ioport_setPinsValue_I(int port)
 {
   char periph[32];
-  sprintf(periph, "P%dOUT", port+1);
+  sprintf(periph, "P%dOUT", port + 1);
   return set_periph("mov", periph);
 }
 
 int MSP430::ioport_setPinsValue_I(int port, int const_val)
 {
   char periph[32];
-  sprintf(periph, "P%dOUT", port+1);
+  sprintf(periph, "P%dOUT", port + 1);
   fprintf(out, "  mov.b #%d, &%s\n", const_val, periph);
   return 0;
 }
@@ -1629,14 +1631,14 @@ int MSP430::ioport_setPinsValue_I(int port, int const_val)
 int MSP430::ioport_setPinsHigh_I(int port)
 {
   char periph[32];
-  sprintf(periph, "P%dOUT", port+1);
+  sprintf(periph, "P%dOUT", port + 1);
   return set_periph("bis", periph);
 }
 
 int MSP430::ioport_setPinsLow_I(int port)
 {
   char periph[32];
-  sprintf(periph, "P%dOUT", port+1);
+  sprintf(periph, "P%dOUT", port + 1);
   return set_periph("bic", periph);
 }
 
@@ -1648,7 +1650,7 @@ int MSP430::ioport_setPinAsOutput_I(int port)
 int MSP430::ioport_setPinAsOutput_I(int port, int const_val)
 {
   if (const_val < 0 || const_val > 7) { return -1; }
-  fprintf(out, "  bis.b #0x%02x, &P%dDIR\n", (1<<const_val), port+1);
+  fprintf(out, "  bis.b #0x%02x, &P%dDIR\n", (1 << const_val), port + 1);
   return 0;
 }
 
@@ -1660,7 +1662,7 @@ int MSP430::ioport_setPinAsInput_I(int port)
 int MSP430::ioport_setPinAsInput_I(int port, int const_val)
 {
   if (const_val < 0 || const_val > 7) { return -1; }
-  fprintf(out, "  bic.b #0x%02x, &P%dDIR\n", (1<<const_val), port+1);
+  fprintf(out, "  bic.b #0x%02x, &P%dDIR\n", (1 << const_val), port + 1);
   return 0;
 }
 
@@ -1672,7 +1674,7 @@ int MSP430::ioport_setPinHigh_I(int port)
 int MSP430::ioport_setPinHigh_I(int port, int const_val)
 {
   if (const_val < 0 || const_val > 7) { return -1; }
-  fprintf(out, "  bis.b #0x%02x, &P%dOUT\n", (1<<const_val), port+1);
+  fprintf(out, "  bis.b #0x%02x, &P%dOUT\n", (1 << const_val), port + 1);
   return 0;
 }
 
@@ -1684,7 +1686,7 @@ int MSP430::ioport_setPinLow_I(int port)
 int MSP430::ioport_setPinLow_I(int port, int const_val)
 {
   if (const_val < 0 || const_val > 7) { return -1; }
-  fprintf(out, "  bic.b #0x%02x, &P%dOUT\n", (1<<const_val), port+1);
+  fprintf(out, "  bic.b #0x%02x, &P%dOUT\n", (1 << const_val), port + 1);
   return 0;
 }
 
@@ -1715,13 +1717,13 @@ int MSP430::ioport_setPortOutputValue_I(int port)
 {
   if (stack == 0)
   {
-    fprintf(out, "  mov.b r%d, &P%dOUT\n", REG_STACK(reg-1), port+1);
+    fprintf(out, "  mov.b r%d, &P%dOUT\n", REG_STACK(reg-1), port + 1);
     reg--;
   }
     else
   {
     fprintf(out, "  pop.w r15\n");
-    fprintf(out, "  mov.b r15, &P%dOUT\n", port+1);
+    fprintf(out, "  mov.b r15, &P%dOUT\n", port + 1);
     stack--;
   }
 
@@ -1732,14 +1734,14 @@ int MSP430::ioport_setPortOutputValue_I(int port)
 int MSP430::ioport_setPinsResistorEnable_I(int port)
 {
   char periph[32];
-  sprintf(periph, "P%dREN", port+1);
+  sprintf(periph, "P%dREN", port + 1);
   return set_periph("mov", periph);
 }
 
 int MSP430::ioport_setPinsResistorEnable_I(int port, int const_val)
 {
   char periph[32];
-  sprintf(periph, "P%dREN", port+1);
+  sprintf(periph, "P%dREN", port + 1);
   fprintf(out, "  mov.b #%d, &%s\n", const_val, periph);
   return 0;
 }
@@ -1875,57 +1877,90 @@ int MSP430::uart_isSendReady(int port)
 // SPI functions
 int MSP430::spi_init_II(int port)
 {
+  char dst[16];
+
   if (port != 0) { return -1; }
 
-  char dst[16];
-  fprintf(out, "  ;; spi_init_II(port=%d)\n", port);
-  fprintf(out, "  bis.b #0xe0, &P1SEL\n");
-  fprintf(out, "  bic.b #0xe0, &P1SEL2\n");
-  fprintf(out, "  mov.b #USIPE7|USIPE6|USIPE5|USIMST|USIOE|USISWRST, &USICTL0\n");
-  pop_reg(dst);
-  fprintf(out, "  mov.b %s, r14\n", dst);
-  fprintf(out, "  rrc.b r14\n");
-  fprintf(out, "  rrc.b r14\n");
-  fprintf(out, "  and.b #0x80, r14 ; CPHA/USICKPH\n");
-  //fprintf(out, "  mov.b #USICKPH, &USICTL1\n");
-  fprintf(out, "  mov.b r14, &USICTL1\n");
-  //fprintf(out, "  mov.b #(USIDIV_7|USISSEL_2), &USICKCTL ; div 128, SMCLK\n");
-  fprintf(out, "  mov.b %s, r14\n", dst);
-  fprintf(out, "  and.b #0x02, r14\n");
-  pop_reg(dst);
-  // If this came off the stack, let's put it in a register, if not let's
-  // just use the register.
-  if (dst[0] != 'r')
+  if (spi_type == SPI_TYPE_USI)
   {
-    fprintf(out, "  mov.b %s, r15\n", dst);
-    strcpy(dst, "r15");
+    fprintf(out, "  ;; spi_init_II(port=%d)\n", port);
+    fprintf(out, "  bis.b #0xe0, &P1SEL\n");
+    fprintf(out, "  bic.b #0xe0, &P1SEL2\n");
+    fprintf(out, "  mov.b #USIPE7|USIPE6|USIPE5|USIMST|USIOE|USISWRST, &USICTL0\n");
+    pop_reg(dst);
+    fprintf(out, "  mov.b %s, r14\n", dst);
+    fprintf(out, "  rrc.b r14\n");
+    fprintf(out, "  rrc.b r14\n");
+    fprintf(out, "  and.b #0x80, r14 ; CPHA/USICKPH\n");
+    fprintf(out, "  mov.b r14, &USICTL1\n");
+    fprintf(out, "  mov.b %s, r14\n", dst);
+    fprintf(out, "  and.b #0x02, r14\n");
+    pop_reg(dst);
+
+    // If this came off the stack, put it in a register, if not
+    // just use the register.
+    if (dst[0] != 'r')
+    {
+      fprintf(out, "  mov.b %s, r15\n", dst);
+      strcpy(dst, "r15");
+    }
+
+    fprintf(out, "  rrc.b %s\n", dst);
+    fprintf(out, "  rrc.b %s\n", dst);
+    fprintf(out, "  rrc.b %s\n", dst);
+    fprintf(out, "  rrc.b %s\n", dst);
+    fprintf(out, "  and.b #0xe0, %s\n", dst);
+    fprintf(out, "  bis.b %s, r14\n", dst);
+    fprintf(out, "  bis.b #USISSEL_2, r14\n");
+    fprintf(out, "  mov.b r14, &USICKCTL ; DIV and CPOL/USICKPL\n");
+    fprintf(out, "  bic.b #USISWRST, &USICTL0      ; clear reset\n\n");
   }
-  fprintf(out, "  rrc.b %s\n", dst);
-  fprintf(out, "  rrc.b %s\n", dst);
-  fprintf(out, "  rrc.b %s\n", dst);
-  fprintf(out, "  rrc.b %s\n", dst);
-  fprintf(out, "  and.b #0xe0, %s\n", dst);
-  fprintf(out, "  bis.b %s, r14\n", dst);
-  fprintf(out, "  bis.b #USISSEL_2, r14\n");
-  fprintf(out, "  mov.b r14, &USICKCTL ; DIV and CPOL/USICKPL\n");
-  fprintf(out, "  bic.b #USISWRST, &USICTL0      ; clear reset\n\n");
+    else
+  {
+    printf("Error: Unsupported SPI call.\n");
+    return -1;
+  }
 
   return 0;
 }
 
 int MSP430::spi_init_II(int port, int clock_divisor, int mode)
 {
-  fprintf(out, "  ;; spi_init_II(port=%d, divisor=%d, mode=%d)\n",
-    port, clock_divisor, mode);
-  fprintf(out, "  bis.b #0xe0, &P1SEL\n");
-  fprintf(out, "  bic.b #0xe0, &P1SEL2\n");
-  fprintf(out, "  mov.b #USIPE7|USIPE6|USIPE5|USIMST|USIOE|USISWRST, &USICTL0\n");
-  fprintf(out, "  mov.b #%s, &USICTL1\n",
-    (mode & 1) == 0 ? "0":"USICKPH");
-  fprintf(out, "  mov.b #USIDIV_%d|USISSEL_2%s, &USICKCTL\n",
-    clock_divisor,
-    (mode & 2) == 0 ? "":"|USICKPL");
-  fprintf(out, "  bic.b #USISWRST, &USICTL0      ; clear reset\n\n");
+  if (spi_type == SPI_TYPE_USI)
+  {
+    fprintf(out, "  ;; spi_init_II(port=%d, divisor=%d, mode=%d)\n",
+      port, clock_divisor, mode);
+    fprintf(out, "  bis.b #0xe0, &P1SEL\n");
+    fprintf(out, "  bic.b #0xe0, &P1SEL2\n");
+    fprintf(out, "  mov.b #USIPE7|USIPE6|USIPE5|USIMST|USIOE|USISWRST, &USICTL0\n");
+    fprintf(out, "  mov.b #%s, &USICTL1\n",
+      (mode & 1) == 1 ? "0" : "USICKPH");
+    fprintf(out, "  mov.b #USIDIV_%d|USISSEL_2%s, &USICKCTL\n",
+      clock_divisor,
+      (mode & 2) == 0 ? "" : "|USICKPL");
+    fprintf(out, "  bic.b #USISWRST, &USICTL0      ; clear reset\n\n");
+  }
+    else
+  if (spi_type == SPI_TYPE_USCI)
+  {
+    fprintf(out, "  ;; spi_init_II(port=%d, divisor=%d, mode=%d)\n",
+      port, clock_divisor, mode);
+    fprintf(out, "  bis.b #0xe0, &P1SEL\n");
+    fprintf(out, "  bis.b #0xe0, &P1SEL2\n");
+    fprintf(out, "  mov.b #UCSWRST, &UCB0CTL1\n");
+    fprintf(out, "  bis.b #UCSSEL_2, &UCB0CTL1\n");
+    fprintf(out, "  mov.b #%s%sUCMSB|UCMST|UCSYNC, &UCB0CTL0\n",
+      (mode & 1) != 0 ? "" : "UCCKPH|",
+      (mode & 2) == 0 ? "" : "UCCKPL|");
+    fprintf(out, "  mov.b #%d, &UCB0BR0\n", 1 << clock_divisor);
+    fprintf(out, "  mov.b #0, &UCB0BR1\n");
+    fprintf(out, "  bic.b #UCSWRST, &UCB0CTL1\n\n");
+  }
+    else
+  {
+    printf("Error: Unsupported SPI for this chip.\n");
+    return -1;
+  }
 
   return 0;
 }
@@ -2553,20 +2588,44 @@ int MSP430::stack_alu(const char *instr)
 
 void MSP430::insert_read_spi()
 {
-  fprintf(out, "; _read_spi(r15)\n");
-  fprintf(out, "_read_spi:\n");
-  fprintf(out, "  mov.b r15, &USISRL\n");
-  fprintf(out, "  mov.b #8, &USICNT\n");
-  fprintf(out, "_read_spi_wait:\n");
-  fprintf(out, "  bit.b #USIIFG, &USICTL1\n");
-  fprintf(out, "  jz _read_spi_wait\n");
-  fprintf(out, "  mov.b &USISRL, r15\n");
-  fprintf(out, "  ret\n\n");
+  if (spi_type == SPI_TYPE_USI)
+  {
+    fprintf(out,
+      ".align 16\n"
+      "; _read_spi(r15)\n"
+      "_read_spi:\n"
+      "  mov.b r15, &USISRL\n"
+      "  mov.b #8, &USICNT\n"
+      "_read_spi_wait:\n"
+      "  bit.b #USIIFG, &USICTL1\n"
+      "  jz _read_spi_wait\n"
+      "  mov.b &USISRL, r15\n"
+      "  ret\n\n");
+  }
+    else
+  if (spi_type == SPI_TYPE_USCI)
+  {
+    fprintf(out,
+      ".align 16\n"
+      "; _read_spi(r15)\n"
+      "_read_spi:\n"
+      "  mov.b r15, &UCB0TXBUF\n"
+      "_read_spi_wait:\n"
+      "  bit.b #UCB0RXIFG, &IFG2\n"
+      "  jz _read_spi_wait\n"
+      "  mov.b &UCB0RXBUF, r15\n"
+      "  ret\n\n");
+  }
+    else
+  {
+    printf("Error: Unsupported SPI for this chip.\n");
+  }
 }
 
 void MSP430::insert_i2c()
 {
   fprintf(out,
+    ".align 16\n"
     ";; SDA goes low while SCL is still high then SCL goes low.\n"
     "i2c_start:\n"
     "  mov.b #0, &USISRL\n"
@@ -2627,59 +2686,62 @@ void MSP430::insert_i2c()
 
 void MSP430::insert_mul_integers()
 {
-  fprintf(out, "; _mul a * b\n");
-  fprintf(out, "_mul_integers:\n");
-  fprintf(out, "  clr r7\n");
-  fprintf(out, "  mov r7, r15\n");
-  fprintf(out, "  mov r7, r6\n");
-  fprintf(out, "  tst r4\n");
-  fprintf(out, "  jge _mul2\n");
-  fprintf(out, "  mov #-1, r6\n");
-  fprintf(out, "  jmp _mul2\n");
-  fprintf(out, "_mul6:\n");
-  fprintf(out, "  add r4, r15\n");
-  fprintf(out, "  addc r6, r7\n");
-  fprintf(out, "_mul1:\n");
-  fprintf(out, "  rla r4\n");
-  fprintf(out, "  rlc r6\n");
-  fprintf(out, "_mul2:\n");
-  fprintf(out, "  rra r5\n");
-  fprintf(out, "  jc _mul5\n");
-  fprintf(out, "  jne _mul1\n");
-  fprintf(out, "  jmp _mul4\n");
-  fprintf(out, "_mul5:\n");
-  fprintf(out, "  sub r4, r15\n");
-  fprintf(out, "  subc r6, r7\n");
-  fprintf(out, "_mul3:\n");
-  fprintf(out, "  rla r4\n");
-  fprintf(out, "  rlc r6\n");
-  fprintf(out, "  rra r5\n");
-  fprintf(out, "  jnc _mul6\n");
-  fprintf(out, "  cmp #0FFFFh, r5\n");
-  fprintf(out, "  jne _mul3\n");
-  fprintf(out, "_mul4:\n");
-  fprintf(out, "  mov r15, r4\n");
-  fprintf(out, "  ret\n\n");
+  fprintf(out,
+    ".align 16\n"
+    "; _mul a * b\n"
+    "_mul_integers:\n"
+    "  clr r7\n"
+    "  mov r7, r15\n"
+    "  mov r7, r6\n"
+    "  tst r4\n"
+    "  jge _mul2\n"
+    "  mov #-1, r6\n"
+    "  jmp _mul2\n"
+    "_mul6:\n"
+    "  add r4, r15\n"
+    "  addc r6, r7\n"
+    "_mul1:\n"
+    "  rla r4\n"
+    "  rlc r6\n"
+    "_mul2:\n"
+    "  rra r5\n"
+    "  jc _mul5\n"
+    "  jne _mul1\n"
+    "  jmp _mul4\n"
+    "_mul5:\n"
+    "  sub r4, r15\n"
+    "  subc r6, r7\n"
+    "_mul3:\n"
+    "  rla r4\n"
+    "  rlc r6\n"
+    "  rra r5\n"
+    "  jnc _mul6\n"
+    "  cmp #0FFFFh, r5\n"
+    "  jne _mul3\n"
+    "_mul4:\n"
+    "  mov r15, r4\n"
+    "  ret\n\n");
 }
 
 void MSP430::insert_div_integers()
 {
-  fprintf(out, "; _div a / b (remainder in r7)\n");
-  fprintf(out, "_div_integers:\n");
-  fprintf(out, "  mov #16, r6\n");
-  fprintf(out, "  clr r7\n");
-  fprintf(out, "_div1:\n");
-  fprintf(out, "  rla r4\n");
-  fprintf(out, "  rlc r7\n");
-  fprintf(out, "  bis #1, r4\n");
-  fprintf(out, "  sub r5, r7\n");
-  fprintf(out, "  jge _div2\n");
-  fprintf(out, "  add r5, r7\n");
-  fprintf(out, "  bic #1, r4\n");
-  fprintf(out, "_div2:\n");
-  fprintf(out, "  dec r6\n");
-  fprintf(out, "  jnz _div1\n");
-  fprintf(out, "  ret\n");
+  fprintf(out,
+    "; _div a / b (remainder in r7)\n"
+    "_div_integers:\n"
+    "  mov #16, r6\n"
+    "  clr r7\n"
+    "_div1:\n"
+    "  rla r4\n"
+    "  rlc r7\n"
+    "  bis #1, r4\n"
+    "  sub r5, r7\n"
+    "  jge _div2\n"
+    "  add r5, r7\n"
+    "  bic #1, r4\n"
+    "_div2:\n"
+    "  dec r6\n"
+    "  jnz _div1\n"
+    "  ret\n");
 }
 
 int MSP430::get_values_from_stack(int *value1, int *value2, int *value3)
