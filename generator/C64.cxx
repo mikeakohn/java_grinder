@@ -1140,9 +1140,3 @@ void C64::insert_c64_vic_copy_lowercase()
   fprintf(out, "  rts\n");
 }
 
-#if 0
-void C64::close()
-{
-}
-#endif
-
