@@ -10,8 +10,7 @@ public class Snake
   static final int sprite_ram = 0xf000;
   static final int sprite_pointer = 0xc400 + 1016;
 
-  // score is kept by adding strings, as 16-bit integers
-  // don't have enough range
+  // score is kept by adding these strings
   static int score[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
   static final int ten[] = { 0, 0, 0, 0, 0, 0, 1, 0 };
   static final int hundred[] = { 0, 0, 0, 0, 0, 1, 0, 0 };
@@ -61,76 +60,41 @@ public class Snake
   static String next_level_song2 =
     "r   t   y   i i9o0p[";
 
-  // animation-related
-  static int anim_spider_colors[] = { 1, 15, 12, 11 };
-  static int anim_spider_timer = 0;
-  static int anim_spider_status = 0;
+  // sound/animation related
+  static int spider_move_timer = 0;
+  static int spider_exp_colors[] = { 1, 15, 12, 11 };
+  static int spider_exp_timer = 0;
+  static int spider_timer = 1;
+  static int spider_type = 1;
 
-  static int anim_ship_colors[] = { 1, 15, 12, 11 };
-  static int anim_ship_timer = 0;
-  static int anim_ship_status = 0;
+  static int ship_exp_colors[] = { 1, 15, 12, 11 };
+  static int ship_exp_timer = 0;
 
-  static int anim_snake_timer = 0;
-  static int anim_snake_status = 0;
+  static int snake_exp_timer = 0;
 
   // sprite definitions
-  // props to spritemate: https://github.com/Esshahn/spritemate
   static final int sprite_ship[] =
   {
-    0b00011000, 0b00000000, 0b00000000,
-    0b00011000, 0b00000000, 0b00000000,
-    0b00011000, 0b00000000, 0b00000000,
-    0b10111101, 0b00000000, 0b00000000,
-    0b11111111, 0b00000000, 0b00000000,
-    0b11111111, 0b00000000, 0b00000000,
-    0b11111111, 0b00000000, 0b00000000,
-    0b11100111, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
+    0x18, 0x00, 0x00, 0x18, 0x00, 0x00, 0x18, 0x00,
+    0x00, 0xbd, 0x00, 0x00, 0xff, 0x00, 0x00, 0xff,
+    0x00, 0x00, 0xff, 0x00, 0x00, 0xe7, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x84
   };
 
   static final int sprite_shot[] =
   {
-    0b00011000, 0b00000000, 0b00000000,
-    0b00011000, 0b00000000, 0b00000000,
-    0b00011000, 0b00000000, 0b00000000,
-    0b00011000, 0b00000000, 0b00000000,
-    0b00011000, 0b00000000, 0b00000000,
-    0b00011000, 0b00000000, 0b00000000,
-    0b00011000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-    0b00000000, 0b00000000, 0b00000000,
-/*
-    8, 0, 0, 8, 0, 0, 8, 0, 0, 8, 0, 0,
-    8, 0, 0, 8, 0, 0, 8, 0, 0, 8, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0,
-*/
+    0x18, 0x00, 0x00, 0x18, 0x00, 0x00, 0x18, 0x00,
+    0x00, 0x18, 0x00, 0x00, 0x18, 0x00, 0x00, 0x18,
+    0x00, 0x00, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x84
   };
 
   static final int sprite_spider1[] =
@@ -280,8 +244,7 @@ public class Snake
         SID.voice1_adsr(0x8888);
         SID.voice1_frequency(x << 9);
         SID.voice1_waveform(33);
-//        wait(40);
-        VIC.text_plot(tx, ty, 35 - (x >>> 2), 1);
+        VIC.text_plot(tx, ty, 35 - (x >> 2), 1);
         VIC.text_copy();
         SID.voice1_waveform(32);
       }
@@ -381,81 +344,146 @@ public class Snake
     return 0;
   }
 
-  public static void animSpider()
+  // play sounds/animations
+  public static void updateSpiderMove()
   {
-    if(anim_spider_status == 0)
-    {
-      if(anim_spider_timer == 0)
-      {
-        // start attack/decay
-        //                srad 
-        SID.voice3_adsr(0xf900);
-        SID.voice3_frequency(1000);
-        SID.voice3_waveform(129);
-      }
+    if(spider_move_timer < 0)
+      return;
 
-      VIC.sprite4color((byte)(anim_spider_colors[(anim_spider_timer >>> 2) & 3]));
-      anim_spider_timer++;
- 
-      if(anim_spider_timer > 13)
-      {
-        // start decay/release
-        SID.voice3_waveform(128);
-        anim_spider_timer = 0;
-        anim_spider_status = 1;
+  if(spider_type == 1)
+  {
+    if(spider_move_timer == 0)
+    {
+      // start attack/decay
+      //                srad 
+      SID.voice3_adsr(0x6333);
+      SID.voice3_waveform(33);
+    }
+
+    SID.voice3_frequency(2000 - (spider_move_timer << 8));
+    spider_move_timer++;
+
+    if(spider_move_timer > 4)
+    {
+      // start decay/release
+      SID.voice3_waveform(32);
+
+      if(spider_move_timer > 6)
+        spider_move_timer = -1;
+    }
+
+  }
+  else
+  {
+    if(spider_move_timer == 0)
+    {
+      // start attack/decay
+      //                srad 
+      SID.voice3_adsr(0x8555);
+      SID.voice3_waveform(65);
+    }
+
+    SID.voice3_frequency(4000 - (spider_move_timer << 8));
+    SID.voice3_pulse_width(0x800 + (spider_move_timer << 4));
+    spider_move_timer++;
+
+    if(spider_move_timer > 2)
+    {
+      // start decay/release
+      SID.voice3_waveform(64);
+      SID.voice3_pulse_width(0x800);
+
+      if(spider_move_timer > 4)
+        spider_move_timer = -1;
+    }
+  }
+
+  }
+
+  public static void updateSpiderExp()
+  {
+    if(spider_exp_timer < 0)
+      return;
+
+    if(spider_exp_timer == 0)
+    {
+      spider_move_timer = -1;
+      SID.voice3_waveform(32);
+
+      // start attack/decay
+      //                srad 
+      SID.voice3_adsr(0xf900);
+      SID.voice3_frequency(1000);
+      SID.voice3_waveform(129);
+    }
+
+    VIC.sprite4color((byte)(spider_exp_colors[(spider_exp_timer >> 2) & 3]));
+    spider_exp_timer++;
+
+    if(spider_exp_timer > 13)
+    {
+      // start decay/release
+      SID.voice3_waveform(128);
+      VIC.sprite4pos(0, 0);
+
+      spider_timer = rnd() % 400 + 1;
+      spider_type = rnd() % 2 + 1;
+
+      if(spider_type == 1)
         VIC.sprite4color(4);
-      }
+      else
+        VIC.sprite4color(8);
+
+      spider_exp_timer = -1;
     }
   }
 
-  public static void animShip()
+  public static void updateShipExp()
   {
-    if(anim_ship_status == 0)
-    {
-      if(anim_ship_timer == 0)
-      {
-        // start attack/decay
-        //                srad 
-        SID.voice3_adsr(0x8d00);
-        SID.voice3_frequency(2000);
-        SID.voice3_waveform(129);
-      }
+    if(ship_exp_timer < 0)
+      return;
 
-      anim_ship_timer++;
+    if(ship_exp_timer == 0)
+    {
+      // start attack/decay
+      //                srad 
+      SID.voice3_adsr(0x8d00);
+      SID.voice3_frequency(2000);
+      SID.voice3_waveform(129);
+    }
+
+    ship_exp_timer++;
  
-      if(anim_ship_timer > 13)
-      {
-        // start decay/release
-        SID.voice3_waveform(128);
-        anim_ship_timer = 0;
-        anim_ship_status = 1;
-        VIC.sprite0color(0);
-      }
+    if(ship_exp_timer > 13)
+    {
+      // start decay/release
+      SID.voice3_waveform(128);
+      ship_exp_timer = -1;
+      VIC.sprite0color(0);
     }
   }
 
-  public static void animSnake()
+  public static void updateSnakeExp()
   {
-    if(anim_snake_status == 0)
-    {
-      if(anim_snake_timer == 0)
-      {
-        // start attack/decay
-        //                srad 
-        SID.voice3_adsr(0xe400);
-        SID.voice3_frequency(2000);
-        SID.voice3_waveform(33);
-      }
+    if(snake_exp_timer < 0)
+      return;
 
-      anim_snake_timer++;
+    if(snake_exp_timer == 0)
+    {
+      // start attack/decay
+      //                srad 
+      SID.voice3_adsr(0xe400);
+      SID.voice3_frequency(2000);
+      SID.voice3_waveform(33);
+    }
+
+    snake_exp_timer++;
  
-      if(anim_snake_timer > 1)
-      {
-        // start decay/release
-        SID.voice3_waveform(32);
-        anim_snake_timer = 0;
-        anim_snake_status = 1;
-      }
+    if(snake_exp_timer > 1)
+    {
+      // start decay/release
+      SID.voice3_waveform(32);
+      snake_exp_timer = -1;
     }
   }
 
@@ -615,8 +643,8 @@ public class Snake
     SID.volume(31);
 
     pulse1 = 0x800;
-    pulse2 = 0x800;
-    pulse3 = 0x800;
+    pulse2 = 0x840;
+    pulse3 = 0x880;
     music_pos = 0;
 
     VIC.border(11);
@@ -673,19 +701,19 @@ public class Snake
     SID.filter_resonance(0);
     SID.volume(15);
 
-    anim_ship_status = 0;
+    ship_exp_timer = 0;
 
     while(true)
     {
-      animShip();
+      updateShipExp();
 
       // game over
-      if(anim_ship_timer == 0)
+      if(ship_exp_timer == -1)
         break;
 
       i++;
 
-      VIC.border(colors1[(i >>> 1) & 7]);
+      VIC.border(colors1[(i >> 1) & 7]);
 
       wait(500);
     }
@@ -733,7 +761,7 @@ public class Snake
       if(play_music > 0)
       {
         play_music--;
-        SID.volume(play_music >>> 2);
+        SID.volume(play_music >> 2);
         playEndMusic();
       }
 
@@ -755,8 +783,6 @@ public class Snake
     int snake_count = snake_length;
     int spiderx = rnd() % 320 + 24;
     int spidery = 0;
-    int spider_timer = 0;
-    int button_pressed = 0;
     int shotx = 0;
     int shoty = 0;
     int shotstatus = 0;
@@ -771,27 +797,44 @@ public class Snake
     byte snakedir[] = new byte[16];
     byte snakestatus[] = new byte[16];
 
-    resetScore();
-    anim_ship_status = 1;
-    anim_spider_status = 1;
-    anim_snake_status = 1;
+    // reset animations
+    spider_type = 1;
+    spider_move_timer = -1;
+    spider_exp_timer = -1;
+    ship_exp_timer = -1;
+    snake_exp_timer = -1;
 
+    // setup graphics
     VIC.sprite_enable(63);
     VIC.sprite_priority(0);
-    VIC.sprite_multicolor_enable(16);
+    VIC.sprite_multicolor_enable(48);
     VIC.sprite_multicolor0(1);
     VIC.sprite_multicolor1(12);
     VIC.sprite0color(1);
     VIC.sprite1color(7);
     VIC.sprite4color(4);
+    VIC.sprite5color(3);
     VIC.border(11);
-
     VIC.background(0);
     VIC.multi1((byte)1);
     VIC.multi2((byte)7);
     VIC.write_control2(VIC.read_control2() | 16);
 
-    // mushrooms
+    // setup sound
+    pulse1 = 0x800;
+    pulse2 = 0x800;
+    pulse3 = 0x800;
+    SID.voice1_adsr(0xf411);
+    SID.voice2_adsr(0xf411);
+    SID.voice3_adsr(0xf411);
+    SID.voice1_waveform(128);
+    SID.voice2_waveform(128);
+    SID.voice3_waveform(128);
+    SID.filter_cutoff(0);
+    SID.filter_resonance(0);
+    SID.volume(15);
+
+    // init mushrooms
     VIC.text_clear((byte)32);
 
     for(i = 0; i < 50; i++)
@@ -800,7 +843,7 @@ public class Snake
       VIC.text_copy();
     }
 
-    // initialize
+    // init snake
     for(i = 0; i < 16; i++)
     {
       snakex[i] = (byte)i;
@@ -813,24 +856,14 @@ public class Snake
         snakestatus[i] = 0;
     }
 
+    // init shot
     shotx = 0;
     shoty = 0;
     shotstatus= 0;
 
+    // init score
+    resetScore();
     printScore();
-
-    pulse1 = 0x800;
-    pulse2 = 0x800;
-    pulse3 = 0x800;
-    SID.voice1_adsr(0x8411);
-    SID.voice2_adsr(0x8411);
-    SID.voice3_adsr(0x8411);
-    SID.voice1_waveform(128);
-    SID.voice2_waveform(128);
-    SID.voice3_waveform(128);
-    SID.filter_cutoff(0);
-    SID.filter_resonance(0);
-    SID.volume(15);
 
     while(true)
     {
@@ -862,7 +895,7 @@ public class Snake
       tx = shipx + accelx;
       ty = shipy + accely;
 
-      temp = VIC.text_read((tx - 20) >>> 3, (ty - 46) >>> 3);
+      temp = VIC.text_read((tx - 20) >> 3, (ty - 46) >> 3);
 
       if(temp == 32)
       {
@@ -889,29 +922,37 @@ public class Snake
       VIC.sprite0pos(shipx, shipy);
 
       // ship hit spider
-      //  if(ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1)
-
-      if(anim_spider_status == 1)
+      if(spider_exp_timer == -1)
       {
         VIC.sprite4pos(spiderx, spidery);
 
+        // if(ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1)
         if(shipx < spiderx + 23 && shipx + 7 > spiderx &&
            shipy < spidery + 20 && shipy + 7 > spidery)
         {
           return;
         }
 
+        // move spider
         if(spider_timer > 0)
         {
           spider_timer--;
+
+          if(spider_timer == 0)
+            spider_move_timer = 0;
         }
         else
         {
-          spidery++;
+          spidery += spider_type;
+
+          if(spider_move_timer == -1)
+            spider_move_timer = 0;
 
           if(spidery > 250)
           {
             spidery = 0;
+            VIC.sprite4pos(spiderx, spidery);
+            spider_move_timer = -1;
           }
         }
       }
@@ -919,22 +960,16 @@ public class Snake
       // shoot
       if((joy & 16) == 16)
       {
-        if(button_pressed == 0 || shotstatus == 0)
+        if(shotstatus == 0)
         {
           shotx = shipx;
           shoty = shipy;
           shotstatus = 1;
           shotfreq = 1500;
         }
-
-        button_pressed = 1;
-      }
-      else
-      {
-        button_pressed = 0;
       }
 
-      // move shots
+      // move shot
       if(shotstatus == 1)
       {
         shoty -= 4;
@@ -954,7 +989,6 @@ public class Snake
       {
         SID.voice1_adsr(0x8411);
         SID.voice1_frequency(shotfreq);
-//        SID.voice1_pulse_width(1536 + pulse1);
         SID.voice1_waveform(129);
       }
       else
@@ -962,38 +996,37 @@ public class Snake
         SID.voice1_waveform(128);
       }
 
-      // check shots
+      // check shot
       if(shotstatus == 1)
       {
         tx = shotx + 4;
         ty = shoty;
 
         // shot hit spider
-        if(anim_spider_status == 1)
+        if(spider_exp_timer == -1)
         {
           if(tx < spiderx + 23 && tx + 1 > spiderx &&
              ty < spidery + 20 && ty + 7 > spidery)
           {
             spiderx = rnd() % 320 + 24;
             spidery = 0;
-            spider_timer = rnd() % 400 + 1;
             shotx = 0;
             shoty = 0;
             shotstatus = 0;
             VIC.sprite1pos(shotx, shoty);
-            anim_spider_status = 0;
+            spider_exp_timer = 0;
             increaseScore(thousand);
             continue;
           }
         }
 
-        tx = ((shotx - 20) >>> 3);
-        ty = ((shoty - 50) >>> 3);
+        tx = ((shotx - 20) >> 3);
+        ty = ((shoty - 50) >> 3);
         temp = VIC.text_read(tx, ty);
 
         if(temp >= 33 && temp <= 35)
         {
-          // hit mushroom
+          // shot hit mushroom
           temp--;
 
           if(temp < 32)
@@ -1015,7 +1048,7 @@ public class Snake
             if((snakestatus[i] == 1) && (sx == tx) && (sy == ty))
             {
               // hit snake
-              anim_snake_status = 0;
+              snake_exp_timer = 0;
               shotstatus = 0;
               shotx = 0;
               VIC.text_plot(sx, sy, 35, 5);
@@ -1059,7 +1092,7 @@ public class Snake
 
                 // add mushrooms
                 addMushrooms();
-                VIC.text_plot((shipx - 20) >>> 3, (shipy - 46) >>> 3, 32, 5);
+                VIC.text_plot((shipx - 20) >> 3, (shipy - 46) >> 3, 32, 5);
               }
             }
           }
@@ -1106,13 +1139,18 @@ public class Snake
           snakex[i] = (byte)sx;
         }
 
-        if((time & 7) >= 4)
+        // animate spider
+        if((time & 31) >= 16)
           Memory.write8(sprite_pointer + 4, (byte)194);
         else
           Memory.write8(sprite_pointer + 4, (byte)195);
 
-        animSpider();
-        animSnake();
+        // update animations
+        updateSpiderMove();
+        updateSpiderExp();
+        updateSnakeExp();
+
+        // update frame (copies data from hidden to visible screen)
         VIC.text_copy();
       }
     }
@@ -1122,11 +1160,12 @@ public class Snake
   {
     int i, temp;
 
+    // set up screen
     VIC.make_text_table();
     VIC.make_color_table();
     VIC.copy_lowercase();
 
-    // copy sprites
+    // copy sprite data
     clearSprite(sprite_ram);
     clearSprite(sprite_ram + 64);
     clearSprite(sprite_ram + 128);
@@ -1146,9 +1185,8 @@ public class Snake
     Memory.write8(sprite_pointer + 2, (byte)193);
     Memory.write8(sprite_pointer + 3, (byte)193);
     Memory.write8(sprite_pointer + 4, (byte)194);
-    Memory.write8(sprite_pointer + 5, (byte)196);
 
-    // copy chars
+    // copy character data
     for(i = 0; i < 8; i++)
     {
       Memory.write8(char_ram + 8 * 61 + i, (byte)char_block[i]);
@@ -1161,45 +1199,14 @@ public class Snake
       Memory.write8(char_ram + 8 * 163 + i, (byte)char_segment4[i]);
     }
 
-/*
-    Memory.write8(0xd021, (byte)0);
-    Memory.write8(0xd022, (byte)1);
-    Memory.write8(0xd023, (byte)1);
-    Memory.write8(0xd024, (byte)1);
-*/
-
     // reset SID
     SID.clear();
-/*
-    for(i = 0; i <= 28; i++)
-      Memory.write8(0xd400 + i, (byte)0);
-*/
-/*
-    // max test
-    if(Math.max(1000, -1000) == 1000)
-      printString(0, 0, 1, "max success");
-    else
-      printString(0, 0, 1, "max fail");
-      
-    if(Math.min(1000, -1000) == -1000)
-      printString(0, 2, 1, "min success");
-    else
-      printString(0, 2, 1, "min fail");
-      
-    if(Math.abs(-32000) == 32000)
-      printString(0, 4, 1, "abs success");
-    else
-      printString(0, 4, 1, "abs fail");
-
-    VIC.text_copy();
-*/      
 
     while(true)
     {
       title();
       snake();
       gameOver();
-
     }
   }
 }
