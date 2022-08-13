@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -15,8 +15,18 @@
 #include "common/JavaClass.h"
 #include "generator/Generator.h"
 
-int ioport(JavaClass *java_class, Generator *generator, const char *method_name, int port);
-int ioport(JavaClass *java_class, Generator *generator, const char *method_name, int port, int const_val);
+int ioport(
+  JavaClass *java_class,
+  Generator *generator,
+  const char *method_name,
+  int port);
+
+int ioport(
+  JavaClass *java_class,
+  Generator *generator,
+  const char *method_name,
+  int port,
+  int const_val);
 
 #endif
 

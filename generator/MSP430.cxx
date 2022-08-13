@@ -1695,6 +1695,21 @@ int MSP430::ioport_isPinInputHigh_I(int port)
   return -1;
 }
 
+int MSP430::ioport_isPinInputHigh_I(int port, int const_val)
+{
+  fprintf(out,
+    "  ;; ioport_isPinInputHigh_I(%d, %d)\n"
+    "  mov.b &P%dIN, r%d\n"
+    "  bic.b #0x%02x, r%d\n",
+    port, const_val,
+    port + 1, REG_STACK(reg),
+    (1 << const_val) ^ 0xff, REG_STACK(reg));
+
+  reg++;
+
+  return 0;
+}
+
 int MSP430::ioport_getPortInputValue(int port)
 {
   if (reg < reg_max)

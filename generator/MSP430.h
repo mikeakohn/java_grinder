@@ -136,6 +136,7 @@ public:
   virtual int ioport_setPinLow_I(int port);
   virtual int ioport_setPinLow_I(int port, int const_val);
   virtual int ioport_isPinInputHigh_I(int port);
+  virtual int ioport_isPinInputHigh_I(int port, int const_val);
   virtual int ioport_getPortInputValue(int port);
   //virtual int ioport_setPortOutputValue_I(int port);
   virtual int ioport_setPinsResistorEnable_I(int port);

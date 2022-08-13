@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -35,6 +35,7 @@ public:
   virtual int ioport_setPinLow_I(int port) { return -1; }
   virtual int ioport_setPinLow_I(int port, int const_val) { return -1; }
   virtual int ioport_isPinInputHigh_I(int port) { return -1; }
+  virtual int ioport_isPinInputHigh_I(int port, int const_val) { return -1; }
   virtual int ioport_getPortInputValue(int port) { return -1; }
   //virtual int ioport_setPortOutputValue(int port) { return -1; }
   virtual int ioport_setPinsResistorEnable_I(int port) { return -1; }
