@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -57,7 +57,7 @@ int NES::nes_setBackgroundPalette_II()
 int NES::nes_setSpritePalette_II()
 {
   fprintf(out,
-    "  ;; nes_setSpritePalette(int index, int color)\n"
+    "  ;; nes_setSpritePalette_II(int index, int color)\n"
     "  lda NES_PPU_STATUS\n"
     "  lda #0x3f\n"
     "  sta NES_PPU_ADDRESS\n"
@@ -73,8 +73,40 @@ int NES::nes_setSpritePalette_II()
 
 int NES::nes_setPattern_IaB()
 {
+  // Point the PPU_ADDRESS to index * 16.
+#if 0
   fprintf(out,
-    "  ;; nes_setSpritePalette(int index, int color)\n");
+    "  ;; nes_setPattern_IaB(int index, byte[] data)\n"
+    "  lda NES_PPU_STATUS\n"
+    "  lda stack_hi + 0, x\n"
+    "  sta NES_PPU_ADDRESS\n"
+    "  lda stack_lo + 0, x\n"
+    "  sta NES_PPU_ADDRESS\n");
+#endif
+  fprintf(out,
+    "  ;; nes_setPattern_IaB(int index, byte[] data)\n"
+    "  lda NES_PPU_STATUS\n"
+    "  lda stack_lo + 0, x\n"
+    "  asl\n"
+    "  sta NES_PPU_ADDRESS\n"
+    "  lda #0\n"
+    "  sta NES_PPU_ADDRESS\n");
+
+  // Copy pattern from RAM to the PPU RAM.
+  // FIXME: Need to replace tile_data_1 with pointer to byte[] passed in. 
+  fprintf(out,
+    "  ldx #0\n"
+    "load_tile_%d:\n"
+    "  lda tile_data_1, x\n"
+    "  sta NES_PPU_DATA\n"
+    "  inx\n"
+    "  cpx #16\n"
+    "  bne load_tile_%d\n",
+    label_count,
+    label_count);
+
+  label_count++;
+
   return -1;
 }
 
