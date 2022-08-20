@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -41,6 +41,7 @@ int nes(JavaClass *java_class, Generator *generator, const char *method_name)
   CHECK_FUNC(setPattern,_IaB)
   CHECK_FUNC(setNameTable,_II)
   CHECK_FUNC(setNameTable,_III)
+  CHECK_FUNC(setScroll,_II)
 
   return -1;
 }

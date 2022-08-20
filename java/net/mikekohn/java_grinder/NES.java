@@ -5,7 +5,7 @@
  *     Web: https://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -20,5 +20,6 @@ abstract public class NES
   public static void setPattern(int index, byte[] data) { }
   public static void setNameTable(int location, int pattern_index) { }
   public static void setNameTable(int x, int y, int pattern_index) { }
+  public static void setScroll(int x, int y) { }
 }
 

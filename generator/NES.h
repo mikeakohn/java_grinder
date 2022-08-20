@@ -26,11 +26,22 @@ public:
   virtual int nes_setPattern_IaB();
   virtual int nes_setNameTable_II();
   virtual int nes_setNameTable_III();
+  virtual int nes_setScroll_II();
 
 private:
   void write_init();
+  void write_set_pattern();
+  void write_set_background_palette_II();
+  void write_set_name_table_II();
+  void write_set_name_table_III();
+  void write_set_scroll_II();
   void write_interrupts();
   void write_cartridge_info();
+
+  bool need_set_background_palette_II;
+  bool need_set_name_table_II;
+  bool need_set_name_table_III;
+  bool need_set_scroll_II;
 
 };
 

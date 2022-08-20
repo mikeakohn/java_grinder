@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -21,6 +21,7 @@ public:
   virtual int nes_setPattern_IaB() { return -1; }
   virtual int nes_setNameTable_II() { return -1; }
   virtual int nes_setNameTable_III() { return -1; }
+  virtual int nes_setScroll_II() { return -1; }
 };
 
 #endif
