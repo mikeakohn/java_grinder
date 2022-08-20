@@ -44,7 +44,14 @@ public class NesJavaDemo
     // (y * 32) + x = 15 * 32 + 10 = 490.
     NES.setNameTable(10, 15, 2);
 
-    while(true);
+    while(true)
+    {
+      for (int x = 0; x < 64; x++)
+      {
+        NES.setScroll(x, 0);
+        NES.waitVerticalBlank();
+      }
+    }
   }
 }
 

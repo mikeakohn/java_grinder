@@ -22,6 +22,9 @@ public:
   virtual int nes_setNameTable_II() { return -1; }
   virtual int nes_setNameTable_III() { return -1; }
   virtual int nes_setScroll_II() { return -1; }
+  virtual int nes_waitVerticalBlank() { return -1; }
+  virtual int nes_setPPUCtrl_I() { return -1; }
+  virtual int nes_setPPUMask_I() { return -1; }
 };
 
 #endif

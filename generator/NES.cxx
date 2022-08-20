@@ -117,6 +117,34 @@ int NES::nes_setScroll_II()
   return 0;
 }
 
+int NES::nes_waitVerticalBlank()
+{
+  write_wait_vertical_blank();
+  return 0;
+}
+
+int NES::nes_setPPUCtrl_I()
+{
+  fprintf(out,
+    "  ;; nes_setPPUCtrl_I(int value)\n"
+    "  dex\n"
+    "  lda stack_lo + 0, x\n"
+    "  sta NES_PPU_CONTROL\n");
+
+  return 0;
+}
+
+int NES::nes_setPPUMask_I()
+{
+  fprintf(out,
+    "  ;; nes_setPPUMask_I(int value)\n"
+    "  dex\n"
+    "  lda stack_lo + 0, x\n"
+    "  sta NES_PPU_MASK\n");
+
+  return 0;
+}
+
 void NES::write_init()
 {
   fprintf(out,
@@ -124,18 +152,29 @@ void NES::write_init()
     "  lda #0xff\n"
     "  sta NES_PPU_CONTROL\n"
     "  sta NES_PPU_MASK\n"
-    "  sta NES_APU_MOD_CONTROL\n\n"
+    "  sta NES_APU_MOD_CONTROL\n\n");
 
-    ";; Wait for vertical blank.\n"
-    "_wait_vblank_1:\n"
-    "  bit NES_PPU_STATUS\n"
-    "  bpl _wait_vblank_1\n\n"
+  write_wait_vertical_blank();
 
+  fprintf(out,
     "  ;; Set up PPU.\n"
     "  lda #0x00\n"
     "  sta NES_PPU_CONTROL\n"
     "  lda #0x0e\n"
     "  sta NES_PPU_MASK\n\n");
+}
+
+void NES::write_wait_vertical_blank()
+{
+  fprintf(out,
+    ";; Wait for vertical blank.\n"
+    "_wait_vblank_%d:\n"
+    "  bit NES_PPU_STATUS\n"
+    "  bpl _wait_vblank_%d\n\n",
+    label_count,
+    label_count);
+
+  label_count++;
 }
 
 void NES::write_set_pattern()

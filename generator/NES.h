@@ -27,9 +27,13 @@ public:
   virtual int nes_setNameTable_II();
   virtual int nes_setNameTable_III();
   virtual int nes_setScroll_II();
+  virtual int nes_waitVerticalBlank();
+  virtual int nes_setPPUCtrl_I();
+  virtual int nes_setPPUMask_I();
 
 private:
   void write_init();
+  void write_wait_vertical_blank();
   void write_set_pattern();
   void write_set_background_palette_II();
   void write_set_name_table_II();
@@ -42,7 +46,6 @@ private:
   bool need_set_name_table_II;
   bool need_set_name_table_III;
   bool need_set_scroll_II;
-
 };
 
 #endif

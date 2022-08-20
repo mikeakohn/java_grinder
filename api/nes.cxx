@@ -42,6 +42,9 @@ int nes(JavaClass *java_class, Generator *generator, const char *method_name)
   CHECK_FUNC(setNameTable,_II)
   CHECK_FUNC(setNameTable,_III)
   CHECK_FUNC(setScroll,_II)
+  CHECK_FUNC(waitVerticalBlank,)
+  CHECK_FUNC(setPPUCtrl,_I)
+  CHECK_FUNC(setPPUMask,_I)
 
   return -1;
 }
