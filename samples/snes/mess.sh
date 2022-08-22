@@ -20,8 +20,8 @@ then
   extra="-aviwrite out.avi"
 fi
 
-mess snes -window -rompath ${ROMPATH} \
-  -cart snes_java_demo.smc \
+mame snes -window -rompath ${ROMPATH} \
+  -cartridge snes_java_demo.smc \
   ${extra}
 
 if [ "$1" = "avi" ]

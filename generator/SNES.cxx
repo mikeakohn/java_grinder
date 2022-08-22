@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -29,6 +29,8 @@ SNES::~SNES()
 int SNES::open(const char *filename)
 {
   if (W65816::open(filename) != 0) { return -1; }
+
+  fprintf(out, ".include \"snes.inc\"\n");
 
   return 0;
 }
@@ -81,16 +83,19 @@ int SNES::snes_setBackgroundColor_I()
 {
   fprintf(out, "  ; snes_setBackgroundColor_I()\n");
   fprintf(out, "  sep #0x30\n");
+
+  // Disable screen.
   fprintf(out, "  lda.b #010000000b\n");
-  fprintf(out, "  sta 0x2100\n");             // Disable screen
+  fprintf(out, "  sta SNES_INIDISP\n");
   fprintf(out, "  pla\n");
-  fprintf(out, "  sta 0x2122\n");
+  fprintf(out, "  sta SNES_CGDATA\n");
   fprintf(out, "  xba\n");
-  fprintf(out, "  sta 0x2122\n");
+  fprintf(out, "  sta SNES_CGDATA\n");
 
   // Dafuq is this?
+  // Enable screen and set brightness.
   fprintf(out, "  lda.b #000001111b  ; End VBlank, setting brightness to 15 (100%%).\n");
-  fprintf(out, "  sta 0x2100\n");             // Enable screen and set brightness
+  fprintf(out, "  sta SNES_INIDISP\n");
   fprintf(out, "  rep #0x30\n");
 
   return 0;
