@@ -5,7 +5,8 @@ public class SnesJavaDemo
 {
   static public void main(String[] args)
   {
-    SNES.setBackgroundColor(0x0f00);
+    // Color is 0bbbbbgg gggrrrrr, in this case b=32, g=0, r=0.
+    SNES.setBackgroundColor(0xe800);
 
     while(true);
   }

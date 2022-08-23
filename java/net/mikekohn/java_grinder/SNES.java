@@ -5,7 +5,7 @@
  *     Web: https://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -15,6 +15,7 @@ abstract public class SNES
 {
   protected SNES() { }
 
-  public static void setBackgroundColor(int color) { }
+  /** Set value to a 16 bit number 0bbbbbgg gggrrrrr. */
+  public static void setBackgroundColor(int value) { }
 }
 
