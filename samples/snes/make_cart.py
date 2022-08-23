@@ -17,6 +17,9 @@ if (len(cart) % 8192) != 0:
 # FIXME: This checksum calculation doesn't seem to work.
 checksum = 0
 
+cart[0xffdc - 32768] = 0xff
+cart[0xffdd - 32768] = 0xff
+
 for i in range(0, len(cart)):
   checksum += cart[i]
 
