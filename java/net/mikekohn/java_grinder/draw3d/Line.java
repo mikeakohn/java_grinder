@@ -5,7 +5,7 @@
  *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -15,16 +15,16 @@ import net.mikekohn.java_grinder.draw3d.Draw3DObject;
 
 public class Line extends Draw3DObject
 {
-   public Line()
-   {
-   }
+  public Line()
+  {
+  }
 
-   public Line(String filename)
-   {
-   }
+  public Line(String filename)
+  {
+  }
 
-   public Line(int point_count)
-   {
-   }
+  public Line(int point_count)
+  {
+  }
 }
 

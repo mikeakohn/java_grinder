@@ -5,7 +5,7 @@
  *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -15,16 +15,16 @@ import net.mikekohn.java_grinder.draw3d.Draw3DObject;
 
 public class Triangle extends Draw3DObject
 {
-   public Triangle()
-   {
-   }
+  public Triangle()
+  {
+  }
 
-   public Triangle(String filename)
-   {
-   }
+  public Triangle(String filename)
+  {
+  }
 
-   public Triangle(int point_count)
-   {
-   }
+  public Triangle(int point_count)
+  {
+  }
 }
 

@@ -5,7 +5,7 @@
  *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -15,16 +15,16 @@ import net.mikekohn.java_grinder.draw3d.Draw3DObject;
 
 public class LineStrip extends Draw3DObject
 {
-   public LineStrip()
-   {
-   }
+  public LineStrip()
+  {
+  }
 
-   public LineStrip(String filename)
-   {
-   }
+  public LineStrip(String filename)
+  {
+  }
 
-   public LineStrip(int point_count)
-   {
-   }
+  public LineStrip(int point_count)
+  {
+  }
 }
 

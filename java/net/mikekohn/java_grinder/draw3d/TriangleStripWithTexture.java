@@ -5,7 +5,7 @@
  *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -15,16 +15,16 @@ import net.mikekohn.java_grinder.draw3d.Draw3DObjectWithTexture;
 
 public class TriangleStripWithTexture extends Draw3DObjectWithTexture
 {
-   public TriangleStripWithTexture()
-   {
-   }
+  public TriangleStripWithTexture()
+  {
+  }
 
-   public TriangleStripWithTexture(String filename)
-   {
-   }
+  public TriangleStripWithTexture(String filename)
+  {
+  }
 
-   public TriangleStripWithTexture(int point_count)
-   {
-   }
+  public TriangleStripWithTexture(int point_count)
+  {
+  }
 }
 

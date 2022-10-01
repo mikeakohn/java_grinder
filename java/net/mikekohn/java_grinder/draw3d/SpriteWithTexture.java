@@ -5,7 +5,7 @@
  *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -15,16 +15,16 @@ import net.mikekohn.java_grinder.draw3d.Draw3DObjectWithTexture;
 
 public class SpriteWithTexture extends Draw3DObjectWithTexture
 {
-   public SpriteWithTexture()
-   {
-   }
+  public SpriteWithTexture()
+  {
+  }
 
-   public SpriteWithTexture(String filename)
-   {
-   }
+  public SpriteWithTexture(String filename)
+  {
+  }
 
-   public SpriteWithTexture(int point_count)
-   {
-   }
+  public SpriteWithTexture(int point_count)
+  {
+  }
 }
 
