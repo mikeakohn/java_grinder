@@ -28,6 +28,8 @@ JAVA_SRC=\
   $(SRC_DIR)/Math.java \
   $(SRC_DIR)/Memory.java \
   $(SRC_DIR)/MSX.java \
+  $(SRC_DIR)/n64/Rectangle.java \
+  $(SRC_DIR)/n64/Triangle.java \
   $(SRC_DIR)/NES.java \
   $(SRC_DIR)/Nintendo64.java \
   $(SRC_DIR)/Parallella.java \

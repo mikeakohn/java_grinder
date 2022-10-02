@@ -32,6 +32,7 @@ API= \
   api/memory.o \
   api/msx.o \
   api/nes.o \
+  api/nintendo64.o \
   api/parallella.o \
   api/playstation_2.o \
   api/propeller.o \

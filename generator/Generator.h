@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -31,6 +31,7 @@
 #include "generator/API_Microcontroller.h"
 #include "generator/API_MSX.h"
 #include "generator/API_NES.h"
+#include "generator/API_Nintendo64.h"
 #include "generator/API_Parallella.h"
 #include "generator/API_Playstation2.h"
 #include "generator/API_Propeller.h"
@@ -56,6 +57,7 @@ class Generator :
   public API_Microcontroller,
   public API_MSX,
   public API_NES,
+  public API_Nintendo64,
   public API_Parallella,
   public API_Playstation2,
   public API_Propeller,

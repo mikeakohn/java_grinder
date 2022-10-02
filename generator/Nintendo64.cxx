@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -65,6 +65,101 @@ int Nintendo64::start_init()
     "start:\n");
 
   return 0;
+}
+
+int Nintendo64::nintendo64_waitVsync()
+{
+  return -1;
+}
+
+int Nintendo64::nintendo64_clearScreen()
+{
+  return -1;
+}
+
+int Nintendo64::nintendo64_setScreen_I()
+{
+  return -1;
+}
+
+int Nintendo64::nintendo64_plot_III()
+{
+  return -1;
+}
+
+int Nintendo64::nintendo64_n64_triangle_Constructor()
+{
+  return -1;
+}
+
+int Nintendo64::nintendo64_n64_triangle_setColor_I()
+{
+  return -1;
+}
+
+int Nintendo64::nintendo64_n64_triangle_setPosition_III()
+{
+  return -1;
+}
+
+int Nintendo64::nintendo64_n64_triangle_setRotation_III() 
+{
+  return -1;
+}
+
+int Nintendo64::nintendo64_n64_triangle_setVertex0_III() 
+{
+  return -1;
+}
+
+int Nintendo64::nintendo64_n64_triangle_setVertex1_III() 
+{
+  return -1;
+}
+
+int Nintendo64::nintendo64_n64_triangle_setVertex2_III() 
+{
+  return -1;
+}
+
+int Nintendo64::nintendo64_n64_triangle_setVertexes_bS() 
+{
+  return -1;
+}
+
+int Nintendo64::nintendo64_n64_triangle_draw() 
+{
+  return -1;
+}
+
+int Nintendo64::nintendo64_n64_rectangle_Constructor() 
+{
+  return -1;
+}
+
+int Nintendo64::nintendo64_n64_rectangle_setColor_I() 
+{
+  return -1;
+}
+
+int Nintendo64::nintendo64_n64_rectangle_setPosition_II()
+{
+  return -1;
+}
+
+int Nintendo64::nintendo64_n64_rectangle_setSize_II()
+{
+  return -1;
+}
+
+int Nintendo64::nintendo64_n64_rectangle_setTexture_aBII()
+{
+  return -1;
+}
+
+int Nintendo64::nintendo64_n64_rectangle_draw()
+{
+  return -1;
 }
 
 void Nintendo64::catridge_header()

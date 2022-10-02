@@ -9,29 +9,29 @@
  *
  */
 
-#ifndef JAVA_GRINDER_API_INVOKE_STATIC_H
-#define JAVA_GRINDER_API_INVOKE_STATIC_H
+#ifndef JAVA_GRINDER_API_NINTENDO64_API_H
+#define JAVA_GRINDER_API_NINTENDO64_API_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"
 
-int invoke_static(
+int nintendo64(
   JavaClass *java_class,
-  int method_id,
-  Generator *generator);
-
-int invoke_static(
-  JavaClass *java_class,
-  int method_id,
   Generator *generator,
-  int *const_vals,
-  int const_count);
+  const char *method_name);
 
-int invoke_static(
+int nintendo64(
   JavaClass *java_class,
-  int method_id,
   Generator *generator,
-  const char *const_val);
+  const char *method_name,
+  int const_val);
+
+int nintendo64(
+  JavaClass *java_class,
+  Generator *generator,
+  const char *method_name,
+  int const_val1,
+  int const_val2);
 
 #endif
 

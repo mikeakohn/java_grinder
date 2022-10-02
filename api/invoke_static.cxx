@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -34,6 +34,7 @@
 #include "api/memory.h"
 #include "api/msx.h"
 #include "api/nes.h"
+#include "api/nintendo64.h"
 #include "api/parallella.h"
 #include "api/playstation_2.h"
 #include "api/propeller.h"
@@ -170,6 +171,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     CHECK(Math, math)
     CHECK(MSX, msx)
     CHECK(NES, nes)
+    CHECK(Nintendo64, nintendo64)
     CHECK(Parallella, parallella)
     CHECK(Playstation2, playstation2)
     CHECK(Propeller, propeller)
@@ -266,6 +268,7 @@ int invoke_static(
     CHECK_CONST(Joystick, joystick)
     CHECK_CONST(MSX, msx)
     CHECK_CONST(NES, nes)
+    CHECK_CONST(Nintendo64, nintendo64)
     CHECK_CONST(Parallella, parallella)
     CHECK_CONST(Playstation2, playstation2)
     CHECK_CONST(Propeller, propeller)
