@@ -41,6 +41,7 @@ int nintendo64(
 {
   CHECK_FUNC(waitVsync,)
   CHECK_FUNC(clearScreen,)
+  CHECK_FUNC(resetZBuffer,)
   CHECK_FUNC(setScreen,_I)
   CHECK_FUNC(plot,_III)
 

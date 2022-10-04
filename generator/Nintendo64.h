@@ -26,6 +26,7 @@ public:
 
   virtual int nintendo64_waitVsync();
   virtual int nintendo64_clearScreen();
+  virtual int nintendo64_resetZBuffer();
   virtual int nintendo64_setScreen_I();
   virtual int nintendo64_plot_III();
 
@@ -49,7 +50,9 @@ public:
 private:
   void catridge_header();
   void init_system();
-  void ntsc_setup();
+  void insert_ntsc_setup();
+  void insert_rsp_data();
+  void insert_rsp_code();
 };
 
 #endif
