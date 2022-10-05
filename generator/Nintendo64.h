@@ -50,8 +50,13 @@ public:
 private:
   void catridge_header();
   void init_system();
+  void rsp_halt();
+  void rsp_start();
+  void rsp_copy_code();
+  void rdp_copy_instructions();
   void insert_ntsc_setup();
   void insert_rsp_data();
+  void insert_run_rdp_screen_setup();
   void insert_rsp_code();
 };
 

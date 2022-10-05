@@ -19,8 +19,8 @@
 Nintendo64::Nintendo64()
 {
   org = 0x80000000;
-  ram_start = 0x00000000;
-  ram_end = 32 * 1024 * 1024;
+  ram_start = 0x80000000;
+  ram_end = 0x80200000;
 }
 
 Nintendo64::~Nintendo64()
@@ -48,6 +48,7 @@ int Nintendo64::finish()
 {
   insert_ntsc_setup();
   insert_rsp_data();
+  insert_run_rdp_screen_setup();
   insert_rsp_code();
   R4000::finish();
 
@@ -60,7 +61,9 @@ int Nintendo64::start_init()
 
   fprintf(out,
     "bootcode:\n"
-    ".binfile \"bootcode.bin\"\n"
+    "  ;; This was downloaded from Peter Lemon's git repo. It seems like it's\n"
+    "  ;; needed to initialize the hardware.\n"
+    ".binfile \"bootcode.bin\"\n\n"
     "start:\n");
 
   init_system();
@@ -71,65 +74,23 @@ int Nintendo64::start_init()
     "  ;; uint8_t  screen_id\n"
     "  li $k0, 320 * 240 * 2 * 2 * 2\n"
     "  li $t0, KSEG1 | 0x0010_0000\n"
+    "  addu $k0, $k0, $t0\n"
     "  li $t1, 1\n"
     "  sw $t0, 0($k0)\n"
-    "  sb $t1, 4($k0)\n");
+    "  sb $t1, 4($k0)\n\n");
 
   fprintf(out,
     "  ;; $k1 points to DMEM\n"
-    "  li $k1, KSEG1 | RSP_DMEM\n");
+    "  li $k1, KSEG1 | RSP_DMEM\n\n");
+
+  rsp_halt();
+  rsp_copy_code();
+  rdp_copy_instructions();
+  rsp_start();
 
   fprintf(out,
-    "  ;; Make sure RSP is halted.\n"
-    "  li $a0, KSEG1 | RSP_CPU_BASE_REG\n"
-    "  li $t0, 0x02\n"
-    "  sw $t0, RSP_CPU_STATUS($a0)\n\n");
-
-  fprintf(out,
-    "  ;; Copy RDP instructions from ROM to RSP data memory.\n"
-    "  ;; Must be done 32 bits at a time, not 64 bit.\n"
-    "_setup_rdp:\n"
-    "  li $a0, KSEG1 | RSP_DMEM\n"
-    "  li $a1, dp_setup\n"
-    "  li $t1, (_dp_list_end - _dp_setup) / 4\n"
-    "  sw $0, 0($a0)\n"
-    "  addiu $a0, $a0, 56\n"
-    "_setup_rdp_loop:\n"
-    "  lw $t2, 0($a1)\n"
-    "  sw $t2, 0($a0)\n"
-    "  addiu $a1, $a1, 4\n"
-    "  addiu $a0, $a0, 4\n"
-    "  addiu $t1, $t1, -1\n"
-    "  bne $t1, $0, _setup_rdp_loop\n"
-    "  nop\n");
-
-  fprintf(out,
-    "  ;; Copy RSP code from ROM to RSP instruction memory.\n"
-    "  ;; Must be done 32 bits at a time, not 64 bit.\n"
-    "_setup_rsp:\n"
-    "  li $a1, _rsp_code_start\n"
-    "  li $t1, (_rsp_code_end - _rsp_code_start) / 4\n"
-    "  li $a0, KSEG1 | RSP_IMEM\n"
-    "_setup_rsp_loop:\n"
-    "  lw $t2, 0($a1)\n"
-    "  sw $t2, 0($a0)\n"
-    "  addiu $a1, $a1, 4\n"
-    "  addiu $a0, $a0, 4\n"
-    "  addiu $t1, $t1, -1\n"
-    "  bne $t1, $0, _setup_rsp_loop\n"
+    "  jal _run_rdp_screen_setup\n"
     "  nop\n\n");
-
-  fprintf(out,
-    "  ;; Reset RSP PC and clear halt to start it.\n"
-    "  li $a0, KSEG1 | RSP_PC\n"
-    "  sw $0, 0($a0)\n"
-    "  li $a0, KSEG1 | RSP_CPU_BASE_REG\n"
-    "  li $t0, 0x01\n"
-    "  sw $t0, RSP_CPU_STATUS($a0)\n\n"
-    "  li $t8, 56\n"
-    "  li $t9, _dp_setup_end - _dp_setup\n"
-    "  jal send_command\n"
-    "  nop\n");
 
   return 0;
 }
@@ -380,7 +341,7 @@ void Nintendo64::init_system()
     "  ;; 0x1fc0_0000 to 0x1fc0_07bf is PIF Boot ROM.\n"
     "  li $a0, PIF_BASE\n"
     "  li $t0, 8\n"
-    "  sw $t0, PIF_RAM+0x3c($a0)\n");
+    "  sw $t0, PIF_RAM+0x3c($a0)\n\n");
 
   fprintf(out,
     "  ;; Enable interrupts.\n"
@@ -389,17 +350,78 @@ void Nintendo64::init_system()
     "  mtc0 $t0, CP0_STATUS\n\n");
 
   fprintf(out,
-    "setup_video:\n"
+    "_setup_video:\n"
     "  li $t0, ntsc_320x240x16\n"
     "  li $t1, (ntsc_320x240x16_end - ntsc_320x240x16) / 8\n"
-    "setup_video_loop:\n"
+    "_setup_video_loop:\n"
     "  lw $a0, 0($t0)\n"
     "  lw $t2, 4($t0)\n"
     "  sw $t2, 0($a0)\n"
     "  addiu $t0, $t0, 8\n"
     "  addiu $t1, $t1, -1\n"
-    "  bne $t1, $0, setup_video_loop\n"
+    "  bne $t1, $0, _setup_video_loop\n"
     "  nop\n\n");
+}
+
+void Nintendo64::rsp_halt()
+{
+  fprintf(out,
+    "  ;; Make sure RSP is halted.\n"
+    "  li $a0, KSEG1 | RSP_CPU_BASE_REG\n"
+    "  li $t0, 0x02\n"
+    "  sw $t0, RSP_CPU_STATUS($a0)\n\n");
+}
+
+void Nintendo64::rsp_start()
+{
+  fprintf(out,
+    "  ;; Reset RSP PC and clear halt to start it.\n"
+    "  li $a0, KSEG1 | RSP_PC\n"
+    "  sw $0, 0($a0)\n"
+    "  li $a0, KSEG1 | RSP_CPU_BASE_REG\n"
+    "  li $t0, 0x01\n"
+    "  sw $t0, RSP_CPU_STATUS($a0)\n\n");
+}
+
+void Nintendo64::rsp_copy_code()
+{
+  fprintf(out,
+    "  ;; Copy RSP code from ROM to RSP instruction memory.\n"
+    "  ;; Must be done 32 bits at a time, not 64 bit.\n"
+    "_setup_rsp:\n"
+    "  li $t1, (_rsp_code_end - _rsp_code_start) / 4\n"
+    "  li $a1, _rsp_code_start\n"
+    "  li $a0, KSEG1 | RSP_IMEM\n"
+    "_setup_rsp_loop:\n"
+    "  lw $t2, 0($a1)\n"
+    "  sw $t2, 0($a0)\n"
+    "  addiu $a1, $a1, 4\n"
+    "  addiu $a0, $a0, 4\n"
+    "  addiu $t1, $t1, -1\n"
+    "  bne $t1, $0, _setup_rsp_loop\n"
+    "  nop\n\n");
+
+}
+
+void Nintendo64::rdp_copy_instructions()
+{
+  fprintf(out,
+    "  ;; Copy RDP instructions from ROM to RSP data memory.\n"
+    "_setup_rdp:\n"
+    "  li $a0, KSEG1 | RSP_DMEM\n"
+    "  li $a1, _dp_setup\n"
+    "  li $t1, (_dp_setup_end - _dp_setup) / 4\n"
+    "  sw $0, 0($a0)\n"
+    "  addiu $a0, $a0, 56\n"
+    "_setup_rdp_loop:\n"
+    "  lw $t2, 0($a1)\n"
+    "  sw $t2, 0($a0)\n"
+    "  addiu $a1, $a1, 4\n"
+    "  addiu $a0, $a0, 4\n"
+    "  addiu $t1, $t1, -1\n"
+    "  bne $t1, $0, _setup_rdp_loop\n"
+    "  nop\n\n");
+
 }
 
 void Nintendo64::insert_ntsc_setup()
@@ -435,8 +457,23 @@ void Nintendo64::insert_rsp_data()
     "  .dc64 (DP_OP_SET_SCISSOR << 56) | ((320 << 2) << 12) | (240 << 2)\n"
     "  .dc64 (DP_OP_SYNC_PIPE << 56)\n"
     "  .dc64 (DP_OP_SET_OTHER_MODES << 56) | (1 << 55) | (3 << 52)\n"
-    "_dp_setup_end:\n");
+    "_dp_setup_end:\n\n");
+}
 
+void Nintendo64::insert_run_rdp_screen_setup()
+{
+  fprintf(out,
+    "_run_rdp_screen_setup:\n"
+    "  ;; Signal RSP code to start.\n"
+    "  li $a0, KSEG1 | RSP_DMEM\n"
+    "  li $t0, 1 << 24\n"
+    "  sw $t0, 0($a0)\n"
+    "_run_rdp_screen_setup_wait_for_rsp:\n"
+    "  lb $t0, 0($a0)\n"
+    "  bne $t0, $0, _run_rdp_screen_setup_wait_for_rsp\n"
+    "  nop\n"
+    "  jr $ra\n"
+    "  nop\n\n");
 }
 
 void Nintendo64::insert_rsp_code()
@@ -444,6 +481,6 @@ void Nintendo64::insert_rsp_code()
   fprintf(out,
     "_rsp_code_start:\n"
     ".binfile \"rsp.bin\"\n"
-    "_rsp_code_end:\n");
+    "_rsp_code_end:\n\n");
 }
 

@@ -5,10 +5,10 @@ public class Nintendo64Demo
 {
   public static void main(String[] args)
   {
-    int y = 10, dy = 1;
+    int y = 50, dy = 1;
     int x;
 
-    while(true)
+    while (true)
     {
       Nintendo64.setScreen(0);
       Nintendo64.clearScreen();
