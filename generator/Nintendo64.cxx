@@ -49,6 +49,9 @@ int Nintendo64::finish()
   insert_ntsc_setup();
   insert_rsp_data();
   insert_run_rdp_screen_setup();
+  insert_clear_screen();
+  insert_reset_z_buffer();
+  insert_set_screen();
   insert_rsp_code();
   R4000::finish();
 
@@ -70,10 +73,12 @@ int Nintendo64::start_init()
 
   fprintf(out,
     "  ;; $k0 points to struct of\n"
-    "  ;; uint32_t current_screen\n"
+    "  ;; uint32_t current_screen (with KSEG1)\n"
+    "  ;; uint32_t current_screen (for DMEM)\n"
     "  ;; uint8_t  screen_id\n"
     "  li $k0, 320 * 240 * 2 * 2 * 2\n"
     "  li $t0, KSEG1 | 0x0010_0000\n"
+    "  li $t2, 0x0010_0000\n"
     "  addu $k0, $k0, $t0\n"
     "  li $t1, 1\n"
     "  sw $t0, 0($k0)\n"
@@ -117,21 +122,10 @@ int Nintendo64::nintendo64_clearScreen()
 {
   fprintf(out,
     "  ;; nintendo64_clearScreen()\n"
-    "  li $t8, (319 << 16) | 240\n"
-    "  li $t9, 0xffff\n"
-    "  sw $0,   8($k1)\n"
-    "  sw $t8, 16($k1)\n"
-    "  sw $0,  48($k1)\n"
-    "  li $t8, 4 << 24\n"
-    "  sw $t8, 0($k1)\n"
-    "_reset_z_buffer_wait_%d:\n"
-    "  lw $t8, 0($k1)\n"
-    "  bne $t8, $0, _reset_z_buffer_wait_%d\n"
-    "  nop\n",
-    label_count,
-    label_count);
-
-  label_count += 1;
+    "  move $s0, $ra\n"
+    "  jal _clear_screen\n"
+    "  nop\n"
+    "  move $ra, $s0\n");
 
   return 0;
 }
@@ -140,62 +134,27 @@ int Nintendo64::nintendo64_resetZBuffer()
 {
   fprintf(out,
     "  ;; nintendo64_resetZBuffer()\n"
-    "  li $at, 320 * 240 * 2\n"
-    "  li $a0, KSEG1 | VI_BASE\n"
-    "  lw $t8, 0($k0)\n"
-    "  addu $t8, $t8, $at\n"
-    "  sw $t8, VI_DRAM_ADDR_REG($a0)\n");
-
-  fprintf(out,
-    "  li $t8, (319 << 16) | 240\n"
-    "  li $t9, 0xffff\n"
-    "  sw $0,   8($k1)\n"
-    "  sw $t8, 16($k1)\n"
-    "  sw $t9, 48($k1)\n"
-    "  li $t8, 4 << 24\n"
-    "  sw $t8, 0($k1)\n"
-    "_reset_z_buffer_wait_%d:\n"
-    "  lw $t8, 0($k1)\n"
-    "  bne $t8, $0, _reset_z_buffer_wait_%d\n"
-    "  nop\n",
-    label_count,
-    label_count);
-
-  fprintf(out,
-    "  lw $t8, 0($k0)\n"
-    "  sw $t8, VI_DRAM_ADDR_REG($a0)\n");
-
-  label_count += 1;
+    "  move $s0, $ra\n"
+    "  jal _reset_z_buffer\n"
+    "  nop\n"
+    "  move $ra, $s0\n");
 
   return 0;
 }
 
 int Nintendo64::nintendo64_setScreen_I()
 {
-  // Note: After the bne is a li $a0, KSEG1 | VI_BASE in the delay slot.
   // setScreen(0): Display screen 0, draw on screen 1.
   // setScreen(1): Display screen 1, draw on screen 0.
-
   fprintf(out,
     "  ;; nintendo64_setScreen_I()\n"
-    "  bne $t%d, $0, _set_screen_not_0%d\n"
-    "  li $a0, KSEG1 | VI_BASE\n"
-    "  li $t8, KSEG1 | 0x0010_0000 + (320 * 2 * 2)\n"
-    "  li $t9, 0x0010_0000\n"
-    "  b _set_screen_finish_%d\n"
+    "  move $s0, $ra\n"
+    "  move $a0, $t%d\n"
+    "  jal _set_screen\n"
     "  nop\n"
-    "_set_screen_not_0%d:\n"
-    "  li $t8, KSEG1 | 0x0010_0000\n"
-    "  li $t9, 0x0010_0000 + (320 * 2 * 2)\n"
-    "_set_screen_finish_%d:\n"
-    "  sw $t8, 0($k0)\n"
-    "  sw $t9, VI_DRAM_ADDR_REG($a0)\n",
-    reg - 1, label_count,
-    label_count,
-    label_count,
-    label_count);
+    "  move $ra, $s0\n",
+    reg - 1);
 
-  label_count += 1;
   reg -= 1;
 
   return 0;
@@ -350,16 +309,16 @@ void Nintendo64::init_system()
     "  mtc0 $t0, CP0_STATUS\n\n");
 
   fprintf(out,
-    "_setup_video:\n"
+    "_setup_vi:\n"
     "  li $t0, ntsc_320x240x16\n"
     "  li $t1, (ntsc_320x240x16_end - ntsc_320x240x16) / 8\n"
-    "_setup_video_loop:\n"
+    "_setup_vi_loop:\n"
     "  lw $a0, 0($t0)\n"
     "  lw $t2, 4($t0)\n"
     "  sw $t2, 0($a0)\n"
     "  addiu $t0, $t0, 8\n"
     "  addiu $t1, $t1, -1\n"
-    "  bne $t1, $0, _setup_video_loop\n"
+    "  bne $t1, $0, _setup_vi_loop\n"
     "  nop\n\n");
 }
 
@@ -388,17 +347,17 @@ void Nintendo64::rsp_copy_code()
   fprintf(out,
     "  ;; Copy RSP code from ROM to RSP instruction memory.\n"
     "  ;; Must be done 32 bits at a time, not 64 bit.\n"
-    "_setup_rsp:\n"
+    "_setup_rsp_mem:\n"
     "  li $t1, (_rsp_code_end - _rsp_code_start) / 4\n"
     "  li $a1, _rsp_code_start\n"
     "  li $a0, KSEG1 | RSP_IMEM\n"
-    "_setup_rsp_loop:\n"
+    "_setup_rsp_mem_loop:\n"
     "  lw $t2, 0($a1)\n"
     "  sw $t2, 0($a0)\n"
     "  addiu $a1, $a1, 4\n"
     "  addiu $a0, $a0, 4\n"
     "  addiu $t1, $t1, -1\n"
-    "  bne $t1, $0, _setup_rsp_loop\n"
+    "  bne $t1, $0, _setup_rsp_mem_loop\n"
     "  nop\n\n");
 
 }
@@ -407,21 +366,20 @@ void Nintendo64::rdp_copy_instructions()
 {
   fprintf(out,
     "  ;; Copy RDP instructions from ROM to RSP data memory.\n"
-    "_setup_rdp:\n"
+    "_setup_rdp_mem:\n"
     "  li $a0, KSEG1 | RSP_DMEM\n"
     "  li $a1, _dp_setup\n"
     "  li $t1, (_dp_setup_end - _dp_setup) / 4\n"
     "  sw $0, 0($a0)\n"
     "  addiu $a0, $a0, 56\n"
-    "_setup_rdp_loop:\n"
+    "_setup_rdp_mem_loop:\n"
     "  lw $t2, 0($a1)\n"
     "  sw $t2, 0($a0)\n"
     "  addiu $a1, $a1, 4\n"
     "  addiu $a0, $a0, 4\n"
     "  addiu $t1, $t1, -1\n"
-    "  bne $t1, $0, _setup_rdp_loop\n"
+    "  bne $t1, $0, _setup_rdp_mem_loop\n"
     "  nop\n\n");
-
 }
 
 void Nintendo64::insert_ntsc_setup()
@@ -471,6 +429,72 @@ void Nintendo64::insert_run_rdp_screen_setup()
     "_run_rdp_screen_setup_wait_for_rsp:\n"
     "  lb $t0, 0($a0)\n"
     "  bne $t0, $0, _run_rdp_screen_setup_wait_for_rsp\n"
+    "  nop\n"
+    "  jr $ra\n"
+    "  nop\n\n");
+}
+
+void Nintendo64::insert_clear_screen()
+{
+  fprintf(out,
+    "_clear_screen:\n"
+    "  li $t0, 8 << 24\n"
+    "  sw $t0, 0($k1)\n"
+    "_clear_screen_wait:\n"
+    "  lw $t0, 0($k1)\n"
+    "  bne $t0, $0, _clear_screen_wait\n"
+    "  nop\n"
+    "  jr $ra\n"
+    "  nop\n\n");
+}
+
+void Nintendo64::insert_reset_z_buffer()
+{
+  fprintf(out,
+    "_reset_z_buffer:\n"
+    "  li $t0, 9 << 24\n"
+    "  sw $t0, 0($k1)\n"
+    "_reset_z_buffer_wait:\n"
+    "  lw $t0, 0($k1)\n"
+    "  bne $t0, $0, _reset_z_buffer_wait\n"
+    "  nop\n"
+    "  jr $ra\n"
+    "  nop\n");
+}
+
+void Nintendo64::insert_set_screen()
+{
+  // Note: After the bne is a li $a0, KSEG1 | VI_BASE in the delay slot.
+
+  fprintf(out,
+    "_set_screen:\n"
+    "  li $a1, KSEG1\n"
+    "  bne $a0, $0, _set_screen_not_0\n"
+    "  li $at, KSEG1 | VI_BASE\n"
+    "  li $t8, 0x0010_0000 + (320 * 240 * 2 * 2)\n"
+    "  li $t9, 0x0010_0000\n"
+    "  b _set_screen_finish\n"
+    "  nop\n"
+    "_set_screen_not_0:\n"
+    "  li $t8, 0x0010_0000\n"
+    "  li $t9, 0x0010_0000 + (320 * 240 * 2 * 2)\n");
+
+  fprintf(out,
+    "_set_screen_finish:\n"
+    "  or $a1, $a1, $t8\n"
+    "  sw $a1, 0($k0)\n"
+    "  sw $t9, VI_DRAM_ADDR_REG($at)\n"
+    "  sw $t8, 60($k1)\n"
+    "  li $at, 320 * 240 * 2\n"
+    "  addu $t8, $t8, $at\n"
+    "  sw $t8, 68($k1)\n");
+
+  fprintf(out,
+    "  li $t0, 1 << 24\n"
+    "  sw $t0, 0($k1)\n"
+    "_set_screen_wait:\n"
+    "  lw $t0, 0($k1)\n"
+    "  bne $t0, $0, _set_screen_wait\n"
     "  nop\n"
     "  jr $ra\n"
     "  nop\n\n");

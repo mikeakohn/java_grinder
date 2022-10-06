@@ -57,6 +57,9 @@ private:
   void insert_ntsc_setup();
   void insert_rsp_data();
   void insert_run_rdp_screen_setup();
+  void insert_clear_screen();
+  void insert_reset_z_buffer();
+  void insert_set_screen();
   void insert_rsp_code();
 };
 
