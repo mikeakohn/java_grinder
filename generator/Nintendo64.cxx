@@ -52,6 +52,11 @@ int Nintendo64::finish()
   insert_clear_screen();
   insert_reset_z_buffer();
   insert_set_screen();
+  insert_triangle_constructor();
+  insert_rectangle_constructor();
+  insert_rectangle_draw();
+  insert_triangle_draw();
+  insert_triangle_vertex_copy();
   insert_rsp_code();
   R4000::finish();
 
@@ -186,79 +191,337 @@ int Nintendo64::nintendo64_plot_III()
   return 0;
 }
 
+int Nintendo64::nintendo64_waitForPolygon()
+{
+  fprintf(out,
+    "  ;; nintendo64_waitForPolygon()\n"
+    "_wait_for_polygon_%d:\n"
+    "  lw $at, 0($a0)\n"
+    "  bne $at, $0, _wait_for_polygon_%d\n"
+    "  nop\n",
+    label_count,
+    label_count);
+
+  label_count++;
+
+  return 0;
+}
+
 int Nintendo64::nintendo64_n64_triangle_Constructor()
 {
-  return -1;
+
+  fprintf(out,
+    "  ;; nintendo64_n64_triangle_Constructor()\n"
+    "  move $s0, $ra\n"
+    "  jal _triangle_constructor\n"
+    "  nop\n"
+    "  move $t%d, $v0\n"
+    "  move $ra, $s0\n",
+    reg);
+
+  reg++;
+
+  return 0;
 }
 
 int Nintendo64::nintendo64_n64_triangle_setColor_I()
 {
-  return -1;
+  const int object = reg - 2;
+  const int color = reg - 1;
+
+  fprintf(out,
+    "  ;; nintendo64_n64_triangle_setColor_I()\n"
+    "  sw $t%d, 40($t%d)\n",
+    color, object);
+
+  reg -= 2;
+
+  return 0;
 }
 
 int Nintendo64::nintendo64_n64_triangle_setPosition_III()
 {
-  return -1;
+  const int object = reg - 4;
+  const int x = reg - 3;
+  const int y = reg - 2;
+  const int z = reg - 1;
+
+  fprintf(out,
+    "  ;; nintendo64_n64_triangle_setPosition_III()\n"
+    "  sh $t%d, 32($t%d)\n"
+    "  sh $t%d, 34($t%d)\n"
+    "  sh $t%d, 36($t%d)\n",
+    x, object,
+    y, object,
+    z, object);
+
+  reg -= 4;
+
+  return 0;
 }
 
-int Nintendo64::nintendo64_n64_triangle_setRotation_III() 
+int Nintendo64::nintendo64_n64_triangle_setRotation_III()
 {
-  return -1;
+  const int object = reg - 4;
+  const int rx = reg - 3;
+  const int ry = reg - 2;
+  const int rz = reg - 1;
+
+  fprintf(out,
+    "  ;; nintendo64_n64_triangle_setRotation_III()\n"
+    "  sh $t%d, 24($t%d)\n"
+    "  sh $t%d, 28($t%d)\n"
+    "  sh $t%d, 30($t%d)\n",
+    rx, object,
+    ry, object,
+    rz, object);
+
+  reg -= 4;
+
+  return 0;
 }
 
-int Nintendo64::nintendo64_n64_triangle_setVertex0_III() 
+int Nintendo64::nintendo64_n64_triangle_setVertex0_III()
 {
-  return -1;
+  const int object = reg - 4;
+  const int x = reg - 3;
+  const int y = reg - 2;
+  const int z = reg - 1;
+
+  fprintf(out,
+    "  ;; nintendo64_n64_triangle_setVertex0_III()\n"
+    "  sh $t%d, 0($t%d)\n"
+    "  sh $t%d, 2($t%d)\n"
+    "  sh $t%d, 4($t%d)\n",
+    x, object,
+    y, object,
+    z, object);
+
+  reg -= 4;
+
+  return 0;
 }
 
-int Nintendo64::nintendo64_n64_triangle_setVertex1_III() 
+int Nintendo64::nintendo64_n64_triangle_setVertex1_III()
 {
-  return -1;
+  const int object = reg - 4;
+  const int x = reg - 3;
+  const int y = reg - 2;
+  const int z = reg - 1;
+
+  fprintf(out,
+    "  ;; nintendo64_n64_triangle_setVertex1_III()\n"
+    "  sh $t%d,  8($t%d)\n"
+    "  sh $t%d, 10($t%d)\n"
+    "  sh $t%d, 12($t%d)\n",
+    x, object,
+    y, object,
+    z, object);
+
+  reg -= 4;
+
+  return 0;
 }
 
-int Nintendo64::nintendo64_n64_triangle_setVertex2_III() 
+int Nintendo64::nintendo64_n64_triangle_setVertex2_III()
 {
-  return -1;
+  const int object = reg - 4;
+  const int x = reg - 3;
+  const int y = reg - 2;
+  const int z = reg - 1;
+
+  fprintf(out,
+    "  ;; nintendo64_n64_triangle_setVertex2_III()\n"
+    "  sh $t%d, 16($t%d)\n"
+    "  sh $t%d, 18($t%d)\n"
+    "  sh $t%d, 20($t%d)\n",
+    x, object,
+    y, object,
+    z, object);
+
+  reg -= 4;
+
+  return 0;
 }
 
-int Nintendo64::nintendo64_n64_triangle_setVertexes_bS() 
+int Nintendo64::nintendo64_n64_triangle_setVertexes_bS()
 {
-  return -1;
+  const int object = reg - 2;
+  const int array = reg - 1;
+
+  fprintf(out,
+    "  ;; nintendo64_n64_setVertexes_bS()\n"
+    "  move $s0, $ra\n"
+    "  move $a0, $t%d\n"
+    "  move $a1, $t%d\n"
+    "  jal _triangle_vertex_copy\n"
+    "  nop\n"
+    "  move $ra, $s0\n",
+    object,
+    array);
+
+  reg -= 2;
+
+  return 0;
 }
 
-int Nintendo64::nintendo64_n64_triangle_draw() 
+int Nintendo64::nintendo64_n64_triangle_setZBuffer_Z()
 {
-  return -1;
+  const int object = reg - 2;
+  const int enabled = reg - 1;
+
+  fprintf(out,
+    "  ;; nintendo64_n64_setZBuffer_Z()\n"
+    "  sb $t%d, 12($t%d)\n",
+    enabled, object);
+
+  reg -= 2;
+
+  return 0;
 }
 
-int Nintendo64::nintendo64_n64_rectangle_Constructor() 
+int Nintendo64::nintendo64_n64_triangle_draw()
 {
-  return -1;
+  fprintf(out,
+    "  ;; nintendo64_n64_triangle_draw()\n"
+    "  move $a0, $t%d\n"
+    "  move $s0, $ra\n"
+    "  jal _triangle_draw\n"
+    "  nop\n"
+    "  move $ra, $s0\n",
+    reg - 1);
+
+  reg -= 1;
+
+  return 0;
 }
 
-int Nintendo64::nintendo64_n64_rectangle_setColor_I() 
+int Nintendo64::nintendo64_n64_rectangle_Constructor()
 {
-  return -1;
+  fprintf(out,
+    "  ;; nintendo64_n64_rectangle_Constructor()\n"
+    "  move $s0, $ra\n"
+    "  jal _rectangle_constructor\n"
+    "  nop\n"
+    "  move $t%d, $v0\n"
+    "  move $ra, $s0\n",
+    reg);
+
+  reg++;
+
+  return 0;
+}
+
+int Nintendo64::nintendo64_n64_rectangle_setColor_I()
+{
+  const int object = reg - 2;
+  const int color = reg - 1;
+
+  fprintf(out,
+    "  ;; nintendo64_n64_rectangle_setColor_I()\n"
+    "  sw $t%d, 8($t%d)\n",
+    color, object);
+
+  reg -= 2;
+
+  return 0;
 }
 
 int Nintendo64::nintendo64_n64_rectangle_setPosition_II()
 {
-  return -1;
+  const int object = reg - 3;
+  const int x = reg - 2;
+  const int y = reg - 1;
+
+  fprintf(out,
+    "  ;; nintendo64_n64_rectangle_setPosition_II()\n"
+    "  sll $t%d, $t%d, 2\n"
+    "  sll $t%d, $t%d, 2\n"
+    "  sh $t%d, 0($t%d)\n"
+    "  sh $t%d, 2($t%d)\n",
+    x, x,
+    y, y,
+    x, object,
+    y, object);
+
+  reg -= 3;
+
+  return 0;
 }
 
 int Nintendo64::nintendo64_n64_rectangle_setSize_II()
 {
-  return -1;
+  const int object = reg - 3;
+  const int width = reg - 2;
+  const int height = reg - 1;
+
+  fprintf(out,
+    "  ;; nintendo64_n64_rectangle_setSize_II()\n"
+    "  sll $t%d, $t%d, 2\n"
+    "  sll $t%d, $t%d, 2\n"
+    "  sh $t%d, 4($t%d)\n"
+    "  sh $t%d, 6($t%d)\n",
+    width, width,
+    height, height,
+    width, object,
+    height, object);
+
+  reg -= 3;
+
+  return 0;
 }
 
 int Nintendo64::nintendo64_n64_rectangle_setTexture_aBII()
 {
-  return -1;
+  const int object = reg - 4;
+  const int array = reg - 3;
+  const int width = reg - 2;
+  const int height = reg - 1;
+
+  fprintf(out,
+    "  ;; nintendo64_n64_rectangle_setTexture_aBII()\n"
+    "  sll $t%d, $t%d, 16\n"
+    "  or $t%d, $t%d, $t%d\n"
+    "  sw $t%d, 40($k1)\n"
+    "  sw $t%d, 48($k1)\n"
+    "  sw $t%d, 12($t%d)\n"
+    "  ;; Set command to setup_texture.\n"
+    "  li $t0, 7 << 24\n"
+    "  sw $t0, 0($a0)\n"
+    "set_texture_%d:\n"
+    "  lw $t0, 0($a0)\n"
+    "  bne $t0, $0, set_texture_%d\n"
+    "  nop\n",
+    width, width,
+    width, width, height,
+    width,
+    array,
+    array, object,
+    label_count,
+    label_count);
+
+  label_count += 1;
+  reg -= 4;
+
+  return 0;
 }
 
 int Nintendo64::nintendo64_n64_rectangle_draw()
 {
-  return -1;
+  const int object = reg - 1;
+
+  fprintf(out,
+    "  ;; nintendo64_n64_rectangle_draw()\n"
+    "  move $a0, $t%d\n"
+    "  move $s0, $ra\n"
+    "  jal _rectangle_draw\n"
+    "  nop\n"
+    "  move $ra, $s0\n",
+    object);
+
+  reg--;
+
+  return 0;
 }
 
 void Nintendo64::catridge_header()
@@ -359,7 +622,6 @@ void Nintendo64::rsp_copy_code()
     "  addiu $t1, $t1, -1\n"
     "  bne $t1, $0, _setup_rsp_mem_loop\n"
     "  nop\n\n");
-
 }
 
 void Nintendo64::rdp_copy_instructions()
@@ -496,6 +758,142 @@ void Nintendo64::insert_set_screen()
     "  lw $t0, 0($k1)\n"
     "  bne $t0, $0, _set_screen_wait\n"
     "  nop\n"
+    "  jr $ra\n"
+    "  nop\n\n");
+}
+
+void Nintendo64::insert_triangle_constructor()
+{
+  // struct
+  // {
+  //    0: uint16_t x0, y0, z0, reserved;
+  //    8: uint16_t x1, y1, z1, reserved;
+  //   16: uint16_t x2, y2, z2, reserved;
+  //   24: uint16_t rx, ry, rz, reserved;
+  //   32: uint16_t dx, dy, dz, reserved;
+  //   40: uint32_t color;
+  //   44: uint8_t do_zbuffer;
+  //       uint8_t reserved, reserved, reserved;
+  // }k
+
+  fprintf(out,
+    "_triangle_constructor:\n"
+    "  subi $sp, $sp, 12 * 4\n"
+    "  move $v0, $sp\n"
+    "  sw $0,  0($v0)\n"
+    "  sw $0,  4($v0)\n"
+    "  sw $0,  8($v0)\n"
+    "  sw $0, 12($v0)\n"
+    "  sw $0, 16($v0)\n"
+    "  sw $0, 20($v0)\n"
+    "  sw $0, 24($v0)\n"
+    "  sw $0, 28($v0)\n"
+    "  sw $0, 32($v0)\n"
+    "  sw $0, 40($v0)\n"
+    "  sw $0, 44($v0)\n"
+    "  jr $ra\n"
+    "  nop\n\n");
+}
+
+void Nintendo64::insert_rectangle_constructor()
+{
+  // struct
+  // {
+  //    0: uint16_t x, y;
+  //    4: uint16_t width, height;
+  //    8: uint32_t color;
+  //   12: uint16_t *texture;
+  //   16: uint16_t texture_width, texture_height;
+  // };
+
+  fprintf(out,
+    "_rectangle_constructor:\n"
+    "  subi $sp, $sp, 6 * 4\n"
+    "  move $v0, $sp\n"
+    "  sw $0,  0($v0)\n"
+    "  sw $0,  4($v0)\n"
+    "  sw $0,  8($v0)\n"
+    "  sw $0, 12($v0)\n"
+    "  sw $0, 16($v0)\n"
+    "  jr $ra\n"
+    "  nop\n\n");
+}
+
+void Nintendo64::insert_triangle_draw()
+{
+  //    0: uint16_t x0, y0, z0, reserved;
+  //    8: uint16_t x1, y1, z1, reserved;
+  //   16: uint16_t x2, y2, z2, reserved;
+  //   24: uint16_t rx, ry, rz, reserved;
+  //   32: uint16_t dx, dy, dz, reserved;
+  //   40: uint32_t color;
+  //   44: uint8_t do_zbuffer;
+  //       uint8_t reserved, reserved, reserved;
+  fprintf(out,
+    "_triangle_draw:\n"
+    "  move a1, a0\n"
+    "  move a2, k1\n"
+    "  li a3, 11\n"
+    "_triangle_draw_memcpy:\n"
+    "  lw $t8, 0($a1)\n"
+    "  sw $t8, 8($a2)\n"
+    "  addui $a1, $a1, 4\n"
+    "  addui $a2, $a2, 4\n"
+    "  addui $a3, $a3, -1\n"
+    "  bne $a3, $0, _triangle_draw_memcpy\n"
+    "  nop\n"
+    "  ;; Set command to draw_triangle.\n"
+    "  li $at, 3 << 24\n"
+    "  sw $at, 0($k1)\n"
+    "  jr $ra\n"
+    "  nop\n\n");
+}
+
+void Nintendo64::insert_rectangle_draw()
+{
+  fprintf(out,
+    "_rectangle_draw:\n"
+    "  lw $s0,  0($a0)\n"
+    "  sw $s0,  8($k1)\n"
+    "  lh $s0,  0($a0)\n"
+    "  lh $s1,  2($a0)\n"
+    "  lh $s2,  4($a0)\n"
+    "  lh $s3,  8($a0)\n"
+    "  addu $s2, $s2, $s0\n"
+    "  addu $s3, $s3, $s1\n"
+    "  sll $s2, $s2, 16\n"
+    "  sw $s2, 16($k1)\n"
+    "  lw $s0,  8($a0)\n"
+    "  sw $s0, 48($a0)\n"
+    "  ;; Set command to draw_rectangle.\n"
+    "  li $at, 5 << 24\n"
+    "  sw $at, 0($k1)\n"
+    "  jr $ra\n"
+    "  nop\n\n");
+}
+
+void Nintendo64::insert_triangle_vertex_copy()
+{
+
+  fprintf(out,
+    "_triangle_vertex_copy:\n"
+    "  ;; X0, Y0, Z0\n"
+    "  lw $t8,  0($a1)\n"
+    "  lw $t9,  4($a1)\n"
+    "  sw $t8,  8($a0)\n"
+    "  sw $t9, 12($a0)\n"
+    "  ;; X1, Y1, Z1\n"
+    "  lh $t8,  6($a1)\n"
+    "  lh $t9,  8($a1)\n"
+    "  lh $at, 10($a1)\n"
+    "  lh $t8, 16($a0)\n"
+    "  lh $t9, 18($a0)\n"
+    "  lh $at, 20($a0)\n"
+    "  ;; X2, Y2, Z2\n"
+    "  lw $t8, 12($a1)\n"
+    "  lh $t9, 14($a1)\n"
+    "  sw $t8, 24($a0)\n"
+    "  sh $t9, 28($a0)\n"
     "  jr $ra\n"
     "  nop\n\n");
 }

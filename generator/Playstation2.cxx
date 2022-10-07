@@ -228,8 +228,8 @@ int Playstation2::new_object(std::string &object_name, int field_count)
 
   const char *s = object_name.c_str();
 
-  while(*s != 0) { s++; }
-  while(s != object_name.c_str() && *s != '/') { s--; }
+  while (*s != 0) { s++; }
+  while (s != object_name.c_str() && *s != '/') { s--; }
   if (*s == '/') { s++; }
 
   if (strcmp(s, "Points") != 0 &&
@@ -978,7 +978,7 @@ int Playstation2::draw3d_texture_Constructor_II(int size)
   fprintf(out, "  move $a1, $t%d\n", height);
   fprintf(out, "  move $s0, $ra\n");
 
-  switch(size)
+  switch (size)
   {
     case 16:
       fprintf(out, "  jal _draw3d_texture16_constructor\n");

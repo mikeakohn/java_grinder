@@ -29,6 +29,7 @@ public:
   virtual int nintendo64_resetZBuffer();
   virtual int nintendo64_setScreen_I();
   virtual int nintendo64_plot_III();
+  virtual int nintendo64_waitForPolygon();
 
   virtual int nintendo64_n64_triangle_Constructor();
   virtual int nintendo64_n64_triangle_setColor_I();
@@ -38,6 +39,7 @@ public:
   virtual int nintendo64_n64_triangle_setVertex1_III();
   virtual int nintendo64_n64_triangle_setVertex2_III();
   virtual int nintendo64_n64_triangle_setVertexes_bS();
+  virtual int nintendo64_n64_triangle_setZBuffer_Z();
   virtual int nintendo64_n64_triangle_draw();
 
   virtual int nintendo64_n64_rectangle_Constructor();
@@ -60,6 +62,11 @@ private:
   void insert_clear_screen();
   void insert_reset_z_buffer();
   void insert_set_screen();
+  void insert_triangle_constructor();
+  void insert_rectangle_constructor();
+  void insert_triangle_draw();
+  void insert_rectangle_draw();
+  void insert_triangle_vertex_copy();
   void insert_rsp_code();
 };
 

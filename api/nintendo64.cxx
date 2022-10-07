@@ -44,6 +44,7 @@ int nintendo64(
   CHECK_FUNC(resetZBuffer,)
   CHECK_FUNC(setScreen,_I)
   CHECK_FUNC(plot,_III)
+  CHECK_FUNC(waitForPolygon,)
 
   CHECK_FUNC(n64_triangle_Constructor,)
   CHECK_FUNC(n64_triangle_setColor,_I)
@@ -53,6 +54,7 @@ int nintendo64(
   CHECK_FUNC(n64_triangle_setVertex1,_III)
   CHECK_FUNC(n64_triangle_setVertex2,_III)
   CHECK_FUNC(n64_triangle_setVertexes,_bS)
+  CHECK_FUNC(n64_triangle_setZBuffer,_Z)
   CHECK_FUNC(n64_triangle_draw,)
 
   CHECK_FUNC(n64_rectangle_Constructor,)

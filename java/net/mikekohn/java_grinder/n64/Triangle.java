@@ -34,11 +34,14 @@ public class Triangle
   /** Array of [ x0, y0, z0, x1, y1, z1, x2, y2, z2 ]. */
   public void setVertexes(short[] points) { }
 
+  public void setZBuffer(boolean is_enabled) { }
+
   public void draw() { }
 
   private short x0, y0, z0;
   private short x1, y1, z1;
   private short x2, y2, z2;
+  private short dx, dy, dz;
   private short rx, ry, rz;
   private int color;
   private boolean do_zbuffer;

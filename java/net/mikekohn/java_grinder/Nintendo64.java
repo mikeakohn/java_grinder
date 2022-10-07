@@ -34,5 +34,8 @@ abstract public class Nintendo64
       RRRR_RGGG_GGBB_BBBA. So full red, no green or blue would be
       0xf800. */
   public static void plot(int x, int y, int color) { }
+
+  /** Wait for the last rectangle / triangle to finish drawing. */
+  public static void waitForPolygon() { }
 }
 
