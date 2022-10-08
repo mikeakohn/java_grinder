@@ -23,6 +23,7 @@ public:
   virtual int open(const char *filename);
   virtual int finish();
   virtual int start_init();
+  virtual int new_object(std::string &object_name, int field_count);
 
   virtual int nintendo64_waitVsync();
   virtual int nintendo64_clearScreen();

@@ -33,5 +33,15 @@ int nintendo64(
   int const_val1,
   int const_val2);
 
+int nintendo64_n64_triangle(
+  JavaClass *java_class,
+  Generator *generator,
+  const char *method_name);
+
+int nintendo64_n64_rectangle(
+  JavaClass *java_class,
+  Generator *generator,
+  const char *method_name);
+
 #endif
 

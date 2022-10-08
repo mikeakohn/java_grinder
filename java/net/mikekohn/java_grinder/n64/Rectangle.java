@@ -20,10 +20,9 @@ public class Rectangle
   /** Value is 32 bit RRGGBBAA. So 0x00ff00ff would be green. */
   public void setColor(int value) { }
 
-  public void setPosition(short x, short y) { }
-  public void setSize(short width, short height) { }
-  public void setTexture(short[] texture, short width, short height) { }
-
+  public void setPosition(int x, int y) { }
+  public void setSize(int width, int height) { }
+  public void setTexture(short[] texture, int width, int height) { }
 
   public void draw() { }
 

@@ -16,6 +16,9 @@
 
 #include "generator/Nintendo64.h"
 
+#define N643D "net/mikekohn/java_grinder/n64/"
+#define N643D_LEN (sizeof(N643D) - 1)
+
 Nintendo64::Nintendo64()
 {
   org = 0x80000000;
@@ -101,6 +104,35 @@ int Nintendo64::start_init()
   fprintf(out,
     "  jal _run_rdp_screen_setup\n"
     "  nop\n\n");
+
+  return 0;
+}
+
+int Nintendo64::new_object(std::string &object_name, int field_count)
+{
+  fprintf(out, "  ;; new_object(%s, field_count=%d)\n",
+    object_name.c_str(), field_count);
+
+  if (strncmp(object_name.c_str(), N643D, N643D_LEN) != 0)
+  {
+     printf("Error: Unsupported class %s\n", object_name.c_str());
+     return -1;
+  }
+
+  const char *s = object_name.c_str();
+
+  while (*s != 0) { s++; }
+  while (s != object_name.c_str() && *s != '/') { s--; }
+  if (*s == '/') { s++; }
+
+  if (strcmp(s, "Triangle") != 0 &&
+      strcmp(s, "Rectangle") != 0)
+  {
+     printf("Error: Unknown class %s\n", object_name.c_str());
+     return -1;
+  }
+
+  reg++;
 
   return 0;
 }
@@ -196,7 +228,7 @@ int Nintendo64::nintendo64_waitForPolygon()
   fprintf(out,
     "  ;; nintendo64_waitForPolygon()\n"
     "_wait_for_polygon_%d:\n"
-    "  lw $at, 0($a0)\n"
+    "  lw $at, 0($k1)\n"
     "  bne $at, $0, _wait_for_polygon_%d\n"
     "  nop\n",
     label_count,
@@ -217,9 +249,9 @@ int Nintendo64::nintendo64_n64_triangle_Constructor()
     "  nop\n"
     "  move $t%d, $v0\n"
     "  move $ra, $s0\n",
-    reg);
+    reg - 2);
 
-  reg++;
+  reg -= 1;
 
   return 0;
 }
@@ -405,9 +437,9 @@ int Nintendo64::nintendo64_n64_rectangle_Constructor()
     "  nop\n"
     "  move $t%d, $v0\n"
     "  move $ra, $s0\n",
-    reg);
+    reg - 2);
 
-  reg++;
+  reg -= 1;
 
   return 0;
 }
@@ -778,7 +810,7 @@ void Nintendo64::insert_triangle_constructor()
 
   fprintf(out,
     "_triangle_constructor:\n"
-    "  subi $sp, $sp, 12 * 4\n"
+    "  addiu $sp, $sp, -12 * 4\n"
     "  move $v0, $sp\n"
     "  sw $0,  0($v0)\n"
     "  sw $0,  4($v0)\n"
@@ -808,7 +840,7 @@ void Nintendo64::insert_rectangle_constructor()
 
   fprintf(out,
     "_rectangle_constructor:\n"
-    "  subi $sp, $sp, 6 * 4\n"
+    "  addiu $sp, $sp, -6 * 4\n"
     "  move $v0, $sp\n"
     "  sw $0,  0($v0)\n"
     "  sw $0,  4($v0)\n"
@@ -831,15 +863,15 @@ void Nintendo64::insert_triangle_draw()
   //       uint8_t reserved, reserved, reserved;
   fprintf(out,
     "_triangle_draw:\n"
-    "  move a1, a0\n"
-    "  move a2, k1\n"
-    "  li a3, 11\n"
+    "  move $a1, $a0\n"
+    "  move $a2, $k1\n"
+    "  li $a3, 11\n"
     "_triangle_draw_memcpy:\n"
     "  lw $t8, 0($a1)\n"
     "  sw $t8, 8($a2)\n"
-    "  addui $a1, $a1, 4\n"
-    "  addui $a2, $a2, 4\n"
-    "  addui $a3, $a3, -1\n"
+    "  addiu $a1, $a1, 4\n"
+    "  addiu $a2, $a2, 4\n"
+    "  addiu $a3, $a3, -1\n"
     "  bne $a3, $0, _triangle_draw_memcpy\n"
     "  nop\n"
     "  ;; Set command to draw_triangle.\n"
@@ -853,18 +885,19 @@ void Nintendo64::insert_rectangle_draw()
 {
   fprintf(out,
     "_rectangle_draw:\n"
-    "  lw $s0,  0($a0)\n"
-    "  sw $s0,  8($k1)\n"
-    "  lh $s0,  0($a0)\n"
+    "  lw $at,  0($a0)\n"
+    "  sw $at,  8($k1)\n"
+    "  lh $at,  0($a0)\n"
     "  lh $s1,  2($a0)\n"
     "  lh $s2,  4($a0)\n"
-    "  lh $s3,  8($a0)\n"
-    "  addu $s2, $s2, $s0\n"
+    "  lh $s3,  6($a0)\n"
+    "  addu $s2, $s2, $at\n"
     "  addu $s3, $s3, $s1\n"
     "  sll $s2, $s2, 16\n"
+    "  or $s2, $s2, $s3\n"
     "  sw $s2, 16($k1)\n"
-    "  lw $s0,  8($a0)\n"
-    "  sw $s0, 48($a0)\n"
+    "  lw $at,  8($a0)\n"
+    "  sw $at, 48($k1)\n"
     "  ;; Set command to draw_rectangle.\n"
     "  li $at, 5 << 24\n"
     "  sw $at, 0($k1)\n"

@@ -21,15 +21,15 @@ public class Triangle
   /** Value is 32 bit RRGGBBAA. So 0x00ff00ff would be green. */
   public void setColor(int value) { }
 
-  public void setPosition(short dx, short dy, short dz) { }
+  public void setPosition(int dx, int dy, int dz) { }
 
   /** Values are between 0 and 511. */
-  public void setRotation(short rx, short ry, short rz) { }
+  public void setRotation(int rx, int ry, int rz) { }
 
 
-  public void setVertex0(short x, short y, short z) { }
-  public void setVertex1(short x, short y, short z) { }
-  public void setVertex2(short x, short y, short z) { }
+  public void setVertex0(int x, int y, int z) { }
+  public void setVertex1(int x, int y, int z) { }
+  public void setVertex2(int x, int y, int z) { }
 
   /** Array of [ x0, y0, z0, x1, y1, z1, x2, y2, z2 ]. */
   public void setVertexes(short[] points) { }

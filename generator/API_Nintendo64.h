@@ -38,7 +38,6 @@ public:
   virtual int nintendo64_n64_rectangle_setSize_II() { return -1; }
   virtual int nintendo64_n64_rectangle_setTexture_aBII() { return -1; }
   virtual int nintendo64_n64_rectangle_draw() { return -1; }
-
 };
 
 #endif

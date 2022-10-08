@@ -34,6 +34,18 @@
     return generator->nintendo64_##funct##sig(const_val1, const_val2); \
   }
 
+#define CHECK_FUNC_TRIANGLE(funct,sig) \
+  if (strcmp(#funct#sig, method_name) == 0) \
+  { \
+    return generator->nintendo64_n64_triangle_##funct##sig(); \
+  }
+
+#define CHECK_FUNC_RECTANGLE(funct,sig) \
+  if (strcmp(#funct#sig, method_name) == 0) \
+  { \
+    return generator->nintendo64_n64_rectangle_##funct##sig(); \
+  }
+
 int nintendo64(
   JavaClass *java_class,
   Generator *generator,
@@ -45,24 +57,6 @@ int nintendo64(
   CHECK_FUNC(setScreen,_I)
   CHECK_FUNC(plot,_III)
   CHECK_FUNC(waitForPolygon,)
-
-  CHECK_FUNC(n64_triangle_Constructor,)
-  CHECK_FUNC(n64_triangle_setColor,_I)
-  CHECK_FUNC(n64_triangle_setPosition,_III)
-  CHECK_FUNC(n64_triangle_setRotation,_III)
-  CHECK_FUNC(n64_triangle_setVertex0,_III)
-  CHECK_FUNC(n64_triangle_setVertex1,_III)
-  CHECK_FUNC(n64_triangle_setVertex2,_III)
-  CHECK_FUNC(n64_triangle_setVertexes,_bS)
-  CHECK_FUNC(n64_triangle_setZBuffer,_Z)
-  CHECK_FUNC(n64_triangle_draw,)
-
-  CHECK_FUNC(n64_rectangle_Constructor,)
-  CHECK_FUNC(n64_rectangle_setColor,_I)
-  CHECK_FUNC(n64_rectangle_setPosition,_II)
-  CHECK_FUNC(n64_rectangle_setSize,_II)
-  CHECK_FUNC(n64_rectangle_setTexture,_aBII)
-  CHECK_FUNC(n64_rectangle_draw,)
 
   return -1;
 }
@@ -83,6 +77,40 @@ int nintendo64(
   int const_val1,
   int const_val2)
 {
+  return -1;
+}
+
+int nintendo64_n64_triangle(
+  JavaClass *java_class,
+  Generator *generator,
+  const char *method_name)
+{
+  CHECK_FUNC_TRIANGLE(Constructor,)
+  CHECK_FUNC_TRIANGLE(setColor,_I)
+  CHECK_FUNC_TRIANGLE(setPosition,_III)
+  CHECK_FUNC_TRIANGLE(setRotation,_III)
+  CHECK_FUNC_TRIANGLE(setVertex0,_III)
+  CHECK_FUNC_TRIANGLE(setVertex1,_III)
+  CHECK_FUNC_TRIANGLE(setVertex2,_III)
+  CHECK_FUNC_TRIANGLE(setVertexes,_bS)
+  CHECK_FUNC_TRIANGLE(setZBuffer,_Z)
+  CHECK_FUNC_TRIANGLE(draw,)
+
+  return -1;
+}
+
+int nintendo64_n64_rectangle(
+  JavaClass *java_class,
+  Generator *generator,
+  const char *method_name)
+{
+  CHECK_FUNC_RECTANGLE(Constructor,)
+  CHECK_FUNC_RECTANGLE(setColor,_I)
+  CHECK_FUNC_RECTANGLE(setPosition,_II)
+  CHECK_FUNC_RECTANGLE(setSize,_II)
+  CHECK_FUNC_RECTANGLE(setTexture,_aBII)
+  CHECK_FUNC_RECTANGLE(draw,)
+
   return -1;
 }
 

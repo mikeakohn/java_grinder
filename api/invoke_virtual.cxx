@@ -21,6 +21,7 @@
 #include "api/amiga.h"
 #include "api/draw3d_object.h"
 #include "api/draw3d_texture.h"
+#include "api/nintendo64.h"
 #include "common/JavaClass.h"
 #include "common/JavaCompiler.h"
 #include "common/Util.h"
@@ -33,6 +34,10 @@
 #define COPPER_LEN (sizeof(COPPER) - 1)
 #define BLITTER "net/mikekohn/java_grinder/amiga/Blitter"
 #define BLITTER_LEN (sizeof(BLITTER) - 1)
+#define N643D_TRIANGLE "net/mikekohn/java_grinder/n64/Triangle"
+#define N643D_TRIANGLE_LEN (sizeof(N643D_TRIANGLE) - 1)
+#define N643D_RECTANGLE "net/mikekohn/java_grinder/n64/Rectangle"
+#define N643D_RECTANGLE_LEN (sizeof(N643D_RECTANGLE) - 1)
 
 // FIXME: Is this function ever called?  This looks like it was made to
 // deal with stuff like System.out.println() where System is the class,
@@ -321,6 +326,36 @@ int invoke_virtual(JavaClass *java_class, int method_id, Generator *generator)
       else
     {
       ret = blitter(java_class, generator, function.c_str());
+    }
+  }
+    else
+  if (strncmp(method_class.c_str(), N643D_TRIANGLE, N643D_TRIANGLE_LEN) == 0)
+  {
+    if (is_constructor == true)
+    {
+      if (method_sig == "()V")
+      {
+        ret = generator->nintendo64_n64_triangle_Constructor();
+      }
+    }
+      else
+    {
+      ret = nintendo64_n64_triangle(java_class, generator, function.c_str());
+    }
+  }
+    else
+  if (strncmp(method_class.c_str(), N643D_RECTANGLE, N643D_RECTANGLE_LEN) == 0)
+  {
+    if (is_constructor == true)
+    {
+      if (method_sig == "()V")
+      {
+        ret = generator->nintendo64_n64_rectangle_Constructor();
+      }
+    }
+      else
+    {
+      ret = nintendo64_n64_rectangle(java_class, generator, function.c_str());
     }
   }
 
