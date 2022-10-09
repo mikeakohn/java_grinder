@@ -56,6 +56,7 @@ private:
   void rsp_halt();
   void rsp_start();
   void rsp_copy_code();
+  void rsp_copy_cos_table();
   void rdp_copy_instructions();
   void insert_ntsc_setup();
   void insert_rsp_data();
@@ -68,6 +69,7 @@ private:
   void insert_triangle_draw();
   void insert_rectangle_draw();
   void insert_triangle_vertex_copy();
+  void insert_cos_table();
   void insert_rsp_code();
 };
 

@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <math.h>
 
 #include "generator/Nintendo64.h"
 
@@ -60,6 +61,7 @@ int Nintendo64::finish()
   insert_rectangle_draw();
   insert_triangle_draw();
   insert_triangle_vertex_copy();
+  insert_cos_table();
   insert_rsp_code();
   R4000::finish();
 
@@ -98,6 +100,7 @@ int Nintendo64::start_init()
 
   rsp_halt();
   rsp_copy_code();
+  rsp_copy_cos_table();
   rdp_copy_instructions();
   rsp_start();
 
@@ -302,8 +305,8 @@ int Nintendo64::nintendo64_n64_triangle_setRotation_III()
   fprintf(out,
     "  ;; nintendo64_n64_triangle_setRotation_III()\n"
     "  sh $t%d, 24($t%d)\n"
-    "  sh $t%d, 28($t%d)\n"
-    "  sh $t%d, 30($t%d)\n",
+    "  sh $t%d, 26($t%d)\n"
+    "  sh $t%d, 28($t%d)\n",
     rx, object,
     ry, object,
     rz, object);
@@ -656,6 +659,23 @@ void Nintendo64::rsp_copy_code()
     "  nop\n\n");
 }
 
+void Nintendo64::rsp_copy_cos_table()
+{
+  fprintf(out,
+    ";; Copy cos() table from ROM to RSP DMEM\n"
+    "  li $t1, (_cos_table_end - _cos_table_start) / 4\n"
+    "  li $a1, _cos_table_start\n"
+    "  li $a0, KSEG1 | RSP_DMEM + 1024\n"
+    "_copy_cos_table_loop:\n"
+    "  lw $t2, 0($a1)\n"
+    "  sw $t2, 0($a0)\n"
+    "  addiu $a1, $a1, 4\n"
+    "  addiu $a0, $a0, 4\n"
+    "  addiu $t1, $t1, -1\n"
+    "  bne $t1, $0, _copy_cos_table_loop\n"
+    "  nop\n\n");
+}
+
 void Nintendo64::rdp_copy_instructions()
 {
   fprintf(out,
@@ -806,7 +826,7 @@ void Nintendo64::insert_triangle_constructor()
   //   40: uint32_t color;
   //   44: uint8_t do_zbuffer;
   //       uint8_t reserved, reserved, reserved;
-  // }k
+  // };
 
   fprintf(out,
     "_triangle_constructor:\n"
@@ -853,14 +873,6 @@ void Nintendo64::insert_rectangle_constructor()
 
 void Nintendo64::insert_triangle_draw()
 {
-  //    0: uint16_t x0, y0, z0, reserved;
-  //    8: uint16_t x1, y1, z1, reserved;
-  //   16: uint16_t x2, y2, z2, reserved;
-  //   24: uint16_t rx, ry, rz, reserved;
-  //   32: uint16_t dx, dy, dz, reserved;
-  //   40: uint32_t color;
-  //   44: uint8_t do_zbuffer;
-  //       uint8_t reserved, reserved, reserved;
   fprintf(out,
     "_triangle_draw:\n"
     "  move $a1, $a0\n"
@@ -875,7 +887,7 @@ void Nintendo64::insert_triangle_draw()
     "  bne $a3, $0, _triangle_draw_memcpy\n"
     "  nop\n"
     "  ;; Set command to draw_triangle.\n"
-    "  li $at, 3 << 24\n"
+    "  li $at, 4 << 24\n"
     "  sw $at, 0($k1)\n"
     "  jr $ra\n"
     "  nop\n\n");
@@ -929,6 +941,41 @@ void Nintendo64::insert_triangle_vertex_copy()
     "  sh $t9, 28($a0)\n"
     "  jr $ra\n"
     "  nop\n\n");
+}
+
+void Nintendo64::insert_cos_table()
+{
+  uint32_t value;
+  int i;
+
+  fprintf(out, "_cos_table_start:\n");
+
+  for (i = 0; i < 512; i++)
+  {
+    float c = M_PI * 2;
+    float d = cos(((float)i / 512) * c);
+
+    if (d >= 0)
+    {
+      value = (int)(65536 * d);
+    }
+      else
+    {
+      value = (int)(65536 * -d);
+      value ^= 0xffffffff;
+      value += 1;
+    }
+
+    if ((i % 6) == 0)
+    {
+      if (i != 0) { fprintf(out, "\n"); }
+      fprintf(out, "  .dc32");
+    }
+
+    fprintf(out, " 0x%08x,", value);
+  }
+
+  fprintf(out, "\n_cos_table_end:\n\n");
 }
 
 void Nintendo64::insert_rsp_code()
