@@ -48,6 +48,10 @@ public class Memory
 
   /** Load a file from disk (at assembler time) and return a reference
       to it as an array of ints. */
+  public static short[] preloadShortArray(String filename) { return null; }
+
+  /** Load a file from disk (at assembler time) and return a reference
+      to it as an array of ints. */
   public static byte[] preloadByteArray(String filename) { return null; }
 
   /** Clear an array of bytes. */

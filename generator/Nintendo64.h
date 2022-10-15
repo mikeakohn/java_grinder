@@ -30,6 +30,7 @@ public:
   virtual int nintendo64_resetZBuffer();
   virtual int nintendo64_setScreen_I();
   virtual int nintendo64_plot_III();
+  virtual int nintendo64_loadTexture_aSII();
   virtual int nintendo64_waitForPolygon();
 
   virtual int nintendo64_n64_triangle_Constructor();
@@ -39,7 +40,8 @@ public:
   virtual int nintendo64_n64_triangle_setVertex0_III();
   virtual int nintendo64_n64_triangle_setVertex1_III();
   virtual int nintendo64_n64_triangle_setVertex2_III();
-  virtual int nintendo64_n64_triangle_setVertexes_bS();
+  virtual int nintendo64_n64_triangle_setVertexes_aS();
+  virtual int nintendo64_n64_triangle_setVertexes_aSI();
   virtual int nintendo64_n64_triangle_setZBuffer_Z();
   virtual int nintendo64_n64_triangle_draw();
 
@@ -47,7 +49,8 @@ public:
   virtual int nintendo64_n64_rectangle_setColor_I();
   virtual int nintendo64_n64_rectangle_setPosition_II();
   virtual int nintendo64_n64_rectangle_setSize_II();
-  virtual int nintendo64_n64_rectangle_setTexture_aBII();
+  virtual int nintendo64_n64_rectangle_setTextureEnabled_II();
+  virtual int nintendo64_n64_rectangle_setTextureDisabled();
   virtual int nintendo64_n64_rectangle_draw();
 
 private:
@@ -69,6 +72,7 @@ private:
   void insert_triangle_draw();
   void insert_rectangle_draw();
   void insert_triangle_vertex_copy();
+  void insert_load_texture();
   void insert_cos_table();
   void insert_rsp_code();
 };

@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -131,6 +131,7 @@ public:
   virtual int array_write_object(std::string &name, int field_id);
   virtual int cpu_nop();
   virtual int memory_preloadByteArray_X(const char *array_name);
+  virtual int memory_preloadShortArray_X(const char *array_name);
   virtual int memory_preloadIntArray_X(const char *array_name);
 
 protected:

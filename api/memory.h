@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -15,9 +15,22 @@
 #include "common/JavaClass.h"
 #include "generator/Generator.h"
 
-int memory(JavaClass *java_class, Generator *generator, const char *method_name);
-int memory(JavaClass *java_class, Generator *generator, const char *method_name, int const_val);
-int memory(JavaClass *java_class, Generator *generator, const char *function, const char *const_val);
+int memory(
+  JavaClass *java_class,
+  Generator *generator,
+  const char *method_name);
+
+int memory(
+  JavaClass *java_class,
+  Generator *generator,
+  const char *method_name,
+  int const_val);
+
+int memory(
+  JavaClass *java_class,
+  Generator *generator,
+  const char *function,
+  const char *const_val);
 
 #endif
 

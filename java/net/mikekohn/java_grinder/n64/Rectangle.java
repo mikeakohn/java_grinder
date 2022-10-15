@@ -22,7 +22,8 @@ public class Rectangle
 
   public void setPosition(int x, int y) { }
   public void setSize(int width, int height) { }
-  public void setTexture(short[] texture, int width, int height) { }
+  public void setTextureEnabled(int width, int height) { }
+  public void setTextureDisabled() { }
 
   public void draw() { }
 

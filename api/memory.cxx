@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2020 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -55,7 +55,11 @@ int memory(JavaClass *java_class, Generator *generator, const char *function)
   return -1;
 }
 
-int memory(JavaClass *java_class, Generator *generator, const char *function, int const_val)
+int memory(
+  JavaClass *java_class,
+  Generator *generator,
+  const char *function,
+  int const_val)
 {
   CHECK_FUNC_CONST(read8,_I)
   CHECK_FUNC_CONST(read16,_I)
@@ -63,9 +67,14 @@ int memory(JavaClass *java_class, Generator *generator, const char *function, in
   return -1;
 }
 
-int memory(JavaClass *java_class, Generator *generator, const char *function, const char *const_val)
+int memory(
+  JavaClass *java_class,
+  Generator *generator,
+  const char *function,
+  const char *const_val)
 {
   CHECK_FUNC_STRING(preloadByteArray,_X)
+  CHECK_FUNC_STRING(preloadShortArray,_X)
   CHECK_FUNC_STRING(preloadIntArray,_X)
 
   return -1;

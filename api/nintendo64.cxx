@@ -56,6 +56,7 @@ int nintendo64(
   CHECK_FUNC(resetZBuffer,)
   CHECK_FUNC(setScreen,_I)
   CHECK_FUNC(plot,_III)
+  CHECK_FUNC(loadTexture,_aSII)
   CHECK_FUNC(waitForPolygon,)
 
   return -1;
@@ -92,7 +93,8 @@ int nintendo64_n64_triangle(
   CHECK_FUNC_TRIANGLE(setVertex0,_III)
   CHECK_FUNC_TRIANGLE(setVertex1,_III)
   CHECK_FUNC_TRIANGLE(setVertex2,_III)
-  CHECK_FUNC_TRIANGLE(setVertexes,_bS)
+  CHECK_FUNC_TRIANGLE(setVertexes,_aS)
+  CHECK_FUNC_TRIANGLE(setVertexes,_aSI)
   CHECK_FUNC_TRIANGLE(setZBuffer,_Z)
   CHECK_FUNC_TRIANGLE(draw,)
 
@@ -108,7 +110,8 @@ int nintendo64_n64_rectangle(
   CHECK_FUNC_RECTANGLE(setColor,_I)
   CHECK_FUNC_RECTANGLE(setPosition,_II)
   CHECK_FUNC_RECTANGLE(setSize,_II)
-  CHECK_FUNC_RECTANGLE(setTexture,_aBII)
+  CHECK_FUNC_RECTANGLE(setTextureEnabled,_II)
+  CHECK_FUNC_RECTANGLE(setTextureDisabled,)
   CHECK_FUNC_RECTANGLE(draw,)
 
   return -1;

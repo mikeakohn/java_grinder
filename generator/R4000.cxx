@@ -1951,6 +1951,22 @@ int R4000::memory_preloadByteArray_X(const char *array_name)
   return 0;
 }
 
+int R4000::memory_preloadShortArray_X(const char *array_name)
+{
+  if (reg < 8)
+  {
+    fprintf(out, "  li $t%d, _%s\n", reg, array_name);
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  li $t8, _%s\n", array_name);
+    STACK_PUSH(8)
+  }
+
+  return 0;
+}
+
 int R4000::memory_preloadIntArray_X(const char *array_name)
 {
   if (reg < 8)

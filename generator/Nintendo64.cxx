@@ -61,6 +61,7 @@ int Nintendo64::finish()
   insert_rectangle_draw();
   insert_triangle_draw();
   insert_triangle_vertex_copy();
+  insert_load_texture();
   insert_cos_table();
   insert_rsp_code();
   R4000::finish();
@@ -83,16 +84,20 @@ int Nintendo64::start_init()
 
   fprintf(out,
     "  ;; $k0 points to struct of\n"
-    "  ;; uint32_t current_screen (with KSEG1)\n"
-    "  ;; uint32_t current_screen (for DMEM)\n"
-    "  ;; uint8_t  screen_id\n"
+    "  ;;  0: uint32_t current_screen (with KSEG1)\n"
+    "  ;;  4: uint32_t current_screen (for DMEM)\n"
+    "  ;;  8: uint8_t  screen_id\n"
+    "  ;;     uint8_t  reserved[3]\n"
+    "  ;; 12: uint32_t reserved\n"
+    "  ;; 16: uint16_t texture[]\n"
     "  li $k0, 320 * 240 * 2 * 2 * 2\n"
     "  li $t0, KSEG1 | 0x0010_0000\n"
     "  li $t2, 0x0010_0000\n"
     "  addu $k0, $k0, $t0\n"
     "  li $t1, 1\n"
     "  sw $t0, 0($k0)\n"
-    "  sb $t1, 4($k0)\n\n");
+    "  sw $t2, 4($k0)\n"
+    "  sb $t1, 8($k0)\n\n");
 
   fprintf(out,
     "  ;; $k1 points to DMEM\n"
@@ -220,6 +225,28 @@ int Nintendo64::nintendo64_plot_III()
     reg - 3, reg - 3, reg - 2,
     reg - 3,
     reg - 1);
+
+  reg -= 3;
+
+  return 0;
+}
+
+int Nintendo64::nintendo64_loadTexture_aSII()
+{
+  const int array = reg - 3;
+  const int width = reg - 2;
+  const int height = reg - 1;
+
+  fprintf(out,
+    "  ;; nintendo64_loadTexture_aSII()\n"
+    "  move $a0, $t%d\n"
+    "  move $a1, $t%d\n"
+    "  move $a2, $t%d\n"
+    "  jal _load_texture\n"
+    "  nop\n",
+    array,
+    width,
+    height);
 
   reg -= 3;
 
@@ -379,7 +406,7 @@ int Nintendo64::nintendo64_n64_triangle_setVertex2_III()
   return 0;
 }
 
-int Nintendo64::nintendo64_n64_triangle_setVertexes_bS()
+int Nintendo64::nintendo64_n64_triangle_setVertexes_aS()
 {
   const int object = reg - 2;
   const int array = reg - 1;
@@ -396,6 +423,32 @@ int Nintendo64::nintendo64_n64_triangle_setVertexes_bS()
     array);
 
   reg -= 2;
+
+  return 0;
+}
+
+int Nintendo64::nintendo64_n64_triangle_setVertexes_aSI()
+{
+  const int object = reg - 3;
+  const int array = reg - 2;
+  const int offset = reg - 1;
+
+  fprintf(out,
+    "  ;; nintendo64_n64_setVertexes_bS()\n"
+    "  move $s0, $ra\n"
+    "  move $a0, $t%d\n"
+    "  move $a1, $t%d\n"
+    "  sll $t%d, $t%d, 1\n"
+    "  addu $a1, $a1, $t%d\n"
+    "  jal _triangle_vertex_copy\n"
+    "  nop\n"
+    "  move $ra, $s0\n",
+    object,
+    array,
+    offset, offset,
+    offset);
+
+  reg -= 3;
 
   return 0;
 }
@@ -506,37 +559,34 @@ int Nintendo64::nintendo64_n64_rectangle_setSize_II()
   return 0;
 }
 
-int Nintendo64::nintendo64_n64_rectangle_setTexture_aBII()
+int Nintendo64::nintendo64_n64_rectangle_setTextureEnabled_II()
 {
-  const int object = reg - 4;
-  const int array = reg - 3;
+  const int object = reg - 3;
   const int width = reg - 2;
   const int height = reg - 1;
 
   fprintf(out,
-    "  ;; nintendo64_n64_rectangle_setTexture_aBII()\n"
-    "  sll $t%d, $t%d, 16\n"
-    "  or $t%d, $t%d, $t%d\n"
-    "  sw $t%d, 40($k1)\n"
-    "  sw $t%d, 48($k1)\n"
-    "  sw $t%d, 12($t%d)\n"
-    "  ;; Set command to setup_texture.\n"
-    "  li $t0, 7 << 24\n"
-    "  sw $t0, 0($a0)\n"
-    "set_texture_%d:\n"
-    "  lw $t0, 0($a0)\n"
-    "  bne $t0, $0, set_texture_%d\n"
-    "  nop\n",
-    width, width,
-    width, width, height,
-    width,
-    array,
-    array, object,
-    label_count,
-    label_count);
+    "  ;; nintendo64_n64_rectangle_setTextureEnabled_II()\n"
+    "  sh $t%d, 12($t%d)\n"
+    "  sh $t%d, 14($t%d)\n",
+    width, object,
+    height, object);
 
-  label_count += 1;
-  reg -= 4;
+  reg -= 3;
+
+  return 0;
+}
+
+int Nintendo64::nintendo64_n64_rectangle_setTextureDisabled()
+{
+  const int object = reg - 2;
+
+  fprintf(out,
+    "  ;; nintendo64_n64_rectangle_setTextureDisabled()\n"
+    "  sw $0, 12($t%d)\n",
+    object);
+
+  reg -= 1;
 
   return 0;
 }
@@ -702,6 +752,7 @@ void Nintendo64::insert_ntsc_setup()
     ";; NTSC values found in the Reality Coprocessor.pdf\n"
     ";; VI_CONTROL_REG:                   0 0011 0010 0000 1110\n"
     ";; VI_TIMING_REG:  0000 0011 1110 0101 0010 0010 0011 1001\n"
+    ".align 32\n"
     "ntsc_320x240x16:\n"
     "  .dc32 KSEG1 | VI_BASE | VI_CONTROL_REG,     0x0000_320e\n"
     "  .dc32 KSEG1 | VI_BASE | VI_DRAM_ADDR_REG,   0xa010_0000\n"
@@ -854,19 +905,17 @@ void Nintendo64::insert_rectangle_constructor()
   //    0: uint16_t x, y;
   //    4: uint16_t width, height;
   //    8: uint32_t color;
-  //   12: uint16_t *texture;
-  //   16: uint16_t texture_width, texture_height;
+  //   12: uint16_t texture_width, texture_height;
   // };
 
   fprintf(out,
     "_rectangle_constructor:\n"
-    "  addiu $sp, $sp, -6 * 4\n"
+    "  addiu $sp, $sp, -4 * 4\n"
     "  move $v0, $sp\n"
     "  sw $0,  0($v0)\n"
     "  sw $0,  4($v0)\n"
     "  sw $0,  8($v0)\n"
     "  sw $0, 12($v0)\n"
-    "  sw $0, 16($v0)\n"
     "  jr $ra\n"
     "  nop\n\n");
 }
@@ -910,8 +959,22 @@ void Nintendo64::insert_rectangle_draw()
     "  sw $s2, 16($k1)\n"
     "  lw $at,  8($a0)\n"
     "  sw $at, 48($k1)\n"
+    "  lw $t8, 12($a0)\n"
+    "  bne $t8, $0, _rectangle_draw_with_texture\n"
+    "  nop\n");
+
+  fprintf(out,
     "  ;; Set command to draw_rectangle.\n"
     "  li $at, 5 << 24\n"
+    "  sw $at, 0($k1)\n"
+    "  jr $ra\n"
+    "  nop\n");
+
+  fprintf(out,
+    "_rectangle_draw_with_texture:\n"
+    "  ;; Set command to draw_rectangle with texture.\n"
+    "  sw $t8, 40($k1)\n"
+    "  li $at, 6 << 24\n"
     "  sw $at, 0($k1)\n"
     "  jr $ra\n"
     "  nop\n\n");
@@ -919,26 +982,61 @@ void Nintendo64::insert_rectangle_draw()
 
 void Nintendo64::insert_triangle_vertex_copy()
 {
-
   fprintf(out,
     "_triangle_vertex_copy:\n"
     "  ;; X0, Y0, Z0\n"
     "  lw $t8,  0($a1)\n"
     "  lw $t9,  4($a1)\n"
-    "  sw $t8,  8($a0)\n"
-    "  sw $t9, 12($a0)\n"
+    "  sw $t8,  0($a0)\n"
+    "  sw $t9,  4($a0)\n"
     "  ;; X1, Y1, Z1\n"
     "  lh $t8,  6($a1)\n"
     "  lh $t9,  8($a1)\n"
     "  lh $at, 10($a1)\n"
-    "  lh $t8, 16($a0)\n"
-    "  lh $t9, 18($a0)\n"
-    "  lh $at, 20($a0)\n"
+    "  sh $t8,  8($a0)\n"
+    "  sh $t9, 10($a0)\n"
+    "  sh $at, 12($a0)\n"
     "  ;; X2, Y2, Z2\n"
     "  lw $t8, 12($a1)\n"
     "  lh $t9, 14($a1)\n"
-    "  sw $t8, 24($a0)\n"
-    "  sh $t9, 28($a0)\n"
+    "  sw $t8, 16($a0)\n"
+    "  sh $t9, 20($a0)\n"
+    "  jr $ra\n"
+    "  nop\n\n");
+}
+
+void Nintendo64::insert_load_texture()
+{
+  fprintf(out,
+    "_load_texture:\n"
+    "  ;; Copy texture to video RAM.\n"
+    "  addiu $a3, $k0, 16\n"
+    "  multu $a1, $a2\n"
+    "  mflo $t8\n"
+    //"  move $t9, $a3\n"
+    "_load_texture_memcpy:\n"
+    "  lh $at, 0($a0)\n"
+    "  sh $at, 0($a3)\n"
+    "  addiu $a0, $a0, 2\n"
+    "  addiu $a3, $a3, 2\n"
+    "  addiu $t8, $t8, -1\n"
+    "  bne $t8, $0, _load_texture_memcpy\n"
+    "  nop\n"
+    "  ;; Copy setup to DMEM.\n"
+    "  sll $a1, $a1, 16\n"
+    "  or $a1, $a1, $a2\n"
+    "  sw $a1, 40($k1)\n"
+    "  li $a3, 0x0010_0000 + (320 * 240 * 2 * 2 * 2) + 16\n"
+    "  sw $a3, 48($k1)\n");
+
+  fprintf(out,
+    "  ;; Set command to setup_texture.\n"
+    "  li $at, 7 << 24\n"
+    "  sw $at, 0($k1)\n"
+    "_load_texture_wait:\n"
+    "  lw $at, 0($k1)\n"
+    "  bne $at, $0, _load_texture_wait\n"
+    "  nop\n"
     "  jr $ra\n"
     "  nop\n\n");
 }

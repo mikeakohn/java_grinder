@@ -27,6 +27,7 @@ public:
   virtual int memory_allocStackShorts_I() { return -1; }
   virtual int memory_allocStackInts_I() { return -1; }
   virtual int memory_preloadByteArray_X(const char *array_name) { return -1; }
+  virtual int memory_preloadShortArray_X(const char *array_name) { return -1; }
   virtual int memory_preloadIntArray_X(const char *array_name) { return -1; }
   virtual int memory_clearArray_aB() { return -1; }
   virtual int memory_clearArray_aS() { return -1; }

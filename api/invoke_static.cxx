@@ -346,12 +346,14 @@ int invoke_static(
     if (strcmp(cls, "Memory") == 0)
     {
       if (function == "preloadByteArray_X" ||
+          function == "preloadShortArray_X" ||
           function == "preloadIntArray_X")
       {
         char array_name[strlen(const_val) + 1];
         int ptr = 0;
         int type = TYPE_BYTE;
 
+        if (function == "preloadShortArray_X") { type = TYPE_SHORT; }
         if (function == "preloadIntArray_X") { type = TYPE_INT; }
 
         while(const_val[ptr] != 0)

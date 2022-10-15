@@ -33,6 +33,7 @@ public class Triangle
 
   /** Array of [ x0, y0, z0, x1, y1, z1, x2, y2, z2 ]. */
   public void setVertexes(short[] points) { }
+  public void setVertexes(short[] points, int offset) { }
 
   public void setZBuffer(boolean is_enabled) { }
 

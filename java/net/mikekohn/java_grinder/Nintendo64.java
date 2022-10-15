@@ -35,6 +35,9 @@ abstract public class Nintendo64
       0xf800. */
   public static void plot(int x, int y, int color) { }
 
+  /** Load texture into TMEM. */
+  public static void loadTexture(short[] texture, int width, int height) { }
+
   /** Wait for the last rectangle / triangle to finish drawing. */
   public static void waitForPolygon() { }
 }
