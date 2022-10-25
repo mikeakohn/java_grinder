@@ -9,16 +9,16 @@
  *
  */
 
-#ifndef JAVA_GRINDER_GENERATOR_TI99_H
-#define JAVA_GRINDER_GENERATOR_TI99_H
+#ifndef JAVA_GRINDER_GENERATOR_COLECO_VISION_H
+#define JAVA_GRINDER_GENERATOR_COLECO_VISION_H
 
 #include "generator/TMS9900.h"
 
-class TI99 : public TMS9900
+class ColecoVision : public Z80
 {
 public:
-  TI99();
-  virtual ~TI99();
+  ColecoVision();
+  virtual ~ColecoVision();
 
   virtual int open(const char *filename);
   virtual int start_init();
@@ -66,7 +66,6 @@ private:
   bool need_set_sprite_image:1;
   bool need_set_sprite_pos:1;
   bool need_set_sprite_color:1;
-  char app_name[16];
 };
 
 #endif

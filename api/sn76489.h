@@ -9,24 +9,24 @@
  *
  */
 
-#ifndef JAVA_GRINDER_API_TI99_H
-#define JAVA_GRINDER_API_TI99_H
+#ifndef JAVA_GRINDER_API_SN76489_H
+#define JAVA_GRINDER_API_SN76489_H
 
 #include "common/JavaClass.h"
 #include "generator/Generator.h"
 
-int ti99(
+int sn76489(
   JavaClass *java_class,
   Generator *generator,
   const char *method_name);
 
-int ti99(
+int sn76489(
   JavaClass *java_class,
   Generator *generator,
   const char *method_name,
   int const_val);
 
-int ti99(
+int sn76489(
   JavaClass *java_class,
   Generator *generator,
   const char *method_name,

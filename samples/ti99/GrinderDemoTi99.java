@@ -1,5 +1,7 @@
 
+import net.mikekohn.java_grinder.SN76489;
 import net.mikekohn.java_grinder.TI99;
+import net.mikekohn.java_grinder.TMS9918A;
 
 public class GrinderDemoTi99
 {
@@ -111,20 +113,20 @@ public class GrinderDemoTi99
   static public void drawMandelbrot()
   {
     final int DEC_PLACE = 4;
-    int x,y;
+    int x, y;
     //int rs = (-2 << DEC_PLACE), re = (1 << DEC_PLACE);
     //int is = (-1 << DEC_PLACE), ie = (1 << DEC_PLACE);
-    int rs,is;
-    int zi,zr;
-    int tr,ti;
-    int zr2,zi2;
+    int rs, is;
+    int zi, zr;
+    int tr, ti;
+    int zr2, zi2;
     //int dx = 0x0019, dy = 0x0015;  according to debugger, 2 lines below work
     //int dx = (re - rs) / 32;
     //int dy = (ie - is) / 24;
     //int rs_save = rs;
     int count;
 
-    TI99.setCursor(0, 0);
+    TMS9918A.setCursor(0, 0);
 
     for (y = 0; y < 24; y++)
     {
@@ -152,9 +154,9 @@ public class GrinderDemoTi99
           zi = ti + is;
         }
 
-        //TI99.printChar((char)((count >> 2) + '0'));
-        //TI99.printChar((char)(count << 4));
-        TI99.plot(x, y, (char)(count << 4));
+        //TMS9918A.printChar((char)((count >> 2) + '0'));
+        //TMS9918A.printChar((char)(count << 4));
+        TMS9918A.plot(x, y, (char)(count << 4));
 
         //rs += dx;
       }
@@ -165,33 +167,33 @@ public class GrinderDemoTi99
 
   static public void playSong1()
   {
-    TI99.setSoundFreq(0, tones[song_1[song_ptr++]]);
-    TI99.setSoundFreq(1, tones[song_1[song_ptr++]]);
-    TI99.setSoundFreq(2, tones[song_1[song_ptr++]]);
-    TI99.setSoundVolume(0, song_1[song_ptr++]);
-    TI99.setSoundVolume(1, song_1[song_ptr++]);
-    TI99.setSoundVolume(2, song_1[song_ptr++]);
+    SN76489.setSoundFreq(0, tones[song_1[song_ptr++]]);
+    SN76489.setSoundFreq(1, tones[song_1[song_ptr++]]);
+    SN76489.setSoundFreq(2, tones[song_1[song_ptr++]]);
+    SN76489.setSoundVolume(0, song_1[song_ptr++]);
+    SN76489.setSoundVolume(1, song_1[song_ptr++]);
+    SN76489.setSoundVolume(2, song_1[song_ptr++]);
 
     if (song_ptr == song_1.length) { song_ptr = 0; }
   }
 
   static public void playSong2()
   {
-    TI99.setSoundFreq(0, tones[song_2[song_ptr++]]);
-    TI99.setSoundFreq(1, tones[song_2[song_ptr++]]);
-    TI99.setSoundFreq(2, tones[song_2[song_ptr++]]);
-    TI99.setSoundVolume(0, song_2[song_ptr++]);
-    TI99.setSoundVolume(1, song_2[song_ptr++]);
-    TI99.setSoundVolume(2, song_2[song_ptr++]);
+    SN76489.setSoundFreq(0, tones[song_2[song_ptr++]]);
+    SN76489.setSoundFreq(1, tones[song_2[song_ptr++]]);
+    SN76489.setSoundFreq(2, tones[song_2[song_ptr++]]);
+    SN76489.setSoundVolume(0, song_2[song_ptr++]);
+    SN76489.setSoundVolume(1, song_2[song_ptr++]);
+    SN76489.setSoundVolume(2, song_2[song_ptr++]);
 
     if (song_ptr == song_2.length) { song_ptr = 0; }
   }
 
   static public void soundOff()
   {
-    TI99.setSoundVolume(0, 15);
-    TI99.setSoundVolume(1, 15);
-    TI99.setSoundVolume(2, 15);
+    SN76489.setSoundVolume(0, 15);
+    SN76489.setSoundVolume(1, 15);
+    SN76489.setSoundVolume(2, 15);
   }
 
   static public void delay()
@@ -220,10 +222,10 @@ public class GrinderDemoTi99
 
   static public void playTone(int tone)
   {
-    TI99.setSoundFreq(0, tones[tone]);
-    TI99.setSoundVolume(0, 0);
+    SN76489.setSoundFreq(0, tones[tone]);
+    SN76489.setSoundVolume(0, 0);
     delayShort();
-    TI99.setSoundVolume(0, 15);
+    SN76489.setSoundVolume(0, 15);
     delayShortTwo();
   }
 
@@ -235,7 +237,7 @@ public class GrinderDemoTi99
     {
       for (b = 0; b < 4; b++)
       {
-        TI99.setSpriteColor(b, a + b + 1);
+        TMS9918A.setSpriteColor(b, a + b + 1);
       }
       delayShort();
     }
@@ -247,8 +249,8 @@ public class GrinderDemoTi99
 
     for (a = 0; a < 4; a++)
     {
-      TI99.setSpriteColor(a, a + 1);
-      TI99.setSpritePos(a, 0xff, 0xd0);
+      TMS9918A.setSpriteColor(a, a + 1);
+      TMS9918A.setSpritePos(a, 0xff, 0xd0);
     }
   }
 
@@ -258,14 +260,14 @@ public class GrinderDemoTi99
 
     for (x = x0; x <= x1; x++)
     {
-      TI99.plot(x, y0, color);
-      TI99.plot(x, y1, color);
+      TMS9918A.plot(x, y0, color);
+      TMS9918A.plot(x, y1, color);
     }
 
     for (y = y0; y <= y1; y++)
     {
-      TI99.plot(x0, y, color);
-      TI99.plot(x1, y, color);
+      TMS9918A.plot(x0, y, color);
+      TMS9918A.plot(x1, y, color);
     }
   }
 
@@ -277,7 +279,7 @@ public class GrinderDemoTi99
     {
       for (x = x0; x <= x1; x++)
       {
-        TI99.plot(x, y, color);
+        TMS9918A.plot(x, y, color);
       }
     }
   }
@@ -292,30 +294,30 @@ public class GrinderDemoTi99
       delayShortTwo();
     }
 
-    TI99.clearScreen();
+    TMS9918A.clearScreen();
   }
 
   static public void showSunMessage()
   {
-    TI99.setCursor(10, 8);
-    TI99.print("IN MEMORY OF");
-    TI99.setCursor(8, 12);
-    TI99.print("SUN MICROSYSTEMS");
-    TI99.setCursor(11, 16);
-    TI99.print("1982-2010");
+    TMS9918A.setCursor(10, 8);
+    TMS9918A.print("IN MEMORY OF");
+    TMS9918A.setCursor(8, 12);
+    TMS9918A.print("SUN MICROSYSTEMS");
+    TMS9918A.setCursor(11, 16);
+    TMS9918A.print("1982-2010");
     delayLong();
-    TI99.clearScreen();
+    TMS9918A.clearScreen();
   }
 
   static public void spritesInit()
   {
     int a,x;
 
-    TI99.setSpriteSize(TI99.SPRITE_SIZE_16X16_SMALL);
-    TI99.setSpriteImage(0, sprite_j);
-    TI99.setSpriteImage(1, sprite_a);
-    TI99.setSpriteImage(2, sprite_v);
-    TI99.setSpriteImage(3, sprite_a);
+    TMS9918A.setSpriteSize(TMS9918A.SPRITE_SIZE_16X16_SMALL);
+    TMS9918A.setSpriteImage(0, sprite_j);
+    TMS9918A.setSpriteImage(1, sprite_a);
+    TMS9918A.setSpriteImage(2, sprite_v);
+    TMS9918A.setSpriteImage(3, sprite_a);
     hideSprites();
 
     x = 0x45;
@@ -331,24 +333,24 @@ public class GrinderDemoTi99
 
   static public void spritesDisplay()
   {
-    TI99.setSpritePos(0, 0x45, 0x40);
+    TMS9918A.setSpritePos(0, 0x45, 0x40);
     playTone(0);
-    TI99.setSpritePos(1, 0x65, 0x40);
+    TMS9918A.setSpritePos(1, 0x65, 0x40);
     playTone(4);
-    TI99.setSpritePos(2, 0x85, 0x40);
+    TMS9918A.setSpritePos(2, 0x85, 0x40);
     playTone(7);
-    TI99.setSpritePos(3, 0xa5, 0x40);
+    TMS9918A.setSpritePos(3, 0xa5, 0x40);
     playTone(9);
 
-    TI99.setCursor(13, 12);
-    TI99.print("GRINDER");
+    TMS9918A.setCursor(13, 12);
+    TMS9918A.print("GRINDER");
 
-    TI99.setSoundFreq(0, tones[0]);
-    TI99.setSoundVolume(0, 0);
-    TI99.setSoundFreq(1, tones[4]);
-    TI99.setSoundVolume(1, 0);
-    TI99.setSoundFreq(2, tones[7]);
-    TI99.setSoundVolume(2, 0);
+    SN76489.setSoundFreq(0, tones[0]);
+    SN76489.setSoundVolume(0, 0);
+    SN76489.setSoundFreq(1, tones[4]);
+    SN76489.setSoundVolume(1, 0);
+    SN76489.setSoundFreq(2, tones[7]);
+    SN76489.setSoundVolume(2, 0);
 
     delay();
 
@@ -356,7 +358,7 @@ public class GrinderDemoTi99
 
     //scrollcolors();
 
-    TI99.clearScreen();
+    TMS9918A.clearScreen();
     hideSprites();
   }
 
@@ -367,7 +369,7 @@ public class GrinderDemoTi99
     x = 0x45;
     for (a = 0; a < 4; a++)
     {
-      TI99.setSpritePos(a, x, 0x40);
+      TMS9918A.setSpritePos(a, x, 0x40);
       x += 0x20;
     }
   }
@@ -380,8 +382,8 @@ public class GrinderDemoTi99
 
     for (a = 0; a < 4; a++)
     {
-      TI99.setSpritePos(a, sprite_x[a], sprite_y[a]);
-      TI99.setSpriteColor(a, c);
+      TMS9918A.setSpritePos(a, sprite_x[a], sprite_y[a]);
+      TMS9918A.setSpriteColor(a, c);
       c++;
 
       sprite_x[a] += sprite_dx[a];
@@ -406,9 +408,9 @@ public class GrinderDemoTi99
     x = 0; y = 0;
     count = 0;
 
-    while(true)
+    while (true)
     {
-      TI99.clearScreen();
+      TMS9918A.clearScreen();
       drawBoxFill(x, y, x + 4, y + 4, (x & 0xf) << 4);
 
       x += dx;
@@ -447,7 +449,7 @@ public class GrinderDemoTi99
     x = 0; y = 0;
     count = 0;
 
-    while(true)
+    while (true)
     {
       drawBoxFill(x, y, x + 4, y + 4, (x & 0xf) << 4);
 
@@ -461,7 +463,7 @@ public class GrinderDemoTi99
 
       if (count == 200)
       {
-        TI99.setSpriteSize(TI99.SPRITE_SIZE_16X16_BIG);
+        TMS9918A.setSpriteSize(TMS9918A.SPRITE_SIZE_16X16_BIG);
       }
 
       if ((count & 0xf) == 0)
@@ -489,7 +491,7 @@ public class GrinderDemoTi99
     spritesInit();
     spritesDisplay();
 
-    TI99.setColors();
+    TMS9918A.setColors();
     drawMandelbrot();
 
     delay();
@@ -504,17 +506,17 @@ public class GrinderDemoTi99
     clearScreenSlow();
     //spritesInit();
 
-    TI99.setSpritePos(0, 0x45, 0x40);
-    TI99.setSpritePos(1, 0x65, 0x40);
-    TI99.setSpritePos(2, 0x85, 0x40);
-    TI99.setSpritePos(3, 0xa5, 0x40);
+    TMS9918A.setSpritePos(0, 0x45, 0x40);
+    TMS9918A.setSpritePos(1, 0x65, 0x40);
+    TMS9918A.setSpritePos(2, 0x85, 0x40);
+    TMS9918A.setSpritePos(3, 0xa5, 0x40);
 
     scrollcolors();
     //delay();
-    //TI99.setSpriteSize(TI99.SPRITE_SIZE_16X16_BIG);
+    //TMS9918A.setSpriteSize(TMS9918A.SPRITE_SIZE_16X16_BIG);
     //scrollcolors();
 
-    while(true);
+    while (true);
   }
 }
 

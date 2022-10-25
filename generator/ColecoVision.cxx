@@ -14,11 +14,11 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "generator/TI99.h"
+#include "generator/ColecoVision.h"
 
 // http://www.nouspikel.com/ti99/titechpages.htm
 
-TI99::TI99() :
+ColecoVision::ColecoVision() :
   need_vdp_command(false),
   need_print_string(false),
   need_clear_screen(false),
@@ -33,11 +33,11 @@ TI99::TI99() :
 {
 }
 
-TI99::~TI99()
+ColecoVision::~ColecoVision()
 {
 }
 
-int TI99::open(const char *filename)
+int ColecoVision::open(const char *filename)
 {
   if (TMS9900::open(filename) != 0) { return -1; }
 
@@ -45,21 +45,10 @@ int TI99::open(const char *filename)
   fprintf(out, "ram_start equ RAM\n");
   fprintf(out, "heap_ptr equ ram_start\n");
 
-  strncpy(app_name, filename, 16);
-  app_name[15] = 0;
-
-  int n;
-  for (n = 0; n < 16; n++)
-  {
-    if (app_name[n] == '_') { app_name[n] = ' '; }
-    else if (app_name[n] >= 'a' && app_name[n] <= 'z') { app_name[n] &= 0xdf; }
-    else if (app_name[n] == 0) { break; }
-  }
-
   return 0;
 }
 
-int TI99::finish()
+int ColecoVision::finish()
 {
   if (need_vdp_command) { insert_vdp_command(); }
   if (need_print_string) { insert_print_string(); }
@@ -76,25 +65,8 @@ int TI99::finish()
   return 0;
 }
 
-int TI99::start_init()
+int ColecoVision::start_init()
 {
-  fprintf(out,
-    "\n"
-  ".org 0x6000\n"
-  "  .db 0xaa, 0x01, 0x01, 0x00\n"
-  "  .dw 0x0000\n"
-  "  .dw _prog\n"
-  "  .dw 0x0000\n"
-  "  .dw 0x0000\n"
-  "  .dw 0x0000\n"
-  "  .dw 0x0000\n"
-  "_prog:\n"
-  "  .dw 0x0000\n"
-  "  .dw start\n"
-  "  .db %d, \"%s\"\n", (int)strlen(app_name), app_name);
-
-  fprintf(out, ".align 16\n\n");
-
   // Add any set up items (stack, registers, etc).
   fprintf(out, "start:\n");
 
@@ -108,7 +80,7 @@ int TI99::start_init()
   return 0;
 }
 
-int TI99::tms9918a_print_X()
+int ColecoVision::tms9918a_print_X()
 {
   need_print_string = true;
 
@@ -126,7 +98,7 @@ int TI99::tms9918a_print_X()
   return 0;
 }
 
-int TI99::tms9918a_printChar_C()
+int ColecoVision::tms9918a_printChar_C()
 {
   fprintf(out,
     "  ;; tms9918a_printChar_C()\n"
@@ -140,7 +112,7 @@ int TI99::tms9918a_printChar_C()
   return 0;
 }
 
-int TI99::tms9918a_printChar_C(int c)
+int ColecoVision::tms9918a_printChar_C(int c)
 {
   fprintf(out,
     "  ;; tms9918a_printChar_C(%d)\n"
@@ -152,7 +124,7 @@ int TI99::tms9918a_printChar_C(int c)
   return 0;
 }
 
-int TI99::tms9918a_setCursor_II()
+int ColecoVision::tms9918a_setCursor_II()
 {
   //mov @-24(r10), r3  ; push local_11
   //mov @-24(r10), r4  ; push local_11
@@ -178,7 +150,7 @@ int TI99::tms9918a_setCursor_II()
   return 0;
 }
 
-int TI99::tms9918a_setCursor_II(int x, int y)
+int ColecoVision::tms9918a_setCursor_II(int x, int y)
 {
   need_vdp_command = true;
   int offset = (y * 32) + x;
@@ -196,12 +168,12 @@ int TI99::tms9918a_setCursor_II(int x, int y)
   return 0;
 }
 
-int TI99::tms9918a_setGraphicsMode_I()
+int ColecoVision::tms9918a_setGraphicsMode_I()
 {
   return -1;
 }
 
-int TI99::tms9918a_setGraphicsMode_I(int mode)
+int ColecoVision::tms9918a_setGraphicsMode_I(int mode)
 {
   need_vdp_command = true;
 
@@ -247,7 +219,7 @@ int TI99::tms9918a_setGraphicsMode_I(int mode)
   return 0;
 }
 
-int TI99::tms9918a_clearScreen()
+int ColecoVision::tms9918a_clearScreen()
 {
   need_clear_screen = true;
 
@@ -261,7 +233,7 @@ int TI99::tms9918a_clearScreen()
   return 0;
 }
 
-int TI99::tms9918a_plot_III()
+int ColecoVision::tms9918a_plot_III()
 {
   need_plot = true;
 
@@ -283,7 +255,7 @@ int TI99::tms9918a_plot_III()
   return 0;
 }
 
-int TI99::tms9918a_setColors()
+int ColecoVision::tms9918a_setColors()
 {
   need_set_colors = true;
 
@@ -297,7 +269,7 @@ int TI99::tms9918a_setColors()
   return 0;
 }
 
-int TI99::tms9918a_setSpriteVisible_IZ()
+int ColecoVision::tms9918a_setSpriteVisible_IZ()
 {
   need_set_sprite_visible = true;
 
@@ -317,7 +289,7 @@ int TI99::tms9918a_setSpriteVisible_IZ()
   return 0;
 }
 
-int TI99::tms9918a_setSpriteImage_IaB()
+int ColecoVision::tms9918a_setSpriteImage_IaB()
 {
   need_set_sprite_image = true;
 
@@ -343,7 +315,7 @@ int TI99::tms9918a_setSpriteImage_IaB()
   return 0;
 }
 
-int TI99::tms9918a_setSpritePos_III()
+int ColecoVision::tms9918a_setSpritePos_III()
 {
   need_set_sprite_pos = true;
 
@@ -365,7 +337,7 @@ int TI99::tms9918a_setSpritePos_III()
   return 0;
 }
 
-int TI99::tms9918a_setSpriteColor_II()
+int ColecoVision::tms9918a_setSpriteColor_II()
 {
   need_set_sprite_color = true;
 
@@ -385,7 +357,7 @@ int TI99::tms9918a_setSpriteColor_II()
   return 0;
 }
 
-int TI99::tms9918a_setSpriteSize_I()
+int ColecoVision::tms9918a_setSpriteSize_I()
 {
   fprintf(out,
     "  ;; tms9918a_setSpriteSize_I()\n"
@@ -405,7 +377,7 @@ int TI99::tms9918a_setSpriteSize_I()
   return 0;
 }
 
-int TI99::sn76489_setSoundFreq_II()
+int ColecoVision::sn76489_setSoundFreq_II()
 {
   need_set_sound_freq = true;
 
@@ -425,7 +397,7 @@ int TI99::sn76489_setSoundFreq_II()
   return 0;
 }
 
-int TI99::sn76489_setSoundVolume_II()
+int ColecoVision::sn76489_setSoundVolume_II()
 {
   need_set_sound_volume = true;
 
@@ -445,7 +417,7 @@ int TI99::sn76489_setSoundVolume_II()
   return 0;
 }
 
-void TI99::insert_print_string()
+void ColecoVision::insert_print_string()
 {
   fprintf(out,
     "_print_string:\n"
@@ -457,7 +429,7 @@ void TI99::insert_print_string()
     "  b *r11\n\n");
 }
 
-void TI99::insert_vdp_command()
+void ColecoVision::insert_vdp_command()
 {
   fprintf(out,
     "_vdp_command:\n"
@@ -468,7 +440,7 @@ void TI99::insert_vdp_command()
     "  b *r11\n\n");
 }
 
-void TI99::insert_clear_screen()
+void ColecoVision::insert_clear_screen()
 {
   fprintf(out,
     "_clear_screen:\n"
@@ -485,7 +457,7 @@ void TI99::insert_clear_screen()
     "  b *r11\n\n");
 }
 
-void TI99::insert_plot()
+void ColecoVision::insert_plot()
 {
   fprintf(out,
     "  ;; plot(r0, r1, r9)\n"
@@ -502,7 +474,7 @@ void TI99::insert_plot()
     "  b *r11\n\n");
 }
 
-void TI99::insert_set_colors()
+void ColecoVision::insert_set_colors()
 {
   // Screen image is 300 bytes long (24x32) (defaults to 0x000)
   // Color table is 32 bytes long. (defaults to 0x380)
@@ -535,7 +507,7 @@ void TI99::insert_set_colors()
     "  b *r11\n\n");
 }
 
-void TI99::insert_set_sound_freq()
+void ColecoVision::insert_set_sound_freq()
 {
   fprintf(out,
     "  ;; set_sound_freq(voice=r0, freq=r1);\n"
@@ -549,7 +521,7 @@ void TI99::insert_set_sound_freq()
     "  b *r11\n\n");
 }
 
-void TI99::insert_set_sound_volume()
+void ColecoVision::insert_set_sound_volume()
 {
   fprintf(out,
     "  ;; set_sound_volume(voice=r0, volume=r1);\n"
@@ -563,7 +535,7 @@ void TI99::insert_set_sound_volume()
     "  b *r11\n\n");
 }
 
-void TI99::insert_set_sprite_visible()
+void ColecoVision::insert_set_sprite_visible()
 {
   // Sprite attributes table is at 0x300-0x380
   fprintf(out,
@@ -581,7 +553,7 @@ void TI99::insert_set_sprite_visible()
     "  b *r11\n\n");
 }
 
-void TI99::insert_set_sprite_image()
+void ColecoVision::insert_set_sprite_image()
 {
   // Sprite patterns table is at 0x3a0-0x780
   fprintf(out,
@@ -616,7 +588,7 @@ void TI99::insert_set_sprite_image()
     "  b *r11\n\n");
 }
 
-void TI99::insert_set_sprite_pos()
+void ColecoVision::insert_set_sprite_pos()
 {
   // Sprite attributes table is at 0x300
   fprintf(out,
@@ -635,9 +607,8 @@ void TI99::insert_set_sprite_pos()
     "  b *r11\n\n");
 }
 
-void TI99::insert_set_sprite_color()
+void ColecoVision::insert_set_sprite_color()
 {
-  // Sprite attributes table is at 0x300
   fprintf(out,
     "  ;; set_sprite_color(index=r0, color=r1)\n"
     "_set_sprite_color:\n"

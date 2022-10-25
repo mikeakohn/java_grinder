@@ -11,9 +11,9 @@
 
 package net.mikekohn.java_grinder;
 
-abstract public class TI99
+abstract public class ColecoVision
 {
-  protected TI99() { }
+  protected ColecoVision() { }
 
 }
 

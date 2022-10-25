@@ -14,46 +14,50 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "api/ti99.h"
+#include "api/sn76489.h"
 
 #define CHECK_FUNC(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return generator->ti99_##funct##sig(); \
+    return generator->sn76489_##funct##sig(); \
   }
 
 #define CHECK_FUNC_CONST(funct,sig) \
   if (strcmp(#funct#sig, method_name) == 0) \
   { \
-    return generator->ti99_##funct##sig(const_val); \
+    return generator->sn78489_##funct##sig(const_val); \
   }
 
 #define CHECK_FUNC_CONST_2(funct,sig) \
   if (strcmp(#funct#sig, function) == 0) \
   { \
-    return generator->ti99_##funct##sig(const_val1, const_val2); \
+    return generator->sn78489_##funct##sig(const_val1, const_val2); \
   }
 
-int ti99(
+int sn76489(
   JavaClass *java_class,
   Generator *generator,
   const char *method_name)
 {
+  CHECK_FUNC(setSoundFreq,_II)
+  CHECK_FUNC(setSoundVolume,_II)
 
   return -1;
 }
 
-int ti99(
+int sn76489(
   JavaClass *java_class,
   Generator *generator,
   const char *method_name,
   int const_val)
 {
+  //CHECK_FUNC_CONST(setSoundFreq,_II)
+  //CHECK_FUNC_CONST(setSoundVolume,_II)
 
   return -1;
 }
 
-int ti99(
+int sn76489(
   JavaClass *java_class,
   Generator *generator,
   const char *function,

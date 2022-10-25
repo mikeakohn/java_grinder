@@ -41,10 +41,12 @@
 #include "api/sega_genesis.h"
 #include "api/spi.h"
 #include "api/snes.h"
+#include "api/sn76489.h"
 #include "api/sxb.h"
 #include "api/ti84.h"
 #include "api/ti99.h"
 #include "api/timer.h"
+#include "api/tms9918a.h"
 #include "api/trs80_coco.h"
 #include "api/uart.h"
 #include "api/watchdog.h"
@@ -176,9 +178,11 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     CHECK(Playstation2, playstation2)
     CHECK(Propeller, propeller)
     CHECK(SegaGenesis, sega_genesis)
+    CHECK(SN76489, sn76489)
     CHECK(SNES, snes)
     CHECK(TI84, ti84)
     CHECK(TI99, ti99)
+    CHECK(TMS9918A, tms9918a)
     CHECK(TRS80Coco, trs80_coco)
     CHECK(SXB, sxb)
     CHECK(Watchdog, watchdog)
@@ -276,9 +280,12 @@ int invoke_static(
     CHECK_CONST(SNES, snes)
     CHECK_CONST(TRS80Coco, trs80_coco)
     CHECK_CONST(SXB, sxb)
+    CHECK_CONST(SN76489, sn76489)
     CHECK_WITH_PORT_CONST(SPI, spi, 0)
     CHECK_WITH_PORT_CONST(SPI, spi, 1)
-    CHECK_WITH_PORT_CONST(TI99, ti99, 0)
+    //CHECK_WITH_PORT_CONST(TI99, ti99, 0)
+    CHECK_CONST(TI99, ti99)
+    CHECK_CONST(TMS9918A, tms9918a)
     CHECK_WITH_PORT_CONST(UART, uart, 0)
     CHECK_WITH_PORT_CONST(UART, uart, 1)
     CHECK_CONST(Watchdog, watchdog)
@@ -295,7 +302,9 @@ int invoke_static(
     CHECK_CONST_2(CPC, cpc)
     CHECK_CONST_2(MSX, msx)
     CHECK_CONST_2(Playstation2, playstation2)
+    CHECK_CONST_2(SN76489, sn76489)
     CHECK_CONST_2(TI99, ti99)
+    CHECK_CONST_2(TMS9918A, tms9918a)
     CHECK_CONST_2(SegaGenesis, sega_genesis)
     CHECK_CONST_2(SNES, snes)
       else

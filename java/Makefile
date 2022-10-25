@@ -10,6 +10,7 @@ JAVA_SRC=\
   $(SRC_DIR)/ADC.java \
   $(SRC_DIR)/c64/SID.java \
   $(SRC_DIR)/c64/VIC.java \
+  $(SRC_DIR)/ColecoVision.java \
   $(SRC_DIR)/CPC.java \
   $(SRC_DIR)/CPU.java \
   $(SRC_DIR)/DSP.java \
@@ -54,6 +55,7 @@ JAVA_SRC=\
   $(SRC_DIR)/draw3d/Texture32.java \
   $(SRC_DIR)/SegaGenesis.java \
   $(SRC_DIR)/SNES.java \
+  $(SRC_DIR)/SN76489.java \
   $(SRC_DIR)/SPI.java \
   $(SRC_DIR)/SPI0.java \
   $(SRC_DIR)/SPI1.java \
@@ -62,6 +64,7 @@ JAVA_SRC=\
   $(SRC_DIR)/TI99.java \
   $(SRC_DIR)/Timer.java \
   $(SRC_DIR)/TimerListener.java \
+  $(SRC_DIR)/TMS9918A.java \
   $(SRC_DIR)/TRS80Coco.java \
   $(SRC_DIR)/UserInterruptListener.java \
   $(SRC_DIR)/UART.java \
