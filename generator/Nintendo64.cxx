@@ -20,6 +20,18 @@
 #define N643D "net/mikekohn/java_grinder/n64/"
 #define N643D_LEN (sizeof(N643D) - 1)
 
+// Screen 0: 0x10_0000 (0x10_0000)
+// Screen 1: 0x12_5800 (0x10_0000 + (320 * 240 * 2))
+// Z Buffer: 0x14_b000 (0x10_0000 + (320 * 240 * 4))
+// $k1 points to DMEM
+// $k0 points to struct of:
+//  0: uint32_t current_screen (with KSEG1)
+//  4: uint32_t current_screen (for DMEM)
+//  8: uint8_t  screen_id
+//     uint8_t  reserved[3]
+// 12: uint32_t reserved
+// 16: uint16_t texture[]
+
 Nintendo64::Nintendo64()
 {
   org = 0x80000000;
@@ -460,7 +472,7 @@ int Nintendo64::nintendo64_n64_triangle_setZBuffer_Z()
 
   fprintf(out,
     "  ;; nintendo64_n64_setZBuffer_Z()\n"
-    "  sb $t%d, 12($t%d)\n",
+    "  sb $t%d, 44($t%d)\n",
     enabled, object);
 
   reg -= 2;
@@ -776,7 +788,7 @@ void Nintendo64::insert_rsp_data()
     ".align_bits 64\n"
     "_dp_setup:\n"
     "  .dc64 (DP_OP_SET_COLOR_IMAGE << 56) | (2 << 51) | (319 << 32) | 0x10_0000\n"
-    "  .dc64 (DP_OP_SET_Z_IMAGE << 56) | (0x10_0000 + (320 * 240 * 2))\n"
+    "  .dc64 (DP_OP_SET_Z_IMAGE << 56) | (0x10_0000 + (320 * 240 * 4))\n"
     "  .dc64 (DP_OP_SET_SCISSOR << 56) | ((320 << 2) << 12) | (240 << 2)\n"
     "  .dc64 (DP_OP_SYNC_PIPE << 56)\n"
     "  .dc64 (DP_OP_SET_OTHER_MODES << 56) | (1 << 55) | (3 << 52)\n"
@@ -935,8 +947,12 @@ void Nintendo64::insert_triangle_draw()
     "  addiu $a3, $a3, -1\n"
     "  bne $a3, $0, _triangle_draw_memcpy\n"
     "  nop\n"
+    "  ;; Copy do_zbuffer boolean to RSP.\n"
+    "  lb $t8, 44($a0)\n"
+    "  sll $t8, $t8, 8\n"
     "  ;; Set command to draw_triangle.\n"
     "  li $at, 4 << 24\n"
+    "  or $at, $at, $t8\n"
     "  sw $at, 0($k1)\n"
     "  jr $ra\n"
     "  nop\n\n");
