@@ -42,6 +42,17 @@ public:
   virtual int sn76489_setSoundFreq_II();
   virtual int sn76489_setSoundVolume_II();
 
+  virtual int joystick_isRight_I();
+  virtual int joystick_isRight_I(int index);
+  virtual int joystick_isLeft_I();
+  virtual int joystick_isLeft_I(int index);
+  virtual int joystick_isDown_I();
+  virtual int joystick_isDown_I(int index);
+  virtual int joystick_isUp_I();
+  virtual int joystick_isUp_I(int index);
+  virtual int joystick_isButtonDown_0_I();
+  virtual int joystick_isButtonDown_0_I(int index);
+
 private:
   void insert_print_string();
   void insert_vdp_command();

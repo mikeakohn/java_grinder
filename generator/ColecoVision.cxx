@@ -417,6 +417,56 @@ int ColecoVision::sn76489_setSoundVolume_II()
   return 0;
 }
 
+int ColecoVision::joystick_isRight_I()
+{
+  return -1;
+}
+
+int ColecoVision::joystick_isRight_I(int index)
+{
+  return -1;
+}
+
+int ColecoVision::joystick_isLeft_I()
+{
+  return -1;
+}
+
+int ColecoVision::joystick_isLeft_I(int index)
+{
+  return -1;
+}
+
+int ColecoVision::joystick_isDown_I()
+{
+  return -1;
+}
+
+int ColecoVision::joystick_isDown_I(int index)
+{
+  return -1;
+}
+
+int ColecoVision::joystick_isUp_I()
+{
+  return -1;
+}
+
+int ColecoVision::joystick_isUp_I(int index)
+{
+  return -1;
+}
+
+int ColecoVision::joystick_isButtonDown_0_I()
+{
+  return -1;
+}
+
+int ColecoVision::joystick_isButtonDown_0_I(int index)
+{
+  return -1;
+}
+
 void ColecoVision::insert_print_string()
 {
   fprintf(out,
