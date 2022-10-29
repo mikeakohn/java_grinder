@@ -848,13 +848,13 @@ void Nintendo64::insert_set_screen()
     "  li $a1, KSEG1\n"
     "  bne $a0, $0, _set_screen_not_0\n"
     "  li $at, KSEG1 | VI_BASE\n"
-    "  li $t8, 0x0010_0000 + (320 * 240 * 2 * 2)\n"
+    "  li $t8, 0x0010_0000 + (320 * 240 * 2)\n"
     "  li $t9, 0x0010_0000\n"
     "  b _set_screen_finish\n"
     "  nop\n"
     "_set_screen_not_0:\n"
     "  li $t8, 0x0010_0000\n"
-    "  li $t9, 0x0010_0000 + (320 * 240 * 2 * 2)\n");
+    "  li $t9, 0x0010_0000 + (320 * 240 * 2)\n");
 
   fprintf(out,
     "_set_screen_finish:\n"

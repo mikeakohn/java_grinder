@@ -32,21 +32,24 @@ public class Nintendo64Demo
     triangle_1.setVertex0(  0, -30, 0);
     triangle_1.setVertex1(-30,  30, 0);
     triangle_1.setVertex2( 30,  30, 0);
-    triangle_1.setPosition(150, 100, 256 + 128);
+    triangle_1.setPosition(150, 100, 256 + 128 - 100);
     triangle_1.setColor(0xff00ffff);
+    triangle_1.setZBuffer(true);
 
     Triangle triangle_2 = new Triangle();
     //triangle_2.setVertex0(  0, -30, 0);
     //triangle_2.setVertex1(-30,  30, 0);
     //triangle_2.setVertex2( 30,  30, 0);
     triangle_2.setVertexes(vertexes);
-    triangle_2.setPosition(180, 100, 256 + 128);
+    triangle_2.setPosition(160, 100, 256 + 128);
     triangle_2.setColor(0x00ff00ff);
+    triangle_2.setZBuffer(true);
 
     Triangle triangle_3 = new Triangle();
     triangle_3.setVertexes(vertexes, 9);
     triangle_3.setPosition(120, 100, 256 + 128);
     triangle_3.setColor(0xffff00ff);
+    triangle_3.setZBuffer(true);
 
     Rectangle rectangle_1 = new Rectangle();
     rectangle_1.setPosition(100, 100);
@@ -62,6 +65,8 @@ public class Nintendo64Demo
     {
       Nintendo64.setScreen(screen);
       Nintendo64.clearScreen();
+      Nintendo64.resetZBuffer();
+
       rectangle_1.draw();
 
       rectangle_2.setPosition(rect_x, rect_y);
