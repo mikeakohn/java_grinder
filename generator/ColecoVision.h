@@ -12,7 +12,7 @@
 #ifndef JAVA_GRINDER_GENERATOR_COLECO_VISION_H
 #define JAVA_GRINDER_GENERATOR_COLECO_VISION_H
 
-#include "generator/TMS9900.h"
+#include "generator/Z80.h"
 
 class ColecoVision : public Z80
 {

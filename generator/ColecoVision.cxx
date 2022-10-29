@@ -16,7 +16,37 @@
 
 #include "generator/ColecoVision.h"
 
-// http://www.nouspikel.com/ti99/titechpages.htm
+// https://github-wiki-see.page/m/alekmaul/pvcollib/wiki/Complete-Colecovision-Specs
+
+// Memory Map:
+// 0x0000: BIOS ROM
+// 0x2000: Expansion Port
+// 0x4000: Expansion Port
+// 0x6000: RAM (1K)
+// 0x8000: Cartridge (32k)
+
+// IO Map:
+// 0xbe - VDP RAM
+// 0xbf - VDP Control (write), VDP Status (read)
+// 0xff - Sound (write), Controls(read)
+
+// VDP format:
+// Command is two bytes: data, control (bit 7: 1, bits 6-3: 0, bits 2-0: reg)
+// VRAM Address Pointer:
+// Byte 0:
+//   bits 7-0: Lower 8 bits of VRAM pointer
+// Byte 1:
+//   bit 7: 0
+//   bit 6: 0=read, 1=write
+//   bits 5-0: Upper 6 bits of VRAM pointer
+
+// Audio Format:
+// Byte 0: 1VVRDDDD
+//       VV: Voice number (0 to 3) where voice 3 is noise.
+//        R: 0=Frequency, 1=Volume.
+//     DDDD: lower 4 bits of data for volume, lower 4 bits for frequency.
+// Byte 1: 00DDDDDD
+//   DDDDDD: Upper 6 bits of frequency (not needed for volume).
 
 ColecoVision::ColecoVision() :
   need_vdp_command(false),
@@ -39,11 +69,14 @@ ColecoVision::~ColecoVision()
 
 int ColecoVision::open(const char *filename)
 {
-  if (TMS9900::open(filename) != 0) { return -1; }
+  if (Z80::open(filename) != 0) { return -1; }
 
-  fprintf(out, ".include \"ti99.inc\"\n\n");
-  fprintf(out, "ram_start equ RAM\n");
-  fprintf(out, "heap_ptr equ ram_start\n");
+  fprintf(out,
+    "ram_start equ 0x6000\n"
+    "heap_ptr equ ram_start\n"
+    "SN76489 equ 0xff\n"
+    "VDP_DATA equ 0xbe\n"
+    "VDP_COMMAND equ 0xbf\n\n");
 
   return 0;
 }
@@ -67,15 +100,35 @@ int ColecoVision::finish()
 
 int ColecoVision::start_init()
 {
+  // Catridge start info.
+  fprintf(out,
+    ".org 0x8000\n"
+    "  .db 0xaa, 0x55\n"
+    //"  .db 0x55, 0xaa\n"
+    "  .dw 0\n"
+    "  .dw 0\n"
+    "  .dw 0\n"
+    "  .dw 0\n"
+    "  .dw start\n"
+    "  jp 0\n"
+    "  jp 0\n"
+    "  jp 0\n"
+    "  jp 0\n"
+    "  jp 0\n"
+    "  jp 0\n"
+    "  jp 0\n"
+    "  jp 0\n"
+    "  .string "JAVA/GRINDER/2022\n\n");
+
   // Add any set up items (stack, registers, etc).
   fprintf(out, "start:\n");
 
-  // Sprite pattern table should start at 0x1600
+  // Sprite pattern table should start at 0x1800 (3 * 0x800).
   fprintf(out,
-    "  li r0, 0x0386\n"
-    "  movb r0, @VDP_COMMAND\n"
-    "  swpb r0\n"
-    "  movb r0, @VDP_COMMAND\n");
+    "  ld a, 0x03\n"
+    "  out (VDP_COMMAND), a\n"
+    "  ld a, 0x86\n"
+    "  out (VDP_COMMAND), a\n");
 
   return 0;
 }
@@ -86,14 +139,8 @@ int ColecoVision::tms9918a_print_X()
 
   fprintf(out,
     "  ;; tms9918a_printChar_X()\n"
-    "  mov r%d, r1\n"
-    "  mov r11, *r10+\n"
-    "  bl @_print_string\n"
-    "  ai r10, -2\n"
-    "  mov *r10, r11\n",
-    REG_STACK(reg - 1));
-
-  reg--;
+    "  pop ix\n"
+    "  call _print_string\n");
 
   return 0;
 }
@@ -102,12 +149,8 @@ int ColecoVision::tms9918a_printChar_C()
 {
   fprintf(out,
     "  ;; tms9918a_printChar_C()\n"
-    "  swpb r%d\n"
-    "  movb r%d, @VDP_WRITE\n",
-    REG_STACK(reg - 1),
-    REG_STACK(reg - 1));
-
-  reg--;
+    "  pop bc\n"
+    "  out (VDP_DATA), c\n");
 
   return 0;
 }
@@ -116,10 +159,8 @@ int ColecoVision::tms9918a_printChar_C(int c)
 {
   fprintf(out,
     "  ;; tms9918a_printChar_C(%d)\n"
-    "  li r0, 0x%02x\n"
-    "  movb r0, @VDP_WRITE\n",
-    c,
-    c << 8);
+    "  ld a, 0x%02x\n"
+    "  out (VDP_DATA), a\n");
 
   return 0;
 }
@@ -141,7 +182,7 @@ int ColecoVision::tms9918a_setCursor_II()
     "  a r%d, r1\n"
     "  mov r1, r0\n"
     "  ai r0, 0x4000\n"
-    "  bl @_vdp_command\n",
+    "  call _vdp_command\n",
     REG_STACK(reg - 1),
     REG_STACK(reg - 2));
 
@@ -156,14 +197,13 @@ int ColecoVision::tms9918a_setCursor_II(int x, int y)
   int offset = (y * 32) + x;
   int address = offset + 0x4000;
 
-  fprintf(out, "  ;; tms9918a_setCursor_II(%d, %d)\n", x, y);
   fprintf(out,
-    "  li r0, 0x%02x%02x ; set write byte to %d\n",
+    "  ;; tms9918a_setCursor_II(%d, %d)\n"
+    "  ld bc, 0x%02x%02x ; set write byte to %d\n",
+    "  ld (VDP_COMMAND), b\n"
+    "  ld (VDP_COMMAND), c\n",
+    x, y,
     address & 0xff, address >> 8, offset);
-  fprintf(out, "  movb r0, @VDP_COMMAND\n");
-  fprintf(out, "  swpb r0\n");
-  fprintf(out, "  movb r0, @VDP_COMMAND\n");
-  //fprintf(out, "  bl @_vdp_command\n");
 
   return 0;
 }
@@ -185,31 +225,31 @@ int ColecoVision::tms9918a_setGraphicsMode_I(int mode)
   {
     case 0:
       fprintf(out,
-        "  li r0, 0x8000\n"
-        "  bl @_vdp_command\n"
-        "  li r0, 0x8100|0x040\n"
-        "  bl @_vdp_command\n");
+        "  ld bc, 0x8000\n"
+        "  call _vdp_command\n"
+        "  ld bc, 0x8100|0x040\n"
+        "  call _vdp_command\n");
       break;
     case 1:
       fprintf(out,
-        "  li r0, 0x8000\n"
-        "  bl @_vdp_command\n"
-        "  li r0, 0x8110|0x40\n"
-        "  bl @_vdp_command\n");
+        "  ld bc, 0x8000\n"
+        "  call _vdp_command\n"
+        "  ld bc, 0x8110|0x40\n"
+        "  call _vdp_command\n");
       break;
     case 2:
       fprintf(out,
-        "  li r0, 0x8000\n"
-        "  bl @_vdp_command\n"
-        "  li r0, 0x8108|0x040\n"
-        "  bl @_vdp_command\n");
+        "  ld bc, 0x8000\n"
+        "  call _vdp_command\n"
+        "  ld bc, 0x8108|0x040\n"
+        "  call _vdp_command\n");
       break;
     case 3:
       fprintf(out,
-        "  li r0, 0x8002\n"
-        "  bl @_vdp_command\n"
-        "  li r0, 0x8100|0x040\n"
-        "  bl @_vdp_command\n");
+        "  ld bc, 0x8002\n"
+        "  call _vdp_command\n"
+        "  ld bc, 0x8100|0x040\n"
+        "  call _vdp_command\n");
       break;
     default:
       printf("Illegal graphics mode %d\n", mode);
@@ -225,10 +265,7 @@ int ColecoVision::tms9918a_clearScreen()
 
   fprintf(out,
     "  ;; tms9918a_clearScreen()\n"
-    "  mov r11, *r10+\n"
-    "  bl @_clear_screen\n"
-    "  ai r10, -2\n"
-    "  mov *r10, r11\n");
+    "  call _clear_screen\n");
 
   return 0;
 }
@@ -243,7 +280,7 @@ int ColecoVision::tms9918a_plot_III()
     "  mov r%d, r1\n"
     "  mov r%d, r9\n"
     "  mov r11, *r10+\n"
-    "  bl @_plot\n"
+    "  call _plot\n"
     "  ai r10, -2\n"
     "  mov *r10, r11\n",
     REG_STACK(reg - 3),
@@ -261,10 +298,7 @@ int ColecoVision::tms9918a_setColors()
 
   fprintf(out,
     "  ;; tms9918a_setColors()\n"
-    "  mov r11, *r10+\n"
-    "  bl @_set_colors\n"
-    "  ai r10, -2\n"
-    "  mov *r10, r11\n");
+    "  call _set_colors\n");
 
   return 0;
 }
@@ -275,16 +309,9 @@ int ColecoVision::tms9918a_setSpriteVisible_IZ()
 
   fprintf(out,
     "  ;; tms9918a_setSpriteVisible_IZ()\n"
-    "  mov r%d, r0\n"
-    "  mov r%d, r1\n"
-    "  mov r11, *r10+\n"
-    "  bl @_set_sprite_visible\n"
-    "  ai r10, -2\n"
-    "  mov *r10, r11\n",
-    REG_STACK(reg - 2),
-    REG_STACK(reg - 1));
-
-  reg -= 2;
+    "  pop de\n"
+    "  pop bc\n"
+    "  call _set_sprite_visible\n");
 
   return 0;
 }
@@ -293,24 +320,11 @@ int ColecoVision::tms9918a_setSpriteImage_IaB()
 {
   need_set_sprite_image = true;
 
-  if (reg < 2)
-  {
-    printf("Internal Error: Empty stack?\n");
-    return -1;
-  }
-
   fprintf(out,
     "  ;; tms9918a_setSpriteImage_IaB()\n"
-    "  mov r%d, r0\n"
-    "  mov r%d, r1\n"
-    "  mov r11, *r10+\n"
-    "  bl @_set_sprite_image\n"
-    "  ai r10, -2\n"
-    "  mov *r10, r11\n",
-    REG_STACK(reg - 2),
-    REG_STACK(reg - 1));
-
-  reg -= 2;
+    "  pop de\n"
+    "  pop bc\n"
+    "  call _set_sprite_image\n");
 
   return 0;
 }
@@ -321,18 +335,10 @@ int ColecoVision::tms9918a_setSpritePos_III()
 
   fprintf(out,
     "  ;; tms9918a_setSpritePos_III()\n"
-    "  mov r%d, r0\n"
-    "  mov r%d, r1\n"
-    "  mov r%d, r9\n"
-    "  mov r11, *r10+\n"
-    "  bl @_set_sprite_pos\n"
-    "  ai r10, -2\n"
-    "  mov *r10, r11\n",
-    REG_STACK(reg - 3),
-    REG_STACK(reg - 2),
-    REG_STACK(reg - 1));
-
-  reg -= 3;
+    "  pop hl\n"
+    "  pop de\n"
+    "  pop bc\n"
+    "  call _set_sprite_pos\n");
 
   return 0;
 }
@@ -343,16 +349,9 @@ int ColecoVision::tms9918a_setSpriteColor_II()
 
   fprintf(out,
     "  ;; tms9918a_setSpriteColor_II()\n"
-    "  mov r%d, r0\n"
-    "  mov r%d, r1\n"
-    "  mov r11, *r10+\n"
-    "  bl @_set_sprite_color\n"
-    "  ai r10, -2\n"
-    "  mov *r10, r11\n",
-    REG_STACK(reg - 2),
-    REG_STACK(reg - 1));
-
-  reg -= 2;
+    "  pop de\n"
+    "  pop bc\n"
+    "  call _set_sprite_color\n");
 
   return 0;
 }
@@ -361,18 +360,11 @@ int ColecoVision::tms9918a_setSpriteSize_I()
 {
   fprintf(out,
     "  ;; tms9918a_setSpriteSize_I()\n"
-    "  sla r%d, 8\n"
-    "  ori r%d, 0xe081\n"
-    "  movb r%d, @VDP_COMMAND\n"
-    "  swpb r%d\n"
-    "  movb r%d, @VDP_COMMAND\n",
-    REG_STACK(reg - 1),
-    REG_STACK(reg - 1),
-    REG_STACK(reg - 1),
-    REG_STACK(reg - 1),
-    REG_STACK(reg - 1));
-
-  reg -= 1;
+    "  pop af\n"
+    "  or a, 0xe0\n"
+    "  ld b, 0x81\n"
+    "  out (VDP_COMMAND), a\n"
+    "  out (VDP_COMMAND), b\n");
 
   return 0;
 }
@@ -383,16 +375,9 @@ int ColecoVision::sn76489_setSoundFreq_II()
 
   fprintf(out,
     "  ;; sn76489_setSoundFreq_II()\n"
-    "  mov r%d, r0\n"
-    "  mov r%d, r1\n"
-    "  mov r11, *r10+\n"
-    "  bl @_set_sound_freq\n"
-    "  ai r10, -2\n"
-    "  mov *r10, r11\n",
-    REG_STACK(reg - 2),
-    REG_STACK(reg - 1));
-
-  reg -= 2;
+    "  pop de\n"
+    "  pop bc\n"
+    "  call _set_sound_freq\n");
 
   return 0;
 }
@@ -403,16 +388,9 @@ int ColecoVision::sn76489_setSoundVolume_II()
 
   fprintf(out,
     " ;; n76489_setSoundVolume_II()\n"
-    "  mov r%d, r0\n"
-    "  mov r%d, r1\n"
-    "  mov r11, *r10+\n"
-    "  bl @_set_sound_volume\n"
-    "  ai r10, -2\n"
-    "  mov *r10, r11\n",
-    REG_STACK(reg - 2),
-    REG_STACK(reg - 1));
-
-  reg -= 2;
+    "  pop de\n"
+    "  pop bc\n"
+    "  call _set_sound_volume\n");
 
   return 0;
 }
@@ -470,58 +448,66 @@ int ColecoVision::joystick_isButtonDown_0_I(int index)
 void ColecoVision::insert_print_string()
 {
   fprintf(out,
+    "  ;; insert_print_string(string=ix)
     "_print_string:\n"
-    "  mov @-2(r1), r0\n"
+    "  ld c, (ix-2)\n"
+    "  ld b, (ix-1)\n"
     "_print_string_loop:\n"
-    "  movb *r1+, @VDP_WRITE\n"
-    "  dec r0\n"
+    "  ld a, ix\n"
+    "  out (VDP_DATA), a\n"
+    "  dec bc\n"
     "  jne _print_string_loop\n"
-    "  b *r11\n\n");
+    "  ret\n\n");
 }
 
 void ColecoVision::insert_vdp_command()
 {
   fprintf(out,
     "_vdp_command:\n"
-    "  swpb r0\n"
-    "  movb r0, @VDP_COMMAND\n"
-    "  swpb r0\n"
-    "  movb r0, @VDP_COMMAND\n"
-    "  b *r11\n\n");
+    "  out (VDP_COMMAND), c\n"
+    "  out (VDP_COMMAND), b\n"
+    "  ret\n\n");
 }
 
 void ColecoVision::insert_clear_screen()
 {
   fprintf(out,
     "_clear_screen:\n"
-    "  li r0, 0x0040\n"
-    "  movb r0, @VDP_COMMAND\n"
-    "  swpb r0\n"
-    "  movb r0, @VDP_COMMAND\n"
-    "  s r0, r0\n"
-    "  li r1, 0x300\n"
+    "  ld bc, 0x0040\n"
+    "  out (VDP_COMMAND), c\n"
+    "  out (VDP_COMMAND), b\n"
+    "  ld a, 0\n"
+    "  ld bc, 0x300\n"
     "_clear_screen_loop:\n"
-    "  movb r0, @VDP_WRITE\n"
-    "  dec r1\n"
+    "  out (VDP_COMMAND), a\n"
+    "  dec bc\n"
     "  jne _clear_screen_loop\n"
-    "  b *r11\n\n");
+    "  ret\n\n");
 }
 
 void ColecoVision::insert_plot()
 {
   fprintf(out,
-    "  ;; plot(r0, r1, r9)\n"
+    "  ;; plot(x=ix, y=bc, color=de)\n"
     "_plot:\n"
-    "  sla r1, 5\n"
-    "  a r1, r0\n"
-    "  ai r0, 0x4000\n"
-    "  swpb r0\n"
-    "  movb r0, @VDP_COMMAND\n"
-    "  swpb r0\n"
-    "  movb r0, @VDP_COMMAND\n"
-    "  swpb r9\n"
-    "  movb r9, @VDP_WRITE\n"
-    "  b *r11\n\n");
+    "  sla c\n"
+    "  rlc b\n"
+    "  sla c\n"
+    "  rlc b\n"
+    "  sla c\n"
+    "  rlc b\n"
+    "  sla c\n"
+    "  rlc b\n"
+    "  sla c\n"
+    "  rlc b\n"
+    "  add ix, bc\n"
+    "  ld bc, 0x4000\n"
+    "  add ix, bc\n"
+    "  ld bc, ix\n"
+    "  out (VDP_COMMAND), c\n"
+    "  out (VDP_COMMAND), b\n"
+    "  out (VDP_DATA), e\n"
+    "  ret\n\n");
 }
 
 void ColecoVision::insert_set_colors()
@@ -532,144 +518,170 @@ void ColecoVision::insert_set_colors()
   fprintf(out,
     "_set_colors:\n"
     "  ;; Set color table\n"
-    "  li r0, 0x8043\n"
-    "  movb r0, @VDP_COMMAND\n"
-    "  swpb r0\n"
-    "  movb r0, @VDP_COMMAND\n"
-    "  s r0, r0\n"
-    "  li r1, 32\n"
+    "  ld bc, 0x8043\n"
+    "  out (VDP_COMMAND), c\n"
+    "  out (VDP_COMMAND), b\n"
+    "  ld a, 0\n"
+    "  ld b, 32\n"
     "_set_colors_loop:\n"
-    "  movb r0, @VDP_WRITE\n"
-    "  ai r0, 0x1000\n"
-    "  dec r1\n"
+    "  out (VDP_DATA), a\n"
+    "  add a, 0x10\n"
+    "  dec c\n"
     "  jne _set_colors_loop\n"
     "  ;; Set pattern table\n"
-    "  li r0, 0x0048\n"
-    "  movb r0, @VDP_COMMAND\n"
-    "  swpb r0\n"
-    "  movb r0, @VDP_COMMAND\n"
-    "  li r0, 0xffff\n"
-    "  li r1, 2048\n"
+    "  ld bc, 0x0048\n"
+    "  out (VDP_COMMAND), c\n"
+    "  out (VDP_COMMAND), b\n"
+    "  ld a, 0xff\n"
+    "  ld ix, 2048\n"
     "_set_patterns_loop:\n"
-    "  movb r0, @VDP_WRITE\n"
-    "  dec r1\n"
+    "  out (VDP_DATA), a\n"
+    "  dec ix\n"
     "  jne _set_patterns_loop\n"
-    "  b *r11\n\n");
+    "  ret\n\n");
 }
 
 void ColecoVision::insert_set_sound_freq()
 {
   fprintf(out,
-    "  ;; set_sound_freq(voice=r0, freq=r1);\n"
+    "  ;; set_sound_freq(voice=bc, freq=de);\n"
     "_set_sound_freq:\n"
-    "  sla r0, 13\n"
-    "  ori r0, 0x8000\n"
-    "  soc r1, r0\n"
-    "  movb r0, @0x8400\n"
-    "  swpb r0\n"
-    "  movb r0, @0x8400\n"
-    "  b *r11\n\n");
+    "  ld a, c\n"
+    "  sll a\n"
+    "  sll a\n"
+    "  sll a\n"
+    "  sll a\n"
+    "  sll a\n"
+    "  or a, 0x80\n"
+    "  ld c, e\n"
+    "  and c, 0x0f\n"
+    "  or a, c\n"
+    "  out (SN76489), a\n"
+    "  sra d\n"
+    "  rrc e\n"
+    "  sra d\n"
+    "  rrc e\n"
+    "  sra d\n"
+    "  rrc e\n"
+    "  sra d\n"
+    "  rrc e\n"
+    "  ld a, e\n"
+    "  out (SN76489), a\n"
+    "  ret\n\n");
 }
 
 void ColecoVision::insert_set_sound_volume()
 {
   fprintf(out,
-    "  ;; set_sound_volume(voice=r0, volume=r1);\n"
+    "  ;; set_sound_volume(voice=bc, volume=de);\n"
     "_set_sound_volume:\n"
-    "  sla r0, 13\n"
-    "  ori r0, 0x9000\n"
-    "  soc r1, r0\n"
-    "  movb r0, @0x8400\n"
-    "  swpb r0\n"
-    "  movb r0, @0x8400\n"
-    "  b *r11\n\n");
+    "  ld a, c\n"
+    "  sll a\n"
+    "  sll a\n"
+    "  sll a\n"
+    "  sll a\n"
+    "  sll a\n"
+    "  or a, 0x90\n"
+    "  and e, 0x0f\n"
+    "  or a, e\n"
+    "  out (SN76489), a\n"
+    "  ret\n\n");
 }
 
 void ColecoVision::insert_set_sprite_visible()
 {
   // Sprite attributes table is at 0x300-0x380
   fprintf(out,
-    "  ;; set_sprite_visible(index=r0, visible=r1)\n"
+    "  ;; set_sprite_visible(index=bc, visible=de)\n"
     "_set_sprite_visible:\n"
-    "  sla r0, 2\n"
-    "  sla r1, 8\n"
-    "  ai r0, 0x4300\n"
-    "  swpb r0\n"
-    "  movb r0, @VDP_COMMAND\n"
-    "  swpb r0\n"
-    "  movb r0, @VDP_COMMAND\n"
-    "  swpb r1\n"
-    "  movb r1, @VDP_WRITE\n"
-    "  b *r11\n\n");
+    "  sla c\n"
+    "  sla c\n"
+    "  ld b, 0x43\n"
+    "  out (VDP_COMMAND), c\n"
+    "  out (VDP_COMMAND), b\n"
+    "  out (VDP_DATA), e\n"
+    "  ret\n\n");
 }
 
 void ColecoVision::insert_set_sprite_image()
 {
   // Sprite patterns table is at 0x3a0-0x780
   fprintf(out,
-    "  ;; set_sprite_image(index=r0, image=r1)\n"
+    "  ;; set_sprite_image(index=bc, image=ix)\n"
     "_set_sprite_image:\n"
-    "  mov r0, r9\n"
-    "  sla r0, 5\n"
-    "  ai r0, 0x4000|0x1800\n"
-    "  swpb r0\n"
-    "  movb r0, @VDP_COMMAND\n"
-    "  swpb r0\n"
-    "  movb r0, @VDP_COMMAND\n"
-    "  mov @-2(r1), r0\n"
+    "  push bc\n"
+    "  sla c\n"
+    "  rlc b\n"
+    "  sla c\n"
+    "  rlc b\n"
+    "  sla c\n"
+    "  rlc b\n"
+    "  sla c\n"
+    "  rlc b\n"
+    "  sla c\n"
+    "  rlc b\n"
+    "  ld iy, bc\n"
+    "  ld bc, 0x4000|0x1800\n"
+    "  add iy, bc\n"
+    "  ld bc, iy\n"
+    "  out (VDP_COMMAND), c\n"
+    "  out (VDP_COMMAND), b\n"
+    "  ld e, (ix-2)\n"
     "_set_sprites_image_loop:\n"
-    "  movb *r1+, @VDP_WRITE\n"
-    "  dec r0\n"
+    "  ld a, (ix)\n"
+    "  out (VDP_DATA), a\n"
+    "  dec e\n"
     "  jne _set_sprites_image_loop\n");
 
   // Sprite attributes table is at 0x300
   // Need to set the pattern number for this sprite
   fprintf(out,
-    "  mov r9, r0\n"
-    "  sla r0, 2\n"
-    "  ai r0, 0x4302\n"
-    "  swpb r0\n"
-    "  movb r0, @VDP_COMMAND\n"
-    "  swpb r0\n"
-    "  movb r0, @VDP_COMMAND\n"
-    "  sla r9, 2\n"
-    "  swpb r9\n"
-    "  movb r9, @VDP_WRITE\n"
-    "  b *r11\n\n");
+    "  pop de\n"
+    "  sla e\n"
+    "  sla e\n"
+    "  ld iy, de\n"
+    "  add iy, 0x4302\n"
+    "  ld de, iy\n"
+    "  out (VDP_COMMAND), e\n"
+    "  out (VDP_COMMAND), d\n"
+    "  sla c\n"
+    "  rlc b\n"
+    "  sla c\n"
+    "  rlc b\n"
+    "  out (VDP_DATA), c\n"
+    "  ret\n\n");
 }
 
 void ColecoVision::insert_set_sprite_pos()
 {
   // Sprite attributes table is at 0x300
   fprintf(out,
-    "  ;; set_sprite_pos(index=r0, x=r1, y=r9)\n"
+    "  ;; set_sprite_pos(index=bc, x=de, y=hl)\n"
     "_set_sprite_pos:\n"
-    "  sla r0, 2\n"
-    "  ai r0, 0x4300\n"
-    "  swpb r0\n"
-    "  movb r0, @VDP_COMMAND\n"
-    "  swpb r0\n"
-    "  movb r0, @VDP_COMMAND\n"
-    "  swpb r9\n"
-    "  swpb r1\n"
-    "  movb r9, @VDP_WRITE\n"
-    "  movb r1, @VDP_WRITE\n"
-    "  b *r11\n\n");
+    "  ld c, a\n"
+    "  sla a\n"
+    "  sla a\n"
+    "  out (VDP_COMMAND), a\n"
+    "  ld a, 0x43\n"
+    "  out (VDP_COMMAND), a\n"
+    "  out (VDP_DATA), l\n"
+    "  out (VDP_DATA), e\n"
+    "  ret\n\n");
 }
 
 void ColecoVision::insert_set_sprite_color()
 {
   fprintf(out,
-    "  ;; set_sprite_color(index=r0, color=r1)\n"
+    "  ;; set_sprite_color(index=bc, color=de)\n"
     "_set_sprite_color:\n"
-    "  sla r0, 2\n"
-    "  ai r0, 0x4303\n"
-    "  swpb r0\n"
-    "  movb r0, @VDP_COMMAND\n"
-    "  swpb r0\n"
-    "  movb r0, @VDP_COMMAND\n"
-    "  swpb r1\n"
-    "  movb r1, @VDP_WRITE\n"
-    "  b *r11\n\n");
+    "  ld c, a\n"
+    "  sla a\n"
+    "  sla a\n"
+    "  add a, 0x03\n"
+    "  out (VDP_COMMAND), a\n"
+    "  ld a, 0x43\n"
+    "  out (VDP_COMMAND), a\n"
+    "  out (VDP_DATA), e\n"
+    "  ret\n\n");
 }
 
