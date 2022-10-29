@@ -861,10 +861,7 @@ void Nintendo64::insert_set_screen()
     "  or $a1, $a1, $t8\n"
     "  sw $a1, 0($k0)\n"
     "  sw $t9, VI_DRAM_ADDR_REG($at)\n"
-    "  sw $t8, 60($k1)\n"
-    "  li $at, 320 * 240 * 2\n"
-    "  addu $t8, $t8, $at\n"
-    "  sw $t8, 68($k1)\n");
+    "  sw $t8, 60($k1)\n");
 
   fprintf(out,
     "  li $t0, 1 << 24\n"
