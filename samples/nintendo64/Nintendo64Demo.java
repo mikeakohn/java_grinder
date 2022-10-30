@@ -41,7 +41,7 @@ public class Nintendo64Demo
     //triangle_2.setVertex1(-30,  30, 0);
     //triangle_2.setVertex2( 30,  30, 0);
     triangle_2.setVertexes(vertexes);
-    triangle_2.setPosition(160, 100, 256 + 128);
+    triangle_2.setPosition(160, 100, 256 + 128 - 200);
     triangle_2.setColor(0x00ff00ff);
     triangle_2.setZBuffer(true);
 
@@ -71,24 +71,19 @@ public class Nintendo64Demo
 
       rectangle_2.setPosition(rect_x, rect_y);
       rectangle_2.setSize(width, height);
-      Nintendo64.waitForPolygon();
       rectangle_2.draw();
 
-      Nintendo64.waitForPolygon();
       triangle_1.setRotation(0, 0, rz);
       triangle_1.draw();
 
-      Nintendo64.waitForPolygon();
       triangle_2.setRotation(rx, 0, rz);
       triangle_2.draw();
 
-      Nintendo64.waitForPolygon();
       triangle_3.setRotation(0, ry, rz);
       triangle_3.draw();
 
       for (x = 0; x < 319; x++) { Nintendo64.plot(x, y, 0xf800); }
 
-      Nintendo64.waitForPolygon();
       Nintendo64.waitVsync();
 
       y += dy;

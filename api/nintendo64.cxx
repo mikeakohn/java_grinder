@@ -57,7 +57,6 @@ int nintendo64(
   CHECK_FUNC(setScreen,_I)
   CHECK_FUNC(plot,_III)
   CHECK_FUNC(loadTexture,_aSII)
-  CHECK_FUNC(waitForPolygon,)
 
   return -1;
 }

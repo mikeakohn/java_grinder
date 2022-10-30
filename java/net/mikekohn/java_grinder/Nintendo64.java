@@ -37,8 +37,5 @@ abstract public class Nintendo64
 
   /** Load texture into TMEM. */
   public static void loadTexture(short[] texture, int width, int height) { }
-
-  /** Wait for the last rectangle / triangle to finish drawing. */
-  public static void waitForPolygon() { }
 }
 

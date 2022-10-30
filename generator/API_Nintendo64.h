@@ -21,7 +21,6 @@ public:
   virtual int nintendo64_setScreen_I() { return -1; }
   virtual int nintendo64_plot_III() { return -1; }
   virtual int nintendo64_loadTexture_aSII() { return -1; }
-  virtual int nintendo64_waitForPolygon() { return -1; }
 
   virtual int nintendo64_n64_triangle_Constructor() { return -1; }
   virtual int nintendo64_n64_triangle_setColor_I() { return -1; }

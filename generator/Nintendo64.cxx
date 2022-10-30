@@ -265,6 +265,7 @@ int Nintendo64::nintendo64_loadTexture_aSII()
   return 0;
 }
 
+#if 0
 int Nintendo64::nintendo64_waitForPolygon()
 {
   fprintf(out,
@@ -280,6 +281,7 @@ int Nintendo64::nintendo64_waitForPolygon()
 
   return 0;
 }
+#endif
 
 int Nintendo64::nintendo64_n64_triangle_Constructor()
 {
@@ -933,6 +935,11 @@ void Nintendo64::insert_triangle_draw()
 {
   fprintf(out,
     "_triangle_draw:\n"
+    "  ;; Make sure RSP is not busy.\n"
+    "_draw_triangle_wait_rsp_busy:\n"
+    "  lw $at, 0($k1)\n"
+    "  bne $at, $0, _draw_triangle_wait_rsp_busy\n"
+    "  nop\n"
     "  move $a1, $a0\n"
     "  move $a2, $k1\n"
     "  li $a3, 11\n"
@@ -959,6 +966,11 @@ void Nintendo64::insert_rectangle_draw()
 {
   fprintf(out,
     "_rectangle_draw:\n"
+    "  ;; Make sure RSP is not busy.\n"
+    "_rectangle_draw_wait_rsp_busy:\n"
+    "  lw $at, 0($k1)\n"
+    "  bne $at, $0, _rectangle_draw_wait_rsp_busy\n"
+    "  nop\n"
     "  lw $at,  0($a0)\n"
     "  sw $at,  8($k1)\n"
     "  lh $at,  0($a0)\n"
@@ -1029,6 +1041,11 @@ void Nintendo64::insert_load_texture()
 {
   fprintf(out,
     "_load_texture:\n"
+    "  ;; Make sure RSP is not busy.\n"
+    "_load_texture_wait_rsp_busy:\n"
+    "  lw $at, 0($k1)\n"
+    "  bne $at, $0, _load_texture_wait_rsp_busy\n"
+    "  nop\n"
     "  ;; Copy texture to video RAM.\n"
     "  addiu $a3, $k0, 16\n"
     "  multu $a1, $a2\n"
@@ -1053,10 +1070,10 @@ void Nintendo64::insert_load_texture()
     "  ;; Set command to setup_texture.\n"
     "  li $at, 7 << 24\n"
     "  sw $at, 0($k1)\n"
-    "_load_texture_wait:\n"
-    "  lw $at, 0($k1)\n"
-    "  bne $at, $0, _load_texture_wait\n"
-    "  nop\n"
+    //"_load_texture_wait:\n"
+    //"  lw $at, 0($k1)\n"
+    //"  bne $at, $0, _load_texture_wait\n"
+    //"  nop\n"
     "  jr $ra\n"
     "  nop\n\n");
 }
