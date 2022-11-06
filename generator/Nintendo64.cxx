@@ -281,11 +281,13 @@ int Nintendo64::nintendo64_loadTexture_aSII()
 
   fprintf(out,
     "  ;; nintendo64_loadTexture_aSII()\n"
+    "  move $s0, $ra\n"
     "  move $a0, $t%d\n"
     "  move $a1, $t%d\n"
     "  move $a2, $t%d\n"
     "  jal _load_texture\n"
-    "  nop\n",
+    "  nop\n"
+    "  move $ra, $s0\n",
     array,
     width,
     height);
