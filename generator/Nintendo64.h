@@ -29,8 +29,15 @@ public:
   virtual int nintendo64_clearScreen();
   virtual int nintendo64_resetZBuffer();
   virtual int nintendo64_setScreen_I();
+  virtual int nintendo64_plot_II();
   virtual int nintendo64_plot_III();
   virtual int nintendo64_loadTexture_aSII();
+  virtual int nintendo64_waitForPolygon();
+
+  virtual int nintendo64_getAudioStatus();
+  virtual int nintendo64_setAudioDACRate_I();
+  virtual int nintendo64_setAudioBitRate_I();
+  virtual int nintendo64_playAudio_aSI();
 
   virtual int nintendo64_n64_triangle_Constructor();
   virtual int nintendo64_n64_triangle_setColor_I();

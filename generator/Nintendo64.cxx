@@ -51,6 +51,7 @@ int Nintendo64::open(const char *filename)
     ".include \"nintendo64/rdp.inc\"\n"
     ".include \"nintendo64/rsp.inc\"\n"
     ".include \"nintendo64/system.inc\"\n"
+    ".include \"nintendo64/audio_interface.inc\"\n"
     ".include \"nintendo64/video_interface.inc\"\n\n");
 
   fprintf(out,
@@ -172,6 +173,18 @@ int Nintendo64::nintendo64_waitVsync()
 
   label_count++;
 
+#if 0
+  fprintf(out,
+    "wait_for_vblank_end_loop_%d:\n"
+    "  lw $t1, VI_V_CURRENT_LINE_REG($a0)\n"
+    "  beq $t0, $t1, wait_for_vblank_end_loop_%d\n"
+    "  nop\n",
+    label_count,
+    label_count);
+
+  label_count++;
+#endif
+
   return 0;
 }
 
@@ -213,6 +226,23 @@ int Nintendo64::nintendo64_setScreen_I()
     reg - 1);
 
   reg -= 1;
+
+  return 0;
+}
+
+int Nintendo64::nintendo64_plot_II()
+{
+  fprintf(out,
+    "  ;; nintendo64_plot_II()\n"
+    "  sll $t%d, $t%d, 1\n"
+    "  lw $a0, ($k0)\n"
+    "  addu $a0, $a0, $t%d\n"
+    "  sh $t%d, ($a0)\n",
+    reg - 2, reg - 2,
+    reg - 2,
+    reg - 1);
+
+  reg -= 2;
 
   return 0;
 }
@@ -265,7 +295,6 @@ int Nintendo64::nintendo64_loadTexture_aSII()
   return 0;
 }
 
-#if 0
 int Nintendo64::nintendo64_waitForPolygon()
 {
   fprintf(out,
@@ -281,7 +310,62 @@ int Nintendo64::nintendo64_waitForPolygon()
 
   return 0;
 }
-#endif
+
+int Nintendo64::nintendo64_getAudioStatus()
+{
+  fprintf(out,
+    "  ;; nintendo64_getAudioStatus()\n"
+    "  li $a0, KSEG1 | AI_BASE_REG\n"
+    "  lw $t%d, AI_STATUS_REG($a0)\n",
+    reg);
+
+  reg += 1;
+
+  return 0;
+}
+
+int Nintendo64::nintendo64_setAudioDACRate_I()
+{
+  fprintf(out,
+    "  ;; nintendo64_setAudioDACRate()\n"
+    "  li $a0, KSEG1 | AI_BASE_REG\n"
+    "  sw $t%d, AI_DACRATE_REG($a0)\n",
+    reg - 1);
+
+  reg -= 1;
+
+  return 0;
+}
+
+int Nintendo64::nintendo64_setAudioBitRate_I()
+{
+  fprintf(out,
+    "  ;; nintendo64_setAudioBitRate()\n"
+    "  li $a0, KSEG1 | AI_BASE_REG\n"
+    "  sw $t%d, AI_BITRATE_REG($a0)\n",
+    reg - 1);
+
+  reg -= 1;
+
+  return 0;
+}
+
+int Nintendo64::nintendo64_playAudio_aSI()
+{
+  fprintf(out,
+    "  ;; nintendo64_playAudio_aSI()\n"
+    "  li $a0, KSEG1 | AI_BASE_REG\n"
+    "  sw $t%d, AI_DRAM_ADDR_REG($a0)\n"
+    "  sw $t%d, AI_LEN_REG($a0)\n"
+    "  li $at, 1\n"
+    "  sw $at, AI_CONTROL_REG($a0)\n",
+    reg - 2,
+    reg - 1);
+
+  reg -= 2;
+
+  return 0;
+}
 
 int Nintendo64::nintendo64_n64_triangle_Constructor()
 {

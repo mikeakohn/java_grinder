@@ -20,11 +20,19 @@ public class Rectangle
   /** Value is 32 bit RRGGBBAA. So 0x00ff00ff would be green. */
   public void setColor(int value) { }
 
+  /** Position of the rectangle on the screen. */
   public void setPosition(int x, int y) { }
+
+  /** Size of the Rectangle. */
   public void setSize(int width, int height) { }
+
+  /** Enable the drawing of texture with the specified width, height. */
   public void setTextureEnabled(int width, int height) { }
+
+  /** Do not draw texture on rectangle. */
   public void setTextureDisabled() { }
 
+  /** Draw the rectangle on the screen. */
   public void draw() { }
 
   private short x, y;

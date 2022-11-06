@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -463,11 +463,11 @@ int Generator::add_array_files()
 
   const char *constant = "dc32";
 
-  if (get_int_size() == 16)
+  if (get_int_size() == 2)
   {
     constant = "dc16";
   }
-  else if (get_int_size() == 8)
+  else if (get_int_size() == 1)
   {
     constant = "dc8";
   }
@@ -480,21 +480,29 @@ int Generator::add_array_files()
       return -1;
     }
 
+    int element_size;
+
+    switch (iter->second.type)
+    {
+      case TYPE_BYTE:  element_size = 1; break;
+      case TYPE_SHORT: element_size = 2; break;
+      case TYPE_INT:   element_size = get_int_size(); break;
+      default:         element_size = 1; break;
+    }
+
     if (preload_array_align == 128)
     {
       fprintf(out, ".align 128\n");
       fprintf(out, "  %s 0, 0, 0, %d\n",
         constant,
-        (int)(iter->second.type == TYPE_BYTE ?
-              statbuf.st_size : statbuf.st_size / get_int_size()));
+        (int)(statbuf.st_size / element_size));
     }
       else
     {
-      fprintf(out, ".align 32\n");
+      fprintf(out, ".align %d\n", get_int_size() * 8);
       fprintf(out, "  %s %d\n",
         constant,
-        (int)(iter->second.type == TYPE_BYTE ?
-              statbuf.st_size : statbuf.st_size / get_int_size()));
+        (int)(statbuf.st_size / element_size));
     }
 
     fprintf(out, "_%s:\n", iter->second.name.c_str());

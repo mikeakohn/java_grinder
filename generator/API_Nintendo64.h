@@ -19,8 +19,15 @@ public:
   virtual int nintendo64_clearScreen() { return -1; }
   virtual int nintendo64_resetZBuffer() { return -1; }
   virtual int nintendo64_setScreen_I() { return -1; }
+  virtual int nintendo64_plot_II() { return -1; }
   virtual int nintendo64_plot_III() { return -1; }
   virtual int nintendo64_loadTexture_aSII() { return -1; }
+  virtual int nintendo64_waitForPolygon() { return -1; }
+
+  virtual int nintendo64_getAudioStatus() { return -1; }
+  virtual int nintendo64_setAudioDACRate_I() { return -1; }
+  virtual int nintendo64_setAudioBitRate_I() { return -1; }
+  virtual int nintendo64_playAudio_aSI() { return -1; }
 
   virtual int nintendo64_n64_triangle_Constructor() { return -1; }
   virtual int nintendo64_n64_triangle_setColor_I() { return -1; }

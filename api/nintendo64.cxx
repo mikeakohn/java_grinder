@@ -55,8 +55,14 @@ int nintendo64(
   CHECK_FUNC(clearScreen,)
   CHECK_FUNC(resetZBuffer,)
   CHECK_FUNC(setScreen,_I)
+  CHECK_FUNC(plot,_II)
   CHECK_FUNC(plot,_III)
   CHECK_FUNC(loadTexture,_aSII)
+  CHECK_FUNC(waitForPolygon,)
+  CHECK_FUNC(getAudioStatus,)
+  CHECK_FUNC(setAudioDACRate,_I)
+  CHECK_FUNC(setAudioBitRate,_I)
+  CHECK_FUNC(playAudio,_aSI)
 
   return -1;
 }
