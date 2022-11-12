@@ -44,10 +44,22 @@ public:
   virtual int appleiigs_setWaveTable_III();
 
 private:
+  bool need_hires_enable:1;
+  bool need_hires_clear:1;
+  bool need_hires_update:1;
+//  bool need_hires_plot:1;
+  bool need_hires_line:1;
+  bool need_hires_span:1;
+  bool need_hires_read:1;
+  bool need_hires_sprite:1;
+  bool need_hires_palette:1;
+  bool need_hires_set_row:1;
+  bool need_rnd:1;
+
   void insert_hires_enable();
   void insert_hires_clear();
   void insert_hires_update();
-  void insert_hires_plot();
+//  void insert_hires_plot();
   void insert_hires_line();
   void insert_hires_span();
   void insert_hires_read();
@@ -57,18 +69,7 @@ private:
   void insert_hires_calc_address();
   void insert_rnd();
   void insert_glu();
-
-  bool need_hires_enable:1;
-  bool need_hires_clear:1;
-  bool need_hires_update:1;
-  bool need_hires_plot:1;
-  bool need_hires_line:1;
-  bool need_hires_span:1;
-  bool need_hires_read:1;
-  bool need_hires_sprite:1;
-  bool need_hires_palette:1;
-  bool need_hires_set_row:1;
-  bool need_rnd:1;
+  void hires_plot();
 };
 
 #endif

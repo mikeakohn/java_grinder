@@ -17,24 +17,9 @@
 
 #include "generator/W65C265SXB.h"
 
-#define PUSH() \
-  fprintf(out, "; PUSH\n"); \
-  fprintf(out, "  sta stack,x\n"); \
-  fprintf(out, "  dex\n"); \
-  fprintf(out, "  dex\n")
-
-#define POP() \
-  fprintf(out, "; POP\n"); \
-  fprintf(out, "  inx\n"); \
-  fprintf(out, "  inx\n"); \
-  fprintf(out, "  lda stack,x\n")
-
-#define LOCALS(a) (a * 2)
-
 W65C265SXB::W65C265SXB()
 {
   start_org = 0x1000;
-  java_stack = 0x900;
   ram_start = 0x7000;
 
   need_put_string = 0;
@@ -51,6 +36,8 @@ int W65C265SXB::open(const char *filename)
 {
   if(W65816::open(filename) != 0) { return -1; }
 
+  fprintf(out, ".65816\n");
+
   fprintf(out, "put_int_result equ 0xe0\n");
   fprintf(out, "put_int_table equ 0xf0\n");
   fprintf(out, "lda #10000\n");
@@ -64,10 +51,6 @@ int W65C265SXB::open(const char *filename)
   fprintf(out, "lda #1\n");
   fprintf(out, "sta put_int_table + 8\n");
 
-  fprintf(out, "; set up processor stack\n");
-  fprintf(out, "  lda #0x8ff\n");
-  fprintf(out, "  tcs\n");
-
   return 0;
 }
 
@@ -76,30 +59,24 @@ int W65C265SXB::sxb_getChar()
 {
   fprintf(out, "; getChar\n");
   fprintf(out, "  lda #0\n");
-  fprintf(out, "  phx\n");
-  fprintf(out, "  sep #0x20\n");
   fprintf(out, "getChar_again_%d:\n", label_count);
+  fprintf(out, "  sep #0x20\n");
   fprintf(out, "  jsr.l 0xe033\n");
   fprintf(out, "  bcs getChar_again_%d\n", label_count);
   fprintf(out, "  rep #0x30\n");
-  fprintf(out, "  plx\n");
-  PUSH();
+  fprintf(out, "  pha\n");
   label_count++;
-  stack++;
 
   return 0;
 }
 
 int W65C265SXB::sxb_putChar_C()
 {
-  POP();
   fprintf(out, "; putChar\n");
-  fprintf(out, "  phx\n");
+  fprintf(out, "  pla\n");
   fprintf(out, "  sep #0x20\n");
   fprintf(out, "  jsr.l 0xe04b\n");
   fprintf(out, "  rep #0x30\n");
-  fprintf(out, "  plx\n");
-  stack--;
 
   return 0;
 }
@@ -115,7 +92,6 @@ int W65C265SXB::sxb_putInt_I()
   need_put_int = 1;
   fprintf(out, "; putInt\n");
   fprintf(out, "  jsr put_int\n");
-  stack--;
 
   return 0;
 }
@@ -130,7 +106,6 @@ int W65C265SXB::sxb_putString_X()
 {
   need_put_string = 1;
   fprintf(out, "  jsr put_string\n");
-  stack--;
 
   return 0;
 }
@@ -138,7 +113,8 @@ int W65C265SXB::sxb_putString_X()
 void W65C265SXB::insert_put_string()
 {
   fprintf(out, "put_string:\n");
-  POP();
+  save_return();
+  fprintf(out, "  pla\n");
   fprintf(out, "  sta address\n");
   fprintf(out, "  dec address\n");
   fprintf(out, "  dec address\n");
@@ -153,21 +129,21 @@ void W65C265SXB::insert_put_string()
   fprintf(out, "  bne put_string_skip\n");
   fprintf(out, "  lda #13\n");
   fprintf(out, "put_string_skip:\n");
-  fprintf(out, "  phx\n");
   fprintf(out, "  sep #0x20\n");
   fprintf(out, "  jsr.l 0xe04b\n");
   fprintf(out, "  rep #0x30\n");
-  fprintf(out, "  plx\n");
   fprintf(out, "  inc address\n");
   fprintf(out, "  dey\n");
   fprintf(out, "  bne put_string_loop\n");
   fprintf(out, "put_string_end:\n");
+  restore_return();
   fprintf(out, "  rts\n");
 }
 
 void W65C265SXB::insert_put_int()
 {
   fprintf(out, "put_int:\n");
+  save_return();
   fprintf(out, "  lda #0\n");
   fprintf(out, "  sta value1\n");
   fprintf(out, "  sta value2\n");
@@ -177,15 +153,15 @@ void W65C265SXB::insert_put_int()
   fprintf(out, "  sta put_int_result + 4\n");
   fprintf(out, "  sta put_int_result + 6\n");
   fprintf(out, "  sta put_int_result + 8\n");
-  POP();
+  fprintf(out, "  pla\n");
   fprintf(out, "  bne put_int_check_sign\n");
   fprintf(out, "  lda #'0'\n");
   fprintf(out, "  sep #0x20\n");
   fprintf(out, "  jsr.l 0xe04b\n");
   fprintf(out, "  rep #0x30\n");
+  restore_return();
   fprintf(out, "  rts\n");
   fprintf(out, "put_int_check_sign:\n");
-  fprintf(out, "  stx result\n");
   fprintf(out, "  bpl put_int_start\n");
   fprintf(out, "  eor #0xffff\n");
   fprintf(out, "  inc\n");
@@ -233,7 +209,7 @@ void W65C265SXB::insert_put_int()
   fprintf(out, "  inx\n");
   fprintf(out, "  cpx #10\n");
   fprintf(out, "  bne put_int_print_loop\n");
-  fprintf(out, "  ldx result\n");
+  restore_return();
   fprintf(out, "  rts\n");
 }
 
@@ -251,13 +227,12 @@ int W65C265SXB::ioport_setPinsAsInput_I(int port)
     return -1;
 
   fprintf(out, "; ioport_setPinsAsInput\n");
-  POP();
+  fprintf(out, "  pla\n");
   fprintf(out, "  eor #0xffff\n");
   fprintf(out, "  and 0xdf24 + %d\n", port - 4);
   fprintf(out, "  sep #0x20\n");
   fprintf(out, "  sta 0xdf24 + %d\n", port - 4);
   fprintf(out, "  rep #0x30\n");
-  stack--;
 
   return 0;
 }
@@ -284,12 +259,11 @@ int W65C265SXB::ioport_setPinsAsOutput_I(int port)
     return -1;
 
   fprintf(out, "; ioport_setPinsAsOutput\n");
-  POP();
+  fprintf(out, "  pla\n");
   fprintf(out, "  ora 0xdf24 + %d\n", port - 4);
   fprintf(out, "  sep #0x20\n");
   fprintf(out, "  sta 0xdf24 + %d\n", port - 4);
   fprintf(out, "  rep #0x30\n");
-  stack--;
 
   return 0;
 }
@@ -315,11 +289,10 @@ int W65C265SXB::ioport_setPinsValue_I(int port)
     return -1;
 
   fprintf(out, "; ioport_setPinsValue\n");
-  POP();
+  fprintf(out, "  pla\n");
   fprintf(out, "  sep #0x20\n");
   fprintf(out, "  sta 0xdf20 + %d\n", port - 4);
   fprintf(out, "  rep #0x30\n");
-  stack--;
 
   return 0;
 }
@@ -344,12 +317,11 @@ int W65C265SXB::ioport_setPinsHigh_I(int port)
     return -1;
 
   fprintf(out, "; ioport_setPinsHigh\n");
-  POP();
+  fprintf(out, "  pla\n");
   fprintf(out, "  ora 0xdf20 + %d\n", port - 4);
   fprintf(out, "  sep #0x20\n");
   fprintf(out, "  sta 0xdf20 + %d\n", port - 4);
   fprintf(out, "  rep #0x30\n");
-  stack--;
 
   return 0;
 }
@@ -360,13 +332,12 @@ int W65C265SXB::ioport_setPinsLow_I(int port)
     return -1;
 
   fprintf(out, "; ioport_setPinsLow\n");
-  POP();
+  fprintf(out, "  pla\n");
   fprintf(out, "  eor #0xffff\n");
   fprintf(out, "  and 0xdf20 + %d\n", port - 4);
   fprintf(out, "  sep #0x20\n");
   fprintf(out, "  sta 0xdf20 + %d\n", port - 4);
   fprintf(out, "  rep #0x30\n");
-  stack--;
 
 
   return 0;
@@ -442,8 +413,7 @@ int W65C265SXB::ioport_getPortInputValue(int port)
   fprintf(out, "  sep #0x20\n");
   fprintf(out, "  lda 0xdf20 + %d\n", port - 4);
   fprintf(out, "  rep #0x30\n");
-  PUSH();
-  stack++;
+  fprintf(out, "  pha\n");
 
   return 0;
 }
@@ -454,23 +424,20 @@ int W65C265SXB::sxb_controlTones_IIZZ()
 //  int control = (enable2 & 1) | ((enable2 & 1) << 1);
 
   fprintf(out, "; controlTones\n");
-  POP();
+  fprintf(out, "  pla\n");
   fprintf(out, "  asl\n");
   fprintf(out, "  sta value1\n");
-  POP();
+  fprintf(out, "  pla\n");
   fprintf(out, "  ora value1\n");
   fprintf(out, "  sta value1\n");
-  POP();
+  fprintf(out, "  pla\n");
   fprintf(out, "  tay\n");
-  POP();
-  fprintf(out, "  phx\n");
+  fprintf(out, "  pla\n");
   fprintf(out, "  tax\n");
   fprintf(out, "  sep #0x20\n");
   fprintf(out, "  lda.b value1\n");
   fprintf(out, "  jsr.l 0xe009\n");
   fprintf(out, "  rep #0x30\n");
-  fprintf(out, "  plx\n");
-  stack -= 4;
 
   return 0;
 }
