@@ -59,10 +59,8 @@ int W65C265SXB::sxb_getChar()
 {
   fprintf(out, "; getChar\n");
   fprintf(out, "  lda #0\n");
-  fprintf(out, "getChar_again_%d:\n", label_count);
   fprintf(out, "  sep #0x20\n");
-  fprintf(out, "  jsr.l 0xe033\n");
-  fprintf(out, "  bcs getChar_again_%d\n", label_count);
+  fprintf(out, "  jsr.l 0xe036\n");
   fprintf(out, "  rep #0x30\n");
   fprintf(out, "  pha\n");
   label_count++;
@@ -77,6 +75,7 @@ int W65C265SXB::sxb_putChar_C()
   fprintf(out, "  sep #0x20\n");
   fprintf(out, "  jsr.l 0xe04b\n");
   fprintf(out, "  rep #0x30\n");
+  label_count++;
 
   return 0;
 }
@@ -144,9 +143,8 @@ void W65C265SXB::insert_put_int()
 {
   fprintf(out, "put_int:\n");
   save_return();
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  sta value1\n");
-  fprintf(out, "  sta value2\n");
+  fprintf(out, "  stz value1\n");
+  fprintf(out, "  stz value2\n");
   fprintf(out, "  lda #'0'\n");
   fprintf(out, "  sta put_int_result + 0\n");
   fprintf(out, "  sta put_int_result + 2\n");
@@ -173,7 +171,6 @@ void W65C265SXB::insert_put_int()
   fprintf(out, "put_int_loop:\n");
   fprintf(out, "  cmp put_int_table,x\n");
   fprintf(out, "  bmi put_int_loop2\n");
-  fprintf(out, "  inc value2\n");
   fprintf(out, "put_int_loop2:\n");
   fprintf(out, "  cmp put_int_table,x\n");
   fprintf(out, "  bmi put_int_continue\n");
@@ -192,19 +189,19 @@ void W65C265SXB::insert_put_int()
   fprintf(out, "  jsr.l 0xe04b\n");
   fprintf(out, "  rep #0x30\n");
   fprintf(out, "put_int_skip_minus:\n");
-  fprintf(out, "  lda #5\n");
-  fprintf(out, "  sta value1\n");
   fprintf(out, "  ldx #0\n");
+  fprintf(out, "put_int_skip_zeros:\n");
+  fprintf(out, "  lda put_int_result,x\n");
+  fprintf(out, "  cmp #'0'\n");
+  fprintf(out, "  bne put_int_print_loop\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  bra put_int_skip_zeros\n");
   fprintf(out, "put_int_print_loop:\n");
-  fprintf(out, "  lda value2\n");
-  fprintf(out, "  cmp value1\n");
-  fprintf(out, "  bmi put_int_print_continue\n");
   fprintf(out, "  lda put_int_result,x\n");
   fprintf(out, "  sep #0x20\n");
   fprintf(out, "  jsr.l 0xe04b\n");
   fprintf(out, "  rep #0x30\n");
-  fprintf(out, "put_int_print_continue:\n");
-  fprintf(out, "  dec value1\n");
   fprintf(out, "  inx\n");
   fprintf(out, "  inx\n");
   fprintf(out, "  cpx #10\n");

@@ -211,11 +211,15 @@ int W65816::push_ref_static(std::string &name, int index)
 
 int W65816::push_fake()
 {
+/*
   fprintf(out, "; push_fake\n");
   fprintf(out, "  pha\n");
   stack++;
 
   return 0;
+*/
+
+  return -1;
 }
 
 int W65816::push_int(int32_t n)
@@ -858,7 +862,7 @@ int W65816::jump_cond_integer(std::string &label, int cond, int const_val, int d
       break;
     case COND_NOT_EQUAL:
       fprintf(out, "  pla\n");
-      fprintf(out, "  lda #0x%04x\n", const_val);
+      fprintf(out, "  cmp #0x%04x\n", const_val);
       fprintf(out, "  beq jump_cond_integer_const_skip_2_%d\n", label_count);
       fprintf(out, "  jmp %s\n", label.c_str());
       break;
