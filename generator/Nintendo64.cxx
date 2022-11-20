@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <math.h>
 
+#include "generator/Math.h"
 #include "generator/Nintendo64.h"
 
 #define N643D "net/mikekohn/java_grinder/n64/"
@@ -77,7 +78,47 @@ int Nintendo64::finish()
   insert_load_texture();
   insert_cos_table();
   insert_rsp_code();
+  Math::add_sin_table(out);
+  Math::add_cos_table(out);
   R4000::finish();
+
+  return 0;
+}
+
+int Nintendo64::math_sin512_I()
+{
+  const int value = reg - 1;
+
+  fprintf(out,
+    "  ;; math_sin512_I()\n"
+    "  andi $t%d, $t%d, 511\n"
+    "  sll $t%d, $t%d, 2\n"
+    "  li $v1, _sin_table_512\n"
+    "  addu $v1, $v1, $t%d\n"
+    "  lwu $t%d, ($v1)\n",
+    value, value,
+    value, value,
+    value,
+    value);
+
+  return 0;
+}
+
+int Nintendo64::math_cos512_I()
+{
+  const int value = reg - 1;
+
+  fprintf(out,
+    "  ;; math_cos512_I()\n"
+    "  andi $t%d, $t%d, 511\n"
+    "  sll $t%d, $t%d, 2\n"
+    "  li $v1, _cos_table_512\n"
+    "  addu $v1, $v1, $t%d\n"
+    "  lwu $t%d, ($v1)\n",
+    value, value,
+    value, value,
+    value,
+    value);
 
   return 0;
 }

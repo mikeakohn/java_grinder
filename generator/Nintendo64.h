@@ -59,6 +59,9 @@ public:
   virtual int nintendo64_n64_rectangle_setTextureDisabled();
   virtual int nintendo64_n64_rectangle_draw();
 
+  virtual int math_sin512_I();
+  virtual int math_cos512_I();
+
 private:
   void catridge_header();
   void init_system();
