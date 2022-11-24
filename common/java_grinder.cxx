@@ -23,6 +23,7 @@
 #include "generator/Atari2600.h"
 #include "generator/AVR8.h"
 #include "generator/C64.h"
+#include "generator/ColecoVision.h"
 #include "generator/CPC.h"
 #include "generator/DotNet.h"
 #include "generator/DSPIC.h"
@@ -121,6 +122,11 @@ static Generator *new_generator(const char *chip_type)
   if (strcasecmp("c64", chip_type) == 0)
   {
     generator = new C64();
+  }
+    else
+  if (strcasecmp("colecovision", chip_type) == 0)
+  {
+    generator = new ColecoVision();
   }
     else
   if (strcasecmp("cpc", chip_type) == 0)

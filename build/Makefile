@@ -83,6 +83,7 @@ SYSTEMS= \
   generator/AppleIIgs.o \
   generator/Atari2600.o \
   generator/C64.o \
+  generator/ColecoVision.o \
   generator/CPC.o \
   generator/MSX.o \
   generator/NES.o \

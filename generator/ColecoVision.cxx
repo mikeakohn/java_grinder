@@ -118,7 +118,7 @@ int ColecoVision::start_init()
     "  jp 0\n"
     "  jp 0\n"
     "  jp 0\n"
-    "  .string "JAVA/GRINDER/2022\n\n");
+    "  .ascii \"JAVA/GRINDER/2022\"\n\n");
 
   // Add any set up items (stack, registers, etc).
   fprintf(out, "start:\n");
@@ -160,33 +160,35 @@ int ColecoVision::tms9918a_printChar_C(int c)
   fprintf(out,
     "  ;; tms9918a_printChar_C(%d)\n"
     "  ld a, 0x%02x\n"
-    "  out (VDP_DATA), a\n");
+    "  out (VDP_DATA), a\n",
+    c,
+    c);
 
   return 0;
 }
 
 int ColecoVision::tms9918a_setCursor_II()
 {
-  //mov @-24(r10), r3  ; push local_11
-  //mov @-24(r10), r4  ; push local_11
-  //mpy r4, r3
-  //mov r4, r3
-
-  // (REG-1 * 32) + REG-2
-
   // FIXME - Is this better as a function?
   fprintf(out,
     "  ;; tms9918a_setCursor_II()\n"
-    "  li r0, 32\n"
-    "  mpy r%d, r0\n"
-    "  a r%d, r1\n"
-    "  mov r1, r0\n"
-    "  ai r0, 0x4000\n"
-    "  call _vdp_command\n",
-    REG_STACK(reg - 1),
-    REG_STACK(reg - 2));
-
-  reg -= 2;
+    "  pop bc\n"
+    "  sla c\n"
+    "  rlc b\n"
+    "  sla c\n"
+    "  rlc b\n"
+    "  sla c\n"
+    "  rlc b\n"
+    "  sla c\n"
+    "  rlc b\n"
+    "  sla c\n"
+    "  rlc b\n"
+    "  pop de\n"
+    "  ld ix, 0x4000\n"
+    "  add ix, bc\n"
+    "  add ix, de\n"
+    "  ld bc, ix\n"
+    "  call _vdp_command\n");
 
   return 0;
 }
@@ -199,7 +201,7 @@ int ColecoVision::tms9918a_setCursor_II(int x, int y)
 
   fprintf(out,
     "  ;; tms9918a_setCursor_II(%d, %d)\n"
-    "  ld bc, 0x%02x%02x ; set write byte to %d\n",
+    "  ld bc, 0x%02x%02x ; set write byte to %d\n"
     "  ld (VDP_COMMAND), b\n"
     "  ld (VDP_COMMAND), c\n",
     x, y,
@@ -276,18 +278,10 @@ int ColecoVision::tms9918a_plot_III()
 
   fprintf(out,
     "  ;; tms9918a_plot_III()\n"
-    "  mov r%d, r0\n"
-    "  mov r%d, r1\n"
-    "  mov r%d, r9\n"
-    "  mov r11, *r10+\n"
-    "  call _plot\n"
-    "  ai r10, -2\n"
-    "  mov *r10, r11\n",
-    REG_STACK(reg - 3),
-    REG_STACK(reg - 2),
-    REG_STACK(reg - 1));
-
-  reg -= 3;
+    "  pop de\n"
+    "  pop bc\n"
+    "  pop ix\n"
+    "  call _plot\n");
 
   return 0;
 }
@@ -448,7 +442,7 @@ int ColecoVision::joystick_isButtonDown_0_I(int index)
 void ColecoVision::insert_print_string()
 {
   fprintf(out,
-    "  ;; insert_print_string(string=ix)
+    "  ;; insert_print_string(string=ix)\n"
     "_print_string:\n"
     "  ld c, (ix-2)\n"
     "  ld b, (ix-1)\n"
