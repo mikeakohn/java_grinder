@@ -74,6 +74,7 @@ int ColecoVision::open(const char *filename)
   fprintf(out,
     "ram_start equ 0x6000\n"
     "heap_ptr equ ram_start\n"
+    "save_iy equ heap_ptr\n"
     "SN76489 equ 0xff\n"
     "VDP_DATA equ 0xbe\n"
     "VDP_COMMAND equ 0xbf\n\n");
@@ -83,6 +84,8 @@ int ColecoVision::open(const char *filename)
 
 int ColecoVision::finish()
 {
+  Z80::finish();
+
   if (need_vdp_command) { insert_vdp_command(); }
   if (need_print_string) { insert_print_string(); }
   if (need_clear_screen) { insert_clear_screen(); }
@@ -200,12 +203,14 @@ int ColecoVision::tms9918a_setCursor_II(int x, int y)
   int address = offset + 0x4000;
 
   fprintf(out,
-    "  ;; tms9918a_setCursor_II(%d, %d)\n"
-    "  ld bc, 0x%02x%02x ; set write byte to %d\n"
-    "  ld (VDP_COMMAND), b\n"
-    "  ld (VDP_COMMAND), c\n",
-    x, y,
-    address & 0xff, address >> 8, offset);
+    "  ;; tms9918a_setCursor_II(%d, %d) offset=%d\n"
+    "  ld a, 0x%02x\n"
+    "  out (VDP_COMMAND), a\n"
+    "  ld a, 0x%02x\n"
+    "  out (VDP_COMMAND), a\n",
+    x, y, offset,
+    address >> 8,
+    address & 0xff);
 
   return 0;
 }
@@ -355,10 +360,10 @@ int ColecoVision::tms9918a_setSpriteSize_I()
   fprintf(out,
     "  ;; tms9918a_setSpriteSize_I()\n"
     "  pop af\n"
-    "  or a, 0xe0\n"
-    "  ld b, 0x81\n"
+    "  or 0xe0\n"
     "  out (VDP_COMMAND), a\n"
-    "  out (VDP_COMMAND), b\n");
+    "  ld a, 0x81\n"
+    "  out (VDP_COMMAND), a\n");
 
   return 0;
 }
@@ -447,10 +452,10 @@ void ColecoVision::insert_print_string()
     "  ld c, (ix-2)\n"
     "  ld b, (ix-1)\n"
     "_print_string_loop:\n"
-    "  ld a, ix\n"
+    "  ld a, (ix)\n"
     "  out (VDP_DATA), a\n"
-    "  dec bc\n"
-    "  jne _print_string_loop\n"
+    "  dec c\n"
+    "  jr nz, _print_string_loop\n"
     "  ret\n\n");
 }
 
@@ -458,8 +463,10 @@ void ColecoVision::insert_vdp_command()
 {
   fprintf(out,
     "_vdp_command:\n"
-    "  out (VDP_COMMAND), c\n"
-    "  out (VDP_COMMAND), b\n"
+    "  ld a, c\n"
+    "  out (VDP_COMMAND), a\n"
+    "  ld a, b\n"
+    "  out (VDP_COMMAND), a\n"
     "  ret\n\n");
 }
 
@@ -467,15 +474,19 @@ void ColecoVision::insert_clear_screen()
 {
   fprintf(out,
     "_clear_screen:\n"
-    "  ld bc, 0x0040\n"
-    "  out (VDP_COMMAND), c\n"
-    "  out (VDP_COMMAND), b\n"
+    "  ld a, 0x00\n"
+    "  out (VDP_COMMAND), a\n"
+    "  ld a, 0x40\n"
+    "  out (VDP_COMMAND), a\n"
     "  ld a, 0\n"
-    "  ld bc, 0x300\n"
+    "  ld b, 0xc0\n"
     "_clear_screen_loop:\n"
     "  out (VDP_COMMAND), a\n"
-    "  dec bc\n"
-    "  jne _clear_screen_loop\n"
+    "  out (VDP_COMMAND), a\n"
+    "  out (VDP_COMMAND), a\n"
+    "  out (VDP_COMMAND), a\n"
+    "  dec b\n"
+    "  jr nz, _clear_screen_loop\n"
     "  ret\n\n");
 }
 
@@ -497,10 +508,14 @@ void ColecoVision::insert_plot()
     "  add ix, bc\n"
     "  ld bc, 0x4000\n"
     "  add ix, bc\n"
-    "  ld bc, ix\n"
-    "  out (VDP_COMMAND), c\n"
-    "  out (VDP_COMMAND), b\n"
-    "  out (VDP_DATA), e\n"
+    "  push ix\n"
+    "  pop bc\n"
+    "  ld a, c\n"
+    "  out (VDP_COMMAND), a\n"
+    "  ld a, b\n"
+    "  out (VDP_COMMAND), a\n"
+    "  ld a, e\n"
+    "  out (VDP_DATA), a\n"
     "  ret\n\n");
 }
 
@@ -512,26 +527,28 @@ void ColecoVision::insert_set_colors()
   fprintf(out,
     "_set_colors:\n"
     "  ;; Set color table\n"
-    "  ld bc, 0x8043\n"
-    "  out (VDP_COMMAND), c\n"
-    "  out (VDP_COMMAND), b\n"
+    "  ld a, 0x43\n"
+    "  out (VDP_COMMAND), a\n"
+    "  ld a, 0x80\n"
+    "  out (VDP_COMMAND), a\n"
     "  ld a, 0\n"
     "  ld b, 32\n"
     "_set_colors_loop:\n"
     "  out (VDP_DATA), a\n"
     "  add a, 0x10\n"
     "  dec c\n"
-    "  jne _set_colors_loop\n"
+    "  jr nz, _set_colors_loop\n"
     "  ;; Set pattern table\n"
-    "  ld bc, 0x0048\n"
-    "  out (VDP_COMMAND), c\n"
-    "  out (VDP_COMMAND), b\n"
+    "  ld a, 0x48\n"
+    "  out (VDP_COMMAND), a\n"
+    "  ld a, 0x00\n"
+    "  out (VDP_COMMAND), a\n"
     "  ld a, 0xff\n"
     "  ld ix, 2048\n"
     "_set_patterns_loop:\n"
     "  out (VDP_DATA), a\n"
-    "  dec ix\n"
-    "  jne _set_patterns_loop\n"
+    "  dec ixl\n"
+    "  jr nz, _set_patterns_loop\n"
     "  ret\n\n");
 }
 
@@ -546,10 +563,10 @@ void ColecoVision::insert_set_sound_freq()
     "  sll a\n"
     "  sll a\n"
     "  sll a\n"
-    "  or a, 0x80\n"
+    "  or 0x80\n"
     "  ld c, e\n"
-    "  and c, 0x0f\n"
-    "  or a, c\n"
+    "  or c\n"
+    "  and 0x0f\n"
     "  out (SN76489), a\n"
     "  sra d\n"
     "  rrc e\n"
@@ -575,9 +592,9 @@ void ColecoVision::insert_set_sound_volume()
     "  sll a\n"
     "  sll a\n"
     "  sll a\n"
-    "  or a, 0x90\n"
-    "  and e, 0x0f\n"
-    "  or a, e\n"
+    "  or 0x90\n"
+    "  or e\n"
+    "  and 0x0f\n"
     "  out (SN76489), a\n"
     "  ret\n\n");
 }
@@ -590,9 +607,10 @@ void ColecoVision::insert_set_sprite_visible()
     "_set_sprite_visible:\n"
     "  sla c\n"
     "  sla c\n"
-    "  ld b, 0x43\n"
-    "  out (VDP_COMMAND), c\n"
-    "  out (VDP_COMMAND), b\n"
+    "  ld a, c\n"
+    "  out (VDP_COMMAND), a\n"
+    "  ld a, 0x43\n"
+    "  out (VDP_COMMAND), a\n"
     "  out (VDP_DATA), e\n"
     "  ret\n\n");
 }
@@ -614,18 +632,22 @@ void ColecoVision::insert_set_sprite_image()
     "  rlc b\n"
     "  sla c\n"
     "  rlc b\n"
-    "  ld iy, bc\n"
+    "  push iy\n"
+    "  pop bc\n"
     "  ld bc, 0x4000|0x1800\n"
     "  add iy, bc\n"
-    "  ld bc, iy\n"
-    "  out (VDP_COMMAND), c\n"
-    "  out (VDP_COMMAND), b\n"
+    "  push iy\n"
+    "  pop bc\n"
+    "  ld a, c\n"
+    "  out (VDP_COMMAND), a\n"
+    "  ld a, b\n"
+    "  out (VDP_COMMAND), a\n"
     "  ld e, (ix-2)\n"
     "_set_sprites_image_loop:\n"
     "  ld a, (ix)\n"
     "  out (VDP_DATA), a\n"
     "  dec e\n"
-    "  jne _set_sprites_image_loop\n");
+    "  jr nz, _set_sprites_image_loop\n");
 
   // Sprite attributes table is at 0x300
   // Need to set the pattern number for this sprite
@@ -633,16 +655,22 @@ void ColecoVision::insert_set_sprite_image()
     "  pop de\n"
     "  sla e\n"
     "  sla e\n"
-    "  ld iy, de\n"
-    "  add iy, 0x4302\n"
-    "  ld de, iy\n"
-    "  out (VDP_COMMAND), e\n"
-    "  out (VDP_COMMAND), d\n"
+    "  push iy\n"
+    "  pop de\n"
+    // FIXME:
+    //"  add iy, 0x4302\n"
+    "  push iy\n"
+    "  pop de\n"
+    "  ld a, e\n"
+    "  out (VDP_COMMAND), a\n"
+    "  ld a, d\n"
+    "  out (VDP_COMMAND), a\n"
     "  sla c\n"
     "  rlc b\n"
     "  sla c\n"
     "  rlc b\n"
-    "  out (VDP_DATA), c\n"
+    "  ld a, c\n"
+    "  out (VDP_DATA), a\n"
     "  ret\n\n");
 }
 
@@ -658,8 +686,10 @@ void ColecoVision::insert_set_sprite_pos()
     "  out (VDP_COMMAND), a\n"
     "  ld a, 0x43\n"
     "  out (VDP_COMMAND), a\n"
-    "  out (VDP_DATA), l\n"
-    "  out (VDP_DATA), e\n"
+    "  ld a, l\n"
+    "  out (VDP_DATA), a\n"
+    "  ld a, e\n"
+    "  out (VDP_DATA), a\n"
     "  ret\n\n");
 }
 
@@ -675,7 +705,8 @@ void ColecoVision::insert_set_sprite_color()
     "  out (VDP_COMMAND), a\n"
     "  ld a, 0x43\n"
     "  out (VDP_COMMAND), a\n"
-    "  out (VDP_DATA), e\n"
+    "  ld a, e\n"
+    "  out (VDP_DATA), a\n"
     "  ret\n\n");
 }
 

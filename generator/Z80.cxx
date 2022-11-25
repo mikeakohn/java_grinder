@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2022 by Michael Kohn
  *
  */
 
@@ -41,20 +41,19 @@ enum
 Z80::Z80() :
   stack(0),
   is_main(false),
-  need_mul16_integer(0),
-  need_div16_integer(0)
+  need_mul16_integer(false),
+  need_div16_integer(false)
 
-  //,need_memory_read8(0),
+  //need_memory_read8(0),
   //need_memory_write8(0),
   //need_memory_read16(0),
   //need_memory_write16(0)
-  
+
 {
 }
 
 Z80::~Z80()
 {
-
 }
 
 int Z80::open(const char *filename)
@@ -74,14 +73,14 @@ int Z80::open(const char *filename)
 int Z80::finish()
 {
   // Math
-  if(need_mul16_integer) { insert_mul16_integer(); }
-  if(need_div16_integer) { insert_div16_integer(); }
-  
-/*  //Memory API 
-  if(need_memory_read8) { insert_memory_read8(); }
-  if(need_memory_write8) { insert_memory_write8(); } 
-  if(need_memory_read16) { insert_memory_read16(); }
-  if(need_memory_write16) { insert_memory_write16(); } 
+  if (need_mul16_integer) { insert_mul16_integer(); }
+  if (need_div16_integer) { insert_div16_integer(); }
+
+/*  //Memory API
+  if (need_memory_read8) { insert_memory_read8(); }
+  if (need_memory_write8) { insert_memory_write8(); }
+  if (need_memory_read16) { insert_memory_read16(); }
+  if (need_memory_write16) { insert_memory_write16(); }
 */
   return 0;
 }
@@ -135,7 +134,7 @@ void Z80::method_start(int local_count, int max_stack, int param_count, std::str
 
   if (is_main)
   {
-    fprintf(out, "  ld (save_iy),iy\n");
+    fprintf(out, "  ld (save_iy), iy\n");
   }
 
   // FIXME - this might be extra since there's a save_iy
@@ -321,16 +320,15 @@ int Z80::sub_integer(int num)
 
 int Z80::mul_integer()
 {
-  need_mul16_integer = 1;
+  need_mul16_integer = true;
   fprintf(out, "  call mul16_integer\n");
-  //stack--;
 
   return 0;
 }
 
 int Z80::div_integer()
 {
-  need_div16_integer = 1;
+  need_div16_integer = true;
   fprintf(out, "  call div16_integer\n");
   fprintf(out, "  pop hl\n"); // del reminder from stack, result is on stack
   //stack--;
@@ -340,13 +338,12 @@ int Z80::div_integer()
 
 int Z80::mod_integer()
 {
-  need_div16_integer = 1;
+  need_div16_integer = true;
   fprintf(out, "  call div16_integer\n");
   fprintf(out, "  pop hl\n"); // get reminder
   fprintf(out, "  pop bc\n"); // del result from stack
   fprintf(out, "  push hl\n"); // store reminder
-   
-  
+
   //stack--;
 
   return 0;
@@ -1059,7 +1056,7 @@ int Z80::stack_alu(int alu_op)
       fprintf(out, "  %s a, l\n", alu_str[alu_op]);
       fprintf(out, "  ld l, a\n");
     }
-    
+
     fprintf(out, "  push hl\n");
   }
 
@@ -1159,7 +1156,7 @@ int Z80::memory_read8_I()
   fprintf(out, "  ld l,a\n");
   fprintf(out, "  ld h,0\n");
   fprintf(out, "  push hl\n");
-  
+
   return 0;
 }
 
@@ -1181,8 +1178,8 @@ int Z80::memory_read16_I()
   fprintf(out, "  inc hl\n");
   fprintf(out, "  ld b,(hl)\n");
   fprintf(out, "  push bc\n");
-  
-  return 0;  
+
+  return 0;
 }
 
 int Z80::memory_write16_IS()
@@ -1196,8 +1193,8 @@ int Z80::memory_write16_IS()
   fprintf(out, "  ld (hl),c\n");
   fprintf(out, "  inc hl\n");
   fprintf(out, "  ld (hl),b\n");
-  
-  return 0;  
+
+  return 0;
 }
 
 int Z80::memory_read8_I(int adr)
@@ -1207,7 +1204,7 @@ int Z80::memory_read8_I(int adr)
   fprintf(out, "  ld l,a\n");
   fprintf(out, "  ld h,0\n");
   fprintf(out, "  push hl\n");
-  
+
   return 0;
 }
 
@@ -1222,7 +1219,7 @@ int Z80::memory_write8_IB(int adr, int8_t val)
     return -1;
   }
 #endif
-  
+
   fprintf(out, "  ld a,0x%02x  ;;memory_write8\n", val);
   fprintf(out, "  ld hl,0x%04x\n", adr);
   fprintf(out, "  ld (hl),a\n");
@@ -1238,14 +1235,14 @@ int Z80::memory_read16_I(int adr)
   fprintf(out, "  inc hl\n");
   fprintf(out, "  ld b,(hl)\n");
   fprintf(out, "  push bc\n");
-  
+
   return 0;
 }
 
 int Z80::memory_write16_IS(int adr, short val)
 {
 #if 0
-  // signed 16 bit values can't be more than 32767 or less than -32768 
+  // signed 16 bit values can't be more than 32767 or less than -32768
   // this is causing a compiler warning.
   if (val > 65535 || val < -32768)
   {
@@ -1253,21 +1250,15 @@ int Z80::memory_write16_IS(int adr, short val)
     return -1;
   }
 #endif
-  
+
   fprintf(out, "  ld bc, 0x%04x  ;;memory_write16_C\n", val);
   fprintf(out, "  ld hl, 0x%04x\n", adr);
   fprintf(out, "  ld (hl),c\n");
   fprintf(out, "  inc hl\n");
   fprintf(out, "  ld (hl),b\n");
-  
-  return 0;  
+
+  return 0;
 }
-
-
-
-// *****************************
-// now the new private functions
-// *****************************
 
 void Z80::insert_mul16_integer()
 {
@@ -1290,13 +1281,10 @@ void Z80::insert_mul16_integer()
   fprintf(out, "  djnz Mult16_Loop\n");
   fprintf(out, "  push hl\n");
   fprintf(out, "  ret\n");
-  
 }
 
-
 void Z80::insert_div16_integer()
-{  
-  
+{
   fprintf(out, ";Divide 16-bit values (with 16-bit result)\n");
   //In: Divide BC by divider DE
   //Out: BC = result, HL = rest
