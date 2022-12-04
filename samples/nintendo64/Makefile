@@ -1,7 +1,7 @@
 
 JAVA_GRINDER=../../java_grinder
 NAKEN_ASM=../../../naken_asm/naken_asm
-INCLUDE_PATH=../../../naken_asm/include/nintendo64
+INCLUDE_PATH=../../../naken_asm/include
 
 default: Nintendo64Demo.class
 
