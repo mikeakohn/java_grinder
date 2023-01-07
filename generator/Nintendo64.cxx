@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2022 by Michael Kohn
+ * Copyright 2014-2023 by Michael Kohn
  *
  */
 
@@ -393,19 +393,21 @@ int Nintendo64::nintendo64_setAudioBitRate_I()
   return 0;
 }
 
-int Nintendo64::nintendo64_playAudio_aSI()
+int Nintendo64::nintendo64_playAudio_aSII()
 {
   fprintf(out,
-    "  ;; nintendo64_playAudio_aSI()\n"
+    "  ;; nintendo64_playAudio_aSII()\n"
     "  li $a0, KSEG1 | AI_BASE_REG\n"
+    "  addu $t%d, $t%d, $t%d\n"
     "  sw $t%d, AI_DRAM_ADDR_REG($a0)\n"
     "  sw $t%d, AI_LEN_REG($a0)\n"
     "  li $at, 1\n"
     "  sw $at, AI_CONTROL_REG($a0)\n",
-    reg - 2,
+    reg - 3, reg - 3, reg - 2,
+    reg - 3,
     reg - 1);
 
-  reg -= 2;
+  reg -= 3;
 
   return 0;
 }

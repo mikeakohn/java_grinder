@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2023 by Michael Kohn
  *
  */
 
@@ -1275,16 +1275,20 @@ int R4000::invoke_static_method(const char *name, int params, int is_void)
 
 int R4000::put_static(std::string &name, int index)
 {
-  fprintf(out, "  ; put_static(%s, %d)\n", name.c_str(), index);
+  fprintf(out,
+    "  ; put_static(%s, %d)\n"
+    "  li $t9, %s\n",
+    name.c_str(), index,
+    name.c_str());
 
   if (stack > 0)
   {
     STACK_POP(8);
-    fprintf(out, "  sw $t8, %d($s1)\n", index * 4);
+    fprintf(out, "  sw $t8, ($t9)\n");
   }
     else
   {
-    fprintf(out, "  sw $t%d, %d($s1)\n", reg - 1, index * 4);
+    fprintf(out, "  sw $t%d, ($t9)\n", reg - 1);
     reg--;
   }
 
@@ -1293,15 +1297,19 @@ int R4000::put_static(std::string &name, int index)
 
 int R4000::get_static(std::string &name, int index)
 {
-  fprintf(out, "  ; get_static(%s, %d)\n", name.c_str(), index);
+  fprintf(out,
+    "  ; get_static(%s, %d)\n"
+    "  li $t9, %s\n",
+    name.c_str(), index,
+    name.c_str());
 
   if (reg < reg_max)
   {
-    fprintf(out, "  lw $t%d, %d($s1)\n", reg++, index * 4);
+    fprintf(out, "  lw $t%d, ($t9)\n", reg++);
   }
     else
   {
-    fprintf(out, "  lw $t8, %d($s1)\n", index * 4);
+    fprintf(out, "  lw $t8, ($t9)\n");
     STACK_PUSH(8);
   }
 

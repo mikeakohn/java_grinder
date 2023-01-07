@@ -5,7 +5,7 @@
  *     Web: https://www.mikekohn.net/
  * License: GPL
  *
- * Copyright 2014-2022 by Michael Kohn
+ * Copyright 2014-2023 by Michael Kohn
  *
  */
 
@@ -59,6 +59,6 @@ abstract public class Nintendo64
   public static void setAudioBitRate(int value) { }
 
   /** Start Audio Interface playing sound. */
-  public static void playAudio(short[] data, int length) { }
+  public static void playAudio(short[] data, int offset, int length) { }
 }
 

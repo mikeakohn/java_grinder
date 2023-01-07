@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2022 by Michael Kohn
+ * Copyright 2014-2023 by Michael Kohn
  *
  */
 
@@ -27,7 +27,7 @@ public:
   virtual int nintendo64_getAudioStatus() { return -1; }
   virtual int nintendo64_setAudioDACRate_I() { return -1; }
   virtual int nintendo64_setAudioBitRate_I() { return -1; }
-  virtual int nintendo64_playAudio_aSI() { return -1; }
+  virtual int nintendo64_playAudio_aSII() { return -1; }
 
   virtual int nintendo64_n64_triangle_Constructor() { return -1; }
   virtual int nintendo64_n64_triangle_setColor_I() { return -1; }

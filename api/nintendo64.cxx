@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2022 by Michael Kohn
+ * Copyright 2014-2023 by Michael Kohn
  *
  */
 
@@ -62,7 +62,7 @@ int nintendo64(
   CHECK_FUNC(getAudioStatus,)
   CHECK_FUNC(setAudioDACRate,_I)
   CHECK_FUNC(setAudioBitRate,_I)
-  CHECK_FUNC(playAudio,_aSI)
+  CHECK_FUNC(playAudio,_aSII)
 
   return -1;
 }
