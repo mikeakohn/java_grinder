@@ -65,6 +65,7 @@ public:
 private:
   void catridge_header();
   void init_system();
+  void copy_1mb_from_rom();
   void rsp_halt();
   void rsp_start();
   void rsp_copy_code();

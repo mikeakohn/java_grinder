@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2022 by Michael Kohn
+ * Copyright 2014-2023 by Michael Kohn
  *
  */
 
@@ -218,7 +218,11 @@ void Generator::add_newline()
   fprintf(out, "\n");
 }
 
-int Generator::insert_db(std::string &name, int32_t *data, int len, uint8_t len_type)
+int Generator::insert_db(
+  std::string &name,
+  int32_t *data,
+  int len,
+  uint8_t len_type)
 {
   if (len_type == TYPE_SHORT)
   {
@@ -252,7 +256,11 @@ int Generator::insert_db(std::string &name, int32_t *data, int len, uint8_t len_
   return 0;
 }
 
-int Generator::insert_dw(std::string &name, int32_t *data, int len, uint8_t len_type)
+int Generator::insert_dw(
+  std::string &name,
+  int32_t *data,
+  int len,
+  uint8_t len_type)
 {
   if (len_type == TYPE_SHORT)
   {
@@ -263,6 +271,7 @@ int Generator::insert_dw(std::string &name, int32_t *data, int len, uint8_t len_
   {
     fprintf(out, "  dc32 %d   ; %s.length\n", len, name.c_str());
   }
+
   fprintf(out, "_%s:\n", name.c_str());
 
   for (int n = 0; n < len; n++)
@@ -286,7 +295,12 @@ int Generator::insert_dw(std::string &name, int32_t *data, int len, uint8_t len_
   return 0;
 }
 
-int Generator::insert_dc32(std::string &name, int32_t *data, int len, uint8_t len_type, const char *dc32)
+int Generator::insert_dc32(
+  std::string &name,
+  int32_t *data,
+  int len,
+  uint8_t len_type,
+  const char *dc32)
 {
   // FIXME: For dc32, the len_type should be dc32 always.
   if (len_type == TYPE_SHORT)
@@ -316,7 +330,12 @@ int Generator::insert_dc32(std::string &name, int32_t *data, int len, uint8_t le
   return 0;
 }
 
-int Generator::insert_float(std::string &name, int32_t *data, int len, uint8_t len_type, const char *dc32)
+int Generator::insert_float(
+  std::string &name,
+  int32_t *data,
+  int len,
+  uint8_t len_type,
+  const char *dc32)
 {
   // FIXME: For dc32, the len_type should be dc32 always.
   if (len_type == TYPE_SHORT)
@@ -490,6 +509,14 @@ int Generator::add_array_files()
       default:         element_size = 1; break;
     }
 
+    if (preload_array_align == 64)
+    {
+      fprintf(out, ".align 64\n");
+      fprintf(out, "  %s 0, %d\n",
+        constant,
+        (int)(statbuf.st_size / element_size));
+    }
+      else
     if (preload_array_align == 128)
     {
       fprintf(out, ".align 128\n");

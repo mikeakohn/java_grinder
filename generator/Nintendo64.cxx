@@ -21,9 +21,9 @@
 #define N643D "net/mikekohn/java_grinder/n64/"
 #define N643D_LEN (sizeof(N643D) - 1)
 
-// Screen 0: 0x10_0000 (0x10_0000)
-// Screen 1: 0x12_5800 (0x10_0000 + (320 * 240 * 2))
-// Z Buffer: 0x14_b000 (0x10_0000 + (320 * 240 * 4))
+// Screen 0: 0x20_0000 (0x20_0000)
+// Screen 1: 0x22_5800 (0x20_0000 + (320 * 240 * 2))
+// Z Buffer: 0x24_b000 (0x20_0000 + (320 * 240 * 4))
 // $k1 points to DMEM
 // $k0 points to struct of:
 //  0: uint32_t current_screen (with KSEG1)
@@ -38,6 +38,7 @@ Nintendo64::Nintendo64()
   org = 0x80000000;
   ram_start = 0x80000000;
   ram_end = 0x80200000;
+  preload_array_align = 64;
 }
 
 Nintendo64::~Nintendo64()
@@ -56,7 +57,7 @@ int Nintendo64::open(const char *filename)
     ".include \"nintendo64/video_interface.inc\"\n\n");
 
   fprintf(out,
-    ".high_address 0x8010_ffff\n"
+    ".high_address 0x801f_ffff\n"
     ".org 0x8000_0000\n\n");
 
   return 0;
@@ -135,6 +136,7 @@ int Nintendo64::start_init()
     "start:\n");
 
   init_system();
+  copy_1mb_from_rom();
 
   fprintf(out,
     "  ;; $k0 points to struct of\n"
@@ -145,8 +147,8 @@ int Nintendo64::start_init()
     "  ;; 12: uint32_t reserved\n"
     "  ;; 16: uint16_t texture[]\n"
     "  li $k0, 320 * 240 * 2 * 2 * 2\n"
-    "  li $t0, KSEG1 | 0x0010_0000\n"
-    "  li $t2, 0x0010_0000\n"
+    "  li $t0, KSEG1 | 0x0020_0000\n"
+    "  li $t2, 0x0020_0000\n"
     "  addu $k0, $k0, $t0\n"
     "  li $t1, 1\n"
     "  sw $t0, 0($k0)\n"
@@ -813,6 +815,24 @@ void Nintendo64::init_system()
     "  nop\n\n");
 }
 
+void Nintendo64::copy_1mb_from_rom()
+{
+  fprintf(out,
+    "  ;; Copy upper 1MB from ROM into RAM.\n"
+    "  li $a0, PI_BASE\n"
+    "  li $t0, 1024 * 1024\n"
+    "  li $t2, 0x1000_0000 | (1024 * 1024)\n"
+    "  li $t1, (1024 * 1024) - 1\n"
+    "  sw $t0, DMA_RAM_ADDRESS($a0)\n"
+    "  sw $t2, DMA_CART_ADDRESS($a0)\n"
+    "  sw $t1, DMA_TRANSFER_SIZE_TO_RAM($a0)\n"
+    "_copy_1mb_rom_to_ram:\n"
+    "  lw $t0, DMA_STATUS($a0)\n"
+    "  andi $t0, $t0, DMA_BUSY\n"
+    "  bne $t0, $0, _copy_1mb_rom_to_ram\n"
+    "  nop\n\n");
+}
+
 void Nintendo64::rsp_halt()
 {
   fprintf(out,
@@ -898,7 +918,7 @@ void Nintendo64::insert_ntsc_setup()
     ".align 32\n"
     "ntsc_320x240x16:\n"
     "  .dc32 KSEG1 | VI_BASE | VI_CONTROL_REG,     0x0000_320e\n"
-    "  .dc32 KSEG1 | VI_BASE | VI_DRAM_ADDR_REG,   0xa010_0000\n"
+    "  .dc32 KSEG1 | VI_BASE | VI_DRAM_ADDR_REG,   0xa020_0000\n"
     "  .dc32 KSEG1 | VI_BASE | VI_H_WIDTH_REG,     0x0000_0140\n"
     "  .dc32 KSEG1 | VI_BASE | VI_V_INTR_REG,      0x0000_0200\n"
     "  .dc32 KSEG1 | VI_BASE | VI_TIMING_REG,      0x03e5_2239\n"
@@ -918,8 +938,8 @@ void Nintendo64::insert_rsp_data()
   fprintf(out,
     ".align_bits 64\n"
     "_dp_setup:\n"
-    "  .dc64 (DP_OP_SET_COLOR_IMAGE << 56) | (2 << 51) | (319 << 32) | 0x10_0000\n"
-    "  .dc64 (DP_OP_SET_Z_IMAGE << 56) | (0x10_0000 + (320 * 240 * 4))\n"
+    "  .dc64 (DP_OP_SET_COLOR_IMAGE << 56) | (2 << 51) | (319 << 32) | 0x20_0000\n"
+    "  .dc64 (DP_OP_SET_Z_IMAGE << 56) | (0x20_0000 + (320 * 240 * 4))\n"
     "  .dc64 (DP_OP_SET_SCISSOR << 56) | ((320 << 2) << 12) | (240 << 2)\n"
     "  .dc64 (DP_OP_SYNC_PIPE << 56)\n"
     "  .dc64 (DP_OP_SET_OTHER_MODES << 56) | (1 << 55) | (3 << 52)\n"
@@ -975,17 +995,18 @@ void Nintendo64::insert_set_screen()
   // Note: After the bne is a li $a0, KSEG1 | VI_BASE in the delay slot.
 
   fprintf(out,
+    "  ;; _set_screen(screen=$a0)\n"
     "_set_screen:\n"
     "  li $a1, KSEG1\n"
     "  bne $a0, $0, _set_screen_not_0\n"
     "  li $at, KSEG1 | VI_BASE\n"
-    "  li $t8, 0x0010_0000 + (320 * 240 * 2)\n"
-    "  li $t9, 0x0010_0000\n"
+    "  li $t8, 0x0020_0000 + (320 * 240 * 2)\n"
+    "  li $t9, 0x0020_0000\n"
     "  b _set_screen_finish\n"
     "  nop\n"
     "_set_screen_not_0:\n"
-    "  li $t8, 0x0010_0000\n"
-    "  li $t9, 0x0010_0000 + (320 * 240 * 2)\n");
+    "  li $t8, 0x0020_0000\n"
+    "  li $t9, 0x0020_0000 + (320 * 240 * 2)\n");
 
   fprintf(out,
     "_set_screen_finish:\n"
@@ -1192,7 +1213,7 @@ void Nintendo64::insert_load_texture()
     "  sll $a1, $a1, 16\n"
     "  or $a1, $a1, $a2\n"
     "  sw $a1, 40($k1)\n"
-    "  li $a3, 0x0010_0000 + (320 * 240 * 2 * 2 * 2) + 16\n"
+    "  li $a3, 0x0020_0000 + (320 * 240 * 2 * 2 * 2) + 16\n"
     "  sw $a3, 48($k1)\n");
 
   fprintf(out,
