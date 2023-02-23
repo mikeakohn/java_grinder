@@ -122,6 +122,7 @@ protected:
   int ram_start;
   int label_count;
   bool is_main:1;
+  bool is_interrupt:1;
 
   bool need_swap:1;
   bool need_add_integer:1;
@@ -151,7 +152,7 @@ protected:
   bool need_math_max:1;
   bool need_math_min:1;
   bool need_math_abs:1;
-
+  
   void insert_swap();
   void insert_add_integer();
   void insert_sub_integer();

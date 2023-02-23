@@ -100,6 +100,16 @@ public:
   virtual int c64_vic_copy_uppercase();
   virtual int c64_vic_copy_lowercase();
 
+  virtual int timer_setInterval_II();
+  virtual int timer_setInterval_II(int cycles, int divider);
+  virtual int timer_setListener_Z();
+  virtual int timer_setListener_Z(int const_value);
+  virtual int timer_getValue();
+  virtual int timer_setValue_I();
+  virtual int timer_setValue_I(int const_value);
+
+  virtual int return_void(int local_count);
+
 protected:
   int label_count;
 
@@ -118,6 +128,7 @@ protected:
   bool need_c64_vic_color_ram_clear:1;
   bool need_c64_vic_copy_uppercase:1;
   bool need_c64_vic_copy_lowercase:1;
+  bool need_c64_timer_interrupt:1;
 
   void insert_c64_vic_hires_enable();
   void insert_c64_vic_hires_clear();

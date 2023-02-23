@@ -33,6 +33,7 @@ M6502::M6502() :
   ram_start(0xa000),
   label_count(0),
   is_main(0),
+  is_interrupt(0),
 
   need_swap(0),
   need_add_integer(0),
@@ -231,11 +232,24 @@ int M6502::field_init_ref(std::string &name, int index)
 void M6502::method_start(int local_count, int max_stack, int param_count, std::string &name)
 {
   stack = 0;
-  is_main = (name == "main") ? 1 : 0;
-
-  fprintf(out, "%s:\n", name.c_str());
+  is_main = name == "main";
+  is_interrupt = name == "timerInterrupt";
 
   // main() function goes here
+  fprintf(out, "%s:\n", name.c_str());
+
+  if (is_interrupt)
+  {
+    // save registers
+    fprintf(out, "  pha\n");
+    fprintf(out, "  txa\n");
+    fprintf(out, "  pha\n");
+    fprintf(out, "  tya\n");
+    fprintf(out, "  pha\n");
+
+    return;
+  }
+
   if (!is_main)
   {
     fprintf(out, "  lda locals\n");
@@ -911,14 +925,27 @@ int M6502::return_void(int local_count)
   fprintf(out, "; return_void\n");
   fprintf(out, "  ldx locals\n");
 
-  if (!is_main)
+  if (is_interrupt)
   {
-    fprintf(out, "  inx\n");
-    fprintf(out, "  lda stack_lo,x\n");
-    fprintf(out, "  sta locals\n");
+    // restore registers
+    fprintf(out, "  pla\n");
+    fprintf(out, "  tay\n");
+    fprintf(out, "  pla\n");
+    fprintf(out, "  tax\n");
+    fprintf(out, "  pla\n");
+    fprintf(out, "  rti\n");
   }
+    else
+  {
+    if (!is_main)
+    {
+      fprintf(out, "  inx\n");
+      fprintf(out, "  lda stack_lo,x\n");
+      fprintf(out, "  sta locals\n");
+    }
 
-  fprintf(out, "  rts\n");
+    fprintf(out, "  rts\n");
+  }
 
   return 0;
 }

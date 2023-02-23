@@ -45,7 +45,8 @@ C64::C64() :
   need_c64_vic_make_color_table(0),
   need_c64_vic_color_ram_clear(0),
   need_c64_vic_copy_uppercase(0),
-  need_c64_vic_copy_lowercase(0)
+  need_c64_vic_copy_lowercase(0),
+  need_c64_timer_interrupt(0)
 {
   start_org = 0x07ff;
 
@@ -159,7 +160,7 @@ int C64::open(const char *filename)
   fprintf(out, "  sta 0xdd00\n");
 
   // put text screen at 0xc400 and charset at 0xc800
-  fprintf(out, "  lda #0x12\n");
+  fprintf(out, "  lda #0x02\n");
   fprintf(out, "  sta 0xd018\n");
 
   // turn off ROM chips
@@ -649,6 +650,116 @@ int C64::c64_vic_copy_lowercase()
   fprintf(out, "  jsr copy_lowercase\n");
   return 0;
 }
+
+int C64::timer_setInterval_II()
+{
+  fprintf(out, "; timer_setInterval\n");
+
+  // timer B
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
+  fprintf(out, "  sta 0xdc06\n");
+  fprintf(out, "  lda stack_hi,x\n");
+  fprintf(out, "  sta 0xdc07\n");
+
+  // timer A
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
+  fprintf(out, "  sta 0xdc04\n");
+  fprintf(out, "  lda stack_hi,x\n");
+  fprintf(out, "  sta 0xdc05\n");
+
+  return 0;
+}
+
+int C64::timer_setInterval_II(int cycles, int divider)
+{
+  return -1;
+}
+
+int C64::timer_setListener_Z()
+{
+  need_c64_timer_interrupt = true;
+  return -1;
+}
+
+int C64::timer_setListener_Z(int const_value)
+{
+  fprintf(out, "; timer_setListener\n");
+
+  // const_value = turn interrupts on/off
+  if (const_value != 0)
+  {
+    need_c64_timer_interrupt = true;
+
+    // vector
+    fprintf(out, "  sei\n");
+    fprintf(out, "  lda #0x7f\n");
+    fprintf(out, "  sta 0xdc0d\n");
+    fprintf(out, "  lda 0xdc0d\n");
+
+    fprintf(out, "  lda #timerInterrupt & 0xff\n");
+    fprintf(out, "  sta 0xfffe\n");
+    fprintf(out, "  lda #timerInterrupt >> 8\n");
+    fprintf(out, "  sta 0xffff\n");
+
+    fprintf(out, "  lda #0x81\n");
+    fprintf(out, "  sta 0xdc0d\n");
+
+    // 0 - timer on/off (start off)
+    // 4 - latch
+    // 5-6 - watch for timer A underflow
+
+    // start timer A
+    fprintf(out, "  lda #00010001b\n");
+    fprintf(out, "  sta 0xdc0e\n");
+
+    // start timer B
+    fprintf(out, "  lda #01010011b\n");
+    fprintf(out, "  sta 0xdc0f\n");
+
+    fprintf(out, "  cli\n");
+  }
+    else
+  { 
+    fprintf(out, "  sei\n");
+
+    // stop timer A
+    fprintf(out, "  lda #00010001b\n");
+    fprintf(out, "  sta 0xdc0e\n");
+
+    // stop timer B
+    fprintf(out, "  lda #01010011b\n");
+    fprintf(out, "  sta 0xdc0f\n");
+  }
+
+  return 0;
+}
+
+int C64::timer_getValue()
+{
+  return -1;
+}
+
+int C64::timer_setValue_I()
+{
+  return -1;
+}
+
+int C64::timer_setValue_I(int const_value)
+{
+  return -1;
+}
+
+int C64::return_void(int local_count)
+{
+  // acknowledge IRQ interrupt
+  fprintf(out, "  lda 0xdc0d\n");
+
+  return M6502::return_void(local_count);
+}
+
+// subroutines
 
 void C64::insert_c64_vic_hires_enable()
 {
