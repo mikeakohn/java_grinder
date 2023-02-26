@@ -247,6 +247,14 @@ void M6502::method_start(int local_count, int max_stack, int param_count, std::s
     fprintf(out, "  tya\n");
     fprintf(out, "  pha\n");
 
+    // save internal vars
+    fprintf(out, "  ldx #0x20\n");
+    fprintf(out, "save_vars_%d_loop:\n", local_count);
+    fprintf(out, "  lda 0,x\n");
+    fprintf(out, "  sta 0x200,x\n");
+    fprintf(out, "  dex\n");
+    fprintf(out, "  bpl save_vars_%d_loop\n", local_count++);
+
     return;
   }
 
@@ -927,6 +935,14 @@ int M6502::return_void(int local_count)
 
   if (is_interrupt)
   {
+    // restore internal vars
+    fprintf(out, "  ldx #0x20\n");
+    fprintf(out, "restore_vars_%d_loop:\n", local_count);
+    fprintf(out, "  lda 0x200,x\n");
+    fprintf(out, "  sta 0,x\n");
+    fprintf(out, "  dex\n");
+    fprintf(out, "  bpl restore_vars_%d_loop\n", local_count++);
+
     // restore registers
     fprintf(out, "  pla\n");
     fprintf(out, "  tay\n");
@@ -976,6 +992,7 @@ int M6502::invoke_static_method(const char *name, int params, int is_void)
   fprintf(out, "; invoke_static_method\n");
 
   local = -params;
+
   while(local != 0)
   {
     if (stack_vars > 0)

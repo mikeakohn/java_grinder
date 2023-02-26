@@ -760,7 +760,6 @@ int C64::return_void(int local_count)
 }
 
 // subroutines
-
 void C64::insert_c64_vic_hires_enable()
 {
   fprintf(out, "hires_enable:\n");
