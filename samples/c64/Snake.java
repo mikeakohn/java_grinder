@@ -1,14 +1,17 @@
 import net.mikekohn.java_grinder.CPU;
 import net.mikekohn.java_grinder.Memory;
 import net.mikekohn.java_grinder.Math;
+import net.mikekohn.java_grinder.Timer;
+import net.mikekohn.java_grinder.TimerListener;
 import net.mikekohn.java_grinder.c64.*;
 
-public class Snake
+public class Snake implements TimerListener
 {
   // addresses
   static final int char_ram = 0xc800;
   static final int sprite_ram = 0xf000;
-  static final int sprite_pointer = 0xc400 + 1016;
+  static final int sprite_pointer1 = 0xc000 + 1016;
+  static final int sprite_pointer2 = 0xc400 + 1016;
 
   // score is kept by adding these strings
   static int score[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -24,6 +27,7 @@ public class Snake
   static int pulse2 = 0x800;
   static int pulse3 = 0x800;
   static int music_pos = 0;
+  static int time = 0;
   
   // one octave of note frequencies
   static int freq[] =
@@ -237,7 +241,7 @@ public class Snake
       int ty = rnd() % 17 + 1;
 
       VIC.text_plot(tx, ty, 35, 1);
-      VIC.text_copy();
+      wait(100);
 
       for(x = 0; x < 12; x++)
       {
@@ -245,12 +249,11 @@ public class Snake
         SID.voice1_frequency(x << 9);
         SID.voice1_waveform(33);
         VIC.text_plot(tx, ty, 35 - (x >> 2), 1);
-        VIC.text_copy();
+        wait(100);
         SID.voice1_waveform(32);
       }
 
       VIC.text_plot(tx, ty, 35, 5);
-      VIC.text_copy();
     }
 
     wait(1000);
@@ -314,9 +317,9 @@ public class Snake
     printScore();
   }
 
-  public static void wait(int time)
+  public static void wait(int delay)
   {
-    for(int i = 0; i < time; i++)
+    for(int i = 0; i < delay; i++)
     {
       // wait
     }
@@ -576,7 +579,6 @@ public class Snake
   public static void playNextLevelMusic()
   {
     int c = 0;
-    int time = 0;
 
     SID.voice3_adsr(0x0000);
     pulse1 = 0x800;
@@ -602,7 +604,6 @@ public class Snake
         SID.voice2_waveform(64);
       }
 
-      time++;
       music_pos++;
 
       if(music_pos >= next_level_song1.length())
@@ -612,7 +613,7 @@ public class Snake
         break;
       }
 
-      wait(300);
+      wait(400);
     }
 
     wait(2000);
@@ -620,7 +621,6 @@ public class Snake
 
   public static void title()
   {
-    int time = 0;
     int colors[] = { 10, 7, 13, 14, 4, 14, 13, 7 };
 
     VIC.text_clear(32);
@@ -659,8 +659,7 @@ public class Snake
         break;
 
       playTitleMusic();
-      wait(300);
-      time++;
+      wait(400);
 
       final int c = colors[time & 7];
 
@@ -672,14 +671,18 @@ public class Snake
 
       VIC.sprite4color(c);
 
-      if((time & 15) >= 8)
-        Memory.write8(sprite_pointer + 4, (byte)194);
+      if(((time >> 2) & 31) >= 16)
+      {
+        Memory.write8(sprite_pointer1 + 4, (byte)194);
+        Memory.write8(sprite_pointer2 + 4, (byte)194);
+      }
       else
-        Memory.write8(sprite_pointer + 4, (byte)195);
+      {
+        Memory.write8(sprite_pointer1 + 4, (byte)195);
+        Memory.write8(sprite_pointer2 + 4, (byte)195);
+      }
 
       VIC.sprite_multicolor0(colors[(time + 1) & 7]);
-
-      VIC.text_copy();
     }
 
     VIC.sprite_enable(0);
@@ -743,7 +746,6 @@ public class Snake
       printString(14, 11, 0,  "           ");
       printString(14, 12, colors2[i & 7],  " Game Over ");
       printString(14, 13, 0, "           ");
-      VIC.text_copy();
 
       joy = 255 - (Memory.read8(0xdc00) + 128);
 
@@ -766,19 +768,17 @@ public class Snake
       }
 
       i++;
-      wait(300);
+      wait(400);
     }
   }
 
   public static void snake()
   {
     int i = 0;
-    int j = 0;
     int shipx = 180;
     int shipy = 208;
     int accelx = 0;
     int accely = 0;
-    int time = 0;
     int snake_length = 8;
     int snake_count = snake_length;
     int spiderx = rnd() % 320 + 24;
@@ -805,7 +805,7 @@ public class Snake
     snake_exp_timer = -1;
 
     // setup graphics
-    VIC.sprite_enable(63);
+    VIC.sprite_enable(31);
     VIC.sprite_priority(0);
     VIC.sprite_multicolor_enable(48);
     VIC.sprite_multicolor0(1);
@@ -840,7 +840,7 @@ public class Snake
     for(i = 0; i < 50; i++)
     {
       VIC.text_plot(rnd() % 40, rnd() % 17 + 1, 35, 5);
-      VIC.text_copy();
+      wait(200);
     }
 
     // init snake
@@ -859,7 +859,7 @@ public class Snake
     // init shot
     shotx = 0;
     shoty = 0;
-    shotstatus= 0;
+    shotstatus = 0;
 
     // init score
     resetScore();
@@ -867,6 +867,8 @@ public class Snake
 
     while(true)
     {
+      int old_time = time;
+
       // move ship
       joy = 255 - (Memory.read8(0xdc00) + 128);
 
@@ -875,7 +877,7 @@ public class Snake
       if((joy & 2) == 2) accely += 1;
       if((joy & 1) == 1) accely -= 1;
 
-      if((time & 1) == 1)
+      if((time & 3) == 3)
       {
         if(accelx > 0) accelx--;
         if(accelx < 0) accelx++;
@@ -1084,8 +1086,6 @@ public class Snake
                   if(snakestatus[i] == 1)
                     VIC.text_plot(snakex[i], snakey[i], 32, 5);
 
-                VIC.text_copy();
-
                 // play music
                 VIC.sprite1pos(0, 0);
                 playNextLevelMusic();
@@ -1098,9 +1098,6 @@ public class Snake
           }
         }
       }
-
-      // update timer
-      time++;
 
       // move snake
       if((time & 3) == 3)
@@ -1141,17 +1138,25 @@ public class Snake
 
         // animate spider
         if((time & 31) >= 16)
-          Memory.write8(sprite_pointer + 4, (byte)194);
+        {
+          Memory.write8(sprite_pointer1 + 4, (byte)194);
+          Memory.write8(sprite_pointer2 + 4, (byte)194);
+        }
         else
-          Memory.write8(sprite_pointer + 4, (byte)195);
+        {
+          Memory.write8(sprite_pointer1 + 4, (byte)195);
+          Memory.write8(sprite_pointer2 + 4, (byte)195);
+        }
 
         // update animations
         updateSpiderMove();
         updateSpiderExp();
         updateSnakeExp();
+      }
 
-        // update frame (copies data from hidden to visible screen)
-        VIC.text_copy();
+      while(time == old_time)
+      {
+        // wait for next timer update
       }
     }
   }
@@ -1180,11 +1185,16 @@ public class Snake
       Memory.write8(sprite_ram + 192 + i, (byte)sprite_spider2[i]);
     }
 
-    Memory.write8(sprite_pointer + 0, (byte)192);
-    Memory.write8(sprite_pointer + 1, (byte)193);
-    Memory.write8(sprite_pointer + 2, (byte)193);
-    Memory.write8(sprite_pointer + 3, (byte)193);
-    Memory.write8(sprite_pointer + 4, (byte)194);
+    Memory.write8(sprite_pointer1 + 0, (byte)192);
+    Memory.write8(sprite_pointer2 + 0, (byte)192);
+    Memory.write8(sprite_pointer1 + 1, (byte)193);
+    Memory.write8(sprite_pointer2 + 1, (byte)193);
+    Memory.write8(sprite_pointer1 + 2, (byte)193);
+    Memory.write8(sprite_pointer2 + 2, (byte)193);
+    Memory.write8(sprite_pointer1 + 3, (byte)193);
+    Memory.write8(sprite_pointer2 + 3, (byte)193);
+    Memory.write8(sprite_pointer1 + 4, (byte)194);
+    Memory.write8(sprite_pointer2 + 4, (byte)194);
 
     // copy character data
     for(i = 0; i < 8; i++)
@@ -1202,12 +1212,20 @@ public class Snake
     // reset SID
     SID.clear();
 
+    Timer.setInterval(16667, 65535);
+    Timer.setListener(true);
+
     while(true)
     {
       title();
       snake();
       gameOver();
     }
+  }
+
+  public void timerInterrupt()
+  {
+    time++;
   }
 }
 
