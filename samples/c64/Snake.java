@@ -1,4 +1,5 @@
 import net.mikekohn.java_grinder.CPU;
+import net.mikekohn.java_grinder.Joystick;
 import net.mikekohn.java_grinder.Memory;
 import net.mikekohn.java_grinder.Math;
 import net.mikekohn.java_grinder.Timer;
@@ -37,7 +38,7 @@ public class Snake implements TimerListener
   };
 
   // these correspond to piano keys
-  static String keys = "q2w3er5t6y7ui9o0p[";
+  static String keys = "q2w3er5t6y7ui9o0Joystick[";
 
   // music, spaces rest
   static String title_song1 =
@@ -653,9 +654,7 @@ public class Snake implements TimerListener
 
     while(true)
     {
-      final int joy = 255 - (Memory.read8(0xdc00) + 128);
-
-      if((joy & 16) == 16)
+      if(Joystick.isButtonDown_0(1))
         break;
 
       playTitleMusic();
@@ -695,7 +694,6 @@ public class Snake implements TimerListener
   public static void gameOver()
   {
     int i = 0;
-    int joy = 0;
     int play_music = 64;
 
     int colors1[] = { 7, 10, 8, 2, 9, 2, 8, 10 }; 
@@ -747,15 +745,11 @@ public class Snake implements TimerListener
       printString(14, 12, colors2[i & 7],  " Game Over ");
       printString(14, 13, 0, "           ");
 
-      joy = 255 - (Memory.read8(0xdc00) + 128);
-
-      if((joy & 16) == 16)
+      if(Joystick.isButtonDown_0(1))
       {
         while(true)
         {
-          joy = 255 - (Memory.read8(0xdc00) + 128);
-
-          if((joy & 16) == 0)
+          if(!Joystick.isButtonDown_0(1))
             return;
         }
       }
@@ -787,7 +781,6 @@ public class Snake implements TimerListener
     int shoty = 0;
     int shotstatus = 0;
     int shotfreq = 0;
-    int joy = 0;
     int temp = 0;
     int tx = 0;
     int ty = 0;
@@ -870,14 +863,12 @@ public class Snake implements TimerListener
       int old_time = time;
 
       // move ship
-      joy = 255 - (Memory.read8(0xdc00) + 128);
+      if(Joystick.isRight(1)) accelx++;
+      if(Joystick.isLeft(1)) accelx--;
+      if(Joystick.isDown(1)) accely++;
+      if(Joystick.isUp(1)) accely--;
 
-      if((joy & 8) == 8) accelx += 1;
-      if((joy & 4) == 4) accelx -= 1;
-      if((joy & 2) == 2) accely += 1;
-      if((joy & 1) == 1) accely -= 1;
-
-      if((time & 3) == 3)
+      if((time & 1) == 1)
       {
         if(accelx > 0) accelx--;
         if(accelx < 0) accelx++;
@@ -885,10 +876,10 @@ public class Snake implements TimerListener
         if(accely < 0) accely++;
       }
 
-      if(accelx > 2) accelx = 2;
-      if(accelx < -2) accelx = -2;
-      if(accely > 2) accely = 2;
-      if(accely < -2) accely = -2;
+      if(accelx > 3) accelx = 3;
+      if(accelx < -3) accelx = -3;
+      if(accely > 3) accely = 3;
+      if(accely < -3) accely = -3;
 
       if(shipx > spiderx) spiderx++;
       if(shipx < spiderx) spiderx--;
@@ -960,7 +951,7 @@ public class Snake implements TimerListener
       }
 
       // shoot
-      if((joy & 16) == 16)
+      if(Joystick.isButtonDown_0(1))
       {
         if(shotstatus == 0)
         {

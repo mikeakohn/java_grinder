@@ -108,6 +108,17 @@ public:
   virtual int timer_setValue_I();
   virtual int timer_setValue_I(int const_value);
 
+  virtual int joystick_isRight();
+  virtual int joystick_isRight_I(int index);
+  virtual int joystick_isLeft();
+  virtual int joystick_isLeft_I(int index);
+  virtual int joystick_isDown();
+  virtual int joystick_isDown_I(int index);
+  virtual int joystick_isUp();
+  virtual int joystick_isUp_I(int index);
+  virtual int joystick_isButtonDown_0();
+  virtual int joystick_isButtonDown_0_I(int index);
+
   virtual int return_void(int local_count);
 
 protected:

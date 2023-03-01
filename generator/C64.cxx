@@ -751,6 +751,171 @@ int C64::timer_setValue_I(int const_value)
   return -1;
 }
 
+int C64::joystick_isRight()
+{
+  return -1;
+}
+
+int C64::joystick_isRight_I(int index)
+{
+  fprintf(out, "; joystick_isRight\n");
+
+  if (index == 0)
+  {
+    fprintf(out, "  lda 0xdc01\n");
+    fprintf(out, "  and #8\n");
+    fprintf(out, "  eor #8\n");
+    fprintf(out, "  sta stack_lo,x\n");
+    fprintf(out, "  lda #0\n");
+    fprintf(out, "  sta stack_hi,x\n");
+    fprintf(out, "  dex\n");
+  }
+    else
+  {
+    fprintf(out, "  lda 0xdc00\n");
+    fprintf(out, "  and #8\n");
+    fprintf(out, "  eor #8\n");
+    fprintf(out, "  sta stack_lo,x\n");
+    fprintf(out, "  lda #0\n");
+    fprintf(out, "  sta stack_hi,x\n");
+    fprintf(out, "  dex\n");
+  }
+
+  return 0;
+}
+
+int C64::joystick_isLeft()
+{
+  return -1;
+}
+
+int C64::joystick_isLeft_I(int index)
+{
+  fprintf(out, "; joystick_isLeft\n");
+
+  if (index == 0)
+  {
+    fprintf(out, "  lda 0xdc01\n");
+    fprintf(out, "  and #4\n");
+    fprintf(out, "  eor #4\n");
+    fprintf(out, "  sta stack_lo,x\n");
+    fprintf(out, "  lda #0\n");
+    fprintf(out, "  sta stack_hi,x\n");
+    fprintf(out, "  dex\n");
+  }
+    else
+  {
+    fprintf(out, "  lda 0xdc00\n");
+    fprintf(out, "  and #4\n");
+    fprintf(out, "  eor #4\n");
+    fprintf(out, "  sta stack_lo,x\n");
+    fprintf(out, "  lda #0\n");
+    fprintf(out, "  sta stack_hi,x\n");
+    fprintf(out, "  dex\n");
+  }
+
+  return 0;
+}
+
+int C64::joystick_isDown()
+{
+  return -1;
+}
+
+int C64::joystick_isDown_I(int index)
+{
+  fprintf(out, "; joystick_isDown\n");
+
+  if (index == 0)
+  {
+    fprintf(out, "  lda 0xdc01\n");
+    fprintf(out, "  and #2\n");
+    fprintf(out, "  eor #2\n");
+    fprintf(out, "  sta stack_lo,x\n");
+    fprintf(out, "  lda #0\n");
+    fprintf(out, "  sta stack_hi,x\n");
+    fprintf(out, "  dex\n");
+  }
+    else
+  {
+    fprintf(out, "  lda 0xdc00\n");
+    fprintf(out, "  and #2\n");
+    fprintf(out, "  eor #2\n");
+    fprintf(out, "  sta stack_lo,x\n");
+    fprintf(out, "  lda #0\n");
+    fprintf(out, "  sta stack_hi,x\n");
+    fprintf(out, "  dex\n");
+  }
+
+  return 0;
+}
+
+int C64::joystick_isUp()
+{
+  return -1;
+}
+
+int C64::joystick_isUp_I(int index)
+{
+  fprintf(out, "; joystick_isUp\n");
+
+  if (index == 0)
+  {
+    fprintf(out, "  lda 0xdc01\n");
+    fprintf(out, "  and #1\n");
+    fprintf(out, "  eor #1\n");
+    fprintf(out, "  sta stack_lo,x\n");
+    fprintf(out, "  lda #0\n");
+    fprintf(out, "  sta stack_hi,x\n");
+    fprintf(out, "  dex\n");
+  }
+    else
+  {
+    fprintf(out, "  lda 0xdc00\n");
+    fprintf(out, "  and #1\n");
+    fprintf(out, "  eor #1\n");
+    fprintf(out, "  sta stack_lo,x\n");
+    fprintf(out, "  lda #0\n");
+    fprintf(out, "  sta stack_hi,x\n");
+    fprintf(out, "  dex\n");
+  }
+
+  return 0;
+}
+
+int C64::joystick_isButtonDown_0()
+{
+  return -1;
+}
+
+int C64::joystick_isButtonDown_0_I(int index)
+{
+  fprintf(out, "; joystick_isButtonDown_0\n");
+
+  if (index == 0)
+  {
+    fprintf(out, "  lda 0xdc01\n");
+    fprintf(out, "  and #16\n");
+    fprintf(out, "  eor #16\n");
+    fprintf(out, "  sta stack_lo,x\n");
+    fprintf(out, "  lda #0\n");
+    fprintf(out, "  sta stack_hi,x\n");
+    fprintf(out, "  dex\n");
+  }
+    else
+  {
+    fprintf(out, "  lda 0xdc00\n");
+    fprintf(out, "  and #16\n");
+    fprintf(out, "  eor #16\n");
+    fprintf(out, "  sta stack_lo,x\n");
+    fprintf(out, "  lda #0\n");
+    fprintf(out, "  sta stack_hi,x\n");
+    fprintf(out, "  dex\n");
+  }
+
+  return 0;
+}
+
 int C64::return_void(int local_count)
 {
   // acknowledge IRQ interrupt
