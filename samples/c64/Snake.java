@@ -28,6 +28,8 @@ public class Snake implements TimerListener
   static int pulse2 = 0x800;
   static int pulse3 = 0x800;
   static int music_pos = 0;
+
+  // incremented by timer interrupt
   static int time = 0;
   
   // one octave of note frequencies
@@ -919,7 +921,6 @@ public class Snake implements TimerListener
       {
         VIC.sprite4pos(spiderx, spidery);
 
-        // if(ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1)
         if(shipx < spiderx + 23 && shipx + 7 > spiderx &&
            shipy < spidery + 20 && shipy + 7 > spidery)
         {
@@ -1083,6 +1084,8 @@ public class Snake implements TimerListener
 
                 // add mushrooms
                 addMushrooms();
+
+                // clear character under ship
                 VIC.text_plot((shipx - 20) >> 3, (shipy - 46) >> 3, 32, 5);
               }
             }

@@ -30,6 +30,8 @@ M6502::M6502() :
   start_org(0x400),
   java_stack_lo(0x200),
   java_stack_hi(0x300),
+  saved_vars(0x100),
+  var_start(0xc0),
   ram_start(0xa000),
   label_count(0),
   is_main(0),
@@ -78,23 +80,27 @@ int M6502::open(const char *filename)
   fprintf(out, "ram_start equ 0x%04x\n", ram_start);
   fprintf(out, "heap_ptr equ ram_start\n");
 
-  // for indirection (2 bytes)
-  fprintf(out, "address equ 0xc0\n");
-
   // java stack
   fprintf(out, "stack_lo equ 0x%04x\n", java_stack_lo);
   fprintf(out, "stack_hi equ 0x%04x\n", java_stack_hi);
 
+  // registers and internal variables are saved here during interrupts
+  fprintf(out, "saved_vars equ 0x%04x\n", saved_vars);
+  fprintf(out, "var_start equ 0x%04x\n", var_start);
+
+  // for indirection (2 bytes)
+  fprintf(out, "address equ var_start + 0\n");
+
   // points to locals
-  fprintf(out, "locals equ 0xc2\n");
+  fprintf(out, "locals equ var_start + 2\n");
 
   // temp variables
-  fprintf(out, "result equ 0xc4\n");
-  fprintf(out, "remainder equ 0xc6\n");
-  fprintf(out, "length equ 0xc8\n");
-  fprintf(out, "value1 equ 0xca\n");
-  fprintf(out, "value2 equ 0xcc\n");
-  fprintf(out, "value3 equ 0xce\n");
+  fprintf(out, "result equ var_start + 4\n");
+  fprintf(out, "remainder equ var_start + 6\n");
+  fprintf(out, "length equ var_start + 8\n");
+  fprintf(out, "value1 equ var_start + 10\n");
+  fprintf(out, "value2 equ var_start + 12\n");
+  fprintf(out, "value3 equ var_start + 14\n");
 
   // start at 0x0400 when using simulator
   fprintf(out, ".org 0x%04x\n", start_org);
@@ -248,10 +254,10 @@ void M6502::method_start(int local_count, int max_stack, int param_count, std::s
     fprintf(out, "  pha\n");
 
     // save internal vars
-    fprintf(out, "  ldx #0x20\n");
+    fprintf(out, "  ldx #16\n");
     fprintf(out, "save_vars_%d_loop:\n", local_count);
-    fprintf(out, "  lda 0,x\n");
-    fprintf(out, "  sta 0x200,x\n");
+    fprintf(out, "  lda var_start,x\n");
+    fprintf(out, "  sta saved_vars,x\n");
     fprintf(out, "  dex\n");
     fprintf(out, "  bpl save_vars_%d_loop\n", local_count++);
 
@@ -936,10 +942,10 @@ int M6502::return_void(int local_count)
   if (is_interrupt)
   {
     // restore internal vars
-    fprintf(out, "  ldx #0x20\n");
+    fprintf(out, "  ldx #16\n");
     fprintf(out, "restore_vars_%d_loop:\n", local_count);
-    fprintf(out, "  lda 0x200,x\n");
-    fprintf(out, "  sta 0,x\n");
+    fprintf(out, "  lda saved_vars,x\n");
+    fprintf(out, "  sta var_start,x\n");
     fprintf(out, "  dex\n");
     fprintf(out, "  bpl restore_vars_%d_loop\n", local_count++);
 

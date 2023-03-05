@@ -53,6 +53,8 @@ C64::C64() :
   // java stack pointer location
   java_stack_lo = 0x80;
   java_stack_hi = 0xc0;
+  saved_vars = 0x100;
+  var_start = 0x02;
   // java_stack_lo = 0x200;
   // java_stack_hi = 0x300;
 
@@ -85,37 +87,34 @@ int C64::open(const char *filename)
   fprintf(out, ".6502\n");
 
   // heap
-  fprintf(out, "  ram_start equ 0x%04x\n", ram_start);
-  fprintf(out, "  heap_ptr equ ram_start\n");
-
-  // for indirection (2 bytes)
-  fprintf(out, "  address equ 0x02\n");
+  fprintf(out, "ram_start equ 0x%04x\n", ram_start);
+  fprintf(out, "heap_ptr equ ram_start\n");
 
   // java stack
-  fprintf(out, "  stack_lo equ 0x%04x\n", java_stack_lo);
-  fprintf(out, "  stack_hi equ 0x%04x\n", java_stack_hi);
+  fprintf(out, "stack_lo equ 0x%04x\n", java_stack_lo);
+  fprintf(out, "stack_hi equ 0x%04x\n", java_stack_hi);
+
+  // registers and internal variables are saved here during interrupts
+  fprintf(out, "saved_vars equ 0x%04x\n", saved_vars);
+  fprintf(out, "var_start equ 0x%04x\n", var_start);
+
+  // for indirection (2 bytes)
+  fprintf(out, "address equ var_start + 0\n");
 
   // points to locals
-  fprintf(out, "  locals equ 0x04\n");
+  fprintf(out, "locals equ var_start + 2\n");
 
   // temp variables
-  fprintf(out, "  result equ 0x0a\n");
-  fprintf(out, "  remainder equ 0x0c\n");
-  fprintf(out, "  length equ 0x0e\n");
-  fprintf(out, "  value1 equ 0x10\n");
-  fprintf(out, "  value2 equ 0x12\n");
-  fprintf(out, "  value3 equ 0x14\n");
-  fprintf(out, "  temp1 equ 0x16\n");
+  fprintf(out, "result equ var_start + 4\n");
+  fprintf(out, "remainder equ var_start + 6\n");
+  fprintf(out, "length equ var_start + 8\n");
+  fprintf(out, "value1 equ var_start + 10\n");
+  fprintf(out, "value2 equ var_start + 12\n");
+  fprintf(out, "value3 equ var_start + 14\n");
 
   // text/color tables
-  fprintf(out, "  text_table equ 0x18\n");
-  fprintf(out, "  color_table equ 0x4a\n");
-
-  // sprites
-  fprintf(out, "  sprite_msb_set equ 0x06\n");
-  fprintf(out, "  sprite_msb_clear equ 0x07\n");
-  fprintf(out, "  sprite_x equ 0x08\n");
-  fprintf(out, "  sprite_y equ 0x09\n");
+  fprintf(out, "text_table equ 0x18\n");
+  fprintf(out, "color_table equ 0x4a\n");
 
   // basic loader
   fprintf(out, ".org 0x%04x\n", start_org);
@@ -1248,15 +1247,15 @@ void C64::insert_c64_vic_text_plot()
   fprintf(out, "  lda text_table + 1,y\n");
   fprintf(out, "  sta address + 1\n");
   fprintf(out, "  lda color_table + 0,y\n");
-  fprintf(out, "  sta temp1 + 0\n");
+  fprintf(out, "  sta value1 + 0\n");
   fprintf(out, "  lda color_table + 1,y\n");
-  fprintf(out, "  sta temp1 + 1\n");
+  fprintf(out, "  sta value1 + 1\n");
   fprintf(out, "  lda stack_lo + 4,x\n"); // x
   fprintf(out, "  tay\n");
   fprintf(out, "  lda stack_lo + 2,x\n"); // char
   fprintf(out, "  sta (address),y\n");
   fprintf(out, "  lda stack_lo + 1,x\n"); // color
-  fprintf(out, "  sta (temp1),y\n");
+  fprintf(out, "  sta (value1),y\n");
   fprintf(out, "  inx\n");
   fprintf(out, "  inx\n");
   fprintf(out, "  inx\n");
