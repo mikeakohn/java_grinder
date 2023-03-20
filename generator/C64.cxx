@@ -46,7 +46,8 @@ C64::C64() :
   need_c64_vic_color_ram_clear(0),
   need_c64_vic_copy_uppercase(0),
   need_c64_vic_copy_lowercase(0),
-  need_c64_timer_interrupt(0)
+  need_c64_timer_interrupt(0),
+  need_c64_keyboard(0)
 {
   start_org = 0x07ff;
 
@@ -78,6 +79,7 @@ C64::~C64()
   if (need_c64_vic_color_ram_clear) { insert_c64_vic_color_ram_clear(); }
   if (need_c64_vic_copy_uppercase) { insert_c64_vic_copy_uppercase(); }
   if (need_c64_vic_copy_lowercase) { insert_c64_vic_copy_lowercase(); }
+  if (need_c64_keyboard) { insert_c64_keyboard(); }
 }
 
 int C64::open(const char *filename)
@@ -915,6 +917,33 @@ int C64::joystick_isButtonDown_0_I(int index)
   return 0;
 }
 
+int C64::keyboard_isKeyPressed_I()
+{
+  need_c64_keyboard = true;
+
+//  fprintf(out, "; keyboard_isKeyPressed_I\n");
+
+  return -1;
+}
+
+int C64::keyboard_isKeyPressed_I(int index)
+{
+  need_c64_keyboard = true;
+
+//  fprintf(out, "; keyboard_isKeyPressed_I (const)\n");
+
+  return -1;
+}
+
+int C64::keyboard_currentKeyPressed()
+{
+  need_c64_keyboard = true;
+
+  fprintf(out, "  jsr keyboard_current_key_pressed\n");
+
+  return 0;
+}
+
 int C64::return_void(int local_count)
 {
   // acknowledge IRQ interrupt
@@ -1411,6 +1440,68 @@ void C64::insert_c64_vic_copy_lowercase()
   fprintf(out, "  bne copy_lowercase_loop\n");
   fprintf(out, "  lda #53\n");
   fprintf(out, "  sta 0x0001\n");
+  fprintf(out, "  rts\n");
+}
+
+void C64::insert_c64_keyboard()
+{
+  fprintf(out, "keyboard_current_key_pressed:\n");
+  fprintf(out, "  txa\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  lda #128\n");
+  fprintf(out, "  sta value1\n");
+  fprintf(out, "  ldx #0\n");
+  fprintf(out, "keyboard_loop_x:\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  lda #255\n");
+  fprintf(out, "  sbc value1\n");
+  fprintf(out, "  sta 0xdc00\n");
+  fprintf(out, "  lda 0xdc01\n");
+  fprintf(out, "  sta value3\n");
+  fprintf(out, "  lda #128\n");
+  fprintf(out, "  sta value2\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "keyboard_loop_y:\n");
+  fprintf(out, "  lda value3\n");
+  fprintf(out, "  and value2\n");
+  fprintf(out, "  beq keyboard_loop_return\n");
+  fprintf(out, "  jmp keyboard_loop_continue\n");
+  fprintf(out, "keyboard_loop_return:\n");
+  fprintf(out, "  tya\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  sta value1\n");
+  fprintf(out, "  txa\n");
+  fprintf(out, "  adc value1\n");
+  fprintf(out, "  sta value1\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  tax\n");
+  fprintf(out, "  lda value1\n");
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sta stack_hi,x\n");
+  fprintf(out, "  dex\n");
+  fprintf(out, "  rts\n");
+  fprintf(out, "keyboard_loop_continue:\n");
+  fprintf(out, "  lda value2\n");
+  fprintf(out, "  lsr\n");
+  fprintf(out, "  sta value2\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  cpy #8\n");
+  fprintf(out, "  bne keyboard_loop_y\n");
+  fprintf(out, "  lda value1\n");
+  fprintf(out, "  lsr\n");
+  fprintf(out, "  sta value1\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  cpx #8\n");
+  fprintf(out, "  bne keyboard_loop_x\n");
+  fprintf(out, "  pla\n");
+  fprintf(out, "  tax\n");
+  fprintf(out, "  lda #0xff\n");
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  sta stack_hi,x\n");
+  fprintf(out, "  dex\n");
   fprintf(out, "  rts\n");
 }
 

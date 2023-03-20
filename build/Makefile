@@ -28,6 +28,7 @@ API= \
   api/java_lang_system.o \
   api/java_lang_string.o \
   api/joystick.o \
+  api/keyboard.o \
   api/math.o \
   api/memory.o \
   api/msx.o \

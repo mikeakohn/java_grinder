@@ -27,6 +27,7 @@
 #include "generator/API_Draw3D.h"
 #include "generator/API_Intellivision.h"
 #include "generator/API_Joystick.h"
+#include "generator/API_Keyboard.h"
 #include "generator/API_Math.h"
 #include "generator/API_Microcontroller.h"
 #include "generator/API_MSX.h"
@@ -53,6 +54,7 @@ class Generator :
   public API_Draw3D,
   public API_Intellivision,
   public API_Joystick,
+  public API_Keyboard,
   public API_Math,
   public API_Microcontroller,
   public API_MSX,

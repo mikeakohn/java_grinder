@@ -26,6 +26,7 @@ JAVA_SRC=\
   $(SRC_DIR)/IOPort6.java \
   $(SRC_DIR)/IOPort7.java \
   $(SRC_DIR)/Joystick.java \
+  $(SRC_DIR)/Keyboard.java \
   $(SRC_DIR)/Math.java \
   $(SRC_DIR)/Memory.java \
   $(SRC_DIR)/MSX.java \

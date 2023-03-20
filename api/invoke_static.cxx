@@ -30,6 +30,7 @@
 #include "api/intellivision.h"
 #include "api/ioport.h"
 #include "api/joystick.h"
+#include "api/keyboard.h"
 #include "api/math.h"
 #include "api/memory.h"
 #include "api/msx.h"
@@ -170,6 +171,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     CHECK(I2C, i2c)
     CHECK(Intellivision, intellivision)
     CHECK(Joystick, joystick)
+    CHECK(Keyboard, keyboard)
     CHECK(Math, math)
     CHECK(MSX, msx)
     CHECK(NES, nes)
@@ -270,6 +272,7 @@ int invoke_static(
     CHECK_CONST(CPC, cpc)
     CHECK_CONST(I2C, i2c)
     CHECK_CONST(Joystick, joystick)
+    CHECK_CONST(Keyboard, keyboard)
     CHECK_CONST(MSX, msx)
     CHECK_CONST(NES, nes)
     CHECK_CONST(Nintendo64, nintendo64)
