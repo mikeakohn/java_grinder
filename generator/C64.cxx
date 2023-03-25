@@ -118,6 +118,9 @@ int C64::open(const char *filename)
   fprintf(out, "text_table equ 0x18\n");
   fprintf(out, "color_table equ 0x4a\n");
 
+  // keyboard buffer
+  fprintf(out, "key_table equ 0x33c\n");
+
   // basic loader
   fprintf(out, ".org 0x%04x\n", start_org);
   fprintf(out, "dw 0x0801\n");
@@ -1448,6 +1451,15 @@ void C64::insert_c64_keyboard()
   fprintf(out, "keyboard_current_key_pressed:\n");
   fprintf(out, "  txa\n");
   fprintf(out, "  pha\n");
+
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "keyboard_table_clear:\n");
+  fprintf(out, "  sta key_table,y\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  cpy #64\n");
+  fprintf(out, "  bne keyboard_table_clear\n");
+
   fprintf(out, "  lda #128\n");
   fprintf(out, "  sta value1\n");
   fprintf(out, "  ldx #0\n");
@@ -1464,25 +1476,25 @@ void C64::insert_c64_keyboard()
   fprintf(out, "keyboard_loop_y:\n");
   fprintf(out, "  lda value3\n");
   fprintf(out, "  and value2\n");
-  fprintf(out, "  beq keyboard_loop_return\n");
-  fprintf(out, "  jmp keyboard_loop_continue\n");
-  fprintf(out, "keyboard_loop_return:\n");
+  fprintf(out, "  bne keyboard_loop_continue\n");
+
   fprintf(out, "  tya\n");
   fprintf(out, "  asl\n");
   fprintf(out, "  asl\n");
   fprintf(out, "  asl\n");
-  fprintf(out, "  sta value1\n");
+  fprintf(out, "  sta result\n");
   fprintf(out, "  txa\n");
-  fprintf(out, "  adc value1\n");
-  fprintf(out, "  sta value1\n");
+  fprintf(out, "  adc result\n");
+  fprintf(out, "  sta result\n");
+
+  fprintf(out, "  txa\n");
+  fprintf(out, "  pha\n");
+  fprintf(out, "  ldx result\n");
+  fprintf(out, "  lda #1\n");
+  fprintf(out, "  sta key_table,x\n");
   fprintf(out, "  pla\n");
   fprintf(out, "  tax\n");
-  fprintf(out, "  lda value1\n");
-  fprintf(out, "  sta stack_lo,x\n");
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  sta stack_hi,x\n");
-  fprintf(out, "  dex\n");
-  fprintf(out, "  rts\n");
+
   fprintf(out, "keyboard_loop_continue:\n");
   fprintf(out, "  lda value2\n");
   fprintf(out, "  lsr\n");
@@ -1496,11 +1508,36 @@ void C64::insert_c64_keyboard()
   fprintf(out, "  inx\n");
   fprintf(out, "  cpx #8\n");
   fprintf(out, "  bne keyboard_loop_x\n");
+
   fprintf(out, "  pla\n");
   fprintf(out, "  tax\n");
-  fprintf(out, "  lda #0xff\n");
-  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  ldy #6\n");
+  fprintf(out, "  lda key_table,y\n");
+  fprintf(out, "  ldy #25\n");
+  fprintf(out, "  ora key_table,y\n");
   fprintf(out, "  sta stack_hi,x\n");
+
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  ldy #6\n");
+  fprintf(out, "  sta key_table,y\n");
+  fprintf(out, "  ldy #25\n");
+  fprintf(out, "  sta key_table,y\n");
+
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "keyboard_return_loop:\n");
+  fprintf(out, "  lda key_table,y\n");
+  fprintf(out, "  cmp #1\n");
+  fprintf(out, "  beq keyboard_return\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  cpy #64\n");
+  fprintf(out, "  bne keyboard_return_loop\n");
+  fprintf(out, "  lda #255\n");
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  dex\n");
+  fprintf(out, "  rts\n");
+  fprintf(out, "keyboard_return:\n");
+  fprintf(out, "  tya\n");
+  fprintf(out, "  sta stack_lo,x\n");
   fprintf(out, "  dex\n");
   fprintf(out, "  rts\n");
 }
