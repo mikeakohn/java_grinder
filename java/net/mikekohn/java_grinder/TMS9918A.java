@@ -57,6 +57,15 @@ abstract public class TMS9918A
   /** For mode 0, remove characters and set colors for drawing */
   public static void initDisplay() { }
 
+  /** Set an 8x8 tile (8 bits) in the pattern table that can drawn to the
+      screen. */
+  public static void setPattern(int index, byte[] data) { }
+
+  /** Color table is 32 colors indexed from 0 to 31. The color is
+      8 bits where the upper 4 bits is color_1 and lower 4 bits are
+      color_0. */
+  public static void setColor(int index, int color) { }
+
   /** Change visibility of a sprite.  Sprite index can be between 0 and 32.
       there are restrictions on the number of sprites that can be displayed
       on a line. */

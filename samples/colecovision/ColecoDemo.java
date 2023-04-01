@@ -5,6 +5,27 @@ import net.mikekohn.java_grinder.TMS9918A;
 
 public class ColecoDemo
 {
+  static byte[] patterns =
+  {
+    (byte) 0b11111111,
+    (byte) 0b11000011,
+    (byte) 0b11000011,
+    (byte) 0b11000011,
+    (byte) 0b11000011,
+    (byte) 0b11000011,
+    (byte) 0b11000011,
+    (byte) 0b11111111,
+
+    (byte) 0b00000000,
+    (byte) 0b00000000,
+    (byte) 0b00000000,
+    (byte) 0b00000000,
+    (byte) 0b11111111,
+    (byte) 0b11111111,
+    (byte) 0b11111111,
+    (byte) 0b11111111,
+  };
+
 /*
   static byte[] sprite_dx;
   static byte[] sprite_dy;
@@ -521,8 +542,11 @@ public class ColecoDemo
 */
     TMS9918A.initDisplay();
     TMS9918A.clearScreen();
+    TMS9918A.setPattern(0, patterns);
+    TMS9918A.setColor(8, (TMS9918A.COLOR_MEDIUM_GREEN << 4) | TMS9918A.COLOR_MEDIUM_RED);
     TMS9918A.setCursor(4, 8);
-    TMS9918A.printChar((char)8);
+    TMS9918A.printChar((char)1);
+    TMS9918A.printChar((char)2);
     TMS9918A.plot(10, 10, 7);
 
     while (true);

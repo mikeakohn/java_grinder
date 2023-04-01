@@ -54,6 +54,8 @@ ColecoVision::ColecoVision() :
   need_clear_screen(false),
   need_plot(false),
   need_init_display(false),
+  need_set_pattern(false),
+  need_set_color(false),
   need_set_sound_freq(false),
   need_set_sound_volume(false),
   need_set_sprite_visible(false),
@@ -86,17 +88,19 @@ int ColecoVision::finish()
 {
   Z80::finish();
 
-  if (need_vdp_command) { insert_vdp_command(); }
-  if (need_print_string) { insert_print_string(); }
-  if (need_clear_screen) { insert_clear_screen(); }
-  if (need_plot) { insert_plot(); }
-  if (need_init_display) { insert_init_display(); }
-  if (need_set_sound_freq) { insert_set_sound_freq(); }
-  if (need_set_sound_volume) { insert_set_sound_volume(); }
+  if (need_vdp_command)        { insert_vdp_command(); }
+  if (need_print_string)       { insert_print_string(); }
+  if (need_clear_screen)       { insert_clear_screen(); }
+  if (need_plot)               { insert_plot(); }
+  if (need_init_display)       { insert_init_display(); }
+  if (need_set_pattern)        { insert_set_pattern(); }
+  if (need_set_color)          { insert_set_color(); }
+  if (need_set_sound_freq)     { insert_set_sound_freq(); }
+  if (need_set_sound_volume)   { insert_set_sound_volume(); }
   if (need_set_sprite_visible) { insert_set_sprite_visible(); }
-  if (need_set_sprite_image) { insert_set_sprite_image(); }
-  if (need_set_sprite_pos) { insert_set_sprite_pos(); }
-  if (need_set_sprite_color) { insert_set_sprite_color(); }
+  if (need_set_sprite_image)   { insert_set_sprite_image(); }
+  if (need_set_sprite_pos)     { insert_set_sprite_pos(); }
+  if (need_set_sprite_color)   { insert_set_sprite_color(); }
 
   return 0;
 }
@@ -132,6 +136,105 @@ int ColecoVision::start_init()
     "  out (VDP_COMMAND), a\n"
     "  ld a, 0x86\n"
     "  out (VDP_COMMAND), a\n");
+
+  return 0;
+}
+
+int ColecoVision::tms9918a_initDisplay()
+{
+  need_init_display = true;
+
+  fprintf(out,
+    "  ;; tms9918a_initDisplay()\n"
+    "  call _init_display\n");
+
+  return 0;
+}
+
+int ColecoVision::tms9918a_setGraphicsMode_I()
+{
+  return -1;
+}
+
+int ColecoVision::tms9918a_setGraphicsMode_I(int mode)
+{
+  need_vdp_command = true;
+
+  // firstbyte: reg content, second byte 0x8000 | reg num
+
+  fprintf(out, "  ;; tms9918a_setGraphicsMode_I(%d)\n", mode);
+
+  switch (mode)
+  {
+    case 0:
+      fprintf(out,
+        "  ld bc, 0x8000\n"
+        "  call _vdp_command\n"
+        "  ld bc, 0x8190|0x40\n"
+        "  call _vdp_command\n");
+      break;
+    case 1:
+      fprintf(out,
+        "  ld bc, 0x8000\n"
+        "  call _vdp_command\n"
+        "  ld bc, 0x8100|0x40\n"
+        "  call _vdp_command\n");
+      break;
+    case 2:
+      fprintf(out,
+        "  ld bc, 0x8000\n"
+        "  call _vdp_command\n"
+        "  ld bc, 0x8108|0x040\n"
+        "  call _vdp_command\n");
+      break;
+    case 3:
+      fprintf(out,
+        "  ld bc, 0x8002\n"
+        "  call _vdp_command\n"
+        "  ld bc, 0x8100|0x040\n"
+        "  call _vdp_command\n");
+      break;
+    default:
+      printf("Illegal graphics mode %d\n", mode);
+      return -1;
+  }
+
+  return 0;
+}
+
+int ColecoVision::tms9918a_setPattern_IaB()
+{
+  need_set_pattern = true;
+
+  fprintf(out,
+    "  ;; tms9918a_setPattern_IaB()\n"
+    "  pop ix\n"
+    "  pop bc\n"
+    "  call _set_pattern\n");
+
+  return 0;
+}
+
+int ColecoVision::tms9918a_setColor_II()
+{
+  need_set_color = true;
+
+  fprintf(out,
+    "  ;; tms9918a_setColor_II()\n"
+    "  pop de\n"
+    "  pop ix\n"
+    "  call _set_color\n");
+
+  return 0;
+}
+
+int ColecoVision::tms9918a_clearScreen()
+{
+  need_clear_screen = true;
+
+  fprintf(out,
+    "  ;; tms9918a_clearScreen()\n"
+    "  call _clear_screen\n");
 
   return 0;
 }
@@ -215,68 +318,6 @@ int ColecoVision::tms9918a_setCursor_II(int x, int y)
   return 0;
 }
 
-int ColecoVision::tms9918a_setGraphicsMode_I()
-{
-  return -1;
-}
-
-int ColecoVision::tms9918a_setGraphicsMode_I(int mode)
-{
-  need_vdp_command = true;
-
-  // firstbyte: reg content, second byte 0x8000 | reg num
-
-  fprintf(out, "  ;; tms9918a_setGraphicsMode_I(%d)\n", mode);
-
-  switch (mode)
-  {
-    case 0:
-      fprintf(out,
-        "  ld bc, 0x8000\n"
-        "  call _vdp_command\n"
-        "  ld bc, 0x8190|0x40\n"
-        "  call _vdp_command\n");
-      break;
-    case 1:
-      fprintf(out,
-        "  ld bc, 0x8000\n"
-        "  call _vdp_command\n"
-        "  ld bc, 0x8100|0x40\n"
-        "  call _vdp_command\n");
-      break;
-    case 2:
-      fprintf(out,
-        "  ld bc, 0x8000\n"
-        "  call _vdp_command\n"
-        "  ld bc, 0x8108|0x040\n"
-        "  call _vdp_command\n");
-      break;
-    case 3:
-      fprintf(out,
-        "  ld bc, 0x8002\n"
-        "  call _vdp_command\n"
-        "  ld bc, 0x8100|0x040\n"
-        "  call _vdp_command\n");
-      break;
-    default:
-      printf("Illegal graphics mode %d\n", mode);
-      return -1;
-  }
-
-  return 0;
-}
-
-int ColecoVision::tms9918a_clearScreen()
-{
-  need_clear_screen = true;
-
-  fprintf(out,
-    "  ;; tms9918a_clearScreen()\n"
-    "  call _clear_screen\n");
-
-  return 0;
-}
-
 int ColecoVision::tms9918a_plot_III()
 {
   need_plot = true;
@@ -287,17 +328,6 @@ int ColecoVision::tms9918a_plot_III()
     "  pop bc\n"
     "  pop ix\n"
     "  call _plot\n");
-
-  return 0;
-}
-
-int ColecoVision::tms9918a_initDisplay()
-{
-  need_init_display = true;
-
-  fprintf(out,
-    "  ;; tms9918a_initDisplay()\n"
-    "  call _init_display\n");
 
   return 0;
 }
@@ -522,6 +552,7 @@ void ColecoVision::insert_init_display()
   // Screen image is 300 bytes long (24x32) (defaults to 0x000)
   // Color table is 32 bytes long. (defaults to 0x380)
   // Character pattern table is 2048k (256 entries * 8 bytes) defaults to 0x800)
+  // Screen is 32 * 24 = 768 = 0x300 bytes.
   fprintf(out,
     "_init_display:\n"
     "  ;; Set graphics mode 1.\n"
@@ -541,8 +572,8 @@ void ColecoVision::insert_init_display()
     "  call _vdp_command\n");
 
   fprintf(out,
-    "  ;; Set color table address (9 * 0x40)\n"
-    "  ld bc, 0x8309\n"
+    "  ;; Set color table address (0xe * 0x40)\n"
+    "  ld bc, 0x830e\n"
     "  call _vdp_command\n");
 
   fprintf(out,
@@ -566,7 +597,62 @@ void ColecoVision::insert_init_display()
     "_set_patterns_loop:\n"
     "  out (VDP_DATA), a\n"
     "  dec ixl\n"
-    "  jr nz, _set_patterns_loop\n"
+    "  jr nz, _set_patterns_loop\n");
+
+  fprintf(out,
+    "  ret\n\n");
+}
+
+void ColecoVision::insert_set_pattern()
+{
+  // Patterns table is at 0x800.
+  fprintf(out,
+    "  ;; set_pattern(index=bc, image=ix)\n"
+    "_set_pattern:\n"
+    "  sla c\n"
+    "  rlc b\n"
+    "  sla c\n"
+    "  rlc b\n"
+    "  sla c\n"
+    "  rlc b\n"
+    "  sla c\n"
+    "  rlc b\n"
+    "  sla c\n"
+    "  rlc b\n"
+    "  ld iy, 0x4000|0x0800\n"
+    "  add iy, bc\n"
+    "  push iy\n"
+    "  pop bc\n"
+    "  ld a, c\n"
+    "  out (VDP_COMMAND), a\n"
+    "  ld a, b\n"
+    "  out (VDP_COMMAND), a\n"
+    "  ld e, (ix-2)\n"
+    "_set_pattern_loop:\n"
+    "  ld a, (ix)\n"
+    "  out (VDP_DATA), a\n"
+    "  inc ix\n"
+    "  dec e\n"
+    "  jr nz, _set_pattern_loop\n"
+    "  ret\n\n");
+}
+
+void ColecoVision::insert_set_color()
+{
+  // Color table is at 0x380.
+  fprintf(out,
+    "  ;; set_color(index=ix, color=de)\n"
+    "_set_color:\n"
+    "  ld bc, 0x380\n"
+    "  add ix, bc\n"
+    "  push ix\n"
+    "  pop bc\n"
+    "  ld a, c\n"
+    "  out (VDP_COMMAND), a\n"
+    "  ld a, b\n"
+    "  out (VDP_COMMAND), a\n"
+    "  ld a, e\n"
+    "  out (VDP_DATA), a\n"
     "  ret\n\n");
 }
 

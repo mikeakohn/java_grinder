@@ -39,13 +39,15 @@ int tms9918a(
   Generator *generator,
   const char *method_name)
 {
+  CHECK_FUNC(initDisplay,)
+  CHECK_FUNC(setGraphicsMode,_I)
+  CHECK_FUNC(setPattern,_IaB)
+  CHECK_FUNC(setColor,_II)
+  CHECK_FUNC(clearScreen,)
   CHECK_FUNC(print,_X)
   CHECK_FUNC(printChar,_C)
   CHECK_FUNC(setCursor,_II)
-  CHECK_FUNC(setGraphicsMode,_I)
-  CHECK_FUNC(clearScreen,)
   CHECK_FUNC(plot,_III)
-  CHECK_FUNC(initDisplay,)
   CHECK_FUNC(setSpriteVisible,_IZ)
   CHECK_FUNC(setSpriteImage,_IaB)
   CHECK_FUNC(setSpritePos,_III)
@@ -61,8 +63,8 @@ int tms9918a(
   const char *method_name,
   int const_val)
 {
-  CHECK_FUNC_CONST(printChar,_C)
   CHECK_FUNC_CONST(setGraphicsMode,_I)
+  CHECK_FUNC_CONST(printChar,_C)
 
   return -1;
 }

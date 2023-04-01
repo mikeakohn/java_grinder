@@ -108,6 +108,95 @@ int TI99::start_init()
   return 0;
 }
 
+int TI99::tms9918a_initDisplay()
+{
+  need_set_colors = true;
+
+  fprintf(out,
+    "  ;; tms9918a_initDisplay()\n"
+    "  mov r11, *r10+\n"
+    "  bl @_set_colors\n"
+    "  ai r10, -2\n"
+    "  mov *r10, r11\n");
+
+  return 0;
+}
+
+int TI99::tms9918a_setGraphicsMode_I()
+{
+  return -1;
+}
+
+int TI99::tms9918a_setGraphicsMode_I(int mode)
+{
+  need_vdp_command = true;
+
+  // firstbyte: reg content, second byte 0x8000 | reg num
+
+  fprintf(out, "  ;; tms9918a_setGraphicsMode_I(%d)\n", mode);
+
+  switch (mode)
+  {
+    case 0:
+      fprintf(out,
+        "  li r0, 0x8000\n"
+        "  bl @_vdp_command\n"
+        "  li r0, 0x8100|0x040\n"
+        "  bl @_vdp_command\n");
+      break;
+    case 1:
+      fprintf(out,
+        "  li r0, 0x8000\n"
+        "  bl @_vdp_command\n"
+        "  li r0, 0x8110|0x40\n"
+        "  bl @_vdp_command\n");
+      break;
+    case 2:
+      fprintf(out,
+        "  li r0, 0x8000\n"
+        "  bl @_vdp_command\n"
+        "  li r0, 0x8108|0x040\n"
+        "  bl @_vdp_command\n");
+      break;
+    case 3:
+      fprintf(out,
+        "  li r0, 0x8002\n"
+        "  bl @_vdp_command\n"
+        "  li r0, 0x8100|0x040\n"
+        "  bl @_vdp_command\n");
+      break;
+    default:
+      printf("Illegal graphics mode %d\n", mode);
+      return -1;
+  }
+
+  return 0;
+}
+
+int TI99::tms9918a_setPattern_IaB()
+{
+  return -1;
+}
+
+int TI99::tms9918a_setColor_II()
+{
+  return -1;
+}
+
+int TI99::tms9918a_clearScreen()
+{
+  need_clear_screen = true;
+
+  fprintf(out,
+    "  ;; tms9918a_clearScreen()\n"
+    "  mov r11, *r10+\n"
+    "  bl @_clear_screen\n"
+    "  ai r10, -2\n"
+    "  mov *r10, r11\n");
+
+  return 0;
+}
+
 int TI99::tms9918a_print_X()
 {
   need_print_string = true;
@@ -196,71 +285,6 @@ int TI99::tms9918a_setCursor_II(int x, int y)
   return 0;
 }
 
-int TI99::tms9918a_setGraphicsMode_I()
-{
-  return -1;
-}
-
-int TI99::tms9918a_setGraphicsMode_I(int mode)
-{
-  need_vdp_command = true;
-
-  // firstbyte: reg content, second byte 0x8000 | reg num
-
-  fprintf(out, "  ;; tms9918a_setGraphicsMode_I(%d)\n", mode);
-
-  switch (mode)
-  {
-    case 0:
-      fprintf(out,
-        "  li r0, 0x8000\n"
-        "  bl @_vdp_command\n"
-        "  li r0, 0x8100|0x040\n"
-        "  bl @_vdp_command\n");
-      break;
-    case 1:
-      fprintf(out,
-        "  li r0, 0x8000\n"
-        "  bl @_vdp_command\n"
-        "  li r0, 0x8110|0x40\n"
-        "  bl @_vdp_command\n");
-      break;
-    case 2:
-      fprintf(out,
-        "  li r0, 0x8000\n"
-        "  bl @_vdp_command\n"
-        "  li r0, 0x8108|0x040\n"
-        "  bl @_vdp_command\n");
-      break;
-    case 3:
-      fprintf(out,
-        "  li r0, 0x8002\n"
-        "  bl @_vdp_command\n"
-        "  li r0, 0x8100|0x040\n"
-        "  bl @_vdp_command\n");
-      break;
-    default:
-      printf("Illegal graphics mode %d\n", mode);
-      return -1;
-  }
-
-  return 0;
-}
-
-int TI99::tms9918a_clearScreen()
-{
-  need_clear_screen = true;
-
-  fprintf(out,
-    "  ;; tms9918a_clearScreen()\n"
-    "  mov r11, *r10+\n"
-    "  bl @_clear_screen\n"
-    "  ai r10, -2\n"
-    "  mov *r10, r11\n");
-
-  return 0;
-}
-
 int TI99::tms9918a_plot_III()
 {
   need_plot = true;
@@ -279,20 +303,6 @@ int TI99::tms9918a_plot_III()
     REG_STACK(reg - 1));
 
   reg -= 3;
-
-  return 0;
-}
-
-int TI99::tms9918a_initDisplay()
-{
-  need_set_colors = true;
-
-  fprintf(out,
-    "  ;; tms9918a_initDisplay()\n"
-    "  mov r11, *r10+\n"
-    "  bl @_set_colors\n"
-    "  ai r10, -2\n"
-    "  mov *r10, r11\n");
 
   return 0;
 }
