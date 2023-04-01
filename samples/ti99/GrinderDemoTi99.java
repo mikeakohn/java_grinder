@@ -491,7 +491,7 @@ public class GrinderDemoTi99
     spritesInit();
     spritesDisplay();
 
-    TMS9918A.setColors();
+    TMS9918A.initDisplay();
     drawMandelbrot();
 
     delay();

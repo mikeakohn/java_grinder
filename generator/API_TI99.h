@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2022 by Michael Kohn
+ * Copyright 2014-2023 by Michael Kohn
  *
  */
 
@@ -25,7 +25,7 @@ public:
   virtual int tms9918a_setGraphicsMode_I(int mode) { return -1; }
   virtual int tms9918a_clearScreen() { return -1; }
   virtual int tms9918a_plot_III() { return -1; }
-  virtual int tms9918a_setColors() { return -1; }
+  virtual int tms9918a_initDisplay() { return -1; }
   virtual int tms9918a_setSpriteVisible_IZ() { return -1; }
   virtual int tms9918a_setSpriteImage_IaB() { return -1; }
   virtual int tms9918a_setSpritePos_III() { return -1; }

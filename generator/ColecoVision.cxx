@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2022 by Michael Kohn
+ * Copyright 2014-2023 by Michael Kohn
  *
  */
 
@@ -53,7 +53,7 @@ ColecoVision::ColecoVision() :
   need_print_string(false),
   need_clear_screen(false),
   need_plot(false),
-  need_set_colors(false),
+  need_init_display(false),
   need_set_sound_freq(false),
   need_set_sound_volume(false),
   need_set_sprite_visible(false),
@@ -90,7 +90,7 @@ int ColecoVision::finish()
   if (need_print_string) { insert_print_string(); }
   if (need_clear_screen) { insert_clear_screen(); }
   if (need_plot) { insert_plot(); }
-  if (need_set_colors) { insert_set_colors(); }
+  if (need_init_display) { insert_init_display(); }
   if (need_set_sound_freq) { insert_set_sound_freq(); }
   if (need_set_sound_volume) { insert_set_sound_volume(); }
   if (need_set_sprite_visible) { insert_set_sprite_visible(); }
@@ -209,8 +209,8 @@ int ColecoVision::tms9918a_setCursor_II(int x, int y)
     "  ld a, 0x%02x\n"
     "  out (VDP_COMMAND), a\n",
     x, y, offset,
-    address >> 8,
-    address & 0xff);
+    address & 0xff,
+    address >> 8);
 
   return 0;
 }
@@ -234,14 +234,14 @@ int ColecoVision::tms9918a_setGraphicsMode_I(int mode)
       fprintf(out,
         "  ld bc, 0x8000\n"
         "  call _vdp_command\n"
-        "  ld bc, 0x8100|0x040\n"
+        "  ld bc, 0x8190|0x40\n"
         "  call _vdp_command\n");
       break;
     case 1:
       fprintf(out,
         "  ld bc, 0x8000\n"
         "  call _vdp_command\n"
-        "  ld bc, 0x8110|0x40\n"
+        "  ld bc, 0x8100|0x40\n"
         "  call _vdp_command\n");
       break;
     case 2:
@@ -291,13 +291,13 @@ int ColecoVision::tms9918a_plot_III()
   return 0;
 }
 
-int ColecoVision::tms9918a_setColors()
+int ColecoVision::tms9918a_initDisplay()
 {
-  need_set_colors = true;
+  need_init_display = true;
 
   fprintf(out,
-    "  ;; tms9918a_setColors()\n"
-    "  call _set_colors\n");
+    "  ;; tms9918a_initDisplay()\n"
+    "  call _init_display\n");
 
   return 0;
 }
@@ -474,17 +474,15 @@ void ColecoVision::insert_clear_screen()
 {
   fprintf(out,
     "_clear_screen:\n"
-    "  ld a, 0x00\n"
-    "  out (VDP_COMMAND), a\n"
-    "  ld a, 0x40\n"
-    "  out (VDP_COMMAND), a\n"
+    "  ld bc, 0x4000\n"
+    "  call _vdp_command\n"
     "  ld a, 0\n"
     "  ld b, 0xc0\n"
     "_clear_screen_loop:\n"
-    "  out (VDP_COMMAND), a\n"
-    "  out (VDP_COMMAND), a\n"
-    "  out (VDP_COMMAND), a\n"
-    "  out (VDP_COMMAND), a\n"
+    "  out (VDP_DATA), a\n"
+    "  out (VDP_DATA), a\n"
+    "  out (VDP_DATA), a\n"
+    "  out (VDP_DATA), a\n"
     "  dec b\n"
     "  jr nz, _clear_screen_loop\n"
     "  ret\n\n");
@@ -519,30 +517,50 @@ void ColecoVision::insert_plot()
     "  ret\n\n");
 }
 
-void ColecoVision::insert_set_colors()
+void ColecoVision::insert_init_display()
 {
   // Screen image is 300 bytes long (24x32) (defaults to 0x000)
   // Color table is 32 bytes long. (defaults to 0x380)
   // Character pattern table is 2048k (256 entries * 8 bytes) defaults to 0x800)
   fprintf(out,
-    "_set_colors:\n"
+    "_init_display:\n"
+    "  ;; Set graphics mode 1.\n"
+    "  ld bc, 0x8000\n"
+    "  call _vdp_command\n"
+    "  ld bc, 0x8143\n"
+    "  call _vdp_command\n");
+
+  fprintf(out,
+    "  ;; Set pattern base address (1 * 0x800)\n"
+    "  ld bc, 0x8401\n"
+    "  call _vdp_command\n");
+
+  fprintf(out,
+    "  ;; Set name table address (0 * 0x800)\n"
+    "  ld bc, 0x8200\n"
+    "  call _vdp_command\n");
+
+  fprintf(out,
+    "  ;; Set color table address (9 * 0x40)\n"
+    "  ld bc, 0x8309\n"
+    "  call _vdp_command\n");
+
+  fprintf(out,
     "  ;; Set color table\n"
-    "  ld a, 0x43\n"
-    "  out (VDP_COMMAND), a\n"
-    "  ld a, 0x80\n"
-    "  out (VDP_COMMAND), a\n"
+    "  ld bc, 0x4380\n"
+    "  call _vdp_command\n"
     "  ld a, 0\n"
     "  ld b, 32\n"
-    "_set_colors_loop:\n"
+    "_init_display_loop:\n"
     "  out (VDP_DATA), a\n"
     "  add a, 0x10\n"
     "  dec c\n"
-    "  jr nz, _set_colors_loop\n"
+    "  jr nz, _init_display_loop\n");
+
+  fprintf(out,
     "  ;; Set pattern table\n"
-    "  ld a, 0x48\n"
-    "  out (VDP_COMMAND), a\n"
-    "  ld a, 0x00\n"
-    "  out (VDP_COMMAND), a\n"
+    "  ld bc, 0x4800\n"
+    "  call _vdp_command\n"
     "  ld a, 0xff\n"
     "  ld ix, 2048\n"
     "_set_patterns_loop:\n"

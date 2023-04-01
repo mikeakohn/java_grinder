@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2022 by Michael Kohn
+ * Copyright 2014-2023 by Michael Kohn
  *
  */
 
@@ -283,12 +283,12 @@ int TI99::tms9918a_plot_III()
   return 0;
 }
 
-int TI99::tms9918a_setColors()
+int TI99::tms9918a_initDisplay()
 {
   need_set_colors = true;
 
   fprintf(out,
-    "  ;; tms9918a_setColors()\n"
+    "  ;; tms9918a_initDisplay()\n"
     "  mov r11, *r10+\n"
     "  bl @_set_colors\n"
     "  ai r10, -2\n"

@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2022 by Michael Kohn
+ * Copyright 2014-2023 by Michael Kohn
  *
  */
 
@@ -45,7 +45,7 @@ int tms9918a(
   CHECK_FUNC(setGraphicsMode,_I)
   CHECK_FUNC(clearScreen,)
   CHECK_FUNC(plot,_III)
-  CHECK_FUNC(setColors,)
+  CHECK_FUNC(initDisplay,)
   CHECK_FUNC(setSpriteVisible,_IZ)
   CHECK_FUNC(setSpriteImage,_IaB)
   CHECK_FUNC(setSpritePos,_III)

@@ -5,6 +5,7 @@ import net.mikekohn.java_grinder.TMS9918A;
 
 public class ColecoDemo
 {
+/*
   static byte[] sprite_dx;
   static byte[] sprite_dy;
   static int[] sprite_x;
@@ -479,9 +480,11 @@ public class ColecoDemo
 
     soundOff();
   }
+*/
 
   static public void main(String[] args)
   {
+/*
     sprite_dx = new byte[4];
     sprite_dy = new byte[4];
     sprite_x = new int[4];
@@ -515,6 +518,12 @@ public class ColecoDemo
     //delay();
     //TMS9918A.setSpriteSize(TMS9918A.SPRITE_SIZE_16X16_BIG);
     //scrollcolors();
+*/
+    TMS9918A.initDisplay();
+    TMS9918A.clearScreen();
+    TMS9918A.setCursor(4, 8);
+    TMS9918A.printChar((char)8);
+    TMS9918A.plot(10, 10, 7);
 
     while (true);
   }
