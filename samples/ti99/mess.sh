@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 
-if [ -e /storage/roms/ti99_4a ]
-then
-  ROMPATH=/storage/roms
-else
-  ROMPATH=/usbdisk/roms/ti99
-fi
+ROMPATH=/usbdisk/roms/ti99
 
 extra=""
 

@@ -28,6 +28,7 @@ public:
   virtual int tms9918a_setGraphicsMode_I(int mode);
   virtual int tms9918a_setPattern_IaB();
   virtual int tms9918a_setColor_II();
+  virtual int tms9918a_setTextBackdropColor_I();
   virtual int tms9918a_clearScreen();
   virtual int tms9918a_print_X();
   virtual int tms9918a_printChar_C();
@@ -49,7 +50,9 @@ private:
   void insert_vdp_command();
   void insert_clear_screen();
   void insert_plot();
-  void insert_set_colors();
+  void insert_init_display();
+  void insert_set_pattern();
+  void insert_set_color();
   void insert_set_sound_freq();
   void insert_set_sound_volume();
   void insert_set_sprite_visible();
@@ -61,7 +64,9 @@ private:
   bool need_print_string : 1;
   bool need_clear_screen : 1;
   bool need_plot : 1;
-  bool need_set_colors : 1;
+  bool need_init_display : 1;
+  bool need_set_pattern : 1;
+  bool need_set_color : 1;
   bool need_set_sound_freq : 1;
   bool need_set_sound_volume : 1;
   bool need_set_sprite_visible : 1;

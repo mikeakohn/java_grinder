@@ -28,6 +28,7 @@ public:
   virtual int tms9918a_setGraphicsMode_I(int mode);
   virtual int tms9918a_setPattern_IaB();
   virtual int tms9918a_setColor_II();
+  virtual int tms9918a_setTextBackdropColor_I();
   virtual int tms9918a_clearScreen();
   virtual int tms9918a_print_X();
   virtual int tms9918a_printChar_C();

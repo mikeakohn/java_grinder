@@ -66,6 +66,10 @@ abstract public class TMS9918A
       color_0. */
   public static void setColor(int index, int color) { }
 
+  /** Set the text color (in the upper 4 bits) and the background color
+      in the lower 4 bits. */
+  public static void setTextBackdropColor(int color) { }
+
   /** Change visibility of a sprite.  Sprite index can be between 0 and 32.
       there are restrictions on the number of sprites that can be displayed
       on a line. */

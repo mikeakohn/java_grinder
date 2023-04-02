@@ -543,11 +543,18 @@ public class ColecoDemo
     TMS9918A.initDisplay();
     TMS9918A.clearScreen();
     TMS9918A.setPattern(0, patterns);
+    TMS9918A.setTextBackdropColor(0xf7);
+    TMS9918A.setColor(0, (TMS9918A.COLOR_DARK_GREEN << 4) | TMS9918A.COLOR_TRANSPARENT);
+    TMS9918A.setColor(1, (TMS9918A.COLOR_DARK_RED << 4) | TMS9918A.COLOR_DARK_YELLOW);
     TMS9918A.setColor(8, (TMS9918A.COLOR_MEDIUM_GREEN << 4) | TMS9918A.COLOR_MEDIUM_RED);
-    TMS9918A.setCursor(4, 8);
+    TMS9918A.setCursor(4, 0);
+    TMS9918A.printChar((char)0x43);
     TMS9918A.printChar((char)1);
     TMS9918A.printChar((char)2);
-    TMS9918A.plot(10, 10, 7);
+    TMS9918A.printChar((char)2);
+    TMS9918A.printChar((char)2);
+    TMS9918A.printChar((char)2);
+    TMS9918A.plot(10, 10, 0x43);
 
     while (true);
   }

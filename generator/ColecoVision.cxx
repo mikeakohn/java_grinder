@@ -228,6 +228,20 @@ int ColecoVision::tms9918a_setColor_II()
   return 0;
 }
 
+int ColecoVision::tms9918a_setTextBackdropColor_I()
+{
+  fprintf(out,
+    "  ;; tms9918a_setTextBackdropColor_I()\n"
+    "  ld bc, 0x8700\n"
+    "  pop ix\n"
+    "  add ix, bc\n"
+    "  push ix\n"
+    "  pop bc\n"
+    "  call _vdp_command\n");
+
+  return 0;
+}
+
 int ColecoVision::tms9918a_clearScreen()
 {
   need_clear_screen = true;
@@ -290,7 +304,7 @@ int ColecoVision::tms9918a_setCursor_II()
     "  sla c\n"
     "  rlc b\n"
     "  pop de\n"
-    "  ld ix, 0x4000\n"
+    "  ld ix, 0x4000|0x1800\n"
     "  add ix, bc\n"
     "  add ix, de\n"
     "  ld bc, ix\n"
@@ -303,7 +317,7 @@ int ColecoVision::tms9918a_setCursor_II(int x, int y)
 {
   need_vdp_command = true;
   int offset = (y * 32) + x;
-  int address = offset + 0x4000;
+  int address = offset + 0x4000 + 0x1800;
 
   fprintf(out,
     "  ;; tms9918a_setCursor_II(%d, %d) offset=%d\n"
@@ -504,7 +518,7 @@ void ColecoVision::insert_clear_screen()
 {
   fprintf(out,
     "_clear_screen:\n"
-    "  ld bc, 0x4000\n"
+    "  ld bc, 0x4000|0x1800\n"
     "  call _vdp_command\n"
     "  ld a, 0\n"
     "  ld b, 0xc0\n"
@@ -534,7 +548,7 @@ void ColecoVision::insert_plot()
     "  sla c\n"
     "  rlc b\n"
     "  add ix, bc\n"
-    "  ld bc, 0x4000\n"
+    "  ld bc, 0x5800\n"
     "  add ix, bc\n"
     "  push ix\n"
     "  pop bc\n"
@@ -549,10 +563,11 @@ void ColecoVision::insert_plot()
 
 void ColecoVision::insert_init_display()
 {
-  // Screen image is 300 bytes long (24x32) (defaults to 0x000)
-  // Color table is 32 bytes long. (defaults to 0x380)
-  // Character pattern table is 2048k (256 entries * 8 bytes) defaults to 0x800)
-  // Screen is 32 * 24 = 768 = 0x300 bytes.
+  // Screen image is 300 bytes long (24x32) (defaults to 0x1800).
+  //  - Screen is 32 * 24 = 768 = 0x300 bytes.
+  // Color table is 32 bytes long. (defaults to 0x2000).
+  // Tile pattern table is 2048k (256 entries * 8 bytes) defaults to 0x000).
+  // Sprite attribute table is 0x1b00 (128 bytes long).
   fprintf(out,
     "_init_display:\n"
     "  ;; Set graphics mode 1.\n"
@@ -562,38 +577,31 @@ void ColecoVision::insert_init_display()
     "  call _vdp_command\n");
 
   fprintf(out,
-    "  ;; Set pattern base address (1 * 0x800)\n"
-    "  ld bc, 0x8401\n"
+    "  ;; Set pattern base address (0 * 0x800).\n"
+    "  ld bc, 0x8400\n"
     "  call _vdp_command\n");
 
   fprintf(out,
-    "  ;; Set name table address (0 * 0x800)\n"
-    "  ld bc, 0x8200\n"
+    "  ;; Set name table address (6 * 0x800).\n"
+    "  ld bc, 0x8206\n"
     "  call _vdp_command\n");
 
   fprintf(out,
-    "  ;; Set color table address (0xe * 0x40)\n"
-    "  ld bc, 0x830e\n"
+    "  ;; Set color table address (0x80 * 0x40).\n"
+    "  ld bc, 0x8380\n"
     "  call _vdp_command\n");
 
   fprintf(out,
-    "  ;; Set color table\n"
-    "  ld bc, 0x4380\n"
+    "  ;; Set sprite attribute table (0x36 * 0x80).\n"
+    "  ld bc, 0x8536\n"
+    "  call _vdp_command\n");
+
+  fprintf(out,
+    "  ;; Clear sprite attributes.\n"
+    "  ld bc, 0x5b00\n"
     "  call _vdp_command\n"
-    "  ld a, 0\n"
-    "  ld b, 32\n"
-    "_init_display_loop:\n"
-    "  out (VDP_DATA), a\n"
-    "  add a, 0x10\n"
-    "  dec c\n"
-    "  jr nz, _init_display_loop\n");
-
-  fprintf(out,
-    "  ;; Set pattern table\n"
-    "  ld bc, 0x4800\n"
-    "  call _vdp_command\n"
-    "  ld a, 0xff\n"
-    "  ld ix, 2048\n"
+    "  ld a, 0x00\n"
+    "  ld ix, 128\n"
     "_set_patterns_loop:\n"
     "  out (VDP_DATA), a\n"
     "  dec ixl\n"
@@ -619,7 +627,7 @@ void ColecoVision::insert_set_pattern()
     "  rlc b\n"
     "  sla c\n"
     "  rlc b\n"
-    "  ld iy, 0x4000|0x0800\n"
+    "  ld iy, 0x4000|0x0000\n"
     "  add iy, bc\n"
     "  push iy\n"
     "  pop bc\n"
@@ -639,11 +647,11 @@ void ColecoVision::insert_set_pattern()
 
 void ColecoVision::insert_set_color()
 {
-  // Color table is at 0x380.
+  // Color table is at 0x2000.
   fprintf(out,
     "  ;; set_color(index=ix, color=de)\n"
     "_set_color:\n"
-    "  ld bc, 0x380\n"
+    "  ld bc, 0x4000|0x2000\n"
     "  add ix, bc\n"
     "  push ix\n"
     "  pop bc\n"

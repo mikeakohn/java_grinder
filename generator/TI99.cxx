@@ -23,7 +23,9 @@ TI99::TI99() :
   need_print_string(false),
   need_clear_screen(false),
   need_plot(false),
-  need_set_colors(false),
+  need_init_display(false),
+  need_set_pattern(false),
+  need_set_color(false),
   need_set_sound_freq(false),
   need_set_sound_volume(false),
   need_set_sprite_visible(false),
@@ -61,17 +63,19 @@ int TI99::open(const char *filename)
 
 int TI99::finish()
 {
-  if (need_vdp_command) { insert_vdp_command(); }
-  if (need_print_string) { insert_print_string(); }
-  if (need_clear_screen) { insert_clear_screen(); }
-  if (need_plot) { insert_plot(); }
-  if (need_set_colors) { insert_set_colors(); }
-  if (need_set_sound_freq) { insert_set_sound_freq(); }
-  if (need_set_sound_volume) { insert_set_sound_volume(); }
+  if (need_vdp_command)        { insert_vdp_command(); }
+  if (need_print_string)       { insert_print_string(); }
+  if (need_clear_screen)       { insert_clear_screen(); }
+  if (need_plot)               { insert_plot(); }
+  if (need_init_display)       { insert_init_display(); }
+  if (need_set_pattern)        { insert_set_pattern(); }
+  if (need_set_color)          { insert_set_color(); }
+  if (need_set_sound_freq)     { insert_set_sound_freq(); }
+  if (need_set_sound_volume)   { insert_set_sound_volume(); }
   if (need_set_sprite_visible) { insert_set_sprite_visible(); }
-  if (need_set_sprite_image) { insert_set_sprite_image(); }
-  if (need_set_sprite_pos) { insert_set_sprite_pos(); }
-  if (need_set_sprite_color) { insert_set_sprite_color(); }
+  if (need_set_sprite_image)   { insert_set_sprite_image(); }
+  if (need_set_sprite_pos)     { insert_set_sprite_pos(); }
+  if (need_set_sprite_color)   { insert_set_sprite_color(); }
 
   return 0;
 }
@@ -110,12 +114,12 @@ int TI99::start_init()
 
 int TI99::tms9918a_initDisplay()
 {
-  need_set_colors = true;
+  need_init_display = true;
 
   fprintf(out,
     "  ;; tms9918a_initDisplay()\n"
     "  mov r11, *r10+\n"
-    "  bl @_set_colors\n"
+    "  bl @_init_display\n"
     "  ai r10, -2\n"
     "  mov *r10, r11\n");
 
@@ -175,12 +179,62 @@ int TI99::tms9918a_setGraphicsMode_I(int mode)
 
 int TI99::tms9918a_setPattern_IaB()
 {
+  need_set_pattern = true;
+
+  fprintf(out,
+    "  ;; tms9918a_setPattern_IaB()\n"
+    "  mov r%d, r0\n"
+    "  mov r%d, r1\n"
+    "  mov r11, *r10+\n"
+    "  bl @_set_pattern\n"
+    "  ai r10, -2\n"
+    "  mov *r10, r11\n",
+    REG_STACK(reg - 2),
+    REG_STACK(reg - 1));
+
+  reg -= 2;
+
   return -1;
 }
 
 int TI99::tms9918a_setColor_II()
 {
-  return -1;
+  need_set_color = true;
+
+  fprintf(out,
+    "  ;; tms9918a_setColor_II()\n"
+    "  mov r%d, r0\n"
+    "  mov r%d, r1\n"
+    "  mov r11, *r10+\n"
+    "  bl @_set_color\n"
+    "  ai r10, -2\n"
+    "  mov *r10, r11\n",
+    REG_STACK(reg - 2),
+    REG_STACK(reg - 1));
+
+  reg -= 2;
+
+  return 0;
+}
+
+int TI99::tms9918a_setTextBackdropColor_I()
+{
+  fprintf(out,
+    "  ;; tms9918a_setTextBackdropColor_I()\n"
+    "  ai r%d, 0x8700\n"
+    "  swpb r%d\n"
+    "  movb r%d, @VDP_COMMAND\n"
+    "  swpb r%d\n"
+    "  movb r%d, @VDP_COMMAND\n",
+    REG_STACK(reg - 1),
+    REG_STACK(reg - 1),
+    REG_STACK(reg - 1),
+    REG_STACK(reg - 1),
+    REG_STACK(reg - 1));
+
+  reg -= 1;
+
+  return 0;
 }
 
 int TI99::tms9918a_clearScreen()
@@ -512,13 +566,13 @@ void TI99::insert_plot()
     "  b *r11\n\n");
 }
 
-void TI99::insert_set_colors()
+void TI99::insert_init_display()
 {
   // Screen image is 300 bytes long (24x32) (defaults to 0x000)
   // Color table is 32 bytes long. (defaults to 0x380)
   // Character pattern table is 2048k (256 entries * 8 bytes) defaults to 0x800)
   fprintf(out,
-    "_set_colors:\n"
+    "_init_display:\n"
     "  ;; Set color table\n"
     "  li r0, 0x8043\n"
     "  movb r0, @VDP_COMMAND\n"
@@ -542,6 +596,34 @@ void TI99::insert_set_colors()
     "  movb r0, @VDP_WRITE\n"
     "  dec r1\n"
     "  jne _set_patterns_loop\n"
+    "  b *r11\n\n");
+}
+
+void TI99::insert_set_pattern()
+{
+  fprintf(out,
+    "_set_pattern:\n"
+    "  ai r0, 0x4000|0x800\n"
+    "  movb r0, @VDP_COMMAND\n"
+    "  swpb r0\n"
+    "  movb r0, @VDP_COMMAND\n"
+    "  mov @-2(r1), r0\n"
+    "_set_patterns_loop:\n"
+    "  movb *r1+, @VDP_WRITE\n"
+    "  dec r0\n"
+    "  jne _set_patterns_loop\n"
+    "  b *r11\n\n");
+}
+
+void TI99::insert_set_color()
+{
+  fprintf(out,
+    "_set_color:\n"
+    "  ai r0, 0x4000|0x380\n"
+    "  movb r0, @VDP_COMMAND\n"
+    "  swpb r0\n"
+    "  movb r0, @VDP_COMMAND\n"
+    "  movb r1, @VDP_WRITE\n"
     "  b *r11\n\n");
 }
 

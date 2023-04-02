@@ -43,6 +43,7 @@ int tms9918a(
   CHECK_FUNC(setGraphicsMode,_I)
   CHECK_FUNC(setPattern,_IaB)
   CHECK_FUNC(setColor,_II)
+  CHECK_FUNC(setTextBackdropColor,_I)
   CHECK_FUNC(clearScreen,)
   CHECK_FUNC(print,_X)
   CHECK_FUNC(printChar,_C)
