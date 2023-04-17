@@ -52,50 +52,50 @@ public class VIC
   // 0xd010
 
   // 0xd011
-  public static void write_control1(int value) { }
-  public static int read_control1() { return 0; }
+  public static void writeControl1(int value) { }
+  public static int readControl1() { return 0; }
 
   // 0xd012
-  public static void wait_raster(int value) { }
+  public static void waitRaster(int value) { }
 
   // 0xd013
   // 0xd014
 
   // 0xd015
-  public static void sprite_enable(int value) { }
+  public static void spriteEnable(int value) { }
 
   // 0xd016
-  public static void write_control2(int value) { }
-  public static int read_control2() { return 0; }
+  public static void writeControl2(int value) { }
+  public static int readControl2() { return 0; }
 
   // 0xd017
-  public static void sprite_expandy(int value) { }
+  public static void spriteExpandY(int value) { }
 
   // 0xd018
-  public static void write_pointer(int value) { }
-  public static int read_pointer() { return 0; }
+  public static void writePointer(int value) { }
+  public static int readPointer() { return 0; }
 
   // 0xd019
-  public static void write_interrupt_status(int value) { }
-  public static int read_interrupt_status() { return 0; }
+  public static void writeInterruptStatus(int value) { }
+  public static int readInterruptStatus() { return 0; }
 
   // 0xd01a
-  public static void interrupt_control(int value) { }
+  public static void interruptControl(int value) { }
 
   // 0xd01b
-  public static void sprite_priority(int value) { }
+  public static void spritePriority(int value) { }
 
   // 0xd01c
-  public static void sprite_multicolor_enable(int value) { }
+  public static void spriteMulticolorEnable(int value) { }
 
   // 0xd01d
-  public static void sprite_expandx(int value) { }
+  public static void spriteExpandX(int value) { }
 
   // 0xd01e
-  public static int sprite_collision() { return 0; }
+  public static int spriteCollision() { return 0; }
 
   // 0xd01f
-  public static int data_collision() { return 0; }
+  public static int dataCollision() { return 0; }
 
   // 0xd020
   public static void border(int value) { }
@@ -104,19 +104,19 @@ public class VIC
   public static void background(int value) { }
 
   // 0xd022
-  public static void multi1(int value) { }
+  public static void multicolor1(int value) { }
 
   // 0xd023
-  public static void multi2(int value) { }
+  public static void multicolor2(int value) { }
 
   // 0xd024
-  public static void multi3(int value) { }
+  public static void multicolor3(int value) { }
 
   // 0xd025
-  public static void sprite_multicolor0(int value) { }
+  public static void spriteMulticolor0(int value) { }
 
   // 0xd026
-  public static void sprite_multicolor1(int value) { }
+  public static void spriteMulticolor1(int value) { }
 
   // 0xd027
   public static void sprite0color(int value) { }
@@ -142,19 +142,19 @@ public class VIC
   // 0xd02e
   public static void sprite7color(int value) { }
 
-  public static void hires_enable() { }
-  public static void hires_clear(int value) { }
-  public static void hires_plot(int x, int y, int value) { }
-  public static void make_hires_tables() { }
-  public static void text_enable() { }
-  public static void text_clear(int value) { }
-  public static void text_copy() { }
-  public static void text_plot(int x, int y, int value, int color) { }
-  public static int text_read(int x, int y) { return 0; }
-  public static void make_text_table() { }
-  public static void make_color_table() { }
-  public static void color_ram_clear(int value) { }
-  public static void copy_uppercase() { }
-  public static void copy_lowercase() { }
+  public static void hiresEnable() { }
+  public static void hiresClear(int value) { }
+  public static void hiresPlot(int x, int y, int value) { }
+  public static void makeHiresTables() { }
+  public static void textEnable() { }
+  public static void textClear(int value) { }
+  public static void textCopy() { }
+  public static void textPlot(int x, int y, int value, int color) { }
+  public static int textRead(int x, int y) { return 0; }
+  public static void makeTextTable() { }
+  public static void makeColorTable() { }
+  public static void colorRamClear(int value) { }
+  public static void copyUppercase() { }
+  public static void copyLowercase() { }
 }
 

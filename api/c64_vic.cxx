@@ -62,89 +62,89 @@ static int c64_vic_sprite7pos(JavaClass *java_class, Generator *generator)
   return generator->c64_vic_sprite7pos();
 }
 
-static int c64_vic_write_control1(JavaClass *java_class, Generator *generator)
+static int c64_vic_writeControl1(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_write_control1();
+  return generator->c64_vic_writeControl1();
 }
 
-static int c64_vic_read_control1(JavaClass *java_class, Generator *generator)
+static int c64_vic_readControl1(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_read_control1();
+  return generator->c64_vic_readControl1();
 }
 
-static int c64_vic_wait_raster(JavaClass *java_class, Generator *generator)
+static int c64_vic_waitRaster(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_wait_raster();
+  return generator->c64_vic_waitRaster();
 }
 
-static int c64_vic_sprite_enable(JavaClass *java_class, Generator *generator)
+static int c64_vic_spriteEnable(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_sprite_enable();
+  return generator->c64_vic_spriteEnable();
 }
 
-static int c64_vic_write_control2(JavaClass *java_class, Generator *generator)
+static int c64_vic_writeControl2(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_write_control2();
+  return generator->c64_vic_writeControl2();
 }
 
-static int c64_vic_read_control2(JavaClass *java_class, Generator *generator)
+static int c64_vic_readControl2(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_read_control2();
+  return generator->c64_vic_readControl2();
 }
 
-static int c64_vic_sprite_expandy(JavaClass *java_class, Generator *generator)
+static int c64_vic_spriteExpandY(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_sprite_expandy();
+  return generator->c64_vic_spriteExpandY();
 }
 
-static int c64_vic_write_pointer(JavaClass *java_class, Generator *generator)
+static int c64_vic_writePointer(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_write_pointer();
+  return generator->c64_vic_writePointer();
 }
 
-static int c64_vic_read_pointer(JavaClass *java_class, Generator *generator)
+static int c64_vic_readPointer(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_read_pointer();
+  return generator->c64_vic_readPointer();
 }
 
-static int c64_vic_write_interrupt_status(JavaClass *java_class, Generator *generator)
+static int c64_vic_writeInterruptStatus(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_write_interrupt_status();
+  return generator->c64_vic_writeInterruptStatus();
 }
 
-static int c64_vic_read_interrupt_status(JavaClass *java_class, Generator *generator)
+static int c64_vic_readInterruptStatus(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_read_interrupt_status();
+  return generator->c64_vic_readInterruptStatus();
 }
 
-static int c64_vic_interrupt_control(JavaClass *java_class, Generator *generator)
+static int c64_vic_interruptControl(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_interrupt_control();
+  return generator->c64_vic_interruptControl();
 }
 
-static int c64_vic_sprite_priority(JavaClass *java_class, Generator *generator)
+static int c64_vic_spritePriority(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_sprite_priority();
+  return generator->c64_vic_spritePriority();
 }
 
-static int c64_vic_sprite_multicolor_enable(JavaClass *java_class, Generator *generator)
+static int c64_vic_spriteMulticolorEnable(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_sprite_multicolor_enable();
+  return generator->c64_vic_spriteMulticolorEnable();
 }
 
-static int c64_vic_sprite_expandx(JavaClass *java_class, Generator *generator)
+static int c64_vic_spriteExpandX(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_sprite_expandx();
+  return generator->c64_vic_spriteExpandX();
 }
 
-static int c64_vic_sprite_collision(JavaClass *java_class, Generator *generator)
+static int c64_vic_spriteCollision(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_sprite_collision();
+  return generator->c64_vic_spriteCollision();
 }
 
-static int c64_vic_data_collision(JavaClass *java_class, Generator *generator)
+static int c64_vic_dataCollision(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_data_collision();
+  return generator->c64_vic_dataCollision();
 }
 
 static int c64_vic_border(JavaClass *java_class, Generator *generator)
@@ -157,29 +157,29 @@ static int c64_vic_background(JavaClass *java_class, Generator *generator)
   return generator->c64_vic_background();
 }
 
-static int c64_vic_multi1(JavaClass *java_class, Generator *generator)
+static int c64_vic_multicolor1(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_multi1();
+  return generator->c64_vic_multicolor1();
 }
 
-static int c64_vic_multi2(JavaClass *java_class, Generator *generator)
+static int c64_vic_multicolor2(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_multi2();
+  return generator->c64_vic_multicolor2();
 }
 
-static int c64_vic_multi3(JavaClass *java_class, Generator *generator)
+static int c64_vic_multicolor3(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_multi3();
+  return generator->c64_vic_multicolor3();
 }
 
-static int c64_vic_sprite_multicolor0(JavaClass *java_class, Generator *generator)
+static int c64_vic_spriteMulticolor0(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_sprite_multicolor0();
+  return generator->c64_vic_spriteMulticolor0();
 }
 
-static int c64_vic_sprite_multicolor1(JavaClass *java_class, Generator *generator)
+static int c64_vic_spriteMulticolor1(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_sprite_multicolor1();
+  return generator->c64_vic_spriteMulticolor1();
 }
 
 static int c64_vic_sprite0color(JavaClass *java_class, Generator *generator)
@@ -222,74 +222,74 @@ static int c64_vic_sprite7color(JavaClass *java_class, Generator *generator)
   return generator->c64_vic_sprite7color();
 }
 
-static int c64_vic_hires_enable(JavaClass *java_class, Generator *generator)
+static int c64_vic_hiresEnable(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_hires_enable();
+  return generator->c64_vic_hiresEnable();
 }
 
-static int c64_vic_hires_clear(JavaClass *java_class, Generator *generator)
+static int c64_vic_hiresClear(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_hires_clear();
+  return generator->c64_vic_hiresClear();
 }
 
-static int c64_vic_hires_plot(JavaClass *java_class, Generator *generator)
+static int c64_vic_hiresPlot(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_hires_plot();
+  return generator->c64_vic_hiresPlot();
 }
 
-static int c64_vic_make_hires_tables(JavaClass *java_class, Generator *generator)
+static int c64_vic_makeHiresTables(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_make_hires_tables();
+  return generator->c64_vic_makeHiresTables();
 }
 
-static int c64_vic_text_enable(JavaClass *java_class, Generator *generator)
+static int c64_vic_textEnable(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_text_enable();
+  return generator->c64_vic_textEnable();
 }
 
-static int c64_vic_text_clear(JavaClass *java_class, Generator *generator)
+static int c64_vic_textClear(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_text_clear();
+  return generator->c64_vic_textClear();
 }
 
-static int c64_vic_text_copy(JavaClass *java_class, Generator *generator)
+static int c64_vic_textCopy(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_text_copy();
+  return generator->c64_vic_textCopy();
 }
 
-static int c64_vic_text_plot(JavaClass *java_class, Generator *generator)
+static int c64_vic_textPlot(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_text_plot();
+  return generator->c64_vic_textPlot();
 }
 
-static int c64_vic_text_read(JavaClass *java_class, Generator *generator)
+static int c64_vic_textRead(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_text_read();
+  return generator->c64_vic_textRead();
 }
 
-static int c64_vic_make_text_table(JavaClass *java_class, Generator *generator)
+static int c64_vic_makeTextTable(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_make_text_table();
+  return generator->c64_vic_makeTextTable();
 }
 
-static int c64_vic_make_color_table(JavaClass *java_class, Generator *generator)
+static int c64_vic_makeColorTable(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_make_color_table();
+  return generator->c64_vic_makeColorTable();
 }
 
-static int c64_vic_color_ram_clear(JavaClass *java_class, Generator *generator)
+static int c64_vic_colorRamClear(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_color_ram_clear();
+  return generator->c64_vic_colorRamClear();
 }
 
-static int c64_vic_copy_uppercase(JavaClass *java_class, Generator *generator)
+static int c64_vic_copyUppercase(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_copy_uppercase();
+  return generator->c64_vic_copyUppercase();
 }
 
-static int c64_vic_copy_lowercase(JavaClass *java_class, Generator *generator)
+static int c64_vic_copyLowercase(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_vic_copy_lowercase();
+  return generator->c64_vic_copyLowercase();
 }
 
 int c64_vic(JavaClass *java_class, Generator *generator, const char *function)
@@ -302,30 +302,30 @@ int c64_vic(JavaClass *java_class, Generator *generator, const char *function)
   CHECK_FUNC(sprite5pos)
   CHECK_FUNC(sprite6pos)
   CHECK_FUNC(sprite7pos)
-  CHECK_FUNC(write_control1)
-  CHECK_FUNC(read_control1)
-  CHECK_FUNC(wait_raster)
-  CHECK_FUNC(sprite_enable)
-  CHECK_FUNC(write_control2)
-  CHECK_FUNC(read_control2)
-  CHECK_FUNC(sprite_expandy)
-  CHECK_FUNC(write_pointer)
-  CHECK_FUNC(read_pointer)
-  CHECK_FUNC(write_interrupt_status)
-  CHECK_FUNC(read_interrupt_status)
-  CHECK_FUNC(interrupt_control)
-  CHECK_FUNC(sprite_priority)
-  CHECK_FUNC(sprite_multicolor_enable)
-  CHECK_FUNC(sprite_expandx)
-  CHECK_FUNC(sprite_collision)
-  CHECK_FUNC(data_collision)
+  CHECK_FUNC(writeControl1)
+  CHECK_FUNC(readControl1)
+  CHECK_FUNC(waitRaster)
+  CHECK_FUNC(spriteEnable)
+  CHECK_FUNC(writeControl2)
+  CHECK_FUNC(readControl2)
+  CHECK_FUNC(spriteExpandY)
+  CHECK_FUNC(writePointer)
+  CHECK_FUNC(readPointer)
+  CHECK_FUNC(writeInterruptStatus)
+  CHECK_FUNC(readInterruptStatus)
+  CHECK_FUNC(interruptControl)
+  CHECK_FUNC(spritePriority)
+  CHECK_FUNC(spriteMulticolorEnable)
+  CHECK_FUNC(spriteExpandX)
+  CHECK_FUNC(spriteCollision)
+  CHECK_FUNC(dataCollision)
   CHECK_FUNC(border)
   CHECK_FUNC(background)
-  CHECK_FUNC(multi1)
-  CHECK_FUNC(multi2)
-  CHECK_FUNC(multi3)
-  CHECK_FUNC(sprite_multicolor0)
-  CHECK_FUNC(sprite_multicolor1)
+  CHECK_FUNC(multicolor1)
+  CHECK_FUNC(multicolor2)
+  CHECK_FUNC(multicolor3)
+  CHECK_FUNC(spriteMulticolor0)
+  CHECK_FUNC(spriteMulticolor1)
   CHECK_FUNC(sprite0color)
   CHECK_FUNC(sprite1color)
   CHECK_FUNC(sprite2color)
@@ -334,20 +334,20 @@ int c64_vic(JavaClass *java_class, Generator *generator, const char *function)
   CHECK_FUNC(sprite5color)
   CHECK_FUNC(sprite6color)
   CHECK_FUNC(sprite7color)
-  CHECK_FUNC(hires_enable)
-  CHECK_FUNC(hires_clear)
-  CHECK_FUNC(hires_plot)
-  CHECK_FUNC(make_hires_tables)
-  CHECK_FUNC(text_enable)
-  CHECK_FUNC(text_clear)
-  CHECK_FUNC(text_copy)
-  CHECK_FUNC(text_plot)
-  CHECK_FUNC(text_read)
-  CHECK_FUNC(make_text_table)
-  CHECK_FUNC(make_color_table)
-  CHECK_FUNC(color_ram_clear)
-  CHECK_FUNC(copy_uppercase)
-  CHECK_FUNC(copy_lowercase)
+  CHECK_FUNC(hiresEnable)
+  CHECK_FUNC(hiresClear)
+  CHECK_FUNC(hiresPlot)
+  CHECK_FUNC(makeHiresTables)
+  CHECK_FUNC(textEnable)
+  CHECK_FUNC(textClear)
+  CHECK_FUNC(textCopy)
+  CHECK_FUNC(textPlot)
+  CHECK_FUNC(textRead)
+  CHECK_FUNC(makeTextTable)
+  CHECK_FUNC(makeColorTable)
+  CHECK_FUNC(colorRamClear)
+  CHECK_FUNC(copyUppercase)
+  CHECK_FUNC(copyLowercase)
 
   return -1;
 }

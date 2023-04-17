@@ -51,13 +51,15 @@ C64::C64() :
 {
   start_org = 0x07ff;
 
-  // java stack pointer location
+  // Java stack pointer location. The default is zero page (32 variables max).
+  // Call Grinder.largeJavaStack() at the start of a program to move it
+  // to 0x200/0x300 (128 variables max, but slower).
+
   java_stack_lo = 0x80;
   java_stack_hi = 0xc0;
+
   saved_vars = 0x100;
   var_start = 0x02;
-  // java_stack_lo = 0x200;
-  // java_stack_hi = 0x300;
 
   // heap location (for new arrays)
   ram_start = 0xa000;
@@ -93,8 +95,8 @@ int C64::open(const char *filename)
   fprintf(out, "heap_ptr equ ram_start\n");
 
   // java stack
-  fprintf(out, "stack_lo equ 0x%04x\n", java_stack_lo);
-  fprintf(out, "stack_hi equ 0x%04x\n", java_stack_hi);
+  fprintf(out, ".set stack_lo=0x%04x\n", java_stack_lo);
+  fprintf(out, ".set stack_hi=0x%04x\n", java_stack_hi);
 
   // registers and internal variables are saved here during interrupts
   fprintf(out, "saved_vars equ 0x%04x\n", saved_vars);
@@ -146,18 +148,7 @@ int C64::open(const char *filename)
   fprintf(out, "  txs\n");
 
   // reset java stack pointer
-  // fprintf(out, "  ldx #0xff\n");  // for 0x200/0x300
   fprintf(out, "  ldx #0x3f\n");  // for 0x80/0xc0
-
-  // clear_stack (so it looks nice in monitor)
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "clear_stack_loop:\n");
-  fprintf(out, "  sta 0x80,y\n");
-  fprintf(out, "  sta 0xc0,y\n");
-  fprintf(out, "  iny\n");
-  fprintf(out, "  cpy #0x40\n");
-  fprintf(out, "  bne clear_stack_loop\n");
 
   // switch VIC-II to bank 0
   fprintf(out, "  lda #4\n");
@@ -175,7 +166,7 @@ int C64::open(const char *filename)
   return 0;
 }
 
-int C64::c64_sid_voice1_frequency(/* value */)
+int C64::c64_sid_frequency1(/* value */)
 {
   fprintf(out, "  inx\n");
   fprintf(out, "  lda stack_hi,x\n");
@@ -186,7 +177,7 @@ int C64::c64_sid_voice1_frequency(/* value */)
   return 0;
 }
 
-int C64::c64_sid_voice1_pulse_width(/* value */)
+int C64::c64_sid_pulseWidth1(/* value */)
 {
   fprintf(out, "  inx\n");
   fprintf(out, "  lda stack_hi,x\n");
@@ -197,9 +188,9 @@ int C64::c64_sid_voice1_pulse_width(/* value */)
   return 0;
 }
 
-int C64::c64_sid_voice1_waveform(/* value */) { POKE(0xd404); return 0; }
+int C64::c64_sid_waveform1(/* value */) { POKE(0xd404); return 0; }
 
-int C64::c64_sid_voice1_adsr(/* value */)
+int C64::c64_sid_adsr1(/* value */)
 {
   fprintf(out, "  inx\n");
   fprintf(out, "  lda stack_hi,x\n");
@@ -210,7 +201,7 @@ int C64::c64_sid_voice1_adsr(/* value */)
   return 0;
 }
 
-int C64::c64_sid_voice2_frequency(/* value */)
+int C64::c64_sid_frequency2(/* value */)
 {
   fprintf(out, "  inx\n");
   fprintf(out, "  lda stack_hi,x\n");
@@ -221,7 +212,7 @@ int C64::c64_sid_voice2_frequency(/* value */)
   return 0;
 }
 
-int C64::c64_sid_voice2_pulse_width(/* value */)
+int C64::c64_sid_pulseWidth2(/* value */)
 {
   fprintf(out, "  inx\n");
   fprintf(out, "  lda stack_hi,x\n");
@@ -232,9 +223,9 @@ int C64::c64_sid_voice2_pulse_width(/* value */)
   return 0;
 }
 
-int C64::c64_sid_voice2_waveform(/* value */) { POKE(0xd40b); return 0; }
+int C64::c64_sid_waveform2(/* value */) { POKE(0xd40b); return 0; }
 
-int C64::c64_sid_voice2_adsr(/* value */)
+int C64::c64_sid_adsr2(/* value */)
 {
   fprintf(out, "  inx\n");
   fprintf(out, "  lda stack_hi,x\n");
@@ -245,7 +236,7 @@ int C64::c64_sid_voice2_adsr(/* value */)
   return 0;
 }
 
-int C64::c64_sid_voice3_frequency(/* value */)
+int C64::c64_sid_frequency3(/* value */)
 {
   fprintf(out, "  inx\n");
   fprintf(out, "  lda stack_hi,x\n");
@@ -256,7 +247,7 @@ int C64::c64_sid_voice3_frequency(/* value */)
   return 0;
 }
 
-int C64::c64_sid_voice3_pulse_width(/* value */)
+int C64::c64_sid_pulseWidth3(/* value */)
 {
   fprintf(out, "  inx\n");
   fprintf(out, "  lda stack_hi,x\n");
@@ -267,9 +258,9 @@ int C64::c64_sid_voice3_pulse_width(/* value */)
   return 0;
 }
 
-int C64::c64_sid_voice3_waveform(/* value */) { POKE(0xd412); return 0; }
+int C64::c64_sid_waveform3(/* value */) { POKE(0xd412); return 0; }
 
-int C64::c64_sid_voice3_adsr(/* value */)
+int C64::c64_sid_adsr3(/* value */)
 {
   fprintf(out, "  inx\n");
   fprintf(out, "  lda stack_hi,x\n");
@@ -280,7 +271,7 @@ int C64::c64_sid_voice3_adsr(/* value */)
   return 0;
 }
 
-int C64::c64_sid_filter_cutoff(/* value */)
+int C64::c64_sid_filterCutoff(/* value */)
 {
   fprintf(out, "  inx\n");
   fprintf(out, "  lda stack_hi,x\n");
@@ -291,10 +282,10 @@ int C64::c64_sid_filter_cutoff(/* value */)
   return 0;
 }
 
-int C64::c64_sid_filter_resonance(/* value */) { POKE(0xd417); return 0; }
+int C64::c64_sid_filterResonance(/* value */) { POKE(0xd417); return 0; }
 int C64::c64_sid_volume(/* value */) { POKE(0xd418); return 0; }
-int C64::c64_sid_voice3_oscillator(/* value */) { POKE(0xd41b); return 0; }
-int C64::c64_sid_voice3_envelope(/* value */) { POKE(0xd41c); return 0; }
+int C64::c64_sid_oscillator3(/* value */) { POKE(0xd41b); return 0; }
+int C64::c64_sid_envelope3(/* value */) { POKE(0xd41c); return 0; }
 
 int C64::c64_sid_clear()
 {
@@ -508,12 +499,12 @@ int C64::c64_vic_sprite7pos(/* x, y */)
   return 0;
 }
 
-int C64::c64_vic_write_control1(/* value */) { POKE(0xd011); return 0; }
-int C64::c64_vic_read_control1() { PEEK(0xd011); return 0; }
+int C64::c64_vic_writeControl1(/* value */) { POKE(0xd011); return 0; }
+int C64::c64_vic_readControl1() { PEEK(0xd011); return 0; }
 
-int C64::c64_vic_wait_raster(/* line */)
+int C64::c64_vic_waitRaster(/* line */)
 {
-  fprintf(out, "; wait_raster\n");
+  fprintf(out, "; waitRaster\n");
   fprintf(out, "  inx\n");
   fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  cmp 0xd012\n");
@@ -522,27 +513,27 @@ int C64::c64_vic_wait_raster(/* line */)
   return 0;
 }
 
-int C64::c64_vic_sprite_enable(/* value */) { POKE(0xd015); return 0; }
-int C64::c64_vic_write_control2(/* value */) { POKE(0xd016); return 0; }
-int C64::c64_vic_read_control2() { PEEK(0xd016); return 0; }
-int C64::c64_vic_sprite_expandy(/* value */) { POKE(0xd017); return 0; }
-int C64::c64_vic_write_pointer(/* value */) { POKE(0xd018); return 0; }
-int C64::c64_vic_read_pointer() { PEEK(0xd018); return 0; }
-int C64::c64_vic_write_interrupt_status(/* value */) { POKE(0xd019); return 0; }
-int C64::c64_vic_read_interrupt_status() { PEEK(0xd019); return 0; }
-int C64::c64_vic_interrupt_control(/* value */) { POKE(0xd01a); return 0; }
-int C64::c64_vic_sprite_priority(/* value */) { POKE(0xd01b); return 0; }
-int C64::c64_vic_sprite_multicolor_enable(/* value */) { POKE(0xd01c); return 0; }
-int C64::c64_vic_sprite_expandx(/* value */) { POKE(0xd01d); return 0; }
-int C64::c64_vic_sprite_collision() { PEEK(0xd01e); return 0; }
-int C64::c64_vic_data_collision() { PEEK(0xd01f); return 0; }
+int C64::c64_vic_spriteEnable(/* value */) { POKE(0xd015); return 0; }
+int C64::c64_vic_writeControl2(/* value */) { POKE(0xd016); return 0; }
+int C64::c64_vic_readControl2() { PEEK(0xd016); return 0; }
+int C64::c64_vic_spriteExpandY(/* value */) { POKE(0xd017); return 0; }
+int C64::c64_vic_writePointer(/* value */) { POKE(0xd018); return 0; }
+int C64::c64_vic_readPointer() { PEEK(0xd018); return 0; }
+int C64::c64_vic_writeInterruptStatus(/* value */) { POKE(0xd019); return 0; }
+int C64::c64_vic_readInterruptStatus() { PEEK(0xd019); return 0; }
+int C64::c64_vic_interruptControl(/* value */) { POKE(0xd01a); return 0; }
+int C64::c64_vic_spritePriority(/* value */) { POKE(0xd01b); return 0; }
+int C64::c64_vic_spriteMulticolorEnable(/* value */) { POKE(0xd01c); return 0; }
+int C64::c64_vic_spriteExpandX(/* value */) { POKE(0xd01d); return 0; }
+int C64::c64_vic_spriteCollision() { PEEK(0xd01e); return 0; }
+int C64::c64_vic_dataCollision() { PEEK(0xd01f); return 0; }
 int C64::c64_vic_border(/* value */) { POKE(0xd020); return 0; }
 int C64::c64_vic_background(/* value */) { POKE(0xd021); return 0; }
-int C64::c64_vic_multi1(/* value */) { POKE(0xd022); return 0; }
-int C64::c64_vic_multi2(/* value */) { POKE(0xd023); return 0; }
-int C64::c64_vic_multi3(/* value */) { POKE(0xd024); return 0; }
-int C64::c64_vic_sprite_multicolor0(/* value */) { POKE(0xd025); return 0; }
-int C64::c64_vic_sprite_multicolor1(/* value */) { POKE(0xd026); return 0; }
+int C64::c64_vic_multicolor1(/* value */) { POKE(0xd022); return 0; }
+int C64::c64_vic_multicolor2(/* value */) { POKE(0xd023); return 0; }
+int C64::c64_vic_multicolor3(/* value */) { POKE(0xd024); return 0; }
+int C64::c64_vic_spriteMulticolor0(/* value */) { POKE(0xd025); return 0; }
+int C64::c64_vic_spriteMulticolor1(/* value */) { POKE(0xd026); return 0; }
 int C64::c64_vic_sprite0color(/* value */) { POKE(0xd027); return 0; }
 int C64::c64_vic_sprite1color(/* value */) { POKE(0xd028); return 0; }
 int C64::c64_vic_sprite2color(/* value */) { POKE(0xd029); return 0; }
@@ -552,14 +543,14 @@ int C64::c64_vic_sprite5color(/* value */) { POKE(0xd02c); return 0; }
 int C64::c64_vic_sprite6color(/* value */) { POKE(0xd02d); return 0; }
 int C64::c64_vic_sprite7color(/* value */) { POKE(0xd02e); return 0; }
 
-int C64::c64_vic_hires_enable()
+int C64::c64_vic_hiresEnable()
 {
   need_c64_vic_hires_enable = 1;
   fprintf(out, "  jsr hires_enable\n");
   return 0;
 }
 
-int C64::c64_vic_hires_clear(/* value */)
+int C64::c64_vic_hiresClear(/* value */)
 {
   need_c64_vic_hires_clear = 1;
   fprintf(out, "  jsr hires_clear\n");
@@ -567,7 +558,7 @@ int C64::c64_vic_hires_clear(/* value */)
   return 0;
 }
 
-int C64::c64_vic_hires_plot(/* x, y, value */)
+int C64::c64_vic_hiresPlot(/* x, y, value */)
 {
   need_c64_vic_hires_plot = 1;
   fprintf(out, "  jsr hires_plot\n");
@@ -575,21 +566,21 @@ int C64::c64_vic_hires_plot(/* x, y, value */)
   return 0;
 }
 
-int C64::c64_vic_make_hires_tables()
+int C64::c64_vic_makeHiresTables()
 {
   need_c64_vic_make_hires_tables = 1;
   fprintf(out, "  jsr make_hires_tables\n");
   return 0;
 }
 
-int C64::c64_vic_text_enable()
+int C64::c64_vic_textEnable()
 {
   need_c64_vic_text_enable = 1;
   fprintf(out, "  jsr text_enable\n");
   return 0;
 }
 
-int C64::c64_vic_text_clear(/* value */)
+int C64::c64_vic_textClear(/* value */)
 {
   need_c64_vic_text_clear = 1;
   fprintf(out, "  jsr text_clear\n");
@@ -597,14 +588,14 @@ int C64::c64_vic_text_clear(/* value */)
   return 0;
 }
 
-int C64::c64_vic_text_copy()
+int C64::c64_vic_textCopy()
 {
   need_c64_vic_text_copy = 1;
   fprintf(out, "  jsr text_copy\n");
   return 0;
 }
 
-int C64::c64_vic_text_plot(/* x, y, value, color */)
+int C64::c64_vic_textPlot(/* x, y, value, color */)
 {
   need_c64_vic_text_plot = 1;
   fprintf(out, "  jsr text_plot\n");
@@ -612,7 +603,7 @@ int C64::c64_vic_text_plot(/* x, y, value, color */)
   return 0;
 }
 
-int C64::c64_vic_text_read(/* x, y */)
+int C64::c64_vic_textRead(/* x, y */)
 {
   need_c64_vic_text_read = 1;
   fprintf(out, "  jsr text_read\n");
@@ -620,35 +611,35 @@ int C64::c64_vic_text_read(/* x, y */)
   return 0;
 }
 
-int C64::c64_vic_make_text_table()
+int C64::c64_vic_makeTextTable()
 {
   need_c64_vic_make_text_table = 1;
   fprintf(out, "  jsr make_text_table\n");
   return 0;
 }
 
-int C64::c64_vic_make_color_table()
+int C64::c64_vic_makeColorTable()
 {
   need_c64_vic_make_color_table = 1;
   fprintf(out, "  jsr make_color_table\n");
   return 0;
 }
 
-int C64::c64_vic_color_ram_clear(/* value */)
+int C64::c64_vic_colorRamClear(/* value */)
 {
   need_c64_vic_color_ram_clear = 1;
   fprintf(out, "  jsr color_ram_clear\n");
   return 0;
 }
 
-int C64::c64_vic_copy_uppercase()
+int C64::c64_vic_copyUppercase()
 {
   need_c64_vic_copy_uppercase = 1;
   fprintf(out, "  jsr copy_uppercase\n");
   return 0;
 }
 
-int C64::c64_vic_copy_lowercase()
+int C64::c64_vic_copyLowercase()
 {
   need_c64_vic_copy_lowercase = 1;
   fprintf(out, "  jsr copy_lowercase\n");
@@ -943,6 +934,21 @@ int C64::keyboard_currentKeyPressed()
   need_c64_keyboard = true;
 
   fprintf(out, "  jsr keyboard_current_key_pressed\n");
+
+  return 0;
+}
+
+int C64::grinder_largeJavaStack()
+{
+  fprintf(out, "; grinder_largeJavaStack\n");
+  fprintf(out, ".set stack_lo=0x200\n");
+  fprintf(out, ".set stack_hi=0x300\n");
+  fprintf(out, "  ldx #0xff\n");
+  fprintf(out, "  stx locals\n");
+  fprintf(out, "  txa\n");
+  fprintf(out, "  sec\n");
+  fprintf(out, "  sbc #0x01\n");
+  fprintf(out, "  tax\n");
 
   return 0;
 }
@@ -1446,6 +1452,7 @@ void C64::insert_c64_vic_copy_lowercase()
   fprintf(out, "  rts\n");
 }
 
+// shift key status is returned in the high byte
 void C64::insert_c64_keyboard()
 {
   fprintf(out, "keyboard_current_key_pressed:\n");

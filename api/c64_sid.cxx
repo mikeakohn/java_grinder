@@ -22,74 +22,74 @@
     return c64_sid_##funct(java_class, generator); \
   }
 
-static int c64_sid_voice1_frequency(JavaClass *java_class, Generator *generator)
+static int c64_sid_frequency1(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_sid_voice1_frequency();
+  return generator->c64_sid_frequency1();
 }
 
-static int c64_sid_voice1_pulse_width(JavaClass *java_class, Generator *generator)
+static int c64_sid_pulseWidth1(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_sid_voice1_pulse_width();
+  return generator->c64_sid_pulseWidth1();
 }
 
-static int c64_sid_voice1_waveform(JavaClass *java_class, Generator *generator)
+static int c64_sid_waveform1(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_sid_voice1_waveform();
+  return generator->c64_sid_waveform1();
 }
 
-static int c64_sid_voice1_adsr(JavaClass *java_class, Generator *generator)
+static int c64_sid_adsr1(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_sid_voice1_adsr();
+  return generator->c64_sid_adsr1();
 }
 
-static int c64_sid_voice2_frequency(JavaClass *java_class, Generator *generator)
+static int c64_sid_frequency2(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_sid_voice2_frequency();
+  return generator->c64_sid_frequency2();
 }
 
-static int c64_sid_voice2_pulse_width(JavaClass *java_class, Generator *generator)
+static int c64_sid_pulseWidth2(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_sid_voice2_pulse_width();
+  return generator->c64_sid_pulseWidth2();
 }
 
-static int c64_sid_voice2_waveform(JavaClass *java_class, Generator *generator)
+static int c64_sid_waveform2(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_sid_voice2_waveform();
+  return generator->c64_sid_waveform2();
 }
 
-static int c64_sid_voice2_adsr(JavaClass *java_class, Generator *generator)
+static int c64_sid_adsr2(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_sid_voice2_adsr();
+  return generator->c64_sid_adsr2();
 }
 
-static int c64_sid_voice3_frequency(JavaClass *java_class, Generator *generator)
+static int c64_sid_frequency3(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_sid_voice3_frequency();
+  return generator->c64_sid_frequency3();
 }
 
-static int c64_sid_voice3_pulse_width(JavaClass *java_class, Generator *generator)
+static int c64_sid_pulseWidth3(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_sid_voice3_pulse_width();
+  return generator->c64_sid_pulseWidth3();
 }
 
-static int c64_sid_voice3_waveform(JavaClass *java_class, Generator *generator)
+static int c64_sid_waveform3(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_sid_voice3_waveform();
+  return generator->c64_sid_waveform3();
 }
 
-static int c64_sid_voice3_adsr(JavaClass *java_class, Generator *generator)
+static int c64_sid_adsr3(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_sid_voice3_adsr();
+  return generator->c64_sid_adsr3();
 }
 
-static int c64_sid_filter_cutoff(JavaClass *java_class, Generator *generator)
+static int c64_sid_filterCutoff(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_sid_filter_cutoff();
+  return generator->c64_sid_filterCutoff();
 }
 
-static int c64_sid_filter_resonance(JavaClass *java_class, Generator *generator)
+static int c64_sid_filterResonance(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_sid_filter_resonance();
+  return generator->c64_sid_filterResonance();
 }
 
 static int c64_sid_volume(JavaClass *java_class, Generator *generator)
@@ -97,14 +97,14 @@ static int c64_sid_volume(JavaClass *java_class, Generator *generator)
   return generator->c64_sid_volume();
 }
 
-static int c64_sid_voice3_oscillator(JavaClass *java_class, Generator *generator)
+static int c64_sid_oscillator3(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_sid_voice3_oscillator();
+  return generator->c64_sid_oscillator3();
 }
 
-static int c64_sid_voice3_envelope(JavaClass *java_class, Generator *generator)
+static int c64_sid_envelope3(JavaClass *java_class, Generator *generator)
 {
-  return generator->c64_sid_voice3_envelope();
+  return generator->c64_sid_envelope3();
 }
 
 static int c64_sid_clear(JavaClass *java_class, Generator *generator)
@@ -114,27 +114,25 @@ static int c64_sid_clear(JavaClass *java_class, Generator *generator)
 
 int c64_sid(JavaClass *java_class, Generator *generator, const char *function)
 {
-  CHECK_FUNC(voice1_frequency)
-  CHECK_FUNC(voice1_pulse_width)
-  CHECK_FUNC(voice1_waveform)
-  CHECK_FUNC(voice1_adsr)
-  CHECK_FUNC(voice2_frequency)
-  CHECK_FUNC(voice2_pulse_width)
-  CHECK_FUNC(voice2_waveform)
-  CHECK_FUNC(voice2_adsr)
-  CHECK_FUNC(voice3_frequency)
-  CHECK_FUNC(voice3_pulse_width)
-  CHECK_FUNC(voice3_waveform)
-  CHECK_FUNC(voice3_adsr)
-  CHECK_FUNC(filter_cutoff)
-  CHECK_FUNC(filter_resonance)
+  CHECK_FUNC(frequency1)
+  CHECK_FUNC(pulseWidth1)
+  CHECK_FUNC(waveform1)
+  CHECK_FUNC(adsr1)
+  CHECK_FUNC(frequency2)
+  CHECK_FUNC(pulseWidth2)
+  CHECK_FUNC(waveform2)
+  CHECK_FUNC(adsr2)
+  CHECK_FUNC(frequency3)
+  CHECK_FUNC(pulseWidth3)
+  CHECK_FUNC(waveform3)
+  CHECK_FUNC(adsr3)
+  CHECK_FUNC(filterCutoff)
+  CHECK_FUNC(filterResonance)
   CHECK_FUNC(volume)
-  CHECK_FUNC(voice3_oscillator)
-  CHECK_FUNC(voice3_envelope)
+  CHECK_FUNC(oscillator3)
+  CHECK_FUNC(envelope3)
   CHECK_FUNC(clear)
 
   return -1;
 }
-
-
 
