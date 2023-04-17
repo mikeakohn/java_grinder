@@ -26,5 +26,5 @@ disk:
 	javac -classpath ../../build/JavaGrinder.jar:. $*.java
 
 clean:
-	@rm -f *.class *.hex *.asm *.lst
+	@rm -f *.class *.prg *.asm *.lst
 

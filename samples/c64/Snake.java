@@ -1,5 +1,9 @@
+// C64 demo game for java_grinder.
+
 import net.mikekohn.java_grinder.CPU;
+import net.mikekohn.java_grinder.Grinder;
 import net.mikekohn.java_grinder.Joystick;
+import net.mikekohn.java_grinder.Keyboard;
 import net.mikekohn.java_grinder.Memory;
 import net.mikekohn.java_grinder.Math;
 import net.mikekohn.java_grinder.Timer;
@@ -40,7 +44,7 @@ public class Snake implements TimerListener
   };
 
   // these correspond to piano keys
-  static String keys = "q2w3er5t6y7ui9o0Joystick[";
+  static String keys = "q2w3er5t6y7ui9o0p[";
 
   // music, spaces rest
   static String title_song1 =
@@ -230,12 +234,12 @@ public class Snake implements TimerListener
     int x, y;
 
     for(x = 0; x < 40; x++)
-      VIC.text_plot(x, 0, 32, 0);
+      VIC.textPlot(x, 0, 32, 0);
 
     for(y = 24; y > 0; y--)
     {
       for(x = 0; x < 40; x++)
-        VIC.text_plot(x, y, VIC.text_read(x, y - 1), 5);
+        VIC.textPlot(x, y, VIC.textRead(x, y - 1), 5);
     }
 
     for(y = 0; y < 16; y++)
@@ -243,20 +247,20 @@ public class Snake implements TimerListener
       int tx = rnd() % 40;
       int ty = rnd() % 17 + 1;
 
-      VIC.text_plot(tx, ty, 35, 1);
+      VIC.textPlot(tx, ty, 35, 1);
       wait(100);
 
       for(x = 0; x < 12; x++)
       {
-        SID.voice1_adsr(0x8888);
-        SID.voice1_frequency(x << 9);
-        SID.voice1_waveform(33);
-        VIC.text_plot(tx, ty, 35 - (x >> 2), 1);
+        SID.adsr1(0x8888);
+        SID.frequency1(x << 9);
+        SID.waveform1(33);
+        VIC.textPlot(tx, ty, 35 - (x >> 2), 1);
         wait(100);
-        SID.voice1_waveform(32);
+        SID.waveform1(32);
       }
 
-      VIC.text_plot(tx, ty, 35, 5);
+      VIC.textPlot(tx, ty, 35, 5);
     }
 
     wait(1000);
@@ -289,14 +293,14 @@ public class Snake implements TimerListener
       else if(temp >= 96)
         temp -= 96;
 
-      VIC.text_plot(x + i, y, temp, color);
+      VIC.textPlot(x + i, y, temp, color);
     }
   }
 
   public static void printScore()
   {
     for (int i = 0; i < 8; i++)
-      VIC.text_plot(16 + i, 0, score[i] + 48, 3);
+      VIC.textPlot(16 + i, 0, score[i] + 48, 3);
   }
 
   public static void resetScore()
@@ -362,17 +366,17 @@ public class Snake implements TimerListener
     {
       // start attack/decay
       //                srad 
-      SID.voice3_adsr(0x6333);
-      SID.voice3_waveform(33);
+      SID.adsr3(0x6333);
+      SID.waveform3(33);
     }
 
-    SID.voice3_frequency(2000 - (spider_move_timer << 8));
+    SID.frequency3(2000 - (spider_move_timer << 8));
     spider_move_timer++;
 
     if(spider_move_timer > 4)
     {
       // start decay/release
-      SID.voice3_waveform(32);
+      SID.waveform3(32);
 
       if(spider_move_timer > 6)
         spider_move_timer = -1;
@@ -385,19 +389,19 @@ public class Snake implements TimerListener
     {
       // start attack/decay
       //                srad 
-      SID.voice3_adsr(0x8555);
-      SID.voice3_waveform(65);
+      SID.adsr3(0x8555);
+      SID.waveform3(65);
     }
 
-    SID.voice3_frequency(4000 - (spider_move_timer << 8));
-    SID.voice3_pulse_width(0x800 + (spider_move_timer << 4));
+    SID.frequency3(4000 - (spider_move_timer << 8));
+    SID.pulseWidth3(0x800 + (spider_move_timer << 4));
     spider_move_timer++;
 
     if(spider_move_timer > 2)
     {
       // start decay/release
-      SID.voice3_waveform(64);
-      SID.voice3_pulse_width(0x800);
+      SID.waveform3(64);
+      SID.pulseWidth3(0x800);
 
       if(spider_move_timer > 4)
         spider_move_timer = -1;
@@ -414,13 +418,13 @@ public class Snake implements TimerListener
     if(spider_exp_timer == 0)
     {
       spider_move_timer = -1;
-      SID.voice3_waveform(32);
+      SID.waveform3(32);
 
       // start attack/decay
       //                srad 
-      SID.voice3_adsr(0xf900);
-      SID.voice3_frequency(1000);
-      SID.voice3_waveform(129);
+      SID.adsr3(0xf900);
+      SID.frequency3(1000);
+      SID.waveform3(129);
     }
 
     VIC.sprite4color((byte)(spider_exp_colors[(spider_exp_timer >> 2) & 3]));
@@ -429,7 +433,7 @@ public class Snake implements TimerListener
     if(spider_exp_timer > 13)
     {
       // start decay/release
-      SID.voice3_waveform(128);
+      SID.waveform3(128);
       VIC.sprite4pos(0, 0);
 
       spider_timer = rnd() % 400 + 1;
@@ -453,9 +457,9 @@ public class Snake implements TimerListener
     {
       // start attack/decay
       //                srad 
-      SID.voice3_adsr(0x8d00);
-      SID.voice3_frequency(2000);
-      SID.voice3_waveform(129);
+      SID.adsr3(0x8d00);
+      SID.frequency3(2000);
+      SID.waveform3(129);
     }
 
     ship_exp_timer++;
@@ -463,7 +467,7 @@ public class Snake implements TimerListener
     if(ship_exp_timer > 13)
     {
       // start decay/release
-      SID.voice3_waveform(128);
+      SID.waveform3(128);
       ship_exp_timer = -1;
       VIC.sprite0color(0);
     }
@@ -478,9 +482,9 @@ public class Snake implements TimerListener
     {
       // start attack/decay
       //                srad 
-      SID.voice3_adsr(0xe400);
-      SID.voice3_frequency(2000);
-      SID.voice3_waveform(33);
+      SID.adsr3(0xe400);
+      SID.frequency3(2000);
+      SID.waveform3(33);
     }
 
     snake_exp_timer++;
@@ -488,7 +492,7 @@ public class Snake implements TimerListener
     if(snake_exp_timer > 1)
     {
       // start decay/release
-      SID.voice3_waveform(32);
+      SID.waveform3(32);
       snake_exp_timer = -1;
     }
   }
@@ -501,42 +505,42 @@ public class Snake implements TimerListener
 
     if(c != 0)
     {
-      SID.voice1_adsr(0xa91a);
-      SID.voice1_frequency(getFreq(title_song1.charAt(music_pos)));
-      SID.voice1_pulse_width(1536 + pulse1);
-      SID.voice1_waveform(33);
+      SID.adsr1(0xa91a);
+      SID.frequency1(getFreq(title_song1.charAt(music_pos)));
+      SID.pulseWidth1(1536 + pulse1);
+      SID.waveform1(33);
     }
     else
     {
-      SID.voice1_waveform(32);
+      SID.waveform1(32);
     }
 
     c = getFreq(title_song2.charAt(music_pos));
 
     if(c != 0)
     {
-      SID.voice2_adsr(0xa91a);
-      SID.voice2_frequency(getFreq(title_song2.charAt(music_pos)) << 1);
-      SID.voice2_pulse_width(1536 + pulse2);
-      SID.voice2_waveform(65);
+      SID.adsr2(0xa91a);
+      SID.frequency2(getFreq(title_song2.charAt(music_pos)) << 1);
+      SID.pulseWidth2(1536 + pulse2);
+      SID.waveform2(65);
     }
     else
     {
-      SID.voice2_waveform(64);
+      SID.waveform2(64);
     }
 
     c = getFreq(title_song3.charAt(music_pos));
 
     if(c != 0)
     {
-      SID.voice3_adsr(0xa91a);
-      SID.voice3_frequency(getFreq(title_song3.charAt(music_pos)) << 2);
-      SID.voice3_pulse_width(1536 + pulse3);
-      SID.voice3_waveform(65);
+      SID.adsr3(0xa91a);
+      SID.frequency3(getFreq(title_song3.charAt(music_pos)) << 2);
+      SID.pulseWidth3(1536 + pulse3);
+      SID.waveform3(65);
     }
     else
     {
-      SID.voice1_waveform(64);
+      SID.waveform3(64);
     }
 
     music_pos++;
@@ -560,17 +564,17 @@ public class Snake implements TimerListener
 
     if(c > 0)
     {
-      SID.voice1_adsr(0xa914);
-      SID.voice1_frequency(getFreq(end_song1.charAt(music_pos)));
-      SID.voice1_waveform(65);
-      SID.voice2_adsr(0xa914);
-      SID.voice2_frequency(getFreq(end_song2.charAt(music_pos)) << 1);
-      SID.voice2_waveform(65);
+      SID.adsr1(0xa914);
+      SID.frequency1(getFreq(end_song1.charAt(music_pos)));
+      SID.waveform1(65);
+      SID.adsr2(0xa914);
+      SID.frequency2(getFreq(end_song2.charAt(music_pos)) << 1);
+      SID.waveform2(65);
     }
     else
     {
-      SID.voice1_waveform(64);
-      SID.voice2_waveform(64);
+      SID.waveform1(64);
+      SID.waveform2(64);
     }
 
     music_pos++;
@@ -583,7 +587,7 @@ public class Snake implements TimerListener
   {
     int c = 0;
 
-    SID.voice3_adsr(0x0000);
+    SID.adsr3(0x0000);
     pulse1 = 0x800;
     pulse2 = 0x600;
     music_pos = 0;
@@ -594,25 +598,25 @@ public class Snake implements TimerListener
 
       if(c > 0)
       {
-        SID.voice1_adsr(0xa949);
-        SID.voice1_frequency(getFreq(next_level_song1.charAt(music_pos)));
-        SID.voice1_waveform(65);
-        SID.voice2_adsr(0xa949);
-        SID.voice2_frequency(getFreq(next_level_song2.charAt(music_pos)) << 1);
-        SID.voice2_waveform(65);
+        SID.adsr1(0xa949);
+        SID.frequency1(getFreq(next_level_song1.charAt(music_pos)));
+        SID.waveform1(65);
+        SID.adsr2(0xa949);
+        SID.frequency2(getFreq(next_level_song2.charAt(music_pos)) << 1);
+        SID.waveform2(65);
       }
       else
       {
-        SID.voice1_waveform(64);
-        SID.voice2_waveform(64);
+        SID.waveform1(64);
+        SID.waveform2(64);
       }
 
       music_pos++;
 
       if(music_pos >= next_level_song1.length())
       {
-        SID.voice1_waveform(64);
-        SID.voice2_waveform(64);
+        SID.waveform1(64);
+        SID.waveform2(64);
         break;
       }
 
@@ -626,23 +630,23 @@ public class Snake implements TimerListener
   {
     int colors[] = { 10, 7, 13, 14, 4, 14, 13, 7 };
 
-    VIC.text_clear(32);
-    VIC.sprite_enable(16);
-    VIC.sprite_priority(0);
-    VIC.sprite_multicolor_enable(255);
-    VIC.sprite_multicolor0(1);
-    VIC.sprite_multicolor1(12);
+    VIC.textClear(32);
+    VIC.spriteEnable(16);
+    VIC.spritePriority(0);
+    VIC.spriteMulticolorEnable(255);
+    VIC.spriteMulticolor0(1);
+    VIC.spriteMulticolor1(12);
     VIC.sprite4pos(24 + 160 - 24, 50 + 124);
-    VIC.sprite_expandx(16);
-    VIC.sprite_expandy(16);
+    VIC.spriteExpandX(16);
+    VIC.spriteExpandY(16);
 
     printString(9, 9, 12, "Made with Java_Grinder");
     printString(13, 13, 4, "Kill the Spider");
     printString(13, 23, 14, "Joystick Port 2");
 
     //                srad 
-    SID.filter_cutoff(1500);
-    SID.filter_resonance(0x7c);
+    SID.filterCutoff(1500);
+    SID.filterResonance(0x7c);
     SID.volume(31);
 
     pulse1 = 0x800;
@@ -652,7 +656,7 @@ public class Snake implements TimerListener
 
     VIC.border(11);
     VIC.background(0);
-    VIC.write_control2(VIC.read_control2() & 239);
+    VIC.writeControl2(VIC.readControl2() & 239);
 
     while(true)
     {
@@ -683,13 +687,13 @@ public class Snake implements TimerListener
         Memory.write8(sprite_pointer2 + 4, (byte)195);
       }
 
-      VIC.sprite_multicolor0(colors[(time + 1) & 7]);
+      VIC.spriteMulticolor0(colors[(time + 1) & 7]);
     }
 
-    VIC.sprite_enable(0);
+    VIC.spriteEnable(0);
     VIC.sprite4pos(0, 0);
-    VIC.sprite_expandx(0);
-    VIC.sprite_expandy(0);
+    VIC.spriteExpandX(0);
+    VIC.spriteExpandY(0);
     SID.volume(0);
   }
 
@@ -701,7 +705,7 @@ public class Snake implements TimerListener
     int colors1[] = { 7, 10, 8, 2, 9, 2, 8, 10 }; 
     int colors2[] = { 13, 3, 14, 4, 6, 4, 14, 3 };
 
-    SID.filter_resonance(0);
+    SID.filterResonance(0);
     SID.volume(15);
 
     ship_exp_timer = 0;
@@ -723,9 +727,8 @@ public class Snake implements TimerListener
 
     VIC.border(2);
     wait(1000);
-    VIC.write_control2(VIC.read_control2() & 239);
-
-    VIC.sprite_enable(0);
+    VIC.writeControl2(VIC.readControl2() & 239);
+    VIC.spriteEnable(0);
     VIC.sprite0pos(0, 0);
     VIC.sprite1pos(0, 0);
     VIC.sprite2pos(0, 0);
@@ -800,41 +803,41 @@ public class Snake implements TimerListener
     snake_exp_timer = -1;
 
     // setup graphics
-    VIC.sprite_enable(31);
-    VIC.sprite_priority(0);
-    VIC.sprite_multicolor_enable(48);
-    VIC.sprite_multicolor0(1);
-    VIC.sprite_multicolor1(12);
+    VIC.spriteEnable(31);
+    VIC.spritePriority(0);
+    VIC.spriteMulticolorEnable(48);
+    VIC.spriteMulticolor0(1);
+    VIC.spriteMulticolor1(12);
     VIC.sprite0color(1);
     VIC.sprite1color(7);
     VIC.sprite4color(4);
     VIC.sprite5color(3);
     VIC.border(11);
     VIC.background(0);
-    VIC.multi1((byte)1);
-    VIC.multi2((byte)7);
-    VIC.write_control2(VIC.read_control2() | 16);
+    VIC.multicolor1((byte)1);
+    VIC.multicolor2((byte)7);
+    VIC.writeControl2(VIC.readControl2() | 16);
 
     // setup sound
     pulse1 = 0x800;
     pulse2 = 0x800;
     pulse3 = 0x800;
-    SID.voice1_adsr(0xf411);
-    SID.voice2_adsr(0xf411);
-    SID.voice3_adsr(0xf411);
-    SID.voice1_waveform(128);
-    SID.voice2_waveform(128);
-    SID.voice3_waveform(128);
-    SID.filter_cutoff(0);
-    SID.filter_resonance(0);
+    SID.adsr1(0xf411);
+    SID.adsr2(0xf411);
+    SID.adsr3(0xf411);
+    SID.waveform1(128);
+    SID.waveform2(128);
+    SID.waveform3(128);
+    SID.filterCutoff(0);
+    SID.filterResonance(0);
     SID.volume(15);
 
     // init mushrooms
-    VIC.text_clear((byte)32);
+    VIC.textClear((byte)32);
 
     for(i = 0; i < 50; i++)
     {
-      VIC.text_plot(rnd() % 40, rnd() % 17 + 1, 35, 5);
+      VIC.textPlot(rnd() % 40, rnd() % 17 + 1, 35, 5);
       wait(200);
     }
 
@@ -890,7 +893,7 @@ public class Snake implements TimerListener
       tx = shipx + accelx;
       ty = shipy + accely;
 
-      temp = VIC.text_read((tx - 20) >> 3, (ty - 46) >> 3);
+      temp = VIC.textRead((tx - 20) >> 3, (ty - 46) >> 3);
 
       if(temp == 32)
       {
@@ -981,13 +984,13 @@ public class Snake implements TimerListener
 
       if(shotstatus == 1)
       {
-        SID.voice1_adsr(0x8411);
-        SID.voice1_frequency(shotfreq);
-        SID.voice1_waveform(129);
+        SID.adsr1(0x8411);
+        SID.frequency1(shotfreq);
+        SID.waveform1(129);
       }
       else
       {
-        SID.voice1_waveform(128);
+        SID.waveform1(128);
       }
 
       // check shot
@@ -1016,7 +1019,7 @@ public class Snake implements TimerListener
 
         tx = ((shotx - 20) >> 3);
         ty = ((shoty - 50) >> 3);
-        temp = VIC.text_read(tx, ty);
+        temp = VIC.textRead(tx, ty);
 
         if(temp >= 33 && temp <= 35)
         {
@@ -1026,7 +1029,7 @@ public class Snake implements TimerListener
           if(temp < 32)
             temp = 32;
 
-          VIC.text_plot(tx, ty, temp, 5);
+          VIC.textPlot(tx, ty, temp, 5);
           shotstatus = 0;
           shotx = 0;
           increaseScore(ten);
@@ -1045,7 +1048,7 @@ public class Snake implements TimerListener
               snake_exp_timer = 0;
               shotstatus = 0;
               shotx = 0;
-              VIC.text_plot(sx, sy, 35, 5);
+              VIC.textPlot(sx, sy, 35, 5);
               snakestatus[i] = 0;
               snake_count--;
               increaseScore(hundred);
@@ -1076,7 +1079,7 @@ public class Snake implements TimerListener
                 // clear snake
                 for(i = 0; i < 16; i++)
                   if(snakestatus[i] == 1)
-                    VIC.text_plot(snakex[i], snakey[i], 32, 5);
+                    VIC.textPlot(snakex[i], snakey[i], 32, 5);
 
                 // play music
                 VIC.sprite1pos(0, 0);
@@ -1086,7 +1089,7 @@ public class Snake implements TimerListener
                 addMushrooms();
 
                 // clear character under ship
-                VIC.text_plot((shipx - 20) >> 3, (shipy - 46) >> 3, 32, 5);
+                VIC.textPlot((shipx - 20) >> 3, (shipy - 46) >> 3, 32, 5);
               }
             }
           }
@@ -1098,7 +1101,7 @@ public class Snake implements TimerListener
       {
         for(i = 0; i < 16; i++)
           if(snakestatus[i] == 1)
-            VIC.text_plot(snakex[i], snakey[i], 32, 10);
+            VIC.textPlot(snakex[i], snakey[i], 32, 10);
 
         for(i = 0; i < 16; i++)
         {
@@ -1106,7 +1109,7 @@ public class Snake implements TimerListener
           int sx = snakex[i] + sdir;
           int sy = snakey[i];
 
-          if(sx < 0 || sx > 39 || VIC.text_read(sx, sy) != 32)
+          if(sx < 0 || sx > 39 || VIC.textRead(sx, sy) != 32)
           {
             sdir = -sdir;
             sx += sdir;
@@ -1125,7 +1128,7 @@ public class Snake implements TimerListener
             d += 2;
 
           if(snakestatus[i] == 1)
-            VIC.text_plot(sx, sy, d, 10);
+            VIC.textPlot(sx, sy, d, 10);
 
           snakex[i] = (byte)sx;
         }
@@ -1159,10 +1162,12 @@ public class Snake implements TimerListener
   {
     int i, temp;
 
+    // Grinder.largeJavaStack();
+
     // set up screen
-    VIC.make_text_table();
-    VIC.make_color_table();
-    VIC.copy_lowercase();
+    VIC.makeTextTable();
+    VIC.makeColorTable();
+    VIC.copyLowercase();
 
     // copy sprite data
     clearSprite(sprite_ram);

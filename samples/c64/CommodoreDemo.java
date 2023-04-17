@@ -1,3 +1,8 @@
+// Original C64 demo for java_grinder. This was written before there
+// was text support in the API.
+
+import net.mikekohn.java_grinder.CPU;
+import net.mikekohn.java_grinder.Grinder;
 import net.mikekohn.java_grinder.Memory;
 import net.mikekohn.java_grinder.c64.*;
 
@@ -369,13 +374,13 @@ public class CommodoreDemo
   public static void musak_init()
   {
     //                srad 
-    SID.voice1_adsr(0x0004);
-    SID.voice2_adsr(0x0009);
-    SID.voice3_adsr(0x0060);
+    SID.adsr1(0x0004);
+    SID.adsr2(0x0009);
+    SID.adsr3(0x0060);
 
-    SID.voice1_pulse_width(2048);
-    SID.voice2_pulse_width(2048);
-    SID.voice3_pulse_width(2048);
+    SID.pulseWidth1(2048);
+    SID.pulseWidth2(2048);
+    SID.pulseWidth3(2048);
   }
 
   public static void musak_play()
@@ -385,25 +390,25 @@ public class CommodoreDemo
     i = note[song1[song1pos]];
     if(i != -1)
     {
-      SID.voice1_frequency(note[song1[song1pos]]);
-      SID.voice1_waveform(128);
-      SID.voice1_waveform(129);
+      SID.frequency1(note[song1[song1pos]]);
+      SID.waveform1(128);
+      SID.waveform1(129);
     }
 
     i = note[song2[song2pos]];
     if(i != -1)
     {
-      SID.voice2_frequency(note[song2[song2pos]] << 1);
-      SID.voice2_waveform(64);
-      SID.voice2_waveform(65);
+      SID.frequency2(note[song2[song2pos]] << 1);
+      SID.waveform2(64);
+      SID.waveform2(65);
     }
 
     i = note[song3[song3pos]];
     if(i != -1)
     {
-      SID.voice3_frequency(note[song3[song3pos]] << 2);
-      SID.voice3_waveform(32);
-      SID.voice3_waveform(33);
+      SID.frequency3(note[song3[song3pos]] << 2);
+      SID.waveform3(32);
+      SID.waveform3(33);
     }
 
     song1pos++;
@@ -416,7 +421,7 @@ public class CommodoreDemo
     if(song3pos >= song3.length)
       song3pos = 0;
 
-    SID.voice2_pulse_width(pulse);
+    SID.pulseWidth2(pulse);
     pulse += 16;
   }
 
@@ -478,8 +483,8 @@ public class CommodoreDemo
     VIC.background(0);
     VIC.border(0);
 
-    VIC.text_clear(160);
-    VIC.color_ram_clear(0);
+    VIC.textClear(160);
+    VIC.colorRamClear(0);
 
     for(i = 0; i < text.length; i++)
     {
@@ -487,9 +492,9 @@ public class CommodoreDemo
       Memory.write8(screen_ram + 40 * 12 + 19 + i, (byte)text[i]);
     }
 
-    SID.voice1_adsr(0xF000);
-    SID.voice2_adsr(0xF000);
-    SID.voice3_adsr(0xF000);
+    SID.adsr1(0xF000);
+    SID.adsr2(0xF000);
+    SID.adsr3(0xF000);
 
     int loc1 = color_ram;
     int loc2 = color_ram + 960;
@@ -540,12 +545,12 @@ public class CommodoreDemo
 
         if((xx & 7) == 7)
         {
-          SID.voice1_frequency(note[re2 & 15]);
-          SID.voice1_waveform(32);
-          SID.voice1_waveform(33);
-          SID.voice2_frequency(note[im2 & 15]);
-          SID.voice2_waveform(32);
-          SID.voice2_waveform(33);
+          SID.frequency1(note[re2 & 15]);
+          SID.waveform1(32);
+          SID.waveform1(33);
+          SID.frequency2(note[im2 & 15]);
+          SID.waveform2(32);
+          SID.waveform2(33);
         }
 
         xx++;
@@ -553,9 +558,9 @@ public class CommodoreDemo
       yy++;
       loc1 += 40;
       loc2 -= 40;
-      SID.voice3_frequency(note[yy & 15]);
-      SID.voice3_waveform(16);
-      SID.voice3_waveform(17);
+      SID.frequency3(note[yy & 15]);
+      SID.waveform3(16);
+      SID.waveform3(17);
     }
 
     wait(10000);
@@ -591,7 +596,7 @@ public class CommodoreDemo
     int y6 = 115;
     int y7 = 125;
 
-    VIC.sprite_enable(255);
+    VIC.spriteEnable(255);
     Memory.write8(sprite_pointer + 0, (byte)16);
     Memory.write8(sprite_pointer + 1, (byte)16);
     Memory.write8(sprite_pointer + 2, (byte)16);
@@ -613,15 +618,15 @@ public class CommodoreDemo
     for(i = 0; i < 63; i++)
       Memory.write8(sprite_ram + i, (byte)sprite1[i]);
 
-    VIC.sprite_expandx(255);
-    VIC.sprite_expandy(255);
+    VIC.spriteExpandX(255);
+    VIC.spriteExpandY(255);
 
     for(i = 0; i < 512; i++)
     {
       if((i & 7) == 7)
         musak_play();
 
-      VIC.wait_raster(251);
+      VIC.waitRaster(251);
       VIC.sprite0pos(x0, y0 + balloon_height[(x0 >> 3) & 15]);
       VIC.sprite1pos(x1, y1 + balloon_height[(x1 >> 3) & 15]);
       VIC.sprite2pos(x2, y2 + balloon_height[(x2 >> 4) & 15]);
@@ -677,28 +682,32 @@ public class CommodoreDemo
       }
     }
 
-    VIC.sprite_enable(0);
+    VIC.spriteEnable(0);
     VIC.background(0);
 
     int vol = 15;
     for(i = 0; i < 19; i++)
     {
-      VIC.wait_raster(251);
+      VIC.waitRaster(251);
+
       Memory.write8(1904 + i, (byte)32);
       Memory.write8(1943 - i, (byte)32);
       Memory.write8(1944 + i, (byte)32);
       Memory.write8(1983 - i, (byte)32);
       Memory.write8(1984 + i, (byte)32);
       Memory.write8(2023 - i, (byte)32);
+
       vol--;
+
       if(vol < 0)
         vol = 0;
+
       SID.volume(vol);
     }
 
     for(i = 21; i >= 0; i--)
     {
-      VIC.wait_raster(251);
+      VIC.waitRaster(251);
       Memory.write8(color_row[i] + 19, (byte)5);
       Memory.write8(color_row[i] + 20, (byte)5);
       Memory.write8(screen_row[i] + 19, (byte)160);
@@ -727,21 +736,21 @@ public class CommodoreDemo
     wait(5000);
 
     //                srad 
-    SID.voice1_adsr(0xf000);
-    SID.voice2_adsr(0xf000);
-    SID.voice3_adsr(0xf000);
-    SID.voice1_frequency(1024);
-    SID.voice2_frequency(2048);
-    SID.voice3_frequency(4096);
-    SID.voice1_pulse_width(1024);
-    SID.voice2_pulse_width(1024);
-    SID.voice3_pulse_width(1024);
-    SID.voice1_waveform(64);
-    SID.voice1_waveform(65);
-    SID.voice2_waveform(64);
-    SID.voice2_waveform(65);
-    SID.voice3_waveform(64);
-    SID.voice3_waveform(65);
+    SID.adsr1(0xf000);
+    SID.adsr2(0xf000);
+    SID.adsr3(0xf000);
+    SID.frequency1(1024);
+    SID.frequency2(2048);
+    SID.frequency3(4096);
+    SID.pulseWidth1(1024);
+    SID.pulseWidth2(1024);
+    SID.pulseWidth3(1024);
+    SID.waveform1(64);
+    SID.waveform1(65);
+    SID.waveform2(64);
+    SID.waveform2(65);
+    SID.waveform3(64);
+    SID.waveform3(65);
     SID.volume(15);
 
     for(i = 0; i < 63; i++)
@@ -750,7 +759,7 @@ public class CommodoreDemo
     VIC.sprite0pos(32, 58);
 
     VIC.sprite0color(5);
-    VIC.sprite_enable(1);
+    VIC.spriteEnable(1);
     wait(500);
     VIC.sprite0color(12);
     wait(500);
@@ -779,9 +788,9 @@ public class CommodoreDemo
       pulse1 += 16;
       pulse2 += 16;
       pulse3 += 16;
-      SID.voice1_pulse_width(pulse1);
-      SID.voice2_pulse_width(pulse2);
-      SID.voice3_pulse_width(pulse3);
+      SID.pulseWidth1(pulse1);
+      SID.pulseWidth2(pulse2);
+      SID.pulseWidth3(pulse3);
     }
 
     wait(5000);
@@ -793,9 +802,9 @@ public class CommodoreDemo
       pulse1 -= 16;
       pulse2 -= 16;
       pulse3 -= 16;
-      SID.voice1_pulse_width(pulse1);
-      SID.voice2_pulse_width(pulse2);
-      SID.voice3_pulse_width(pulse3);
+      SID.pulseWidth1(pulse1);
+      SID.pulseWidth2(pulse2);
+      SID.pulseWidth3(pulse3);
     }
 
     wait(4000);
@@ -821,7 +830,7 @@ public class CommodoreDemo
 
     wait(10000);
 
-    VIC.sprite_enable(0);
+    VIC.spriteEnable(0);
 
     for(i = 38; i >= 8; i--)
     {
@@ -858,7 +867,7 @@ public class CommodoreDemo
     for(i = screen_ram + 960; i < screen_ram + 1000; i++)
       Memory.write8(i, (byte)34);
 
-    VIC.hires_clear(0);
+    VIC.hiresClear(0);
 
     for(i = 0; i < java_logo.length; i++)
       Memory.write8(hires_ram + 320 + i, (byte)java_logo[i]);
@@ -869,9 +878,9 @@ public class CommodoreDemo
       Memory.write8(hires_ram + 7080 + 320 + i, (byte)java_redlogo[i + 240]);
     }
 
-    VIC.sprite_enable(15);
-    VIC.sprite_expandx(15);
-    VIC.sprite_expandy(15);
+    VIC.spriteEnable(15);
+    VIC.spriteExpandX(15);
+    VIC.spriteExpandY(15);
     VIC.sprite0color(10);
     VIC.sprite1color(10);
     VIC.sprite2color(14);
@@ -890,18 +899,18 @@ public class CommodoreDemo
     VIC.sprite2pos(136, 112 + 42);
     VIC.sprite3pos(136 + 48, 112 + 42);
 
-    VIC.hires_enable();
+    VIC.hiresEnable();
 
     wait(20000);
 
     VIC.background(0);
 
-    VIC.text_clear(160);
-    VIC.color_ram_clear(1);
+    VIC.textClear(160);
+    VIC.colorRamClear(1);
 
-    VIC.sprite_enable(0);
+    VIC.spriteEnable(0);
 
-    VIC.text_enable();
+    VIC.textEnable();
   }
 
   public static void yin_yang()
@@ -909,11 +918,11 @@ public class CommodoreDemo
     VIC.background(5);
     VIC.border(0);
 
-    VIC.text_clear(16);
-    VIC.color_ram_clear(0);
+    VIC.textClear(16);
+    VIC.colorRamClear(0);
 
-    VIC.hires_enable();
-    VIC.hires_clear(0);
+    VIC.hiresEnable();
+    VIC.hiresClear(0);
 
     int j, k;
     int temp1 = 0;
@@ -934,8 +943,8 @@ public class CommodoreDemo
           // this makes a checkerboard background
           if(((k & 1) ^ (j & 1)) == 1)
           {
-            VIC.hires_plot(95 + (129 - k), 60 + (82 - j), 1);
-            VIC.hires_plot(95 + k, 60 + j, 1);
+            VIC.hiresPlot(95 + (129 - k), 60 + (82 - j), 1);
+            VIC.hiresPlot(95 + k, 60 + j, 1);
           }
           continue;
         }
@@ -945,12 +954,12 @@ public class CommodoreDemo
         temp2 += temp1;
         if(temp2 < 30 )
         {
-          VIC.hires_plot(95 + k, 60 + j, 1);
+          VIC.hiresPlot(95 + k, 60 + j, 1);
           continue;
         }
         if(temp2 < 342 )
         {
-          VIC.hires_plot(95 + (129 - k), 60 + (82 - j), 1);
+          VIC.hiresPlot(95 + (129 - k), 60 + (82 - j), 1);
           continue;
         }
 
@@ -959,23 +968,27 @@ public class CommodoreDemo
         temp2 += temp1;
         if(temp2 < 30 )
         {
-          VIC.hires_plot(95 + (129 - k), 60 + (82 - j), 1);
+          VIC.hiresPlot(95 + (129 - k), 60 + (82 - j), 1);
           continue;
         }
         if(temp2 < 342 )
         {
-          VIC.hires_plot(95 + k, 60 + j, 1);
+          VIC.hiresPlot(95 + k, 60 + j, 1);
           continue;
         }
 
-        VIC.hires_plot(95 + k, 60 + j, 1);
+        VIC.hiresPlot(95 + k, 60 + j, 1);
       }
     }
   }
 
   public static void main()
   {
-    VIC.make_hires_tables();
+    // Grinder.largeJavaStack;
+
+    VIC.makeHiresTables();
+    VIC.copyUppercase();
+
     java_screen();
     wipe();
     musak_init();
