@@ -20,6 +20,7 @@
 #include "api/c64_vic.h"
 #include "api/cpu.h"
 #include "api/dsp.h"
+#include "api/grinder.h"
 #include "api/ioport.h"
 #include "api/memory.h"
 #include "api/spi.h"

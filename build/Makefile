@@ -19,6 +19,7 @@ API= \
   api/dsp.o \
   api/draw3d_object.o \
   api/draw3d_texture.o \
+  api/grinder.o \
   api/intellivision.o \
   api/i2c.o \
   api/invoke.o \

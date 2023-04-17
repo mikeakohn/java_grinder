@@ -26,6 +26,7 @@
 #include "api/cpc.h"
 #include "api/cpu.h"
 #include "api/dsp.h"
+#include "api/grinder.h"
 #include "api/i2c.h"
 #include "api/intellivision.h"
 #include "api/ioport.h"
@@ -148,6 +149,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
   {
     const char *cls = method_class.c_str() + len;
 
+    CHECK(Grinder, grinder)
     CHECK(CPU, cpu)
     CHECK_WITH_PORT(IOPort, ioport, 0)
     CHECK_WITH_PORT(IOPort, ioport, 1)
