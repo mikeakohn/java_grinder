@@ -121,7 +121,8 @@ int C64::open(const char *filename)
   fprintf(out, "color_table equ 0x4a\n");
 
   // keyboard buffer
-  fprintf(out, "key_table equ 0x33c\n");
+//  fprintf(out, "key_table equ 0x33c\n");
+  fprintf(out, "key_table equ 0x708\n");
 
   // basic loader
   fprintf(out, ".org 0x%04x\n", start_org);
@@ -1460,12 +1461,11 @@ void C64::insert_c64_keyboard()
   fprintf(out, "  pha\n");
 
   fprintf(out, "  lda #0\n");
-  fprintf(out, "  ldy #0\n");
+  fprintf(out, "  ldy #63\n");
   fprintf(out, "keyboard_table_clear:\n");
   fprintf(out, "  sta key_table,y\n");
-  fprintf(out, "  iny\n");
-  fprintf(out, "  cpy #64\n");
-  fprintf(out, "  bne keyboard_table_clear\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bpl keyboard_table_clear\n");
 
   fprintf(out, "  lda #128\n");
   fprintf(out, "  sta value1\n");
@@ -1530,14 +1530,13 @@ void C64::insert_c64_keyboard()
   fprintf(out, "  ldy #25\n");
   fprintf(out, "  sta key_table,y\n");
 
-  fprintf(out, "  ldy #0\n");
+  fprintf(out, "  ldy #63\n");
   fprintf(out, "keyboard_return_loop:\n");
   fprintf(out, "  lda key_table,y\n");
   fprintf(out, "  cmp #1\n");
   fprintf(out, "  beq keyboard_return\n");
-  fprintf(out, "  iny\n");
-  fprintf(out, "  cpy #64\n");
-  fprintf(out, "  bne keyboard_return_loop\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bpl keyboard_return_loop\n");
   fprintf(out, "  lda #255\n");
   fprintf(out, "  sta stack_lo,x\n");
   fprintf(out, "  dex\n");
