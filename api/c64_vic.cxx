@@ -277,11 +277,6 @@ static int c64_vic_textString(JavaClass *java_class, Generator *generator)
   return generator->c64_vic_textString();
 }
 
-static int c64_vic_textNum(JavaClass *java_class, Generator *generator)
-{
-  return generator->c64_vic_textNum();
-}
-
 static int c64_vic_makeTextTable(JavaClass *java_class, Generator *generator)
 {
   return generator->c64_vic_makeTextTable();
@@ -360,7 +355,6 @@ int c64_vic(JavaClass *java_class, Generator *generator, const char *function)
   CHECK_FUNC(textAsciiPlot)
   CHECK_FUNC(textRead)
   CHECK_FUNC(textString)
-  CHECK_FUNC(textNum)
   CHECK_FUNC(makeTextTable)
   CHECK_FUNC(makeColorTable)
   CHECK_FUNC(colorRamClear)

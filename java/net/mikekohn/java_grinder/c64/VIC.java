@@ -153,7 +153,6 @@ public class VIC
   public static void textAsciiPlot(int x, int y, int value, int color) { }
   public static int textRead(int x, int y) { return 0; }
   public static void textString(int x, int y, String str, int color) { }
-  public static void textNum(int x, int y, int value, int color) { }
   public static void makeTextTable() { }
   public static void makeColorTable() { }
   public static void colorRamClear(int value) { }
