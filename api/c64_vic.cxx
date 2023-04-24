@@ -262,9 +262,24 @@ static int c64_vic_textPlot(JavaClass *java_class, Generator *generator)
   return generator->c64_vic_textPlot();
 }
 
+static int c64_vic_textAsciiPlot(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_textAsciiPlot();
+}
+
 static int c64_vic_textRead(JavaClass *java_class, Generator *generator)
 {
   return generator->c64_vic_textRead();
+}
+
+static int c64_vic_textString(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_textString();
+}
+
+static int c64_vic_textNum(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_textNum();
 }
 
 static int c64_vic_makeTextTable(JavaClass *java_class, Generator *generator)
@@ -342,7 +357,10 @@ int c64_vic(JavaClass *java_class, Generator *generator, const char *function)
   CHECK_FUNC(textClear)
   CHECK_FUNC(textCopy)
   CHECK_FUNC(textPlot)
+  CHECK_FUNC(textAsciiPlot)
   CHECK_FUNC(textRead)
+  CHECK_FUNC(textString)
+  CHECK_FUNC(textNum)
   CHECK_FUNC(makeTextTable)
   CHECK_FUNC(makeColorTable)
   CHECK_FUNC(colorRamClear)

@@ -83,7 +83,10 @@ public:
   virtual int c64_vic_textClear() { return -1; }
   virtual int c64_vic_textCopy() { return -1; }
   virtual int c64_vic_textPlot() { return -1; }
+  virtual int c64_vic_textAsciiPlot() { return -1; }
   virtual int c64_vic_textRead() { return -1; }
+  virtual int c64_vic_textString() { return -1; }
+  virtual int c64_vic_textNum() { return -1; }
   virtual int c64_vic_makeTextTable() { return -1; }
   virtual int c64_vic_makeColorTable() { return -1; }
   virtual int c64_vic_colorRamClear() { return -1; }

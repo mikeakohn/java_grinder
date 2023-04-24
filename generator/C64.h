@@ -93,7 +93,10 @@ public:
   virtual int c64_vic_textClear();
   virtual int c64_vic_textCopy();
   virtual int c64_vic_textPlot();
+  virtual int c64_vic_textAsciiPlot();
   virtual int c64_vic_textRead();
+  virtual int c64_vic_textString();
+  virtual int c64_vic_textNum();
   virtual int c64_vic_makeTextTable();
   virtual int c64_vic_makeColorTable();
   virtual int c64_vic_colorRamClear();
@@ -138,8 +141,10 @@ protected:
   bool need_c64_vic_text_clear:1;
   bool need_c64_vic_text_copy:1;
   bool need_c64_vic_text_plot:1;
+  bool need_c64_vic_text_ascii_plot:1;
   bool need_c64_vic_text_read:1;
-  bool need_c64_vic_text_print:1;
+  bool need_c64_vic_text_string:1;
+  bool need_c64_vic_text_num:1;
   bool need_c64_vic_make_text_table:1;
   bool need_c64_vic_make_color_table:1;
   bool need_c64_vic_color_ram_clear:1;
@@ -156,7 +161,10 @@ protected:
   void insert_c64_vic_text_clear();
   void insert_c64_vic_text_copy();
   void insert_c64_vic_text_plot();
+  void insert_c64_vic_text_ascii_plot();
   void insert_c64_vic_text_read();
+  void insert_c64_vic_text_string();
+  void insert_c64_vic_text_num();
   void insert_c64_vic_make_text_table();
   void insert_c64_vic_make_color_table();
   void insert_c64_vic_color_ram_clear();

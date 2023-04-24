@@ -46,7 +46,7 @@ public class Sound
   };
 
   static public String note_keys = "Q2W3ER5T6Y7UI9O0P@                      ";
-  static public String hex = "0123456789ABCDEF";
+  static public String hex = "0123456789abcdef";
   static int voice = 0;
   static int octave[] = { 2, 3, 4 };
   static int wave[] = { 2, 1, 0 };
@@ -59,6 +59,7 @@ public class Sound
   static int last_item = 0;
   static int tempo = 1500;
 
+/*
   static public void printString(int x, int y, String str, int color)
   {
     for (int i = 0; i < str.length(); i++)
@@ -75,7 +76,9 @@ public class Sound
       VIC.textPlot(x + i, y, temp, color);
     }
   }
+*/
 
+/*
   static public void printChar(int x, int y, int c, int color)
   {
     if(c == 124)
@@ -85,13 +88,14 @@ public class Sound
 
     VIC.textPlot(x, y, c, color);
   }
+*/
 
   static public void printHex(int x, int y, int num, int color)
   {
-    printChar(x + 0, y, hex.charAt((num >> 12) & 0xf), color);
-    printChar(x + 1, y, hex.charAt((num >> 8) & 0xf), color);
-    printChar(x + 2, y, hex.charAt((num >> 4) & 0xf), color);
-    printChar(x + 3, y, hex.charAt((num >> 0) & 0xf), color);
+    VIC.textAsciiPlot(x + 0, y, hex.charAt((num >> 12) & 0xf), color);
+    VIC.textAsciiPlot(x + 1, y, hex.charAt((num >> 8) & 0xf), color);
+    VIC.textAsciiPlot(x + 2, y, hex.charAt((num >> 4) & 0xf), color);
+    VIC.textAsciiPlot(x + 3, y, hex.charAt((num >> 0) & 0xf), color);
   }
 
   static public void printNum(int x, int y, int num, int color)
@@ -200,11 +204,11 @@ public class Sound
       b1 = segments[value];
     }
 
-    printString(x, y, str, color);
+    VIC.textString(x, y, str, color);
     VIC.textPlot(x + 1, y + 2, b2, color);
     VIC.textPlot(x + 1, y + 3, b1, color);
     drawBorder(x, y + 1, 3, 4, 11);
-    printChar(x + 1, y + 5, hex.charAt(value), 12);
+    VIC.textAsciiPlot(x + 1, y + 5, hex.charAt(value), 12);
   }
 
   public static void updateSong(int v)
@@ -391,20 +395,20 @@ public class Sound
       color = 11;
 
     if(v == 0)
-      printString(x + 2, y, "VOICE 1", color);
+      VIC.textString(x + 2, y, "voice 1", color);
     else if(v == 1)
-      printString(x + 2, y, "VOICE 2", color);
+      VIC.textString(x + 2, y, "voice 2", color);
     else if(v == 2)
-      printString(x + 2, y, "VOICE 3", color);
+      VIC.textString(x + 2, y, "voice 3", color);
 
     drawBorder(x, y + 1, 11, 6, color);
-    printString(x + 1, y + 2, "OCTAVE:", 12);
-    printChar(x + 9, y + 2, octave[v] + 0x30, 15);
-    printString(x + 1, y + 3, "WAVE:", 12);
-    printChar(x + 9, y + 3, wave[v] + 0x30, 15);
-    printString(x + 1, y + 4, "PW:", 12);
+    VIC.textString(x + 1, y + 2, "octave:", 12);
+    VIC.textAsciiPlot(x + 9, y + 2, octave[v] + 0x30, 15);
+    VIC.textString(x + 1, y + 3, "wave:", 12);
+    VIC.textAsciiPlot(x + 9, y + 3, wave[v] + 0x30, 15);
+    VIC.textString(x + 1, y + 4, "pw:", 12);
     printHex(x + 6, y + 4, pulse[v], 15);
-    printString(x + 1, y + 5, "ADSR:", 12);
+    VIC.textString(x + 1, y + 5, "adsr:", 12);
     printHex(x + 6, y + 5, (adsr[v] >>> 8) | ((adsr[v] & 0xff) << 8), 15);
   }
 
@@ -425,18 +429,19 @@ public class Sound
       Memory.write8(0xc000 + i, (byte)32);
 
     drawBorder(0, 15, 40, 10, 15);
-    printString(2, 16, "OCTAVE", 12);
-    printString(2, 17, "WAVEFORM", 12);
-    printString(2, 18, "PULSE WIDTH", 12);
-    printString(2, 19, "ATTACK", 12);
-    printString(2, 20, "DECAY", 12);
-    printString(2, 21, "SUSTAIN", 12);
-    printString(2, 22, "RELEASE", 12);
-    printString(2, 23, "TEMPO", 12);
+    VIC.textString(2, 16, "octave", 12);
+    VIC.textString(2, 17, "waveform", 12);
+    VIC.textString(2, 18, "pulse width", 12);
+    VIC.textString(2, 19, "attack", 12);
+    VIC.textString(2, 20, "decay", 12);
+    VIC.textString(2, 21, "sustain", 12);
+    VIC.textString(2, 22, "release", 12);
+    VIC.textString(2, 23, "tempo", 12);
 
     int item = last_item;
     int redraw = 1;
     int temp = 0;
+    int last_key = 0;
 
     while((Keyboard.currentKeyPressed() & 255) != 255)
     {
@@ -634,7 +639,13 @@ public class Sound
         }
 
         VIC.textPlot(1, 16 + item, '>', 4);
-        wait(1000);
+
+        if(k == last_key)
+          wait(400);
+        else
+          wait(2400);
+
+        last_key = k;
       }
       else if(k == 0 || k == 40)
       {
@@ -653,6 +664,10 @@ public class Sound
         drawCursor(1);
         last_item = item;
         return;
+      }
+      else if(k == 255)
+      {
+        last_key = 0;
       }
 
       if(redraw == 1)
@@ -687,8 +702,8 @@ public class Sound
     int x = 1;
     int y = 1;
 
-    printString(x, y,     " 2 3   5 6 7   9 0", 12);
-    printString(x, y + 5, "Q W E R T Y U I O P @ ", 12);
+    VIC.textString(x, y,     " 2 3   5 6 7   9 0", 12);
+    VIC.textString(x, y + 5, "q w e r t y u i o p @ ", 12);
 
     for(int i = 0; i < 14; i++)
     {
@@ -706,12 +721,12 @@ public class Sound
       VIC.textPlot(x + i + 14, y + 4, keyboard[i + 14], 15);
     }
 
-    printString(23, 0, "SID_GRINDER", 4); 
-    printString(23, 2, "UP/DN: VOICE", 3); 
-    printString(23, 3, "LT/RT: POSITION", 3); 
-    printString(23, 4, "CTRL: PARAMS", 3); 
-    printString(23, 5, "RETURN: PLAY", 3); 
-    printString(23, 6, "RUN/STOP: CANCEL", 3); 
+    VIC.textString(23, 0, "sid_grinder", 4); 
+    VIC.textString(23, 2, "up/dn: voice", 3); 
+    VIC.textString(23, 3, "lt/rt: position", 3); 
+    VIC.textString(23, 4, "ctrl: params", 3); 
+    VIC.textString(23, 5, "return: play", 3); 
+    VIC.textString(23, 6, "run/stop: cancel", 3); 
 
     drawBorder(x - 1, y - 1, 23, 8, 11);
 
@@ -743,8 +758,8 @@ public class Sound
       // mask off shift status
       k &= 255;
 
-      if(k == last_key)
-        continue;
+//      if(k == last_key)
+//        continue;
 
       if(k == 40)
       {
@@ -784,7 +799,13 @@ public class Sound
         }
 
         drawCursor(0);
-        wait(1000);
+
+        if(k == last_key)
+          wait(400);
+        else
+          wait(2400);
+
+        last_key = k;
       }
       else if(k == 26)
       {
@@ -882,6 +903,9 @@ public class Sound
       }
       else if(k >= 0 && k <= 63)
       {
+        if(k == last_key)
+          continue;
+
         int i = piano_keys[k];
 
         if(i != -1)
