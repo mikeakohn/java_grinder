@@ -146,7 +146,7 @@ public class VIC
   public static void hiresClear(int value) { }
   public static void hiresPlot(int x, int y, int value) { }
   public static void makeHiresTables() { }
-  public static void textEnable() { }
+  public static void textEnable(int screen) { }
   public static void textClear(int value) { }
   public static void textCopy() { }
   public static void textPlot(int x, int y, int value, int color) { }

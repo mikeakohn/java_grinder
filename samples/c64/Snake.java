@@ -1165,6 +1165,7 @@ public class Snake implements TimerListener
     // Grinder.largeJavaStack();
 
     // set up screen
+    VIC.textEnable(0);
     VIC.makeTextTable();
     VIC.makeColorTable();
     VIC.copyLowercase();

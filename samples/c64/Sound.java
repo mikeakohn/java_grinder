@@ -947,6 +947,7 @@ public class Sound
   {
     // Grinder.largeJavaStack();
  
+    VIC.textEnable(0);
     VIC.makeTextTable();
     VIC.makeColorTable();
     VIC.copyUppercase();

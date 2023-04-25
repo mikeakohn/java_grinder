@@ -578,7 +578,7 @@ int C64::c64_vic_makeHiresTables()
   return 0;
 }
 
-int C64::c64_vic_textEnable()
+int C64::c64_vic_textEnable(/* screen */)
 {
   need_c64_vic_text_enable = 1;
   fprintf(out, "  jsr text_enable\n");
@@ -1192,10 +1192,17 @@ void C64::insert_c64_vic_make_hires_tables()
 void C64::insert_c64_vic_text_enable()
 {
   fprintf(out, "text_enable:\n");
-  fprintf(out, "  lda #2\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
+  fprintf(out, "  bne text_enable_1\n");
+  fprintf(out, "  lda #0x02\n");
+  fprintf(out, "  jmp text_enable_2\n");
+  fprintf(out, "text_enable_1:\n");
+  fprintf(out, "  lda #0x12\n");
+  fprintf(out, "text_enable_2:\n");
   fprintf(out, "  sta 0xd018\n");
   fprintf(out, "  lda 0xd011\n");
-  fprintf(out, "  and #223\n");
+  fprintf(out, "  and #0xdf\n");
   fprintf(out, "  sta 0xd011\n");
   fprintf(out, "  rts\n");
 }
