@@ -44,6 +44,10 @@ C64::C64() :
   need_c64_vic_text_ascii_plot(0),
   need_c64_vic_text_read(0),
   need_c64_vic_text_string(0),
+  need_c64_vic_text_scroll_left(0),
+  need_c64_vic_text_scroll_right(0),
+  need_c64_vic_text_scroll_up(0),
+  need_c64_vic_text_scroll_down(0),
   need_c64_vic_make_color_table(0),
   need_c64_vic_color_ram_clear(0),
   need_c64_vic_copy_uppercase(0),
@@ -80,6 +84,10 @@ C64::~C64()
   if (need_c64_vic_text_ascii_plot) { insert_c64_vic_text_ascii_plot(); }
   if (need_c64_vic_text_read) { insert_c64_vic_text_read(); }
   if (need_c64_vic_text_string) { insert_c64_vic_text_string(); }
+  if (need_c64_vic_text_scroll_left) { insert_c64_vic_text_scroll_left(); }
+  if (need_c64_vic_text_scroll_right) { insert_c64_vic_text_scroll_right(); }
+  if (need_c64_vic_text_scroll_up) { insert_c64_vic_text_scroll_up(); }
+  if (need_c64_vic_text_scroll_down) { insert_c64_vic_text_scroll_down(); }
   if (need_c64_vic_make_text_table) { insert_c64_vic_make_text_table(); }
   if (need_c64_vic_make_color_table) { insert_c64_vic_make_color_table(); }
   if (need_c64_vic_color_ram_clear) { insert_c64_vic_color_ram_clear(); }
@@ -628,6 +636,38 @@ int C64::c64_vic_textString(/* x, y, string, color */)
 {
   need_c64_vic_text_string = 1;
   fprintf(out, "  jsr text_string\n");
+
+  return 0;
+}
+
+int C64::c64_vic_textScrollLeft()
+{
+  need_c64_vic_text_scroll_left = 1;
+  fprintf(out, "  jsr text_scroll_left\n");
+
+  return 0;
+}
+
+int C64::c64_vic_textScrollRight()
+{
+  need_c64_vic_text_scroll_right = 1;
+  fprintf(out, "  jsr text_scroll_right\n");
+
+  return 0;
+}
+
+int C64::c64_vic_textScrollUp()
+{
+  need_c64_vic_text_scroll_up = 1;
+  fprintf(out, "  jsr text_scroll_up\n");
+
+  return 0;
+}
+
+int C64::c64_vic_textScrollDown()
+{
+  need_c64_vic_text_scroll_down = 1;
+  fprintf(out, "  jsr text_scroll_down\n");
 
   return 0;
 }
@@ -1476,6 +1516,178 @@ void C64::insert_c64_vic_text_string()
   fprintf(out, "  inx\n");
   fprintf(out, "  inx\n");
   fprintf(out, "  inx\n");
+  fprintf(out, "  rts\n");
+}
+
+void C64::insert_c64_vic_text_scroll_left()
+{
+  fprintf(out, "text_scroll_left:\n");
+  fprintf(out, "  ldy #0\n");
+
+  fprintf(out, "text_scroll_left_loop_y:\n");
+  fprintf(out, "  lda text_table + 0,y\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda text_table + 1,y\n");
+  fprintf(out, "  sta address + 1\n");
+  fprintf(out, "  lda color_table + 0,y\n");
+  fprintf(out, "  sta value1 + 0\n");
+  fprintf(out, "  lda color_table + 1,y\n");
+  fprintf(out, "  sta value1 + 1\n");
+  fprintf(out, "  tya\n");
+  fprintf(out, "  pha\n");
+
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "text_scroll_left_loop_x:\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  lda (address),y\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  sta (address),y\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  lda (value1),y\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  sta (value1),y\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  cpy #39\n");
+  fprintf(out, "  bne text_scroll_left_loop_x\n");
+
+  fprintf(out, "  pla\n");
+  fprintf(out, "  tay\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  cpy #52\n");
+  fprintf(out, "  bne text_scroll_left_loop_y\n");
+
+  fprintf(out, "  rts\n");
+}
+
+void C64::insert_c64_vic_text_scroll_right()
+{
+  fprintf(out, "text_scroll_right:\n");
+  fprintf(out, "  ldy #0\n");
+
+  fprintf(out, "text_scroll_right_loop_y:\n");
+  fprintf(out, "  lda text_table + 0,y\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda text_table + 1,y\n");
+  fprintf(out, "  sta address + 1\n");
+  fprintf(out, "  lda color_table + 0,y\n");
+  fprintf(out, "  sta value1 + 0\n");
+  fprintf(out, "  lda color_table + 1,y\n");
+  fprintf(out, "  sta value1 + 1\n");
+  fprintf(out, "  tya\n");
+  fprintf(out, "  pha\n");
+
+  fprintf(out, "  ldy #39\n");
+  fprintf(out, "text_scroll_right_loop_x:\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  lda (address),y\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  sta (address),y\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  lda (value1),y\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  sta (value1),y\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  cpy #1\n");
+  fprintf(out, "  bne text_scroll_right_loop_x\n");
+
+  fprintf(out, "  pla\n");
+  fprintf(out, "  tay\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  cpy #52\n");
+  fprintf(out, "  bne text_scroll_right_loop_y\n");
+
+  fprintf(out, "  rts\n");
+}
+
+void C64::insert_c64_vic_text_scroll_up()
+{
+  fprintf(out, "text_scroll_up:\n");
+  fprintf(out, "  ldy #0\n");
+
+  fprintf(out, "text_scroll_up_loop_y:\n");
+  fprintf(out, "  lda text_table + 0,y\n");
+  fprintf(out, "  sta value1 + 0\n");
+  fprintf(out, "  lda text_table + 1,y\n");
+  fprintf(out, "  sta value1 + 1\n");
+  fprintf(out, "  lda text_table + 2,y\n");
+  fprintf(out, "  sta value2 + 0\n");
+  fprintf(out, "  lda text_table + 3,y\n");
+  fprintf(out, "  sta value2 + 1\n");
+  fprintf(out, "  lda color_table + 0,y\n");
+  fprintf(out, "  sta value3 + 0\n");
+  fprintf(out, "  lda color_table + 1,y\n");
+  fprintf(out, "  sta value3 + 1\n");
+  fprintf(out, "  lda color_table + 2,y\n");
+  fprintf(out, "  sta value4 + 0\n");
+  fprintf(out, "  lda color_table + 3,y\n");
+  fprintf(out, "  sta value4 + 1\n");
+  fprintf(out, "  tya\n");
+  fprintf(out, "  pha\n");
+
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "text_scroll_up_loop_x:\n");
+  fprintf(out, "  lda (value2),y\n");
+  fprintf(out, "  sta (value1),y\n");
+  fprintf(out, "  lda (value4),y\n");
+  fprintf(out, "  sta (value3),y\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  cpy #40\n");
+  fprintf(out, "  bne text_scroll_up_loop_x\n");
+
+  fprintf(out, "  pla\n");
+  fprintf(out, "  tay\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  cpy #48\n");
+  fprintf(out, "  bne text_scroll_up_loop_y\n");
+
+  fprintf(out, "  rts\n");
+}
+
+void C64::insert_c64_vic_text_scroll_down()
+{
+  fprintf(out, "text_scroll_down:\n");
+  fprintf(out, "  ldy #48\n");
+
+  fprintf(out, "text_scroll_down_loop_y:\n");
+  fprintf(out, "  lda text_table + 2,y\n");
+  fprintf(out, "  sta value1 + 0\n");
+  fprintf(out, "  lda text_table + 3,y\n");
+  fprintf(out, "  sta value1 + 1\n");
+  fprintf(out, "  lda text_table + 0,y\n");
+  fprintf(out, "  sta value2 + 0\n");
+  fprintf(out, "  lda text_table + 1,y\n");
+  fprintf(out, "  sta value2 + 1\n");
+  fprintf(out, "  lda color_table + 2,y\n");
+  fprintf(out, "  sta value3 + 0\n");
+  fprintf(out, "  lda color_table + 3,y\n");
+  fprintf(out, "  sta value3 + 1\n");
+  fprintf(out, "  lda color_table + 0,y\n");
+  fprintf(out, "  sta value4 + 0\n");
+  fprintf(out, "  lda color_table + 1,y\n");
+  fprintf(out, "  sta value4 + 1\n");
+  fprintf(out, "  tya\n");
+  fprintf(out, "  pha\n");
+
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "text_scroll_down_loop_x:\n");
+  fprintf(out, "  lda (value2),y\n");
+  fprintf(out, "  sta (value1),y\n");
+  fprintf(out, "  lda (value4),y\n");
+  fprintf(out, "  sta (value3),y\n");
+  fprintf(out, "  iny\n");
+  fprintf(out, "  cpy #40\n");
+  fprintf(out, "  bne text_scroll_down_loop_x\n");
+
+  fprintf(out, "  pla\n");
+  fprintf(out, "  tay\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  cpy #2\n");
+  fprintf(out, "  bne text_scroll_down_loop_y\n");
+
   fprintf(out, "  rts\n");
 }
 
