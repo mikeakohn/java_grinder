@@ -1685,8 +1685,8 @@ void C64::insert_c64_vic_text_scroll_down()
   fprintf(out, "  tay\n");
   fprintf(out, "  dey\n");
   fprintf(out, "  dey\n");
-  fprintf(out, "  cpy #2\n");
-  fprintf(out, "  bne text_scroll_down_loop_y\n");
+//  fprintf(out, "  cpy #0\n");
+  fprintf(out, "  bpl text_scroll_down_loop_y\n");
 
   fprintf(out, "  rts\n");
 }
