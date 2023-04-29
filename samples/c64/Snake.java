@@ -236,11 +236,14 @@ public class Snake implements TimerListener
     for(x = 0; x < 40; x++)
       VIC.textPlot(x, 0, 32, 0);
 
+    VIC.textScrollDown();
+/*
     for(y = 24; y > 0; y--)
     {
       for(x = 0; x < 40; x++)
         VIC.textPlot(x, y, VIC.textRead(x, y - 1), 5);
     }
+*/
 
     for(y = 0; y < 16; y++)
     {
@@ -658,15 +661,18 @@ public class Snake implements TimerListener
     VIC.background(0);
     VIC.writeControl2(VIC.readControl2() & 239);
 
+    int count = 0;
+
     while(true)
     {
       if(Joystick.isButtonDown_0(1))
         break;
 
       playTitleMusic();
-      wait(400);
+//      wait(400);
 
-      final int c = colors[time & 7];
+
+      final int c = colors[count & 7];
 
       printString(9, 3, c,  "=== =   =  ==  = = ===");
       printString(9, 4, c,  "=   ==  = =  = = = =  ");
@@ -676,7 +682,7 @@ public class Snake implements TimerListener
 
       VIC.sprite4color(c);
 
-      if(((time >> 2) & 31) >= 16)
+      if((count & 15) >= 8)
       {
         Memory.write8(sprite_pointer1 + 4, (byte)194);
         Memory.write8(sprite_pointer2 + 4, (byte)194);
@@ -688,6 +694,14 @@ public class Snake implements TimerListener
       }
 
       VIC.spriteMulticolor0(colors[(time + 1) & 7]);
+      count++;
+
+      time = 0;
+
+      while(time == 0)
+      {
+        // wait for next timer update
+      }
     }
 
     VIC.spriteEnable(0);
@@ -719,10 +733,8 @@ public class Snake implements TimerListener
         break;
 
       i++;
-
       VIC.border(colors1[(i >> 1) & 7]);
-
-      wait(500);
+      wait(200);
     }
 
     VIC.border(2);
@@ -745,7 +757,6 @@ public class Snake implements TimerListener
 
     while(true)
     {
-
       printString(14, 11, 0,  "           ");
       printString(14, 12, colors2[i & 7],  " Game Over ");
       printString(14, 13, 0, "           ");
@@ -767,7 +778,12 @@ public class Snake implements TimerListener
       }
 
       i++;
-      wait(400);
+      time = 0;
+
+      while(time == 0)
+      {
+        // wait for next timer update
+      }
     }
   }
 
@@ -789,6 +805,7 @@ public class Snake implements TimerListener
     int temp = 0;
     int tx = 0;
     int ty = 0;
+    int frame = 0;
 
     byte snakex[] = new byte[16];
     byte snakey[] = new byte[16];
@@ -865,15 +882,16 @@ public class Snake implements TimerListener
 
     while(true)
     {
-      int old_time = time;
-
       // move ship
-      if(Joystick.isRight(1)) accelx++;
-      if(Joystick.isLeft(1)) accelx--;
-      if(Joystick.isDown(1)) accely++;
-      if(Joystick.isUp(1)) accely--;
+//      if((frame & 3) == 3)
+//      {
+        if(Joystick.isRight(1)) accelx++;
+        if(Joystick.isLeft(1)) accelx--;
+        if(Joystick.isDown(1)) accely++;
+        if(Joystick.isUp(1)) accely--;
+//      }
 
-      if((time & 1) == 1)
+      if((frame & 1) == 1)
       {
         if(accelx > 0) accelx--;
         if(accelx < 0) accelx++;
@@ -1097,7 +1115,8 @@ public class Snake implements TimerListener
       }
 
       // move snake
-      if((time & 3) == 3)
+//      if((frame & 1) == 1)
+      if((frame & 3) == 3)
       {
         for(i = 0; i < 16; i++)
           if(snakestatus[i] == 1)
@@ -1124,7 +1143,7 @@ public class Snake implements TimerListener
 
           int d = sdir >= 0 ? 160 : 161;
 
-          if((time & 3) == 3)
+          if((frame & 3) == 3)
             d += 2;
 
           if(snakestatus[i] == 1)
@@ -1134,7 +1153,7 @@ public class Snake implements TimerListener
         }
 
         // animate spider
-        if((time & 31) >= 16)
+        if((frame & 31) >= 16)
         {
           Memory.write8(sprite_pointer1 + 4, (byte)194);
           Memory.write8(sprite_pointer2 + 4, (byte)194);
@@ -1151,7 +1170,10 @@ public class Snake implements TimerListener
         updateSnakeExp();
       }
 
-      while(time == old_time)
+      frame++;
+      time = 0;
+
+      while(time == 0)
       {
         // wait for next timer update
       }
@@ -1212,13 +1234,19 @@ public class Snake implements TimerListener
     // reset SID
     SID.clear();
 
-    Timer.setInterval(16667, 65535);
-    Timer.setListener(true);
-
     while(true)
     {
+      Timer.setListener(false);
+      Timer.setInterval(14, 10000);
+      Timer.setListener(true);
       title();
+      Timer.setListener(false);
+      Timer.setInterval(0, 10000);
+      Timer.setListener(true);
       snake();
+      Timer.setListener(false);
+      Timer.setInterval(6, 10000);
+      Timer.setListener(true);
       gameOver();
     }
   }

@@ -759,7 +759,7 @@ int C64::timer_setListener_Z(int const_value)
     fprintf(out, "  lda #timerInterrupt >> 8\n");
     fprintf(out, "  sta 0xffff\n");
 
-    fprintf(out, "  lda #0x81\n");
+    fprintf(out, "  lda #10000010b\n");
     fprintf(out, "  sta 0xdc0d\n");
 
     // 0 - timer on/off (start off)
@@ -767,11 +767,11 @@ int C64::timer_setListener_Z(int const_value)
     // 5-6 - watch for timer A underflow
 
     // start timer A
-    fprintf(out, "  lda #00010001b\n");
+    fprintf(out, "  lda #00000001b\n");
     fprintf(out, "  sta 0xdc0e\n");
 
     // start timer B
-    fprintf(out, "  lda #01010011b\n");
+    fprintf(out, "  lda #01000001b\n");
     fprintf(out, "  sta 0xdc0f\n");
 
     fprintf(out, "  cli\n");
@@ -781,11 +781,11 @@ int C64::timer_setListener_Z(int const_value)
     fprintf(out, "  sei\n");
 
     // stop timer A
-    fprintf(out, "  lda #00010001b\n");
+    fprintf(out, "  lda #00000000b\n");
     fprintf(out, "  sta 0xdc0e\n");
 
     // stop timer B
-    fprintf(out, "  lda #01010011b\n");
+    fprintf(out, "  lda #01000000b\n");
     fprintf(out, "  sta 0xdc0f\n");
   }
 
