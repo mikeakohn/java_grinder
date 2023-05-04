@@ -1782,28 +1782,28 @@ int M6502::memory_addressOf_aB()
 {
   fprintf(out, "; memory_addressOf_aB()\n");
 
-  return 0;
+  return -1;
 }
 
 int M6502::memory_addressOf_aS()
 {
   fprintf(out, "; memory_addressOf_aS()\n");
 
-  return 0;
+  return -1;
 }
 
 int M6502::memory_addressOf_aC()
 {
   fprintf(out, "; memory_addressOf_aC()\n");
 
-  return 0;
+  return -1;
 }
 
 int M6502::memory_addressOf_aI()
 {
   fprintf(out, "; memory_addressOf_aI()\n");
 
-  return 0;
+  return -1;
 }
 
 void M6502::insert_memory_read8()

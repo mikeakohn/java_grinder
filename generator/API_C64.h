@@ -95,6 +95,7 @@ public:
   virtual int c64_vic_colorRamClear() { return -1; }
   virtual int c64_vic_copyUppercase() { return -1; }
   virtual int c64_vic_copyLowercase() { return -1; }
+  virtual int c64_vic_copyDataFromArray() { return -1; }
 };
 
 #endif

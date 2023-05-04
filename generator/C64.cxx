@@ -52,6 +52,7 @@ C64::C64() :
   need_c64_vic_color_ram_clear(0),
   need_c64_vic_copy_uppercase(0),
   need_c64_vic_copy_lowercase(0),
+  need_c64_vic_copy_data_from_array(0),
   need_c64_timer_interrupt(0),
   need_c64_keyboard(0)
 {
@@ -93,6 +94,7 @@ C64::~C64()
   if (need_c64_vic_color_ram_clear) { insert_c64_vic_color_ram_clear(); }
   if (need_c64_vic_copy_uppercase) { insert_c64_vic_copy_uppercase(); }
   if (need_c64_vic_copy_lowercase) { insert_c64_vic_copy_lowercase(); }
+  if (need_c64_vic_copy_data_from_array) { insert_c64_vic_copy_data_from_array(); }
   if (need_c64_keyboard) { insert_c64_keyboard(); }
 }
 
@@ -707,6 +709,13 @@ int C64::c64_vic_copyLowercase()
   return 0;
 }
 
+int C64::c64_vic_copyDataFromArray()
+{
+  need_c64_vic_copy_data_from_array = 1;
+  fprintf(out, "  jsr copy_data_from_array\n");
+  return 0;
+}
+
 int C64::timer_setInterval_II()
 {
   fprintf(out, "; timer_setInterval\n");
@@ -1250,6 +1259,29 @@ void C64::insert_c64_vic_text_enable()
 void C64::insert_c64_vic_text_clear()
 {
   fprintf(out, "text_clear:\n");
+  fprintf(out, "  lda stack_lo + 2,x\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "text_clear_loop:\n");
+  fprintf(out, "  sta 0xc000,y\n");
+  fprintf(out, "  sta 0xc100,y\n");
+  fprintf(out, "  sta 0xc200,y\n");
+  fprintf(out, "  sta 0xc2e8,y\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bne text_clear_loop\n");
+  fprintf(out, "  lda stack_lo + 1,x\n");
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "text_clear_color_loop:\n");
+  fprintf(out, "  sta 0xd800,y\n");
+  fprintf(out, "  sta 0xd900,y\n");
+  fprintf(out, "  sta 0xda00,y\n");
+  fprintf(out, "  sta 0xdae8,y\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bne text_clear_color_loop\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  rts\n");
+/*
+  fprintf(out, "text_clear:\n");
   fprintf(out, "  inx\n");
   fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  ldy #0\n");
@@ -1261,6 +1293,7 @@ void C64::insert_c64_vic_text_clear()
   fprintf(out, "  dey\n");
   fprintf(out, "  bne text_clear_loop\n");
   fprintf(out, "  rts\n");
+*/
 }
 
 void C64::insert_c64_vic_text_copy()
@@ -1818,6 +1851,51 @@ void C64::insert_c64_vic_copy_lowercase()
   fprintf(out, "  bne copy_lowercase_loop\n");
   fprintf(out, "  lda #53\n");
   fprintf(out, "  sta 0x0001\n");
+  fprintf(out, "  rts\n");
+}
+
+void C64::insert_c64_vic_copy_data_from_array()
+{
+  fprintf(out, "copy_data_from_array:\n");
+  fprintf(out, "  lda stack_lo + 1,x\n");
+  fprintf(out, "  sta value3 + 0\n");
+  fprintf(out, "  lda stack_hi + 1,x\n");
+  fprintf(out, "  sta value3 + 1\n"); // bytes
+  fprintf(out, "  lda stack_lo + 2,x\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda stack_hi + 2,x\n");
+  fprintf(out, "  sta address + 1\n"); // address
+  fprintf(out, "  lda stack_lo + 3,x\n");
+  fprintf(out, "  sta value1 + 0\n");
+  fprintf(out, "  lda stack_hi + 3,x\n");
+  fprintf(out, "  sta value1 + 1\n"); // array
+  fprintf(out, "  ldy #0\n");
+  fprintf(out, "copy_data_from_array_loop:\n");
+  fprintf(out, "  lda (value1),y\n");
+  fprintf(out, "  sta (address),y\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda value1 + 0\n");
+  fprintf(out, "  adc #2\n");
+  fprintf(out, "  sta value1 + 0\n");
+  fprintf(out, "  lda value1 + 1\n");
+  fprintf(out, "  adc #0\n");
+  fprintf(out, "  sta value1 + 1\n");
+  fprintf(out, "  inc address + 0\n");
+  fprintf(out, "  bne copy_data_from_array_inc\n");
+  fprintf(out, "  inc address + 1\n");
+  fprintf(out, "copy_data_from_array_inc:\n");
+  fprintf(out, "  lda value3 + 0\n");
+  fprintf(out, "  bne copy_data_from_array_dec\n");
+  fprintf(out, "  lda value3 + 1\n");
+  fprintf(out, "  bmi copy_data_from_array_end\n");
+  fprintf(out, "  dec value3 + 1\n");
+  fprintf(out, "copy_data_from_array_dec:\n");
+  fprintf(out, "  dec value3 + 0\n");
+  fprintf(out, "  jmp copy_data_from_array_loop\n");
+  fprintf(out, "copy_data_from_array_end:\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  inx\n");
   fprintf(out, "  rts\n");
 }
 

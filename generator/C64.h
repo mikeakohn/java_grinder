@@ -105,6 +105,7 @@ public:
   virtual int c64_vic_colorRamClear();
   virtual int c64_vic_copyUppercase();
   virtual int c64_vic_copyLowercase();
+  virtual int c64_vic_copyDataFromArray();
 
   virtual int timer_setInterval_II();
   virtual int timer_setInterval_II(int cycles, int divider);
@@ -156,6 +157,7 @@ protected:
   bool need_c64_vic_color_ram_clear:1;
   bool need_c64_vic_copy_uppercase:1;
   bool need_c64_vic_copy_lowercase:1;
+  bool need_c64_vic_copy_data_from_array:1;
   bool need_c64_timer_interrupt:1;
   bool need_c64_keyboard:1;
 
@@ -179,6 +181,7 @@ protected:
   void insert_c64_vic_color_ram_clear();
   void insert_c64_vic_copy_uppercase();
   void insert_c64_vic_copy_lowercase();
+  void insert_c64_vic_copy_data_from_array();
   void insert_c64_keyboard();
 };
 

@@ -322,6 +322,11 @@ static int c64_vic_copyLowercase(JavaClass *java_class, Generator *generator)
   return generator->c64_vic_copyLowercase();
 }
 
+static int c64_vic_copyDataFromArray(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_copyDataFromArray();
+}
+
 int c64_vic(JavaClass *java_class, Generator *generator, const char *function)
 {
   CHECK_FUNC(sprite0pos)
@@ -384,6 +389,7 @@ int c64_vic(JavaClass *java_class, Generator *generator, const char *function)
   CHECK_FUNC(colorRamClear)
   CHECK_FUNC(copyUppercase)
   CHECK_FUNC(copyLowercase)
+  CHECK_FUNC(copyDataFromArray)
 
   return -1;
 }
