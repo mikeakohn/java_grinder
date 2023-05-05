@@ -1806,6 +1806,19 @@ int M6502::memory_addressOf_aI()
   return -1;
 }
 
+int M6502::memory_preloadByteArray_X(const char *array_name)
+{
+  fprintf(out, "; memory.preloadByteArray()\n");
+  fprintf(out, "  lda #_%s & 0xff\n", array_name);
+  fprintf(out, "  sta stack_lo,x\n");
+  fprintf(out, "  lda #_%s >> 8\n", array_name);
+  fprintf(out, "  sta stack_hi,x\n");
+  fprintf(out, "  dex\n");
+  stack++;
+
+  return 0;
+}
+
 void M6502::insert_memory_read8()
 {
   fprintf(out, "memory_read8:\n");

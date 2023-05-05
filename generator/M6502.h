@@ -106,6 +106,7 @@ public:
   virtual int memory_addressOf_aS();
   virtual int memory_addressOf_aC();
   virtual int memory_addressOf_aI();
+  virtual int memory_preloadByteArray_X(const char *array_name);
 
   // Math API
   virtual int math_abs_I();
