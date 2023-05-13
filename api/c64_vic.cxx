@@ -277,6 +277,16 @@ static int c64_vic_textString(JavaClass *java_class, Generator *generator)
   return generator->c64_vic_textString();
 }
 
+static int c64_vic_textFill(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_textFill();
+}
+
+static int c64_vic_textPaint(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_textPaint();
+}
+
 static int c64_vic_textScrollLeft(JavaClass *java_class, Generator *generator)
 {
   return generator->c64_vic_textScrollLeft();
@@ -380,6 +390,8 @@ int c64_vic(JavaClass *java_class, Generator *generator, const char *function)
   CHECK_FUNC(textAsciiPlot)
   CHECK_FUNC(textRead)
   CHECK_FUNC(textString)
+  CHECK_FUNC(textFill)
+  CHECK_FUNC(textPaint)
   CHECK_FUNC(textScrollLeft)
   CHECK_FUNC(textScrollRight)
   CHECK_FUNC(textScrollUp)

@@ -86,6 +86,8 @@ public:
   virtual int c64_vic_textAsciiPlot() { return -1; }
   virtual int c64_vic_textRead() { return -1; }
   virtual int c64_vic_textString() { return -1; }
+  virtual int c64_vic_textFill() { return -1; }
+  virtual int c64_vic_textPaint() { return -1; }
   virtual int c64_vic_textScrollLeft() { return -1; }
   virtual int c64_vic_textScrollRight() { return -1; }
   virtual int c64_vic_textScrollUp() { return -1; }

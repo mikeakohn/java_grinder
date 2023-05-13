@@ -142,17 +142,19 @@ public class VIC
   // 0xd02e
   public static void sprite7color(int value) { }
 
-  public static void hiresEnable() { }
+  public static void hiresEnable(int mode) { }
   public static void hiresClear(int value) { }
   public static void hiresPlot(int x, int y, int value) { }
   public static void makeHiresTables() { }
   public static void textEnable(int screen) { }
-  public static void textClear(int ch, int color) { }
+  public static void textClear(int value) { }
   public static void textCopy() { }
   public static void textPlot(int x, int y, int value, int color) { }
   public static void textAsciiPlot(int x, int y, int value, int color) { }
   public static int textRead(int x, int y) { return 0; }
   public static void textString(int x, int y, String str, int color) { }
+  public static void textFill(int x, int y, int w, int h, int value) { }
+  public static void textPaint(int x, int y, int w, int h, int value) { }
   public static void textScrollLeft() { }
   public static void textScrollRight() { }
   public static void textScrollUp() { }

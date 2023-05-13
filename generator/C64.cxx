@@ -44,6 +44,8 @@ C64::C64() :
   need_c64_vic_text_ascii_plot(0),
   need_c64_vic_text_read(0),
   need_c64_vic_text_string(0),
+  need_c64_vic_text_fill(0),
+  need_c64_vic_text_paint(0),
   need_c64_vic_text_scroll_left(0),
   need_c64_vic_text_scroll_right(0),
   need_c64_vic_text_scroll_up(0),
@@ -85,6 +87,8 @@ C64::~C64()
   if (need_c64_vic_text_ascii_plot) { insert_c64_vic_text_ascii_plot(); }
   if (need_c64_vic_text_read) { insert_c64_vic_text_read(); }
   if (need_c64_vic_text_string) { insert_c64_vic_text_string(); }
+  if (need_c64_vic_text_fill) { insert_c64_vic_text_fill(); }
+  if (need_c64_vic_text_paint) { insert_c64_vic_text_paint(); }
   if (need_c64_vic_text_scroll_left) { insert_c64_vic_text_scroll_left(); }
   if (need_c64_vic_text_scroll_right) { insert_c64_vic_text_scroll_right(); }
   if (need_c64_vic_text_scroll_up) { insert_c64_vic_text_scroll_up(); }
@@ -642,6 +646,22 @@ int C64::c64_vic_textString(/* x, y, string, color */)
   return 0;
 }
 
+int C64::c64_vic_textFill(/* x, y, w, h, value */)
+{
+  need_c64_vic_text_fill = 1;
+  fprintf(out, "  jsr text_fill\n");
+
+  return 0;
+}
+
+int C64::c64_vic_textPaint(/* x, y, w, h, value */)
+{
+  need_c64_vic_text_paint = 1;
+  fprintf(out, "  jsr text_paint\n");
+
+  return 0;
+}
+
 int C64::c64_vic_textScrollLeft()
 {
   need_c64_vic_text_scroll_left = 1;
@@ -1040,7 +1060,25 @@ void C64::insert_c64_vic_hires_enable()
   fprintf(out, "  lda 0xd011\n");
   fprintf(out, "  ora #32\n");
   fprintf(out, "  sta 0xd011\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  lda stack_lo,x\n");
+  fprintf(out, "  bne hires_enable_multicolor\n");
   fprintf(out, "  rts\n");
+  fprintf(out, "hires_enable_multicolor:\n");
+  fprintf(out, "  lda 0xd016\n");
+  fprintf(out, "  ora #16\n");
+  fprintf(out, "  sta 0xd016\n");
+  fprintf(out, "  rts\n");
+
+/*
+  fprintf(out, "hires_enable:\n");
+  fprintf(out, "  lda #8\n");
+  fprintf(out, "  sta 0xd018\n");
+  fprintf(out, "  lda 0xd011\n");
+  fprintf(out, "  ora #32\n");
+  fprintf(out, "  sta 0xd011\n");
+  fprintf(out, "  rts\n");
+*/
 }
 
 void C64::insert_c64_vic_hires_clear()
@@ -1259,29 +1297,6 @@ void C64::insert_c64_vic_text_enable()
 void C64::insert_c64_vic_text_clear()
 {
   fprintf(out, "text_clear:\n");
-  fprintf(out, "  lda stack_lo + 2,x\n");
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "text_clear_loop:\n");
-  fprintf(out, "  sta 0xc000,y\n");
-  fprintf(out, "  sta 0xc100,y\n");
-  fprintf(out, "  sta 0xc200,y\n");
-  fprintf(out, "  sta 0xc2e8,y\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bne text_clear_loop\n");
-  fprintf(out, "  lda stack_lo + 1,x\n");
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "text_clear_color_loop:\n");
-  fprintf(out, "  sta 0xd800,y\n");
-  fprintf(out, "  sta 0xd900,y\n");
-  fprintf(out, "  sta 0xda00,y\n");
-  fprintf(out, "  sta 0xdae8,y\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bne text_clear_color_loop\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  rts\n");
-/*
-  fprintf(out, "text_clear:\n");
   fprintf(out, "  inx\n");
   fprintf(out, "  lda stack_lo,x\n");
   fprintf(out, "  ldy #0\n");
@@ -1293,7 +1308,6 @@ void C64::insert_c64_vic_text_clear()
   fprintf(out, "  dey\n");
   fprintf(out, "  bne text_clear_loop\n");
   fprintf(out, "  rts\n");
-*/
 }
 
 void C64::insert_c64_vic_text_copy()
@@ -1545,6 +1559,96 @@ void C64::insert_c64_vic_text_string()
   fprintf(out, "text_string_skip_inc_hi:\n");
   fprintf(out, "  dec length\n");
   fprintf(out, "  bne text_string_loop\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  rts\n");
+}
+
+void C64::insert_c64_vic_text_fill()
+{
+  fprintf(out, "text_fill:\n");
+  fprintf(out, "  lda stack_lo + 4,x\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  tay\n");
+  fprintf(out, "  lda text_table + 0,y\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda text_table + 1,y\n");
+  fprintf(out, "  sta address + 1\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda address + 0\n");
+  fprintf(out, "  adc stack_lo + 5,x\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda address + 1\n");
+  fprintf(out, "  adc #0\n");
+  fprintf(out, "  sta address + 1\n");
+  fprintf(out, "  lda stack_lo + 2,x\n");
+  fprintf(out, "  sta value1\n");
+  fprintf(out, "  dec value1\n");
+  fprintf(out, "text_fill_loop_y:\n");
+  fprintf(out, "  lda stack_lo + 3,x\n");
+  fprintf(out, "  tay\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  lda stack_lo + 1,x\n");
+  fprintf(out, "text_fill_loop_x:\n");
+  fprintf(out, "  sta (address),y\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bpl text_fill_loop_x\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda address + 0\n");
+  fprintf(out, "  adc #40\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda address + 1\n");
+  fprintf(out, "  adc #0\n");
+  fprintf(out, "  sta address + 1\n");
+  fprintf(out, "  dec value1\n");
+  fprintf(out, "  bpl text_fill_loop_y\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  inx\n");
+  fprintf(out, "  rts\n");
+}
+
+void C64::insert_c64_vic_text_paint()
+{
+  fprintf(out, "text_paint:\n");
+  fprintf(out, "  lda stack_lo + 4,x\n");
+  fprintf(out, "  asl\n");
+  fprintf(out, "  tay\n");
+  fprintf(out, "  lda color_table + 0,y\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda color_table + 1,y\n");
+  fprintf(out, "  sta address + 1\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda address + 0\n");
+  fprintf(out, "  adc stack_lo + 5,x\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda address + 1\n");
+  fprintf(out, "  adc #0\n");
+  fprintf(out, "  sta address + 1\n");
+  fprintf(out, "  lda stack_lo + 2,x\n");
+  fprintf(out, "  sta value1\n");
+  fprintf(out, "  dec value1\n");
+  fprintf(out, "text_paint_loop_y:\n");
+  fprintf(out, "  lda stack_lo + 3,x\n");
+  fprintf(out, "  tay\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  lda stack_lo + 1,x\n");
+  fprintf(out, "text_paint_loop_x:\n");
+  fprintf(out, "  sta (address),y\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bpl text_paint_loop_x\n");
+  fprintf(out, "  clc\n");
+  fprintf(out, "  lda address + 0\n");
+  fprintf(out, "  adc #40\n");
+  fprintf(out, "  sta address + 0\n");
+  fprintf(out, "  lda address + 1\n");
+  fprintf(out, "  adc #0\n");
+  fprintf(out, "  sta address + 1\n");
+  fprintf(out, "  dec value1\n");
+  fprintf(out, "  bpl text_paint_loop_y\n");
   fprintf(out, "  inx\n");
   fprintf(out, "  inx\n");
   fprintf(out, "  inx\n");

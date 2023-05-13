@@ -96,6 +96,8 @@ public:
   virtual int c64_vic_textAsciiPlot();
   virtual int c64_vic_textRead();
   virtual int c64_vic_textString();
+  virtual int c64_vic_textFill();
+  virtual int c64_vic_textPaint();
   virtual int c64_vic_textScrollLeft();
   virtual int c64_vic_textScrollRight();
   virtual int c64_vic_textScrollUp();
@@ -148,6 +150,8 @@ protected:
   bool need_c64_vic_text_ascii_plot:1;
   bool need_c64_vic_text_read:1;
   bool need_c64_vic_text_string:1;
+  bool need_c64_vic_text_fill:1;
+  bool need_c64_vic_text_paint:1;
   bool need_c64_vic_text_scroll_left:1;
   bool need_c64_vic_text_scroll_right:1;
   bool need_c64_vic_text_scroll_up:1;
@@ -172,6 +176,8 @@ protected:
   void insert_c64_vic_text_ascii_plot();
   void insert_c64_vic_text_read();
   void insert_c64_vic_text_string();
+  void insert_c64_vic_text_fill();
+  void insert_c64_vic_text_paint();
   void insert_c64_vic_text_scroll_left();
   void insert_c64_vic_text_scroll_right();
   void insert_c64_vic_text_scroll_up();
