@@ -164,6 +164,6 @@ public class VIC
   public static void colorRamClear(int value) { }
   public static void copyUppercase() { }
   public static void copyLowercase() { }
-  public static void copyDataFromArray(int[] array, int address, int bytes) { }
+  public static void copyDataFromArray(byte[] array, int address, int bytes) { }
 }
 
