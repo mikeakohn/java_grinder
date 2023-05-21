@@ -104,11 +104,13 @@ int M6502::open(const char *filename)
 
   // start at 0x0400 when using simulator
   fprintf(out, ".org 0x%04x\n", start_org);
-  fprintf(out, "reset:\n");
-  fprintf(out, "  sei\n");
-  fprintf(out, "  cld\n");
-  fprintf(out, "  ldx #0xff\n");
-  fprintf(out, "  txs\n");
+
+  fprintf(out,
+    "reset:\n"
+    "  sei\n"
+    "  cld\n"
+    "  ldx #0xff\n"
+    "  txs\n");
 
   return 0;
 }
@@ -1216,523 +1218,542 @@ int M6502::array_write_int(std::string &name, int field_id)
 // subroutines
 void M6502::insert_swap()
 {
-  fprintf(out, "swap:\n");
-  fprintf(out, "  lda stack_lo,x\n");
-  fprintf(out, "  sta value1 + 0,x\n");
-  fprintf(out, "  lda stack_hi,x\n");
-  fprintf(out, "  sta value1 + 1,x\n");
+  fprintf(out,
+    "swap:\n"
+    "  lda stack_lo,x\n"
+    "  sta value1 + 0,x\n"
+    "  lda stack_hi,x\n"
+    "  sta value1 + 1,x\n"
 
-  fprintf(out, "  lda stack_lo - 1,x\n");
-  fprintf(out, "  sta stack_lo,x\n");
-  fprintf(out, "  lda stack_hi - 1,x\n");
-  fprintf(out, "  sta stack_hi,x\n");
+    "  lda stack_lo - 1,x\n"
+    "  sta stack_lo,x\n"
+    "  lda stack_hi - 1,x\n"
+    "  sta stack_hi,x\n"
 
-  fprintf(out, "  lda value1 + 0\n");
-  fprintf(out, "  sta stack_lo - 1,x\n");
-  fprintf(out, "  lda value1 + 1\n");
-  fprintf(out, "  sta stack_hi - 1,x\n");
-  fprintf(out, "  rts\n");
+    "  lda value1 + 0\n"
+    "  sta stack_lo - 1,x\n"
+    "  lda value1 + 1\n"
+    "  sta stack_hi - 1,x\n"
+    "  rts\n");
 }
 
 void M6502::insert_add_integer()
 {
-  fprintf(out, "add_integer:\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda stack_lo + 0,x\n");
-  fprintf(out, "  adc stack_lo + 1,x\n");
-  fprintf(out, "  sta stack_lo + 1,x\n");
-  fprintf(out, "  lda stack_hi + 0,x\n");
-  fprintf(out, "  adc stack_hi + 1,x\n");
-  fprintf(out, "  sta stack_hi + 1,x\n");
-  fprintf(out, "  rts\n");
+  fprintf(out,
+    "add_integer:\n"
+    "  inx\n"
+    "  clc\n"
+    "  lda stack_lo + 0,x\n"
+    "  adc stack_lo + 1,x\n"
+    "  sta stack_lo + 1,x\n"
+    "  lda stack_hi + 0,x\n"
+    "  adc stack_hi + 1,x\n"
+    "  sta stack_hi + 1,x\n"
+    "  rts\n");
 }
 
 void M6502::insert_sub_integer()
 {
-  fprintf(out, "sub_integer:\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  sec\n");
-  fprintf(out, "  lda stack_lo + 1,x\n");
-  fprintf(out, "  sbc stack_lo + 0,x\n");
-  fprintf(out, "  sta stack_lo + 1,x\n");
-  fprintf(out, "  lda stack_hi + 1,x\n");
-  fprintf(out, "  sbc stack_hi + 0,x\n");
-  fprintf(out, "  sta stack_hi + 1,x\n");
-  fprintf(out, "  rts\n");
+  fprintf(out,
+    "sub_integer:\n"
+    "  inx\n"
+    "  sec\n"
+    "  lda stack_lo + 1,x\n"
+    "  sbc stack_lo + 0,x\n"
+    "  sta stack_lo + 1,x\n"
+    "  lda stack_hi + 1,x\n"
+    "  sbc stack_hi + 0,x\n"
+    "  sta stack_hi + 1,x\n"
+    "  rts\n");
 }
 
 void M6502::insert_mul_integer()
 {
-  fprintf(out, "mul_integer:\n");
-  // load values
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_hi + 0,x\n");
-  fprintf(out, "  sta value2 + 1\n");
-  fprintf(out, "  lda stack_lo + 0,x\n");
-  fprintf(out, "  sta value2 + 0\n");
-  fprintf(out, "  lda stack_hi + 1,x\n");
-  fprintf(out, "  sta value1 + 1\n");
-  fprintf(out, "  lda stack_lo + 1,x\n");
-  fprintf(out, "  sta value1 + 0\n");
+  fprintf(out,
+    "mul_integer:\n"
+    // load values
+    "  inx\n"
+    "  lda stack_hi + 0,x\n"
+    "  sta value2 + 1\n"
+    "  lda stack_lo + 0,x\n"
+    "  sta value2 + 0\n"
+    "  lda stack_hi + 1,x\n"
+    "  sta value1 + 1\n"
+    "  lda stack_lo + 1,x\n"
+    "  sta value1 + 0\n"
 
-  // clear result
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  sta result + 0\n");
-  fprintf(out, "  sta result + 1\n");
-  fprintf(out, "  ldy #16\n");
+    // clear result
+    "  lda #0\n"
+    "  sta result + 0\n"
+    "  sta result + 1\n"
+    "  ldy #16\n"
 
-  // loop
-  fprintf(out, "mul_integer_loop:\n");
-  fprintf(out, "  asl result + 0\n");
-  fprintf(out, "  rol result + 1\n");
-  fprintf(out, "  asl value1 + 0\n");
-  fprintf(out, "  rol value1 + 1\n");
-  fprintf(out, "  bcc mul_integer_next\n");
+    // loop
+    "mul_integer_loop:\n"
+    "  asl result + 0\n"
+    "  rol result + 1\n"
+    "  asl value1 + 0\n"
+    "  rol value1 + 1\n"
+    "  bcc mul_integer_next\n"
 
-  // add
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda result + 0\n");
-  fprintf(out, "  adc value2 + 0\n");
-  fprintf(out, "  sta result + 0\n");
-  fprintf(out, "  lda result + 1\n");
-  fprintf(out, "  adc value2 + 1\n");
-  fprintf(out, "  sta result + 1\n");
+    // add
+    "  clc\n"
+    "  lda result + 0\n"
+    "  adc value2 + 0\n"
+    "  sta result + 0\n"
+    "  lda result + 1\n"
+    "  adc value2 + 1\n"
+    "  sta result + 1\n"
 
-  // next
-  fprintf(out, "mul_integer_next:\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bne mul_integer_loop\n");
+    // next
+    "mul_integer_next:\n"
+    "  dey\n"
+    "  bne mul_integer_loop\n"
 
-  // push result
-  fprintf(out, "  lda result + 0\n");
-  fprintf(out, "  sta stack_lo + 1,x\n");
-  fprintf(out, "  lda result + 1\n");
-  fprintf(out, "  sta stack_hi + 1,x\n");
-  fprintf(out, "  rts\n");
+    // push result
+    "  lda result + 0\n"
+    "  sta stack_lo + 1,x\n"
+    "  lda result + 1\n"
+    "  sta stack_hi + 1,x\n"
+    "  rts\n");
 }
 
 void M6502::insert_div_integer()
 {
-  fprintf(out, "div_integer:\n");
-  // load values
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_hi + 0,x\n");
-  fprintf(out, "  sta value2 + 1\n");
-  fprintf(out, "  sta value2 + 1\n");
-  fprintf(out, "  lda stack_lo + 0,x\n");
-  fprintf(out, "  sta value2 + 0\n");
+  fprintf(out,
+    "div_integer:\n"
+    // load values
+    "  inx\n"
+    "  lda stack_hi + 0,x\n"
+    "  sta value2 + 1\n"
+    "  sta value2 + 1\n"
+    "  lda stack_lo + 0,x\n"
+    "  sta value2 + 0\n"
 
-  fprintf(out, "  lda stack_lo + 1,x\n");
-  fprintf(out, "  sta value1 + 0\n");
-  fprintf(out, "  lda stack_hi + 1,x\n");
-  fprintf(out, "  sta value1 + 1\n");
+    "  lda stack_lo + 1,x\n"
+    "  sta value1 + 0\n"
+    "  lda stack_hi + 1,x\n"
+    "  sta value1 + 1\n"
 
-  // clear remainder
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  sta remainder + 0\n");
-  fprintf(out, "  sta remainder + 1\n");
-  fprintf(out, "  ldy #16\n");
+    // clear remainder
+    "  lda #0\n"
+    "  sta remainder + 0\n"
+    "  sta remainder + 1\n"
+    "  ldy #16\n"
 
-  // loop
-  fprintf(out, "div_integer_loop:\n");
-  fprintf(out, "  asl value1 + 0\n");
-  fprintf(out, "  rol value1 + 1\n");
-  fprintf(out, "  rol remainder + 0\n");
-  fprintf(out, "  rol remainder + 1\n");
+    // loop
+    "div_integer_loop:\n"
+    "  asl value1 + 0\n"
+    "  rol value1 + 1\n"
+    "  rol remainder + 0\n"
+    "  rol remainder + 1\n"
 
-  // sub
-  fprintf(out, "  sec\n");
-  fprintf(out, "  lda remainder + 0\n");
-  fprintf(out, "  sbc value2 + 0\n");
-  fprintf(out, "  sta value3\n");
-  fprintf(out, "  lda remainder + 1\n");
-  fprintf(out, "  sbc value2 + 1\n");
-  fprintf(out, "  bcc div_integer_next\n");
+    // sub
+    "  sec\n"
+    "  lda remainder + 0\n"
+    "  sbc value2 + 0\n"
+    "  sta value3\n"
+    "  lda remainder + 1\n"
+    "  sbc value2 + 1\n"
+    "  bcc div_integer_next\n"
 
-  fprintf(out, "  sta remainder + 1\n");
-  fprintf(out, "  lda value3\n");
-  fprintf(out, "  sta remainder + 0\n");
-  fprintf(out, "  inc value1 + 0\n");
+    "  sta remainder + 1\n"
+    "  lda value3\n"
+    "  sta remainder + 0\n"
+    "  inc value1 + 0\n"
 
-  // next
-  fprintf(out, "div_integer_next:\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bne div_integer_loop\n");
+    // next
+    "div_integer_next:\n"
+    "  dey\n"
+    "  bne div_integer_loop\n"
 
-  // push result
-  fprintf(out, "  lda value1 + 0\n");
-  fprintf(out, "  sta stack_lo + 1, x\n");
-  fprintf(out, "  lda value1 + 1\n");
-  fprintf(out, "  sta stack_hi + 1, x\n");
-  fprintf(out, "  rts\n");
+    // push result
+    "  lda value1 + 0\n"
+    "  sta stack_lo + 1, x\n"
+    "  lda value1 + 1\n"
+    "  sta stack_hi + 1, x\n"
+    "  rts\n");
 }
 
 void M6502::insert_neg_integer()
 {
-  fprintf(out, "neg_integer:\n");
-  fprintf(out, "  sec\n");
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  sbc stack_lo + 1,x\n");
-  fprintf(out, "  sta stack_lo + 1,x\n");
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  sbc stack_hi + 1,x\n");
-  fprintf(out, "  sta stack_hi + 1,x\n");
-  fprintf(out, "  rts\n");
+  fprintf(out,
+    "neg_integer:\n"
+    "  sec\n"
+    "  lda #0\n"
+    "  sbc stack_lo + 1,x\n"
+    "  sta stack_lo + 1,x\n"
+    "  lda #0\n"
+    "  sbc stack_hi + 1,x\n"
+    "  sta stack_hi + 1,x\n"
+    "  rts\n");
 }
 
 void M6502::insert_shift_left_integer()
 {
-  fprintf(out, "shift_left_integer:\n");
-
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_lo + 0,x\n");
-  fprintf(out, "  tay\n");
-
-  fprintf(out, "shift_left_integer_loop:\n");
-  fprintf(out, "  asl stack_lo + 1,x\n");
-  fprintf(out, "  rol stack_hi + 1,x\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bne shift_left_integer_loop\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "shift_left_integer:\n"
+    "  inx\n"
+    "  lda stack_lo + 0,x\n"
+    "  tay\n"
+    "shift_left_integer_loop:\n"
+    "  asl stack_lo + 1,x\n"
+    "  rol stack_hi + 1,x\n"
+    "  dey\n"
+    "  bne shift_left_integer_loop\n"
+    "  rts\n");
 }
 
 void M6502::insert_shift_right_integer()
 {
-  fprintf(out, "shift_right_integer:\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_lo + 0,x\n");
-  fprintf(out, "  tay\n");
-
-  fprintf(out, "shift_right_integer_loop:\n");
-  fprintf(out, "  lda stack_hi + 1,x\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  ror stack_hi + 1,x\n");
-  fprintf(out, "  ror stack_lo + 1,x\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bne shift_right_integer_loop\n");
-
-  fprintf(out, "  rts\n");
+  fprintf(out,
+    "shift_right_integer:\n"
+    "  inx\n"
+    "  lda stack_lo + 0,x\n"
+    "  tay\n"
+    "shift_right_integer_loop:\n"
+    "  lda stack_hi + 1,x\n"
+    "  asl\n"
+    "  ror stack_hi + 1,x\n"
+    "  ror stack_lo + 1,x\n"
+    "  dey\n"
+    "  bne shift_right_integer_loop\n"
+    "  rts\n");
 }
 
 void M6502::insert_shift_right_uinteger()
 {
-  fprintf(out, "shift_right_uinteger:\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_lo + 0,x\n");
-  fprintf(out, "  tay\n");
-  fprintf(out, "shift_right_uinteger_loop:\n");
-  fprintf(out, "  lsr stack_hi + 1,x\n");
-  fprintf(out, "  ror stack_lo + 1,x\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bne shift_right_uinteger_loop\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "shift_right_uinteger:\n"
+    "  inx\n"
+    "  lda stack_lo + 0,x\n"
+    "  tay\n"
+    "shift_right_uinteger_loop:\n"
+    "  lsr stack_hi + 1,x\n"
+    "  ror stack_lo + 1,x\n"
+    "  dey\n"
+    "  bne shift_right_uinteger_loop\n"
+    "  rts\n");
 }
 
 void M6502::insert_and_integer()
 {
-  fprintf(out, "and_integer:\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_lo + 0,x\n");
-  fprintf(out, "  and stack_lo + 1,x\n");
-  fprintf(out, "  sta stack_lo + 1,x\n");
-  fprintf(out, "  lda stack_hi + 0,x\n");
-  fprintf(out, "  and stack_hi + 1,x\n");
-  fprintf(out, "  sta stack_hi + 1,x\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "and_integer:\n"
+    "  inx\n"
+    "  lda stack_lo + 0,x\n"
+    "  and stack_lo + 1,x\n"
+    "  sta stack_lo + 1,x\n"
+    "  lda stack_hi + 0,x\n"
+    "  and stack_hi + 1,x\n"
+    "  sta stack_hi + 1,x\n"
+    "  rts\n");
 }
 
 void M6502::insert_or_integer()
 {
-  fprintf(out, "or_integer:\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_lo + 0,x\n");
-  fprintf(out, "  ora stack_lo + 1,x\n");
-  fprintf(out, "  sta stack_lo + 1,x\n");
-  fprintf(out, "  lda stack_hi + 0,x\n");
-  fprintf(out, "  ora stack_hi + 1,x\n");
-  fprintf(out, "  sta stack_hi + 1,x\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "or_integer:\n"
+    "  inx\n"
+    "  lda stack_lo + 0,x\n"
+    "  ora stack_lo + 1,x\n"
+    "  sta stack_lo + 1,x\n"
+    "  lda stack_hi + 0,x\n"
+    "  ora stack_hi + 1,x\n"
+    "  sta stack_hi + 1,x\n"
+    "  rts\n");
 }
 
 void M6502::insert_xor_integer()
 {
-  fprintf(out, "xor_integer:\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_lo + 0,x\n");
-  fprintf(out, "  eor stack_lo + 1,x\n");
-  fprintf(out, "  sta stack_lo + 1,x\n");
-  fprintf(out, "  lda stack_hi + 0,x\n");
-  fprintf(out, "  eor stack_hi + 1,x\n");
-  fprintf(out, "  sta stack_hi + 1,x\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "xor_integer:\n"
+    "  inx\n"
+    "  lda stack_lo + 0,x\n"
+    "  eor stack_lo + 1,x\n"
+    "  sta stack_lo + 1,x\n"
+    "  lda stack_hi + 0,x\n"
+    "  eor stack_hi + 1,x\n"
+    "  sta stack_hi + 1,x\n"
+    "  rts\n");
 }
 
 void M6502::insert_integer_to_byte()
 {
-  fprintf(out, "integer_to_byte:\n");
-  fprintf(out, "  lda stack_lo + 1,x\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  adc #0xff\n");
-  fprintf(out, "  eor #0xff\n");
-  fprintf(out, "  sta stack_hi + 1,x\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "integer_to_byte:\n"
+    "  lda stack_lo + 1,x\n"
+    "  asl\n"
+    "  lda #0\n"
+    "  adc #0xff\n"
+    "  eor #0xff\n"
+    "  sta stack_hi + 1,x\n"
+    "  rts\n");
 }
 
 // FIXME untested
 void M6502::insert_dup()
 {
-  fprintf(out, "dup:\n");
-  fprintf(out, "  lda stack_lo + 1,x\n");
-  fprintf(out, "  sta stack_lo + 0,x\n");
-  fprintf(out, "  lda stack_hi + 1,x\n");
-  fprintf(out, "  sta stack_hi + 0,x\n");
-  fprintf(out, "  dex\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "dup:\n"
+    "  lda stack_lo + 1,x\n"
+    "  sta stack_lo + 0,x\n"
+    "  lda stack_hi + 1,x\n"
+    "  sta stack_hi + 0,x\n"
+    "  dex\n"
+    "  rts\n");
 }
 
 void M6502::insert_dup2()
 {
-  fprintf(out, "dup2:\n");
-  fprintf(out, "  lda stack_lo + 2,x\n");
-  fprintf(out, "  sta stack_lo + 0,x\n");
-  fprintf(out, "  lda stack_hi + 2,x\n");
-  fprintf(out, "  sta stack_hi + 0,x\n");
+  fprintf(out, 
+    "dup2:\n"
+    "  lda stack_lo + 2,x\n"
+    "  sta stack_lo + 0,x\n"
+    "  lda stack_hi + 2,x\n"
+    "  sta stack_hi + 0,x\n"
 
-  fprintf(out, "  lda stack_lo + 1,x\n");
-  fprintf(out, "  sta stack_lo - 1,x\n");
-  fprintf(out, "  lda stack_hi + 1,x\n");
-  fprintf(out, "  sta stack_hi - 1,x\n");
+    "  lda stack_lo + 1,x\n"
+    "  sta stack_lo - 1,x\n"
+    "  lda stack_hi + 1,x\n"
+    "  sta stack_hi - 1,x\n"
 
-  fprintf(out, "  dex\n");
-  fprintf(out, "  dex\n");
-  fprintf(out, "  rts\n");
+    "  dex\n"
+    "  dex\n"
+    "  rts\n");
 }
 
 void M6502::insert_push_array_length()
 {
-  fprintf(out, "push_array_length:\n");
-  fprintf(out, "  lda stack_lo + 1,x\n");
-  fprintf(out, "  sec\n");
-  fprintf(out, "  sbc #2\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda stack_hi + 1,x\n");
-  fprintf(out, "  sbc #0\n");
-  fprintf(out, "  sta address + 1\n");
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda (address),y\n");
-  fprintf(out, "  sta stack_lo + 1,x\n");
-  fprintf(out, "  ldy #1\n");
-  fprintf(out, "  lda (address),y\n");
-  fprintf(out, "  sta stack_hi + 1,x\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "push_array_length:\n"
+    "  lda stack_lo + 1,x\n"
+    "  sec\n"
+    "  sbc #2\n"
+    "  sta address + 0\n"
+    "  lda stack_hi + 1,x\n"
+    "  sbc #0\n"
+    "  sta address + 1\n"
+    "  ldy #0\n"
+    "  lda (address),y\n"
+    "  sta stack_lo + 1,x\n"
+    "  ldy #1\n"
+    "  lda (address),y\n"
+    "  sta stack_hi + 1,x\n"
+    "  rts\n");
 }
 
 void M6502::insert_push_array_length2()
 {
-  fprintf(out, "push_array_length2:\n");
-  fprintf(out, "  sec\n");
-  fprintf(out, "  lda address + 0\n");
-  fprintf(out, "  sbc #2\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda address + 1\n");
-  fprintf(out, "  sbc #0\n");
-  fprintf(out, "  sta address + 1\n");
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda (address),y\n");
-  fprintf(out, "  sta stack_lo,x\n");
-  fprintf(out, "  ldy #1\n");
-  fprintf(out, "  lda (address),y\n");
-  fprintf(out, "  sta stack_hi,x\n");
-  fprintf(out, "  dex\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "push_array_length2:\n"
+    "  sec\n"
+    "  lda address + 0\n"
+    "  sbc #2\n"
+    "  sta address + 0\n"
+    "  lda address + 1\n"
+    "  sbc #0\n"
+    "  sta address + 1\n"
+    "  ldy #0\n"
+    "  lda (address),y\n"
+    "  sta stack_lo,x\n"
+    "  ldy #1\n"
+    "  lda (address),y\n"
+    "  sta stack_hi,x\n"
+    "  dex\n"
+    "  rts\n");
 }
 
 void M6502::insert_array_byte_support()
 {
   // new array_byte
-  fprintf(out, "new_array_byte:\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_lo + 0,x\n");
-  fprintf(out, "  sta length + 0\n");
-  fprintf(out, "  lda stack_hi + 0,x\n");
-  fprintf(out, "  sta length + 1\n");
+  fprintf(out, 
+    "new_array_byte:\n"
+    "  inx\n"
+    "  lda stack_lo + 0,x\n"
+    "  sta length + 0\n"
+    "  lda stack_hi + 0,x\n"
+    "  sta length + 1\n"
 
-  fprintf(out, "  lda heap_ptr + 0\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda heap_ptr + 1\n");
-  fprintf(out, "  sta address + 1\n");
+    "  lda heap_ptr + 0\n"
+    "  sta address + 0\n"
+    "  lda heap_ptr + 1\n"
+    "  sta address + 1\n"
 
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda length + 0\n");
-  fprintf(out, "  sta (address),y\n");
-  fprintf(out, "  ldy #1\n");
-  fprintf(out, "  lda length + 1\n");
-  fprintf(out, "  sta (address),y\n");
+    "  ldy #0\n"
+    "  lda length + 0\n"
+    "  sta (address),y\n"
+    "  ldy #1\n"
+    "  lda length + 1\n"
+    "  sta (address),y\n"
 
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda length + 0\n");
-  fprintf(out, "  adc #2\n");
-  fprintf(out, "  sta length + 0\n");
-  fprintf(out, "  lda length + 1\n");
-  fprintf(out, "  adc #0\n");
-  fprintf(out, "  sta length + 1\n");
+    "  clc\n"
+    "  lda length + 0\n"
+    "  adc #2\n"
+    "  sta length + 0\n"
+    "  lda length + 1\n"
+    "  adc #0\n"
+    "  sta length + 1\n"
 
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda heap_ptr + 0\n");
-  fprintf(out, "  adc length + 0\n");
-  fprintf(out, "  sta heap_ptr + 0\n");
-  fprintf(out, "  lda heap_ptr + 1\n");
-  fprintf(out, "  adc length + 1\n");
-  fprintf(out, "  sta heap_ptr + 1\n");
+    "  clc\n"
+    "  lda heap_ptr + 0\n"
+    "  adc length + 0\n"
+    "  sta heap_ptr + 0\n"
+    "  lda heap_ptr + 1\n"
+    "  adc length + 1\n"
+    "  sta heap_ptr + 1\n"
 
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda address + 0\n");
-  fprintf(out, "  adc #3\n");
-  fprintf(out, "  and #254\n");
-  fprintf(out, "  sta stack_lo + 0,x\n");
-  fprintf(out, "  lda address + 1\n");
-  fprintf(out, "  adc #0\n");
-  fprintf(out, "  sta stack_hi + 0,x\n");
-  fprintf(out, "  dex\n");
-  fprintf(out, "  rts\n");
+    "  clc\n"
+    "  lda address + 0\n"
+    "  adc #3\n"
+    "  and #254\n"
+    "  sta stack_lo + 0,x\n"
+    "  lda address + 1\n"
+    "  adc #0\n"
+    "  sta stack_hi + 0,x\n"
+    "  dex\n"
+    "  rts\n");
 
   // array_read_byte
-  fprintf(out, "array_read_byte:\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda stack_lo + 1,x\n");
-  fprintf(out, "  adc stack_lo + 0,x\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda stack_hi + 1,x\n");
-  fprintf(out, "  adc stack_hi + 0,x\n");
-  fprintf(out, "  sta address + 1\n");
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda (address),y\n");
-  fprintf(out, "  sta stack_lo + 1,x\n");
-  fprintf(out, "  asl\n");
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  adc #0xff\n");
-  fprintf(out, "  eor #0xff\n");
-  fprintf(out, "  sta stack_hi + 1,x\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "array_read_byte:\n"
+    "  inx\n"
+    "  clc\n"
+    "  lda stack_lo + 1,x\n"
+    "  adc stack_lo + 0,x\n"
+    "  sta address + 0\n"
+    "  lda stack_hi + 1,x\n"
+    "  adc stack_hi + 0,x\n"
+    "  sta address + 1\n"
+    "  ldy #0\n"
+    "  lda (address),y\n"
+    "  sta stack_lo + 1,x\n"
+    "  asl\n"
+    "  lda #0\n"
+    "  adc #0xff\n"
+    "  eor #0xff\n"
+    "  sta stack_hi + 1,x\n"
+    "  rts\n");
 
   // array_write_byte
-  fprintf(out, "array_write_byte:\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda stack_lo + 2,x\n");
-  fprintf(out, "  adc stack_lo + 1,x\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda stack_hi + 2,x\n");
-  fprintf(out, "  adc stack_hi + 1,x\n");
-  fprintf(out, "  sta address + 1\n");
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda stack_lo + 0,x\n");
-  fprintf(out, "  sta (address),y\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "array_write_byte:\n"
+    "  inx\n"
+    "  clc\n"
+    "  lda stack_lo + 2,x\n"
+    "  adc stack_lo + 1,x\n"
+    "  sta address + 0\n"
+    "  lda stack_hi + 2,x\n"
+    "  adc stack_hi + 1,x\n"
+    "  sta address + 1\n"
+    "  ldy #0\n"
+    "  lda stack_lo + 0,x\n"
+    "  sta (address),y\n"
+    "  inx\n"
+    "  inx\n"
+    "  rts\n");
 }
 
 void M6502::insert_array_int_support()
 {
   // new_array int
-  fprintf(out, "new_array_int:\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_lo + 0,x\n");
-  fprintf(out, "  sta length + 0\n");
-  fprintf(out, "  lda stack_hi + 0,x\n");
-  fprintf(out, "  sta length + 1\n");
+  fprintf(out, 
+    "new_array_int:\n"
+    "  inx\n"
+    "  lda stack_lo + 0,x\n"
+    "  sta length + 0\n"
+    "  lda stack_hi + 0,x\n"
+    "  sta length + 1\n"
 
-  fprintf(out, "  lda heap_ptr + 0\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda heap_ptr + 1\n");
-  fprintf(out, "  sta address + 1\n");
+    "  lda heap_ptr + 0\n"
+    "  sta address + 0\n"
+    "  lda heap_ptr + 1\n"
+    "  sta address + 1\n"
 
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda length + 0\n");
-  fprintf(out, "  sta (address),y\n");
-  fprintf(out, "  ldy #1\n");
-  fprintf(out, "  lda length + 1\n");
-  fprintf(out, "  sta (address),y\n");
+    "  ldy #0\n"
+    "  lda length + 0\n"
+    "  sta (address),y\n"
+    "  ldy #1\n"
+    "  lda length + 1\n"
+    "  sta (address),y\n"
 
-  fprintf(out, "  asl length + 0\n");
-  fprintf(out, "  rol length + 1\n");
+    "  asl length + 0\n"
+    "  rol length + 1\n"
 
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda length + 0\n");
-  fprintf(out, "  adc #2\n");
-  fprintf(out, "  sta length + 0\n");
-  fprintf(out, "  lda length + 1\n");
-  fprintf(out, "  adc #0\n");
-  fprintf(out, "  sta length + 1\n");
+    "  clc\n"
+    "  lda length + 0\n"
+    "  adc #2\n"
+    "  sta length + 0\n"
+    "  lda length + 1\n"
+    "  adc #0\n"
+    "  sta length + 1\n"
 
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda heap_ptr + 0\n");
-  fprintf(out, "  adc length + 0\n");
-  fprintf(out, "  sta heap_ptr + 0\n");
-  fprintf(out, "  lda heap_ptr + 1\n");
-  fprintf(out, "  adc length + 1\n");
-  fprintf(out, "  sta heap_ptr + 1\n");
+    "  clc\n"
+    "  lda heap_ptr + 0\n"
+    "  adc length + 0\n"
+    "  sta heap_ptr + 0\n"
+    "  lda heap_ptr + 1\n"
+    "  adc length + 1\n"
+    "  sta heap_ptr + 1\n"
 
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda address + 0\n");
-  fprintf(out, "  adc #3\n");
-  fprintf(out, "  and #254\n");
-  fprintf(out, "  sta stack_lo + 0,x\n");
-  fprintf(out, "  lda address + 1\n");
-  fprintf(out, "  adc #0\n");
-  fprintf(out, "  sta stack_hi + 0,x\n");
-  fprintf(out, "  dex\n");
-  fprintf(out, "  rts\n");
+    "  clc\n"
+    "  lda address + 0\n"
+    "  adc #3\n"
+    "  and #254\n"
+    "  sta stack_lo + 0,x\n"
+    "  lda address + 1\n"
+    "  adc #0\n"
+    "  sta stack_hi + 0,x\n"
+    "  dex\n"
+    "  rts\n");
 
   // array_read_int
-  fprintf(out, "array_read_int:\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  asl stack_lo + 0,x\n");
-  fprintf(out, "  rol stack_hi + 0,x\n");
+  fprintf(out, 
+    "array_read_int:\n"
+    "  inx\n"
+    "  asl stack_lo + 0,x\n"
+    "  rol stack_hi + 0,x\n"
 
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda stack_lo + 1,x\n");
-  fprintf(out, "  adc stack_lo + 0,x\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda stack_hi + 1,x\n");
-  fprintf(out, "  adc stack_hi + 0,x\n");
-  fprintf(out, "  sta address + 1\n");
+    "  clc\n"
+    "  lda stack_lo + 1,x\n"
+    "  adc stack_lo + 0,x\n"
+    "  sta address + 0\n"
+    "  lda stack_hi + 1,x\n"
+    "  adc stack_hi + 0,x\n"
+    "  sta address + 1\n"
 
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda (address),y\n");
-  fprintf(out, "  sta stack_lo + 1,x\n");
-  fprintf(out, "  iny\n");
-  fprintf(out, "  lda (address),y\n");
-  fprintf(out, "  sta stack_hi + 1,x\n");
-  fprintf(out, "  rts\n");
+    "  ldy #0\n"
+    "  lda (address),y\n"
+    "  sta stack_lo + 1,x\n"
+    "  iny\n"
+    "  lda (address),y\n"
+    "  sta stack_hi + 1,x\n"
+    "  rts\n");
 
   // array_write_int
-  fprintf(out, "array_write_int:\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  asl stack_lo + 1,x\n");
-  fprintf(out, "  rol stack_hi + 1,x\n");
+  fprintf(out, 
+    "array_write_int:\n"
+    "  inx\n"
+    "  asl stack_lo + 1,x\n"
+    "  rol stack_hi + 1,x\n"
 
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda stack_lo + 2,x\n");
-  fprintf(out, "  adc stack_lo + 1,x\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda stack_hi + 2,x\n");
-  fprintf(out, "  adc stack_hi + 1,x\n");
-  fprintf(out, "  sta address + 1\n");
+    "  clc\n"
+    "  lda stack_lo + 2,x\n"
+    "  adc stack_lo + 1,x\n"
+    "  sta address + 0\n"
+    "  lda stack_hi + 2,x\n"
+    "  adc stack_hi + 1,x\n"
+    "  sta address + 1\n"
 
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda stack_lo + 0,x\n");
-  fprintf(out, "  sta (address),y\n");
-  fprintf(out, "  iny\n");
-  fprintf(out, "  lda stack_hi + 0,x\n");
-  fprintf(out, "  sta (address),y\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  rts\n");
+    "  ldy #0\n"
+    "  lda stack_lo + 0,x\n"
+    "  sta (address),y\n"
+    "  iny\n"
+    "  lda stack_hi + 0,x\n"
+    "  sta (address),y\n"
+    "  inx\n"
+    "  inx\n"
+    "  rts\n");
 }
 
 // Memory API
@@ -1814,79 +1835,83 @@ int M6502::memory_preloadByteArray_X(const char *array_name)
   fprintf(out, "  lda #_%s >> 8\n", array_name);
   fprintf(out, "  sta stack_hi,x\n");
   fprintf(out, "  dex\n");
-  stack++;
 
+  stack++;
   return 0;
 }
 
 void M6502::insert_memory_read8()
 {
-  fprintf(out, "memory_read8:\n");
-  fprintf(out, "  lda stack_lo + 1,x\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda stack_hi + 1,x\n");
-  fprintf(out, "  sta address + 1\n");
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda (address),y\n");
-  fprintf(out, "  sta stack_lo + 1,x\n");
+  fprintf(out, 
+    "memory_read8:\n"
+    "  lda stack_lo + 1,x\n"
+    "  sta address + 0\n"
+    "  lda stack_hi + 1,x\n"
+    "  sta address + 1\n"
+    "  ldy #0\n"
+    "  lda (address),y\n"
+    "  sta stack_lo + 1,x\n"
 
-  // sign-extend
-  fprintf(out, "  asl\n");
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  adc #0xff\n");
-  fprintf(out, "  eor #0xff\n");
-  fprintf(out, "  sta stack_hi + 1,x\n");
-  fprintf(out, "  rts\n");
+    // sign-extend
+    "  asl\n"
+    "  lda #0\n"
+    "  adc #0xff\n"
+    "  eor #0xff\n"
+    "  sta stack_hi + 1,x\n"
+    "  rts\n");
 }
 
 void M6502::insert_memory_write8()
 {
-  fprintf(out, "memory_write8:\n");
-  fprintf(out, "  lda stack_lo + 2,x\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda stack_hi + 2,x\n");
-  fprintf(out, "  sta address + 1\n");
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda stack_lo + 1,x\n");
-  fprintf(out, "  sta (address),y\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "memory_write8:\n"
+    "  lda stack_lo + 2,x\n"
+    "  sta address + 0\n"
+    "  lda stack_hi + 2,x\n"
+    "  sta address + 1\n"
+    "  ldy #0\n"
+    "  lda stack_lo + 1,x\n"
+    "  sta (address),y\n"
+    "  inx\n"
+    "  inx\n"
+    "  rts\n");
 }
 
 void M6502::insert_memory_read16()
 {
-  fprintf(out, "memory_read16:\n");
-  fprintf(out, "  lda stack_lo + 1,x\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda stack_hi + 1,x\n");
-  fprintf(out, "  sta address + 1\n");
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda (address),y\n");
-  fprintf(out, "  sta stack_lo + 1,x\n");
-  fprintf(out, "  iny\n");
-  fprintf(out, "  lda (address),y\n");
-  fprintf(out, "  sta stack_hi + 1,x\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "memory_read16:\n"
+    "  lda stack_lo + 1,x\n"
+    "  sta address + 0\n"
+    "  lda stack_hi + 1,x\n"
+    "  sta address + 1\n"
+    "  ldy #0\n"
+    "  lda (address),y\n"
+    "  sta stack_lo + 1,x\n"
+    "  iny\n"
+    "  lda (address),y\n"
+    "  sta stack_hi + 1,x\n"
+    "  rts\n");
 }
 
 void M6502::insert_memory_write16()
 {
-  fprintf(out, "memory_write16:\n");
-  fprintf(out, "  lda stack_lo + 2,x\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda stack_hi + 2,x\n");
-  fprintf(out, "  sta address + 1\n");
+  fprintf(out, 
+    "memory_write16:\n"
+    "  lda stack_lo + 2,x\n"
+    "  sta address + 0\n"
+    "  lda stack_hi + 2,x\n"
+    "  sta address + 1\n"
 
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda stack_lo + 1,x\n");
-  fprintf(out, "  sta (address),y\n");
-  fprintf(out, "  iny\n");
-  fprintf(out, "  lda stack_hi + 1,x\n");
-  fprintf(out, "  sta (address),y\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  rts\n");
+    "  ldy #0\n"
+    "  lda stack_lo + 1,x\n"
+    "  sta (address),y\n"
+    "  iny\n"
+    "  lda stack_hi + 1,x\n"
+    "  sta (address),y\n"
+    "  inx\n"
+    "  inx\n"
+    "  rts\n");
 }
 
 // Math API
@@ -1919,56 +1944,59 @@ int M6502::math_abs_I()
 
 void M6502::insert_math_max()
 {
-  fprintf(out, "math_max:\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_lo + 1,x\n");
-  fprintf(out, "  cmp stack_lo + 0,x\n");
-  fprintf(out, "  lda stack_hi + 1,x\n");
-  fprintf(out, "  sbc stack_hi + 0,x\n");
-  fprintf(out, "  bvc #2\n");
-  fprintf(out, "  eor #0x80\n");
-  fprintf(out, "  bpl math_max_skip\n");
-  fprintf(out, "  lda stack_lo + 0,x\n");
-  fprintf(out, "  sta stack_lo + 1,x\n");
-  fprintf(out, "  lda stack_hi + 0,x\n");
-  fprintf(out, "  sta stack_hi + 1,x\n");
-  fprintf(out, "math_max_skip:\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "math_max:\n"
+    "  inx\n"
+    "  lda stack_lo + 1,x\n"
+    "  cmp stack_lo + 0,x\n"
+    "  lda stack_hi + 1,x\n"
+    "  sbc stack_hi + 0,x\n"
+    "  bvc #2\n"
+    "  eor #0x80\n"
+    "  bpl math_max_skip\n"
+    "  lda stack_lo + 0,x\n"
+    "  sta stack_lo + 1,x\n"
+    "  lda stack_hi + 0,x\n"
+    "  sta stack_hi + 1,x\n"
+    "math_max_skip:\n"
+    "  rts\n");
 };
 
 void M6502::insert_math_min()
 {
-  fprintf(out, "math_min:\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_lo + 0,x\n");
-  fprintf(out, "  cmp stack_lo + 1,x\n");
-  fprintf(out, "  lda stack_hi + 0,x\n");
-  fprintf(out, "  sbc stack_hi + 1,x\n");
-  fprintf(out, "  bvc #2\n");
-  fprintf(out, "  eor #0x80\n");
-  fprintf(out, "  bpl math_min_skip\n");
-  fprintf(out, "  lda stack_lo + 0,x\n");
-  fprintf(out, "  sta stack_lo + 1,x\n");
-  fprintf(out, "  lda stack_hi + 0,x\n");
-  fprintf(out, "  sta stack_hi + 1,x\n");
-  fprintf(out, "math_min_skip:\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "math_min:\n"
+    "  inx\n"
+    "  lda stack_lo + 0,x\n"
+    "  cmp stack_lo + 1,x\n"
+    "  lda stack_hi + 0,x\n"
+    "  sbc stack_hi + 1,x\n"
+    "  bvc #2\n"
+    "  eor #0x80\n"
+    "  bpl math_min_skip\n"
+    "  lda stack_lo + 0,x\n"
+    "  sta stack_lo + 1,x\n"
+    "  lda stack_hi + 0,x\n"
+    "  sta stack_hi + 1,x\n"
+    "math_min_skip:\n"
+    "  rts\n");
 };
 
 void M6502::insert_math_abs()
 {
-  fprintf(out, "math_abs:\n");
-  fprintf(out, "  lda stack_hi + 1,x\n");
-  fprintf(out, "  and #0x80\n");
-  fprintf(out, "  bne #1\n");
-  fprintf(out, "  rts\n");
-  fprintf(out, "  sec\n");
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  sbc stack_lo + 1,x\n");
-  fprintf(out, "  sta stack_lo + 1,x\n");
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  sbc stack_hi + 1,x\n");
-  fprintf(out, "  sta stack_hi + 1,x\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "math_abs:\n"
+    "  lda stack_hi + 1,x\n"
+    "  and #0x80\n"
+    "  bne #1\n"
+    "  rts\n"
+    "  sec\n"
+    "  lda #0\n"
+    "  sbc stack_lo + 1,x\n"
+    "  sta stack_lo + 1,x\n"
+    "  lda #0\n"
+    "  sbc stack_hi + 1,x\n"
+    "  sta stack_hi + 1,x\n"
+    "  rts\n");
 };
 
