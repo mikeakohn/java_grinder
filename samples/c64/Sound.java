@@ -956,6 +956,20 @@ public class Sound
     VIC.border(11);
     VIC.textClear(32);
 
+CPU.asm(".set bits = 8\n");
+CPU.asm(".if bits == 8\n");
+VIC.border(6);
+CPU.asm(".else\n");
+VIC.border(14);
+CPU.asm(".endif\n");
+
+CPU.asm(".set bits = 16\n");
+CPU.asm(".if bits == 8\n");
+VIC.border(6);
+CPU.asm(".else\n");
+VIC.border(14);
+CPU.asm(".endif\n");
+
     for(int i = 0; i < 120; i++)
     {
       Memory.write8(0xc000 + 40 * 16 + i, (byte)64);
