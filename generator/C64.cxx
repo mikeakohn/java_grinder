@@ -188,22 +188,24 @@ int C64::open(const char *filename)
 
 int C64::c64_sid_frequency1(/* value */)
 {
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_hi,x\n");
-  fprintf(out, "  sta 0xd401\n");
-  fprintf(out, "  lda stack_lo,x\n");
-  fprintf(out, "  sta 0xd400\n");
+  fprintf(out, 
+    "  inx\n"
+    "  lda stack_hi,x\n"
+    "  sta 0xd401\n"
+    "  lda stack_lo,x\n"
+    "  sta 0xd400\n");
 
   return 0;
 }
 
 int C64::c64_sid_pulseWidth1(/* value */)
 {
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_hi,x\n");
-  fprintf(out, "  sta 0xd403\n");
-  fprintf(out, "  lda stack_lo,x\n");
-  fprintf(out, "  sta 0xd402\n");
+  fprintf(out, 
+    "  inx\n"
+    "  lda stack_hi,x\n"
+    "  sta 0xd403\n"
+    "  lda stack_lo,x\n"
+    "  sta 0xd402\n");
 
   return 0;
 }
@@ -212,33 +214,36 @@ int C64::c64_sid_waveform1(/* value */) { POKE(0xd404); return 0; }
 
 int C64::c64_sid_adsr1(/* value */)
 {
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_hi,x\n");
-  fprintf(out, "  sta 0xd406\n");
-  fprintf(out, "  lda stack_lo,x\n");
-  fprintf(out, "  sta 0xd405\n");
+  fprintf(out, 
+    "  inx\n"
+    "  lda stack_hi,x\n"
+    "  sta 0xd406\n"
+    "  lda stack_lo,x\n"
+    "  sta 0xd405\n");
 
   return 0;
 }
 
 int C64::c64_sid_frequency2(/* value */)
 {
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_hi,x\n");
-  fprintf(out, "  sta 0xd408\n");
-  fprintf(out, "  lda stack_lo,x\n");
-  fprintf(out, "  sta 0xd407\n");
+  fprintf(out, 
+    "  inx\n"
+    "  lda stack_hi,x\n"
+    "  sta 0xd408\n"
+    "  lda stack_lo,x\n"
+    "  sta 0xd407\n");
 
   return 0;
 }
 
 int C64::c64_sid_pulseWidth2(/* value */)
 {
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_hi,x\n");
-  fprintf(out, "  sta 0xd40a\n");
-  fprintf(out, "  lda stack_lo,x\n");
-  fprintf(out, "  sta 0xd409\n");
+  fprintf(out, 
+    "  inx\n"
+    "  lda stack_hi,x\n"
+    "  sta 0xd40a\n"
+    "  lda stack_lo,x\n"
+    "  sta 0xd409\n");
 
   return 0;
 }
@@ -247,33 +252,36 @@ int C64::c64_sid_waveform2(/* value */) { POKE(0xd40b); return 0; }
 
 int C64::c64_sid_adsr2(/* value */)
 {
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_hi,x\n");
-  fprintf(out, "  sta 0xd40d\n");
-  fprintf(out, "  lda stack_lo,x\n");
-  fprintf(out, "  sta 0xd40c\n");
+  fprintf(out, 
+    "  inx\n"
+    "  lda stack_hi,x\n"
+    "  sta 0xd40d\n"
+    "  lda stack_lo,x\n"
+    "  sta 0xd40c\n");
 
   return 0;
 }
 
 int C64::c64_sid_frequency3(/* value */)
 {
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_hi,x\n");
-  fprintf(out, "  sta 0xd40f\n");
-  fprintf(out, "  lda stack_lo,x\n");
-  fprintf(out, "  sta 0xd40e\n");
+  fprintf(out, 
+    "  inx\n"
+    "  lda stack_hi,x\n"
+    "  sta 0xd40f\n"
+    "  lda stack_lo,x\n"
+    "  sta 0xd40e\n");
 
   return 0;
 }
 
 int C64::c64_sid_pulseWidth3(/* value */)
 {
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_hi,x\n");
-  fprintf(out, "  sta 0xd411\n");
-  fprintf(out, "  lda stack_lo,x\n");
-  fprintf(out, "  sta 0xd410\n");
+  fprintf(out, 
+    "  inx\n"
+    "  lda stack_hi,x\n"
+    "  sta 0xd411\n"
+    "  lda stack_lo,x\n"
+    "  sta 0xd410\n");
 
   return 0;
 }
@@ -282,22 +290,24 @@ int C64::c64_sid_waveform3(/* value */) { POKE(0xd412); return 0; }
 
 int C64::c64_sid_adsr3(/* value */)
 {
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_hi,x\n");
-  fprintf(out, "  sta 0xd414\n");
-  fprintf(out, "  lda stack_lo,x\n");
-  fprintf(out, "  sta 0xd413\n");
+  fprintf(out, 
+    "  inx\n"
+    "  lda stack_hi,x\n"
+    "  sta 0xd414\n"
+    "  lda stack_lo,x\n"
+    "  sta 0xd413\n");
 
   return 0;
 }
 
 int C64::c64_sid_filterCutoff(/* value */)
 {
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_hi,x\n");
-  fprintf(out, "  sta 0xd416\n");
-  fprintf(out, "  lda stack_lo,x\n");
-  fprintf(out, "  sta 0xd415\n");
+  fprintf(out, 
+    "  inx\n"
+    "  lda stack_hi,x\n"
+    "  sta 0xd416\n"
+    "  lda stack_lo,x\n"
+    "  sta 0xd415\n");
 
   return 0;
 }
@@ -307,14 +317,16 @@ int C64::c64_sid_volume(/* value */) { POKE(0xd418); return 0; }
 int C64::c64_sid_oscillator3(/* value */) { POKE(0xd41b); return 0; }
 int C64::c64_sid_envelope3(/* value */) { POKE(0xd41c); return 0; }
 
+//FIXME this should be a subroutine
 int C64::c64_sid_clear()
 {
-  fprintf(out, "; sid clear\n");
-  fprintf(out, "  ldy #0x1c\n");
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  sta 0xd400,y\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bpl #-6\n");
+  fprintf(out, 
+    "; sid clear\n"
+    "  ldy #0x1c\n"
+    "  lda #0\n"
+    "  sta 0xd400,y\n"
+    "  dey\n"
+    "  bpl #-6\n");
 
   return 0;
 }
