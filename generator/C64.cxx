@@ -1295,114 +1295,118 @@ void C64::insert_c64_vic_make_hires_tables()
 
 void C64::insert_c64_vic_text_enable()
 {
-  fprintf(out, "text_enable:\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_lo,x\n");
-  fprintf(out, "  bne text_enable_1\n");
-  fprintf(out, "  lda #0x02\n");
-  fprintf(out, "  jmp text_enable_2\n");
-  fprintf(out, "text_enable_1:\n");
-  fprintf(out, "  lda #0x12\n");
-  fprintf(out, "text_enable_2:\n");
-  fprintf(out, "  sta 0xd018\n");
-  fprintf(out, "  lda 0xd011\n");
-  fprintf(out, "  and #0xdf\n");
-  fprintf(out, "  sta 0xd011\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "text_enable:\n"
+    "  inx\n"
+    "  lda stack_lo,x\n"
+    "  bne text_enable_1\n"
+    "  lda #0x02\n"
+    "  jmp text_enable_2\n"
+    "text_enable_1:\n"
+    "  lda #0x12\n"
+    "text_enable_2:\n"
+    "  sta 0xd018\n"
+    "  lda 0xd011\n"
+    "  and #0xdf\n"
+    "  sta 0xd011\n"
+    "  rts\n");
 }
 
 void C64::insert_c64_vic_text_clear()
 {
-  fprintf(out, "text_clear:\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_lo,x\n");
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "text_clear_loop:\n");
-  fprintf(out, "  sta 0xc000,y\n");
-  fprintf(out, "  sta 0xc100,y\n");
-  fprintf(out, "  sta 0xc200,y\n");
-  fprintf(out, "  sta 0xc2e8,y\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bne text_clear_loop\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "text_clear:\n"
+    "  inx\n"
+    "  lda stack_lo,x\n"
+    "  ldy #0\n"
+    "text_clear_loop:\n"
+    "  sta 0xc000,y\n"
+    "  sta 0xc100,y\n"
+    "  sta 0xc200,y\n"
+    "  sta 0xc2e8,y\n"
+    "  dey\n"
+    "  bne text_clear_loop\n"
+    "  rts\n");
 }
 
 void C64::insert_c64_vic_text_copy()
 {
-  fprintf(out, "text_copy:\n");
-  fprintf(out, "  ldy #39\n");
-  fprintf(out, "text_copy_loop:\n");
-  fprintf(out, "  lda 0xc000 + 40 * 0,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 0,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 1,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 1,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 2,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 2,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 3,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 3,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 4,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 4,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 5,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 5,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 6,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 6,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 7,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 7,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 8,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 8,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 9,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 9,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 10,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 10,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 11,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 11,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 12,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 12,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 13,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 13,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 14,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 14,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 15,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 15,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 16,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 16,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 17,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 17,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 18,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 18,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 19,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 19,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 20,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 20,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 21,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 21,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 22,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 22,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 23,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 23,y\n");
-  fprintf(out, "  lda 0xc000 + 40 * 24,y\n");
-  fprintf(out, "  sta 0xc400 + 40 * 24,y\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bmi #3\n");
-  fprintf(out, "  jmp text_copy_loop\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "text_copy:\n"
+    "  ldy #39\n"
+    "text_copy_loop:\n"
+    "  lda 0xc000 + 40 * 0,y\n"
+    "  sta 0xc400 + 40 * 0,y\n"
+    "  lda 0xc000 + 40 * 1,y\n"
+    "  sta 0xc400 + 40 * 1,y\n"
+    "  lda 0xc000 + 40 * 2,y\n"
+    "  sta 0xc400 + 40 * 2,y\n"
+    "  lda 0xc000 + 40 * 3,y\n"
+    "  sta 0xc400 + 40 * 3,y\n"
+    "  lda 0xc000 + 40 * 4,y\n"
+    "  sta 0xc400 + 40 * 4,y\n"
+    "  lda 0xc000 + 40 * 5,y\n"
+    "  sta 0xc400 + 40 * 5,y\n"
+    "  lda 0xc000 + 40 * 6,y\n"
+    "  sta 0xc400 + 40 * 6,y\n"
+    "  lda 0xc000 + 40 * 7,y\n"
+    "  sta 0xc400 + 40 * 7,y\n"
+    "  lda 0xc000 + 40 * 8,y\n"
+    "  sta 0xc400 + 40 * 8,y\n"
+    "  lda 0xc000 + 40 * 9,y\n"
+    "  sta 0xc400 + 40 * 9,y\n"
+    "  lda 0xc000 + 40 * 10,y\n"
+    "  sta 0xc400 + 40 * 10,y\n"
+    "  lda 0xc000 + 40 * 11,y\n"
+    "  sta 0xc400 + 40 * 11,y\n"
+    "  lda 0xc000 + 40 * 12,y\n"
+    "  sta 0xc400 + 40 * 12,y\n"
+    "  lda 0xc000 + 40 * 13,y\n"
+    "  sta 0xc400 + 40 * 13,y\n"
+    "  lda 0xc000 + 40 * 14,y\n"
+    "  sta 0xc400 + 40 * 14,y\n"
+    "  lda 0xc000 + 40 * 15,y\n"
+    "  sta 0xc400 + 40 * 15,y\n"
+    "  lda 0xc000 + 40 * 16,y\n"
+    "  sta 0xc400 + 40 * 16,y\n"
+    "  lda 0xc000 + 40 * 17,y\n"
+    "  sta 0xc400 + 40 * 17,y\n"
+    "  lda 0xc000 + 40 * 18,y\n"
+    "  sta 0xc400 + 40 * 18,y\n"
+    "  lda 0xc000 + 40 * 19,y\n"
+    "  sta 0xc400 + 40 * 19,y\n"
+    "  lda 0xc000 + 40 * 20,y\n"
+    "  sta 0xc400 + 40 * 20,y\n"
+    "  lda 0xc000 + 40 * 21,y\n"
+    "  sta 0xc400 + 40 * 21,y\n"
+    "  lda 0xc000 + 40 * 22,y\n"
+    "  sta 0xc400 + 40 * 22,y\n"
+    "  lda 0xc000 + 40 * 23,y\n"
+    "  sta 0xc400 + 40 * 23,y\n"
+    "  lda 0xc000 + 40 * 24,y\n"
+    "  sta 0xc400 + 40 * 24,y\n"
+    "  dey\n"
+    "  bmi #3\n"
+    "  jmp text_copy_loop\n"
+    "  rts\n");
 
 /*
-  // about 10% slower version but smaller
-  fprintf(out, "text_copy:\n");
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "text_copy_loop_1:\n");
-  fprintf(out, "  lda 0xc000,y\n");
-  fprintf(out, "  sta 0xc400,y\n");
-  fprintf(out, "  lda 0xc100,y\n");
-  fprintf(out, "  sta 0xc500,y\n");
-  fprintf(out, "  lda 0xc200,y\n");
-  fprintf(out, "  sta 0xc600,y\n");
-  fprintf(out, "  lda 0xc2e8,y\n");
-  fprintf(out, "  sta 0xc6e8,y\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bne text_copy_loop_1\n");
-  fprintf(out, "  rts\n");
+  // about 10% slower but smaller
+  fprintf(out, 
+    "text_copy:\n"
+    "  ldy #0\n"
+    "text_copy_loop_1:\n"
+    "  lda 0xc000,y\n"
+    "  sta 0xc400,y\n"
+    "  lda 0xc100,y\n"
+    "  sta 0xc500,y\n"
+    "  lda 0xc200,y\n"
+    "  sta 0xc600,y\n"
+    "  lda 0xc2e8,y\n"
+    "  sta 0xc6e8,y\n"
+    "  dey\n"
+    "  bne text_copy_loop_1\n"
+    "  rts\n");
 */
 }
 
