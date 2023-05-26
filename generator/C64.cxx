@@ -848,23 +848,25 @@ int C64::joystick_isRight_I(int index)
 
   if (index == 0)
   {
-    fprintf(out, "  lda 0xdc01\n");
-    fprintf(out, "  and #8\n");
-    fprintf(out, "  eor #8\n");
-    fprintf(out, "  sta stack_lo,x\n");
-    fprintf(out, "  lda #0\n");
-    fprintf(out, "  sta stack_hi,x\n");
-    fprintf(out, "  dex\n");
+    fprintf(out, 
+      "  lda 0xdc01\n"
+      "  and #8\n"
+      "  eor #8\n"
+      "  sta stack_lo,x\n"
+      "  lda #0\n"
+      "  sta stack_hi,x\n"
+      "  dex\n");
   }
     else
   {
-    fprintf(out, "  lda 0xdc00\n");
-    fprintf(out, "  and #8\n");
-    fprintf(out, "  eor #8\n");
-    fprintf(out, "  sta stack_lo,x\n");
-    fprintf(out, "  lda #0\n");
-    fprintf(out, "  sta stack_hi,x\n");
-    fprintf(out, "  dex\n");
+    fprintf(out, 
+      "  lda 0xdc00\n"
+      "  and #8\n"
+      "  eor #8\n"
+      "  sta stack_lo,x\n"
+      "  lda #0\n"
+      "  sta stack_hi,x\n"
+      "  dex\n");
   }
 
   return 0;
@@ -881,23 +883,25 @@ int C64::joystick_isLeft_I(int index)
 
   if (index == 0)
   {
-    fprintf(out, "  lda 0xdc01\n");
-    fprintf(out, "  and #4\n");
-    fprintf(out, "  eor #4\n");
-    fprintf(out, "  sta stack_lo,x\n");
-    fprintf(out, "  lda #0\n");
-    fprintf(out, "  sta stack_hi,x\n");
-    fprintf(out, "  dex\n");
+    fprintf(out, 
+      "  lda 0xdc01\n"
+      "  and #4\n"
+      "  eor #4\n"
+      "  sta stack_lo,x\n"
+      "  lda #0\n"
+      "  sta stack_hi,x\n"
+      "  dex\n");
   }
     else
   {
-    fprintf(out, "  lda 0xdc00\n");
-    fprintf(out, "  and #4\n");
-    fprintf(out, "  eor #4\n");
-    fprintf(out, "  sta stack_lo,x\n");
-    fprintf(out, "  lda #0\n");
-    fprintf(out, "  sta stack_hi,x\n");
-    fprintf(out, "  dex\n");
+    fprintf(out, 
+      "  lda 0xdc00\n"
+      "  and #4\n"
+      "  eor #4\n"
+      "  sta stack_lo,x\n"
+      "  lda #0\n"
+      "  sta stack_hi,x\n"
+      "  dex\n");
   }
 
   return 0;
@@ -914,23 +918,25 @@ int C64::joystick_isDown_I(int index)
 
   if (index == 0)
   {
-    fprintf(out, "  lda 0xdc01\n");
-    fprintf(out, "  and #2\n");
-    fprintf(out, "  eor #2\n");
-    fprintf(out, "  sta stack_lo,x\n");
-    fprintf(out, "  lda #0\n");
-    fprintf(out, "  sta stack_hi,x\n");
-    fprintf(out, "  dex\n");
+    fprintf(out, 
+      "  lda 0xdc01\n"
+      "  and #2\n"
+      "  eor #2\n"
+      "  sta stack_lo,x\n"
+      "  lda #0\n"
+      "  sta stack_hi,x\n"
+      "  dex\n");
   }
     else
   {
-    fprintf(out, "  lda 0xdc00\n");
-    fprintf(out, "  and #2\n");
-    fprintf(out, "  eor #2\n");
-    fprintf(out, "  sta stack_lo,x\n");
-    fprintf(out, "  lda #0\n");
-    fprintf(out, "  sta stack_hi,x\n");
-    fprintf(out, "  dex\n");
+    fprintf(out, 
+      "  lda 0xdc00\n"
+      "  and #2\n"
+      "  eor #2\n"
+      "  sta stack_lo,x\n"
+      "  lda #0\n"
+      "  sta stack_hi,x\n"
+      "  dex\n");
   }
 
   return 0;
@@ -947,23 +953,25 @@ int C64::joystick_isUp_I(int index)
 
   if (index == 0)
   {
-    fprintf(out, "  lda 0xdc01\n");
-    fprintf(out, "  and #1\n");
-    fprintf(out, "  eor #1\n");
-    fprintf(out, "  sta stack_lo,x\n");
-    fprintf(out, "  lda #0\n");
-    fprintf(out, "  sta stack_hi,x\n");
-    fprintf(out, "  dex\n");
+    fprintf(out, 
+      "  lda 0xdc01\n"
+      "  and #1\n"
+      "  eor #1\n"
+      "  sta stack_lo,x\n"
+      "  lda #0\n"
+      "  sta stack_hi,x\n"
+      "  dex\n");
   }
     else
   {
-    fprintf(out, "  lda 0xdc00\n");
-    fprintf(out, "  and #1\n");
-    fprintf(out, "  eor #1\n");
-    fprintf(out, "  sta stack_lo,x\n");
-    fprintf(out, "  lda #0\n");
-    fprintf(out, "  sta stack_hi,x\n");
-    fprintf(out, "  dex\n");
+    fprintf(out, 
+      "  lda 0xdc00\n"
+      "  and #1\n"
+      "  eor #1\n"
+      "  sta stack_lo,x\n"
+      "  lda #0\n"
+      "  sta stack_hi,x\n"
+      "  dex\n");
   }
 
   return 0;
@@ -980,23 +988,25 @@ int C64::joystick_isButtonDown_0_I(int index)
 
   if (index == 0)
   {
-    fprintf(out, "  lda 0xdc01\n");
-    fprintf(out, "  and #16\n");
-    fprintf(out, "  eor #16\n");
-    fprintf(out, "  sta stack_lo,x\n");
-    fprintf(out, "  lda #0\n");
-    fprintf(out, "  sta stack_hi,x\n");
-    fprintf(out, "  dex\n");
+    fprintf(out, 
+      "  lda 0xdc01\n"
+      "  and #16\n"
+      "  eor #16\n"
+      "  sta stack_lo,x\n"
+      "  lda #0\n"
+      "  sta stack_hi,x\n"
+      "  dex\n");
   }
     else
   {
-    fprintf(out, "  lda 0xdc00\n");
-    fprintf(out, "  and #16\n");
-    fprintf(out, "  eor #16\n");
-    fprintf(out, "  sta stack_lo,x\n");
-    fprintf(out, "  lda #0\n");
-    fprintf(out, "  sta stack_hi,x\n");
-    fprintf(out, "  dex\n");
+    fprintf(out, 
+      "  lda 0xdc00\n"
+      "  and #16\n"
+      "  eor #16\n"
+      "  sta stack_lo,x\n"
+      "  lda #0\n"
+      "  sta stack_hi,x\n"
+      "  dex\n");
   }
 
   return 0;
@@ -1172,102 +1182,103 @@ void C64::insert_c64_vic_hires_plot()
 
 void C64::insert_c64_vic_make_hires_tables()
 {
-  fprintf(out, "make_hires_tables:\n");
-  // row tables
-  fprintf(out, "  lda #0x00\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda #0xe0\n");
-  fprintf(out, "  sta address + 1\n");
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "make_hires_tables_loop1:\n");
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda address + 0\n");
-  fprintf(out, "  sta 0x0400,y\n");
-  fprintf(out, "  adc #1\n");
-  fprintf(out, "  sta 0x0401,y\n");
-  fprintf(out, "  adc #1\n");
-  fprintf(out, "  sta 0x0402,y\n");
-  fprintf(out, "  adc #1\n");
-  fprintf(out, "  sta 0x0403,y\n");
-  fprintf(out, "  adc #1\n");
-  fprintf(out, "  sta 0x0404,y\n");
-  fprintf(out, "  adc #1\n");
-  fprintf(out, "  sta 0x0405,y\n");
-  fprintf(out, "  adc #1\n");
-  fprintf(out, "  sta 0x0406,y\n");
-  fprintf(out, "  adc #1\n");
-  fprintf(out, "  sta 0x0407,y\n");
-  fprintf(out, "  lda address + 1\n");
-  fprintf(out, "  sta 0x0500,y\n");
-  fprintf(out, "  sta 0x0501,y\n");
-  fprintf(out, "  sta 0x0502,y\n");
-  fprintf(out, "  sta 0x0503,y\n");
-  fprintf(out, "  sta 0x0504,y\n");
-  fprintf(out, "  sta 0x0505,y\n");
-  fprintf(out, "  sta 0x0506,y\n");
-  fprintf(out, "  sta 0x0507,y\n");
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda #0x40\n");
-  fprintf(out, "  adc address + 0\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda #0x01\n");
-  fprintf(out, "  adc address + 1\n");
-  fprintf(out, "  sta address + 1\n");
-  fprintf(out, "  iny\n");
-  fprintf(out, "  iny\n");
-  fprintf(out, "  iny\n");
-  fprintf(out, "  iny\n");
-  fprintf(out, "  iny\n");
-  fprintf(out, "  iny\n");
-  fprintf(out, "  iny\n");
-  fprintf(out, "  iny\n");
-  fprintf(out, "  bne make_hires_tables_loop1\n");
+  fprintf(out, 
+    "make_hires_tables:\n"
+    // row tables
+    "  lda #0x00\n"
+    "  sta address + 0\n"
+    "  lda #0xe0\n"
+    "  sta address + 1\n"
+    "  ldy #0\n"
+    "make_hires_tables_loop1:\n"
+    "  clc\n"
+    "  lda address + 0\n"
+    "  sta 0x0400,y\n"
+    "  adc #1\n"
+    "  sta 0x0401,y\n"
+    "  adc #1\n"
+    "  sta 0x0402,y\n"
+    "  adc #1\n"
+    "  sta 0x0403,y\n"
+    "  adc #1\n"
+    "  sta 0x0404,y\n"
+    "  adc #1\n"
+    "  sta 0x0405,y\n"
+    "  adc #1\n"
+    "  sta 0x0406,y\n"
+    "  adc #1\n"
+    "  sta 0x0407,y\n"
+    "  lda address + 1\n"
+    "  sta 0x0500,y\n"
+    "  sta 0x0501,y\n"
+    "  sta 0x0502,y\n"
+    "  sta 0x0503,y\n"
+    "  sta 0x0504,y\n"
+    "  sta 0x0505,y\n"
+    "  sta 0x0506,y\n"
+    "  sta 0x0507,y\n"
+    "  clc\n"
+    "  lda #0x40\n"
+    "  adc address + 0\n"
+    "  sta address + 0\n"
+    "  lda #0x01\n"
+    "  adc address + 1\n"
+    "  sta address + 1\n"
+    "  iny\n"
+    "  iny\n"
+    "  iny\n"
+    "  iny\n"
+    "  iny\n"
+    "  iny\n"
+    "  iny\n"
+    "  iny\n"
+    "  bne make_hires_tables_loop1\n"
 
-  // col table
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "make_hires_tables_loop3:\n");
-  fprintf(out, "  sta 0x0600,y\n");
-  fprintf(out, "  clc\n");
-  fprintf(out, "  adc #8\n");
-  fprintf(out, "  iny\n");
-  fprintf(out, "  bne make_hires_tables_loop3\n");
+    // col table
+    "  ldy #0\n"
+    "  lda #0\n"
+    "make_hires_tables_loop3:\n"
+    "  sta 0x0600,y\n"
+    "  clc\n"
+    "  adc #8\n"
+    "  iny\n"
+    "  bne make_hires_tables_loop3\n"
 
-  fprintf(out, "  ldy #40\n");
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "make_hires_tables_loop4:\n");
-  fprintf(out, "  sta 0x0640,y\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bne make_hires_tables_loop4\n");
+    "  ldy #40\n"
+    "  lda #0\n"
+    "make_hires_tables_loop4:\n"
+    "  sta 0x0640,y\n"
+    "  dey\n"
+    "  bne make_hires_tables_loop4\n"
 
-  fprintf(out, "  lda #1\n");
-  fprintf(out, "  sta 0x0660\n");
-  fprintf(out, "  sta 0x0661\n");
-  fprintf(out, "  sta 0x0662\n");
-  fprintf(out, "  sta 0x0663\n");
-  fprintf(out, "  sta 0x0664\n");
-  fprintf(out, "  sta 0x0665\n");
-  fprintf(out, "  sta 0x0666\n");
-  fprintf(out, "  sta 0x0667\n");
+    "  lda #1\n"
+    "  sta 0x0660\n"
+    "  sta 0x0661\n"
+    "  sta 0x0662\n"
+    "  sta 0x0663\n"
+    "  sta 0x0664\n"
+    "  sta 0x0665\n"
+    "  sta 0x0666\n"
+    "  sta 0x0667\n"
 
-  // bit table
-  fprintf(out, "  lda #128\n");
-  fprintf(out, "  sta 0x0700\n");
-  fprintf(out, "  lda #64\n");
-  fprintf(out, "  sta 0x0701\n");
-  fprintf(out, "  lda #32\n");
-  fprintf(out, "  sta 0x0702\n");
-  fprintf(out, "  lda #16\n");
-  fprintf(out, "  sta 0x0703\n");
-  fprintf(out, "  lda #8\n");
-  fprintf(out, "  sta 0x0704\n");
-  fprintf(out, "  lda #4\n");
-  fprintf(out, "  sta 0x0705\n");
-  fprintf(out, "  lda #2\n");
-  fprintf(out, "  sta 0x0706\n");
-  fprintf(out, "  lda #1\n");
-  fprintf(out, "  sta 0x0707\n");
-  fprintf(out, "  rts\n");
+    // bit table
+    "  lda #128\n"
+    "  sta 0x0700\n"
+    "  lda #64\n"
+    "  sta 0x0701\n"
+    "  lda #32\n"
+    "  sta 0x0702\n"
+    "  lda #16\n"
+    "  sta 0x0703\n"
+    "  lda #8\n"
+    "  sta 0x0704\n"
+    "  lda #4\n"
+    "  sta 0x0705\n"
+    "  lda #2\n"
+    "  sta 0x0706\n"
+    "  lda #1\n"
+    "  sta 0x0707\n"
+    "  rts\n");
 }
 
 void C64::insert_c64_vic_text_enable()
@@ -1894,62 +1905,64 @@ void C64::insert_c64_vic_color_ram_clear()
 
 void C64::insert_c64_vic_copy_uppercase()
 {
-  fprintf(out, "copy_uppercase:\n");
-  fprintf(out, "  lda #50\n");
-  fprintf(out, "  sta 0x0001\n");
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "copy_uppercase_loop:\n");
-  fprintf(out, "  lda 0xd000,y\n");
-  fprintf(out, "  sta 0xc800,y\n");
-  fprintf(out, "  lda 0xd100,y\n");
-  fprintf(out, "  sta 0xc900,y\n");
-  fprintf(out, "  lda 0xd200,y\n");
-  fprintf(out, "  sta 0xca00,y\n");
-  fprintf(out, "  lda 0xd300,y\n");
-  fprintf(out, "  sta 0xcb00,y\n");
-  fprintf(out, "  lda 0xd400,y\n");
-  fprintf(out, "  sta 0xcc00,y\n");
-  fprintf(out, "  lda 0xd500,y\n");
-  fprintf(out, "  sta 0xcd00,y\n");
-  fprintf(out, "  lda 0xd600,y\n");
-  fprintf(out, "  sta 0xce00,y\n");
-  fprintf(out, "  lda 0xd700,y\n");
-  fprintf(out, "  sta 0xcf00,y\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bne copy_uppercase_loop\n");
-  fprintf(out, "  lda #53\n");
-  fprintf(out, "  sta 0x0001\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "copy_uppercase:\n"
+    "  lda #50\n"
+    "  sta 0x0001\n"
+    "  ldy #0\n"
+    "copy_uppercase_loop:\n"
+    "  lda 0xd000,y\n"
+    "  sta 0xc800,y\n"
+    "  lda 0xd100,y\n"
+    "  sta 0xc900,y\n"
+    "  lda 0xd200,y\n"
+    "  sta 0xca00,y\n"
+    "  lda 0xd300,y\n"
+    "  sta 0xcb00,y\n"
+    "  lda 0xd400,y\n"
+    "  sta 0xcc00,y\n"
+    "  lda 0xd500,y\n"
+    "  sta 0xcd00,y\n"
+    "  lda 0xd600,y\n"
+    "  sta 0xce00,y\n"
+    "  lda 0xd700,y\n"
+    "  sta 0xcf00,y\n"
+    "  dey\n"
+    "  bne copy_uppercase_loop\n"
+    "  lda #53\n"
+    "  sta 0x0001\n"
+    "  rts\n");
 }
 
 void C64::insert_c64_vic_copy_lowercase()
 {
-  fprintf(out, "copy_lowercase:\n");
-  fprintf(out, "  lda #50\n");
-  fprintf(out, "  sta 0x0001\n");
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "copy_lowercase_loop:\n");
-  fprintf(out, "  lda 0xd800,y\n");
-  fprintf(out, "  sta 0xc800,y\n");
-  fprintf(out, "  lda 0xd900,y\n");
-  fprintf(out, "  sta 0xc900,y\n");
-  fprintf(out, "  lda 0xda00,y\n");
-  fprintf(out, "  sta 0xca00,y\n");
-  fprintf(out, "  lda 0xdb00,y\n");
-  fprintf(out, "  sta 0xcb00,y\n");
-  fprintf(out, "  lda 0xdc00,y\n");
-  fprintf(out, "  sta 0xcc00,y\n");
-  fprintf(out, "  lda 0xdd00,y\n");
-  fprintf(out, "  sta 0xcd00,y\n");
-  fprintf(out, "  lda 0xde00,y\n");
-  fprintf(out, "  sta 0xce00,y\n");
-  fprintf(out, "  lda 0xdf00,y\n");
-  fprintf(out, "  sta 0xcf00,y\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bne copy_lowercase_loop\n");
-  fprintf(out, "  lda #53\n");
-  fprintf(out, "  sta 0x0001\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "copy_lowercase:\n"
+    "  lda #50\n"
+    "  sta 0x0001\n"
+    "  ldy #0\n"
+    "copy_lowercase_loop:\n"
+    "  lda 0xd800,y\n"
+    "  sta 0xc800,y\n"
+    "  lda 0xd900,y\n"
+    "  sta 0xc900,y\n"
+    "  lda 0xda00,y\n"
+    "  sta 0xca00,y\n"
+    "  lda 0xdb00,y\n"
+    "  sta 0xcb00,y\n"
+    "  lda 0xdc00,y\n"
+    "  sta 0xcc00,y\n"
+    "  lda 0xdd00,y\n"
+    "  sta 0xcd00,y\n"
+    "  lda 0xde00,y\n"
+    "  sta 0xce00,y\n"
+    "  lda 0xdf00,y\n"
+    "  sta 0xcf00,y\n"
+    "  dey\n"
+    "  bne copy_lowercase_loop\n"
+    "  lda #53\n"
+    "  sta 0x0001\n"
+    "  rts\n");
 }
 
 void C64::insert_c64_vic_copy_data_from_array()
