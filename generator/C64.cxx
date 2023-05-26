@@ -1412,179 +1412,183 @@ void C64::insert_c64_vic_text_copy()
 
 void C64::insert_c64_vic_text_plot()
 {
-  fprintf(out, "text_plot:\n");
-  fprintf(out, "  lda stack_lo + 3,x\n"); // y
-  fprintf(out, "  asl\n");
-  fprintf(out, "  tay\n");
-  fprintf(out, "  lda text_table + 0,y\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda text_table + 1,y\n");
-  fprintf(out, "  sta address + 1\n");
-  fprintf(out, "  lda color_table + 0,y\n");
-  fprintf(out, "  sta value1 + 0\n");
-  fprintf(out, "  lda color_table + 1,y\n");
-  fprintf(out, "  sta value1 + 1\n");
-  fprintf(out, "  lda stack_lo + 4,x\n"); // x
-  fprintf(out, "  tay\n");
-  fprintf(out, "  lda stack_lo + 2,x\n"); // char
-  fprintf(out, "  sta (address),y\n");
-  fprintf(out, "  lda stack_lo + 1,x\n"); // color
-  fprintf(out, "  sta (value1),y\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "text_plot:\n"
+    "  lda stack_lo + 3,x\n" // y
+    "  asl\n"
+    "  tay\n"
+    "  lda text_table + 0,y\n"
+    "  sta address + 0\n"
+    "  lda text_table + 1,y\n"
+    "  sta address + 1\n"
+    "  lda color_table + 0,y\n"
+    "  sta value1 + 0\n"
+    "  lda color_table + 1,y\n"
+    "  sta value1 + 1\n"
+    "  lda stack_lo + 4,x\n" // x
+    "  tay\n"
+    "  lda stack_lo + 2,x\n" // char
+    "  sta (address),y\n"
+    "  lda stack_lo + 1,x\n" // color
+    "  sta (value1),y\n"
+    "  inx\n"
+    "  inx\n"
+    "  inx\n"
+    "  inx\n"
+    "  rts\n");
 }
 
 void C64::insert_c64_vic_text_ascii_plot()
 {
-  fprintf(out, "text_ascii_plot:\n");
-  fprintf(out, "  lda stack_lo + 3,x\n"); // y
-  fprintf(out, "  asl\n");
-  fprintf(out, "  tay\n");
-  fprintf(out, "  lda text_table + 0,y\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda text_table + 1,y\n");
-  fprintf(out, "  sta address + 1\n");
-  fprintf(out, "  lda color_table + 0,y\n");
-  fprintf(out, "  sta value1 + 0\n");
-  fprintf(out, "  lda color_table + 1,y\n");
-  fprintf(out, "  sta value1 + 1\n");
-  fprintf(out, "  lda stack_lo + 4,x\n"); // x
-  fprintf(out, "  tay\n");
-  fprintf(out, "  lda stack_lo + 2,x\n"); // char
-  fprintf(out, "  cmp #124\n"); // ascii pipe
-  fprintf(out, "  bne text_ascii_plot_skip_1\n");
-  fprintf(out, "  lda #66\n");
-  fprintf(out, "  jmp text_ascii_plot_continue\n");
-  fprintf(out, "text_ascii_plot_skip_1:\n");
-  fprintf(out, "  cmp #95\n"); // ascii underscore
-  fprintf(out, "  bne text_ascii_plot_skip_2\n");
-  fprintf(out, "  lda #100\n");
-  fprintf(out, "  jmp text_ascii_plot_continue\n");
-  fprintf(out, "text_ascii_plot_skip_2:\n");
-  fprintf(out, "  cmp #64\n"); // ascii at
-  fprintf(out, "  bne text_ascii_plot_skip_3\n");
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  jmp text_ascii_plot_continue\n");
-  fprintf(out, "text_ascii_plot_skip_3:\n");
-  fprintf(out, "  cmp #96\n");
-  fprintf(out, "  bmi text_ascii_plot_continue\n");
-  fprintf(out, "  sec\n");
-  fprintf(out, "  sbc #96\n");
-  fprintf(out, "text_ascii_plot_continue:\n");
-  fprintf(out, "  sta (address),y\n");
-  fprintf(out, "  lda stack_lo + 1,x\n"); // color
-  fprintf(out, "  sta (value1),y\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "text_ascii_plot:\n"
+    "  lda stack_lo + 3,x\n" // y
+    "  asl\n"
+    "  tay\n"
+    "  lda text_table + 0,y\n"
+    "  sta address + 0\n"
+    "  lda text_table + 1,y\n"
+    "  sta address + 1\n"
+    "  lda color_table + 0,y\n"
+    "  sta value1 + 0\n"
+    "  lda color_table + 1,y\n"
+    "  sta value1 + 1\n"
+    "  lda stack_lo + 4,x\n" // x
+    "  tay\n"
+    "  lda stack_lo + 2,x\n" // char
+    "  cmp #124\n" // ascii pipe
+    "  bne text_ascii_plot_skip_1\n"
+    "  lda #66\n"
+    "  jmp text_ascii_plot_continue\n"
+    "text_ascii_plot_skip_1:\n"
+    "  cmp #95\n" // ascii underscore
+    "  bne text_ascii_plot_skip_2\n"
+    "  lda #100\n"
+    "  jmp text_ascii_plot_continue\n"
+    "text_ascii_plot_skip_2:\n"
+    "  cmp #64\n" // ascii at
+    "  bne text_ascii_plot_skip_3\n"
+    "  lda #0\n"
+    "  jmp text_ascii_plot_continue\n"
+    "text_ascii_plot_skip_3:\n"
+    "  cmp #96\n"
+    "  bmi text_ascii_plot_continue\n"
+    "  sec\n"
+    "  sbc #96\n"
+    "text_ascii_plot_continue:\n"
+    "  sta (address),y\n"
+    "  lda stack_lo + 1,x\n" // color
+    "  sta (value1),y\n"
+    "  inx\n"
+    "  inx\n"
+    "  inx\n"
+    "  inx\n"
+    "  rts\n");
 }
 
 void C64::insert_c64_vic_text_read()
 {
-  fprintf(out, "text_read:\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_lo + 0,x\n"); // y
-  fprintf(out, "  asl\n");
-  fprintf(out, "  tay\n");
-  fprintf(out, "  lda text_table + 0,y\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda text_table + 1,y\n");
-  fprintf(out, "  sta address + 1\n");
-  fprintf(out, "  lda stack_lo + 1,x\n"); // x
-  fprintf(out, "  tay\n");
-  fprintf(out, "  lda (address),y\n");
-  fprintf(out, "  sta stack_lo + 1,x\n");
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  sta stack_hi + 1,x\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "text_read:\n"
+    "  inx\n"
+    "  lda stack_lo + 0,x\n" // y
+    "  asl\n"
+    "  tay\n"
+    "  lda text_table + 0,y\n"
+    "  sta address + 0\n"
+    "  lda text_table + 1,y\n"
+    "  sta address + 1\n"
+    "  lda stack_lo + 1,x\n" // x
+    "  tay\n"
+    "  lda (address),y\n"
+    "  sta stack_lo + 1,x\n"
+    "  lda #0\n"
+    "  sta stack_hi + 1,x\n"
+    "  rts\n");
 }
 
 void C64::insert_c64_vic_text_string()
 {
-  fprintf(out, "text_string:\n");
-  fprintf(out, "  lda stack_lo + 2,x\n");
-  fprintf(out, "  sta value2 + 0\n");
-  fprintf(out, "  lda stack_hi + 2,x\n");
-  fprintf(out, "  sta value2 + 1\n"); // string pointer
-  fprintf(out, "  sec\n");
-  fprintf(out, "  lda value2 + 0\n");
-  fprintf(out, "  sbc #2\n");
-  fprintf(out, "  sta value2 + 0\n");
-  fprintf(out, "  lda value2 + 1\n");
-  fprintf(out, "  sbc #0\n");
-  fprintf(out, "  sta value2 + 1\n"); // back -2 for length
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda (value2),y\n");
-  fprintf(out, "  sta length\n"); // string length
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda value2 + 0\n");
-  fprintf(out, "  adc #2\n");
-  fprintf(out, "  sta value2 + 0\n");
-  fprintf(out, "  lda value2 + 1\n");
-  fprintf(out, "  adc #0\n");
-  fprintf(out, "  sta value2 + 1\n"); // forward +2 to string start
-  fprintf(out, "  lda stack_lo + 3,x\n"); // y
-  fprintf(out, "  asl\n");
-  fprintf(out, "  tay\n");
-  fprintf(out, "  lda text_table + 0,y\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda text_table + 1,y\n");
-  fprintf(out, "  sta address + 1\n"); // text row
-  fprintf(out, "  lda color_table + 0,y\n");
-  fprintf(out, "  sta value1 + 0\n");
-  fprintf(out, "  lda color_table + 1,y\n");
-  fprintf(out, "  sta value1 + 1\n"); // color row
-  fprintf(out, "  lda stack_lo + 4,x\n"); // x
-  fprintf(out, "  tay\n"); // text column
-  fprintf(out, "text_string_loop:\n");
-  fprintf(out, "  tya\n");
-  fprintf(out, "  pha\n");
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda (value2),y\n");
-  fprintf(out, "  sta value3\n");
-  fprintf(out, "  pla\n");
-  fprintf(out, "  tay\n");
-  fprintf(out, "  lda value3\n"); // char
-  fprintf(out, "  cmp #124\n"); // ascii pipe
-  fprintf(out, "  bne text_string_skip_1\n");
-  fprintf(out, "  lda #66\n");
-  fprintf(out, "  jmp text_string_continue\n");
-  fprintf(out, "text_string_skip_1:\n");
-  fprintf(out, "  cmp #95\n"); // ascii underscore
-  fprintf(out, "  bne text_string_skip_2\n");
-  fprintf(out, "  lda #100\n");
-  fprintf(out, "  jmp text_string_continue\n");
-  fprintf(out, "text_string_skip_2:\n");
-  fprintf(out, "  cmp #64\n"); // ascii at
-  fprintf(out, "  bne text_string_skip_3\n");
-  fprintf(out, "  lda #0\n");
-  fprintf(out, "  jmp text_string_continue\n");
-  fprintf(out, "text_string_skip_3:\n");
-  fprintf(out, "  cmp #96\n");
-  fprintf(out, "  bmi text_string_continue\n");
-  fprintf(out, "  sec\n");
-  fprintf(out, "  sbc #96\n");
-  fprintf(out, "text_string_continue:\n");
-  fprintf(out, "  sta (address),y\n");
-  fprintf(out, "  lda stack_lo + 1,x\n"); // color
-  fprintf(out, "  sta (value1),y\n");
-  fprintf(out, "  iny\n");
-  fprintf(out, "  inc value2 + 0\n");
-  fprintf(out, "  bne text_string_skip_inc_hi\n");
-  fprintf(out, "  inc value2 + 1\n"); // increment string pointer
-  fprintf(out, "text_string_skip_inc_hi:\n");
-  fprintf(out, "  dec length\n");
-  fprintf(out, "  bne text_string_loop\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "text_string:\n"
+    "  lda stack_lo + 2,x\n"
+    "  sta value2 + 0\n"
+    "  lda stack_hi + 2,x\n"
+    "  sta value2 + 1\n" // string pointer
+    "  sec\n"
+    "  lda value2 + 0\n"
+    "  sbc #2\n"
+    "  sta value2 + 0\n"
+    "  lda value2 + 1\n"
+    "  sbc #0\n"
+    "  sta value2 + 1\n" // back -2 for length
+    "  ldy #0\n"
+    "  lda (value2),y\n"
+    "  sta length\n" // string length
+    "  clc\n"
+    "  lda value2 + 0\n"
+    "  adc #2\n"
+    "  sta value2 + 0\n"
+    "  lda value2 + 1\n"
+    "  adc #0\n"
+    "  sta value2 + 1\n" // forward +2 to string start
+    "  lda stack_lo + 3,x\n" // y
+    "  asl\n"
+    "  tay\n"
+    "  lda text_table + 0,y\n"
+    "  sta address + 0\n"
+    "  lda text_table + 1,y\n"
+    "  sta address + 1\n" // text row
+    "  lda color_table + 0,y\n"
+    "  sta value1 + 0\n"
+    "  lda color_table + 1,y\n"
+    "  sta value1 + 1\n" // color row
+    "  lda stack_lo + 4,x\n" // x
+    "  tay\n" // text column
+    "text_string_loop:\n"
+    "  tya\n"
+    "  pha\n"
+    "  ldy #0\n"
+    "  lda (value2),y\n"
+    "  sta value3\n"
+    "  pla\n"
+    "  tay\n"
+    "  lda value3\n" // char
+    "  cmp #124\n" // ascii pipe
+    "  bne text_string_skip_1\n"
+    "  lda #66\n"
+    "  jmp text_string_continue\n"
+    "text_string_skip_1:\n"
+    "  cmp #95\n" // ascii underscore
+    "  bne text_string_skip_2\n"
+    "  lda #100\n"
+    "  jmp text_string_continue\n"
+    "text_string_skip_2:\n"
+    "  cmp #64\n" // ascii at
+    "  bne text_string_skip_3\n"
+    "  lda #0\n"
+    "  jmp text_string_continue\n"
+    "text_string_skip_3:\n"
+    "  cmp #96\n"
+    "  bmi text_string_continue\n"
+    "  sec\n"
+    "  sbc #96\n"
+    "text_string_continue:\n"
+    "  sta (address),y\n"
+    "  lda stack_lo + 1,x\n" // color
+    "  sta (value1),y\n"
+    "  iny\n"
+    "  inc value2 + 0\n"
+    "  bne text_string_skip_inc_hi\n"
+    "  inc value2 + 1\n" // increment string pointer
+    "text_string_skip_inc_hi:\n"
+    "  dec length\n"
+    "  bne text_string_loop\n"
+    "  inx\n"
+    "  inx\n"
+    "  inx\n"
+    "  inx\n"
+    "  rts\n");
 }
 
 void C64::insert_c64_vic_text_fill()
