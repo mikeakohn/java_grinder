@@ -144,19 +144,20 @@ int C64::open(const char *filename)
 
   // basic loader
   fprintf(out, ".org 0x%04x\n", start_org);
-  fprintf(out, "dw 0x0801\n");
-  fprintf(out, "dw start\n");
-  fprintf(out, "dw 2013\n");
-  fprintf(out, "db 0x9e\n");
-  fprintf(out, "db (((start / 1000) %% 10) + 0x30)\n");
-  fprintf(out, "db (((start / 100) %% 10) + 0x30)\n");
-  fprintf(out, "db (((start / 10) %% 10) + 0x30)\n");
-  fprintf(out, "db (((start / 1) %% 10) + 0x30)\n");
-  fprintf(out, "db ':'\n");
-  fprintf(out, "db 0x8f\n");
-  fprintf(out, "db \" JAVA-GRINDER \"\n");
-  fprintf(out, "db 0\n");
-  fprintf(out, "dw 0\n\n");
+  fprintf(out, 
+    "dw 0x0801\n"
+    "dw start\n"
+    "dw 2013\n"
+    "db 0x9e\n"
+    "db (((start / 1000) %% 10) + 0x30)\n"
+    "db (((start / 100) %% 10) + 0x30)\n"
+    "db (((start / 10) %% 10) + 0x30)\n"
+    "db (((start / 1) %% 10) + 0x30)\n"
+    "db ':'\n"
+    "db 0x8f\n"
+    "db \" JAVA-GRINDER \"\n"
+    "db 0\n"
+    "dw 0\n\n");
 
   fprintf(out, "start:\n");
   fprintf(out, "  sei\n");
@@ -1030,15 +1031,16 @@ int C64::keyboard_currentKeyPressed()
 
 int C64::grinder_largeJavaStack()
 {
-  fprintf(out, "; grinder_largeJavaStack\n");
-  fprintf(out, ".set stack_lo=0x200\n");
-  fprintf(out, ".set stack_hi=0x300\n");
-  fprintf(out, "  ldx #0xff\n");
-  fprintf(out, "  stx locals\n");
-  fprintf(out, "  txa\n");
-  fprintf(out, "  sec\n");
-  fprintf(out, "  sbc #0x01\n");
-  fprintf(out, "  tax\n");
+  fprintf(out, 
+    "; grinder_largeJavaStack\n"
+    ".set stack_lo=0x200\n"
+    ".set stack_hi=0x300\n"
+    "  ldx #0xff\n"
+    "  stx locals\n"
+    "  txa\n"
+    "  sec\n"
+    "  sbc #0x01\n"
+    "  tax\n");
 
   return 0;
 }
@@ -1054,126 +1056,118 @@ int C64::return_void(int local_count)
 // subroutines
 void C64::insert_c64_vic_hires_enable()
 {
-  fprintf(out, "hires_enable:\n");
-  fprintf(out, "  lda #8\n");
-  fprintf(out, "  sta 0xd018\n");
-  fprintf(out, "  lda 0xd011\n");
-  fprintf(out, "  ora #32\n");
-  fprintf(out, "  sta 0xd011\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_lo,x\n");
-  fprintf(out, "  bne hires_enable_multicolor\n");
-  fprintf(out, "  rts\n");
-  fprintf(out, "hires_enable_multicolor:\n");
-  fprintf(out, "  lda 0xd016\n");
-  fprintf(out, "  ora #16\n");
-  fprintf(out, "  sta 0xd016\n");
-  fprintf(out, "  rts\n");
-
-/*
-  fprintf(out, "hires_enable:\n");
-  fprintf(out, "  lda #8\n");
-  fprintf(out, "  sta 0xd018\n");
-  fprintf(out, "  lda 0xd011\n");
-  fprintf(out, "  ora #32\n");
-  fprintf(out, "  sta 0xd011\n");
-  fprintf(out, "  rts\n");
-*/
+  fprintf(out, 
+    "hires_enable:\n"
+    "  lda #8\n"
+    "  sta 0xd018\n"
+    "  lda 0xd011\n"
+    "  ora #32\n"
+    "  sta 0xd011\n"
+    "  inx\n"
+    "  lda stack_lo,x\n"
+    "  bne hires_enable_multicolor\n"
+    "  rts\n"
+    "hires_enable_multicolor:\n"
+    "  lda 0xd016\n"
+    "  ora #16\n"
+    "  sta 0xd016\n"
+    "  rts\n");
 }
 
 void C64::insert_c64_vic_hires_clear()
 {
-  fprintf(out, "hires_clear:\n");
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_lo,x\n");
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "hires_clear_loop:\n");
-  fprintf(out, "  sta 0xe000,y\n");
-  fprintf(out, "  sta 0xe100,y\n");
-  fprintf(out, "  sta 0xe200,y\n");
-  fprintf(out, "  sta 0xe300,y\n");
-  fprintf(out, "  sta 0xe400,y\n");
-  fprintf(out, "  sta 0xe500,y\n");
-  fprintf(out, "  sta 0xe600,y\n");
-  fprintf(out, "  sta 0xe700,y\n");
-  fprintf(out, "  sta 0xe800,y\n");
-  fprintf(out, "  sta 0xe900,y\n");
-  fprintf(out, "  sta 0xea00,y\n");
-  fprintf(out, "  sta 0xeb00,y\n");
-  fprintf(out, "  sta 0xec00,y\n");
-  fprintf(out, "  sta 0xed00,y\n");
-  fprintf(out, "  sta 0xee00,y\n");
-  fprintf(out, "  sta 0xef00,y\n");
-  fprintf(out, "  sta 0xf000,y\n");
-  fprintf(out, "  sta 0xf100,y\n");
-  fprintf(out, "  sta 0xf200,y\n");
-  fprintf(out, "  sta 0xf300,y\n");
-  fprintf(out, "  sta 0xf400,y\n");
-  fprintf(out, "  sta 0xf500,y\n");
-  fprintf(out, "  sta 0xf600,y\n");
-  fprintf(out, "  sta 0xf700,y\n");
-  fprintf(out, "  sta 0xf800,y\n");
-  fprintf(out, "  sta 0xf900,y\n");
-  fprintf(out, "  sta 0xfa00,y\n");
-  fprintf(out, "  sta 0xfb00,y\n");
-  fprintf(out, "  sta 0xfc00,y\n");
-  fprintf(out, "  sta 0xfd00,y\n");
-  fprintf(out, "  sta 0xfe00,y\n");
-  fprintf(out, "  sta 0xff00,y\n");
-  fprintf(out, "  dey\n");
-  fprintf(out, "  bne hires_clear_loop\n");
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "hires_clear:\n"
+    "  inx\n"
+    "  lda stack_lo,x\n"
+    "  ldy #0\n"
+    "hires_clear_loop:\n"
+    "  sta 0xe000,y\n"
+    "  sta 0xe100,y\n"
+    "  sta 0xe200,y\n"
+    "  sta 0xe300,y\n"
+    "  sta 0xe400,y\n"
+    "  sta 0xe500,y\n"
+    "  sta 0xe600,y\n"
+    "  sta 0xe700,y\n"
+    "  sta 0xe800,y\n"
+    "  sta 0xe900,y\n"
+    "  sta 0xea00,y\n"
+    "  sta 0xeb00,y\n"
+    "  sta 0xec00,y\n"
+    "  sta 0xed00,y\n"
+    "  sta 0xee00,y\n"
+    "  sta 0xef00,y\n"
+    "  sta 0xf000,y\n"
+    "  sta 0xf100,y\n"
+    "  sta 0xf200,y\n"
+    "  sta 0xf300,y\n"
+    "  sta 0xf400,y\n"
+    "  sta 0xf500,y\n"
+    "  sta 0xf600,y\n"
+    "  sta 0xf700,y\n"
+    "  sta 0xf800,y\n"
+    "  sta 0xf900,y\n"
+    "  sta 0xfa00,y\n"
+    "  sta 0xfb00,y\n"
+    "  sta 0xfc00,y\n"
+    "  sta 0xfd00,y\n"
+    "  sta 0xfe00,y\n"
+    "  sta 0xff00,y\n"
+    "  dey\n"
+    "  bne hires_clear_loop\n"
+    "  rts\n");
 }
 
 void C64::insert_c64_vic_hires_plot()
 {
-  fprintf(out, "hires_plot:\n");
-  // value
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_lo,x\n");
-  // y
-  fprintf(out, "  inx\n");
-  fprintf(out, "  ldy stack_lo,x\n");
-  // address lo/hi
-  fprintf(out, "  lda 0x0400,y\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda 0x0500,y\n");
-  fprintf(out, "  sta address + 1\n");
-  // x
-  fprintf(out, "  inx\n");
-  fprintf(out, "  lda stack_hi,x\n");
-  fprintf(out, "  sta result + 1\n");
-  fprintf(out, "  lda stack_lo,x\n");
-  fprintf(out, "  sta result + 0\n");
-  // x & 7
-  fprintf(out, "  and #7\n");
-  fprintf(out, "  sta value1 + 0\n");
-  // x / 8
-  fprintf(out, "  lsr result + 1\n");
-  fprintf(out, "  ror result + 0\n");
-  fprintf(out, "  lsr result + 1\n");
-  fprintf(out, "  ror result + 0\n");
-  fprintf(out, "  lsr result + 1\n");
-  fprintf(out, "  ror result + 0\n");
-  fprintf(out, "  lda result + 0\n");
-  fprintf(out, "  tay\n");
-  // col
-  fprintf(out, "  clc\n");
-  fprintf(out, "  lda 0x0600,y\n");
-  fprintf(out, "  adc address + 0\n");
-  fprintf(out, "  sta address + 0\n");
-  fprintf(out, "  lda 0x0640,y\n");
-  fprintf(out, "  adc address + 1\n");
-  fprintf(out, "  sta address + 1\n");
-  // read byte
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  lda (address),y\n");
-  fprintf(out, "  ldy value1 + 0\n");
-  fprintf(out, "  ora 0x0700,y\n");
-  fprintf(out, "  ldy #0\n");
-  fprintf(out, "  sta (address),y\n");
-
-  fprintf(out, "  rts\n");
+  fprintf(out, 
+    "hires_plot:\n"
+    // value
+    "  inx\n"
+    "  lda stack_lo,x\n"
+    // y
+    "  inx\n"
+    "  ldy stack_lo,x\n"
+    // address lo/hi
+    "  lda 0x0400,y\n"
+    "  sta address + 0\n"
+    "  lda 0x0500,y\n"
+    "  sta address + 1\n"
+    // x
+    "  inx\n"
+    "  lda stack_hi,x\n"
+    "  sta result + 1\n"
+    "  lda stack_lo,x\n"
+    "  sta result + 0\n"
+    // x & 7
+    "  and #7\n"
+    "  sta value1 + 0\n"
+    // x / 8
+    "  lsr result + 1\n"
+    "  ror result + 0\n"
+    "  lsr result + 1\n"
+    "  ror result + 0\n"
+    "  lsr result + 1\n"
+    "  ror result + 0\n"
+    "  lda result + 0\n"
+    "  tay\n"
+    // col
+    "  clc\n"
+    "  lda 0x0600,y\n"
+    "  adc address + 0\n"
+    "  sta address + 0\n"
+    "  lda 0x0640,y\n"
+    "  adc address + 1\n"
+    "  sta address + 1\n"
+    // read byte
+    "  ldy #0\n"
+    "  lda (address),y\n"
+    "  ldy value1 + 0\n"
+    "  ora 0x0700,y\n"
+    "  ldy #0\n"
+    "  sta (address),y\n"
+    "  rts\n");
 }
 
 void C64::insert_c64_vic_make_hires_tables()
