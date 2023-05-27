@@ -249,11 +249,12 @@ void M6502::method_start(int local_count, int max_stack, int param_count, std::s
   if (is_interrupt)
   {
     // save registers
-    fprintf(out, "  pha\n");
-    fprintf(out, "  txa\n");
-    fprintf(out, "  pha\n");
-    fprintf(out, "  tya\n");
-    fprintf(out, "  pha\n");
+    fprintf(out, 
+      "  pha\n"
+      "  txa\n"
+      "  pha\n"
+      "  tya\n"
+      "  pha\n");
 
     // save internal vars
     fprintf(out, "  ldx #16\n");
@@ -268,11 +269,12 @@ void M6502::method_start(int local_count, int max_stack, int param_count, std::s
 
   if (!is_main)
   {
-    fprintf(out, "  lda locals\n");
-    fprintf(out, "  sta stack_lo,x\n");
-    fprintf(out, "  lda #0\n");
-    fprintf(out, "  sta stack_hi,x\n");
-    fprintf(out, "  dex\n");
+    fprintf(out, 
+      "  lda locals\n"
+      "  sta stack_lo,x\n"
+      "  lda #0\n"
+      "  sta stack_hi,x\n"
+      "  dex\n");
   }
 
   fprintf(out, "  stx locals\n");
@@ -487,11 +489,14 @@ int M6502::div_integer()
 int M6502::mod_integer()
 {
   need_div_integer = 1;
-  fprintf(out, "  jsr div_integer\n");
-  fprintf(out, "  lda remainder + 0\n");
-  fprintf(out, "  sta stack_lo + 1,x\n");
-  fprintf(out, "  lda remainder + 1\n");
-  fprintf(out, "  sta stack_hi + 1,x\n");
+
+  fprintf(out, 
+    "  jsr div_integer\n"
+    "  lda remainder + 0\n"
+    "  sta stack_lo + 1,x\n"
+    "  lda remainder + 1\n"
+    "  sta stack_hi + 1,x\n");
+
   stack--;
 
   return 0;
@@ -952,20 +957,22 @@ int M6502::return_void(int local_count)
     fprintf(out, "  bpl restore_vars_%d_loop\n", local_count++);
 
     // restore registers
-    fprintf(out, "  pla\n");
-    fprintf(out, "  tay\n");
-    fprintf(out, "  pla\n");
-    fprintf(out, "  tax\n");
-    fprintf(out, "  pla\n");
-    fprintf(out, "  rti\n");
+    fprintf(out, 
+      "  pla\n"
+      "  tay\n"
+      "  pla\n"
+      "  tax\n"
+      "  pla\n"
+      "  rti\n");
   }
     else
   {
     if (!is_main)
     {
-      fprintf(out, "  inx\n");
-      fprintf(out, "  lda stack_lo,x\n");
-      fprintf(out, "  sta locals\n");
+      fprintf(out, 
+        "  inx\n"
+        "  lda stack_lo,x\n"
+        "  sta locals\n");
     }
 
     fprintf(out, "  rts\n");
