@@ -6,11 +6,9 @@ import net.mikekohn.java_grinder.Joystick;
 import net.mikekohn.java_grinder.Keyboard;
 import net.mikekohn.java_grinder.Memory;
 import net.mikekohn.java_grinder.Math;
-import net.mikekohn.java_grinder.Timer;
-import net.mikekohn.java_grinder.TimerListener;
 import net.mikekohn.java_grinder.c64.*;
 
-public class Snake implements TimerListener
+public class Snake
 {
   // addresses
   static final int char_ram = 0xc800;
@@ -33,9 +31,6 @@ public class Snake implements TimerListener
   static int pulse3 = 0x800;
   static int music_pos = 0;
 
-  // incremented by timer interrupt
-  static int time = 0;
-  
   // one octave of note frequencies
   static int freq[] =
   {
@@ -661,7 +656,7 @@ public class Snake implements TimerListener
     VIC.background(0);
     VIC.writeControl2(VIC.readControl2() & 239);
 
-    int count = 0;
+    int time = 0;
 
     while(true)
     {
@@ -669,10 +664,9 @@ public class Snake implements TimerListener
         break;
 
       playTitleMusic();
-//      wait(400);
+      wait(400);
 
-
-      final int c = colors[count & 7];
+      final int c = colors[time & 7];
 
       printString(9, 3, c,  "=== =   =  ==  = = ===");
       printString(9, 4, c,  "=   ==  = =  = = = =  ");
@@ -682,7 +676,7 @@ public class Snake implements TimerListener
 
       VIC.sprite4color(c);
 
-      if((count & 15) >= 8)
+      if((time & 15) >= 8)
       {
         Memory.write8(sprite_pointer1 + 4, (byte)194);
         Memory.write8(sprite_pointer2 + 4, (byte)194);
@@ -694,10 +688,7 @@ public class Snake implements TimerListener
       }
 
       VIC.spriteMulticolor0(colors[(time + 1) & 7]);
-      count++;
-
-      time = 0;
-
+      time++;
 /*
 for(int i = 0; i < 4; i++)
 {
@@ -724,10 +715,10 @@ for(int i = 0; i < 4; i++)
 }
 */
 
-      while(time == 0)
-      {
-        // wait for next timer update
-      }
+//      while(time == 0)
+//      {
+//        // wait for next timer update
+//      }
     }
 
     VIC.spriteEnable(0);
@@ -804,12 +795,7 @@ for(int i = 0; i < 4; i++)
       }
 
       i++;
-      time = 0;
-
-      while(time == 0)
-      {
-        // wait for next timer update
-      }
+      wait(350);
     }
   }
 
@@ -831,7 +817,7 @@ for(int i = 0; i < 4; i++)
     int temp = 0;
     int tx = 0;
     int ty = 0;
-    int frame = 0;
+    int time = 0;
 
     byte snakex[] = new byte[16];
     byte snakey[] = new byte[16];
@@ -909,15 +895,15 @@ for(int i = 0; i < 4; i++)
     while(true)
     {
       // move ship
-//      if((frame & 3) == 3)
-//      {
+      if((time % 2) == 0)
+      {
         if(Joystick.isRight(1)) accelx++;
         if(Joystick.isLeft(1)) accelx--;
         if(Joystick.isDown(1)) accely++;
         if(Joystick.isUp(1)) accely--;
-//      }
+      }
 
-      if((frame & 1) == 1)
+      if((time % 3) == 0)
       {
         if(accelx > 0) accelx--;
         if(accelx < 0) accelx++;
@@ -1141,8 +1127,8 @@ for(int i = 0; i < 4; i++)
       }
 
       // move snake
-//      if((frame & 1) == 1)
-      if((frame & 3) == 3)
+//      if((time & 1) == 1)
+      if((time & 3) == 3)
       {
         for(i = 0; i < 16; i++)
           if(snakestatus[i] == 1)
@@ -1169,7 +1155,7 @@ for(int i = 0; i < 4; i++)
 
           int d = sdir >= 0 ? 160 : 161;
 
-          if((frame & 3) == 3)
+          if((time & 3) == 3)
             d += 2;
 
           if(snakestatus[i] == 1)
@@ -1179,7 +1165,7 @@ for(int i = 0; i < 4; i++)
         }
 
         // animate spider
-        if((frame & 31) >= 16)
+        if((time & 31) >= 16)
         {
           Memory.write8(sprite_pointer1 + 4, (byte)194);
           Memory.write8(sprite_pointer2 + 4, (byte)194);
@@ -1196,13 +1182,7 @@ for(int i = 0; i < 4; i++)
         updateSnakeExp();
       }
 
-      frame++;
-      time = 0;
-
-      while(time == 0)
-      {
-        // wait for next timer update
-      }
+      time++;
     }
   }
 
@@ -1210,9 +1190,10 @@ for(int i = 0; i < 4; i++)
   {
     int i, temp;
 
-    // Grinder.largeJavaStack();
+//    Grinder.largeJavaStack();
 
     // set up screen
+    VIC.textClear(32);
     VIC.textEnable(0);
     VIC.makeTextTable();
     VIC.makeColorTable();
@@ -1225,20 +1206,10 @@ for(int i = 0; i < 4; i++)
     clearSprite(sprite_ram + 192);
     clearSprite(sprite_ram + 256);
 
-/*
-    for(i = 0; i < 63; i++)
-    {
-      Memory.write8(sprite_ram + i, (byte)sprite_ship[i]);
-      Memory.write8(sprite_ram + 64 + i, (byte)sprite_shot[i]);
-      Memory.write8(sprite_ram + 128 + i, (byte)sprite_spider1[i]);
-      Memory.write8(sprite_ram + 192 + i, (byte)sprite_spider2[i]);
-    }
-*/
-
-   VIC.copyDataFromArray(sprite_ship, sprite_ram + 0, 63);
-   VIC.copyDataFromArray(sprite_shot, sprite_ram + 64, 63);
-   VIC.copyDataFromArray(sprite_spider1, sprite_ram + 128, 63);
-   VIC.copyDataFromArray(sprite_spider2, sprite_ram + 192, 63);
+    VIC.copyDataFromArray(sprite_ship, sprite_ram + 0, 63);
+    VIC.copyDataFromArray(sprite_shot, sprite_ram + 64, 63);
+    VIC.copyDataFromArray(sprite_spider1, sprite_ram + 128, 63);
+    VIC.copyDataFromArray(sprite_spider2, sprite_ram + 192, 63);
 
 
     Memory.write8(sprite_pointer1 + 0, (byte)192);
@@ -1270,24 +1241,10 @@ for(int i = 0; i < 4; i++)
 
     while(true)
     {
-      Timer.setListener(false);
-      Timer.setInterval(14, 10000);
-      Timer.setListener(true);
       title();
-      Timer.setListener(false);
-      Timer.setInterval(0, 10000);
-      Timer.setListener(true);
       snake();
-      Timer.setListener(false);
-      Timer.setInterval(6, 10000);
-      Timer.setListener(true);
       gameOver();
     }
-  }
-
-  public void timerInterrupt()
-  {
-    time++;
   }
 }
 

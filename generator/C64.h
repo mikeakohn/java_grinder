@@ -189,6 +189,7 @@ protected:
   void insert_c64_vic_copy_lowercase();
   void insert_c64_vic_copy_data_from_array();
   void insert_c64_keyboard();
+  void insert_c64_sprite_interrupt();
 };
 
 #endif

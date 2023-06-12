@@ -100,6 +100,8 @@ C64::~C64()
   if (need_c64_vic_copy_lowercase) { insert_c64_vic_copy_lowercase(); }
   if (need_c64_vic_copy_data_from_array) { insert_c64_vic_copy_data_from_array(); }
   if (need_c64_keyboard) { insert_c64_keyboard(); }
+
+  insert_c64_sprite_interrupt();
 }
 
 int C64::open(const char *filename)
@@ -142,6 +144,11 @@ int C64::open(const char *filename)
   // keyboard buffer
   fprintf(out, "key_table equ 0x708\n");
 
+  // sprite positions
+  fprintf(out, "sprite_pos_x equ 0x748\n");
+  fprintf(out, "sprite_pos_y equ 0x750\n");
+  fprintf(out, "sprite_pos_x_msb equ 0x758\n");
+
   // basic loader
   fprintf(out, ".org 0x%04x\n", start_org);
   fprintf(out, 
@@ -181,6 +188,55 @@ int C64::open(const char *filename)
   // turn off ROM chips
   fprintf(out, "  lda #53\n");
   fprintf(out, "  sta 0x0001\n");
+
+  // sprite interrupt
+  fprintf(out, "  lda #0x7f\n");
+  fprintf(out, "  sta 0xdc0d\n");
+  fprintf(out, "  sta 0xdd0d\n");
+
+  fprintf(out, "  lda 0xdc0d\n");
+  fprintf(out, "  lda 0xdd0d\n");
+
+  fprintf(out, "  lda #1\n");
+  fprintf(out, "  sta 0xd01a\n");
+
+//  fprintf(out, "  lda #0x1b\n");
+  fprintf(out, "  lda 0xd011\n");
+  fprintf(out, "  and #0x7f\n");
+  fprintf(out, "  sta 0xd011\n");
+
+  fprintf(out, "  lda #251\n");
+  fprintf(out, "  sta 0xd012\n");
+
+  fprintf(out, "  lda #sprite_interrupt & 0xff\n");
+  fprintf(out, "  sta 0xfffe\n");
+  fprintf(out, "  lda #sprite_interrupt >> 8\n");
+  fprintf(out, "  sta 0xffff\n");
+
+  fprintf(out, "  cli\n");
+/*
+  fprintf(out, "  lda #0x7f\n");
+  fprintf(out, "  sta 0xdc0d\n");
+  fprintf(out, "  and 0xd011\n");
+  fprintf(out, "  sta 0xd011\n");
+
+  fprintf(out, "  lda 0xdc0d\n");
+  fprintf(out, "  sta 0xdd0d\n");
+
+  fprintf(out, "  lda #251\n");
+  fprintf(out, "  sta 0xd012\n");
+
+  fprintf(out, "  lda #sprite_interrupt & 0xff\n");
+  fprintf(out, "  sta 0xfffe\n");
+  fprintf(out, "  lda #sprite_interrupt >> 8\n");
+  fprintf(out, "  sta 0xffff\n");
+
+  fprintf(out, "  lda #1\n");
+  fprintf(out, "  sta 0xd01a\n");
+
+  fprintf(out, "  cli\n");
+*/
+
   fprintf(out, "\n");
 
   return 0;
@@ -337,6 +393,25 @@ int C64::c64_vic_sprite0pos(/* x, y */)
     "; sprite0pos\n"
     "  inx\n"
     "  lda stack_lo,x\n"
+    "  sta sprite_pos_y + 0\n"
+
+    "  lda sprite_pos_x_msb\n"
+    "  and #255 - 1\n"
+    "  sta sprite_pos_x_msb\n"
+
+    "  inx\n"
+    "  lda stack_hi,x\n"
+    "  beq #8\n"
+    "  lda sprite_pos_x_msb\n"
+    "  ora #1\n"
+    "  sta sprite_pos_x_msb\n"
+    "  lda stack_lo,x\n"
+    "  sta sprite_pos_x + 0\n");
+/*
+  fprintf(out, 
+    "; sprite0pos\n"
+    "  inx\n"
+    "  lda stack_lo,x\n"
     "  sta 0xd001\n"
     "  lda 0xd010\n"
     "  and #255 - 1\n"
@@ -349,6 +424,7 @@ int C64::c64_vic_sprite0pos(/* x, y */)
     "  sta 0xd010\n"
     "  lda stack_lo,x\n"
     "  sta 0xd000\n");
+*/
 
   return 0;
 }
@@ -359,18 +435,20 @@ int C64::c64_vic_sprite1pos(/* x, y */)
     "; sprite1pos\n"
     "  inx\n"
     "  lda stack_lo,x\n"
-    "  sta 0xd003\n"
-    "  lda 0xd010\n"
+    "  sta sprite_pos_y + 1\n"
+
+    "  lda sprite_pos_x_msb\n"
     "  and #255 - 2\n"
-    "  sta 0xd010\n"
+    "  sta sprite_pos_x_msb\n"
+
     "  inx\n"
     "  lda stack_hi,x\n"
     "  beq #8\n"
-    "  lda 0xd010\n"
+    "  lda sprite_pos_x_msb\n"
     "  ora #2\n"
-    "  sta 0xd010\n"
+    "  sta sprite_pos_x_msb\n"
     "  lda stack_lo,x\n"
-    "  sta 0xd002\n");
+    "  sta sprite_pos_x + 1\n");
 
   return 0;
 }
@@ -381,18 +459,20 @@ int C64::c64_vic_sprite2pos(/* x, y */)
     "; sprite2pos\n"
     "  inx\n"
     "  lda stack_lo,x\n"
-    "  sta 0xd005\n"
-    "  lda 0xd010\n"
+    "  sta sprite_pos_y + 2\n"
+
+    "  lda sprite_pos_x_msb\n"
     "  and #255 - 4\n"
-    "  sta 0xd010\n"
+    "  sta sprite_pos_x_msb\n"
+
     "  inx\n"
     "  lda stack_hi,x\n"
     "  beq #8\n"
-    "  lda 0xd010\n"
+    "  lda sprite_pos_x_msb\n"
     "  ora #4\n"
-    "  sta 0xd010\n"
+    "  sta sprite_pos_x_msb\n"
     "  lda stack_lo,x\n"
-    "  sta 0xd004\n");
+    "  sta sprite_pos_x + 2\n");
 
   return 0;
 }
@@ -403,18 +483,20 @@ int C64::c64_vic_sprite3pos(/* x, y */)
     "; sprite3pos\n"
     "  inx\n"
     "  lda stack_lo,x\n"
-    "  sta 0xd007\n"
-    "  lda 0xd010\n"
+    "  sta sprite_pos_y + 3\n"
+
+    "  lda sprite_pos_x_msb\n"
     "  and #255 - 8\n"
-    "  sta 0xd010\n"
+    "  sta sprite_pos_x_msb\n"
+
     "  inx\n"
     "  lda stack_hi,x\n"
     "  beq #8\n"
-    "  lda 0xd010\n"
+    "  lda sprite_pos_x_msb\n"
     "  ora #8\n"
-    "  sta 0xd010\n"
+    "  sta sprite_pos_x_msb\n"
     "  lda stack_lo,x\n"
-    "  sta 0xd006\n");
+    "  sta sprite_pos_x + 3\n");
 
   return 0;
 }
@@ -425,18 +507,20 @@ int C64::c64_vic_sprite4pos(/* x, y */)
     "; sprite4pos\n"
     "  inx\n"
     "  lda stack_lo,x\n"
-    "  sta 0xd009\n"
-    "  lda 0xd010\n"
+    "  sta sprite_pos_y + 4\n"
+
+    "  lda sprite_pos_x_msb\n"
     "  and #255 - 16\n"
-    "  sta 0xd010\n"
+    "  sta sprite_pos_x_msb\n"
+
     "  inx\n"
     "  lda stack_hi,x\n"
     "  beq #8\n"
-    "  lda 0xd010\n"
+    "  lda sprite_pos_x_msb\n"
     "  ora #16\n"
-    "  sta 0xd010\n"
+    "  sta sprite_pos_x_msb\n"
     "  lda stack_lo,x\n"
-    "  sta 0xd008\n");
+    "  sta sprite_pos_x + 4\n");
 
   return 0;
 }
@@ -447,18 +531,20 @@ int C64::c64_vic_sprite5pos(/* x, y */)
     "; sprite5pos\n"
     "  inx\n"
     "  lda stack_lo,x\n"
-    "  sta 0xd00b\n"
-    "  lda 0xd010\n"
+    "  sta sprite_pos_y + 5\n"
+
+    "  lda sprite_pos_x_msb\n"
     "  and #255 - 32\n"
-    "  sta 0xd010\n"
+    "  sta sprite_pos_x_msb\n"
+
     "  inx\n"
     "  lda stack_hi,x\n"
     "  beq #8\n"
-    "  lda 0xd010\n"
+    "  lda sprite_pos_x_msb\n"
     "  ora #32\n"
-    "  sta 0xd010\n"
+    "  sta sprite_pos_x_msb\n"
     "  lda stack_lo,x\n"
-    "  sta 0xd00a\n");
+    "  sta sprite_pos_x + 5\n");
 
   return 0;
 }
@@ -469,18 +555,20 @@ int C64::c64_vic_sprite6pos(/* x, y */)
     "; sprite6pos\n"
     "  inx\n"
     "  lda stack_lo,x\n"
-    "  sta 0xd00d\n"
-    "  lda 0xd010\n"
+    "  sta sprite_pos_y + 6\n"
+
+    "  lda sprite_pos_x_msb\n"
     "  and #255 - 64\n"
-    "  sta 0xd010\n"
+    "  sta sprite_pos_x_msb\n"
+
     "  inx\n"
     "  lda stack_hi,x\n"
     "  beq #8\n"
-    "  lda 0xd010\n"
+    "  lda sprite_pos_x_msb\n"
     "  ora #64\n"
-    "  sta 0xd010\n"
+    "  sta sprite_pos_x_msb\n"
     "  lda stack_lo,x\n"
-    "  sta 0xd00c\n");
+    "  sta sprite_pos_x + 6\n");
 
   return 0;
 }
@@ -491,18 +579,20 @@ int C64::c64_vic_sprite7pos(/* x, y */)
     "; sprite7pos\n"
     "  inx\n"
     "  lda stack_lo,x\n"
-    "  sta 0xd00f\n"
-    "  lda 0xd010\n"
+    "  sta sprite_pos_y + 7\n"
+
+    "  lda sprite_pos_x_msb\n"
     "  and #255 - 128\n"
-    "  sta 0xd010\n"
+    "  sta sprite_pos_x_msb\n"
+
     "  inx\n"
     "  lda stack_hi,x\n"
     "  beq #8\n"
-    "  lda 0xd010\n"
+    "  lda sprite_pos_x_msb\n"
     "  ora #128\n"
-    "  sta 0xd010\n"
+    "  sta sprite_pos_x_msb\n"
     "  lda stack_lo,x\n"
-    "  sta 0xd00e\n");
+    "  sta sprite_pos_x + 7\n");
 
   return 0;
 }
@@ -1284,7 +1374,8 @@ void C64::insert_c64_vic_text_enable()
     "text_enable_2:\n"
     "  sta 0xd018\n"
     "  lda 0xd011\n"
-    "  and #0xdf\n"
+//    "  and #0xdf\n"
+    "  and #0x5f\n"
     "  sta 0xd011\n"
     "  rts\n");
 }
@@ -1908,6 +1999,7 @@ void C64::insert_c64_vic_copy_uppercase()
 {
   fprintf(out, 
     "copy_uppercase:\n"
+    "  sei\n"
     "  lda #50\n"
     "  sta 0x0001\n"
     "  ldy #0\n"
@@ -1932,6 +2024,7 @@ void C64::insert_c64_vic_copy_uppercase()
     "  bne copy_uppercase_loop\n"
     "  lda #53\n"
     "  sta 0x0001\n"
+    "  cli\n"
     "  rts\n");
 }
 
@@ -1939,6 +2032,7 @@ void C64::insert_c64_vic_copy_lowercase()
 {
   fprintf(out, 
     "copy_lowercase:\n"
+    "  sei\n"
     "  lda #50\n"
     "  sta 0x0001\n"
     "  ldy #0\n"
@@ -1963,6 +2057,7 @@ void C64::insert_c64_vic_copy_lowercase()
     "  bne copy_lowercase_loop\n"
     "  lda #53\n"
     "  sta 0x0001\n"
+    "  cli\n"
     "  rts\n");
 }
 
@@ -2105,5 +2200,61 @@ void C64::insert_c64_keyboard()
     "  sta stack_lo,x\n"
     "  dex\n"
     "  rts\n");
+}
+
+void C64::insert_c64_sprite_interrupt()
+{
+  fprintf(out, 
+    "sprite_interrupt:\n"
+    "  pha\n"
+    "  txa\n"
+    "  pha\n"
+    "  tya\n"
+    "  pha\n"
+//    "  inc 53280\n"
+    "  lda sprite_pos_x + 0\n"
+    "  sta 0xd000\n"
+    "  lda sprite_pos_y + 0\n"
+    "  sta 0xd001\n"
+    "  lda sprite_pos_x + 1\n"
+    "  sta 0xd002\n"
+    "  lda sprite_pos_y + 1\n"
+    "  sta 0xd003\n"
+    "  lda sprite_pos_x + 2\n"
+    "  sta 0xd004\n"
+    "  lda sprite_pos_y + 2\n"
+    "  sta 0xd005\n"
+    "  lda sprite_pos_x + 3\n"
+    "  sta 0xd006\n"
+    "  lda sprite_pos_y + 3\n"
+    "  sta 0xd007\n"
+    "  lda sprite_pos_x + 4\n"
+    "  sta 0xd008\n"
+    "  lda sprite_pos_y + 4\n"
+    "  sta 0xd009\n"
+    "  lda sprite_pos_x + 5\n"
+    "  sta 0xd00a\n"
+    "  lda sprite_pos_y + 5\n"
+    "  sta 0xd00b\n"
+    "  lda sprite_pos_x + 6\n"
+    "  sta 0xd00c\n"
+    "  lda sprite_pos_y + 6\n"
+    "  sta 0xd00d\n"
+    "  lda sprite_pos_x + 7\n"
+    "  sta 0xd00e\n"
+    "  lda sprite_pos_y + 7\n"
+    "  sta 0xd00f\n"
+
+    "  lda sprite_pos_x_msb\n"
+    "  sta 0xd010\n"
+
+    "  lda #0xff\n"
+    "  sta 0xd019\n"
+    "  pla\n"
+    "  tay\n"
+    "  pla\n"
+    "  tax\n"
+    "  pla\n"
+    "  rti\n");
 }
 
