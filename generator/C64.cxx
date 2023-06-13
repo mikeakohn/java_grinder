@@ -203,7 +203,6 @@ int C64::open(const char *filename)
   fprintf(out, "  lda #1\n");
   fprintf(out, "  sta 0xd01a\n");
 
-//  fprintf(out, "  lda #0x1b\n");
   fprintf(out, "  lda 0xd011\n");
   fprintf(out, "  and #0x7f\n");
   fprintf(out, "  sta 0xd011\n");
@@ -219,31 +218,7 @@ int C64::open(const char *filename)
   // timer
   fprintf(out, "  lda #0\n");
   fprintf(out, "  sta timer_enable\n");
-
   fprintf(out, "  cli\n");
-/*
-  fprintf(out, "  lda #0x7f\n");
-  fprintf(out, "  sta 0xdc0d\n");
-  fprintf(out, "  and 0xd011\n");
-  fprintf(out, "  sta 0xd011\n");
-
-  fprintf(out, "  lda 0xdc0d\n");
-  fprintf(out, "  sta 0xdd0d\n");
-
-  fprintf(out, "  lda #251\n");
-  fprintf(out, "  sta 0xd012\n");
-
-  fprintf(out, "  lda #sprite_interrupt & 0xff\n");
-  fprintf(out, "  sta 0xfffe\n");
-  fprintf(out, "  lda #sprite_interrupt >> 8\n");
-  fprintf(out, "  sta 0xffff\n");
-
-  fprintf(out, "  lda #1\n");
-  fprintf(out, "  sta 0xd01a\n");
-
-  fprintf(out, "  cli\n");
-*/
-
   fprintf(out, "\n");
 
   return 0;
@@ -414,24 +389,6 @@ int C64::c64_vic_sprite0pos(/* x, y */)
     "  sta sprite_pos_x_msb\n"
     "  lda stack_lo,x\n"
     "  sta sprite_pos_x + 0\n");
-/*
-  fprintf(out, 
-    "; sprite0pos\n"
-    "  inx\n"
-    "  lda stack_lo,x\n"
-    "  sta 0xd001\n"
-    "  lda 0xd010\n"
-    "  and #255 - 1\n"
-    "  sta 0xd010\n"
-    "  inx\n"
-    "  lda stack_hi,x\n"
-    "  beq #8\n"
-    "  lda 0xd010\n"
-    "  ora #1\n"
-    "  sta 0xd010\n"
-    "  lda stack_lo,x\n"
-    "  sta 0xd000\n");
-*/
 
   return 0;
 }
@@ -1212,7 +1169,8 @@ void C64::insert_c64_vic_hires_clear()
     "  sta 0xfc00,y\n"
     "  sta 0xfd00,y\n"
     "  sta 0xfe00,y\n"
-    "  sta 0xff00,y\n"
+    "  sta 0xfe40,y\n"
+//    "  sta 0xff00,y\n"
     "  dey\n"
     "  bne hires_clear_loop\n"
     "  rts\n");
@@ -1892,7 +1850,7 @@ void C64::insert_c64_vic_text_scroll_down()
 {
   fprintf(out, 
     "text_scroll_down:\n"
-    "  ldy #48\n"
+    "  ldy #46\n"
 
     "text_scroll_down_loop_y:\n"
     "  lda text_table + 2,y\n"
@@ -2221,7 +2179,6 @@ void C64::insert_c64_sprite_interrupt()
     "  pha\n"
     "  tya\n"
     "  pha\n"
-//    "  inc 53280\n"
     "  lda sprite_pos_x + 0\n"
     "  sta 0xd000\n"
     "  lda sprite_pos_y + 0\n"

@@ -78,194 +78,6 @@ public class CommodoreDemo
     color_ram + 40 * 24
   };
 
-  static int java_logo[] =
-  {
-    0, 0, 0, 3, 7, 15, 15, 15, 
-    0, 0, 252, 255, 255, 255, 143, 7, 
-    0, 0, 0, 0, 128, 192, 192, 192, 
-    31, 31, 31, 31, 31, 31, 31, 31, 
-    252, 255, 255, 255, 15, 7, 7, 7, 
-    15, 15, 143, 143, 192, 192, 192, 192, 
-    62, 62, 62, 62, 62, 62, 62, 62, 
-    124, 124, 124, 124, 124, 124, 124, 124, 
-    240, 240, 240, 240, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    7, 7, 7, 7, 7, 7, 7, 7, 
-    255, 255, 255, 255, 255, 193, 192, 192, 
-    0, 192, 224, 240, 248, 248, 252, 124, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    31, 31, 31, 31, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    31, 31, 31, 31, 31, 31, 31, 31, 
-    254, 255, 255, 255, 31, 15, 7, 7, 
-    0, 0, 128, 192, 192, 192, 192, 192, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    1, 1, 1, 1, 1, 1, 1, 1, 
-    240, 240, 240, 240, 240, 240, 240, 240, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    7, 15, 31, 255, 254, 255, 127, 15, 
-    192, 192, 128, 0, 0, 0, 128, 128, 
-    31, 31, 31, 31, 31, 31, 31, 31, 
-    7, 15, 255, 254, 254, 255, 15, 7, 
-    143, 143, 15, 15, 15, 143, 207, 207, 
-    62, 62, 62, 62, 62, 62, 62, 62, 
-    124, 124, 124, 124, 124, 124, 124, 124, 
-    240, 240, 240, 241, 241, 241, 243, 243, 
-    63, 127, 255, 251, 241, 224, 224, 224, 
-    131, 195, 227, 243, 243, 251, 251, 251, 
-    239, 255, 255, 247, 227, 225, 225, 225, 
-    192, 192, 224, 224, 224, 224, 224, 224, 
-    7, 7, 7, 7, 7, 7, 7, 7, 
-    192, 192, 192, 192, 192, 192, 192, 192, 
-    124, 124, 124, 124, 124, 124, 125, 125, 
-    31, 127, 127, 241, 240, 240, 255, 255, 
-    135, 199, 227, 243, 243, 241, 241, 241, 
-    193, 193, 193, 227, 227, 227, 227, 247, 
-    223, 223, 223, 223, 223, 223, 159, 159, 
-    3, 15, 31, 31, 62, 62, 62, 62, 
-    240, 248, 252, 124, 62, 30, 0, 0, 
-    31, 63, 127, 120, 240, 240, 255, 255, 
-    192, 225, 243, 243, 251, 251, 251, 249, 
-    254, 255, 255, 231, 195, 240, 254, 255, 
-    0, 0, 128, 192, 192, 0, 0, 0, 
-    31, 31, 31, 31, 31, 31, 31, 31, 
-    7, 7, 15, 255, 254, 254, 255, 31, 
-    223, 159, 159, 31, 31, 31, 159, 159, 
-    15, 15, 15, 15, 15, 15, 15, 15, 
-    60, 63, 63, 63, 62, 62, 62, 62, 
-    252, 252, 254, 126, 62, 30, 30, 30, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    1, 1, 1, 1, 1, 1, 1, 1, 
-    240, 240, 241, 241, 241, 240, 240, 241, 
-    127, 255, 255, 227, 227, 15, 255, 255, 
-    31, 159, 207, 207, 207, 199, 199, 199, 
-    7, 7, 15, 143, 143, 143, 158, 222, 
-    143, 159, 191, 124, 120, 7, 31, 63, 
-    224, 240, 248, 120, 120, 248, 248, 248, 
-    0, 31, 31, 15, 15, 7, 3, 1, 
-    7, 7, 7, 143, 255, 255, 254, 252, 
-    192, 192, 192, 192, 128, 0, 0, 0, 
-    31, 31, 31, 31, 31, 31, 31, 31, 
-    3, 3, 7, 15, 255, 255, 255, 254, 
-    239, 239, 239, 239, 207, 207, 143, 15, 
-    62, 62, 62, 62, 62, 62, 62, 62, 
-    124, 124, 124, 124, 124, 124, 124, 124, 
-    243, 243, 241, 241, 241, 240, 240, 240, 
-    224, 224, 224, 241, 251, 255, 127, 31, 
-    251, 251, 251, 243, 243, 227, 195, 3, 
-    225, 225, 225, 225, 225, 225, 225, 225, 
-    224, 224, 224, 224, 224, 224, 224, 224, 
-    7, 7, 7, 7, 7, 7, 7, 7, 
-    192, 192, 193, 255, 255, 255, 255, 255, 
-    125, 253, 248, 248, 248, 240, 192, 0, 
-    255, 240, 240, 240, 249, 255, 63, 31, 
-    241, 0, 0, 240, 240, 224, 224, 128, 
-    247, 247, 255, 255, 127, 126, 126, 62, 
-    159, 31, 31, 31, 31, 31, 31, 31, 
-    62, 62, 62, 63, 31, 15, 15, 3, 
-    0, 24, 62, 62, 252, 252, 248, 224, 
-    255, 240, 240, 240, 125, 127, 63, 15, 
-    248, 0, 3, 251, 243, 243, 225, 128, 
-    127, 31, 199, 199, 239, 255, 255, 124, 
-    128, 192, 192, 192, 128, 128, 0, 0, 
-    31, 31, 31, 31, 31, 31, 31, 31, 
-    15, 15, 15, 15, 7, 7, 7, 7, 
-    159, 223, 223, 223, 223, 207, 207, 195, 
-    15, 15, 15, 31, 255, 255, 239, 207, 
-    62, 62, 62, 62, 62, 62, 62, 62, 
-    30, 30, 30, 30, 30, 30, 30, 30, 
-    1, 1, 1, 1, 0, 0, 0, 0, 
-    241, 241, 241, 255, 255, 255, 127, 31, 
-    243, 243, 243, 243, 227, 227, 193, 0, 
-    243, 227, 195, 195, 231, 255, 251, 243, 
-    199, 195, 195, 195, 193, 193, 225, 225, 
-    222, 220, 252, 252, 252, 248, 248, 248, 
-    124, 120, 120, 120, 125, 127, 63, 30, 
-    120, 120, 120, 120, 248, 248, 120, 120, 
-  };
-
-  static int java_redlogo[] =
-  {
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    248, 248, 248, 248, 248, 248, 248, 248, 
-    0, 1, 3, 7, 7, 15, 31, 31, 
-    240, 248, 248, 252, 254, 254, 191, 31, 
-    3, 3, 1, 0, 0, 0, 0, 128, 
-    240, 248, 248, 252, 252, 126, 63, 63, 
-    0, 1, 3, 3, 7, 7, 15, 31, 
-    252, 248, 240, 240, 224, 224, 192, 128, 
-    0, 1, 3, 7, 7, 15, 31, 31, 
-    240, 248, 248, 252, 254, 254, 191, 31, 
-    0, 0, 0, 0, 0, 0, 0, 128, 
-    0, 0, 0, 0, 0, 0, 0, 0, 
-    1, 3, 7, 15, 15, 15, 15, 15, 
-    255, 255, 255, 255, 224, 128, 128, 0, 
-    255, 255, 254, 252, 0, 0, 0, 0, 
-    191, 63, 63, 63, 60, 60, 61, 61, 
-    255, 255, 255, 255, 0, 0, 255, 255, 
-    225, 241, 249, 249, 249, 249, 249, 249, 
-    207, 207, 207, 207, 207, 207, 206, 206, 
-    0, 128, 192, 224, 240, 248, 252, 126, 
-    59, 59, 59, 59, 59, 59, 59, 59, 
-    255, 255, 255, 255, 192, 192, 192, 192, 
-    255, 255, 255, 255, 15, 3, 3, 1, 
-    1, 131, 199, 231, 231, 239, 239, 239, 
-    255, 255, 255, 255, 224, 192, 128, 255, 
-    255, 255, 255, 255, 0, 0, 0, 255, 
-    191, 191, 63, 63, 60, 60, 61, 61, 
-    255, 255, 255, 255, 0, 0, 255, 255, 
-    240, 240, 248, 248, 248, 248, 248, 248, 
-    0, 0, 0, 0, 3, 7, 31, 63, 
-    0, 0, 0, 0, 255, 255, 255, 255, 
-    248, 248, 248, 248, 248, 249, 243, 227, 
-    63, 63, 127, 252, 252, 248, 240, 240, 
-    255, 255, 255, 7, 3, 1, 1, 0, 
-    128, 192, 224, 224, 240, 248, 248, 252, 
-    31, 15, 15, 7, 7, 3, 1, 1, 
-    159, 255, 254, 254, 252, 252, 248, 240, 
-    128, 0, 0, 0, 0, 1, 3, 3, 
-    63, 63, 127, 252, 252, 248, 240, 240, 
-    255, 255, 255, 7, 3, 1, 1, 0, 
-    128, 192, 224, 224, 240, 248, 249, 252, 
-    0, 0, 0, 0, 0, 0, 255, 255, 
-    15, 15, 15, 15, 15, 7, 231, 243, 
-    0, 0, 128, 128, 224, 255, 255, 255, 
-    7, 7, 7, 7, 7, 255, 255, 255, 
-    189, 188, 188, 188, 188, 188, 188, 188, 
-    255, 255, 127, 63, 31, 15, 7, 3, 
-    241, 225, 129, 193, 225, 241, 249, 253, 
-    206, 206, 206, 206, 206, 206, 206, 206, 
-    63, 31, 15, 7, 3, 1, 0, 0, 
-    59, 187, 251, 251, 251, 251, 251, 123, 
-    192, 192, 192, 192, 192, 255, 255, 255, 
-    1, 1, 3, 7, 15, 255, 255, 255, 
-    239, 239, 239, 239, 231, 199, 195, 129, 
-    255, 255, 128, 192, 224, 255, 255, 255, 
-    254, 252, 0, 0, 0, 255, 255, 255, 
-    61, 60, 60, 60, 60, 188, 188, 60, 
-    255, 255, 127, 63, 31, 15, 7, 3, 
-    240, 224, 0, 128, 192, 224, 240, 248, 
-  };
-
   static int java_sprite[] =
   {
     0, 0, 0, 0, 0, 0, 0, 0, 
@@ -305,40 +117,6 @@ public class CommodoreDemo
     0, 0, 0, 0, 0, 0, 0, 0,
   };
 
-  static int sprite1[] =
-  {
-    0, 127, 0, 1, 255, 192, 3, 255, 224, 3, 231, 224,
-    7, 217, 240, 7, 223, 240, 7, 217, 240, 3, 231, 224,
-    3, 255, 224, 3, 255, 224, 2, 255, 160, 1, 127, 64,
-    1, 62, 64, 0, 156, 128, 0, 156, 128, 0, 73, 0, 0, 73, 0,
-    0, 62, 0, 0, 62, 0, 0, 62, 0, 0, 28, 0
-  };
-
-  static int sprite2[] =
-  {
-    0b00000000, 0b11111111, 0b00000000,
-    0b00000111, 0b00000000, 0b11100000,
-    0b00001000, 0b00000000, 0b00010000,
-    0b00010000, 0b00000000, 0b00001000,
-    0b00100000, 0b00000000, 0b00000100,
-    0b01000001, 0b11111111, 0b11100010,
-    0b01000000, 0b00001111, 0b00000010,
-    0b10000000, 0b00001111, 0b00000001,
-    0b10000000, 0b00001111, 0b00000001,
-    0b10000000, 0b00001111, 0b00000001,
-    0b10000000, 0b00001111, 0b00000001,
-    0b10000000, 0b00001111, 0b00000001,
-    0b10000000, 0b00001111, 0b00000001,
-    0b10000011, 0b00001111, 0b00000001,
-    0b01000011, 0b00001111, 0b00000010,
-    0b01000001, 0b10011110, 0b00000010,
-    0b00100000, 0b11111100, 0b00000100,
-    0b00010000, 0b00000000, 0b00001000,
-    0b00001000, 0b00000000, 0b00010000,
-    0b00000111, 0b00000000, 0b11100000,
-    0b00000000, 0b11111111, 0b00000000
-  };
-
   public static int pulse = 1024;
   public static int note[] = { 1403, 1486, 1574, 1668, 1767, 1872, 1984, 2102, 2227, 2359, 2500, 2648, 2806, 2973, 3149, 3337, 3535, 3745, 3968, 4204, 4454, 4719, 5000, 5297 };
 
@@ -371,9 +149,9 @@ public class CommodoreDemo
     for(i = 0; i < time; i++);
   }
 
-  public static void musak_init()
+  public static void initMusic()
   {
-    //                srad 
+    //          srad 
     SID.adsr1(0x0004);
     SID.adsr2(0x0009);
     SID.adsr3(0x0060);
@@ -383,11 +161,12 @@ public class CommodoreDemo
     SID.pulseWidth3(2048);
   }
 
-  public static void musak_play()
+  public static void playMusic()
   {
     int i;
 
     i = note[song1[song1pos]];
+
     if(i != -1)
     {
       SID.frequency1(note[song1[song1pos]]);
@@ -396,6 +175,7 @@ public class CommodoreDemo
     }
 
     i = note[song2[song2pos]];
+
     if(i != -1)
     {
       SID.frequency2(note[song2[song2pos]] << 1);
@@ -404,6 +184,7 @@ public class CommodoreDemo
     }
 
     i = note[song3[song3pos]];
+
     if(i != -1)
     {
       SID.frequency3(note[song3[song3pos]] << 2);
@@ -412,12 +193,17 @@ public class CommodoreDemo
     }
 
     song1pos++;
+
     if(song1pos >= song1.length)
       song1pos = 0;
+
     song2pos++;
+
     if(song2pos >= song2.length)
       song2pos = 0;
+
     song3pos++;
+
     if(song3pos >= song3.length)
       song3pos = 0;
 
@@ -425,13 +211,12 @@ public class CommodoreDemo
     pulse += 16;
   }
 
-  public static void wipe()
+  public static void transition()
   {
     int left = 0;
     int right = 39;
     int top = 0;
     int bottom = 24;
-
     int i;
 
     while(top <= 13)
@@ -441,16 +226,19 @@ public class CommodoreDemo
         Memory.write8(color_row[top] + i, (byte)0);
         Memory.write8(screen_row[top] + i, (byte)32);
       }
+
       for(i = top; i <= bottom; i++)
       {
         Memory.write8(color_row[i] + right, (byte)0);
         Memory.write8(screen_row[i] + right, (byte)32);
       }
+
       for(i = right; i >= left; i--)
       {
         Memory.write8(color_row[bottom] + i, (byte)0);
         Memory.write8(screen_row[bottom] + i, (byte)32);
       }
+
       for(i = bottom; i >= top; i--)
       {
         Memory.write8(color_row[i] + left, (byte)0);
@@ -458,15 +246,22 @@ public class CommodoreDemo
       }
 
       left++;
+
       if(left > 39)
         left = 39;
+
       right--;
+
       if(right < 0)
         right = 0;
+
       top++;
+
       if(top > 24)
         top = 24;
+
       bottom--;
+
       if(bottom < 0)
         bottom = 0;
     }
@@ -492,13 +287,14 @@ public class CommodoreDemo
       Memory.write8(screen_ram + 40 * 12 + 19 + i, (byte)text[i]);
     }
 
-    SID.adsr1(0xF000);
-    SID.adsr2(0xF000);
-    SID.adsr3(0xF000);
+    SID.adsr1(0xf000);
+    SID.adsr2(0xf000);
+    SID.adsr3(0xf000);
 
     int loc1 = color_ram;
     int loc2 = color_ram + 960;
     int yy = 0;
+
     for(y = 0; y < 13 * 16; y += 16)
     {
       imc = (y - 13 * 16) >> 4;
@@ -539,6 +335,7 @@ public class CommodoreDemo
         if(i < 12)
         {
           byte c = mandel_colors[i];
+
           Memory.write8(loc1 + xx, c);
           Memory.write8(loc2 + xx, c);
         }
@@ -555,6 +352,7 @@ public class CommodoreDemo
 
         xx++;
       }
+
       yy++;
       loc1 += 40;
       loc2 -= 40;
@@ -568,6 +366,7 @@ public class CommodoreDemo
 
   public static void sprites()
   {
+    byte balloon[] = Memory.preloadByteArray("sprite_balloon.bin");
     int i, j;
 
     VIC.background(6);
@@ -616,7 +415,7 @@ public class CommodoreDemo
     VIC.sprite7color(1);
 
     for(i = 0; i < 63; i++)
-      Memory.write8(sprite_ram + i, (byte)sprite1[i]);
+      Memory.write8(sprite_ram + i, (byte)balloon[i]);
 
     VIC.spriteExpandX(255);
     VIC.spriteExpandY(255);
@@ -624,9 +423,8 @@ public class CommodoreDemo
     for(i = 0; i < 512; i++)
     {
       if((i & 7) == 7)
-        musak_play();
+        playMusic();
 
-      VIC.waitRaster(251);
       VIC.sprite0pos(x0, y0 + balloon_height[(x0 >> 3) & 15]);
       VIC.sprite1pos(x1, y1 + balloon_height[(x1 >> 3) & 15]);
       VIC.sprite2pos(x2, y2 + balloon_height[(x2 >> 4) & 15]);
@@ -656,27 +454,42 @@ public class CommodoreDemo
       if((x0 & 3) == 3)
       {
         y0++;
+
         if(y0 > 160)
           y0 = 160;
+
         y1++;
+
         if(y1 > 160)
           y1 = 160;
+
         y2++;
+
         if(y2 > 160)
           y2 = 160;
+
         y3++;
+
         if(y3 > 160)
           y3 = 160;
+
         y4++;
+
         if(y4 > 160)
           y4 = 160;
+
         y5++;
+
         if(y5 > 160)
           y5 = 160;
+
         y6++;
+
         if(y6 > 160)
           y6 = 160;
+
         y7++;
+
         if(y7 > 160)
           y7 = 160;
       }
@@ -686,10 +499,9 @@ public class CommodoreDemo
     VIC.background(0);
 
     int vol = 15;
+
     for(i = 0; i < 19; i++)
     {
-      VIC.waitRaster(251);
-
       Memory.write8(1904 + i, (byte)32);
       Memory.write8(1943 - i, (byte)32);
       Memory.write8(1944 + i, (byte)32);
@@ -707,7 +519,6 @@ public class CommodoreDemo
 
     for(i = 21; i >= 0; i--)
     {
-      VIC.waitRaster(251);
       Memory.write8(color_row[i] + 19, (byte)5);
       Memory.write8(color_row[i] + 20, (byte)5);
       Memory.write8(screen_row[i] + 19, (byte)160);
@@ -728,6 +539,7 @@ public class CommodoreDemo
 
   public static void green()
   {
+    byte circlej[] = Memory.preloadByteArray("sprite_circlej.bin");
     int i, j;
     int pulse1 = 1024;
     int pulse2 = 2048;
@@ -735,7 +547,7 @@ public class CommodoreDemo
 
     wait(5000);
 
-    //                srad 
+    //          srad 
     SID.adsr1(0xf000);
     SID.adsr2(0xf000);
     SID.adsr3(0xf000);
@@ -754,7 +566,7 @@ public class CommodoreDemo
     SID.volume(15);
 
     for(i = 0; i < 63; i++)
-      Memory.write8(sprite_ram + i, (byte)sprite2[i]);
+      Memory.write8(sprite_ram + i, (byte)circlej[i]);
 
     VIC.sprite0pos(32, 58);
 
@@ -776,11 +588,14 @@ public class CommodoreDemo
     for(i = 38; i >= 7; i--)
     {
       int k = i;
+
       for(j = 24; j >= 0; j--)
       {
         Memory.write8(screen_row[j] + k, (byte)105);
         Memory.write8(screen_row[j] + k + 1, (byte)32);
+
         k++;
+
         if(k > 38)
           break;
       }
@@ -788,6 +603,7 @@ public class CommodoreDemo
       pulse1 += 16;
       pulse2 += 16;
       pulse3 += 16;
+
       SID.pulseWidth1(pulse1);
       SID.pulseWidth2(pulse2);
       SID.pulseWidth3(pulse3);
@@ -808,6 +624,7 @@ public class CommodoreDemo
     }
 
     wait(4000);
+
     int vol = 15;
 
     for(i = 0; i < text2.length; i++)
@@ -826,6 +643,7 @@ public class CommodoreDemo
       vol--;
       SID.volume(vol);
     }
+
     SID.volume(0);
 
     wait(10000);
@@ -841,15 +659,21 @@ public class CommodoreDemo
         Memory.write8(screen_row[j] + k + 1, (byte)160);
         Memory.write8(color_row[j] + k, (byte)4);
         Memory.write8(color_row[j] + k + 1, (byte)4);
+
         k++;
+
         if(k > 38)
           break;
       }
     }
   }
 
-  public static void java_screen()
+  // parody of a Java advertisement from back in the day
+  public static void billion()
   {
+    byte logo1[] = Memory.preloadByteArray("hires_logo_1.bin");
+    byte logo2[] = Memory.preloadByteArray("hires_logo_2.bin");
+
     VIC.background(1);
     VIC.border(0);
 
@@ -867,15 +691,16 @@ public class CommodoreDemo
     for(i = screen_ram + 960; i < screen_ram + 1000; i++)
       Memory.write8(i, (byte)34);
 
+    VIC.hiresEnable(0);
     VIC.hiresClear(0);
 
-    for(i = 0; i < java_logo.length; i++)
-      Memory.write8(hires_ram + 320 + i, (byte)java_logo[i]);
+    for(i = 0; i < logo1.length; i++)
+      Memory.write8(hires_ram + 320 + i, (byte)logo1[i]);
 
     for(i = 0; i < 240; i++)
     {
-      Memory.write8(hires_ram + 7080 + i, (byte)java_redlogo[i]);
-      Memory.write8(hires_ram + 7080 + 320 + i, (byte)java_redlogo[i + 240]);
+      Memory.write8(hires_ram + 7080 + i, (byte)logo2[i]);
+      Memory.write8(hires_ram + 7080 + 320 + i, (byte)logo2[i + 240]);
     }
 
     VIC.spriteEnable(15);
@@ -899,21 +724,17 @@ public class CommodoreDemo
     VIC.sprite2pos(136, 112 + 42);
     VIC.sprite3pos(136 + 48, 112 + 42);
 
-    VIC.hiresEnable();
-
     wait(20000);
 
     VIC.background(0);
-
     VIC.textClear(160);
     VIC.colorRamClear(1);
-
     VIC.spriteEnable(0);
-
-    VIC.textEnable();
+    VIC.textEnable(0);
   }
 
-  public static void yin_yang()
+  // hires demo, adapted from 
+  public static void yinYang()
   {
     VIC.background(5);
     VIC.border(0);
@@ -921,7 +742,7 @@ public class CommodoreDemo
     VIC.textClear(16);
     VIC.colorRamClear(0);
 
-    VIC.hiresEnable();
+    VIC.hiresEnable(0);
     VIC.hiresClear(0);
 
     int j, k;
@@ -938,6 +759,7 @@ public class CommodoreDemo
 
         temp2 = (41 - j);
         temp2 *= temp2;
+
         if((temp1 + temp2) > 1332 )
         {
           // this makes a checkerboard background
@@ -946,17 +768,20 @@ public class CommodoreDemo
             VIC.hiresPlot(95 + (129 - k), 60 + (82 - j), 1);
             VIC.hiresPlot(95 + k, 60 + j, 1);
           }
+
           continue;
         }
 
         temp2 = (23 - j);
         temp2 *= temp2;
         temp2 += temp1;
+
         if(temp2 < 30 )
         {
           VIC.hiresPlot(95 + k, 60 + j, 1);
           continue;
         }
+
         if(temp2 < 342 )
         {
           VIC.hiresPlot(95 + (129 - k), 60 + (82 - j), 1);
@@ -966,11 +791,13 @@ public class CommodoreDemo
         temp2 = (59 - j);
         temp2 *= temp2;
         temp2 += temp1;
+
         if(temp2 < 30 )
         {
           VIC.hiresPlot(95 + (129 - k), 60 + (82 - j), 1);
           continue;
         }
+
         if(temp2 < 342 )
         {
           VIC.hiresPlot(95 + k, 60 + j, 1);
@@ -989,17 +816,23 @@ public class CommodoreDemo
     VIC.makeHiresTables();
     VIC.copyUppercase();
 
-    java_screen();
-    wipe();
-    musak_init();
+    VIC.textClear(16);
+    VIC.background(0);
+    VIC.colorRamClear(3);
+
+    wait(10000);
+
+    billion();
+    transition();
+    initMusic();
     SID.volume(15);
     mandel();
-    wipe();
+    transition();
     sprites();
     green();
-    wipe();
+    transition();
     SID.volume(0);
-    yin_yang();
+    yinYang();
     while(true);
   }
 }

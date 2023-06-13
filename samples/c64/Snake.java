@@ -226,6 +226,14 @@ public class Snake implements TimerListener
     0b11001100
   };
 
+  public static void wait(int delay)
+  {
+    for(int i = 0; i < delay; i++)
+    {
+      // wait
+    }
+  }
+
   public static void addMushrooms()
   {
     int x, y;
@@ -234,6 +242,7 @@ public class Snake implements TimerListener
       VIC.textPlot(x, 0, 32, 0);
 
     VIC.textScrollDown();
+
 /*
     for(y = 24; y > 0; y--)
     {
@@ -322,14 +331,6 @@ public class Snake implements TimerListener
     }
 
     printScore();
-  }
-
-  public static void wait(int delay)
-  {
-    for(int i = 0; i < delay; i++)
-    {
-      // wait
-    }
   }
 
   public static int getFreq(int c)

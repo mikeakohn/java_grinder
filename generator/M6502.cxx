@@ -257,11 +257,11 @@ void M6502::method_start(int local_count, int max_stack, int param_count, std::s
       "  pha\n");
 
     // save internal vars
-    fprintf(out, "  ldx #16\n");
+    fprintf(out, "  ldy #17\n");
     fprintf(out, "save_vars_%d_loop:\n", local_count);
-    fprintf(out, "  lda var_start,x\n");
-    fprintf(out, "  sta saved_vars,x\n");
-    fprintf(out, "  dex\n");
+    fprintf(out, "  lda var_start,y\n");
+    fprintf(out, "  sta saved_vars,y\n");
+    fprintf(out, "  dey\n");
     fprintf(out, "  bpl save_vars_%d_loop\n", local_count++);
 
     return;
@@ -949,11 +949,11 @@ int M6502::return_void(int local_count)
   if (is_interrupt)
   {
     // restore internal vars
-    fprintf(out, "  ldx #16\n");
+    fprintf(out, "  ldy #17\n");
     fprintf(out, "restore_vars_%d_loop:\n", local_count);
-    fprintf(out, "  lda saved_vars,x\n");
-    fprintf(out, "  sta var_start,x\n");
-    fprintf(out, "  dex\n");
+    fprintf(out, "  lda saved_vars,y\n");
+    fprintf(out, "  sta var_start,y\n");
+    fprintf(out, "  dey\n");
     fprintf(out, "  bpl restore_vars_%d_loop\n", local_count++);
 
     // restore registers
