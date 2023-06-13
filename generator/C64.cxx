@@ -149,6 +149,9 @@ int C64::open(const char *filename)
   fprintf(out, "sprite_pos_y equ 0x750\n");
   fprintf(out, "sprite_pos_x_msb equ 0x758\n");
 
+  // timer related
+  fprintf(out, "timer_enable equ 0x75a\n");
+
   // basic loader
   fprintf(out, ".org 0x%04x\n", start_org);
   fprintf(out, 
@@ -212,6 +215,10 @@ int C64::open(const char *filename)
   fprintf(out, "  sta 0xfffe\n");
   fprintf(out, "  lda #sprite_interrupt >> 8\n");
   fprintf(out, "  sta 0xffff\n");
+
+  // timer
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sta timer_enable\n");
 
   fprintf(out, "  cli\n");
 /*
@@ -823,16 +830,16 @@ int C64::timer_setInterval_II()
   // timer B
   fprintf(out, "  inx\n");
   fprintf(out, "  lda stack_lo,x\n");
-  fprintf(out, "  sta 0xdc06\n");
+  fprintf(out, "  sta 0xdd06\n");
   fprintf(out, "  lda stack_hi,x\n");
-  fprintf(out, "  sta 0xdc07\n");
+  fprintf(out, "  sta 0xdd07\n");
 
   // timer A
   fprintf(out, "  inx\n");
   fprintf(out, "  lda stack_lo,x\n");
-  fprintf(out, "  sta 0xdc04\n");
+  fprintf(out, "  sta 0xdd04\n");
   fprintf(out, "  lda stack_hi,x\n");
-  fprintf(out, "  sta 0xdc05\n");
+  fprintf(out, "  sta 0xdd05\n");
 
   return 0;
 }
@@ -858,18 +865,17 @@ int C64::timer_setListener_Z(int const_value)
     need_c64_timer_interrupt = true;
 
     // vector
-    fprintf(out, "  sei\n");
     fprintf(out, "  lda #0x7f\n");
-    fprintf(out, "  sta 0xdc0d\n");
-    fprintf(out, "  lda 0xdc0d\n");
+    fprintf(out, "  sta 0xdd0d\n");
+    fprintf(out, "  lda 0xdd0d\n");
 
     fprintf(out, "  lda #timerInterrupt & 0xff\n");
-    fprintf(out, "  sta 0xfffe\n");
+    fprintf(out, "  sta 0xfffa\n");
     fprintf(out, "  lda #timerInterrupt >> 8\n");
-    fprintf(out, "  sta 0xffff\n");
+    fprintf(out, "  sta 0xfffb\n");
 
     fprintf(out, "  lda #10000010b\n");
-    fprintf(out, "  sta 0xdc0d\n");
+    fprintf(out, "  sta 0xdd0d\n");
 
     // 0 - timer on/off (start off)
     // 4 - latch
@@ -877,25 +883,27 @@ int C64::timer_setListener_Z(int const_value)
 
     // start timer A
     fprintf(out, "  lda #00000001b\n");
-    fprintf(out, "  sta 0xdc0e\n");
+    fprintf(out, "  sta 0xdd0e\n");
 
     // start timer B
     fprintf(out, "  lda #01000001b\n");
-    fprintf(out, "  sta 0xdc0f\n");
+    fprintf(out, "  sta 0xdd0f\n");
 
-    fprintf(out, "  cli\n");
+    fprintf(out, "  lda #1\n");
+    fprintf(out, "  sta timer_enable\n");
   }
     else
   { 
-    fprintf(out, "  sei\n");
+    fprintf(out, "  lda #0\n");
+    fprintf(out, "  sta timer_enable\n");
 
     // stop timer A
     fprintf(out, "  lda #00000000b\n");
-    fprintf(out, "  sta 0xdc0e\n");
+    fprintf(out, "  sta 0xdd0e\n");
 
     // stop timer B
     fprintf(out, "  lda #01000000b\n");
-    fprintf(out, "  sta 0xdc0f\n");
+    fprintf(out, "  sta 0xdd0f\n");
   }
 
   return 0;
@@ -1136,8 +1144,10 @@ int C64::grinder_largeJavaStack()
 
 int C64::return_void(int local_count)
 {
-  // acknowledge IRQ interrupt
-  fprintf(out, "  lda 0xdc0d\n");
+  // acknowledge NMI timer interrupt
+  fprintf(out, "  lda timer_enable\n");
+  fprintf(out, "  beq #3\n");
+  fprintf(out, "  lda 0xdd0d\n");
 
   return M6502::return_void(local_count);
 }

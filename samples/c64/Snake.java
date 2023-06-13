@@ -6,9 +6,11 @@ import net.mikekohn.java_grinder.Joystick;
 import net.mikekohn.java_grinder.Keyboard;
 import net.mikekohn.java_grinder.Memory;
 import net.mikekohn.java_grinder.Math;
+import net.mikekohn.java_grinder.Timer;
+import net.mikekohn.java_grinder.TimerListener;
 import net.mikekohn.java_grinder.c64.*;
 
-public class Snake
+public class Snake implements TimerListener
 {
   // addresses
   static final int char_ram = 0xc800;
@@ -1127,7 +1129,6 @@ for(int i = 0; i < 4; i++)
       }
 
       // move snake
-//      if((time & 1) == 1)
       if((time & 3) == 3)
       {
         for(i = 0; i < 16; i++)
@@ -1241,10 +1242,19 @@ for(int i = 0; i < 4; i++)
 
     while(true)
     {
+      Timer.setListener(false);
+      Timer.setInterval(14, 30000);
+      Timer.setListener(true);
       title();
+      Timer.setListener(false);
       snake();
       gameOver();
     }
+  }
+
+  public void timerInterrupt()
+  {
+    CPU.asm("inc 53280\n");
   }
 }
 
