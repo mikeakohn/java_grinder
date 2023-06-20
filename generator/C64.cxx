@@ -193,6 +193,13 @@ int C64::open(const char *filename)
   fprintf(out, "  sta 0x0001\n");
 
   // sprite interrupt
+  fprintf(out, "  ldy #16\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "sprite_pos_reset_loop:\n");
+  fprintf(out, "  sta sprite_pos_x,y\n");
+  fprintf(out, "  dey\n");
+  fprintf(out, "  bpl sprite_pos_reset_loop\n");
+
   fprintf(out, "  lda #0x7f\n");
   fprintf(out, "  sta 0xdc0d\n");
   fprintf(out, "  sta 0xdd0d\n");
