@@ -493,6 +493,8 @@ public class CommodoreDemo
         if(y7 > 160)
           y7 = 160;
       }
+
+      wait(100);
     }
 
     VIC.spriteEnable(0);
@@ -539,7 +541,7 @@ public class CommodoreDemo
 
   public static void green()
   {
-    byte circlej[] = Memory.preloadByteArray("sprite_circlej.bin");
+    byte circlej[] = Memory.preloadByteArray("sprite_circle.bin");
     int i, j;
     int pulse1 = 1024;
     int pulse2 = 2048;
@@ -833,6 +835,7 @@ public class CommodoreDemo
     transition();
     SID.volume(0);
     yinYang();
+
     while(true);
   }
 }
