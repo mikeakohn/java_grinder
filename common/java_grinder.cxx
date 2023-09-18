@@ -46,6 +46,7 @@
 #include "generator/SegaGenesis.h"
 #include "generator/SNES.h"
 #include "generator/SleepyBee.h"
+#include "generator/R4000.h"
 #include "generator/STDC.h"
 #include "generator/TI84.h"
 #include "generator/TI99.h"
@@ -252,6 +253,11 @@ static Generator *new_generator(const char *chip_type)
   if (strcasecmp("stdc", chip_type) == 0)
   {
     generator = new STDC();
+  }
+    else
+  if (strcasecmp("r4000", chip_type) == 0)
+  {
+    generator = new R4000();
   }
     else
   if (strcasecmp("ti84plus", chip_type) == 0)
