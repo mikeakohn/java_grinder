@@ -2,7 +2,7 @@
  *  Java Grinder
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
  * Copyright 2014-2023 by Michael Kohn
@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #include "generator/Math.h"

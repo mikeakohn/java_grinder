@@ -2,10 +2,10 @@
  *  Java Grinder
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2022 by Michael Kohn
+ * Copyright 2014-2023 by Michael Kohn
  *
  */
 
@@ -335,7 +335,7 @@ int main(int argc, char *argv[])
 
   printf("\nJava Grinder\n"
          "Authors: Michael Kohn, Joe Davisson, Carsten Dost\n"
-         "    Web: http://www.mikekohn.net/micro/java_grinder.php\n"
+         "    Web: https://www.mikekohn.net/micro/java_grinder.php\n"
          "  Email: mike@mikekohn.net\n\n"
          "Version: " VERSION "\n\n");
 
