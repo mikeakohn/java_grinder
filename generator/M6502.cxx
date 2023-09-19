@@ -1949,6 +1949,14 @@ int M6502::math_abs_I()
   return 0;
 }
 
+int M6502::cpu_nop()
+{
+  fprintf(out, "; cpu_nop()\n");
+  fprintf(out, "  nop\n");
+
+  return 0;
+}
+
 void M6502::insert_math_max()
 {
   fprintf(out, 
@@ -2006,4 +2014,5 @@ void M6502::insert_math_abs()
     "  sta stack_hi + 1,x\n"
     "  rts\n");
 };
+
 

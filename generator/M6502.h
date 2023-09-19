@@ -113,6 +113,9 @@ public:
   virtual int math_min_II();
   virtual int math_max_II();
 
+  // CPU API
+  virtual int cpu_nop();
+
 protected:
   virtual int get_int_size() { return 2; }
 
