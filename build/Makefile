@@ -69,6 +69,7 @@ CPUS= \
   generator/MSP430.o \
   generator/MSP430X.o \
   generator/Propeller.o \
+  generator/RISCV.o \
   generator/R4000.o \
   generator/R5900.o \
   generator/SH4.o \

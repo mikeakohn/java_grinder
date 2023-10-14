@@ -2,7 +2,7 @@
  *  Java Grinder
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
  * Copyright 2014-2023 by Michael Kohn
@@ -887,7 +887,7 @@ int R4000::jump_cond(std::string &label, int cond, int distance)
 {
   fprintf(out, "  ; jump_cond(%s, %d, %d)\n", label.c_str(), cond, distance);
 
-  switch(cond)
+  switch (cond)
   {
     case COND_EQUAL:
       fprintf(out, "  beq $t%d, $0, %s\n", --reg, label.c_str());
@@ -931,7 +931,7 @@ int R4000::jump_cond_integer(std::string &label, int cond, int distance)
     return -1;
   }
 
-  switch(cond)
+  switch (cond)
   {
     case COND_EQUAL:
       fprintf(out, "  beq $t%d, $t%d, %s\n", reg - 2, reg - 1, label.c_str());
@@ -1018,7 +1018,7 @@ int R4000::ternary(int cond, int value_true, int value_false)
   fprintf(out, "  ; ternary %d ? %d : %d\n", cond, value_true, value_false);
   fprintf(out, "  ; true condition is in delay slot\n");
 
-  switch(cond)
+  switch (cond)
   {
     case COND_EQUAL:
       fprintf(out, "  beq $t%d, $t%d, ternary_%d\n", reg - 2, reg - 1, label_count);
@@ -1080,7 +1080,7 @@ int R4000::ternary(int cond, int compare, int value_true, int value_false)
 
   if (set_constant(8, compare) != 0) { return -1; }
 
-  switch(cond)
+  switch (cond)
   {
     case COND_EQUAL:
       fprintf(out, "  beq $t%d, $t8, ternary_%d\n", reg - 1, label_count);

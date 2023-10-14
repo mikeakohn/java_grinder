@@ -12,7 +12,7 @@ run_msp430_test()
     exit 1
   fi
   ../../naken_asm/naken_asm -l -I../../naken_asm/include -o ${file}.hex ${file}.asm > /dev/null
-  a=`../../naken_asm/naken_util -run ${file}.hex`
+  a=`/home/mike/source/naken_asm/naken_util -run ${file}.hex`
   cycles=`echo ${a} | sed 's/ clock cycles.*$//' | sed 's/^.* //'`
   answer=`echo ${a} | sed 's/^.* r15: //' | sed 's/,.*$//'`
   answer=`printf "%d" ${answer}`
@@ -31,7 +31,7 @@ run_6502_test()
   file=$1
   ../java_grinder $2 ${file}.class ${file}.asm c64 > /dev/null
   ../../naken_asm/naken_asm -l -I../../naken_asm/include -o ${file}.hex ${file}.asm > /dev/null
-  a=`../../naken_asm/naken_util -6502 -run ${file}.hex`
+  a=`/home/mike/source/naken_asm/naken_util -6502 -run ${file}.hex`
   cycles=`echo ${a} | sed 's/ clock cycles.*$//' | sed 's/^.* //'`
   answer=`echo ${a} | sed 's/^.* r15: //' | sed 's/,.*$//'`
   answer=`printf "%d" ${answer}`
@@ -48,17 +48,20 @@ run_6502_test()
 run_mips_test()
 {
   file=$1
-  ../java_grinder $2 ${file}.class ${file}.asm pic32 > /dev/null
+  ../java_grinder $2 ${file}.class ${file}.asm r4000 > /dev/null
   if [ $? -ne 0 ]
   then
     echo "${file} : GRIND FAILED ***"
     exit 1
   fi
   ../../naken_asm/naken_asm -l -I../../naken_asm/include -o ${file}.hex ${file}.asm > /dev/null
-  a=`../../naken_asm/naken_util -run -mips32 ${file}.hex`
-  cycles=`echo ${a} | grep cycles | sed 's/ clock cycles.*$//' | sed 's/^.* //'`
-  answer=`echo ${a} | grep '$v0' | sed 's/^.* $v0: //' | sed 's/ .*$//'`
-  #echo ${a}
+  a=`/home/mike/source/naken_asm/naken_util -run -mips ${file}.hex`
+  /home/mike/source/naken_asm/naken_util -run -mips ${file}.hex > out.txt
+  #cycles=`echo ${a} | grep cycles | tail -n 1 | sed 's/ clock cycles.*$//' | sed 's/^.* //'`
+  #answer=`echo ${a} | grep '$v0' | sed 's/^.* $v0: //' | sed 's/ .*$//'`
+  cycles=`grep cycles out.txt | tail -n 1 | sed 's/ clock cycles.*$//' | sed 's/^.* //'`
+  answer=`grep '$v0' out.txt | tail -n 1 | sed 's/^.* $v0: //' | sed 's/ .*$//'`
+  #echo ${a} | grep cycles
   #echo ${cycles}
   #echo ${answer}
   answer=`printf "%d" ${answer}`

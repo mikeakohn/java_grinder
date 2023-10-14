@@ -9,29 +9,29 @@
  *
  */
 
-#ifndef JAVA_GRINDER_GENERATOR_MIPS32_H
-#define JAVA_GRINDER_GENERATOR_MIPS32_H
+#ifndef JAVA_GRINDER_GENERATOR_RISCV_H
+#define JAVA_GRINDER_GENERATOR_RISCV_H
 
 #include "generator/Generator.h"
 
 // Stack points to the last used slot.
 // push = subtract 4, then place value
 #define STACK_PUSH(t) \
-  fprintf(out, "  addi $sp, $sp, -4\n"); \
-  fprintf(out, "  sw $t%d, 0($sp)\n", t); \
+  fprintf(out, "  addi sp, sp, -4\n"); \
+  fprintf(out, "  sw $t%d, 0(sp)\n", t); \
   stack++;
 
 // pop = read value, then subtract 4
 #define STACK_POP(t) \
-  fprintf(out, "  lw $%d, 0($sp)\n", t); \
-  fprintf(out, "  addi $sp, $sp, 4\n"); \
+  fprintf(out, "  lw $%d, 0(sp)\n", t); \
+  fprintf(out, "  addi sp, sp, 4\n"); \
   stack--;
 
-class MIPS32 : public Generator
+class RISCV : public Generator
 {
 public:
-  MIPS32();
-  virtual ~MIPS32();
+  RISCV();
+  virtual ~RISCV();
 
   virtual int open(const char *filename);
   virtual int start_init();
@@ -119,8 +119,6 @@ protected:
   uint32_t org;       // .org to use for this chip
   uint32_t ram_start; // start of ram
   uint32_t ram_end;   // end of ram
-  uint32_t virtual_address;  // start of code space virtual address
-  uint32_t physical_address; // start of code space physical address
 
 private:
   int stack_alu(const char *instr);
