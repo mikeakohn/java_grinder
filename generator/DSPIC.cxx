@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2023 by Michael Kohn
  *
  */
 
@@ -1759,6 +1759,12 @@ void DSPIC::pop_reg(char *dst)
     else
   {
     reg--;
+    if (reg < 0)
+    {
+      printf("Internal Error %s:%d\n", __FILE__, __LINE__);
+      exit(1);
+    }
+
     sprintf(dst, "w%d", REG_STACK(reg));
   }
 }

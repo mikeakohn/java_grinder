@@ -28,6 +28,7 @@
 #include "generator/DotNet.h"
 #include "generator/DSPIC.h"
 #include "generator/Epiphany.h"
+#include "generator/F100_L.h"
 #include "generator/Intellivision.h"
 #include "generator/M6502.h"
 #include "generator/M6502_8.h"
@@ -153,6 +154,11 @@ static Generator *new_generator(const char *chip_type)
   if (strcasecmp("epiphany", chip_type) == 0)
   {
     generator = new Epiphany();
+  }
+    else
+  if (strcasecmp("f100_l", chip_type) == 0)
+  {
+    generator = new F100_L();
   }
     else
   if (strcasecmp("intellivision", chip_type) == 0)

@@ -58,6 +58,7 @@ CPUS= \
   generator/DotNet.o \
   generator/DSPIC.o \
   generator/Epiphany.o \
+  generator/F100_L.o \
   generator/Intellivision.o \
   generator/M6502.o \
   generator/M6502_8.o \
