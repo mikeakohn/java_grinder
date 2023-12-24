@@ -98,6 +98,11 @@ public:
   virtual int array_write_short(std::string &name, int field_id);
   virtual int array_write_int(std::string &name, int field_id);
 
+  // If this CPU is used for other things, move this into a more
+  // specific file.
+  virtual int ice_fun_setTone_I();
+  virtual int ice_fun_setServo_II();
+
 protected:
   int reg;            // count number of registers are are using as stack
   int reg_max;        // size of register stack

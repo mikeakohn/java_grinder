@@ -26,6 +26,7 @@
 #include "generator/API_DSP.h"
 #include "generator/API_Draw3D.h"
 #include "generator/API_Grinder.h"
+#include "generator/API_IceFun.h"
 #include "generator/API_Intellivision.h"
 #include "generator/API_Joystick.h"
 #include "generator/API_Keyboard.h"
@@ -54,6 +55,7 @@ class Generator :
   public API_DSP,
   public API_Draw3D,
   public API_Grinder,
+  public API_IceFun,
   public API_Intellivision,
   public API_Joystick,
   public API_Keyboard,

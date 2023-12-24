@@ -458,3 +458,13 @@ int F100_L::array_write_int(std::string &name, int field_id)
   return -1;
 }
 
+int F100_L::ice_fun_setTone_I()
+{
+  return -1;
+}
+
+int F100_L::ice_fun_setServo_II()
+{
+  return -1;
+}
+

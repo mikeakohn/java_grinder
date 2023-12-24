@@ -14,18 +14,8 @@
 
 #include "generator/Generator.h"
 
-// Stack points to the last used slot.
-// push = subtract 4, then place value
-#define STACK_PUSH(t) \
-  fprintf(out, "  addi sp, sp, -4\n"); \
-  fprintf(out, "  sw $t%d, 0(sp)\n", t); \
-  stack++;
-
-// pop = read value, then subtract 4
-#define STACK_POP(t) \
-  fprintf(out, "  lw $%d, 0(sp)\n", t); \
-  fprintf(out, "  addi sp, sp, 4\n"); \
-  stack--;
+// This is currently hardcoded to use the IceFun APIs as more of a
+// proof of concept, but this can be changed in the future.
 
 class RISCV : public Generator
 {

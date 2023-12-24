@@ -63,6 +63,20 @@
 //
 //   STACK <--- sp
 
+// FIXME: Make these functions.
+// Stack points to the last used slot.
+// push = subtract 4, then place value
+#define STACK_PUSH(t) \
+  fprintf(out, "  addi sp, sp, -4\n"); \
+  fprintf(out, "  sw $t%d, 0(sp)\n", t); \
+  stack++;
+
+// pop = read value, then subtract 4
+#define STACK_POP(t) \
+  fprintf(out, "  lw $%d, 0(sp)\n", t); \
+  fprintf(out, "  addi sp, sp, 4\n"); \
+  stack--;
+
 RISCV::RISCV() :
   reg(0),
   reg_max(8),
@@ -726,26 +740,22 @@ int RISCV::jump_cond_integer(std::string &label, int cond, int distance)
       reg -= 2;
       return 0;
     case COND_LESS:
-      fprintf(out, "  sub a%d, a%d, a%d\n", reg - 2, reg - 2, reg - 1);
-      fprintf(out, "  bltz a%d, %s\n", reg - 2, label.c_str());
+      fprintf(out, "  blt a%d, a%d, %s\n", reg - 2, reg - 1, label.c_str());
       fprintf(out, "  nop\n");
       reg -= 2;
       return 0;
     case COND_LESS_EQUAL:
-      fprintf(out, "  sub a%d, a%d, a%d\n", reg - 2, reg - 2, reg - 1);
-      fprintf(out, "  blez a%d, %s\n", reg - 2, label.c_str());
+      fprintf(out, "  ble a%d, a%d, %s\n", reg - 2, reg - 1, label.c_str());
       fprintf(out, "  nop\n");
       reg -= 2;
       return 0;
     case COND_GREATER:
-      fprintf(out, "  sub a%d, a%d, a%d\n", reg - 2, reg - 2, reg - 1);
-      fprintf(out, "  bgtz a%d, %s\n", reg - 2, label.c_str());
+      fprintf(out, "  bgt a%d, a%d, %s\n", reg - 2, reg - 1, label.c_str());
       fprintf(out, "  nop\n");
       reg -= 2;
       return 0;
     case COND_GREATER_EQUAL:
-      fprintf(out, "  sub a%d, a%d, a%d\n", reg - 2, reg - 2, reg - 1);
-      fprintf(out, "  bgez a%d, %s\n", reg - 2, label.c_str());
+      fprintf(out, "  bge a%d, a%d, %s\n", reg - 2, reg - 1, label.c_str());
       fprintf(out, "  nop\n");
       reg -= 2;
       return 0;
@@ -778,32 +788,28 @@ int RISCV::ternary(int cond, int value_true, int value_false)
       reg -= 1;
       return 0;
     case COND_LESS:
-      fprintf(out, "  sub a%d, a%d, a%d\n", reg - 2, reg - 2, reg - 1);
-      fprintf(out, "  bltz a%d, ternary_%d\n", reg - 2, label_count);
+      fprintf(out, "  blt a%d, a%d, ternary_%d\n", reg - 2, reg - 1, label_count);
       if (set_constant(reg - 2, value_true) != 0) { return -1; }
       if (set_constant(reg - 2, value_false) != 0) { return -1; }
       fprintf(out, "ternary_%d:\n", label_count++);
       reg -= 1;
       return 0;
     case COND_LESS_EQUAL:
-      fprintf(out, "  sub a%d, a%d, a%d\n", reg - 2, reg - 2, reg - 1);
-      fprintf(out, "  blez a%d, ternary_%d\n", reg - 2, label_count);
+      fprintf(out, "  ble a%d, a%d, ternary_%d\n", reg - 2, reg - 1, label_count);
       if (set_constant(reg - 2, value_true) != 0) { return -1; }
       if (set_constant(reg - 2, value_false) != 0) { return -1; }
       fprintf(out, "ternary_%d:\n", label_count++);
       reg -= 1;
       return 0;
     case COND_GREATER:
-      fprintf(out, "  sub a%d, a%d, a%d\n", reg - 2, reg - 2, reg - 1);
-      fprintf(out, "  bgtz a%d, ternary_%d\n", reg - 2, label_count);
+      fprintf(out, "  bgt a%d, a%d, ternary_%d\n", reg - 2, reg - 1, label_count);
       if (set_constant(reg - 2, value_true) != 0) { return -1; }
       if (set_constant(reg - 2, value_false) != 0) { return -1; }
       fprintf(out, "ternary_%d:\n", label_count++);
       reg -= 1;
       return 0;
     case COND_GREATER_EQUAL:
-      fprintf(out, "  sub a%d, a%d, a%d\n", reg - 2, reg - 2, reg - 1);
-      fprintf(out, "  bgez a%d, ternary_%d\n", reg - 2, label_count);
+      fprintf(out, "  bge a%d, a%d, ternary_%d\n", reg - 2, reg - 1, label_count);
       if (set_constant(reg - 2, value_true) != 0) { return -1; }
       if (set_constant(reg - 2, value_false) != 0) { return -1; }
       fprintf(out, "ternary_%d:\n", label_count++);
@@ -838,29 +844,25 @@ int RISCV::ternary(int cond, int compare, int value_true, int value_false)
       fprintf(out, "ternary_%d:\n", label_count++);
       return 0;
     case COND_LESS:
-      fprintf(out, "  sub t0, a%d, t0\n", reg - 1);
-      fprintf(out, "  bltz t0, ternary_%d\n", label_count);
+      fprintf(out, "  blt a%d, t0, ternary_%d\n", reg - 1, label_count);
       if (set_constant(reg - 1, value_true) != 0) { return -1; }
       if (set_constant(reg - 1, value_false) != 0) { return -1; }
       fprintf(out, "ternary_%d:\n", label_count++);
       return 0;
     case COND_LESS_EQUAL:
-      fprintf(out, "  sub t0, a%d, t0\n", reg - 1);
-      fprintf(out, "  blez t0, ternary_%d\n", label_count);
+      fprintf(out, "  ble a%d, t0, ternary_%d\n", reg - 1, label_count);
       if (set_constant(reg - 1, value_true) != 0) { return -1; }
       if (set_constant(reg - 1, value_false) != 0) { return -1; }
       fprintf(out, "ternary_%d:\n", label_count++);
       return 0;
     case COND_GREATER:
-      fprintf(out, "  sub t0, a%d, t0\n", reg - 1);
-      fprintf(out, "  bgtz t0, ternary_%d\n", label_count);
+      fprintf(out, "  bgt a%d, t0, ternary_%d\n", reg - 1, label_count);
       if (set_constant(reg - 1, value_true) != 0) { return -1; }
       if (set_constant(reg - 1, value_false) != 0) { return -1; }
       fprintf(out, "ternary_%d:\n", label_count++);
       return 0;
     case COND_GREATER_EQUAL:
-      fprintf(out, "  sub t0, a%d, t0\n", reg - 1);
-      fprintf(out, "  bgez t0, ternary_%d\n", label_count);
+      fprintf(out, "  bge a%d, t0, ternary_%d\n", reg - 1, label_count);
       if (set_constant(reg - 1, value_true) != 0) { return -1; }
       if (set_constant(reg - 1, value_false) != 0) { return -1; }
       fprintf(out, "ternary_%d:\n", label_count++);
