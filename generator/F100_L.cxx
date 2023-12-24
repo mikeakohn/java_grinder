@@ -18,12 +18,24 @@
 #define REG_STACK(a) (a)
 #define LOCALS(i) (i * 4)
 
-// ABI is:
+// Memory:
+// 0x0000          lsp (hardware stack pointer)
+// 0x0001          frame pointer
+// 0x0002          java stack pointer
+// 0x0003          heap pointer,
+// 0x0004          start of static variables
+// 0x0100 - 0x03ff
+// 0x0401          globals pointer
+// 0x0402          heap pointer
+// 0x0403 - 0x07ff heap
 
 F100_L::F100_L() :
-  reg(0),
-  reg_max(9),
   stack(0),
+  heap_address(0x403),
+  frame_ptr(0x0001),
+  java_stack_ptr(0x0002),
+  heap_ptr(0x0003),
+  global_vars(0x0004),
   is_main(false)
 {
 
@@ -37,7 +49,7 @@ int F100_L::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 
-  fprintf(out, ".CPU_PART\n");
+  fprintf(out, ".f100_l\n");
 
   // Set where RAM starts / ends
   //fprintf(out, "ram_start equ 0\n");
@@ -49,7 +61,7 @@ int F100_L::open(const char *filename)
 int F100_L::start_init()
 {
   // Add any set up items (stack, registers, etc).
-  //fprintf(out, ".org ???\n");
+  fprintf(out, ".org 0x2000\n");
   fprintf(out, "start:\n");
 
   return 0;
@@ -65,15 +77,33 @@ int F100_L::insert_static_field_define(
 
 int F100_L::init_heap(int field_count)
 {
-  fprintf(out, "  ;; Set up heap and static initializers\n");
-  //fprintf(out, "  mov #ram_start+%d, &ram_start\n", (field_count + 1) * 2);
+  // The stack ptr (lsp) points to the global_vars - 1 because it's
+  // a +1 first then write value on push, read value then -1 on pop.
+  fprintf(out,
+    "  ;; Set up heap, stack, and static initializers\n"
+    "  lda #0x0100\n"
+    "  sto 0x%04x\n"
+    "  lda #0x%04x\n"
+    "  sto 0\n",
+    heap_ptr,
+    global_vars + field_count - 1);
 
-  return -1;
+  return 0;
 }
 
 int F100_L::field_init_int(std::string &name, int index, int value)
 {
-  return -1;
+  value = value & 0xffff;
+
+  fprintf(out,
+    "  ;; field_init_int(): %s = %d\n"
+    "  lda #0x%04x\n"
+    "  sto %d\n",
+    name.c_str(), value,
+    value,
+    global_vars + index);
+
+  return 0;
 }
 
 int F100_L::field_init_ref(std::string &name, int index)
@@ -105,7 +135,14 @@ int F100_L::push_local_var_ref(int index)
 
 int F100_L::push_ref_static(std::string &name, int index)
 {
-  return -1;
+  fprintf(out,
+    "  ;; push_ref_static(%s, %d);\n"
+    "  lda 0x%04x\n"
+    "  sto [0x0001]+\n",
+    name.c_str(), index,
+    global_vars + index);
+
+  return 0;
 }
 
 int F100_L::push_fake()
@@ -288,6 +325,8 @@ int F100_L::integer_to_short()
 
 int F100_L::jump_cond(std::string &label, int cond, int distance)
 {
+  fprintf(out, "  jmp %s\n", label.c_str());
+
   return -1;
 }
 
@@ -330,7 +369,9 @@ int F100_L::return_void(int local_count)
 
 int F100_L::jump(std::string &name, int distance)
 {
-  return -1;
+  fprintf(out, "  jmp %s\n", name.c_str());
+
+  return 0;
 }
 
 int F100_L::call(std::string &name)
@@ -350,12 +391,23 @@ int F100_L::put_static(std::string &name, int index)
 
 int F100_L::get_static(std::string &name, int index)
 {
-  return -1;
+  fprintf(out,
+    "  ;; get_static(%s, %d);\n"
+    "  lda 0x%04x\n"
+    "  sto [0x0001]+\n",
+    name.c_str(), index,
+    global_vars + index);
+
+  return 0;
 }
 
 int F100_L::brk()
 {
-  return -1;
+  fprintf(out,
+    "  ;; brk();\n"
+    "  halt\n");
+
+  return 0;
 }
 
 int F100_L::new_array(uint8_t type)

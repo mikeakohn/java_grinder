@@ -104,9 +104,12 @@ public:
   virtual int ice_fun_setServo_II();
 
 protected:
-  int reg;            // count number of registers are are using as stack
-  int reg_max;        // size of register stack
   int stack;          // count how many things currently on the stack
+  int heap_address;
+  int frame_ptr;
+  int java_stack_ptr;
+  int heap_ptr;
+  int global_vars;
   bool is_main : 1;
 };
 
