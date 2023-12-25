@@ -2,10 +2,10 @@
  *  Java Grinder
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2022 by Michael Kohn
+ * Copyright 2014-2023 by Michael Kohn
  *
  */
 
@@ -107,7 +107,7 @@ public:
   virtual int push_long(int64_t n);
   virtual int push_float(float f);
   virtual int push_double(double f);
-  virtual int push_ref(std::string &name) = 0;
+  virtual int push_ref(std::string &name, int index) = 0;
   virtual int pop_local_var_int(int index) = 0;
   virtual int pop_local_var_ref(int index) = 0;
   virtual int pop_local_var_float(int index) { return -1; }

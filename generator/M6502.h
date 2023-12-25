@@ -2,10 +2,10 @@
  *  Java Grinder
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn
+ * Copyright 2014-2023 by Michael Kohn
  *
  * M6502 written by Joe Davisson
  *
@@ -36,7 +36,7 @@ public:
   virtual int push_ref_static(std::string &name, int index);
   virtual int push_fake();
   virtual int push_int(int32_t n);
-  virtual int push_ref(std::string &name);
+  virtual int push_ref(std::string &name, int index);
   virtual int pop_local_var_int(int index);
   virtual int pop_local_var_ref(int index);
   virtual int pop();

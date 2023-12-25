@@ -2,10 +2,10 @@
  *  Java Grinder
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2023 by Michael Kohn
  *
  */
 
@@ -211,7 +211,7 @@ int MC68000::push_double(double f)
 }
 #endif
 
-int MC68000::push_ref(std::string &name)
+int MC68000::push_ref(std::string &name, int index)
 {
   fprintf(out, "  movea.l #%s, a2\n", name.c_str());
   fprintf(out, "  move.l (a2), %s\n", push_reg());

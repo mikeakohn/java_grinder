@@ -336,7 +336,7 @@ int MIPS32::push_double(double f)
 }
 #endif
 
-int MIPS32::push_ref(std::string &name)
+int MIPS32::push_ref(std::string &name, int index)
 {
   fprintf(out, "  ; push_ref(%s)\n", name.c_str());
   fprintf(out, "  li $t8, %s\n", name.c_str());

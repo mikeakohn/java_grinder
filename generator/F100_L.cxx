@@ -2,7 +2,7 @@
  *  Java Grinder
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
  * Copyright 2014-2023 by Michael Kohn
@@ -53,7 +53,7 @@ int F100_L::open(const char *filename)
 
   // Set where RAM starts / ends
   //fprintf(out, "ram_start equ 0\n");
-  //fprintf(out, "ram_end equ 0x8000\n");
+  fprintf(out, "java_stack_ptr equ 0x%04x\n", java_stack_ptr);
 
   return 0;
 }
@@ -135,9 +135,11 @@ int F100_L::push_local_var_ref(int index)
 
 int F100_L::push_ref_static(std::string &name, int index)
 {
+  // Push the address of the static rather than what the static is
+  // pointing to?
   fprintf(out,
     "  ;; push_ref_static(%s, %d);\n"
-    "  lda 0x%04x\n"
+    "  lda #0x%04x\n"
     "  sto [0x0001]+\n",
     name.c_str(), index,
     global_vars + index);
@@ -152,7 +154,22 @@ int F100_L::push_fake()
 
 int F100_L::push_int(int32_t n)
 {
-  return -1;
+  int value = n & 0xffff;
+
+  if (n > 65535 || n < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", n);
+    return -1;
+  }
+
+  fprintf(out,
+    "  ;; push_int(%d);\n"
+    "  lda #%d\n"
+    "  sto [java_stack_ptr]+\n",
+    n,
+    value);
+
+  return 0;
 }
 
 #if 0
@@ -172,10 +189,17 @@ int F100_L::push_double(double f)
 }
 #endif
 
-int F100_L::push_ref(std::string &name)
+int F100_L::push_ref(std::string &name, int index)
 {
-  // Need to move the address of name to the top of stack
-  return -1;
+  // Push what the reference is pointing to (unlike push_ref_static).
+  fprintf(out,
+    "  ;; push_ref(%s, %d);\n"
+    "  lda 0x%04x\n"
+    "  sto [0x0001]+\n",
+    name.c_str(), index,
+    global_vars + index);
+
+  return 0;
 }
 
 int F100_L::pop_local_var_int(int index)
@@ -210,12 +234,32 @@ int F100_L::swap()
 
 int F100_L::add_integer()
 {
-  return -1;
+  fprintf(out,
+    "  ;; add_integer();\n"
+    "  lda [java_stack_ptr]-\n"
+    "  add [java_stack_ptr]\n");
+
+  return 0;
 }
 
 int F100_L::add_integer(int num)
 {
-  return -1;
+  int value = num & 0xffff;
+
+  if (num > 65535 || num < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", num);
+    return -1;
+  }
+
+  fprintf(out,
+    "  ;; add_integer(%d);\n"
+    "  lda #%d\n"
+    "  add [java_stack_ptr]\n",
+    num,
+    value);
+
+  return 0;
 }
 
 int F100_L::sub_integer()
@@ -339,6 +383,37 @@ int F100_L::jump_cond_zero(std::string &label, int cond, int distance)
 
 int F100_L::jump_cond_integer(std::string &label, int cond, int distance)
 {
+  fprintf(out,
+     "  ; jump_cond_integer(%s, %d, %d)\n"
+     "  lda [java_stack]-\n"
+     "  cmp [java_stack]-\n",
+     label.c_str(),
+     cond,
+     distance);
+
+  switch (cond)
+  {
+    case COND_EQUAL:
+      fprintf(out, "  jz %s\n", label.c_str());
+      return 0;
+    case COND_NOT_EQUAL:
+      fprintf(out, "  jnz %s\n", label.c_str());
+      return 0;
+    case COND_LESS:
+      fprintf(out,
+        "  jnz %s\n",
+        label.c_str());
+      return 0;
+    case COND_LESS_EQUAL:
+      return 0;
+    case COND_GREATER:
+      return 0;
+    case COND_GREATER_EQUAL:
+      return 0;
+    default:
+      break;
+  }
+
   return -1;
 }
 
@@ -386,11 +461,19 @@ int F100_L::invoke_static_method(const char *name, int params, int is_void)
 
 int F100_L::put_static(std::string &name, int index)
 {
-  return -1;
+  fprintf(out,
+    "  ;; put_static(%s, %d);\n"
+    "  lda [0x0001]-\n"
+    "  sto 0x%04x\n",
+    name.c_str(), index,
+    global_vars + index);
+
+  return 0;
 }
 
 int F100_L::get_static(std::string &name, int index)
 {
+  // Seems to be the same as push_ref().
   fprintf(out,
     "  ;; get_static(%s, %d);\n"
     "  lda 0x%04x\n"
@@ -508,6 +591,20 @@ int F100_L::array_write_short(std::string &name, int field_id)
 int F100_L::array_write_int(std::string &name, int field_id)
 {
   return -1;
+}
+
+int F100_L::ioport_setPinsValue_I(int port)
+{
+  int peripheral = port == 0 ? 0x4008 : 0x400a;
+
+  fprintf(out,
+    "  ;; setPinsValue(port=%d)\n"
+    "  lda [java_stack_ptr]-\n"
+    "  sto 0x%04x\n",
+    port,
+    peripheral);
+
+  return 0;
 }
 
 int F100_L::ice_fun_setTone_I()

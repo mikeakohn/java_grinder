@@ -2,10 +2,10 @@
  *  Java Grinder
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn, Joe Davisson
+ * Copyright 2014-2023 by Michael Kohn, Joe Davisson
  *
  * AVR8 written by Joe Davisson
  *
@@ -420,7 +420,7 @@ int AVR8::push_double(double f)
 }
 #endif
 
-int AVR8::push_ref(std::string &name)
+int AVR8::push_ref(std::string &name, int index)
 {
   fprintf(out, "; push_ref\n");
   fprintf(out, "  lds temp, %s + 0\n", name.c_str());

@@ -2,10 +2,10 @@
  *  Java Grinder
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2022 by Michael Kohn
+ * Copyright 2014-2023 by Michael Kohn
  *
  */
 
@@ -313,7 +313,7 @@ int MSP430::push_double(double f)
 }
 #endif
 
-int MSP430::push_ref(std::string &name)
+int MSP430::push_ref(std::string &name, int index)
 {
   if (reg < reg_max)
   {

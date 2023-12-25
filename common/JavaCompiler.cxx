@@ -2,10 +2,10 @@
  *  Java Grinder
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2022 by Michael Kohn
+ * Copyright 2014-2023 by Michael Kohn
  *
  */
 
@@ -712,7 +712,7 @@ int JavaCompiler::push_ref(int index, Stack &stack)
 
   if (ret == -1)
   {
-    ret = generator->push_ref(field_name);
+    ret = generator->push_ref(field_name, index);
     ret |= generator->pop_local_var_ref(index);
   }
 
@@ -1915,7 +1915,7 @@ int JavaCompiler::compile_method(
           else
         if (type[0] == '[')
         {
-          ret = generator->push_ref(field_name);
+          ret = generator->push_ref(field_name, index);
         }
           else
         if (type[0] == 'L')
@@ -1935,14 +1935,14 @@ int JavaCompiler::compile_method(
           if (type == "Ljava/lang/String;")
           {
             DEBUG_PRINT("  static is %s (will invoke)\n", field_name.c_str());
-            //generator->push_ref(field_name);
+            //generator->push_ref(field_name, index);
             stack.push(ref);
           }
 #endif
         }
           else
         {
-          ret = generator->push_ref(field_name);
+          ret = generator->push_ref(field_name, index);
         }
 
         break;
@@ -1962,6 +1962,8 @@ int JavaCompiler::compile_method(
           break;
         }
 
+        index = java_class->get_field_index(field_name);
+
         if (stack.length() != 0)
         {
           std::string field_name;
@@ -1974,10 +1976,9 @@ int JavaCompiler::compile_method(
             break;
           }
 
-          ret = generator->push_ref(field_name);
+          ret = generator->push_ref(field_name, index);
         }
 
-        index = java_class->get_field_index(field_name);
         ret = generator->put_static(field_name, index);
 
         break;

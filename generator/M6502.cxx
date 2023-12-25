@@ -2,10 +2,10 @@
  *  Java Grinder
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn, Joe Davisson
+ * Copyright 2014-2023 by Michael Kohn, Joe Davisson
  *
  * M6502 written by Joe Davisson
  *
@@ -351,7 +351,7 @@ int M6502::push_int(int32_t n)
   return 0;
 }
 
-int M6502::push_ref(std::string &name)
+int M6502::push_ref(std::string &name, int index)
 {
   fprintf(out, "; push_ref\n");
   fprintf(out, "  lda %s + 0\n", name.c_str());

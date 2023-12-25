@@ -2,10 +2,10 @@
  *  Java Grinder
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn
+ * Copyright 2014-2023 by Michael Kohn
  *
  */
 
@@ -241,7 +241,7 @@ int X86::push_double(double f)
 }
 #endif
 
-int X86::push_ref(std::string &name)
+int X86::push_ref(std::string &name, int index)
 {
   fprintf(out, "  ; push_ref(%s)\n", name.c_str());
 

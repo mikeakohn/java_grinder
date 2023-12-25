@@ -2,10 +2,10 @@
  *  Java Grinder
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2022 by Michael Kohn
+ * Copyright 2014-2023 by Michael Kohn
  *
  */
 
@@ -227,7 +227,7 @@ int Z80::push_double(double f)
 }
 #endif
 
-int Z80::push_ref(std::string &name)
+int Z80::push_ref(std::string &name, int index)
 {
   fprintf(out, "  ;; push_short(%s)\n", name.c_str());
   fprintf(out, "  ld hl, (%s)\n", name.c_str());

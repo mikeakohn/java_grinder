@@ -272,7 +272,7 @@ int RISCV::push_double(double f)
 }
 #endif
 
-int RISCV::push_ref(std::string &name)
+int RISCV::push_ref(std::string &name, int index)
 {
   fprintf(out, "  ; push_ref(%s)\n", name.c_str());
   fprintf(out, "  li t0, %s\n", name.c_str());

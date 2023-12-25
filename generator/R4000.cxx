@@ -365,7 +365,7 @@ int R4000::push_double(double f)
 }
 #endif
 
-int R4000::push_ref(std::string &name)
+int R4000::push_ref(std::string &name, int index)
 {
   fprintf(out, "  ; push_ref(%s)\n", name.c_str());
   fprintf(out, "  li $t8, %s\n", name.c_str());

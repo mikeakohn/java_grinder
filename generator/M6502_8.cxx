@@ -2,10 +2,10 @@
  *  Java Grinder
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2019 by Michael Kohn, Joe Davisson
+ * Copyright 2014-2023 by Michael Kohn, Joe Davisson
  *
  */
 
@@ -302,7 +302,7 @@ int M6502_8::push_short(int16_t s)
 }
 #endif
 
-int M6502_8::push_ref(std::string &name)
+int M6502_8::push_ref(std::string &name, int index)
 {
   fprintf(out, "; push_ref\n");
   fprintf(out, "  lda #(%s & 0xff)\n", name.c_str());

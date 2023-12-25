@@ -2,10 +2,10 @@
  *  Java Grinder
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2023 by Michael Kohn
  *
  */
 
@@ -119,7 +119,7 @@ int WebAssembly::push_double(double f)
 }
 #endif
 
-int WebAssembly::push_ref(std::string &name)
+int WebAssembly::push_ref(std::string &name, int index)
 {
   // Need to move the address of name to the top of stack
   return -1;

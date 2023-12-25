@@ -2,10 +2,10 @@
  *  Java Grinder
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2023 by Michael Kohn
  *
  * W65816 written by Joe Davisson
  *
@@ -258,7 +258,7 @@ int W65816::push_double(double f)
 }
 #endif
 
-int W65816::push_ref(std::string &name)
+int W65816::push_ref(std::string &name, int index)
 {
   fprintf(out, "; push_ref\n");
   fprintf(out, "  lda %s\n", name.c_str());

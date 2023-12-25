@@ -2,7 +2,7 @@
  *  Java Grinder
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
  * Copyright 2014-2023 by Michael Kohn
@@ -36,7 +36,7 @@ public:
   //virtual int push_long(int64_t n);
   //virtual int push_float(float f);
   //virtual int push_double(double f);
-  virtual int push_ref(std::string &name);
+  virtual int push_ref(std::string &name, int index);
   virtual int pop_local_var_int(int index);
   virtual int pop_local_var_ref(int index);
   virtual int pop();
@@ -100,6 +100,7 @@ public:
 
   // If this CPU is used for other things, move this into a more
   // specific file.
+  virtual int ioport_setPinsValue_I(int port);
   virtual int ice_fun_setTone_I();
   virtual int ice_fun_setServo_II();
 
