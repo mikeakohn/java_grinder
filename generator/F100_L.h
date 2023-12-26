@@ -101,6 +101,7 @@ public:
   // If this CPU is used for other things, move this into a more
   // specific file.
   virtual int ioport_setPinsValue_I(int port);
+  virtual int ioport_setPinsValue_I(int port, int const_val);
   virtual int ice_fun_setTone_I();
   virtual int ice_fun_setServo_II();
 

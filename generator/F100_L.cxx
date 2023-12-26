@@ -24,6 +24,7 @@
 // 0x0002          java stack pointer
 // 0x0003          heap pointer,
 // 0x0004          start of static variables
+//                 stack + java_stack
 // 0x0100 - 0x03ff
 // 0x0401          globals pointer
 // 0x0402          heap pointer
@@ -54,6 +55,9 @@ int F100_L::open(const char *filename)
   // Set where RAM starts / ends
   //fprintf(out, "ram_start equ 0\n");
   fprintf(out, "java_stack_ptr equ 0x%04x\n", java_stack_ptr);
+  fprintf(out, "heap_ptr equ 0x%04x\n", heap_ptr);
+  fprintf(out, "frame_ptr equ 0x%04x\n", frame_ptr);
+  fprintf(out, "lsp equ 0x0000\n");
 
   return 0;
 }
@@ -82,10 +86,11 @@ int F100_L::init_heap(int field_count)
   fprintf(out,
     "  ;; Set up heap, stack, and static initializers\n"
     "  lda #0x0100\n"
-    "  sto 0x%04x\n"
+    "  sto heap_ptr\n"
     "  lda #0x%04x\n"
-    "  sto 0\n",
-    heap_ptr,
+    "  sto java_stack_ptr\n"
+    "  sto frame_ptr\n"
+    "  sto lsp\n",
     global_vars + field_count - 1);
 
   return 0;
@@ -140,7 +145,7 @@ int F100_L::push_ref_static(std::string &name, int index)
   fprintf(out,
     "  ;; push_ref_static(%s, %d);\n"
     "  lda #0x%04x\n"
-    "  sto [0x0001]+\n",
+    "  sto [java_stack_ptr]+\n",
     name.c_str(), index,
     global_vars + index);
 
@@ -195,7 +200,7 @@ int F100_L::push_ref(std::string &name, int index)
   fprintf(out,
     "  ;; push_ref(%s, %d);\n"
     "  lda 0x%04x\n"
-    "  sto [0x0001]+\n",
+    "  sto [java_stack_ptr]+\n",
     name.c_str(), index,
     global_vars + index);
 
@@ -237,7 +242,7 @@ int F100_L::add_integer()
   fprintf(out,
     "  ;; add_integer();\n"
     "  lda [java_stack_ptr]-\n"
-    "  add [java_stack_ptr]\n");
+    "  ads [java_stack_ptr]\n");
 
   return 0;
 }
@@ -255,7 +260,7 @@ int F100_L::add_integer(int num)
   fprintf(out,
     "  ;; add_integer(%d);\n"
     "  lda #%d\n"
-    "  add [java_stack_ptr]\n",
+    "  ads [java_stack_ptr]\n",
     num,
     value);
 
@@ -385,8 +390,8 @@ int F100_L::jump_cond_integer(std::string &label, int cond, int distance)
 {
   fprintf(out,
      "  ; jump_cond_integer(%s, %d, %d)\n"
-     "  lda [java_stack]-\n"
-     "  cmp [java_stack]-\n",
+     "  lda [java_stack_ptr]-\n"
+     "  cmp [java_stack_ptr]-\n",
      label.c_str(),
      cond,
      distance);
@@ -400,15 +405,54 @@ int F100_L::jump_cond_integer(std::string &label, int cond, int distance)
       fprintf(out, "  jnz %s\n", label.c_str());
       return 0;
     case COND_LESS:
+      // Branch if cr.s != cr.v (bits 3 and 2).
+      // (cr & 0xc0) + 0x04 .. if bit3 == bit2, then bit3 will now be 0.
+      //      32           3
+      // 0000 1100 -> 0001 0000   <-- bits are the same.
+      // 0000 0000 -> 0000 0100   <-- bits are the same.
+      // 0000 1000 -> 0000 1100   <-- bits are different.
+      // 0000 0100 -> 0000 1000   <-- bits are different.
       fprintf(out,
-        "  jnz %s\n",
+        "  setm\n"
+        "  sll.d #16, cr\n"
+        "  clrm\n"
+        "  add #0x04\n"
+        "  jbs #3, a, %s\n",
         label.c_str());
       return 0;
     case COND_LESS_EQUAL:
+      // Branch if cr.z == 1 or cr.s != cr.v (bits 3 and 2).
+      fprintf(out,
+        "  jz %s\n"
+        "  setm\n"
+        "  sll.d #16, cr\n"
+        "  clrm\n"
+        "  add #0x04\n"
+        "  jbs #3, a, %s\n",
+        label.c_str(),
+        label.c_str());
       return 0;
     case COND_GREATER:
-      return 0;
+      // Branch if cr.z == 0 and cr.s == cr.v (bits 3 and 2).
+      fprintf(out,
+        "  setm\n"
+        "  sll.d #16, cr\n"
+        "  clrm\n"
+        "  add #0x04\n"
+        "  and #0x0a\n"
+        "  cmp #0x08\n"
+        "  jz %s\n",
+        label.c_str());
+      return -1;
     case COND_GREATER_EQUAL:
+      // Branch if cr.s == cr.v (bits 3 and 2).
+      fprintf(out,
+        "  setm\n"
+        "  sll.d #16, cr\n"
+        "  clrm\n"
+        "  add #0x04\n"
+        "  jbc #3, a, %s\n",
+        label.c_str());
       return 0;
     default:
       break;
@@ -463,7 +507,7 @@ int F100_L::put_static(std::string &name, int index)
 {
   fprintf(out,
     "  ;; put_static(%s, %d);\n"
-    "  lda [0x0001]-\n"
+    "  lda [java_stack_ptr]-\n"
     "  sto 0x%04x\n",
     name.c_str(), index,
     global_vars + index);
@@ -477,7 +521,7 @@ int F100_L::get_static(std::string &name, int index)
   fprintf(out,
     "  ;; get_static(%s, %d);\n"
     "  lda 0x%04x\n"
-    "  sto [0x0001]+\n",
+    "  sto [java_stack_ptr]+\n",
     name.c_str(), index,
     global_vars + index);
 
@@ -602,6 +646,21 @@ int F100_L::ioport_setPinsValue_I(int port)
     "  lda [java_stack_ptr]-\n"
     "  sto 0x%04x\n",
     port,
+    peripheral);
+
+  return 0;
+}
+
+int F100_L::ioport_setPinsValue_I(int port, int const_val)
+{
+  int peripheral = port == 0 ? 0x4008 : 0x400a;
+
+  fprintf(out,
+    "  ;; setPinsValue(port=%d, const_val=%d)\n"
+    "  lda #0x%04x\n"
+    "  sto 0x%04x\n",
+    port, const_val,
+    const_val,
     peripheral);
 
   return 0;
