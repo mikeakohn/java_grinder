@@ -67,7 +67,7 @@ public:
   virtual int integer_to_byte();
   virtual int integer_to_short();
   virtual int jump_cond(std::string &label, int cond, int distance);
-  //virtual int jump_cond_zero(std::string &label, int cond, int distance);
+  virtual int jump_cond_zero(std::string &label, int cond, int distance);
   virtual int jump_cond_integer(std::string &label, int cond, int distance);
   virtual int ternary(int cond, int value_true, int value_false);
   virtual int ternary(int cond, int compare, int value_true, int value_false);

@@ -269,12 +269,32 @@ int F100_L::add_integer(int num)
 
 int F100_L::sub_integer()
 {
-  return -1;
+  fprintf(out,
+    "  ;; sub_integer();\n"
+    "  lda [java_stack_ptr]-\n"
+    "  sbs [java_stack_ptr]\n");
+
+  return 0;
 }
 
 int F100_L::sub_integer(int num)
 {
-  return -1;
+  int value = num & 0xffff;
+
+  if (num > 65535 || num < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", num);
+    return -1;
+  }
+
+  fprintf(out,
+    "  ;; sub_integer(%d);\n"
+    "  lda #%d\n"
+    "  sbs [java_stack_ptr]\n",
+    num,
+    value);
+
+  return 0;
 }
 
 int F100_L::mul_integer()
@@ -294,97 +314,375 @@ int F100_L::mod_integer()
 
 int F100_L::neg_integer()
 {
-  return -1;
+  fprintf(out,
+    "  ;; neg_integer();\n"
+    "  lda [java_stack_ptr]\n"
+    "  neq #0xffff\n"
+    "  add #1\n"
+    "  sto [java_stack_ptr]\n");
+
+  return 0;
 }
 
 int F100_L::shift_left_integer()
 {
-  return -1;
+  fprintf(out,
+    "  ;; shift_left_integer();\n"
+    "  lda [java_stack_ptr]-\n"
+    "label_%d:\n"
+    "  sll #1, [java_stack_ptr]\n"
+    "  sub #1\n"
+    "  jnz label_%d\n"
+    "  sto [java_stack_ptr]\n",
+    label_count,
+    label_count);
+
+  label_count--;
+
+  return 0;
 }
 
 int F100_L::shift_left_integer(int num)
 {
-  return -1;
+  fprintf(out,
+    "  ;; shift_left_integer(%d);\n"
+    "  sll #%d, [java_stack_ptr]\n",
+    num,
+    num);
+
+  return 0;
 }
 
 int F100_L::shift_right_integer()
 {
-  return -1;
+  fprintf(out,
+    "  ;; shift_right_integer();\n"
+    "  lda [java_stack_ptr]-\n"
+    "label_%d:\n"
+    "  sra #1, [java_stack_ptr]\n"
+    "  sub #1\n"
+    "  jnz label_%d\n"
+    "  sto [java_stack_ptr]\n",
+    label_count,
+    label_count);
+
+  label_count--;
+
+  return 0;
 }
 
 int F100_L::shift_right_integer(int num)
 {
-  return -1;
+  fprintf(out,
+    "  ;; shift_right_integer(%d);\n"
+    "  sra #%d, [java_stack_ptr]\n",
+    num,
+    num);
+
+  return 0;
 }
 
 int F100_L::shift_right_uinteger()
 {
-  return -1;
+  fprintf(out,
+    "  ;; shift_right_uinteger();\n"
+    "  lda [java_stack_ptr]-\n"
+    "label_%d:\n"
+    "  srl #1, [java_stack_ptr]\n"
+    "  sub #1\n"
+    "  jnz label_%d\n"
+    "  sto [java_stack_ptr]\n",
+    label_count,
+    label_count);
+
+  label_count--;
+
+  return 0;
 }
 
 int F100_L::shift_right_uinteger(int num)
 {
-  return -1;
+  fprintf(out,
+    "  ;; shift_right_uinteger(%d);\n"
+    "  srl #%d, [java_stack_ptr]\n",
+    num,
+    num);
+
+  return 0;
 }
 
 int F100_L::and_integer()
 {
-  return -1;
+  fprintf(out,
+    "  ;; and_integer();\n"
+    "  lda [java_stack_ptr]-\n"
+    "  and [java_stack_ptr]\n"
+    "  sto [java_stack_ptr]\n");
+
+  return 0;
 }
 
 int F100_L::and_integer(int num)
 {
-  return -1;
+  int value = num & 0xffff;
+
+  if (num > 65535 || num < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", num);
+    return -1;
+  }
+
+  fprintf(out,
+    "  ;; and_integer(%d);\n"
+    "  lda #%d\n"
+    "  and [java_stack_ptr]\n"
+    "  sto [java_stack_ptr]\n",
+    num,
+    value);
+
+  return 0;
 }
 
 int F100_L::or_integer()
 {
-  return -1;
+  // F100-L has no OR instruction.
+  // Can be done with: (A ^ B) + (A & B);
+  fprintf(out,
+    "  ;; and_integer();\n"
+    "  lda [java_stack_ptr]-\n"
+    "  sto temp_2\n"
+    "  and [java_stack_ptr]\n"
+    "  sto temp_1\n"
+    "  lda temp_2\n"
+    "  xor [java_stack_ptr]\n"
+    "  add temp_1\n"
+    "  sto [java_stack_ptr]\n");
+
+  return 0;
 }
 
 int F100_L::or_integer(int num)
 {
-  return -1;
+  int value = num & 0xffff;
+
+  if (num > 65535 || num < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", num);
+    return -1;
+  }
+
+  // F100-L has no OR instruction.
+  // Can be done with: (A ^ B) + (A & B);
+  // or if only 1 bit is set, SET can be used.
+
+  fprintf(out, "  ;; or_integer(%d);\n", value);
+
+  if (num == 0) { return 0; }
+
+  int bit_count = 0;
+  int a = value;
+
+  for (int i = 0; i < 16; i++)
+  {
+    if ((a & 1) == 1) { bit_count++; }
+    a = a >> 1;
+  }
+
+  if (bit_count < 8)
+  {
+    a = value;
+
+    for (int i = 0; i < 16; i++)
+    {
+      if ((a & 1) == 1)
+      {
+        fprintf(out, "  set #%d, [java_stack_ptr]\n", i);
+      }
+
+      a = a >> 1;
+    }
+  }
+    else
+  {
+    fprintf(out,
+      "  lda #%d\n"
+      "  and [java_stack_ptr]\n"
+      "  sto temp_1\n"
+      "  lda #%d\n"
+      "  xor [java_stack_ptr]\n"
+      "  add temp_1\n"
+      "  sto [java_stack_ptr]\n",
+      value,
+      value);
+  }
+
+  return 0;
 }
 
 int F100_L::xor_integer()
 {
-  return -1;
+  fprintf(out,
+    "  ;; and_integer();\n"
+    "  lda [java_stack_ptr]-\n"
+    "  neq [java_stack_ptr]\n"
+    "  sto [java_stack_ptr]\n");
+
+  return 0;
 }
 
 int F100_L::xor_integer(int num)
 {
-  return -1;
+  int value = num & 0xffff;
+
+  if (num > 65535 || num < -32768)
+  {
+    printf("Error: literal value %d bigger than 16 bit.\n", num);
+    return -1;
+  }
+
+  fprintf(out,
+    "  ;; and_integer(%d);\n"
+    "  lda #%d\n"
+    "  neq [java_stack_ptr]\n"
+    "  sto [java_stack_ptr]\n",
+    num,
+    value);
+
+  return 0;
 }
 
 int F100_L::inc_integer(int index, int num)
 {
-  return -1;
+  int16_t value = num & 0xffff;
+
+  fprintf(out,
+    "  ;; inc_integer(%d);\n"
+    "  ads #%d, [java_stack_ptr]\n",
+    num,
+    value);
+
+  return 0;
 }
 
 int F100_L::integer_to_byte()
 {
-  return -1;
+  fprintf(out,
+    "  ;; integer_to_short()\n"
+    "  sll #8, [java_stack_ptr]\n"
+    "  sra #8, [java_stack_ptr]\n");
+
+  return 0;
 }
 
 int F100_L::integer_to_short()
 {
-  return -1;
+  // Nothing to do here since this is 16 bit.
+  fprintf(out, "  ;; integer_to_short()\n");
+  return 0;
 }
 
 int F100_L::jump_cond(std::string &label, int cond, int distance)
 {
-  fprintf(out, "  jmp %s\n", label.c_str());
+  fprintf(out,
+     "  ; jump_cond(%s, %d, %d)\n"
+     "  lda [java_stack_ptr]-\n",
+     label.c_str(),
+     cond,
+     distance);
+
+  switch (cond)
+  {
+    case COND_EQUAL:
+      fprintf(out, "  jz %s\n", label.c_str());
+      return 0;
+    case COND_NOT_EQUAL:
+      fprintf(out, "  jnz %s\n", label.c_str());
+      return 0;
+    case COND_LESS:
+      // Branch if cr.s != cr.v (bits 3 and 2).
+      // (cr & 0xc0) + 0x04 .. if bit3 == bit2, then bit3 will now be 0.
+      //      32           3
+      // 0000 1100 -> 0001 0000   <-- bits are the same.
+      // 0000 0000 -> 0000 0100   <-- bits are the same.
+      // 0000 1000 -> 0000 1100   <-- bits are different.
+      // 0000 0100 -> 0000 1000   <-- bits are different.
+      fprintf(out,
+        "  cmp #0\n"
+        "  setm\n"
+        "  sll.d #16, cr\n"
+        "  clrm\n"
+        "  add #0x04\n"
+        "  jbs #3, a, %s\n",
+        label.c_str());
+      return 0;
+    case COND_LESS_EQUAL:
+      // Branch if cr.z == 1 or cr.s != cr.v (bits 3 and 2).
+      fprintf(out,
+        "  jz %s\n"
+        "  cmp #0\n"
+        "  setm\n"
+        "  sll.d #16, cr\n"
+        "  clrm\n"
+        "  add #0x04\n"
+        "  jbs #3, a, %s\n",
+        label.c_str(),
+        label.c_str());
+      return 0;
+    case COND_GREATER:
+      // Branch if cr.z == 0 and cr.s == cr.v (bits 3 and 2).
+      fprintf(out,
+        "  cmp #0\n"
+        "  setm\n"
+        "  sll.d #16, cr\n"
+        "  clrm\n"
+        "  add #0x04\n"
+        "  and #0x0a\n"
+        "  cmp #0x08\n"
+        "  jz %s\n",
+        label.c_str());
+      return -1;
+    case COND_GREATER_EQUAL:
+      // Branch if cr.s == cr.v (bits 3 and 2).
+      fprintf(out,
+        "  cmp #0\n"
+        "  setm\n"
+        "  sll.d #16, cr\n"
+        "  clrm\n"
+        "  add #0x04\n"
+        "  jbc #3, a, %s\n",
+        label.c_str());
+      return 0;
+    default:
+      break;
+  }
 
   return -1;
 }
 
-#if 0
 int F100_L::jump_cond_zero(std::string &label, int cond, int distance)
 {
+  if (cond == COND_EQUAL)
+  {
+    fprintf(out,
+      "  ;; jump_cond_zero(%s, COND_EQUAL, %d)\n"
+      "  lda [java_stack_ptr]-\n"
+      "  jz %s\n",
+      label.c_str(), distance,
+      label.c_str());
+  }
+    else
+  if (cond == COND_NOT_EQUAL)
+  {
+    fprintf(out,
+      "  ;; jump_cond_zero(%s, COND_NOT_EQUAL, %d)\n"
+      "  lda [java_stack_ptr]-\n"
+      "  jnz %s\n",
+      label.c_str(), distance,
+      label.c_str());
+  }
+
   return -1;
 }
-#endif
 
 int F100_L::jump_cond_integer(std::string &label, int cond, int distance)
 {
@@ -546,7 +844,7 @@ int F100_L::insert_array(std::string &name, int32_t *data, int len, uint8_t type
 {
   if (type == TYPE_BYTE)
   {
-    return insert_db(name, data, len, TYPE_INT);
+    return insert_dw(name, data, len, TYPE_INT);
   }
     else
   if (type == TYPE_SHORT)
