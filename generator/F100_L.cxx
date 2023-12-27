@@ -145,8 +145,8 @@ void F100_L::method_start(
   if (is_main)
   {
     // local vars       (frame 0)
-    // frame_ptr 0      (save)
-    // java_stack_ptr 0 (save)
+    // 0                (save frame_ptr, not needed)
+    // 0                (save java_stack_ptr, not needed)
     // java stack       (frame 0)
     fprintf(out,
       "  lda #0x%04x\n"
@@ -163,36 +163,37 @@ void F100_L::method_start(
     else
   {
     // local vars       (frame 0)
-    // frame_ptr 0      (save)
-    // java_stack_ptr 0 (save)
+    // 0                (save frame_ptr, not needed)
+    // 0                (save java_stack_ptr, not needed)
     // java stack       (frame 0) (might not be empty)
     // local vars       (frame 1) <-- frame_ptr (passed paramters / locals)
-    // frame_ptr 1      (save)
-    // java_stack_ptr 1 (save)
+    // frame_ptr 0      (save)
+    // java_stack_ptr 0 (save)
     // java stack       (frame 1) <-- java_stack_ptr
 
-    // frame_ptr = stack_ptr
+    // Variables to save the frame_ptr and java_stack_ptr are used as
+    // 2 extra local variables.
+    // The new frame_ptr is the current java_stack_ptr.
+
+    // temp_ptr = java_stack_ptr + 2
+    // [temp_ptr]++ = frame_ptr
+    // [temp_ptr]++ = java_stack_ptr
     fprintf(out,
       "  lda java_stack_ptr\n"
-      "  sto frame_ptr\n");
-
-    // temp_ptr = frame_ptr + local_count
-    // [temp_ptr++] = frame_ptr
-    fprintf(out,
-      "  sto temp_ptr\n"
-      "  lda #%d\n"
-      "  ads temp_ptr\n"
+      "  add #%d\n"
+      "  sto temp_ptr\n,"
       "  lda frame_ptr\n"
+      "  sto [temp_ptr]+\n"
+      "  lda java_stack_ptr\n"
       "  sto [temp_ptr]+\n",
       local_count);
 
-    // java_stack_ptr = temp_ptr + 1
-    // [temp_ptr++] = java_stack_ptr
     fprintf(out,
       "  lda temp_ptr\n"
-      "  add #1\n"
-      "  sto java_stack_ptr\n"
-      "  sto [temp_ptr]\n"); 
+      "  sto frame_ptr\n"
+      "  add #%d + 2\n"
+      "  sto java_stack_ptr\n",
+      local_count);
   }
 }
 
@@ -904,28 +905,67 @@ int F100_L::ternary(int cond, int compare, int value_true, int value_false)
 
 int F100_L::return_local(int index, int local_count)
 {
-  return -1;
+  // Restore frame_ptr
+  // Restore java_stack_ptr
+  fprintf(out,
+    "  ;; return_void(local_count=%d)\n"
+    "  lda frame_ptr\n"
+    "  add #%d\n"
+    "  sto frame_ptr\n"
+    "  lda [frame_ptr]\n"
+    "  sto temp_1\n"
+    "  lda frame_ptr\n"
+    "  sta temp_ptr\n"
+    "  lda #%d + 2\n"
+    "  lda [temp_ptr]+\n"
+    "  sto frame_ptr\n"
+    "  lda [temp_ptr]+\n"
+    "  sto java_stack_ptr\n"
+    "  lda temp_1\n"
+    "  sto [java_stack_ptr]+\n",
+    local_count,
+    index,
+    local_count);
+
+  return 0;
 }
 
 int F100_L::return_integer(int local_count)
 {
+  // Restore frame_ptr
+  // Restore java_stack_ptr
   fprintf(out,
     "  ;; return_void(local_count=%d)\n"
-    "  lda #%d\n"
-    "  sbs frame_ptr\n",
+    "  lda [java_stack]-\n"
+    "  sto temp_1\n"
+    "  lda frame_ptr\n"
+    "  sta temp_ptr\n"
+    "  lda #%d + 2\n"
+    "  lda [temp_ptr]+\n"
+    "  sto frame_ptr\n"
+    "  lda [temp_ptr]+\n"
+    "  sto java_stack_ptr\n"
+    "  lda temp_1\n"
+    "  sto [java_stack_ptr]+\n",
     local_count,
     local_count);
 
-  return -1;
+  return 0;
 }
 
 int F100_L::return_void(int local_count)
 {
-  // Need to restore frame.
+  // Restore frame_ptr
+  // Restore java_stack_ptr
   fprintf(out,
     "  ;; return_void(local_count=%d)\n"
-    "  lda #%d\n"
-    "  sbs frame_ptr\n",
+    "  lda frame_ptr\n"
+    "  sta temp_ptr\n"
+    "  lda #%d + 2\n"
+    "  lda [temp_ptr]+\n"
+    "  sto frame_ptr\n"
+    "  lda [temp_ptr]+\n"
+    "  sto java_stack_ptr\n",
     local_count,
     local_count);
 
@@ -952,19 +992,20 @@ int F100_L::invoke_static_method(const char *name, int params, int is_void)
 
   // Before:
   // local vars (frame 0) <-- frame_ptr
-  // frame_ptr 0 (save)
-  // java_stack_ptr 0 (save)
+  // 0          (save frame_ptr, not needed)
+  // 0          (save java_stack_ptr, not needed)
   // java stack 0
   // java stack 1
   // ...                  <-- java_stack_ptr
 
   // After:
   // local vars       (frame 0)
-  // frame_ptr 0      (save)
-  // java_stack_ptr 0 (save)
+  // 0
+  // 0
   // java stack       (frame 0) (might not be empty)
   // local vars       (frame 1) <-- frame_ptr (locals include passed paramters)
-  // frame_ptr 1      (save)
+  // frame_ptr 0      (save)
+  // java_stack_ptr 0 (save)
   // java stack       (frame 1) <-- java_stack_ptr
 
   fprintf(out,
