@@ -69,6 +69,8 @@ int F100_L::open(const char *filename)
   fprintf(out, "heap_ptr equ 0x%04x\n", heap_ptr);
   fprintf(out, "frame_ptr equ 0x%04x\n", frame_ptr);
   fprintf(out, "temp_ptr equ 0x%04x\n", temp_ptr);
+  fprintf(out, "temp_1 equ 0x%04x\n", temp_1);
+  fprintf(out, "temp_2 equ 0x%04x\n", temp_2);
   fprintf(out, "global_vars equ 0x%04x\n", global_vars);
   fprintf(out, "lsp equ 0x0000\n");
 
@@ -181,7 +183,7 @@ void F100_L::method_start(
     fprintf(out,
       "  lda java_stack_ptr\n"
       "  add #%d\n"
-      "  sto temp_ptr\n,"
+      "  sto temp_ptr\n"
       "  lda frame_ptr\n"
       "  sto [temp_ptr]+\n"
       "  lda java_stack_ptr\n"
@@ -915,7 +917,7 @@ int F100_L::return_local(int index, int local_count)
     "  lda [frame_ptr]\n"
     "  sto temp_1\n"
     "  lda frame_ptr\n"
-    "  sta temp_ptr\n"
+    "  sto temp_ptr\n"
     "  lda #%d + 2\n"
     "  lda [temp_ptr]+\n"
     "  sto frame_ptr\n"
@@ -936,10 +938,10 @@ int F100_L::return_integer(int local_count)
   // Restore java_stack_ptr
   fprintf(out,
     "  ;; return_void(local_count=%d)\n"
-    "  lda [java_stack]-\n"
+    "  lda [java_stack_ptr]-\n"
     "  sto temp_1\n"
     "  lda frame_ptr\n"
-    "  sta temp_ptr\n"
+    "  sto temp_ptr\n"
     "  lda #%d + 2\n"
     "  lda [temp_ptr]+\n"
     "  sto frame_ptr\n"
@@ -960,7 +962,7 @@ int F100_L::return_void(int local_count)
   fprintf(out,
     "  ;; return_void(local_count=%d)\n"
     "  lda frame_ptr\n"
-    "  sta temp_ptr\n"
+    "  sto temp_ptr\n"
     "  lda #%d + 2\n"
     "  lda [temp_ptr]+\n"
     "  sto frame_ptr\n"
