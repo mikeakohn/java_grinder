@@ -25,7 +25,11 @@
 // 0x0003          heap pointer,
 // 0x0004          start of static variables
 //                 stack + java_stack
-// 0x0100 - 0x03ff
+//        - 0x00fe "zero page" (stack, static vars, method frames)
+// 0x00ff          temp_ptr
+// 0x0100 - 0x03fd
+// 0x03fe          temp_1
+// 0x03ff          temp_2
 // 0x0401          globals pointer
 // 0x0402          heap pointer
 // 0x0403 - 0x07ff heap
@@ -37,6 +41,9 @@ F100_L::F100_L() :
   java_stack_ptr(0x0002),
   heap_ptr(0x0003),
   global_vars(0x0004),
+  temp_1(0x03fe),
+  temp_2(0x03ff),
+  temp_ptr(0x00ff),
   is_main(false)
 {
 
@@ -57,6 +64,8 @@ int F100_L::open(const char *filename)
   fprintf(out, "java_stack_ptr equ 0x%04x\n", java_stack_ptr);
   fprintf(out, "heap_ptr equ 0x%04x\n", heap_ptr);
   fprintf(out, "frame_ptr equ 0x%04x\n", frame_ptr);
+  fprintf(out, "temp_ptr equ 0x%04x\n", temp_ptr);
+  fprintf(out, "global_vars equ 0x%04x\n", global_vars);
   fprintf(out, "lsp equ 0x0000\n");
 
   return 0;
@@ -83,13 +92,14 @@ int F100_L::init_heap(int field_count)
 {
   // The stack ptr (lsp) points to the global_vars - 1 because it's
   // a +1 first then write value on push, read value then -1 on pop.
+  // java_stack_ptr and frame_ptr get computed at the start of main().
   fprintf(out,
     "  ;; Set up heap, stack, and static initializers\n"
     "  lda #0x0100\n"
     "  sto heap_ptr\n"
     "  lda #0x%04x\n"
-    "  sto java_stack_ptr\n"
-    "  sto frame_ptr\n"
+    //"  sto java_stack_ptr\n"
+    //"  sto frame_ptr\n"
     "  sto lsp\n",
     global_vars + field_count - 1);
 
@@ -101,12 +111,12 @@ int F100_L::field_init_int(std::string &name, int index, int value)
   value = value & 0xffff;
 
   fprintf(out,
-    "  ;; field_init_int(): %s = %d\n"
+    "  ;; field_init_int(index = %d): %s = %d\n"
     "  lda #0x%04x\n"
-    "  sto %d\n",
-    name.c_str(), value,
+    "  sto global_vars + %d\n",
+    index, name.c_str(), value,
     value,
-    global_vars + index);
+    index);
 
   return 0;
 }
@@ -122,15 +132,41 @@ void F100_L::method_start(
   int param_count,
   std::string &name)
 {
+  is_main = name == "main";
+
+  // main() function goes here
+  fprintf(out, "%s:\n", name.c_str());
+
+  if (!is_main)
+  {
+  }
+
+  fprintf(out,
+    "  lda lsp\n"
+    "  sto frame_ptr\n"
+    "  add #%d\n"
+    "  sto java_stack_ptr\n",
+    local_count);
 }
 
 void F100_L::method_end(int local_count)
 {
+  fprintf(out, "\n");
 }
 
 int F100_L::push_local_var_int(int index)
 {
-  return -1;
+  fprintf(out,
+    "  ;; push_local_var_int(%d)\n"
+    "  lda frame_ptr\n"
+    "  add #%d\n"
+    "  sto temp_ptr\n"
+    "  lda [temp_ptr]\n"
+    "  sto [java_stack_ptr]+\n",
+    index,
+    index);
+
+  return 0;
 }
 
 int F100_L::push_local_var_ref(int index)
@@ -144,17 +180,31 @@ int F100_L::push_ref_static(std::string &name, int index)
   // pointing to?
   fprintf(out,
     "  ;; push_ref_static(%s, %d);\n"
-    "  lda #0x%04x\n"
+    "  lda #global_vars + %d\n"
     "  sto [java_stack_ptr]+\n",
     name.c_str(), index,
-    global_vars + index);
+    index);
 
   return 0;
 }
 
 int F100_L::push_fake()
 {
-  return -1;
+#if 0
+  fprintf(out,
+    "  ;; push_fake()\n"
+    "  lda #1\n"
+    "  ads java_stack_ptr\n");
+#endif
+
+  // This is kind of a hack. icz is increment and jump zero. If it's
+  // ever zero, something went really wrong, so just use icz to save
+  // an instruction.
+  fprintf(out,
+    "  ;; push_fake()\n"
+    "  icz java_stack_ptr, start\n");
+
+  return 0;
 }
 
 int F100_L::push_int(int32_t n)
@@ -199,17 +249,27 @@ int F100_L::push_ref(std::string &name, int index)
   // Push what the reference is pointing to (unlike push_ref_static).
   fprintf(out,
     "  ;; push_ref(%s, %d);\n"
-    "  lda 0x%04x\n"
+    "  lda global_vars + %d\n"
     "  sto [java_stack_ptr]+\n",
     name.c_str(), index,
-    global_vars + index);
+    index);
 
   return 0;
 }
 
 int F100_L::pop_local_var_int(int index)
 {
-  return -1;
+  fprintf(out,
+    "  ;; pop_local_var_int(%d)\n"
+    "  lda frame_ptr\n"
+    "  add #%d\n"
+    "  sto temp_ptr\n"
+    "  lda [java_stack_ptr]-\n"
+    "  sto [temp_ptr]\n",
+    index,
+    index);
+
+  return 0;
 }
 
 int F100_L::pop_local_var_ref(int index)
@@ -219,12 +279,22 @@ int F100_L::pop_local_var_ref(int index)
 
 int F100_L::pop()
 {
-  return -1;
+  fprintf(out,
+    "  ;; pop()\n"
+    "  lda #1\n"
+    "  sbs java_stack_ptr\n");
+
+  return 0;
 }
 
 int F100_L::dup()
 {
-  return -1;
+  fprintf(out,
+    "  ;; dup()\n"
+    "  lda [java_stack_ptr]\n"
+    "  sto [java_stack_ptr]+\n");
+
+  return 0;
 }
 
 int F100_L::dup2()
@@ -234,7 +304,18 @@ int F100_L::dup2()
 
 int F100_L::swap()
 {
-  return -1;
+  fprintf(out,
+    "  ;; swap()\n"
+    "  lda [java_stack_ptr]-\n"
+    "  sto temp_1\n"
+    "  lda [java_stack_ptr]-\n"
+    "  sto temp_2\n"
+    "  lda temp_1\n"
+    "  lda [java_stack_ptr]+\n"
+    "  lda temp_2\n"
+    "  lda [java_stack_ptr]+\n");
+
+  return 0;
 }
 
 int F100_L::add_integer()
@@ -555,11 +636,25 @@ int F100_L::inc_integer(int index, int num)
 {
   int16_t value = num & 0xffff;
 
+/*
   fprintf(out,
     "  ;; inc_integer(%d);\n"
-    "  ads #%d, [java_stack_ptr]\n",
+    "  lda #%d\n"
+    "  ads [java_stack_ptr]\n",
     num,
     value);
+*/
+
+  fprintf(out,
+    "  ;; inc_integer(local=%d, num=%d)\n"
+    "  lda frame_ptr\n"
+    "  add #%d\n"
+    "  sto temp_ptr\n"
+    "  lda #0x%04x\n"
+    "  ads [temp_ptr]\n",
+    index, num,
+    value,
+    index);
 
   return 0;
 }
@@ -806,9 +901,9 @@ int F100_L::put_static(std::string &name, int index)
   fprintf(out,
     "  ;; put_static(%s, %d);\n"
     "  lda [java_stack_ptr]-\n"
-    "  sto 0x%04x\n",
+    "  sto global_vars + %d\n",
     name.c_str(), index,
-    global_vars + index);
+    index);
 
   return 0;
 }
@@ -818,10 +913,10 @@ int F100_L::get_static(std::string &name, int index)
   // Seems to be the same as push_ref().
   fprintf(out,
     "  ;; get_static(%s, %d);\n"
-    "  lda 0x%04x\n"
+    "  lda global_vars + %d\n"
     "  sto [java_stack_ptr]+\n",
     name.c_str(), index,
-    global_vars + index);
+    index);
 
   return 0;
 }
