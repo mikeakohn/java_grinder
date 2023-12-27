@@ -112,6 +112,9 @@ protected:
   int java_stack_ptr;
   int heap_ptr;
   int global_vars;
+  int frame_start;
+  int call_stack;
+  int heap;
   int temp_1;
   int temp_2;
   int temp_ptr;

@@ -25,9 +25,10 @@
 // 0x0003          heap pointer,
 // 0x0004          start of static variables
 //                 stack + java_stack
-//        - 0x00fe "zero page" (stack, static vars, method frames)
+//        - 0x00fe "zero page" (frames: locals, frame_ptr save, java stack)
 // 0x00ff          temp_ptr
-// 0x0100 - 0x03fd
+// 0x0100 - 0x011f call stack (lsp points here)
+// 0x0120 - 0x03fd heap
 // 0x03fe          temp_1
 // 0x03ff          temp_2
 // 0x0401          globals pointer
@@ -41,6 +42,9 @@ F100_L::F100_L() :
   java_stack_ptr(0x0002),
   heap_ptr(0x0003),
   global_vars(0x0004),
+  frame_start(0x0004),
+  call_stack(0x0100),
+  heap(0x0120),
   temp_1(0x03fe),
   temp_2(0x03ff),
   temp_ptr(0x00ff),
@@ -90,18 +94,19 @@ int F100_L::insert_static_field_define(
 
 int F100_L::init_heap(int field_count)
 {
-  // The stack ptr (lsp) points to the global_vars - 1 because it's
+  // The frame_start points to the global_vars - 1 because it's
   // a +1 first then write value on push, read value then -1 on pop.
   // java_stack_ptr and frame_ptr get computed at the start of main().
   fprintf(out,
     "  ;; Set up heap, stack, and static initializers\n"
-    "  lda #0x0100\n"
-    "  sto heap_ptr\n"
     "  lda #0x%04x\n"
-    //"  sto java_stack_ptr\n"
-    //"  sto frame_ptr\n"
-    "  sto lsp\n",
-    global_vars + field_count - 1);
+    "  sto lsp\n"
+    "  lda #0x%04x\n"
+    "  sto heap_ptr\n",
+    call_stack - 1,
+    heap);
+
+  frame_start = global_vars + field_count - 1;
 
   return 0;
 }
@@ -137,16 +142,58 @@ void F100_L::method_start(
   // main() function goes here
   fprintf(out, "%s:\n", name.c_str());
 
-  if (!is_main)
+  if (is_main)
   {
+    // local vars       (frame 0)
+    // frame_ptr 0      (save)
+    // java_stack_ptr 0 (save)
+    // java stack       (frame 0)
+    fprintf(out,
+      "  lda #0x%04x\n"
+      "  sto frame_ptr\n"
+      "  sto frame_ptr + %d\n"
+      "  lda #0x%04x\n"
+      "  sto frame_ptr + %d\n"
+      "  sto java_stack_ptr\n",
+      frame_start + 1,
+      frame_start + local_count,
+      frame_start + local_count + 2,
+      frame_start + local_count + 1);
   }
+    else
+  {
+    // local vars       (frame 0)
+    // frame_ptr 0      (save)
+    // java_stack_ptr 0 (save)
+    // java stack       (frame 0) (might not be empty)
+    // local vars       (frame 1) <-- frame_ptr (passed paramters / locals)
+    // frame_ptr 1      (save)
+    // java_stack_ptr 1 (save)
+    // java stack       (frame 1) <-- java_stack_ptr
 
-  fprintf(out,
-    "  lda lsp\n"
-    "  sto frame_ptr\n"
-    "  add #%d\n"
-    "  sto java_stack_ptr\n",
-    local_count);
+    // frame_ptr = stack_ptr
+    fprintf(out,
+      "  lda java_stack_ptr\n"
+      "  sto frame_ptr\n");
+
+    // temp_ptr = frame_ptr + local_count
+    // [temp_ptr++] = frame_ptr
+    fprintf(out,
+      "  sto temp_ptr\n"
+      "  lda #%d\n"
+      "  ads temp_ptr\n"
+      "  lda frame_ptr\n"
+      "  sto [temp_ptr]+\n",
+      local_count);
+
+    // java_stack_ptr = temp_ptr + 1
+    // [temp_ptr++] = java_stack_ptr
+    fprintf(out,
+      "  lda temp_ptr\n"
+      "  add #1\n"
+      "  sto java_stack_ptr\n"
+      "  sto [temp_ptr]\n"); 
+  }
 }
 
 void F100_L::method_end(int local_count)
@@ -636,15 +683,6 @@ int F100_L::inc_integer(int index, int num)
 {
   int16_t value = num & 0xffff;
 
-/*
-  fprintf(out,
-    "  ;; inc_integer(%d);\n"
-    "  lda #%d\n"
-    "  ads [java_stack_ptr]\n",
-    num,
-    value);
-*/
-
   fprintf(out,
     "  ;; inc_integer(local=%d, num=%d)\n"
     "  lda frame_ptr\n"
@@ -871,12 +909,27 @@ int F100_L::return_local(int index, int local_count)
 
 int F100_L::return_integer(int local_count)
 {
+  fprintf(out,
+    "  ;; return_void(local_count=%d)\n"
+    "  lda #%d\n"
+    "  sbs frame_ptr\n",
+    local_count,
+    local_count);
+
   return -1;
 }
 
 int F100_L::return_void(int local_count)
 {
-  return -1;
+  // Need to restore frame.
+  fprintf(out,
+    "  ;; return_void(local_count=%d)\n"
+    "  lda #%d\n"
+    "  sbs frame_ptr\n",
+    local_count,
+    local_count);
+
+  return 0;
 }
 
 int F100_L::jump(std::string &name, int distance)
@@ -893,7 +946,42 @@ int F100_L::call(std::string &name)
 
 int F100_L::invoke_static_method(const char *name, int params, int is_void)
 {
-  return -1;
+  // This code is making the assumption that the Java stack is empty.
+  // Seems like a bug if it's not, but if it's not this will be a
+  // Java Grinder bug.
+
+  // Before:
+  // local vars (frame 0) <-- frame_ptr
+  // frame_ptr 0 (save)
+  // java_stack_ptr 0 (save)
+  // java stack 0
+  // java stack 1
+  // ...                  <-- java_stack_ptr
+
+  // After:
+  // local vars       (frame 0)
+  // frame_ptr 0      (save)
+  // java_stack_ptr 0 (save)
+  // java stack       (frame 0) (might not be empty)
+  // local vars       (frame 1) <-- frame_ptr (locals include passed paramters)
+  // frame_ptr 1      (save)
+  // java stack       (frame 1) <-- java_stack_ptr
+
+  fprintf(out,
+    "  ;; invoke_static_method(%s, params=%d, is_void=%d)\n",
+    name,
+    params,
+    is_void);
+
+  // local vars come from the stack, so should be able to just subtract
+  // the num of params from java_stack_ptr.
+
+  fprintf(out,
+    "  lda #%d\n"
+    "  sbs java_stack_ptr\n",
+    params);
+
+  return 0;
 }
 
 int F100_L::put_static(std::string &name, int index)
