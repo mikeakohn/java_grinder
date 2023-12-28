@@ -1,5 +1,5 @@
 
-defauit: LedBlink.class
+default: LedBlink.class
 
 grind: LedBlink.class
 	../../java_grinder -v LedBlink.class led_blink.asm f100_l

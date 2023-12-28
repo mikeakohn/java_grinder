@@ -108,7 +108,7 @@ int F100_L::init_heap(int field_count)
     call_stack - 1,
     heap);
 
-  frame_start = global_vars + field_count - 1;
+  frame_start = global_vars + field_count;
 
   return 0;
 }
@@ -142,6 +142,13 @@ void F100_L::method_start(
   is_main = name == "main";
 
   // main() function goes here
+  fprintf(out,
+    "  ;; %s(local_count=%d, max_stack=%d, param_count=%d)\n",
+    name.c_str(),
+    local_count,
+    max_stack,
+    param_count);
+
   fprintf(out, "%s:\n", name.c_str());
 
   if (is_main)
@@ -150,16 +157,13 @@ void F100_L::method_start(
     // 0                (save frame_ptr, not needed)
     // 0                (save java_stack_ptr, not needed)
     // java stack       (frame 0)
+
     fprintf(out,
       "  lda #0x%04x\n"
       "  sto frame_ptr\n"
-      "  sto frame_ptr + %d\n"
       "  lda #0x%04x\n"
-      "  sto frame_ptr + %d\n"
       "  sto java_stack_ptr\n",
-      frame_start + 1,
-      frame_start + local_count,
-      frame_start + local_count + 2,
+      frame_start,
       frame_start + local_count + 1);
   }
     else
@@ -191,11 +195,10 @@ void F100_L::method_start(
       local_count);
 
     fprintf(out,
-      "  lda temp_ptr\n"
+      "  add #1\n"
       "  sto frame_ptr\n"
-      "  add #%d + 2\n"
-      "  sto java_stack_ptr\n",
-      local_count);
+      "  lda temp_ptr\n"
+      "  sto java_stack_ptr\n");
   }
 }
 
@@ -206,15 +209,24 @@ void F100_L::method_end(int local_count)
 
 int F100_L::push_local_var_int(int index)
 {
-  fprintf(out,
-    "  ;; push_local_var_int(%d)\n"
-    "  lda frame_ptr\n"
-    "  add #%d\n"
-    "  sto temp_ptr\n"
-    "  lda [temp_ptr]\n"
-    "  sto [java_stack_ptr]+\n",
-    index,
-    index);
+  fprintf(out, "  ;; push_local_var_int(%d)\n", index);
+
+  if (index == 0)
+  {
+    fprintf(out,
+      "  lda [frame_ptr]\n"
+      "  sto [java_stack_ptr]+\n");
+  }
+    else
+  {
+    fprintf(out,
+      "  lda frame_ptr\n"
+      "  add #%d\n"
+      "  sto temp_ptr\n"
+      "  lda [temp_ptr]\n"
+      "  sto [java_stack_ptr]+\n",
+      index);
+  }
 
   return 0;
 }
@@ -247,12 +259,11 @@ int F100_L::push_fake()
     "  ads java_stack_ptr\n");
 #endif
 
-  // This is kind of a hack. icz is increment and jump zero. If it's
-  // ever zero, something went really wrong, so just use icz to save
-  // an instruction.
+  // This is kind of a hack. icz is increment and jump not zero. This
+  // instruction either skips the jump or jumps to the next address anyway.
   fprintf(out,
     "  ;; push_fake()\n"
-    "  icz java_stack_ptr, start\n");
+    "  icz java_stack_ptr, $ + 2\n");
 
   return 0;
 }
@@ -910,24 +921,25 @@ int F100_L::return_local(int index, int local_count)
   // Restore frame_ptr
   // Restore java_stack_ptr
   fprintf(out,
-    "  ;; return_void(local_count=%d)\n"
+    "  ;; return_local(local_count=%d)\n"
     "  lda frame_ptr\n"
     "  add #%d\n"
     "  sto frame_ptr\n"
     "  lda [frame_ptr]\n"
     "  sto temp_1\n"
     "  lda frame_ptr\n"
+    "  add #%d\n"
     "  sto temp_ptr\n"
-    "  lda #%d + 2\n"
     "  lda [temp_ptr]+\n"
     "  sto frame_ptr\n"
     "  lda [temp_ptr]+\n"
     "  sto java_stack_ptr\n"
     "  lda temp_1\n"
-    "  sto [java_stack_ptr]+\n",
+    "  sto [java_stack_ptr]+\n"
+    "  rtn\n",
     local_count,
     index,
-    local_count);
+    local_count - 1);
 
   return 0;
 }
@@ -937,20 +949,21 @@ int F100_L::return_integer(int local_count)
   // Restore frame_ptr
   // Restore java_stack_ptr
   fprintf(out,
-    "  ;; return_void(local_count=%d)\n"
+    "  ;; return_integer(local_count=%d)\n"
     "  lda [java_stack_ptr]-\n"
     "  sto temp_1\n"
     "  lda frame_ptr\n"
+    "  add #%d\n"
     "  sto temp_ptr\n"
-    "  lda #%d + 2\n"
     "  lda [temp_ptr]+\n"
     "  sto frame_ptr\n"
     "  lda [temp_ptr]+\n"
     "  sto java_stack_ptr\n"
     "  lda temp_1\n"
-    "  sto [java_stack_ptr]+\n",
+    "  sto [java_stack_ptr]+\n"
+    "  rtn\n",
     local_count,
-    local_count);
+    local_count - 1);
 
   return 0;
 }
@@ -962,14 +975,15 @@ int F100_L::return_void(int local_count)
   fprintf(out,
     "  ;; return_void(local_count=%d)\n"
     "  lda frame_ptr\n"
+    "  add #%d\n"
     "  sto temp_ptr\n"
-    "  lda #%d + 2\n"
     "  lda [temp_ptr]+\n"
     "  sto frame_ptr\n"
     "  lda [temp_ptr]+\n"
-    "  sto java_stack_ptr\n",
+    "  sto java_stack_ptr\n"
+    "  rtn\n",
     local_count,
-    local_count);
+    local_count - 1);
 
   return 0;
 }
@@ -1023,6 +1037,9 @@ int F100_L::invoke_static_method(const char *name, int params, int is_void)
     "  lda #%d\n"
     "  sbs java_stack_ptr\n",
     params);
+
+  // Call it.
+  fprintf(out, "  cal %s\n", name);
 
   return 0;
 }
