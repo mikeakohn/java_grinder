@@ -22,20 +22,20 @@ public class LedBlink
     while (true)
     {
       IOPort0.setPinsValue(0x01);
-      for (counter = 0; counter < 3000; counter++);
+      for (counter = 0; counter < 30000; counter++);
 
       IOPort0.setPinsValue(0x00);
-      for (b = 0; b < 3000; b++);
+      for (b = 0; b < 30000; b++);
 
-      b = getValue(10000, 20000);
+      b = getValue(1000, 5000);
 
-      delay(b);
       IOPort0.setPinsValue(0x01);
-
-      b = getValue(10000, 10000);
-
       delay(b);
+
+      b = getValue(1000, 5000);
+
       IOPort0.setPinsValue(0x00);
+      delay(b);
     }
   }
 }
