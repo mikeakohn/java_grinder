@@ -89,7 +89,35 @@ public class Conditionals
       counter++;
     }
 
-    if (counter != 11)
+    b = 1000;
+
+    // 12 
+    if (b >= 0)
+    {
+      counter++;
+    }
+
+    // 13 
+    if (b > 0)
+    {
+      counter++;
+    }
+
+    b = - 10;
+
+    // 14 
+    if (b < 0)
+    {
+      counter++;
+    }
+
+    // 15 
+    if (b <= 0)
+    {
+      counter++;
+    }
+
+    if (counter != 15)
     {
       IOPort0.setPinsValue(0x00);
     }

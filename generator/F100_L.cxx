@@ -743,13 +743,6 @@ int F100_L::jump_cond(std::string &label, int cond, int distance)
      "  lda [java_stack_ptr]-\n",
      label.c_str(), show_cond(cond), distance);
 
-  // (cr & 0xc0) + 0x04 .. if bit3 == bit2, then bit3 will now be 0.
-  //      32           3
-  // 0000 1100 -> 0001 0000   <-- bits are the same.
-  // 0000 0000 -> 0000 0100   <-- bits are the same.
-  // 0000 1000 -> 0000 1100   <-- bits are different.
-  // 0000 0100 -> 0000 1000   <-- bits are different.
-
   switch (cond)
   {
     case COND_EQUAL:
@@ -759,52 +752,24 @@ int F100_L::jump_cond(std::string &label, int cond, int distance)
       fprintf(out, "  jnz %s\n", label.c_str());
       return 0;
     case COND_LESS:
-      // Branch if cr.s != cr.v (bits 3 and 2).
-      fprintf(out,
-        "  cmp #0\n"
-        "  setm\n"
-        "  sll.d #16, cr\n"
-        "  clrm\n"
-        "  add #0x04\n"
-        "  jbs #3, a, %s\n",
-        label.c_str());
+      // Branch is sign bit is set.
+      fprintf(out, "  jbs s, cr, %s\n", label.c_str());
       return 0;
     case COND_LESS_EQUAL:
-      // Branch if cr.z == 1 or cr.s != cr.v (bits 3 and 2).
-      fprintf(out,
-        "  jz %s\n"
-        "  cmp #0\n"
-        "  setm\n"
-        "  sll.d #16, cr\n"
-        "  clrm\n"
-        "  add #0x04\n"
-        "  jbs #3, a, %s\n",
-        label.c_str(),
-        label.c_str());
+      fprintf(out, "  jz %s\n", label.c_str());
+      fprintf(out, "  jbs s, cr, %s\n", label.c_str());
       return 0;
     case COND_GREATER:
-      // Branch if cr.z == 0 and cr.s == cr.v (bits 3 and 2).
+      // Branch if 2's complement has sign bit set.
       fprintf(out,
-        "  cmp #0\n"
-        "  setm\n"
-        "  sll.d #16, cr\n"
-        "  clrm\n"
-        "  add #0x04\n"
-        "  and #0x0a\n"
-        //"  cmp #0x08\n"
-        "  jz %s\n",
+        "  neq #0xffff\n"
+        "  add #1\n"
+        "  jbs s, cr, %s\n",
         label.c_str());
       return 0;
     case COND_GREATER_EQUAL:
-      // Branch if cr.s == cr.v (bits 3 and 2).
-      fprintf(out,
-        "  cmp #0\n"
-        "  setm\n"
-        "  sll.d #16, cr\n"
-        "  clrm\n"
-        "  add #0x04\n"
-        "  jbc #3, a, %s\n",
-        label.c_str());
+      // Branch is sign bit is clear.
+      fprintf(out, "  jbc s, cr, %s\n", label.c_str());
       return 0;
     default:
       break;
