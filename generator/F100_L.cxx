@@ -713,8 +713,8 @@ int F100_L::inc_integer(int index, int num)
     "  lda #0x%04x\n"
     "  ads [temp_ptr]\n",
     index, num,
-    value,
-    index);
+    index,
+    value);
 
   return 0;
 }
@@ -743,6 +743,13 @@ int F100_L::jump_cond(std::string &label, int cond, int distance)
      "  lda [java_stack_ptr]-\n",
      label.c_str(), show_cond(cond), distance);
 
+  // (cr & 0xc0) + 0x04 .. if bit3 == bit2, then bit3 will now be 0.
+  //      32           3
+  // 0000 1100 -> 0001 0000   <-- bits are the same.
+  // 0000 0000 -> 0000 0100   <-- bits are the same.
+  // 0000 1000 -> 0000 1100   <-- bits are different.
+  // 0000 0100 -> 0000 1000   <-- bits are different.
+
   switch (cond)
   {
     case COND_EQUAL:
@@ -753,12 +760,6 @@ int F100_L::jump_cond(std::string &label, int cond, int distance)
       return 0;
     case COND_LESS:
       // Branch if cr.s != cr.v (bits 3 and 2).
-      // (cr & 0xc0) + 0x04 .. if bit3 == bit2, then bit3 will now be 0.
-      //      32           3
-      // 0000 1100 -> 0001 0000   <-- bits are the same.
-      // 0000 0000 -> 0000 0100   <-- bits are the same.
-      // 0000 1000 -> 0000 1100   <-- bits are different.
-      // 0000 0100 -> 0000 1000   <-- bits are different.
       fprintf(out,
         "  cmp #0\n"
         "  setm\n"
@@ -793,7 +794,7 @@ int F100_L::jump_cond(std::string &label, int cond, int distance)
         "  cmp #0x08\n"
         "  jz %s\n",
         label.c_str());
-      return -1;
+      return 0;
     case COND_GREATER_EQUAL:
       // Branch if cr.s == cr.v (bits 3 and 2).
       fprintf(out,
@@ -892,7 +893,7 @@ int F100_L::jump_cond_integer(std::string &label, int cond, int distance)
         "  cmp #0x08\n"
         "  jz %s\n",
         label.c_str());
-      return -1;
+      return 0;
     case COND_GREATER_EQUAL:
       // Branch if cr.s == cr.v (bits 3 and 2).
       fprintf(out,
