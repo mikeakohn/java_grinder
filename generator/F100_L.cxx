@@ -791,7 +791,7 @@ int F100_L::jump_cond(std::string &label, int cond, int distance)
         "  clrm\n"
         "  add #0x04\n"
         "  and #0x0a\n"
-        "  cmp #0x08\n"
+        //"  cmp #0x08\n"
         "  jz %s\n",
         label.c_str());
       return 0;
@@ -891,7 +891,6 @@ int F100_L::jump_cond_integer(std::string &label, int cond, int distance)
         "  clrm\n"
         "  add #0x04\n"
         "  and #0x0a\n"
-        "  cmp #0x08\n"
         "  jz %s\n",
         label.c_str());
       return 0;
