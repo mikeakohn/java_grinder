@@ -846,6 +846,13 @@ int F100_L::jump_cond_integer(std::string &label, int cond, int distance)
      "  cmp [java_stack_ptr]-\n",
      label.c_str(), show_cond(cond), distance);
 
+  // (cr & 0xc0) + 0x04 .. if bit3 == bit2, then bit3 will now be 0.
+  //      32           3
+  // 0000 1100 -> 0001 0000   <-- bits are the same.
+  // 0000 0000 -> 0000 0100   <-- bits are the same.
+  // 0000 1000 -> 0000 1100   <-- bits are different.
+  // 0000 0100 -> 0000 1000   <-- bits are different.
+
   switch (cond)
   {
     case COND_EQUAL:
@@ -856,12 +863,6 @@ int F100_L::jump_cond_integer(std::string &label, int cond, int distance)
       return 0;
     case COND_LESS:
       // Branch if cr.s != cr.v (bits 3 and 2).
-      // (cr & 0xc0) + 0x04 .. if bit3 == bit2, then bit3 will now be 0.
-      //      32           3
-      // 0000 1100 -> 0001 0000   <-- bits are the same.
-      // 0000 0000 -> 0000 0100   <-- bits are the same.
-      // 0000 1000 -> 0000 1100   <-- bits are different.
-      // 0000 0100 -> 0000 1000   <-- bits are different.
       fprintf(out,
         "  setm\n"
         "  sll.d #16, cr\n"
