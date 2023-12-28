@@ -243,6 +243,8 @@ protected:
   int preload_array_align;
   std::map<uint32_t, int> constants_pool;
   std::map<std::string, ArrayFiles> preload_arrays;
+
+  const char *show_cond(int value);
 };
 
 enum

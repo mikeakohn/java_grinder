@@ -539,3 +539,32 @@ int Generator::add_array_files()
   return 0;
 }
 
+const char *Generator::show_cond(int value)
+{
+  const char *text[] =
+  {
+    "EQUAL",
+    "NOT_EQUAL",
+    "LESS",
+    "LESS_EQUAL",
+    "GREATER",
+    "GREATER_EQUAL"
+  };
+
+  if (value <= COND_GREATER_EQUAL) { return text[value]; }
+
+  return "ERROR";
+/*
+  switch (value)
+  {
+    case COND_EQUAL:         return "EQUAL";
+    case COND_NOT_EQUAL:     return "NOT_EQUAL";
+    case COND_LESS:          return "LESS";
+    case COND_LESS_EQUAL:    return "LESS_EQUAL";
+    case COND_GREATER:       return "GREATER";
+    case COND_GREATER_EQUAL: return "GREATER_EQUAL";
+    default:                 return "ERROR";
+  }
+*/
+}
+

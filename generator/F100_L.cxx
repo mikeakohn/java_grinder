@@ -130,7 +130,15 @@ int F100_L::field_init_int(std::string &name, int index, int value)
 
 int F100_L::field_init_ref(std::string &name, int index)
 {
-  return -1;
+  fprintf(out,
+    "  ;; field_init_ref(%s, %d)\n"
+    "  lda #_%s\n"
+    "  sto global_vars + %d\n",
+    name.c_str(), index,
+    name.c_str(),
+    index);
+
+  return 0;
 }
 
 void F100_L::method_start(
@@ -473,7 +481,7 @@ int F100_L::shift_left_integer()
     "  lda [java_stack_ptr]-\n"
     "label_%d:\n"
     "  sll #1, [java_stack_ptr]\n"
-    "  sub #1\n"
+    "  add #0xffff\n"
     "  jnz label_%d\n"
     "  sto [java_stack_ptr]\n",
     label_count,
@@ -502,7 +510,7 @@ int F100_L::shift_right_integer()
     "  lda [java_stack_ptr]-\n"
     "label_%d:\n"
     "  sra #1, [java_stack_ptr]\n"
-    "  sub #1\n"
+    "  add #0xffff\n"
     "  jnz label_%d\n"
     "  sto [java_stack_ptr]\n",
     label_count,
@@ -531,7 +539,7 @@ int F100_L::shift_right_uinteger()
     "  lda [java_stack_ptr]-\n"
     "label_%d:\n"
     "  srl #1, [java_stack_ptr]\n"
-    "  sub #1\n"
+    "  add #0xffff\n"
     "  jnz label_%d\n"
     "  sto [java_stack_ptr]\n",
     label_count,
@@ -731,11 +739,9 @@ int F100_L::integer_to_short()
 int F100_L::jump_cond(std::string &label, int cond, int distance)
 {
   fprintf(out,
-     "  ; jump_cond(%s, %d, %d)\n"
+     "  ; jump_cond(%s, %s, %d)\n"
      "  lda [java_stack_ptr]-\n",
-     label.c_str(),
-     cond,
-     distance);
+     label.c_str(), show_cond(cond), distance);
 
   switch (cond)
   {
@@ -834,12 +840,10 @@ int F100_L::jump_cond_zero(std::string &label, int cond, int distance)
 int F100_L::jump_cond_integer(std::string &label, int cond, int distance)
 {
   fprintf(out,
-     "  ; jump_cond_integer(%s, %d, %d)\n"
+     "  ; jump_cond_integer(%s, %s, %d)\n"
      "  lda [java_stack_ptr]-\n"
      "  cmp [java_stack_ptr]-\n",
-     label.c_str(),
-     cond,
-     distance);
+     label.c_str(), show_cond(cond), distance);
 
   switch (cond)
   {
@@ -1087,17 +1091,17 @@ int F100_L::insert_array(std::string &name, int32_t *data, int len, uint8_t type
 {
   if (type == TYPE_BYTE)
   {
-    return insert_dw(name, data, len, TYPE_INT);
+    return insert_dw(name, data, len, TYPE_SHORT);
   }
     else
   if (type == TYPE_SHORT)
   {
-    return insert_dw(name, data, len, TYPE_INT);
+    return insert_dw(name, data, len, TYPE_SHORT);
   }
     else
   if (type == TYPE_INT)
   {
-    return insert_dc32(name, data, len, TYPE_INT);
+    return insert_dw(name, data, len, TYPE_SHORT);
   }
 
   return -1;
@@ -1110,12 +1114,34 @@ int F100_L::insert_string(std::string &name, uint8_t *bytes, int len)
 
 int F100_L::push_array_length()
 {
-  return -1;
+  fprintf(out,
+    "  ;; push_array_length()\n"
+    "  lda [java_stack_ptr]-\n"
+    //"  sto temp_ptr\n"
+    //"  lda [temp_ptr]\n"
+    "  sto temp_ptr\n"
+    "  lda #1\n"
+    "  sbs temp_ptr\n"
+    "  lda [temp_ptr]\n"
+    "  sto [java_stack_ptr]+\n");
+
+  return 0;
 }
 
 int F100_L::push_array_length(std::string &name, int field_id)
 {
-  return -1;
+  fprintf(out,
+    "  ;; push_array_length(%s, %d)\n"
+    "  lda [global_vars + %d]\n"
+    "  sto temp_ptr\n"
+    "  lda #1\n"
+    "  sbs temp_ptr\n"
+    "  lda [temp_ptr]\n"
+    "  sto [java_stack_ptr]+\n",
+    name.c_str(), field_id,
+    field_id);
+
+  return 0;
 }
 
 int F100_L::array_read_byte()
@@ -1125,12 +1151,26 @@ int F100_L::array_read_byte()
 
 int F100_L::array_read_short()
 {
-  return -1;
+  // Java stack is:
+  // 0: arrayref
+  // 1: index
+  fprintf(out,
+    "  ;; array_read_short()\n"
+    "  lda [java_stack_ptr]-\n"
+    "  sto temp_1\n"
+    "  lda [java_stack_ptr]-\n"
+    "  sto temp_ptr\n"
+    "  lda temp_1\n"
+    "  ads temp_ptr\n"
+    "  lda [temp_ptr]\n"
+    "  sto [java_stack_ptr]+\n");
+
+  return 0;
 }
 
 int F100_L::array_read_int()
 {
-  return -1;
+  return array_read_short();
 }
 
 int F100_L::array_read_byte(std::string &name, int field_id)
@@ -1140,12 +1180,26 @@ int F100_L::array_read_byte(std::string &name, int field_id)
 
 int F100_L::array_read_short(std::string &name, int field_id)
 {
-  return -1;
+  // Java stack is:
+  // 0: arrayref
+  // 1: index
+  fprintf(out,
+    "  ;; array_read_short(%s, %d)\n"
+    "  lda [global_vars + %d]\n"
+    "  sto temp_ptr\n"
+    "  lda [java_stack_ptr]-\n"
+    "  ads temp_ptr\n"
+    "  lda [temp_ptr]\n"
+    "  sto [java_stack_ptr]+\n",
+    name.c_str(), field_id,
+    field_id);
+
+  return 0;
 }
 
 int F100_L::array_read_int(std::string &name, int field_id)
 {
-  return -1;
+  return array_read_short(name, field_id);
 }
 
 int F100_L::array_write_byte()
@@ -1155,12 +1209,29 @@ int F100_L::array_write_byte()
 
 int F100_L::array_write_short()
 {
-  return -1;
+  // Java stack is:
+  // 0: arrayref
+  // 1: index
+  // 2: value
+  fprintf(out,
+    "  ;; array_write_short()\n"
+    "  lda [java_stack_ptr]-\n"
+    "  sto temp_1\n"
+    "  lda [java_stack_ptr]-\n"
+    "  sto temp_2\n"
+    "  lda [java_stack_ptr]-\n"
+    "  sto temp_ptr\n"
+    "  lda temp_2\n"
+    "  ads temp_ptr\n"
+    "  lda temp_1\n"
+    "  sto [temp_ptr]\n");
+
+  return 0;
 }
 
 int F100_L::array_write_int()
 {
-  return -1;
+  return array_write_short();
 }
 
 int F100_L::array_write_byte(std::string &name, int field_id)
@@ -1170,12 +1241,29 @@ int F100_L::array_write_byte(std::string &name, int field_id)
 
 int F100_L::array_write_short(std::string &name, int field_id)
 {
-  return -1;
+  // Java stack is:
+  // 0: arrayref  <-- not on stack here
+  // 1: index
+  // 2: value
+  fprintf(out,
+    "  ;; array_write_short(%s, %d)\n"
+    "  lda [java_stack_ptr]-\n"
+    "  sto temp_1\n"
+    "  lda [global_vars + %d]\n"
+    "  sto temp_ptr\n"
+    "  lda [java_stack_ptr]-\n"
+    "  ads temp_ptr\n"
+    "  lda temp_1\n"
+    "  sto [temp_ptr]\n",
+    name.c_str(), field_id,
+    field_id);
+
+  return 0;
 }
 
 int F100_L::array_write_int(std::string &name, int field_id)
 {
-  return -1;
+  return array_write_short(name, field_id);
 }
 
 int F100_L::ioport_setPinsValue_I(int port)
