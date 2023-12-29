@@ -1263,11 +1263,24 @@ int F100_L::ioport_setPinsValue_I(int port, int const_val)
 
 int F100_L::ice_fun_setTone_I()
 {
-  return -1;
+  fprintf(out,
+    "  ;; ice_fun_setTone_I()\n"
+    "  lda [java_stack_ptr]-\n"
+    "  sto 0x4009\n");
+  return 0;
 }
 
 int F100_L::ice_fun_setServo_II()
 {
-  return -1;
+  fprintf(out,
+    "  ;; ice_fun_setServo_II()\n"
+    "  lda [java_stack_ptr]-\n"
+    "  sto temp_1\n"
+    "  lda [java_stack_ptr]-\n"
+    "  add #0x4010\n"
+    "  sto temp_ptr\n"
+    "  lda temp_1\n"
+    "  sto [temp_ptr]\n");
+  return 0;
 }
 

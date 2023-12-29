@@ -2,10 +2,10 @@
  *  Java Grinder
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2022 by Michael Kohn
+ * Copyright 2014-2023 by Michael Kohn
  *
  */
 
@@ -28,6 +28,7 @@
 #include "api/dsp.h"
 #include "api/grinder.h"
 #include "api/i2c.h"
+#include "api/ice_fun.h"
 #include "api/intellivision.h"
 #include "api/ioport.h"
 #include "api/joystick.h"
@@ -171,6 +172,7 @@ int invoke_static(JavaClass *java_class, int method_id, Generator *generator)
     CHECK_WITH_PORT(UART, uart, 0)
     CHECK_WITH_PORT(UART, uart, 1)
     CHECK(I2C, i2c)
+    CHECK(IceFun, ice_fun)
     CHECK(Intellivision, intellivision)
     CHECK(Joystick, joystick)
     CHECK(Keyboard, keyboard)

@@ -14,9 +14,6 @@
 
 #include "generator/Generator.h"
 
-// This is currently hardcoded to use the IceFun APIs as more of a
-// proof of concept, but this can be changed in the future.
-
 class RISCV : public Generator
 {
 public:

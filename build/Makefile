@@ -101,6 +101,7 @@ SYSTEMS= \
   generator/SegaGenesis.o \
   generator/SNES.o \
   generator/SleepyBee.o \
+  generator/RISCVIceFun.o \
   generator/TI84.o \
   generator/TI99.o \
   generator/TRS80Coco.o \

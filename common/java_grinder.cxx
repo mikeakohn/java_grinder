@@ -44,6 +44,7 @@
 #include "generator/Playstation2.h"
 #include "generator/Propeller.h"
 #include "generator/RISCV.h"
+#include "generator/RISCVIceFun.h"
 #include "generator/SegaDreamcast.h"
 #include "generator/SegaGenesis.h"
 #include "generator/SNES.h"
@@ -270,6 +271,11 @@ static Generator *new_generator(const char *chip_type)
   if (strcasecmp("riscv", chip_type) == 0)
   {
     generator = new RISCV();
+  }
+    else
+  if (strcasecmp("riscv_icefun", chip_type) == 0)
+  {
+    generator = new RISCVIceFun();
   }
     else
   if (strcasecmp("ti84plus", chip_type) == 0)

@@ -68,12 +68,12 @@
 // push = subtract 4, then place value
 #define STACK_PUSH(t) \
   fprintf(out, "  addi sp, sp, -4\n"); \
-  fprintf(out, "  sw $t%d, 0(sp)\n", t); \
+  fprintf(out, "  sw t%d, 0(sp)\n", t); \
   stack++;
 
 // pop = read value, then subtract 4
 #define STACK_POP(t) \
-  fprintf(out, "  lw $%d, 0(sp)\n", t); \
+  fprintf(out, "  lw %d, 0(sp)\n", t); \
   fprintf(out, "  addi sp, sp, 4\n"); \
   stack--;
 
@@ -99,7 +99,7 @@ int RISCV::open(const char *filename)
 {
   if (Generator::open(filename) != 0) { return -1; }
 
-  //fprintf(out, ".mips32\n");
+  fprintf(out, ".riscv\n");
 
   // Set where RAM starts / ends
   fprintf(out, "  ram_start equ 0x%x\n", ram_start);
@@ -122,7 +122,7 @@ int RISCV::start_init()
 
 int RISCV::insert_static_field_define(std::string &name, std::string &type, int index)
 {
-  fprintf(out, "  %s equ ram_star t +%d\n", name.c_str(), index * 4);
+  fprintf(out, "  %s equ ram_start + %d\n", name.c_str(), index * 4);
   return 0;
 }
 
@@ -920,7 +920,7 @@ int RISCV::return_void(int local_count)
 
 int RISCV::jump(std::string &name, int distance)
 {
-  fprintf(out, "  b %s\n", name.c_str());
+  fprintf(out, "  j %s\n", name.c_str());
   fprintf(out, "  nop ; Delay slot\n");
 
   return 0;
