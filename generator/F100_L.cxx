@@ -63,6 +63,26 @@ int F100_L::open(const char *filename)
 
   fprintf(out, ".f100_l\n");
 
+  fprintf(out,
+    ";; Registers.\n"
+    "BUTTON     equ 0x4000\n"
+    "SPI_TX     equ 0x4001\n"
+    "SPI_RX     equ 0x4002\n"
+    "SPI_CTL    equ 0x4003\n"
+    "PORT0      equ 0x4008\n"
+    "SOUND      equ 0x4009\n"
+    "PORT1      equ 0x400a\n"
+    "SERVO_0    equ 0x4010\n"
+    "SERVO_1    equ 0x4011\n"
+    "SERVO_2    equ 0x4012\n"
+    "SERVO_3    equ 0x4013\n");
+
+  fprintf(out,
+    ";; Bits in SPI_CTL.\n"
+    "SPI_BUSY   equ 0\n"
+    "SPI_START  equ 1\n"
+    "SPI_16     equ 2\n");
+
   // Set where RAM starts / ends
   //fprintf(out, "ram_start equ 0\n");
   fprintf(out, "java_stack_ptr equ 0x%04x\n", java_stack_ptr);
@@ -1261,12 +1281,94 @@ int F100_L::ioport_setPinsValue_I(int port, int const_val)
   return 0;
 }
 
+int F100_L::spi_send_I(int port)
+{
+  fprintf(out,
+    "  ;; spi_send_I(%d)\n"
+    "  lda [java_stack_ptr]-\n"
+    "  sto SPI_TX\n"
+    "  lda #(1 << SPI_START)\n"
+    "  sto SPI_CTL\n",
+    port);
+
+  return 0;
+}
+
+int F100_L::spi_send16_I(int port)
+{
+  fprintf(out,
+    "  ;; spi_send16_I(%d)\n"
+    "  lda [java_stack_ptr]-\n"
+    "  sto SPI_TX\n"
+    "  lda #(1 << SPI_16)|(1 << SPI_START)\n"
+    "  sto SPI_CTL\n",
+    port);
+
+  return 0;
+}
+
+int F100_L::spi_read_I(int port)
+{
+  fprintf(out,
+    "  ;; spi_read_I(%d)\n"
+    "  lda #0x00\n"
+    "  sto SPI_TX\n"
+    "  lda #(1 << SPI_START)\n"
+    "  sto SPI_CTL\n"
+    "label_%d:\n"
+    "  lda SPI_CTL\n"
+    "  jbs #SPI_BUSY, a, label_%d\n"
+    "  lda SPI_RX\n"
+    "  sto [java_stack_ptr]+\n",
+    port,
+    label_count,
+    label_count);
+
+  label_count--;
+
+  return 0;
+}
+
+int F100_L::spi_read16_I(int port)
+{
+  fprintf(out,
+    "  ;; spi_read16_I(%d)\n"
+    "  lda #0x00\n"
+    "  sto SPI_TX\n"
+    "  lda #(1 << SPI_16)|(1 << SPI_START)\n"
+    "  sto SPI_CTL\n"
+    "label_%d:\n"
+    "  lda SPI_CTL\n"
+    "  jbs #SPI_BUSY, a, label_%d\n"
+    "  lda SPI_RX\n"
+    "  sto [java_stack_ptr]+\n",
+    port,
+    label_count,
+    label_count);
+
+  label_count--;
+
+  return 0;
+}
+
+int F100_L::spi_isBusy(int port)
+{
+  fprintf(out,
+    "  ;; spi_isBusy(%d)\n"
+    "  lda SPI_CTL\n"
+    "  and #(1 << SPI_BUSY)\n"
+    "  sto [java_stack_ptr]+\n",
+    port);
+
+  return 0;
+}
+
 int F100_L::ice_fun_setTone_I()
 {
   fprintf(out,
     "  ;; ice_fun_setTone_I()\n"
     "  lda [java_stack_ptr]-\n"
-    "  sto 0x4009\n");
+    "  sto SOUND\n");
   return 0;
 }
 
@@ -1277,7 +1379,7 @@ int F100_L::ice_fun_setServo_II()
     "  lda [java_stack_ptr]-\n"
     "  sto temp_1\n"
     "  lda [java_stack_ptr]-\n"
-    "  add #0x4010\n"
+    "  add #SERVO_0\n"
     "  sto temp_ptr\n"
     "  lda temp_1\n"
     "  sto [temp_ptr]\n");
