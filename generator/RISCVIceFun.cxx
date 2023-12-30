@@ -57,8 +57,8 @@ int RISCVIceFun::ioport_setPinsValue_I(int port)
 
   fprintf(out,
     "  ;; setPinsValue(port=%d)\n"
-    "  li a1, PERF_BASE\n"
-    "  sw t%d, %d(a1)\n",
+    "  li t1, PERF_BASE\n"
+    "  sw a%d, 0x%02x(t1)\n",
     port,
     reg - 1, peripheral);
 
@@ -73,9 +73,9 @@ int RISCVIceFun::ioport_setPinsValue_I(int port, int const_val)
 
   fprintf(out,
     "  ;; setPinsValue(port=%d, const_val=%d)\n"
-    "  li a1, PERF_BASE\n"
-    "  li a0, %d\n"
-    "  sw a0, %d(a1)\n",
+    "  li t1, PERF_BASE\n"
+    "  li t0, %d\n"
+    "  sw t0, 0x%02x(t1)\n",
     port, const_val,
     const_val,
     peripheral);
@@ -87,10 +87,10 @@ int RISCVIceFun::spi_send_I(int port)
 {
   fprintf(out,
     "  ;; spi_send_I(port=%d)\n"
-    "  li a1, PERF_BASE\n"
-    "  sw t%d, SPI_TX(a1)\n"
-    "  li a0, SPI_START\n"
-    "  sw a0, SPI_CTL(a1)\n",
+    "  li t1, PERF_BASE\n"
+    "  sw a%d, SPI_TX(t1)\n"
+    "  li t0, SPI_START\n"
+    "  sw t0, SPI_CTL(t1)\n",
     port,
     reg - 1);
 
@@ -103,10 +103,10 @@ int RISCVIceFun::spi_send16_I(int port)
 {
   fprintf(out,
     "  ;; spi_send16_I(port=%d)\n"
-    "  li a1, PERF_BASE\n"
-    "  sw t%d, SPI_TX(a1)\n"
-    "  li a0, SPI_16|SPI_START\n"
-    "  sw a0, SPI_CTL(a1)\n",
+    "  li t1, PERF_BASE\n"
+    "  sw a%d, SPI_TX(t1)\n"
+    "  li t0, SPI_16|SPI_START\n"
+    "  sw t0, SPI_CTL(t1)\n",
     port,
     reg - 1);
 
@@ -119,16 +119,16 @@ int RISCVIceFun::spi_read_I(int port)
 {
   fprintf(out,
     "  ;; spi_read_I(port=%d)\n"
-    "  li a1, PERF_BASE\n"
-    "  li a0, 0\n"
-    "  sw a0, SPI_RX(a1)\n"
-    "  li a0, SPI_START\n"
-    "  sw a0, SPI_CTL(a1)\n"
+    "  li t1, PERF_BASE\n"
+    "  li t0, 0\n"
+    "  sw t0, SPI_RX(t1)\n"
+    "  li t0, SPI_START\n"
+    "  sw t0, SPI_CTL(t1)\n"
     "label_%d:\n"
-    "  lw a0, SPI_CTL(a1)\n"
-    "  andi a0, a0, 1\n"
-    "  bnez a0, label_%d\n" 
-    "  lw t%d, SPI_RX(a1)\n",
+    "  lw t0, SPI_CTL(t1)\n"
+    "  andi t0, t0, 1\n"
+    "  bnez t0, label_%d\n" 
+    "  lw a%d, SPI_RX(t1)\n",
     port,
     label_count,
     label_count,
@@ -144,16 +144,16 @@ int RISCVIceFun::spi_read16_I(int port)
 {
   fprintf(out,
     "  ;; spi_read16_I(port=%d)\n"
-    "  li a1, PERF_BASE\n"
-    "  li a0, 0\n"
-    "  sw a0, SPI_RX(a1)\n"
-    "  li a0, SPI_START\n"
-    "  sw a0, SPI_CTL(a1)\n"
+    "  li t1, PERF_BASE\n"
+    "  li t0, 0\n"
+    "  sw t0, SPI_RX(t1)\n"
+    "  li t0, SPI_START\n"
+    "  sw t0, SPI_CTL(t1)\n"
     "label_%d:\n"
-    "  lw a0, SPI_CTL(a1)\n"
-    "  andi a0, a0, 1\n"
-    "  bnez a0, label_%d\n" 
-    "  lw t%d, SPI_RX(a1)\n",
+    "  lw t0, SPI_CTL(t1)\n"
+    "  andi t0, t0, 1\n"
+    "  bnez t0, label_%d\n" 
+    "  lw a%d, SPI_RX(t1)\n",
     port,
     label_count,
     label_count,
@@ -168,10 +168,13 @@ int RISCVIceFun::spi_read16_I(int port)
 int RISCVIceFun::spi_isBusy(int port)
 {
   fprintf(out,
-    "  ;; spi_read16_I(port=%d)\n"
-    "  lw t%d, SPI_CTL(a1)\n",
+    "  ;; spi_isBusy(port=%d)\n"
+    "  li t1, PERF_BASE\n"
+    "  lw a%d, SPI_CTL(t1)\n"
+    "  andi a%d, a%d, 1\n",
     port,
-    reg);
+    reg,
+    reg, reg);
 
   reg += 1;
 
@@ -182,8 +185,8 @@ int RISCVIceFun::ice_fun_setTone_I()
 {
   fprintf(out,
     "  ;; ice_fun_setTone_I()\n"
-    "  li a1, PERF_BASE\n"
-    "  sw t%d, SOUND(a1)\n",
+    "  li t1, PERF_BASE\n"
+    "  sw a%d, SOUND(t1)\n",
     reg - 1);
 
   reg -= 1;

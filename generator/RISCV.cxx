@@ -687,27 +687,21 @@ int RISCV::jump_cond(std::string &label, int cond, int distance)
   {
     case COND_EQUAL:
       fprintf(out, "  beq a%d, zero, %s\n", --reg, label.c_str());
-      fprintf(out, "  nop\n");
       return 0;
     case COND_NOT_EQUAL:
       fprintf(out, "  bne a%d, zero, %s\n", --reg, label.c_str());
-      fprintf(out, "  nop\n");
       return 0;
     case COND_LESS:
       fprintf(out, "  bltz a%d, %s\n", --reg, label.c_str());
-      fprintf(out, "  nop\n");
       return 0;
     case COND_LESS_EQUAL:
       fprintf(out, "  blez a%d, %s\n", --reg, label.c_str());
-      fprintf(out, "  nop\n");
       return 0;
     case COND_GREATER:
       fprintf(out, "  bgtz a%d, %s\n", --reg, label.c_str());
-      fprintf(out, "  nop\n");
       return 0;
     case COND_GREATER_EQUAL:
       fprintf(out, "  bgez a%d, %s\n", --reg, label.c_str());
-      fprintf(out, "  nop\n");
       return 0;
     default:
       break;
@@ -731,32 +725,26 @@ int RISCV::jump_cond_integer(std::string &label, int cond, int distance)
   {
     case COND_EQUAL:
       fprintf(out, "  beq a%d, a%d, %s\n", reg - 2, reg - 1, label.c_str());
-      fprintf(out, "  nop\n");
       reg -= 2;
       return 0;
     case COND_NOT_EQUAL:
       fprintf(out, "  bne a%d, a%d, %s\n", reg - 2, reg - 1, label.c_str());
-      fprintf(out, "  nop\n");
       reg -= 2;
       return 0;
     case COND_LESS:
       fprintf(out, "  blt a%d, a%d, %s\n", reg - 2, reg - 1, label.c_str());
-      fprintf(out, "  nop\n");
       reg -= 2;
       return 0;
     case COND_LESS_EQUAL:
       fprintf(out, "  ble a%d, a%d, %s\n", reg - 2, reg - 1, label.c_str());
-      fprintf(out, "  nop\n");
       reg -= 2;
       return 0;
     case COND_GREATER:
       fprintf(out, "  bgt a%d, a%d, %s\n", reg - 2, reg - 1, label.c_str());
-      fprintf(out, "  nop\n");
       reg -= 2;
       return 0;
     case COND_GREATER_EQUAL:
       fprintf(out, "  bge a%d, a%d, %s\n", reg - 2, reg - 1, label.c_str());
-      fprintf(out, "  nop\n");
       reg -= 2;
       return 0;
     default:
@@ -884,7 +872,6 @@ int RISCV::return_local(int index, int local_count)
   fprintf(out, "  lw s1, %d(fp) ; local_%d\n", LOCALS(index), index);
   fprintf(out, "  addi sp, sp, %d\n", (local_count * 4) + 4);
   fprintf(out, "  jr ra\n");
-  fprintf(out, "  nop\n");
 
   return 0;
 }
@@ -899,7 +886,6 @@ int RISCV::return_integer(int local_count)
   fprintf(out, "  mv s1, a0\n");
   fprintf(out, "  addi sp, sp, %d\n", (local_count * 4) + 4);
   fprintf(out, "  jr ra\n");
-  fprintf(out, "  nop ; Delay slot\n");
   reg--;
 
   return 0;
@@ -914,14 +900,12 @@ int RISCV::return_void(int local_count)
 
   fprintf(out, "  addi sp, sp, %d\n", (local_count * 4) + 4);
   fprintf(out, "  jr ra\n");
-  fprintf(out, "  nop ; Delay slot\n");
   return 0;
 }
 
 int RISCV::jump(std::string &name, int distance)
 {
   fprintf(out, "  j %s\n", name.c_str());
-  fprintf(out, "  nop ; Delay slot\n");
 
   return 0;
 }
@@ -974,7 +958,6 @@ int RISCV::invoke_static_method(const char *name, int params, int is_void)
   }
 
   fprintf(out, "  jal %s\n", name);
-  fprintf(out, "  nop ; Delay slot\n");
 
   // Restore temp registers
   for (n = 0; n < save_regs; n++)
@@ -1454,6 +1437,7 @@ int RISCV::stack_alu(const char *instr)
 
 int RISCV::divide()
 {
+#if 0
   int rs, rt;
 
   if (stack > 0)
@@ -1482,8 +1466,9 @@ int RISCV::divide()
   fprintf(out, "  div a%d, a%d\n", rs, rt);
   fprintf(out, "  nop\n");
   fprintf(out, "  nop\n");
+#endif
 
-  return 0;
+  return -1;
 }
 
 
