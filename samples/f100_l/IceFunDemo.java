@@ -9,7 +9,7 @@ public class IceFunDemo
 {
   static int counter = 1;
 
-  static char[] music =
+  static short[] music =
   {
     89,  375, 89,  125, 84,  250, 89, 1000,  0, 250, 82,  250, 84,  500,
     77, 1000, 82,  125, 84,  125, 89,  250, 84, 250, 91,  250, 89, 1000,

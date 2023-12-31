@@ -1,11 +1,27 @@
 
+import net.mikekohn.java_grinder.IceFun;
 import net.mikekohn.java_grinder.IOPort0;
 import net.mikekohn.java_grinder.IOPort1;
+import net.mikekohn.java_grinder.Joystick;
 import net.mikekohn.java_grinder.SPI0;
 
-public class LCD
+// This is identical to the F100-L sample IceFunDemo.java, with the song
+// speed changed.
+
+public class IceFunDemo
 {
   static int counter = 1;
+
+  static short[] music =
+  {
+    89,  562, 89,  187, 84,  375, 89, 1500,  0, 375, 82,  375, 84,  750,
+    77, 1500, 82,  187, 84,  187, 89,  375, 84, 375, 91,  375, 89, 1500,
+     0,  375, 87,  562, 86,  187, 84,  187, 82, 750, 84, 1500, 89,  562,
+    89,  187, 84,  375, 89, 1500,  0,  375, 81, 375, 82,  750, 84,  375,
+    77, 1500, 82,  375, 81,  375,  0,  375, 77, 375, 82,  750, 81,  750,
+    82,  750, 81,  750, 77,  375, 79, 1125, 77, 750, 84,  750, 82,  750,
+    87,  750, 89, 1500, 77,  375
+  };
 
   public static final int command_display_off = 0xae;
   public static final int command_set_remap = 0xa0;
@@ -100,6 +116,23 @@ public class LCD
     return a + b;
   }
 
+  public static void playSong()
+  {
+    int n, tone, duration;
+
+    for (n = 0; n < music.length; n = n + 2)
+    {
+      tone     = music[n + 0];
+      duration = music[n + 1] << 6;
+
+      IceFun.setTone(tone);
+      delay(duration);
+
+      IceFun.setTone(0);
+      delay(1000);
+    }
+  }
+
   public static void main(String[] args)
   {
     int b;
@@ -132,16 +165,24 @@ public class LCD
 
     while (true)
     {
+      if (Joystick.isButtonDown_0(0)) { playSong(); }
+
       IOPort0.setPinsValue(0x01);
       for (counter = 0; counter < 30000; counter++);
 
+      if (Joystick.isButtonDown_0(0)) { playSong(); }
+
       IOPort0.setPinsValue(0x00);
       for (b = 0; b < 30000; b++);
+
+      if (Joystick.isButtonDown_0(0)) { playSong(); }
 
       b = getValue(1000, 5000);
 
       IOPort0.setPinsValue(0x01);
       delay(b);
+
+      if (Joystick.isButtonDown_0(0)) { playSong(); }
 
       b = getValue(1000, 5000);
 

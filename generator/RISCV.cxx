@@ -539,12 +539,12 @@ int RISCV::shift_left_integer(int num)
   if (stack > 0)
   {
     STACK_POP(8);
-    fprintf(out, "  sll t0, t0, %d\n", num);
+    fprintf(out, "  slli t0, t0, %d\n", num);
     STACK_PUSH(8);
   }
     else
   {
-    fprintf(out, "  sll a%d, a%d, %d\n", REG_STACK(reg - 1), REG_STACK(reg - 1), num);
+    fprintf(out, "  slli a%d, a%d, %d\n", REG_STACK(reg - 1), REG_STACK(reg - 1), num);
   }
 
   return 0;
@@ -563,12 +563,12 @@ int RISCV::shift_right_integer(int num)
   if (stack > 0)
   {
     STACK_POP(8);
-    fprintf(out, "  sra t0, t0, %d\n", num);
+    fprintf(out, "  srai t0, t0, %d\n", num);
     STACK_PUSH(8);
   }
     else
   {
-    fprintf(out, "  sra a%d, a%d, %d\n", REG_STACK(reg - 1), REG_STACK(reg - 1), num);
+    fprintf(out, "  srai a%d, a%d, %d\n", REG_STACK(reg - 1), REG_STACK(reg - 1), num);
   }
 
   return 0;
@@ -587,12 +587,12 @@ int RISCV::shift_right_uinteger(int num)
   if (stack > 0)
   {
     STACK_POP(8);
-    fprintf(out, "  srl t0, t0, %d\n", num);
+    fprintf(out, "  srli t0, t0, %d\n", num);
     STACK_PUSH(8);
   }
     else
   {
-    fprintf(out, "  srl a%d, a%d, %d\n", REG_STACK(reg - 1), REG_STACK(reg - 1), num);
+    fprintf(out, "  srli a%d, a%d, %d\n", REG_STACK(reg - 1), REG_STACK(reg - 1), num);
   }
 
   return 0;
@@ -1061,12 +1061,12 @@ int RISCV::new_array(uint8_t type)
 
   if (type == TYPE_INT)
   {
-    fprintf(out, "  sll a%d, a%d, 2\n", t, t);
+    fprintf(out, "  slli a%d, a%d, 2\n", t, t);
   }
     else
   if (type == TYPE_SHORT || type == TYPE_CHAR)
   {
-    fprintf(out, "  sll a%d, a%d, 1\n", t, t);
+    fprintf(out, "  slli a%d, a%d, 1\n", t, t);
   }
 
   fprintf(out, "  addi a%d, a%d, 4\n", t, t);
@@ -1179,7 +1179,7 @@ int RISCV::array_read_short()
 
   get_values_from_stack(&index_reg, &ref_reg);
 
-  fprintf(out, "  sll a%d, a%d, 1\n", index_reg, index_reg);
+  fprintf(out, "  slli a%d, a%d, 1\n", index_reg, index_reg);
   fprintf(out, "  add a%d, a%d, a%d\n", ref_reg, ref_reg, index_reg);
 
   if (reg < reg_max)
@@ -1203,7 +1203,7 @@ int RISCV::array_read_int()
 
   get_values_from_stack(&index_reg, &ref_reg);
 
-  fprintf(out, "  sll a%d, a%d, 2\n", index_reg, index_reg);
+  fprintf(out, "  slli a%d, a%d, 2\n", index_reg, index_reg);
   fprintf(out, "  add a%d, a%d, a%d\n", ref_reg, ref_reg, index_reg);
 
   if (reg < reg_max)
@@ -1250,7 +1250,7 @@ int RISCV::array_read_short(std::string &name, int field_id)
   get_values_from_stack(&index_reg);
 
   fprintf(out, "  lw t2, %d(tp)\n", field_id * 4);
-  fprintf(out, "  sll a%d, a%d, 1\n", index_reg, index_reg);
+  fprintf(out, "  slli a%d, a%d, 1\n", index_reg, index_reg);
   fprintf(out, "  add t2, t2, a%d\n", index_reg);
 
   if (reg < reg_max)
@@ -1274,7 +1274,7 @@ int RISCV::array_read_int(std::string &name, int field_id)
   get_values_from_stack(&index_reg);
 
   fprintf(out, "  lw t2, %d(tp)\n", field_id * 4);
-  fprintf(out, "  sll a%d, a%d, 2\n", index_reg, index_reg);
+  fprintf(out, "  slli a%d, a%d, 2\n", index_reg, index_reg);
   fprintf(out, "  add t2, t2, a%d\n", index_reg);
 
   if (reg < reg_max)
@@ -1323,13 +1323,13 @@ int RISCV::array_write_short()
 
   if (get_ref_from_stack(&ref_reg) == -1)
   {
-    fprintf(out, "  sll a%d, a%d, 1\n", index_reg, index_reg);
+    fprintf(out, "  slli a%d, a%d, 1\n", index_reg, index_reg);
     fprintf(out, "  add t2, t2, a%d\n", index_reg);
     fprintf(out, "  sh a%d, 0(t2)\n", value_reg);
   }
     else
   {
-    fprintf(out, "  sll a%d, a%d, 1\n", index_reg, index_reg);
+    fprintf(out, "  slli a%d, a%d, 1\n", index_reg, index_reg);
     fprintf(out, "  add a%d, a%d, a%d\n", ref_reg, ref_reg, index_reg);
     fprintf(out, "  sh a%d, 0(a%d)\n", value_reg, ref_reg);
   }
@@ -1347,13 +1347,13 @@ int RISCV::array_write_int()
 
   if (get_ref_from_stack(&ref_reg) == -1)
   {
-    fprintf(out, "  sll a%d, a%d, 2\n", index_reg, index_reg);
+    fprintf(out, "  slli a%d, a%d, 2\n", index_reg, index_reg);
     fprintf(out, "  add t2, t2, a%d\n", index_reg);
     fprintf(out, "  sw a%d, 0(t2)\n", value_reg);
   }
     else
   {
-    fprintf(out, "  sll a%d, a%d, 2\n", index_reg, index_reg);
+    fprintf(out, "  slli a%d, a%d, 2\n", index_reg, index_reg);
     fprintf(out, "  add a%d, a%d, a%d\n", ref_reg, ref_reg, index_reg);
     fprintf(out, "  sw a%d, 0(a%d)\n", value_reg, ref_reg);
   }
@@ -1383,7 +1383,7 @@ int RISCV::array_write_short(std::string &name, int field_id)
   get_values_from_stack(&value_reg, &index_reg);
 
   fprintf(out, "  lw t2, %d(tp)\n", field_id * 4);
-  fprintf(out, "  sll a%d, a%d, 1\n", index_reg, index_reg);
+  fprintf(out, "  slli a%d, a%d, 1\n", index_reg, index_reg);
   fprintf(out, "  add t2, t2, a%d\n", index_reg);
   fprintf(out, "  sh a%d, 0(t2)\n", value_reg);
 
@@ -1398,7 +1398,7 @@ int RISCV::array_write_int(std::string &name, int field_id)
   get_values_from_stack(&value_reg, &index_reg);
 
   fprintf(out, "  lw t2, %d(tp)\n", field_id * 4);
-  fprintf(out, "  sll a%d, a%d, 2\n", index_reg, index_reg);
+  fprintf(out, "  slli a%d, a%d, 2\n", index_reg, index_reg);
   fprintf(out, "  add t2, t2, a%d\n", index_reg);
   fprintf(out, "  sw a%d, 0(t2)\n", value_reg);
 

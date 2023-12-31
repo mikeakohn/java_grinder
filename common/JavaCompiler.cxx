@@ -1210,14 +1210,7 @@ int JavaCompiler::compile_method(
         break;
 
       case 52: // caload (0x34)
-        if (stack.length() == 0)
-        {
-          ret = generator->array_read_short();
-        }
-          else
-        {
-          ret = array_load(java_class, stack.pop(), ARRAY_TYPE_SHORT);
-        }
+        UNIMPL()
         break;
 
       case 53: // saload (0x35)
