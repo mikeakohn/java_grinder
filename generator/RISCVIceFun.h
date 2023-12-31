@@ -32,6 +32,9 @@ public:
   virtual int spi_read16_I(int port);
   virtual int spi_isBusy(int port);
 
+  virtual int joystick_isButtonDown_0_I();
+  virtual int joystick_isButtonDown_0_I(int index);
+
   virtual int ice_fun_setTone_I();
 };
 

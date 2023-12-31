@@ -181,6 +181,35 @@ int RISCVIceFun::spi_isBusy(int port)
   return 0;
 }
 
+int RISCVIceFun::joystick_isButtonDown_0_I()
+{
+  fprintf(out,
+    "  ;; isButtonDown_0_I()\n"
+    "  li t1, PERF_BASE\n"
+    "  lw a%d, BUTTON(t1)\n"
+    "  andi a%d, a%d, 1\n",
+    reg - 1,
+    reg - 1, reg - 1);
+
+  return 0;
+}
+
+int RISCVIceFun::joystick_isButtonDown_0_I(int index)
+{
+  fprintf(out,
+    "  ;; isButtonDown_0_I(index=%d)\n"
+    "  li t1, PERF_BASE\n"
+    "  lw a%d, BUTTON(t1)\n"
+    "  andi a%d, a%d, 1\n",
+    index,
+    reg,
+    reg, reg);
+
+  reg += 1;
+
+  return 0;
+}
+
 int RISCVIceFun::ice_fun_setTone_I()
 {
   fprintf(out,

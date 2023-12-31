@@ -1,11 +1,24 @@
 
+import net.mikekohn.java_grinder.IceFun;
 import net.mikekohn.java_grinder.IOPort0;
 import net.mikekohn.java_grinder.IOPort1;
+import net.mikekohn.java_grinder.Joystick;
 import net.mikekohn.java_grinder.SPI0;
 
-public class LCD
+public class IceFunDemo
 {
   static int counter = 1;
+
+  static char[] music =
+  {
+    89,  375, 89,  125, 84,  250, 89, 1000,  0, 250, 82,  250, 84,  500,
+    77, 1000, 82,  125, 84,  125, 89,  250, 84, 250, 91,  250, 89, 1000,
+     0,  250, 87,  375, 86,  125, 84,  125, 82, 500, 84, 1000, 89,  375,
+    89,  125, 84,  250, 89, 1000,  0,  250, 81, 250, 82,  500, 84,  250,
+    77, 1000, 82,  250, 81,  250,  0,  250, 77, 250, 82,  500, 81,  500,
+    82,  500, 81,  500, 77,  250, 79,  750, 77, 500, 84,  500, 82,  500,
+    87,  500, 89, 1000, 77,  250
+  };
 
   public static final int command_display_off = 0xae;
   public static final int command_set_remap = 0xa0;
@@ -100,6 +113,23 @@ public class LCD
     return a + b;
   }
 
+  public static void playSong()
+  {
+    int n, tone, duration;
+
+    for (n = 0; n < music.length; n = n + 2)
+    {
+      tone     = music[n + 0];
+      duration = music[n + 1] << 4;
+
+      IceFun.setTone(tone);
+      delay(duration);
+
+      IceFun.setTone(0);
+      delay(100);
+    }
+  }
+
   public static void main(String[] args)
   {
     int b;
@@ -132,16 +162,24 @@ public class LCD
 
     while (true)
     {
+      if (Joystick.isButtonDown_0(0)) { playSong(); }
+
       IOPort0.setPinsValue(0x01);
       for (counter = 0; counter < 30000; counter++);
 
+      if (Joystick.isButtonDown_0(0)) { playSong(); }
+
       IOPort0.setPinsValue(0x00);
       for (b = 0; b < 30000; b++);
+
+      if (Joystick.isButtonDown_0(0)) { playSong(); }
 
       b = getValue(1000, 5000);
 
       IOPort0.setPinsValue(0x01);
       delay(b);
+
+      if (Joystick.isButtonDown_0(0)) { playSong(); }
 
       b = getValue(1000, 5000);
 

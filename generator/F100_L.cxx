@@ -348,15 +348,26 @@ int F100_L::push_ref(std::string &name, int index)
 
 int F100_L::pop_local_var_int(int index)
 {
-  fprintf(out,
-    "  ;; pop_local_var_int(%d)\n"
-    "  lda frame_ptr\n"
-    "  add #%d\n"
-    "  sto temp_ptr\n"
-    "  lda [java_stack_ptr]-\n"
-    "  sto [temp_ptr]\n",
-    index,
-    index);
+  if (index == 0)
+  {
+    fprintf(out,
+      "  ;; pop_local_var_int(%d)\n"
+      "  lda [java_stack_ptr]-\n"
+      "  sto [frame_ptr]\n",
+      index);
+  }
+    else
+  {
+    fprintf(out,
+      "  ;; pop_local_var_int(%d)\n"
+      "  lda frame_ptr\n"
+      "  add #%d\n"
+      "  sto temp_ptr\n"
+      "  lda [java_stack_ptr]-\n"
+      "  sto [temp_ptr]\n",
+      index,
+      index);
+  }
 
   return 0;
 }
@@ -516,7 +527,9 @@ int F100_L::shift_left_integer(int num)
 {
   fprintf(out,
     "  ;; shift_left_integer(%d);\n"
-    "  sll #%d, [java_stack_ptr]\n",
+    "  lda [java_stack_ptr]\n"
+    "  sll #%d, a\n"
+    "  sto [java_stack_ptr]\n",
     num,
     num);
 
@@ -1009,7 +1022,7 @@ int F100_L::invoke_static_method(const char *name, int params, int is_void)
   // 0
   // 0
   // java stack       (frame 0) (might not be empty)
-  // local vars       (frame 1) <-- frame_ptr (locals include passed paramters)
+  // local vars       (frame 1) <-- frame_ptr (locals include passed parameters)
   // frame_ptr 0      (save)
   // java_stack_ptr 0 (save)
   // java stack       (frame 1) <-- java_stack_ptr
@@ -1023,10 +1036,13 @@ int F100_L::invoke_static_method(const char *name, int params, int is_void)
   // local vars come from the stack, so should be able to just subtract
   // the num of params from java_stack_ptr.
 
-  fprintf(out,
-    "  lda #%d\n"
-    "  sbs java_stack_ptr\n",
-    params);
+  if (params != 0)
+  {
+    fprintf(out,
+      "  lda #%d\n"
+      "  sbs java_stack_ptr\n",
+      params);
+  }
 
   // Call it.
   fprintf(out, "  cal %s\n", name);
@@ -1359,6 +1375,29 @@ int F100_L::spi_isBusy(int port)
     "  and #(1 << SPI_BUSY)\n"
     "  sto [java_stack_ptr]+\n",
     port);
+
+  return 0;
+}
+
+int F100_L::joystick_isButtonDown_0_I()
+{
+  fprintf(out,
+    "  ;; spi_isButtonDown_0_I()\n"
+    "  lda BUTTON\n"
+    "  and #1\n"
+    "  sto [java_stack_ptr]\n");
+
+  return 0;
+}
+
+int F100_L::joystick_isButtonDown_0_I(int index)
+{
+  fprintf(out,
+    "  ;; isButtonDown_0_I(%d)\n"
+    "  lda BUTTON\n"
+    "  and #1\n"
+    "  sto [java_stack_ptr]+\n",
+    index);
 
   return 0;
 }
