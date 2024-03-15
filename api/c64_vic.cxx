@@ -307,6 +307,11 @@ static int c64_vic_textScrollDown(JavaClass *java_class, Generator *generator)
   return generator->c64_vic_textScrollDown();
 }
 
+static int c64_vic_textSmoothScroll(JavaClass *java_class, Generator *generator)
+{
+  return generator->c64_vic_textSmoothScroll();
+}
+
 static int c64_vic_makeTextTable(JavaClass *java_class, Generator *generator)
 {
   return generator->c64_vic_makeTextTable();
@@ -396,6 +401,7 @@ int c64_vic(JavaClass *java_class, Generator *generator, const char *function)
   CHECK_FUNC(textScrollRight)
   CHECK_FUNC(textScrollUp)
   CHECK_FUNC(textScrollDown)
+  CHECK_FUNC(textSmoothScroll)
   CHECK_FUNC(makeTextTable)
   CHECK_FUNC(makeColorTable)
   CHECK_FUNC(colorRamClear)

@@ -159,6 +159,7 @@ public class VIC
   public static void textScrollRight() { }
   public static void textScrollUp() { }
   public static void textScrollDown() { }
+  public static void textSmoothScroll(byte[] array, int x, int y, int w) { }
   public static void makeTextTable() { }
   public static void makeColorTable() { }
   public static void colorRamClear(int value) { }

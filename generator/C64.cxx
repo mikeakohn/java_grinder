@@ -50,6 +50,7 @@ C64::C64() :
   need_c64_vic_text_scroll_right(0),
   need_c64_vic_text_scroll_up(0),
   need_c64_vic_text_scroll_down(0),
+  need_c64_vic_text_smooth_scroll(0),
   need_c64_vic_make_color_table(0),
   need_c64_vic_color_ram_clear(0),
   need_c64_vic_copy_uppercase(0),
@@ -93,6 +94,7 @@ C64::~C64()
   if (need_c64_vic_text_scroll_right) { insert_c64_vic_text_scroll_right(); }
   if (need_c64_vic_text_scroll_up) { insert_c64_vic_text_scroll_up(); }
   if (need_c64_vic_text_scroll_down) { insert_c64_vic_text_scroll_down(); }
+  if (need_c64_vic_text_smooth_scroll) { insert_c64_vic_text_smooth_scroll(); }
   if (need_c64_vic_make_text_table) { insert_c64_vic_make_text_table(); }
   if (need_c64_vic_make_color_table) { insert_c64_vic_make_color_table(); }
   if (need_c64_vic_color_ram_clear) { insert_c64_vic_color_ram_clear(); }
@@ -123,19 +125,19 @@ int C64::open(const char *filename)
   fprintf(out, "var_start equ 0x%04x\n", var_start);
 
   // for indirection (2 bytes)
-  fprintf(out, "address equ var_start + 0\n");
+  fprintf(out, "address equ 0x02\n");
 
   // points to locals
-  fprintf(out, "locals equ var_start + 2\n");
+  fprintf(out, "locals equ 0x04\n");
 
   // temp variables
-  fprintf(out, "result equ var_start + 4\n");
-  fprintf(out, "remainder equ var_start + 6\n");
-  fprintf(out, "length equ var_start + 8\n");
-  fprintf(out, "value1 equ var_start + 10\n");
-  fprintf(out, "value2 equ var_start + 12\n");
-  fprintf(out, "value3 equ var_start + 14\n");
-  fprintf(out, "value4 equ var_start + 16\n");
+  fprintf(out, "result equ 0x06\n");
+  fprintf(out, "remainder equ 0x08\n");
+  fprintf(out, "length equ 0x0a\n");
+  fprintf(out, "value1 equ 0x0c\n");
+  fprintf(out, "value2 equ 0x0e\n");
+  fprintf(out, "value3 equ 0x10\n");
+  fprintf(out, "value4 equ 0x12\n");
 
   // text/color tables
   fprintf(out, "text_table equ 0x18\n");
@@ -151,6 +153,19 @@ int C64::open(const char *filename)
 
   // timer related
   fprintf(out, "timer_enable equ 0x75a\n");
+
+  // smooth scroll related
+  fprintf(out, "scroll_x equ 0x760\n");
+  fprintf(out, "scroll_y equ 0x762\n");
+  fprintf(out, "scroll_w equ 0x764\n");
+  fprintf(out, "scroll_x_fine equ 0x766\n");
+  fprintf(out, "scroll_y_fine equ 0x768\n");
+  fprintf(out, "scroll_frame equ 0x76a\n");
+  fprintf(out, "scroll_src_0 equ 0x76c\n");
+  fprintf(out, "scroll_src_1 equ 0x76e\n");
+  fprintf(out, "scroll_dest_0 equ 0x770\n");
+  fprintf(out, "scroll_dest_1 equ 0x772\n");
+  fprintf(out, "scroll_page equ 0x774\n");
 
   // basic loader
   fprintf(out, ".org 0x%04x\n", start_org);
@@ -191,6 +206,12 @@ int C64::open(const char *filename)
   // turn off ROM chips
   fprintf(out, "  lda #53\n");
   fprintf(out, "  sta 0x0001\n");
+
+  // reset scroll
+  fprintf(out, "  lda #3\n");
+  fprintf(out, "  sta scroll_frame\n");
+  fprintf(out, "  lda #0\n");
+  fprintf(out, "  sta scroll_page\n");
 
   // sprite interrupt
   fprintf(out, "  ldy #16\n");
@@ -741,6 +762,14 @@ int C64::c64_vic_textScrollDown()
 {
   need_c64_vic_text_scroll_down = 1;
   fprintf(out, "  jsr text_scroll_down\n");
+
+  return 0;
+}
+
+int C64::c64_vic_textSmoothScroll()
+{
+  need_c64_vic_text_smooth_scroll = 1;
+  fprintf(out, "  jsr text_smooth_scroll\n");
 
   return 0;
 }
@@ -1677,6 +1706,7 @@ void C64::insert_c64_vic_text_fill()
     "  inx\n"
     "  inx\n"
     "  inx\n"
+    "  inx\n"
     "  rts\n");
 }
 
@@ -1719,6 +1749,7 @@ void C64::insert_c64_vic_text_paint()
     "  sta address + 1\n"
     "  dec value1\n"
     "  bpl text_paint_loop_y\n"
+    "  inx\n"
     "  inx\n"
     "  inx\n"
     "  inx\n"
@@ -1894,6 +1925,145 @@ void C64::insert_c64_vic_text_scroll_down()
     "  dey\n"
     "  dey\n"
     "  bpl text_scroll_down_loop_y\n"
+    "  rts\n");
+}
+
+void C64::insert_c64_vic_text_smooth_scroll()
+{
+  fprintf(out, 
+    "text_smooth_scroll:\n"
+    "  lda scroll_frame\n"
+    "  cmp #3\n"
+    "  beq text_smooth_scroll_continue\n"
+    "  inx\n"
+    "  inx\n"
+    "  inx\n"
+    "  inx\n"
+    "  rts\n"
+    "text_smooth_scroll_continue:\n"
+    "  lda stack_lo + 3,x\n" // x
+    "  sta scroll_x + 0\n"
+    "  and #7\n"
+    "  sta scroll_x_fine\n"
+    "  sec\n"
+    "  lda #7\n"
+    "  sbc scroll_x_fine\n"
+    "  sta scroll_x_fine\n"
+
+    "  lda stack_hi + 3,x\n"
+    "  sta scroll_x + 1\n"
+
+    "  lsr scroll_x + 1\n" // divide by 8
+    "  ror scroll_x + 0\n"
+    "  lsr scroll_x + 1\n"
+    "  ror scroll_x + 0\n"
+    "  lsr scroll_x + 1\n"
+    "  ror scroll_x + 0\n"
+
+    "  lda stack_lo + 2,x\n" // y
+    "  sta scroll_y + 0\n"
+    "  and #7\n"
+    "  sta scroll_y_fine\n"
+    "  sec\n"
+    "  lda #7\n"
+    "  sbc scroll_y_fine\n"
+    "  sta scroll_y_fine\n"
+
+    "  lda stack_hi + 2,x\n"
+    "  sta scroll_y + 1\n"
+
+    "  lsr scroll_y + 1\n" // divide by 8
+    "  ror scroll_y + 0\n"
+    "  lsr scroll_y + 1\n"
+    "  ror scroll_y + 0\n"
+    "  lsr scroll_y + 1\n"
+    "  ror scroll_y + 0\n"
+
+    "  lda stack_lo + 1,x\n" // w
+    "  sta scroll_w + 0\n"
+    "  lda stack_hi + 1,x\n"
+    "  sta scroll_w + 1\n"
+
+    "  lda stack_lo + 4,x\n"
+    "  sta scroll_src_0 + 0\n"
+    "  lda stack_hi + 4,x\n"
+    "  sta scroll_src_0 + 1\n"
+
+    "  ldy scroll_y\n"
+    "text_smooth_scroll_loop_1:\n"
+    "  clc\n"
+    "  lda scroll_src_0 + 0\n"
+    "  adc scroll_w + 0\n"
+    "  sta scroll_src_0 + 0\n"
+    "  lda scroll_src_0 + 1\n"
+    "  adc scroll_w + 1\n"
+    "  sta scroll_src_0 + 1\n"
+    "  dey\n"
+    "  bpl text_smooth_scroll_loop_1\n"
+
+    "  clc\n"
+    "  lda scroll_src_0 + 0\n"
+    "  adc scroll_x + 0\n"
+    "  sta scroll_src_0 + 0\n"
+    "  lda scroll_src_0 + 1\n"
+    "  adc scroll_x + 1\n"
+    "  sta scroll_src_0 + 1\n"
+
+    "  lda scroll_src_0 + 0\n"
+    "  sta scroll_src_1 + 0\n"
+    "  lda scroll_src_0 + 1\n"
+    "  sta scroll_src_1 + 1\n"
+
+    "  ldy #11\n"
+    "text_smooth_scroll_loop_2:\n"
+    "  clc\n"
+    "  lda scroll_src_1 + 0\n"
+    "  adc scroll_w + 0\n"
+    "  sta scroll_src_1 + 0\n"
+    "  lda scroll_src_1 + 1\n"
+    "  adc scroll_w + 1\n"
+    "  sta scroll_src_1 + 1\n"
+    "  dey\n"
+    "  bpl text_smooth_scroll_loop_2\n"
+
+    "  lda scroll_page\n"
+    "  bne text_smooth_scroll_page_1\n"
+
+    "text_smooth_scroll_page_0:\n"
+    "  clc\n"
+    "  lda #0x00\n"
+    "  sta scroll_dest_0 + 0\n"
+    "  lda #0xc4\n"
+    "  sta scroll_dest_0 + 1\n"
+
+    "  lda #0xe0\n"
+    "  sta scroll_dest_1 + 0\n"
+    "  lda #0xc5\n"
+    "  sta scroll_dest_1 + 1\n"
+
+    "  jmp text_smooth_scroll_page_skip\n"
+
+    "text_smooth_scroll_page_1:\n"
+
+    "  lda #0x00\n"
+    "  sta scroll_dest_0 + 0\n"
+    "  lda #0xc0\n"
+    "  sta scroll_dest_0 + 1\n"
+
+    "  lda #0xe0\n"
+    "  sta scroll_dest_1 + 0\n"
+    "  lda #0xc1\n"
+    "  sta scroll_dest_1 + 1\n"
+
+    "text_smooth_scroll_page_skip:\n"
+
+    "  lda #2\n"
+    "  sta scroll_frame\n" // reset frame counter
+
+    "  inx\n"
+    "  inx\n"
+    "  inx\n"
+    "  inx\n"
     "  rts\n");
 }
 
@@ -2186,6 +2356,14 @@ void C64::insert_c64_sprite_interrupt()
     "  pha\n"
     "  tya\n"
     "  pha\n"
+    "  lda value1 + 0\n"
+    "  pha\n"
+    "  lda value1 + 1\n"
+    "  pha\n"
+    "  lda value2 + 0\n"
+    "  pha\n"
+    "  lda value2 + 1\n"
+    "  pha\n"
     "  lda sprite_pos_x + 0\n"
     "  sta 0xd000\n"
     "  lda sprite_pos_y + 0\n"
@@ -2222,8 +2400,111 @@ void C64::insert_c64_sprite_interrupt()
     "  lda sprite_pos_x_msb\n"
     "  sta 0xd010\n"
 
-    "  lda #0xff\n"
-    "  sta 0xd019\n"
+    "  lda scroll_frame\n"
+    "  bne scroll_flip_skip\n"
+
+    "  lda scroll_page\n"
+    "  eor #1\n"
+    "  sta scroll_page\n"
+    "  bne scroll_flip_1\n"
+    "scroll_flip_0:\n"
+    "  lda 0xd018\n"
+    "  and #15\n"
+    "  jmp scroll_flip_end\n"
+    "scroll_flip_1:\n"
+    "  lda 0xd018\n"
+    "  and #15\n"
+    "  ora #16\n"
+    "scroll_flip_end:\n"
+    "  sta 0xd018\n"
+
+    "  lda 0xd016\n"
+    "  and #0xf8\n"
+    "  ora scroll_x_fine\n"
+    "  sta 0xd016\n"
+
+    "  lda 0xd011\n"
+    "  and #0xf8\n"
+    "  ora scroll_y_fine\n"
+    "  sta 0xd011\n"
+
+    "  lda #3\n"
+    "  sta scroll_frame\n"
+    "  jmp scroll_skip\n"
+    "scroll_flip_skip:\n"
+    "  lda scroll_frame\n"
+    "  cmp #2\n"
+    "  bne scroll_1\n"
+
+    "scroll_0:\n"
+    "  lda scroll_src_0 + 0\n"
+    "  sta value1 + 0\n"
+    "  lda scroll_src_0 + 1\n"
+    "  sta value1 + 1\n"
+       
+    "  lda scroll_dest_0 + 0\n"
+    "  sta value2 + 0\n"
+    "  lda scroll_dest_0 + 1\n"
+    "  sta value2 + 1\n"
+
+    "  jmp scroll_start\n"
+
+    "scroll_1:\n"
+    "  lda scroll_frame\n"
+    "  cmp #1\n"
+    "  bne scroll_skip\n"
+
+    "  lda scroll_src_1 + 0\n"
+    "  sta value1 + 0\n"
+    "  lda scroll_src_1 + 1\n"
+    "  sta value1 + 1\n"
+       
+    "  lda scroll_dest_1 + 0\n"
+    "  sta value2 + 0\n"
+    "  lda scroll_dest_1 + 1\n"
+    "  sta value2 + 1\n"
+
+    "scroll_start:\n"
+    "  ldx #12\n" // row
+    "scroll_loop_0_y:\n"
+    "  ldy #39\n" // column
+    "scroll_loop_0_x:\n"
+    "  lda (value1),y\n"
+    "  sta (value2),y\n"
+    "  dey\n"
+    "  bpl scroll_loop_0_x\n"
+    "  clc\n"
+    "  lda value1 + 0\n"
+    "  adc scroll_w + 0\n"
+    "  sta value1 + 0\n"
+    "  lda value1 + 1\n"
+    "  adc scroll_w + 1\n"
+    "  sta value1 + 1\n"
+
+    "  clc\n"
+    "  lda value2 + 0\n"
+    "  adc #40\n"
+    "  sta value2 + 0\n"
+    "  lda value2 + 1\n"
+    "  adc #0\n"
+    "  sta value2 + 1\n"
+
+    "  dex\n"
+    "  bpl scroll_loop_0_y\n"
+
+    "  dec scroll_frame\n"
+
+    "scroll_skip:\n"
+    "  asl 0xd019\n"
+
+    "  pla\n"
+    "  sta value2 + 1\n"
+    "  pla\n"
+    "  sta value2 + 0\n"
+    "  pla\n"
+    "  sta value1 + 1\n"
+    "  pla\n"
+    "  sta value1 + 0\n"
     "  pla\n"
     "  tay\n"
     "  pla\n"

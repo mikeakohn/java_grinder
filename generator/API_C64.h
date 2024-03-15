@@ -92,6 +92,7 @@ public:
   virtual int c64_vic_textScrollRight() { return -1; }
   virtual int c64_vic_textScrollUp() { return -1; }
   virtual int c64_vic_textScrollDown() { return -1; }
+  virtual int c64_vic_textSmoothScroll() { return -1; }
   virtual int c64_vic_makeTextTable() { return -1; }
   virtual int c64_vic_makeColorTable() { return -1; }
   virtual int c64_vic_colorRamClear() { return -1; }
