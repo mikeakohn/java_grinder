@@ -54,7 +54,6 @@ public:
   virtual int c64_vic_sprite7pos();
   virtual int c64_vic_writeControl1();
   virtual int c64_vic_readControl1();
-  virtual int c64_vic_waitRaster();
   virtual int c64_vic_spriteEnable();
   virtual int c64_vic_writeControl2();
   virtual int c64_vic_readControl2();
@@ -102,7 +101,6 @@ public:
   virtual int c64_vic_textScrollRight();
   virtual int c64_vic_textScrollUp();
   virtual int c64_vic_textScrollDown();
-  virtual int c64_vic_textSmoothScroll();
   virtual int c64_vic_makeTextTable();
   virtual int c64_vic_makeColorTable();
   virtual int c64_vic_colorRamClear();
@@ -157,7 +155,6 @@ protected:
   bool need_c64_vic_text_scroll_right:1;
   bool need_c64_vic_text_scroll_up:1;
   bool need_c64_vic_text_scroll_down:1;
-  bool need_c64_vic_text_smooth_scroll:1;
   bool need_c64_vic_make_text_table:1;
   bool need_c64_vic_make_color_table:1;
   bool need_c64_vic_color_ram_clear:1;
@@ -184,7 +181,6 @@ protected:
   void insert_c64_vic_text_scroll_right();
   void insert_c64_vic_text_scroll_up();
   void insert_c64_vic_text_scroll_down();
-  void insert_c64_vic_text_smooth_scroll();
   void insert_c64_vic_make_text_table();
   void insert_c64_vic_make_color_table();
   void insert_c64_vic_color_ram_clear();

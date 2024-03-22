@@ -72,11 +72,6 @@ static int c64_vic_readControl1(JavaClass *java_class, Generator *generator)
   return generator->c64_vic_readControl1();
 }
 
-static int c64_vic_waitRaster(JavaClass *java_class, Generator *generator)
-{
-  return generator->c64_vic_waitRaster();
-}
-
 static int c64_vic_spriteEnable(JavaClass *java_class, Generator *generator)
 {
   return generator->c64_vic_spriteEnable();
@@ -307,11 +302,6 @@ static int c64_vic_textScrollDown(JavaClass *java_class, Generator *generator)
   return generator->c64_vic_textScrollDown();
 }
 
-static int c64_vic_textSmoothScroll(JavaClass *java_class, Generator *generator)
-{
-  return generator->c64_vic_textSmoothScroll();
-}
-
 static int c64_vic_makeTextTable(JavaClass *java_class, Generator *generator)
 {
   return generator->c64_vic_makeTextTable();
@@ -354,7 +344,6 @@ int c64_vic(JavaClass *java_class, Generator *generator, const char *function)
   CHECK_FUNC(sprite7pos)
   CHECK_FUNC(writeControl1)
   CHECK_FUNC(readControl1)
-  CHECK_FUNC(waitRaster)
   CHECK_FUNC(spriteEnable)
   CHECK_FUNC(writeControl2)
   CHECK_FUNC(readControl2)
@@ -401,7 +390,6 @@ int c64_vic(JavaClass *java_class, Generator *generator, const char *function)
   CHECK_FUNC(textScrollRight)
   CHECK_FUNC(textScrollUp)
   CHECK_FUNC(textScrollDown)
-  CHECK_FUNC(textSmoothScroll)
   CHECK_FUNC(makeTextTable)
   CHECK_FUNC(makeColorTable)
   CHECK_FUNC(colorRamClear)

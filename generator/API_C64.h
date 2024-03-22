@@ -45,7 +45,6 @@ public:
   virtual int c64_vic_sprite7pos() { return -1; }
   virtual int c64_vic_writeControl1() { return -1; }
   virtual int c64_vic_readControl1() { return -1; }
-  virtual int c64_vic_waitRaster() { return -1; }
   virtual int c64_vic_spriteEnable() { return -1; }
   virtual int c64_vic_writeControl2() { return -1; }
   virtual int c64_vic_readControl2() { return -1; }
@@ -92,7 +91,6 @@ public:
   virtual int c64_vic_textScrollRight() { return -1; }
   virtual int c64_vic_textScrollUp() { return -1; }
   virtual int c64_vic_textScrollDown() { return -1; }
-  virtual int c64_vic_textSmoothScroll() { return -1; }
   virtual int c64_vic_makeTextTable() { return -1; }
   virtual int c64_vic_makeColorTable() { return -1; }
   virtual int c64_vic_colorRamClear() { return -1; }
