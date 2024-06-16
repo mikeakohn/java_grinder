@@ -53,6 +53,12 @@ for note in song.split(","):
     l += note[0]
     note = note[1:]
 
+  dot = False
+
+  if "." in note:
+    dot = True
+    note = note.replace(".", "")
+
   if note[-1].isdigit():
     octave = note[-1]
     note = note[:-1]
@@ -63,16 +69,11 @@ for note in song.split(","):
 
   print(original + " " + note + " " + str(l) + " " + str(octave))
 
-  dot = False
-
-  if "." in note:
-    dot = True
-    note = note.replace(".", "")
-
   n = notes[note]
   if n != 0: n += (int(octave) - 4) * 12
 
   length = int(2000 / int(l))
+  #length = int(4000 / int(l))
   if dot: length = int(length + (length / 2))
 
   b.append(n)
