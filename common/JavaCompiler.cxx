@@ -1169,7 +1169,7 @@ int JavaCompiler::compile_method(
         {
           ret = array_load(java_class, stack.pop(), ARRAY_TYPE_LONG);
         }
-        break;
+
         break;
 
       case 48: // faload (0x30)
