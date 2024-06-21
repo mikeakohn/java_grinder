@@ -589,8 +589,7 @@ int M6502::and_integer()
 
 int M6502::and_integer(int const_val)
 {
-  fprintf(out, "; and_integer (const_val)");
-  fprintf(out, "  inx\n");
+  fprintf(out, "; and_integer (const_val)\n");
   fprintf(out, "  lda #%d\n", const_val & 0xff);
   fprintf(out, "  and stack_lo + 1,x\n");
   fprintf(out, "  sta stack_lo + 1,x\n");
@@ -612,8 +611,7 @@ int M6502::or_integer()
 
 int M6502::or_integer(int const_val)
 {
-  fprintf(out, "; or_integer (const_val)");
-  fprintf(out, "  inx\n");
+  fprintf(out, "; or_integer (const_val)\n");
   fprintf(out, "  lda #%d\n", const_val & 0xff);
   fprintf(out, "  ora stack_lo + 1,x\n");
   fprintf(out, "  sta stack_lo + 1,x\n");
@@ -635,8 +633,7 @@ int M6502::xor_integer()
 
 int M6502::xor_integer(int const_val)
 {
-  fprintf(out, "; xor_integer (const_val)");
-  fprintf(out, "  inx\n");
+  fprintf(out, "; xor_integer (const_val)\n");
   fprintf(out, "  lda #%d\n", const_val & 0xff);
   fprintf(out, "  eor stack_lo + 1,x\n");
   fprintf(out, "  sta stack_lo + 1,x\n");
