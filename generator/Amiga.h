@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2026 by Michael Kohn
  *
  */
 
@@ -31,7 +31,7 @@ public:
   virtual int push_ref_static(std::string &name, int index);
   virtual int put_static(std::string &name, int index);
   virtual int get_static(std::string &name, int index);
-  virtual int push_ref(std::string &name);
+  virtual int push_ref(std::string &name, int index);
   virtual int new_object(std::string &object_name, int field_count);
   virtual int amiga_disableMultitasking();
   virtual int amiga_enableMultitasking();

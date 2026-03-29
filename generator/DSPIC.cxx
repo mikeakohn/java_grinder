@@ -5,7 +5,7 @@
  *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2023 by Michael Kohn
+ * Copyright 2014-2026 by Michael Kohn
  *
  */
 
@@ -44,20 +44,24 @@ static const char *cond_str[] = { "z", "nz", "lt", "le", "gt", "ge" };
 static int8_t stack_regs[] = { 5, 4, 11, 2, 3, 8, 9, 10 };
 
 DSPIC::DSPIC(uint8_t chip_type) :
-  reg(0),
-  reg_max(sizeof(stack_regs)),
-  stack(0),
-  is_main(false),
-  need_stack_set(false),
-  need_tables(false)
+  reg            (0),
+  reg_max        (sizeof(stack_regs)),
+  stack          (0),
+  is_main        (false),
+  need_stack_set (false),
+  need_tables    (false)
 {
   this->chip_type = chip_type;
 }
 
 DSPIC::~DSPIC()
 {
-  fprintf(out, ".org __FICD\n");
-  fprintf(out, "  dc32 0xffcf\n\n");
+  // FIXME: probably need to set up config for this chip too.
+  if (chip_type != P33CK64MC105)
+  {
+    fprintf(out, ".org __FICD\n");
+    fprintf(out, "  dc32 0xffcf\n\n");
+  }
 }
 
 int DSPIC::open(const char *filename)
@@ -69,14 +73,19 @@ int DSPIC::open(const char *filename)
 
   switch(chip_type)
   {
-    case DSPIC30F3012:
+    case P30F3012:
       fprintf(out, ".include \"p30f3012.inc\"\n\n");
       //flash_start = 0x100;
       break;
-    case DSPIC33FJ06GS101A:
+    case P33FJ06GS101A:
       fprintf(out, ".include \"p33fj06gs101a.inc\"\n\n");
       //flash_start = 0x100;
       need_stack_set = true;
+      break;
+    case P33CK64MC105:
+      fprintf(out, ".include \"p33ck64mc105.inc\"\n\n");
+      //flash_start = 0x200;
+      //need_stack_set = true;
       break;
     default:
       printf("Unknown chip type.\n");
@@ -99,7 +108,9 @@ int DSPIC::start_init()
   // Also, not sure what to do with SPLIM.
   fprintf(out, ".org __CODE_BASE\n");
   fprintf(out, "start:\n");
+
   if (need_stack_set) { fprintf(out, "  mov #__DATA_BASE, SP\n\n"); }
+
   if (need_tables)
   {
     fprintf(out, "  ;; For reading out of flash, need table instructions\n");
@@ -486,9 +497,8 @@ int DSPIC::xor_integer()
 
 int DSPIC::inc_integer(int index, int num)
 {
-//int8_t n = (int8_t)num;
-
   fprintf(out, "  mov [w14+%d], w0\n", LOCALS(index));
+
   if (num >= 0)
   {
     fprintf(out, "  add #%d, w0\n", num);
@@ -603,7 +613,7 @@ int DSPIC::return_integer(int local_count)
   {
     fprintf(out, "  mov [sp-2], w0\n");
   }
-    else 
+    else
   {
     fprintf(out, "  mov w%d, w0\n", REG_STACK(reg - 1));
   }
@@ -798,12 +808,14 @@ int DSPIC::push_array_length(std::string &name, int field_id)
 
 int DSPIC::array_read_byte()
 {
-int index_reg;
-int ref_reg;
+  int index_reg;
+  int ref_reg;
 
   get_values_from_stack(&index_reg, &ref_reg);
+
   fprintf(out, "  sl w%d\n", index_reg);
   fprintf(out, "  add w%d, w%d\n", index_reg, ref_reg);
+
   if (reg < reg_max)
   {
     fprintf(out, "  mov.b [w%d], w%d\n", ref_reg, REG_STACK(reg));
@@ -820,8 +832,8 @@ int ref_reg;
 
 int DSPIC::array_read_short()
 {
-int index_reg;
-int ref_reg;
+  int index_reg;
+  int ref_reg;
 
   get_values_from_stack(&index_reg, &ref_reg);
   fprintf(out, "  sl w%d\n", index_reg);
@@ -895,9 +907,9 @@ int DSPIC::array_read_int(std::string &name, int field_id)
 
 int DSPIC::array_write_byte()
 {
-int value_reg;
-int index_reg;
-int ref_reg;
+  int value_reg;
+  int index_reg;
+  int ref_reg;
 
   get_values_from_stack(&value_reg, &index_reg, &ref_reg);
   fprintf(out, "  sl w%d\n", index_reg);
@@ -909,9 +921,9 @@ int ref_reg;
 
 int DSPIC::array_write_short()
 {
-int value_reg;
-int index_reg;
-int ref_reg;
+  int value_reg;
+  int index_reg;
+  int ref_reg;
 
   get_values_from_stack(&value_reg, &index_reg, &ref_reg);
   fprintf(out, "  sl w%d\n", index_reg);
@@ -1144,16 +1156,111 @@ int DSPIC::ioport_getPortInputValue(int port)
   return -1;
 }
 
+int DSPIC::uart_init_I(int port)
+{
+  uart_init_I(port, 2);
+
+  return 0;
+}
+
+int DSPIC::uart_init_I(int port, int baud_rate)
+{
+  fprintf(out,
+    "  ;; uart_init_I(%d, %d)\n"
+    "  clr w0\n"
+    "  mov.w wreg, U1MODEH\n"
+    "  mov.w wreg, U1STA\n"
+    "  mov.w wreg, U1STAH\n\n"
+    "  mov #25, w0\n"
+    "  mov.w wreg, U1BRG\n\n"
+    "  mov #(1 << UARTEN) | (1 << UTXEN) | (1 << URXEN), w0\n"
+    "  mov.w wreg, U1MODE\n",
+    port,
+    baud_rate);
+
+  // FIXME: This is hardcoded for the P33CK64MC105 port 1.
+  if (chip_type == P33CK64MC105 && port == 1)
+  {
+    fprintf(out,
+      "  mov #1, w0\n"
+      "  mov.w wreg, RPOR13\n"
+      "  mov #59, w0\n"
+      "  mov.w wreg, RPINR18\n\n");
+  }
+
+  return 0;
+}
+
+int DSPIC::uart_send_I(int port)
+{
+  fprintf(out,
+    "  ;; uart_send_I(%d)\n"
+    "  mov.w w%d, w0\n"
+    "  mov.w wreg, U1TXREG\n",
+    port,
+    REG_STACK(reg-1));
+
+  reg--;
+
+  return 0;
+}
+
+int DSPIC::uart_read(int port)
+{
+  fprintf(out,
+    "  ;; uart_read(%d)\n"
+    "  mov.w U1RXREG, wreg\n"
+    "  mov.w w0, w%d\n",
+    port,
+    REG_STACK(reg));
+
+  reg++;
+
+  return 0;
+}
+
+int DSPIC::uart_isDataAvailable(int port)
+{
+  fprintf(out,
+    "  ;; uart_isDataAvailable(%d)\n"
+    "  mov #0, w%d\n"
+    "  btss U1STAH, #URXBE\n"
+    "  mov #1, w%d\n",
+    port,
+    REG_STACK(reg),
+    REG_STACK(reg));
+
+  reg++;
+
+  return 0;
+}
+
+int DSPIC::uart_isSendReady(int port)
+{
+  fprintf(out,
+    "  ;; uart_isSendReady(%d)\n"
+    "  mov #0, w%d\n"
+    "  btss U1STAH, #UTXBF\n"
+    "  mov #1, w%d\n",
+    port,
+    REG_STACK(reg),
+    REG_STACK(reg));
+
+  reg++;
+
+  return -1;
+}
+
 // SPI functions
 int DSPIC::spi_init_II(int port)
 {
-char dst[16];
+  char dst[16];
 
   if (port != 0) { return -1; }
 
   fprintf(out, "  ;; Set up SPI\n");
   // This chip needs the RP pins set.
-  if (chip_type == DSPIC33FJ06GS101A)
+  if (chip_type == P33FJ06GS101A)
   {
     fprintf(out, "  ; SDI is on RP2\n");
     fprintf(out, "  mov #SDI1R2, w0\n");
@@ -1171,6 +1278,7 @@ char dst[16];
   fprintf(out, "  mov #(1<<MSTEN), w0\n");
   fprintf(out, "  mov w0, SPI1CON1\n");
   pop_reg(dst);
+
   if (strcmp(dst, "w0") == 0)
   {
     fprintf(out, "  mov w0, w13\n");
@@ -1222,7 +1330,7 @@ int DSPIC::spi_init_II(int port, int clock_divisor, int mode)
 
   fprintf(out, "  ;; Set up SPI\n");
   // This chip needs the RP pins set.
-  if (chip_type == DSPIC33FJ06GS101A)
+  if (chip_type == P33FJ06GS101A)
   {
     fprintf(out, "  ; SDI is on RP2\n");
     fprintf(out, "  mov #SDI1R2, w0\n");

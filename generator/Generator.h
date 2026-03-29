@@ -5,7 +5,7 @@
  *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2023 by Michael Kohn
+ * Copyright 2014-2026 by Michael Kohn
  *
  */
 
@@ -260,14 +260,14 @@ enum
 // This is redundant
 enum
 {
-  TYPE_BOOLEAN=4,
-  TYPE_CHAR=5,
-  TYPE_FLOAT=6,
-  TYPE_DOUBLE=7,
-  TYPE_BYTE=8,
-  TYPE_SHORT=9,
-  TYPE_INT=10,
-  TYPE_LONG=11,
+  TYPE_BOOLEAN = 4,
+  TYPE_CHAR    = 5,
+  TYPE_FLOAT   = 6,
+  TYPE_DOUBLE  = 7,
+  TYPE_BYTE    = 8,
+  TYPE_SHORT   = 9,
+  TYPE_INT     = 10,
+  TYPE_LONG    = 11,
 };
 
 #endif

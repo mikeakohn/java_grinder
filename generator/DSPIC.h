@@ -5,7 +5,7 @@
  *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2023 by Michael Kohn
+ * Copyright 2014-2026 by Michael Kohn
  *
  */
 
@@ -13,12 +13,6 @@
 #define JAVA_GRINDER_GENERATOR_DSPIC_H
 
 #include "generator/Generator.h"
-
-enum
-{
-  DSPIC30F3012,
-  DSPIC33FJ06GS101A,
-};
 
 class DSPIC : public Generator
 {
@@ -102,7 +96,7 @@ public:
   virtual int array_write_int(std::string &name, int field_id);
   //virtual void close();
 
-  // GPIO functions
+  // GPIO methods.
   virtual int ioport_setPinsAsInput_I(int port);
   virtual int ioport_setPinsAsInput_I(int port, int const_val);
   virtual int ioport_setPinsAsOutput_I(int port);
@@ -124,7 +118,15 @@ public:
   virtual int ioport_getPortInputValue(int port);
   //virtual int ioport_setPortOutputValue_I(int port);
 
-  // SPI functions
+  // UART methods.
+  virtual int uart_init_I(int port);
+  virtual int uart_init_I(int port, int baud_rate);
+  virtual int uart_send_I(int port);
+  virtual int uart_read(int port);
+  virtual int uart_isDataAvailable(int port);
+  virtual int uart_isSendReady(int port);
+
+  // SPI methods..
   virtual int spi_init_II(int port);
   virtual int spi_init_II(int port, int clock_divisor, int mode);
   virtual int spi_init16_II(int port);
@@ -138,7 +140,7 @@ public:
   virtual int spi_disable(int port);
   virtual int spi_enable(int port);
 
-  // CPU functions
+  // CPU methods.
   virtual int cpu_setClock16();
   virtual int cpu_nop();
 
@@ -185,6 +187,13 @@ public:
   //virtual int dsp_euclideanDistanceAndAddToB();
   virtual int dsp_shiftA();
   virtual int dsp_shiftB();
+
+  enum
+  {
+    P30F3012,
+    P33FJ06GS101A,
+    P33CK64MC105,
+  };
 
 protected:
   virtual int get_int_size() { return 2; }

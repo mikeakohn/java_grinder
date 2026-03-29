@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2026 by Michael Kohn
  *
  */
 
@@ -23,7 +23,7 @@
 // NOTE: a3 points to Amiga hardware registers.
 
 Amiga::Amiga() :
-  need_set_sprite_position(false)
+  need_set_sprite_position (false)
 {
   //start_org = 0x8000;
 }
@@ -248,7 +248,7 @@ int Amiga::get_static(std::string &name, int index)
   return 0;
 }
 
-int Amiga::push_ref(std::string &name)
+int Amiga::push_ref(std::string &name, int index)
 {
   fprintf(out,
     "  ;; push_ref(%s)\n"

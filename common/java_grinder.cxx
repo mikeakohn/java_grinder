@@ -145,12 +145,17 @@ static Generator *new_generator(const char *chip_type)
     else
   if (strcasecmp("dspic30f3012", chip_type) == 0)
   {
-    generator = new DSPIC(DSPIC30F3012);
+    generator = new DSPIC(DSPIC::P30F3012);
   }
     else
   if (strcasecmp("dspic33fj06gs101a", chip_type) == 0)
   {
-    generator = new DSPIC(DSPIC33FJ06GS101A);
+    generator = new DSPIC(DSPIC::P33FJ06GS101A);
+  }
+    else
+  if (strcasecmp("dspic33ck64mc105", chip_type) == 0)
+  {
+    generator = new DSPIC(DSPIC::P33CK64MC105);
   }
     else
   if (strcasecmp("epiphany", chip_type) == 0)
