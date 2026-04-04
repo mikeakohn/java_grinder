@@ -2,10 +2,10 @@
  *  Java Grinder
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2026 by Michael Kohn
  *
  */
 
@@ -44,18 +44,26 @@ int timer(JavaClass *java_class, Generator *generator, const char *function)
   return -1;
 }
 
-int timer(JavaClass *java_class, Generator *generator, const char *function, int const_val)
+int timer(
+  JavaClass *java_class,
+  Generator *generator,
+  const char *function,
+  int const_val)
 {
   CHECK_FUNC_CONST_1(setListener,_Z)
   CHECK_FUNC_CONST_1(setValue,_I)
   return -1;
 }
 
-int timer(JavaClass *java_class, Generator *generator, const char *function, int const_val1, int const_val2)
+int timer(
+  JavaClass *java_class,
+  Generator *generator,
+  const char *function,
+  int const_val1,
+  int const_val2)
 {
   CHECK_FUNC_CONST_2(setInterval,_II)
+
   return -1;
 }
-
-
 

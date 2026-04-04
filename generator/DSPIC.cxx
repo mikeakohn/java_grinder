@@ -44,23 +44,40 @@ static const char *cond_str[] = { "z", "nz", "lt", "le", "gt", "ge" };
 static int8_t stack_regs[] = { 5, 4, 11, 2, 3, 8, 9, 10 };
 
 DSPIC::DSPIC(uint8_t chip_type) :
-  reg            (0),
-  reg_max        (sizeof(stack_regs)),
-  stack          (0),
-  is_main        (false),
-  need_stack_set (false),
-  need_tables    (false)
+  reg                  (0),
+  reg_max              (sizeof(stack_regs)),
+  stack                (0),
+  is_main              (false),
+  is_interrupt         (false),
+  need_stack_set       (false),
+  need_tables          (false),
+  need_timer_interrupt (false)
 {
   this->chip_type = chip_type;
 }
 
 DSPIC::~DSPIC()
 {
-  // FIXME: probably need to set up config for this chip too.
-  if (chip_type != P33CK64MC105)
+  if (need_timer_interrupt)
   {
-    fprintf(out, ".org __FICD\n");
-    fprintf(out, "  dc32 0xffcf\n\n");
+    fprintf(out,
+      ".org __T1Interrupt\n"
+      "  .dc32 timerInterrupt\n\n");
+  }
+
+  if (chip_type == P33CK64MC105)
+  {
+    fprintf(out,
+      ".org __FOSCSEL\n"
+      "  .dc32 FNOSC_FRC\n"
+      ".org __FOSC\n"
+       "  .dc32 FCKSM_CSECMD & OSCIOFNC_ON\n\n");
+  }
+    else
+  {
+    fprintf(out,
+      ".org __FICD\n"
+      "  .dc32 0xffcf\n\n");
   }
 }
 
@@ -85,15 +102,16 @@ int DSPIC::open(const char *filename)
     case P33CK64MC105:
       fprintf(out, ".include \"p33ck64mc105.inc\"\n\n");
       //flash_start = 0x200;
-      //need_stack_set = true;
+      need_stack_set = true;
       break;
     default:
       printf("Unknown chip type.\n");
+      break;
   }
 
   // Set where RAM starts / ends
   fprintf(out, "ram_start equ __DATA_BASE\n");
-  fprintf(out, "ram_end equ __DATA_BASE+__DATA_LENGTH\n");
+  fprintf(out, "ram_end   equ __DATA_BASE+__DATA_LENGTH\n");
 
   return 0;
 }
@@ -109,7 +127,17 @@ int DSPIC::start_init()
   fprintf(out, ".org __CODE_BASE\n");
   fprintf(out, "start:\n");
 
-  if (need_stack_set) { fprintf(out, "  mov #__DATA_BASE, SP\n\n"); }
+  if (need_stack_set)
+  {
+    //fprintf(out, "  mov #__DATA_BASE, SP\n\n");
+    //fprintf(out, "  mov #__SP_init, SP\n\n");
+    //fprintf(out, "  __SPLIM_init, w0\n");
+    //fprintf(out, "  mov w0, SPLIM\n");
+    fprintf(out,
+      "  mov #ram_start, SP\n"
+      "  mov #ram_end, w0\n"
+      "  mov w0, SPLIM\n\n");
+  }
 
   if (need_tables)
   {
@@ -144,22 +172,39 @@ int DSPIC::init_heap(int field_count)
 int DSPIC::field_init_int(std::string &name, int index, int value)
 {
   if (value < -32768 || value > 65535) { return -1; }
+
+  bool need_clear = true;
+
   if (value == 0)
   {
-    fprintf(out, "  clr %s\n", name.c_str());
+    //fprintf(out, "  clr %s\n", name.c_str());
+
+    if (need_clear)
+    {
+      fprintf(out, "  mov #0, w0\n");
+      need_clear = false;
+    }
+
+    fprintf(out, "  mov w0, %s\n", name.c_str());
   }
     else
   {
     fprintf(out, "  mov #%d, w0\n", value);
     fprintf(out, "  mov w0, %s\n", name.c_str());
   }
+
   return 0;
 }
 
 int DSPIC::field_init_ref(std::string &name, int index)
 {
-  fprintf(out, "  mov #_%s, w0\n", name.c_str());
-  fprintf(out, "  mov w0, %s\n", name.c_str());
+  fprintf(out,
+    "  ;; field_init_ref(%s, %d)\n"
+    "  mov #_%s, w0\n"
+    "  mov w0, %s\n",
+    name.c_str(), index,
+    name.c_str(),
+    name.c_str());
   return 0;
 }
 
@@ -173,9 +218,19 @@ void DSPIC::method_start(
   stack = 0;
 
   is_main = name == "main";
+  is_interrupt = name == "timerInterrupt";
 
-  // main() function goes here
+  // main() function goes here.
   fprintf(out, "%s:\n", name.c_str());
+
+  if (is_interrupt)
+  {
+    // Interrupts need to push all the registers.
+    for (int n = 0; n < 14; n++)
+    {
+      fprintf(out, "  push w%d\n", n);
+    }
+  }
 
   if (!is_main)
   {
@@ -200,17 +255,15 @@ void DSPIC::method_end(int local_count)
 
 int DSPIC::push_local_var_int(int index)
 {
+  fprintf(out, "  ;; push_local_var_int(%d)\n", index);
+
   if (reg < reg_max)
   {
-    //fprintf(out, "  mov [w14+%d], w0\n", LOCALS(index));
-    //fprintf(out, "  mov w0, w%d\n", REG_STACK(reg));
     fprintf(out, "  mov [w14+%d], w%d\n", LOCALS(index), REG_STACK(reg));
     reg++;
   }
     else
   {
-    //fprintf(out, "  mov [w14+%d], w0\n", LOCALS(index));
-    //fprintf(out, "  push w0\n");
     fprintf(out, "  push [w14+%d]\n", LOCALS(index));
     stack++;
   }
@@ -225,7 +278,21 @@ int DSPIC::push_local_var_ref(int index)
 
 int DSPIC::push_ref_static(std::string &name, int index)
 {
-  return -1;
+  fprintf(out, "  ;; push_ref_static(%s, %d)\n", name.c_str(), index);
+
+  if (reg < reg_max)
+  {
+    fprintf(out, "  mov #_%s, w%d\n", name.c_str(), REG_STACK(reg));
+    reg++;
+  }
+    else
+  {
+    fprintf(out, "  mov #_%s, w0\n", name.c_str());
+    fprintf(out, "  push wreg\n");
+    stack++;
+  }
+
+  return 0;
 }
 
 int DSPIC::push_fake()
@@ -237,6 +304,8 @@ int DSPIC::push_fake()
 
 int DSPIC::push_int(int32_t n)
 {
+  fprintf(out, "  ;; push_int(%d)\n", n);
+
   if (n > 65535 || n < -32768)
   {
     printf("Error: literal value %d bigger than 16 bit.\n", n);
@@ -279,6 +348,8 @@ int DSPIC::push_double(double f)
 
 int DSPIC::push_ref(std::string &name, int index)
 {
+  fprintf(out, "  ;; push_ref(%s, %d)\n", name.c_str(), index);
+
   if (reg < reg_max)
   {
     fprintf(out, "  mov #%s, w0\n", name.c_str());
@@ -296,6 +367,8 @@ int DSPIC::push_ref(std::string &name, int index)
 
 int DSPIC::pop_local_var_int(int index)
 {
+  fprintf(out, "  ;; pop_local_var_int(%d)\n", index);
+
   if (stack > 0)
   {
     fprintf(out, "  pop w0\n");
@@ -319,6 +392,8 @@ int DSPIC::pop_local_var_ref(int index)
 
 int DSPIC::pop()
 {
+  fprintf(out, "  ;; pop()\n");
+
   if (stack > 0)
   {
     fprintf(out, "  pop w0\n");
@@ -335,6 +410,8 @@ int DSPIC::pop()
 
 int DSPIC::dup()
 {
+  fprintf(out, "  ;; dup()\n");
+
   if (stack > 0)
   {
     fprintf(out, "  push [SP]\n");
@@ -363,6 +440,8 @@ int DSPIC::dup2()
 
 int DSPIC::swap()
 {
+  fprintf(out, "  ;; swap()\n");
+
   if (stack == 0)
   {
     fprintf(out, "  mov.w w%d, w0\n", REG_STACK(reg-1));
@@ -389,32 +468,57 @@ int DSPIC::swap()
 
 int DSPIC::add_integer()
 {
+  fprintf(out, "  ;; add_integer()\n");
+
   return stack_alu("add");
 }
 
 int DSPIC::sub_integer()
 {
+  fprintf(out, "  ;; sub_integer()\n");
+
   return stack_alu("sub");
 }
 
 int DSPIC::mul_integer()
 {
-  return stack_alu("mul");
+  fprintf(out, "  ;; mul_integer()\n");
+
+  fprintf(out,
+    "  mul.ss w%d, w%d, w0\n"
+    "  mov w0, w%d\n",
+    REG_STACK(reg-2),
+    REG_STACK(reg-1),
+    REG_STACK(reg-2));
+
+  reg--;
+
+  return 0;
 }
 
 int DSPIC::div_integer()
 {
+  fprintf(out, "  ;; div_integer()\n");
+
   stack_alu_div();
 
   // Result of divide is in w0
-  if (stack > 0) { fprintf(out, "  mov.w w0, [SP-2]\n"); }
-  else { fprintf(out, "  mov.w w0, w%d\n", REG_STACK(reg-1)); }
+  if (stack > 0)
+  {
+    fprintf(out, "  mov.w w0, [SP-2]\n");
+  }
+    else
+  {
+    fprintf(out, "  mov.w w0, w%d\n", REG_STACK(reg-1));
+  }
 
   return 0;
 }
 
 int DSPIC::mod_integer()
 {
+  fprintf(out, "  ;; mod_integer()\n");
+
   stack_alu_div();
 
   // Remainder of divide is in w1
@@ -426,6 +530,8 @@ int DSPIC::mod_integer()
 
 int DSPIC::neg_integer()
 {
+  fprintf(out, "  ;; neg_integer()\n");
+
   if (stack > 0)
   {
     fprintf(out, "  mov.w [SP-2], w0\n");
@@ -443,11 +549,15 @@ int DSPIC::neg_integer()
 
 int DSPIC::shift_left_integer()
 {
+  fprintf(out, "  ;; shift_left_integer()\n");
+
   return stack_shift("sl");
 }
 
 int DSPIC::shift_left_integer(int count)
 {
+  fprintf(out, "  ;; shift_left_integer(%d)\n", count);
+
   if (stack == 0) { return -1; }
   fprintf(out, "  sl w%d, #%d, w%d\n", REG_STACK(reg-1), count, REG_STACK(reg-1));
 
@@ -456,11 +566,15 @@ int DSPIC::shift_left_integer(int count)
 
 int DSPIC::shift_right_integer()
 {
+  fprintf(out, "  ;; shift_right_integer()\n");
+
   return stack_shift("asr");
 }
 
 int DSPIC::shift_right_integer(int count)
 {
+  fprintf(out, "  ;; shift_right_integer(%d)\n", count);
+
   if (stack == 0) { return -1; }
   fprintf(out, "  asr w%d, #%d, w%d\n", REG_STACK(reg-1), count, REG_STACK(reg-1));
 
@@ -469,11 +583,15 @@ int DSPIC::shift_right_integer(int count)
 
 int DSPIC::shift_right_uinteger()
 {
+  fprintf(out, "  ;; shift_right_uinteger()\n");
+
   return stack_shift("lsr");
 }
 
 int DSPIC::shift_right_uinteger(int count)
 {
+  fprintf(out, "  ;; shift_right_uinteger(%d)\n", count);
+
   if (stack == 0) { return -1; }
   fprintf(out, "  lsr w%d, #%d, w%d\n", REG_STACK(reg-1), count, REG_STACK(reg-1));
 
@@ -497,6 +615,8 @@ int DSPIC::xor_integer()
 
 int DSPIC::inc_integer(int index, int num)
 {
+  fprintf(out, "  ;; inc_integer()\n");
+
   fprintf(out, "  mov [w14+%d], w0\n", LOCALS(index));
 
   if (num >= 0)
@@ -515,15 +635,17 @@ int DSPIC::inc_integer(int index, int num)
 
 int DSPIC::integer_to_byte()
 {
+  fprintf(out, "  ;; integer_to_byte()\n");
+
   if (stack == 0)
+  {
+    fprintf(out, "  se w%d, w%d\n", REG_STACK(reg-1), REG_STACK(reg-1));
+  }
+    else
   {
     fprintf(out, "  pop w0\n");
     fprintf(out, "  se w0, w0\n");
     fprintf(out, "  push w0\n");
-  }
-    else
-  {
-    fprintf(out, "  se w%d, w%d\n", REG_STACK(reg-1), REG_STACK(reg-1));
   }
 
   return 0;
@@ -531,12 +653,16 @@ int DSPIC::integer_to_byte()
 
 int DSPIC::integer_to_short()
 {
-  // I think we do nothing here.  On dsPIC, integers are already 16 bit.
+  fprintf(out, "  ;; integer_to_short()\n");
+
+  // I think do nothing here. On dsPIC, integers are already 16 bit.
   return 0;
 }
 
 int DSPIC::jump_cond(std::string &label, int cond, int distance)
 {
+  fprintf(out, "  ;; jump_cond(%s, %d, %d)\n", label.c_str(), cond, distance);
+
   if (stack > 0)
   {
     //fprintf(out, "  mov [SP-2], w0\n");
@@ -556,6 +682,11 @@ int DSPIC::jump_cond(std::string &label, int cond, int distance)
 
 int DSPIC::jump_cond_integer(std::string &label, int cond, int distance)
 {
+  fprintf(out, "  ;; jump_cond_integer(%s, %d, %d)\n",
+    label.c_str(),
+    cond,
+    distance);
+
   if (stack > 1)
   {
     fprintf(out, "  mov [SP-2], w0\n");
@@ -609,6 +740,8 @@ int DSPIC::return_local(int index, int local_count)
 
 int DSPIC::return_integer(int local_count)
 {
+  fprintf(out, "  ;; return_integer(%d)\n", local_count);
+
   if (stack > 0)
   {
     fprintf(out, "  mov [sp-2], w0\n");
@@ -629,6 +762,23 @@ int DSPIC::return_void(int local_count)
 {
   //fprintf(out, "  mov w14, sp\n");
   //if (!is_main) { fprintf(out, "  pop w14\n"); }
+
+  if (is_interrupt)
+  {
+    if (local_count != 0) { fprintf(out, "  ulnk\n"); }
+
+    for (int n = 13; n >= 0; n--)
+    {
+      fprintf(out, "  pop w%d\n", n);
+    }
+
+    fprintf(out,
+      "  bclr IFS0, #T1IF\n"
+      "  retfie\n");
+
+    return 0;
+  }
+
   if (local_count != 0) { fprintf(out, "  ulnk\n"); }
   fprintf(out, "  return\n");
 
@@ -728,7 +878,17 @@ int DSPIC::invoke_static_method(const char *name, int params, int is_void)
 
 int DSPIC::put_static(std::string &name, int index)
 {
-  return -1;
+  fprintf(out,
+    "  ;; put_static(%s, %d)\n"
+    "  mov w%d, %s\n",
+    name.c_str(),
+    index,
+    REG_STACK(reg - 1),
+    name.c_str());
+
+  reg -= 1;
+
+  return 0;
 }
 
 int DSPIC::get_static(std::string &name, int index)
@@ -811,10 +971,12 @@ int DSPIC::array_read_byte()
   int index_reg;
   int ref_reg;
 
+  fprintf(out, "  ;; array_read_byte()\n");
+
   get_values_from_stack(&index_reg, &ref_reg);
 
-  fprintf(out, "  sl w%d\n", index_reg);
-  fprintf(out, "  add w%d, w%d\n", index_reg, ref_reg);
+  //fprintf(out, "  sl w%d, w%d\n", index_reg, index_reg);
+  fprintf(out, "  add w%d, w%d, w%d\n", index_reg, ref_reg, ref_reg);
 
   if (reg < reg_max)
   {
@@ -835,9 +997,12 @@ int DSPIC::array_read_short()
   int index_reg;
   int ref_reg;
 
+  fprintf(out, "  ;; array_read_short()\n");
+
   get_values_from_stack(&index_reg, &ref_reg);
-  fprintf(out, "  sl w%d\n", index_reg);
-  fprintf(out, "  add w%d, w%d\n", index_reg, ref_reg);
+  fprintf(out, "  sl w%d, w%d\n", index_reg, index_reg);
+  fprintf(out, "  add w%d, w%d, w%d\n", index_reg, ref_reg, ref_reg);
+
   if (reg < reg_max)
   {
     fprintf(out, "  mov [w%d], w%d\n", ref_reg, REG_STACK(reg));
@@ -859,7 +1024,11 @@ int DSPIC::array_read_int()
 
 int DSPIC::array_read_byte(std::string &name, int field_id)
 {
-  fprintf(out, "  mov %s, w6\n", name.c_str());
+  fprintf(out,
+    "  ;; array_read_byte(%s, %d)\n"
+    "  mov %s, w6\n",
+    name.c_str(), field_id,
+    name.c_str());
 
   if (stack > 0)
   {
@@ -881,7 +1050,11 @@ int DSPIC::array_read_byte(std::string &name, int field_id)
 
 int DSPIC::array_read_short(std::string &name, int field_id)
 {
-  fprintf(out, "  mov %s, w6\n", name.c_str());
+  fprintf(out,
+    "  ;; array_read_short(%s, %d)\n"
+    "  mov %s, w6\n",
+    name.c_str(), field_id,
+    name.c_str());
 
   if (stack > 0)
   {
@@ -911,8 +1084,10 @@ int DSPIC::array_write_byte()
   int index_reg;
   int ref_reg;
 
+  fprintf(out, "  ;; array_write_byte()\n");
+
   get_values_from_stack(&value_reg, &index_reg, &ref_reg);
-  fprintf(out, "  sl w%d\n", index_reg);
+  //fprintf(out, "  sl w%d, #1, w%d\n", index_reg, index_reg);
   fprintf(out, "  add w%d, w%d, w%d\n", index_reg, ref_reg, ref_reg);
   fprintf(out, "  mov.b w%d, [w%d]\n", value_reg, ref_reg);
 
@@ -925,8 +1100,10 @@ int DSPIC::array_write_short()
   int index_reg;
   int ref_reg;
 
+  fprintf(out, "  ;; array_write_short()\n");
+
   get_values_from_stack(&value_reg, &index_reg, &ref_reg);
-  fprintf(out, "  sl w%d\n", index_reg);
+  fprintf(out, "  sl w%d, #1, w%d\n", index_reg, index_reg);
   fprintf(out, "  add w%d, w%d, w%d\n", index_reg, ref_reg, ref_reg);
   fprintf(out, "  mov w%d, [w%d]\n", value_reg, ref_reg);
 
@@ -945,7 +1122,7 @@ int index_reg;
 
   get_values_from_stack(&value_reg, &index_reg);
 
-  fprintf(out, "  sl w%d\n", index_reg);
+  fprintf(out, "  sl w%d, #1, w%d\n", index_reg, index_reg);
   fprintf(out, "  add %s, w%d\n", name.c_str(), index_reg);
   fprintf(out, "  mov.b w%d, [w%d]\n", value_reg, index_reg);
 
@@ -959,7 +1136,7 @@ int index_reg;
 
   get_values_from_stack(&value_reg, &index_reg);
 
-  fprintf(out, "  sl w%d\n", index_reg);
+  fprintf(out, "  sl w%d, #1, w%d\n", index_reg, index_reg);
   fprintf(out, "  add %s, w%d\n", name.c_str(), index_reg);
   fprintf(out, "  mov w%d, [w%d]\n", value_reg, index_reg);
 
@@ -1248,7 +1425,7 @@ int DSPIC::uart_isSendReady(int port)
 
   reg++;
 
-  return -1;
+  return 0;
 }
 
 // SPI functions
@@ -1466,7 +1643,196 @@ int DSPIC::spi_enable(int port)
   return 0;
 }
 
-// CPU functions
+// ADC functions.
+int DSPIC::adc_enable()
+{
+  fprintf(out,
+    "  ;; adc_enable()\n"
+    "  bclr ADCON1L, #ADON\n"
+    "  bclr ADCON1L, #ASAMP\n"
+    "  bclr ADCON1L, #FORM\n"
+    "  bclr ADCON1L, #SSRC\n"
+    "  bclr ADCON3H, #ADCS\n");
+
+  return -1;
+}
+
+int DSPIC::adc_disable()
+{
+  fprintf(out,
+    "  ;; adc_disable()\n"
+    "  bclr ADCON1L, #ADON\n");
+
+  return -1;
+}
+
+int DSPIC::adc_setChannel_I()
+{
+  fprintf(out,
+    "  ;; adc_setChannel_I()\n");
+
+  return -1;
+}
+
+int DSPIC::adc_setChannel_I(int channel)
+{
+  fprintf(out,
+    "  ;; adc_setChannel_I(%d)\n"
+    "  bset ANSELA, #ANSELA%d\n"
+    "  bset ADCHS0L, CH%dSEL\n",
+    channel,
+    channel,
+    channel);
+
+  return -1;
+}
+
+int DSPIC::adc_read()
+{
+  fprintf(out,
+    "  ;; adc_read()\n"
+    "  bset ADCON1L, #ADON\n"
+    "  bset ADCON1L, #ASAMP\n"
+    "adc_read_wait_sample_%d:\n"
+    "  btsc ADCON1L, #ASAMP\n"
+    "  bra adc_read_wait_sample_%d\n"
+    "  bclr ADCON1L, #ASAMP\n"
+    "adc_read_wait_conversion_%d:\n"
+    "  btsc ADCON1L, #ADON\n"
+    "  bra adc_read_wait_conversion_%d\n"
+    "  mov.w ADCBUF0, w%d\n",
+    label_count,
+    label_count,
+    label_count,
+    label_count,
+    REG_STACK(reg));
+
+  label_count++;
+  reg++;
+
+  return -1;
+}
+
+// Timer functions.
+int DSPIC::timer_setInterval_II()
+{
+  fprintf(out,
+    "  ;; timer_setInterval_II()\n"
+    "  sl.w w%d, #4, w%d\n"
+    "  mov.w w%d, T1CON\n"
+    "  mov.w w%d, PR1\n"
+    "  bset T1CON, #TON\n",
+    REG_STACK(reg - 1),
+    REG_STACK(reg - 1),
+    REG_STACK(reg - 1),
+    REG_STACK(reg - 2));
+
+  reg -= 2;
+
+  return 0;
+}
+
+int DSPIC::timer_setInterval_II(int cycles, int divider)
+{
+  int scale = 0;
+
+#if 0
+  switch (divider)
+  {
+    case 1:   scale = 0; break;
+    case 8:   scale = 1; break;
+    case 64:  scale = 2; break;
+    case 256: scale = 3; break;
+    default:  scale = 0; break;
+  }
+#endif
+
+  scale = divider;
+
+  fprintf(out,
+    "  ;; timer_setInterval_II(%d, %d)\n"
+    "  mov #0x%04x, w0\n"
+    "  mov wreg, T1CON\n"
+    "  mov #%d, w0\n"
+    "  mov wreg, PR1\n"
+    "  bset T1CON, #TON\n",
+    cycles,
+    divider,
+    scale << 4,
+    cycles);
+
+  return 0;
+}
+
+int DSPIC::timer_setListener_Z()
+{
+  fprintf(out,
+    "  ;; timer_setListener_Z()\n"
+    "  mov #1 << 4, IPC0\n"
+    "  bclr IFS0, #T1IF\n"
+    "  bset IEC0, #T1IE\n");
+
+  need_timer_interrupt = true;
+
+  return 0;
+}
+
+int DSPIC::timer_setListener_Z(int const_value)
+{
+  const char *instruction = const_value == 0 ? "bclr" : "bset";
+
+  fprintf(out,
+    "  ;; timer_setListener_Z(%d)\n"
+    "  bclr T1CON, #TON\n"
+    "  mov #1 << 4, w0\n"
+    "  mov w0, IPC0\n"
+    "  bclr IFS0, #T1IF\n"
+    "  %s IEC0, #T1IE\n"
+    "  bset T1CON, #TON\n",
+    const_value,
+    instruction);
+
+  need_timer_interrupt = true;
+
+  return 0;
+}
+
+int DSPIC::timer_getValue()
+{
+  fprintf(out,
+    "  ;; timer_getValue()\n"
+    "  mov.w TMR1, w%d\n",
+    REG_STACK(reg));
+
+  reg++;
+
+  return 0;
+}
+
+int DSPIC::timer_setValue_I()
+{
+  fprintf(out,
+    "  ;; timer_setValue_I()\n"
+    "  mov.w w%d, TMR1\n",
+    REG_STACK(reg-1));
+
+  reg--;
+
+  return 0;
+}
+
+int DSPIC::timer_setValue_I(int const_value)
+{
+  fprintf(out,
+    "  ;; timer_setValue_I(%d)\n"
+    "  mov.w #%d, TMR1\n",
+    const_value,
+    const_value);
+
+  return -1;
+}
+
+// CPU functions.
 int DSPIC::cpu_setClock16()
 {
   return -1;
@@ -1479,7 +1845,7 @@ int DSPIC::cpu_nop()
 }
 
 
-// Memory
+// Memory.
 int DSPIC::memory_read8_I()
 {
   if (stack != 0)
@@ -1566,7 +1932,7 @@ int DSPIC::memory_write16_IS()
   return 0;
 }
 
-// DSP (dsPIC stuff)
+// DSP (dsPIC stuff).
 int DSPIC::dsp_getA()
 {
   return dsp_store("sac", "A", 0);
@@ -2076,5 +2442,4 @@ int DSPIC::get_values_from_stack(int *value1, int *value2)
 
   return 0;
 }
-
 

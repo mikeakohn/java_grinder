@@ -5,7 +5,7 @@
  *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2023 by Michael Kohn
+ * Copyright 2014-2026 by Michael Kohn
  *
  */
 
@@ -13,21 +13,6 @@
 #define JAVA_GRINDER_GENERATOR_MSP430_H
 
 #include "generator/Generator.h"
-
-enum
-{
-  MSP430G2231,
-  MSP430G2452,
-  MSP430G2553,
-  MSP430F5529,
-};
-
-enum
-{
-  SPI_TYPE_NONE,
-  SPI_TYPE_USI,
-  SPI_TYPE_USCI,
-};
 
 class MSP430 : public Generator
 {
@@ -209,6 +194,14 @@ public:
   virtual int i2c_write_I();
   virtual int i2c_read();
 
+  enum
+  {
+    G2231,
+    G2452,
+    G2553,
+    F5529,
+  };
+
 protected:
   virtual int get_int_size() { return 2; }
   int set_periph(const char *instr, const char *periph);
@@ -247,6 +240,14 @@ protected:
   uint8_t spi_type;
   const char *include_file;
   uint16_t vector_timer;
+
+private:
+  enum
+  {
+    SPI_TYPE_NONE,
+    SPI_TYPE_USI,
+    SPI_TYPE_USCI,
+  };
 };
 
 #endif

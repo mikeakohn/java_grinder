@@ -195,22 +195,22 @@ static Generator *new_generator(const char *chip_type)
     else
   if (strcasecmp("msp430g2231", chip_type) == 0)
   {
-    generator = new MSP430(MSP430G2231);
+    generator = new MSP430(MSP430::G2231);
   }
     else
   if (strcasecmp("msp430g2452", chip_type) == 0)
   {
-    generator = new MSP430(MSP430G2452);
+    generator = new MSP430(MSP430::G2452);
   }
     else
   if (strcasecmp("msp430g2553", chip_type) == 0)
   {
-    generator = new MSP430(MSP430G2553);
+    generator = new MSP430(MSP430::G2553);
   }
     else
   if (strcasecmp("msp430f5529", chip_type) == 0)
   {
-    generator = new MSP430X(MSP430F5529);
+    generator = new MSP430X(MSP430::F5529);
   }
     else
   if (strcasecmp("msx", chip_type) == 0)

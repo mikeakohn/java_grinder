@@ -41,7 +41,7 @@ MSP430X::MSP430X(uint8_t chip_type) :
 
   switch(chip_type)
   {
-    case MSP430F5529:
+    case F5529:
       // There are 4 sections of flash, and 4 2k sections of RAM.
       // Not sure how to get to this RAM easily.
       flash_start = 0x4400;

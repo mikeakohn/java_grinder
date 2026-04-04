@@ -140,6 +140,22 @@ public:
   virtual int spi_disable(int port);
   virtual int spi_enable(int port);
 
+  // ADC functions.
+  virtual int adc_enable();
+  virtual int adc_disable();
+  virtual int adc_setChannel_I();
+  virtual int adc_setChannel_I(int channel);
+  virtual int adc_read();
+
+  // Timer functions.
+  virtual int timer_setInterval_II();
+  virtual int timer_setInterval_II(int cycles, int divider);
+  virtual int timer_setListener_Z();
+  virtual int timer_setListener_Z(int const_value);
+  virtual int timer_getValue();
+  virtual int timer_setValue_I();
+  virtual int timer_setValue_I(int const_value);
+
   // CPU methods.
   virtual int cpu_setClock16();
   virtual int cpu_nop();
@@ -217,8 +233,10 @@ private:
   int stack;          // count how many things we put on the stack
   uint8_t chip_type;
   bool is_main;
+  bool is_interrupt;
   bool need_stack_set;
   bool need_tables;
+  bool need_timer_interrupt;
   //int flash_start;
 };
 

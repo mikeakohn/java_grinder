@@ -5,7 +5,7 @@
  *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2023 by Michael Kohn
+ * Copyright 2014-2026 by Michael Kohn
  *
  */
 
@@ -55,38 +55,38 @@ static const char *cond_str[] = { "jz", "jnz", "jl", "jle", "jg", "jge" };
 //                                                    rev    rev
 
 MSP430::MSP430(uint8_t chip_type) :
-  reg(0),
-  reg_max(6),
-  stack(0),
-  label_count(0),
-  need_read_spi(false),
-  need_i2c(false),
-  need_mul_integers(false),
-  need_div_integers(false),
-  need_timer_interrupt(false),
-  is_main(false),
-  is_interrupt(false),
-  has_usci(false),
-  cpu_speed(1000000),
-  chip_type(chip_type),
-  spi_type(SPI_TYPE_NONE)
+  reg                  (0),
+  reg_max              (6),
+  stack                (0),
+  label_count          (0),
+  need_read_spi        (false),
+  need_i2c             (false),
+  need_mul_integers    (false),
+  need_div_integers    (false),
+  need_timer_interrupt (false),
+  is_main              (false),
+  is_interrupt         (false),
+  has_usci             (false),
+  cpu_speed            (1000000),
+  chip_type            (chip_type),
+  spi_type             (SPI_TYPE_NONE)
 {
-  ram_start = 0x0200;
+  ram_start    = 0x0200;
   vector_timer = 0xfff2;
   include_file = "msp430x2xx.inc";
 
   switch (chip_type)
   {
-    case MSP430G2231:
+    case G2231:
       flash_start = 0xf800;
       stack_start = 0x0280;
       spi_type = SPI_TYPE_USI;
       break;
-    case MSP430G2452:
+    case G2452:
       flash_start = 0xe000;
       stack_start = 0x0300;
       break;
-    case MSP430G2553:
+    case G2553:
       flash_start = 0xc000;
       stack_start = 0x0400;
       spi_type = SPI_TYPE_USCI;
@@ -192,16 +192,16 @@ void MSP430::method_start(
   is_main = name == "main";
   is_interrupt = name == "timerInterrupt";
 
-  // main() function goes here
+  // main() function goes here.
   fprintf(out, "%s:\n", name.c_str());
 
   if (is_interrupt)
   {
-    // If this is an interrupt, we have to push all possible registers that
-    // could be in use.  Right now we'll push all temporary registers and
-    // and max_stack registers.  This is bad because if the user calls a
+    // If this is an interrupt, need to push all possible registers that
+    // could be in use. Right now just push all temporary registers and
+    // and max_stack registers. This is bad because if the user calls a
     // another method in the interrupt that has a bigger max_stack, it
-    // could cause odd results.  Fix later maybe.
+    // could cause odd results. Fix later maybe.
     for (int n = 0; n < max_stack; n++)
     {
       fprintf(out, "  push r%d\n", REG_STACK(n));
@@ -1105,7 +1105,7 @@ int MSP430::return_void(int local_count)
 
   if (is_interrupt)
   {
-    // This should be the only place we return from an interrupt since
+    // This should be the only place to return from an interrupt since
     // interrupts should be void.
     fprintf(out, "  pop r12\n");
     fprintf(out, "  pop r15\n");
