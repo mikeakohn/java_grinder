@@ -1648,13 +1648,30 @@ int DSPIC::adc_enable()
 {
   fprintf(out,
     "  ;; adc_enable()\n"
-    "  bclr ADCON1L, #ADON\n"
-    "  bclr ADCON1L, #ASAMP\n"
-    "  bclr ADCON1L, #FORM\n"
-    "  bclr ADCON1L, #SSRC\n"
-    "  bclr ADCON3H, #ADCS\n");
+    "  mov #0, w0\n"
+    "  mov w0, ADCON1L\n"
+    "  mov #3 << 5, w0\n"
+    "  mov w0, ADCON1H\n"
+    "  mov #0x7f, w0\n"
+    "  mov w0, ADCON2L\n"
+    "  mov #0x3ff, w0\n"
+    "  mov w0, ADCON2H\n"
+    //"  mov #0x7f00, w0\n"
+    "  mov #0x4000, w0\n"
+    "  mov w0, ADCON3H\n"
+    "  mov #0x0400, w0\n"
+    "  mov w0, ADCON5H\n"
+    "  bset ADCON1L, #ADON\n"
+    "  bset ADCON5L, #SHRPWR\n"
+    "adc_enable_%d:\n"
+    "  btss ADCON5L, #SHRRDY\n"
+    "  bra adc_enable_%d\n",
+    label_count,
+    label_count);
 
-  return -1;
+  label_count++;
+
+  return 0;
 }
 
 int DSPIC::adc_disable()
@@ -1663,7 +1680,7 @@ int DSPIC::adc_disable()
     "  ;; adc_disable()\n"
     "  bclr ADCON1L, #ADON\n");
 
-  return -1;
+  return 0;
 }
 
 int DSPIC::adc_setChannel_I()
@@ -1679,30 +1696,33 @@ int DSPIC::adc_setChannel_I(int channel)
   fprintf(out,
     "  ;; adc_setChannel_I(%d)\n"
     "  bset ANSELA, #ANSELA%d\n"
-    "  bset ADCHS0L, CH%dSEL\n",
+    "  bset TRISA, #ANSELA%d\n"
+    "  mov #%d, w0\n"
+    "  mov w0, ADCON3L\n",
+    channel,
     channel,
     channel,
     channel);
 
-  return -1;
+  return 0;
 }
 
 int DSPIC::adc_read()
 {
   fprintf(out,
     "  ;; adc_read()\n"
-    "  bset ADCON1L, #ADON\n"
-    "  bset ADCON1L, #ASAMP\n"
-    "adc_read_wait_sample_%d:\n"
-    "  btsc ADCON1L, #ASAMP\n"
-    "  bra adc_read_wait_sample_%d\n"
-    "  bclr ADCON1L, #ASAMP\n"
+    //"  mov #0, w0\n"
+    //"  mov w0, ADCON3L\n"   // CHANNEL 0
+    "  bset ADCON3H,  #SHREN\n"
+    "  bset ADTRIG0L, #TRIGSRC01\n"
+    //"  bset ADTRIG0H, #TRGSRC01\n"
+    "  bset ADCON3L,  #CNVRTCH\n"
+    "  bset ADCON3L,  #SWCTRG\n"
     "adc_read_wait_conversion_%d:\n"
-    "  btsc ADCON1L, #ADON\n"
+    "  btss ADSTATL, #0\n"
     "  bra adc_read_wait_conversion_%d\n"
-    "  mov.w ADCBUF0, w%d\n",
-    label_count,
-    label_count,
+    "  mov ADCBUF0, w0\n"
+    "  mov w0, w%d\n",
     label_count,
     label_count,
     REG_STACK(reg));
@@ -1710,7 +1730,7 @@ int DSPIC::adc_read()
   label_count++;
   reg++;
 
-  return -1;
+  return 0;
 }
 
 // Timer functions.
