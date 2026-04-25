@@ -6,6 +6,8 @@
 *.jar
 *.bin
 *.lst
+*.hex
+*.z64
 tests/*.hex
 tests/*.lst
 samples/c64/c64_demo.prg

@@ -24,6 +24,7 @@ abstract public class IOPort
   public static void setPinsLow(int mask) { }
   public static void setPinAsOutput(int pin) { }
   public static void setPinAsInput(int pin) { }
+  public static void setPinAsHighZ(int pin) { }
   public static void setPinHigh(int pin) { }
   public static void setPinLow(int pin) { }
   public static boolean isPinInputHigh(int pin) { return false; }

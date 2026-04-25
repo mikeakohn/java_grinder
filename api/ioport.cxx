@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2022 by Michael Kohn
+ * Copyright 2014-2026 by Michael Kohn
  *
  */
 
@@ -41,6 +41,7 @@ int ioport(
   CHECK_FUNC(setPinsLow,_I)
   CHECK_FUNC(setPinAsOutput,_I)
   CHECK_FUNC(setPinAsInput,_I)
+  CHECK_FUNC(setPinAsHighZ,_I)
   CHECK_FUNC(setPinHigh,_I)
   CHECK_FUNC(setPinLow,_I)
   CHECK_FUNC(isPinInputHigh,_I)
@@ -60,16 +61,15 @@ int ioport(
 {
   CHECK_FUNC_CONST(setPinsAsInput,_I)
   CHECK_FUNC_CONST(setPinsAsOutput,_I)
-  CHECK_FUNC_CONST(setPinsValue,_I)
   CHECK_FUNC_CONST(setPinsHigh,_I)
   CHECK_FUNC_CONST(setPinsLow,_I)
   CHECK_FUNC_CONST(setPinAsOutput,_I)
   CHECK_FUNC_CONST(setPinAsInput,_I)
+  CHECK_FUNC_CONST(setPinAsHighZ,_I)
   CHECK_FUNC_CONST(setPinHigh,_I)
   CHECK_FUNC_CONST(setPinLow,_I)
   CHECK_FUNC_CONST(isPinInputHigh,_I)
   CHECK_FUNC_CONST(setPinsResistorEnable,_I)
   return -1;
 }
-
 

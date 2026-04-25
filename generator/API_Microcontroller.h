@@ -30,6 +30,8 @@ public:
   virtual int ioport_setPinAsOutput_I(int port, int const_val) { return -1; }
   virtual int ioport_setPinAsInput_I(int port) { return -1; }
   virtual int ioport_setPinAsInput_I(int port, int const_val) { return -1; }
+  virtual int ioport_setPinAsHighZ_I(int port) { return -1; }
+  virtual int ioport_setPinAsHighZ_I(int port, int const_val) { return -1; }
   virtual int ioport_setPinHigh_I(int port) { return -1; }
   virtual int ioport_setPinHigh_I(int port, int const_val) { return -1; }
   virtual int ioport_setPinLow_I(int port) { return -1; }

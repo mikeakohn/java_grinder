@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2026 by Michael Kohn
  *
  */
 
@@ -58,6 +58,8 @@ int cpu(JavaClass *java_class, Generator *generator, const char *method_name)
   CHECK_FUNC(setClockExternal2,)
   CHECK_FUNC(nop,)
   CHECK_FUNC(getCycleCount,)
+  CHECK_FUNC(interruptEnable,)
+  CHECK_FUNC(interruptDisable,)
 
   return -1;
 }

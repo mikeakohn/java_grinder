@@ -110,6 +110,8 @@ public:
   virtual int ioport_setPinAsOutput_I(int port, int const_val);
   virtual int ioport_setPinAsInput_I(int port);
   virtual int ioport_setPinAsInput_I(int port, int const_val);
+  virtual int ioport_setPinAsHighZ_I(int port);
+  virtual int ioport_setPinAsHighZ_I(int port, int const_val);
   virtual int ioport_setPinHigh_I(int port);
   virtual int ioport_setPinHigh_I(int port, int const_val);
   virtual int ioport_setPinLow_I(int port);
@@ -159,6 +161,8 @@ public:
   // CPU methods.
   virtual int cpu_setClock16();
   virtual int cpu_nop();
+  virtual int cpu_interruptEnable();
+  virtual int cpu_interruptDisable();
 
   // Memory
   virtual int memory_read8_I();

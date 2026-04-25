@@ -5,7 +5,7 @@
  *     Web: http://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2021 by Michael Kohn
+ * Copyright 2014-2026 by Michael Kohn
  *
  */
 
@@ -48,6 +48,8 @@ public:
   virtual int cpu_nop() { return -1; }
   virtual int cpu_asm_X(const char *code, int len) { return -1; }
   virtual int cpu_getCycleCount() { return -1; }
+  virtual int cpu_interruptEnable() { return -1; }
+  virtual int cpu_interruptDisable() { return -1; }
 };
 
 #endif

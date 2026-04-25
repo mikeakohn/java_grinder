@@ -13,6 +13,10 @@ curiosity: CuriosityUart.class CuriosityTimer.class CuriosityADC.class
 	naken_asm -l -I ../../../naken_asm/include -o curiosity_timer.hex curiosity_timer.asm
 	naken_asm -l -I ../../../naken_asm/include -o curiosity_adc.hex curiosity_adc.asm
 
+analog: AnalogCalculator.class
+	../../java_grinder AnalogCalculator.class analog_calculator.asm dspic33ck64mc105
+	naken_asm -l -I ../../../naken_asm/include -o analog_calculator.hex analog_calculator.asm
+
 %.class: %.java
 	javac -classpath ../../build/JavaGrinder.jar:. $*.java
 

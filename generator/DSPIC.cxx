@@ -1158,14 +1158,14 @@ void DSPIC::close()
 int DSPIC::ioport_setPinsAsInput_I(int port)
 {
   char periph[32];
-  sprintf(periph, "TRIS%c", port+'A');
+  sprintf(periph, "TRIS%c", port + 'A');
   return set_periph("ior", periph);
 }
 
 int DSPIC::ioport_setPinsAsInput_I(int port, int const_val)
 {
   char periph[32];
-  sprintf(periph, "TRIS%c", port+'A');
+  sprintf(periph, "TRIS%c", port + 'A');
 
   int pin = get_pin_number(const_val);
   if (pin == -1)
@@ -1183,14 +1183,14 @@ int DSPIC::ioport_setPinsAsInput_I(int port, int const_val)
 int DSPIC::ioport_setPinsAsOutput_I(int port)
 {
   char periph[32];
-  sprintf(periph, "TRIS%c", port+'A');
+  sprintf(periph, "TRIS%c", port + 'A');
   return set_periph("and", periph, true);
 }
 
 int DSPIC::ioport_setPinsAsOutput_I(int port, int const_val)
 {
   char periph[32];
-  sprintf(periph, "TRIS%c", port+'A');
+  sprintf(periph, "TRIS%c", port + 'A');
 
   int pin = get_pin_number(const_val);
   if (pin == -1)
@@ -1208,7 +1208,7 @@ int DSPIC::ioport_setPinsAsOutput_I(int port, int const_val)
 int DSPIC::ioport_setPinsValue_I(int port)
 {
   char periph[32];
-  sprintf(periph, "LAT%c", port+'A');
+  sprintf(periph, "LAT%c", port + 'A');
 
   if (stack == 0)
   {
@@ -1228,14 +1228,14 @@ int DSPIC::ioport_setPinsValue_I(int port)
 int DSPIC::ioport_setPinsHigh_I(int port)
 {
   char periph[32];
-  sprintf(periph, "LAT%c", port+'A');
+  sprintf(periph, "LAT%c", port + 'A');
   return set_periph("ior", periph);
 }
 
 int DSPIC::ioport_setPinsHigh_I(int port, int const_val)
 {
   char periph[32];
-  sprintf(periph, "LAT%c", port+'A');
+  sprintf(periph, "LAT%c", port + 'A');
 
   int pin = get_pin_number(const_val);
   if (pin == -1)
@@ -1253,14 +1253,14 @@ int DSPIC::ioport_setPinsHigh_I(int port, int const_val)
 int DSPIC::ioport_setPinsLow_I(int port)
 {
   char periph[32];
-  sprintf(periph, "LAT%c", port+'A');
+  sprintf(periph, "LAT%c", port + 'A');
   return set_periph("and", periph, true);
 }
 
 int DSPIC::ioport_setPinsLow_I(int port, int const_val)
 {
   char periph[32];
-  sprintf(periph, "LAT%c", port+'A');
+  sprintf(periph, "LAT%c", port + 'A');
 
   int pin = get_pin_number(const_val);
   if (pin == -1)
@@ -1283,7 +1283,7 @@ int DSPIC::ioport_setPinAsOutput_I(int port)
 int DSPIC::ioport_setPinAsOutput_I(int port, int const_val)
 {
   if (const_val < 0 || const_val > 15) { return -1; }
-  fprintf(out, "  bclr TRIS%c, #%d\n", port+'A', const_val);
+  fprintf(out, "  bclr TRIS%c, #%d\n", port + 'A', const_val);
   return 0;
 }
 
@@ -1295,7 +1295,20 @@ int DSPIC::ioport_setPinAsInput_I(int port)
 int DSPIC::ioport_setPinAsInput_I(int port, int const_val)
 {
   if (const_val < 0 || const_val > 15) { return -1; }
-  fprintf(out, "  bset TRIS%c, #%d\n", port+'A', const_val);
+  fprintf(out, "  bset TRIS%c, #%d\n", port + 'A', const_val);
+  return 0;
+}
+
+int DSPIC::ioport_setPinAsHighZ_I(int port)
+{
+  return -1;
+}
+
+int DSPIC::ioport_setPinAsHighZ_I(int port, int const_val)
+{
+  if (const_val < 0 || const_val > 15) { return -1; }
+  fprintf(out, "  bclr LAT%c, #%d\n", port + 'A', const_val);
+  fprintf(out, "  bset TRIS%c, #%d\n", port + 'A', const_val);
   return 0;
 }
 
@@ -1307,7 +1320,7 @@ int DSPIC::ioport_setPinHigh_I(int port)
 int DSPIC::ioport_setPinHigh_I(int port, int const_val)
 {
   if (const_val < 0 || const_val > 15) { return -1; }
-  fprintf(out, "  bset LAT%c, #%d\n", port+'A', const_val);
+  fprintf(out, "  bset LAT%c, #%d\n", port + 'A', const_val);
   return 0;
 }
 
@@ -1319,7 +1332,7 @@ int DSPIC::ioport_setPinLow_I(int port)
 int DSPIC::ioport_setPinLow_I(int port, int const_val)
 {
   if (const_val < 0 || const_val > 15) { return -1; }
-  fprintf(out, "  bclr LAT%c, #%d\n", port+'A', const_val);
+  fprintf(out, "  bclr LAT%c, #%d\n", port + 'A', const_val);
   return 0;
 }
 
@@ -1436,6 +1449,7 @@ int DSPIC::spi_init_II(int port)
   if (port != 0) { return -1; }
 
   fprintf(out, "  ;; Set up SPI\n");
+
   // This chip needs the RP pins set.
   if (chip_type == P33FJ06GS101A)
   {
@@ -1465,6 +1479,7 @@ int DSPIC::spi_init_II(int port)
   {
     fprintf(out, "  mov %s, w0\n", dst);
   }
+
   fprintf(out, "  and #2, w0\n");
   fprintf(out, "  sl w0, #5, w0\n");
   fprintf(out, "  and #1, %s\n", dst);
@@ -1477,6 +1492,7 @@ int DSPIC::spi_init_II(int port)
   pop_reg(dst);
   fprintf(out, "  ; primary_prescale=(div>>1)&0x3\n");
   fprintf(out, "  ; secondary_prescale=((div&1)&0x7)<<2)\n");
+
   if (strcmp(dst, "w0") == 0)
   {
     fprintf(out, "  mov w0, w13\n");
@@ -1486,6 +1502,7 @@ int DSPIC::spi_init_II(int port)
   {
     fprintf(out, "  mov %s, w0\n", dst);
   }
+
   fprintf(out, "  asr w0, #1, w0\n");
   fprintf(out, "  xor #3, w0\n");
   fprintf(out, "  and #1, %s\n", dst);
@@ -1693,15 +1710,33 @@ int DSPIC::adc_setChannel_I()
 
 int DSPIC::adc_setChannel_I(int channel)
 {
+  char port_name = 'A';
+  int port_num = 0;
+
+  // FIXME: This probably only works for dsPIC33CK64MC105.
+  switch (channel)
+  {
+    case 0:  port_name = 'A'; port_num = 0; break;
+    case 1:  port_name = 'B'; port_num = 2; break;
+    case 8:  port_name = 'B'; port_num = 3; break;
+    case 10: port_name = 'B'; port_num = 8; break;
+    case 11: port_name = 'B'; port_num = 9; break;
+    case 13: port_name = 'C'; port_num = 1; break;
+    case 14: port_name = 'C'; port_num = 2; break;
+    default: break;
+  }
+
   fprintf(out,
     "  ;; adc_setChannel_I(%d)\n"
-    "  bset ANSELA, #ANSELA%d\n"
-    "  bset TRISA, #ANSELA%d\n"
+    "  bset ANSEL%c, #ANSELA%d\n"
+    "  bset TRIS%c, #ANSELA%d\n"
     "  mov #%d, w0\n"
     "  mov w0, ADCON3L\n",
     channel,
-    channel,
-    channel,
+    port_name,
+    port_num,
+    port_name,
+    port_num,
     channel);
 
   return 0;
@@ -1864,6 +1899,23 @@ int DSPIC::cpu_nop()
   return 0;
 }
 
+int DSPIC::cpu_interruptEnable()
+{
+  fprintf(out,
+    "  ;; cpu_interruptEnable()\n"
+    "  bset INTCON1, #GIE\n");
+
+  return 0;
+}
+
+int DSPIC::cpu_interruptDisable()
+{
+  fprintf(out,
+    "  ;; cpu_interruptDisable()\n"
+    "  bclr INTCON1, #GIE\n");
+
+  return 0;
+}
 
 // Memory.
 int DSPIC::memory_read8_I()
