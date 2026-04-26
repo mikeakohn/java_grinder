@@ -71,6 +71,8 @@ public:
   virtual int adc_setChannel_I() { return -1; }
   virtual int adc_setChannel_I(int channel) { return -1; }
   virtual int adc_read() { return -1; }
+  virtual int adc_read_I() { return -1; }
+  virtual int adc_read_I(int channel) { return -1; }
 
   // Timer functions.
   virtual int timer_setInterval_II() { return -1; }

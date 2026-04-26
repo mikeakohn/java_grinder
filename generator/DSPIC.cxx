@@ -1673,7 +1673,6 @@ int DSPIC::adc_enable()
     "  mov w0, ADCON2L\n"
     "  mov #0x3ff, w0\n"
     "  mov w0, ADCON2H\n"
-    //"  mov #0x7f00, w0\n"
     "  mov #0x4000, w0\n"
     "  mov w0, ADCON3H\n"
     "  mov #0x0400, w0\n"
@@ -1721,6 +1720,7 @@ int DSPIC::adc_setChannel_I(int channel)
     case 8:  port_name = 'B'; port_num = 3; break;
     case 10: port_name = 'B'; port_num = 8; break;
     case 11: port_name = 'B'; port_num = 9; break;
+    case 12: port_name = 'C'; port_num = 0; break;
     case 13: port_name = 'C'; port_num = 1; break;
     case 14: port_name = 'C'; port_num = 2; break;
     default: break;
@@ -1728,8 +1728,10 @@ int DSPIC::adc_setChannel_I(int channel)
 
   fprintf(out,
     "  ;; adc_setChannel_I(%d)\n"
-    "  bset ANSEL%c, #ANSELA%d\n"
-    "  bset TRIS%c, #ANSELA%d\n"
+    //"  bclr ADCON1L, #ADON\n"
+    //"  bclr ADCON3H, #SHREN\n"
+    "  bset ANSEL%c, #%d\n"
+    "  bset TRIS%c, #%d\n"
     "  mov #%d, w0\n"
     "  mov w0, ADCON3L\n",
     channel,
@@ -1744,22 +1746,32 @@ int DSPIC::adc_setChannel_I(int channel)
 
 int DSPIC::adc_read()
 {
+  return -1;
+}
+
+int DSPIC::adc_read_I()
+{
+  return -1;
+}
+
+int DSPIC::adc_read_I(int channel)
+{
   fprintf(out,
-    "  ;; adc_read()\n"
-    //"  mov #0, w0\n"
-    //"  mov w0, ADCON3L\n"   // CHANNEL 0
+    "  ;; adc_read(%d)\n"
     "  bset ADCON3H,  #SHREN\n"
     "  bset ADTRIG0L, #TRIGSRC01\n"
-    //"  bset ADTRIG0H, #TRGSRC01\n"
     "  bset ADCON3L,  #CNVRTCH\n"
     "  bset ADCON3L,  #SWCTRG\n"
     "adc_read_wait_conversion_%d:\n"
-    "  btss ADSTATL, #0\n"
+    "  btss ADSTATL, #%d\n"
     "  bra adc_read_wait_conversion_%d\n"
-    "  mov ADCBUF0, w0\n"
+    "  mov ADCBUF%d, w0\n"
     "  mov w0, w%d\n",
+    channel,
     label_count,
+    channel,
     label_count,
+    channel,
     REG_STACK(reg));
 
   label_count++;

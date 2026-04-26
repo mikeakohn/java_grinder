@@ -2,10 +2,10 @@
  *  Java Grinder
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
- *     Web: http://www.mikekohn.net/
+ *     Web: https://www.mikekohn.net/
  * License: GPLv3
  *
- * Copyright 2014-2018 by Michael Kohn
+ * Copyright 2014-2026 by Michael Kohn
  *
  */
 
@@ -61,6 +61,7 @@ int adc(JavaClass *java_class, Generator *generator, const char *function)
   CHECK_FUNC(disable,)
   CHECK_FUNC(setChannel,_I)
   CHECK_FUNC(read,)
+  CHECK_FUNC(read,_I)
 
   return -1;
 }
@@ -68,6 +69,7 @@ int adc(JavaClass *java_class, Generator *generator, const char *function)
 int adc(JavaClass *java_class, Generator *generator, const char *function, int const_val)
 {
   CHECK_FUNC_CONST_1(setChannel,_I)
+  CHECK_FUNC_CONST_1(read,_I)
   return -1;
 }
 

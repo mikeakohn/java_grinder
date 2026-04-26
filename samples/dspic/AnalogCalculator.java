@@ -47,6 +47,7 @@ public class AnalogCalculator implements TimerListener
     // AN8:  RB3
     // AN10: RB8
     // AN11: RB9
+    // AN12: RC0
     // AN13: RC1
     // AN14: RC2
     ADC.setChannel(0);
@@ -99,7 +100,7 @@ public class AnalogCalculator implements TimerListener
         else
       if (data == '-')
       {
-        operator = '+';
+        operator = '-';
         sendChar(data);
       }
         else
@@ -110,20 +111,33 @@ public class AnalogCalculator implements TimerListener
         value1 = value1 & 0xfff;
         value1 |= 0x3000;
 
+        int value = 0;
+
         if (operator == '+')
         {
           ADC.setChannel(0);
+          //ADC.enable();
         }
           else
         if (operator == '-')
         {
-          ADC.setChannel(13);
+          ADC.setChannel(12);
+          //ADC.enable();
         }
 
         spiSendData(value0, 0);
         spiSendData(value1, 1);
 
-        int value = ADC.read();
+        if (operator == '+')
+        {
+          value = ADC.read(0);
+        }
+          else
+        if (operator == '-')
+        {
+          value = ADC.read(12);
+        }
+
         sendInt(value);
         sendPrompt();
 
@@ -238,7 +252,7 @@ public class AnalogCalculator implements TimerListener
 
     while (true)
     {
-      int value = ADC.read();
+      int value = ADC.read(14);
       if (value == 0) { break; }
     }
   }
@@ -263,7 +277,7 @@ public class AnalogCalculator implements TimerListener
     IOPort2.setPinAsOutput(3);
     IOPort2.setPinLow(3);
 
-    int value = ADC.read();
+    int value = ADC.read(14);
 
     IOPort2.setPinAsHighZ(3);
     writeMemory(value);

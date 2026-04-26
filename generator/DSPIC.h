@@ -148,6 +148,8 @@ public:
   virtual int adc_setChannel_I();
   virtual int adc_setChannel_I(int channel);
   virtual int adc_read();
+  virtual int adc_read_I();
+  virtual int adc_read_I(int channel);
 
   // Timer functions.
   virtual int timer_setInterval_II();
