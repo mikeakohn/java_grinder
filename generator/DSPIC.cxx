@@ -1915,7 +1915,7 @@ int DSPIC::cpu_interruptEnable()
 {
   fprintf(out,
     "  ;; cpu_interruptEnable()\n"
-    "  bset INTCON1, #GIE\n");
+    "  bset INTCON2, #GIE\n");
 
   return 0;
 }
@@ -1924,7 +1924,7 @@ int DSPIC::cpu_interruptDisable()
 {
   fprintf(out,
     "  ;; cpu_interruptDisable()\n"
-    "  bclr INTCON1, #GIE\n");
+    "  bclr INTCON2, #GIE\n");
 
   return 0;
 }

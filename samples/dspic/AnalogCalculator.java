@@ -1,5 +1,6 @@
 
 import net.mikekohn.java_grinder.ADC;
+import net.mikekohn.java_grinder.CPU;
 import net.mikekohn.java_grinder.IOPort0;
 import net.mikekohn.java_grinder.IOPort1;
 import net.mikekohn.java_grinder.IOPort2;
@@ -23,14 +24,17 @@ public class AnalogCalculator implements TimerListener
     // RA1:  SCK
     // RD1:  SDI
     // RD10: LED
-    // RC3:  Capactor GND/HighZ
+    // RD8:  Analog memory cell High-Z MOSFET control.
     IOPort3.setPinAsOutput(13);
     IOPort1.setPinAsOutput(0);
     IOPort1.setPinAsOutput(1);
     IOPort0.setPinAsOutput(1);
     IOPort3.setPinAsOutput(1);
     IOPort3.setPinAsOutput(10);
-    IOPort2.setPinAsHighZ(3);
+    IOPort3.setPinAsOutput(8);
+
+    // Disconnect memory cell.
+    IOPort3.setPinLow(8);
 
     // Init software SPI.
     IOPort3.setPinHigh(13);
@@ -42,27 +46,28 @@ public class AnalogCalculator implements TimerListener
     // Init UART.
     UART1.init(UART.BAUD_9600);
 
-    // AN0:  RA0
+    // AN0:  RA0  (sum)
     // AN1:  RB2
     // AN8:  RB3
     // AN10: RB8
     // AN11: RB9
-    // AN12: RC0
-    // AN13: RC1
+    // AN12: RC0  (sub)
+    // AN13: RC1  (memory)
     // AN14: RC2
     ADC.setChannel(0);
     ADC.enable();
 
     // Setup timer.
-    //Timer.setInterval(60000, 3);
-    //Timer.setListener(true);
+    Timer.setInterval(200, 3);
+    Timer.setListener(true);
 
     sendPrompt();
 
-    int i = 0;
+    //int i = 0;
 
     while (true)
     {
+/*
       if ((i & 1) == 0)
       {
         IOPort3.setPinHigh(10);
@@ -71,6 +76,7 @@ public class AnalogCalculator implements TimerListener
       {
         IOPort3.setPinLow(10);
       }
+*/
 
       while (!UART1.isDataAvailable());
 
@@ -104,6 +110,30 @@ public class AnalogCalculator implements TimerListener
         sendChar(data);
       }
         else
+      if (data == '.')
+      {
+        sendChar(data);
+        CPU.interruptDisable();
+        //clearMemory();
+        writeMemory(value0);
+        CPU.interruptEnable();
+        sendPrompt();
+        value0 = 0;
+        value1 = 0;
+      }
+        else
+      if (data == '=')
+      {
+        sendChar(data);
+        CPU.interruptDisable();
+        int value = readMemory();
+        CPU.interruptEnable();
+        sendInt(value);
+        sendPrompt();
+        value0 = 0;
+        value1 = 0;
+      }
+        else
       if (data == '\r')
       {
         value0 = value0 & 0xfff;
@@ -116,13 +146,11 @@ public class AnalogCalculator implements TimerListener
         if (operator == '+')
         {
           ADC.setChannel(0);
-          //ADC.enable();
         }
           else
         if (operator == '-')
         {
           ADC.setChannel(12);
-          //ADC.enable();
         }
 
         spiSendData(value0, 0);
@@ -150,7 +178,7 @@ public class AnalogCalculator implements TimerListener
       {
       }
 
-      i++;
+      //i++;
     }
   }
 
@@ -248,39 +276,45 @@ public class AnalogCalculator implements TimerListener
 
   static public void clearMemory()
   {
-    ADC.setChannel(14);
+    ADC.setChannel(13);
+    IOPort3.setPinHigh(8);
 
     while (true)
     {
-      int value = ADC.read(14);
+      int value = ADC.read(13);
       if (value == 0) { break; }
     }
+
+    IOPort3.setPinLow(8);
   }
 
   static public void writeMemory(int value)
   {
     spiSendData(0x3000 | value, 2);
-    IOPort2.setPinAsOutput(3);
-    IOPort2.setPinLow(3);
+    //IOPort2.setPinAsOutput(3);
+    //IOPort2.setPinLow(3);
+    IOPort3.setPinHigh(8);
 
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 10000; i++)
     {
     }
 
-    IOPort2.setPinAsHighZ(3);
+    //IOPort2.setPinAsHighZ(3);
+    IOPort3.setPinLow(8);
     spiSendData(0x0000, 2);
   }
 
   static public int readMemory()
   {
-    ADC.setChannel(14);
-    IOPort2.setPinAsOutput(3);
-    IOPort2.setPinLow(3);
+    ADC.setChannel(13);
 
-    int value = ADC.read(14);
+    IOPort3.setPinHigh(8);
+    int value = ADC.read(13);
+    IOPort3.setPinLow(8);
 
-    IOPort2.setPinAsHighZ(3);
     writeMemory(value);
+
+value = 100;
 
     return value;
   }
@@ -289,6 +323,9 @@ public class AnalogCalculator implements TimerListener
 
   public void timerInterrupt()
   {
+    // Refresh memory by doing a read operation.
+    readMemory();
+
     // Blink LED in timer interrupt.
     if ((interrupt_count & 1) == 0)
     {

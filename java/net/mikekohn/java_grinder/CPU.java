@@ -3,9 +3,9 @@
  *  Author: Michael Kohn
  *   Email: mike@mikekohn.net
  *     Web: https://www.mikekohn.net/
- * License: GPL
+ * License: GPLv3
  *
- * Copyright 2014-2022 by Michael Kohn
+ * Copyright 2014-2026 by Michael Kohn
  *
  */
 
@@ -19,34 +19,40 @@ public class CPU
   {
   }
 
-  /** Set clock speed to 1MHz (internal crystal? DCO?) */
+  /** Set clock speed to 1MHz (internal crystal? DCO?). */
   public static void setClock1() { }
 
-  /** Set clock speed to 2MHz (internal crystal? DCO?) */
+  /** Set clock speed to 2MHz (internal crystal? DCO?). */
   public static void setClock2() { }
 
-  /** Set clock speed to 4MHz (internal crystal? DCO?) */
+  /** Set clock speed to 4MHz (internal crystal? DCO?). */
   public static void setClock4() { }
 
-  /** Set clock speed to 8MHz (internal crystal? DCO?) */
+  /** Set clock speed to 8MHz (internal crystal? DCO?). */
   public static void setClock8() { }
 
-  /** Set clock speed to 16MHz (internal crystal? DCO?) */
+  /** Set clock speed to 16MHz (internal crystal? DCO?). */
   public static void setClock16() { }
 
-  /** Set clock speed to 25MHz (internal crystal? DCO?) */
+  /** Set clock speed to 25MHz (internal crystal? DCO?). */
   public static void setClock25() { }
 
-  /** Set clock speed to XT2 (external crystal) */
+  /** Set clock speed to XT2 (external crystal). */
   public static void setClockExternal2() { }
 
   /** Insert a CPU level NOP */
   public static void nop() { }
 
-  /** Insert inline assembly */
+  /** Insert inline assembly. */
   public static void asm(String code) { }
 
-  /** Get cycle counter from CPU (if available) { } */
+  /** Get cycle counter from CPU (if available). */
   public static int getCycleCount() { return 0; }
+
+  /** Enable interrupts. */
+  public static void interruptEnable() { }
+
+  /** Disable interrupts. */
+  public static void interruptDisable() { }
 }
 
